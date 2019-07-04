@@ -71,7 +71,6 @@ import com.revolsys.swing.map.component.GeometryFactoryField;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.preferences.PreferenceFields;
 import com.revolsys.swing.tree.TreeNodes;
@@ -105,8 +104,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   static {
     final MenuFactory menu = MenuFactory.getMenu(AbstractLayer.class);
 
-    Menus.addMenuItem(menu, "zoom", "Zoom to Layer", "magnifier",
-      AbstractLayer::isZoomToLayerEnabled, AbstractLayer::zoomToLayer, true);
+    menu.addMenuItem("zoom", -1, "Zoom to Layer", "magnifier", AbstractLayer::isZoomToLayerEnabled,
+      AbstractLayer::zoomToLayer, true);
 
     final Predicate<AbstractLayer> hasGeometry = AbstractLayer::isHasGeometry;
     menu.addComponentFactory("scale", new TreeItemScaleMenu<>(true, hasGeometry,
@@ -116,13 +115,13 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
     final Predicate<AbstractLayer> exists = AbstractLayer::isExists;
 
-    Menus.<AbstractLayer> addMenuItem(menu, "refresh", "Refresh", "arrow_refresh",
+    menu.<AbstractLayer> addMenuItem("refresh", "Refresh", "arrow_refresh",
       AbstractLayer::refreshAll, true);
 
-    Menus.<AbstractLayer> addMenuItem(menu, "layer", "Delete", "delete",
-      AbstractLayer::deleteWithConfirm, false);
+    menu.<AbstractLayer> addMenuItem("layer", "Delete", "delete", AbstractLayer::deleteWithConfirm,
+      false);
 
-    Menus.<AbstractLayer> addMenuItem(menu, "layer", "Layer Properties", "information", exists,
+    menu.addMenuItem("layer", -1, "Layer Properties", "information", exists,
       AbstractLayer::showProperties, false);
 
     PreferenceFields.addField("com.revolsys.gis", PREFERENCE_NEW_LAYERS_VISIBLE);

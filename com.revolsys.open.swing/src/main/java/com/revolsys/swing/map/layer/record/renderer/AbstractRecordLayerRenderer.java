@@ -40,7 +40,6 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.RecordDefinitionSqlFilter;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -56,11 +55,11 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   static {
     final MenuFactory menu = MenuFactory.getMenu(AbstractRecordLayerRenderer.class);
 
-    Menus.addMenuItem(menu, "layer", "View/Edit Style", "palette",
+    menu.addMenuItem("layer", -1, "View/Edit Style", "palette",
       ((Predicate<AbstractRecordLayerRenderer>)AbstractRecordLayerRenderer::isEditing).negate(),
       AbstractRecordLayerRenderer::showProperties, false);
 
-    Menus.addMenuItem(menu, "layer", "Delete", "delete", AbstractRecordLayerRenderer::isHasParent,
+    menu.addMenuItem("layer", -1, "Delete", "delete", AbstractRecordLayerRenderer::isHasParent,
       AbstractRecordLayerRenderer::delete, true);
 
     menu.addComponentFactory("scale", new TreeItemScaleMenu<>(true, null,
@@ -68,13 +67,13 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     menu.addComponentFactory("scale", new TreeItemScaleMenu<>(false, null,
       AbstractRecordLayerRenderer::getMaximumScale, AbstractRecordLayerRenderer::setMaximumScale));
 
-    Menus.addMenuItem(menu, "wrap", "Wrap With Multiple Style", "style_multiple_wrap",
+    menu.addMenuItem("wrap", "Wrap With Multiple Style", "style_multiple_wrap",
       AbstractRecordLayerRenderer::wrapWithMultipleStyle, false);
 
-    Menus.addMenuItem(menu, "wrap", "Wrap With Filter Style", "style_filter_wrap",
+    menu.addMenuItem("wrap", "Wrap With Filter Style", "style_filter_wrap",
       AbstractRecordLayerRenderer::wrapWithFilterStyle, false);
 
-    Menus.addMenuItem(menu, "wrap", "Wrap With Scale Style", "style_scale_wrap",
+    menu.addMenuItem("wrap", "Wrap With Scale Style", "style_scale_wrap",
       AbstractRecordLayerRenderer::wrapWithScaleStyle, false);
   }
 

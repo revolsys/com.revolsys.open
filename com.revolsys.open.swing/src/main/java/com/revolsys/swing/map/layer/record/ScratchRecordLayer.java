@@ -10,7 +10,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 
 public class ScratchRecordLayer extends ListRecordLayer {
 
@@ -18,8 +17,9 @@ public class ScratchRecordLayer extends ListRecordLayer {
     MenuFactory.addMenuInitializer(ScratchRecordLayer.class, menu -> {
       menu.deleteMenuItem("edit", "Save Changes");
       menu.deleteMenuItem("edit", "Cancel Changes");
+      final MenuFactory menu1 = menu;
 
-      Menus.addMenuItem(menu, "edit", "Delete All Records", "table:delete",
+      menu1.addMenuItem("edit", -1, "Delete All Records", "table:delete",
         ScratchRecordLayer::isCanDeleteRecords, layer -> {
           if (layer.confirmDeleteRecords(layer.records)) {
             layer.clearRecords();

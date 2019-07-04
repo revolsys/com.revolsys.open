@@ -45,11 +45,11 @@ public class LayerRecordMenu extends MenuFactory {
   public static <V extends Record> RunnableAction addMenuItem(final MenuFactory menu,
     final String groupName, final int index, final CharSequence name, final String toolTip,
     final String iconName, final Predicate<V> enabledFilter, final Consumer<V> consumer) {
-    final EnableCheck enableCheck = enableCheck(enabledFilter);
+    final EnableCheck enableCheck = enableCheckLayerRecord(enabledFilter);
     return addMenuItem(menu, groupName, index, name, toolTip, iconName, enableCheck, consumer);
   }
 
-  public static <V extends Record> EnableCheck enableCheck(final Predicate<V> filter) {
+  public static <V extends Record> EnableCheck enableCheckLayerRecord(final Predicate<V> filter) {
     if (filter == null) {
       return null;
     } else {

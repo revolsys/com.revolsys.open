@@ -32,14 +32,14 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerErrors;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
-import com.revolsys.swing.menu.Menus;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.TablePanel;
 
 public abstract class AbstractUpdateField extends JDialog {
   private static final long serialVersionUID = 1L;
 
   protected static EnableCheck newEnableCheck() {
-    final EnableCheck enableCheck = Menus.enableCheck((final RecordLayerTable table) -> {
+    final EnableCheck enableCheck = MenuFactory.enableCheck((final RecordLayerTable table) -> {
       final int columnIndex = TablePanel.getEventColumn();
       final RecordLayerTableModel tableModel = table.getModel();
       if (tableModel.isFieldEditable(columnIndex)) {

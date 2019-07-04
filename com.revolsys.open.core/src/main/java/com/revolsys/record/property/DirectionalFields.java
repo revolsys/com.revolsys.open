@@ -118,6 +118,18 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     property.reverseFieldValuesAndGeometry(record);
   }
 
+  public static void reverseFieldValues(final Record record) {
+    final DirectionalFields property = getProperty(record);
+    final Map<String, Object> map = record;
+    property.reverseFieldValues(map);
+  }
+
+  public static void reverseGeometry(final Record record) {
+    final DirectionalFields property = getProperty(record);
+    final Map<String, Object> map = record;
+    property.reverseGeometry(map);
+  }
+
   private final Map<String, Map<Object, Object>> directionalFieldValues = new HashMap<>();
 
   private final List<List<String>> endAndSideFieldNamePairs = new ArrayList<>();

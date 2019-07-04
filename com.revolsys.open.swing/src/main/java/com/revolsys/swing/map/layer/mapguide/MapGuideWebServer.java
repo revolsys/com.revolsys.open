@@ -8,7 +8,6 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 
 public class MapGuideWebServer {
   private static final String J_TYPE = "mapGuideWebServerRecordLayer";
@@ -36,8 +35,7 @@ public class MapGuideWebServer {
     });
 
     MenuFactory.addMenuInitializer(FeatureLayer.class, (menu) -> {
-      Menus.addMenuItem(menu, "default", "Add Layer", "map:add", MapGuideWebServer::actionAddLayer,
-        false);
+      menu.addMenuItem("default", "Add Layer", "map:add", MapGuideWebServer::actionAddLayer, false);
     });
   }
 }

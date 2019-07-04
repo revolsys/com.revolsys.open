@@ -8,7 +8,6 @@ import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.Property;
 
 public interface WebMercatorTileCache {
@@ -42,7 +41,7 @@ public interface WebMercatorTileCache {
       });
 
     MenuFactory.addMenuInitializer(BaseMapLayerGroup.class, (menu) -> {
-      Menus.addMenuItem(menu, "group", "Add Web Mercator Tile Cache Layer",
+      menu.addMenuItem("group", "Add Web Mercator Tile Cache Layer",
         Icons.getIconWithBadge("map", "add"), WebMercatorTileCache::actionAddLayer, false);
     });
   }

@@ -21,7 +21,6 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.Property;
 
 public class FileRecordLayer extends ListRecordLayer {
@@ -29,7 +28,7 @@ public class FileRecordLayer extends ListRecordLayer {
   static {
     final Class<AbstractRecordLayer> clazz = AbstractRecordLayer.class;
     final MenuFactory menu = MenuFactory.getMenu(clazz);
-    Menus.<FileRecordLayer> addMenuItem(menu, "refresh", "Reload from File",
+    menu.<FileRecordLayer> addMenuItem("refresh", "Reload from File",
       Icons.getIconWithBadge("page", "refresh"), FileRecordLayer::revertDo, true);
   }
 

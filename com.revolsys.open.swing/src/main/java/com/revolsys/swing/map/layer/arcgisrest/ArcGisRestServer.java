@@ -13,7 +13,6 @@ import com.revolsys.swing.map.layer.BaseMapLayer;
 import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.tree.node.WebServiceConnectionTrees;
 import com.revolsys.util.Property;
 
@@ -76,13 +75,13 @@ public interface ArcGisRestServer {
 
   public static void initMenus() {
     MenuFactory.addMenuInitializer(FeatureLayer.class, (menu) -> {
-      Menus.addMenuItem(menu, "default", "Add Layer", "map:add",
-        ArcGisRestServer::actionAddRecordLayer, false);
+      menu.addMenuItem("default", "Add Layer", "map:add", ArcGisRestServer::actionAddRecordLayer,
+        false);
     });
 
     MenuFactory.addMenuInitializer(BaseMapLayerGroup.class, (menu) -> {
-      Menus.addMenuItem(menu, "group", "Add ArcGIS Tile Cache",
-        Icons.getIconWithBadge("map", "add"), ArcGisRestServer::actionAddTileCacheLayer, false);
+      menu.addMenuItem("group", "Add ArcGIS Tile Cache", Icons.getIconWithBadge("map", "add"),
+        ArcGisRestServer::actionAddTileCacheLayer, false);
     });
 
     MenuFactory.addMenuInitializer(TileInfo.class, (menu) -> {

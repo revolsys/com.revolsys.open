@@ -25,7 +25,6 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
@@ -41,8 +40,8 @@ public class ArcGisRestServerTileCacheLayer
 
       menu.addGroup(3, "server");
 
-      Menus.<ArcGisRestServerTileCacheLayer> addCheckboxMenuItem(menu, "server",
-        "Project image on Server", "", ArcGisRestServerTileCacheLayer::isExportTilesAllowed,
+      menu.<ArcGisRestServerTileCacheLayer> addCheckboxMenuItem("server", "Project image on Server",
+        "", ArcGisRestServerTileCacheLayer::isExportTilesAllowed,
         ArcGisRestServerTileCacheLayer::toggleUseServerExport,
         ArcGisRestServerTileCacheLayer::isUseServerExport, true);
 

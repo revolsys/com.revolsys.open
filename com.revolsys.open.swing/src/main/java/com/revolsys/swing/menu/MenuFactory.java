@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -17,6 +18,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.beans.ClassRegistry;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.swing.Icons;
@@ -25,6 +28,7 @@ import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.swing.field.Field;
+import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.util.Property;
 
 public class MenuFactory extends BaseObjectWithProperties implements ComponentFactory<JMenuItem> {
@@ -51,6 +55,26 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   public static void addToComponent(final JComponent component, final MenuFactory menuFactory) {
     component.putClientProperty(KEY_POPUP_MENU, menuFactory);
     ShowMenuMouseListener.addListener(component, menuFactory::newJPopupMenu, true);
+  }
+
+  public static <V> EnableCheck enableCheck(final Predicate<V> filter) {
+    if (filter == null) {
+      return null;
+    } else {
+      return () -> {
+        final V node = getMenuSource();
+        if (node == null) {
+          return false;
+        } else {
+          try {
+            return filter.test(node);
+          } catch (final Throwable e) {
+            Logs.debug(TreeNodes.class, "Exception processing enable check", e);
+            return false;
+          }
+        }
+      };
+    }
   }
 
   public static MenuFactory findMenu(final Class<?> clazz) {
@@ -115,6 +139,23 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
       }
       return menuFactory;
     }
+  }
+
+  public static <V> MenuSourceAction newAction(final CharSequence name, final Icon icon,
+    final Predicate<V> enabledFilter, final Consumer<V> consumer, final boolean runInBackground) {
+    final EnableCheck enableCheck = enableCheck(enabledFilter);
+    final MenuSourceAction action = new MenuSourceAction(name, null, icon, consumer,
+      runInBackground);
+    action.setEnableCheck(enableCheck);
+    return action;
+  }
+
+  public static <V> MenuSourceAction newAction(final CharSequence name, final String iconName,
+    final Predicate<V> enabledFilter, final Consumer<V> consumer, final boolean runInBackground) {
+    final Icon icon = Icons.getIcon(iconName);
+    final MenuSourceAction action = newAction(name, icon, enabledFilter, consumer, runInBackground);
+    action.setIconName(iconName);
+    return action;
   }
 
   public static RunnableAction newMenuItem(final CharSequence name, final String toolTip,
@@ -188,6 +229,16 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
   }
 
+  public <V> MenuSourceAction addCheckboxMenuItem(final String groupName, final CharSequence name,
+    final String iconName, final Predicate<V> enableCheck, final Consumer<V> consumer,
+    final Predicate<V> itemChecked, final boolean runInBackground) {
+    final MenuSourceAction action = MenuFactory.newAction(name, iconName, enableCheck, consumer,
+      runInBackground);
+    final EnableCheck itemCheckedEnableCheck = enableCheck(itemChecked);
+    addCheckboxMenuItem(groupName, action, itemCheckedEnableCheck);
+    return action;
+  }
+
   public void addComponent(final Component component) {
     addComponent("default", component);
   }
@@ -230,6 +281,18 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return menuItem;
   }
 
+  public <V> MenuSourceAction addMenuItem(final MenuFactory menu, final String groupName,
+    final CharSequence name, final String iconName, final Predicate<V> enabledFilter,
+    final Consumer<V> consumer, final boolean runInBackground) {
+    return addMenuItem(groupName, -1, name, iconName, enabledFilter, consumer, runInBackground);
+  }
+
+  public <V> MenuSourceAction addMenuItem(final MenuFactory menu, final String groupName,
+    final int index, final CharSequence name, final String iconName, final Consumer<V> consumer,
+    final boolean runInBackground) {
+    return addMenuItem(groupName, index, name, iconName, null, consumer, runInBackground);
+  }
+
   public JMenuItem addMenuItem(final String title) {
     final JMenuItem menuItem = new JMenuItem(title);
     addComponent("default", menuItem);
@@ -241,9 +304,37 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     addComponentFactory(groupName, factory);
   }
 
+  public <V> MenuSourceAction addMenuItem(final String groupName, final CharSequence name,
+    final Icon icon, final Consumer<V> consumer, final boolean runInBackground) {
+    return addMenuItem(groupName, -1, name, icon, null, consumer, runInBackground);
+  }
+
+  public <V> MenuSourceAction addMenuItem(final String groupName, final CharSequence name,
+    final String iconName, final Consumer<V> consumer, final boolean runInBackground) {
+    return addMenuItem(groupName, -1, name, iconName, null, consumer, runInBackground);
+  }
+
   public void addMenuItem(final String groupName, final int index, final AbstractAction action) {
     final ActionMainMenuItemFactory factory = new ActionMainMenuItemFactory(action);
     addComponentFactory(groupName, index, factory);
+  }
+
+  public <V> MenuSourceAction addMenuItem(final String groupName, final int index,
+    final CharSequence name, final Icon icon, final Predicate<V> enabledFilter,
+    final Consumer<V> consumer, final boolean runInBackground) {
+    final MenuSourceAction action = MenuFactory.newAction(name, icon, enabledFilter, consumer,
+      runInBackground);
+    addMenuItem(groupName, index, action);
+    return action;
+  }
+
+  public <V> MenuSourceAction addMenuItem(final String groupName, final int index,
+    final CharSequence name, final String iconName, final Predicate<V> enableCheck,
+    final Consumer<V> consumer, final boolean runInBackground) {
+    final MenuSourceAction action = MenuFactory.newAction(name, iconName, enableCheck, consumer,
+      runInBackground);
+    addMenuItem(groupName, index, action);
+    return action;
   }
 
   public void addMenuItem(final String groupName, final int index, final String title,
@@ -351,6 +442,12 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return this.enableCheck;
   }
 
+  /*
+   * public void setGroupEnabled(final String groupName, final boolean enabled)
+   * { final List<Component> components = getGroup(groupName); for (final
+   * Component component : components) { component.setEnabled(enabled); } }
+   */
+
   public MenuFactory getFactory(final String name) {
     for (final List<ComponentFactory<?>> group : this.groups.values()) {
       for (final ComponentFactory<?> factory : group) {
@@ -381,12 +478,6 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   public List<String> getGroupNames() {
     return this.groupNames;
   }
-
-  /*
-   * public void setGroupEnabled(final String groupName, final boolean enabled)
-   * { final List<Component> components = getGroup(groupName); for (final
-   * Component component : components) { component.setEnabled(enabled); } }
-   */
 
   public Map<String, List<ComponentFactory<?>>> getGroups() {
     return this.groups;
@@ -448,7 +539,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     boolean first = true;
     for (final String groupName : this.groupNames) {
       final List<ComponentFactory<?>> factories = this.groups.get(groupName);
-      if (!factories.isEmpty()) {
+      if (factories != null && !factories.isEmpty()) {
         if (first) {
           first = false;
         } else {

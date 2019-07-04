@@ -35,7 +35,6 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
@@ -50,19 +49,20 @@ public class GeoreferencedImageLayer extends AbstractLayer {
         .negate();
       final Predicate<GeoreferencedImageLayer> editable = GeoreferencedImageLayer::isEditable;
 
-      Menus.<GeoreferencedImageLayer> addMenuItem(menu, "table", "View Tie-Points", "table_go",
+      menu.<GeoreferencedImageLayer> addMenuItem("table", "View Tie-Points", "table_go",
         GeoreferencedImageLayer::showTableView, false);
 
-      Menus.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit", "Editable", "pencil",
-        notReadOnly, GeoreferencedImageLayer::toggleEditable, editable, true);
+      menu.<GeoreferencedImageLayer> addCheckboxMenuItem("edit", "Editable", "pencil", notReadOnly,
+        GeoreferencedImageLayer::toggleEditable, editable, true);
 
-      Menus.<GeoreferencedImageLayer> addCheckboxMenuItem(menu, "edit", "Show Original Image",
+      menu.<GeoreferencedImageLayer> addCheckboxMenuItem("edit", "Show Original Image",
         (String)null, editable.and(GeoreferencedImageLayer::isHasTransform),
         GeoreferencedImageLayer::toggleShowOriginalImage,
         GeoreferencedImageLayer::isShowOriginalImage, true);
+      final MenuFactory menu1 = menu;
 
-      Menus.<GeoreferencedImageLayer> addMenuItem(menu, "edit", "Fit to Screen", "arrow_out",
-        editable, GeoreferencedImageLayer::fitToViewport, true);
+      menu1.addMenuItem("edit", -1, "Fit to Screen", "arrow_out", editable,
+        GeoreferencedImageLayer::fitToViewport, true);
 
       menu.deleteMenuItem("refresh", "Refresh");
     });

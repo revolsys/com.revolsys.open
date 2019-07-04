@@ -123,7 +123,6 @@ import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
 import com.revolsys.swing.map.overlay.CloseLocation;
 import com.revolsys.swing.map.overlay.EditRecordGeometryOverlay;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.menu.WrappedMenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.preferences.PreferenceFields;
@@ -172,51 +171,52 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
     final Predicate<AbstractRecordLayer> exists = AbstractRecordLayer::isExists;
 
-    Menus.addMenuItem(menu, "table", "View Records", "table_go", exists,
+    menu.addMenuItem("table", -1, "View Records", "table_go", exists,
       AbstractRecordLayer::showRecordsTable, false);
 
     final Predicate<AbstractRecordLayer> hasSelectedRecords = AbstractRecordLayer::isHasSelectedRecords;
     final Predicate<AbstractRecordLayer> hasSelectedRecordsWithGeometry = AbstractRecordLayer::isHasSelectedRecordsWithGeometry;
 
-    Menus.addMenuItem(menu, "zoom", "Zoom to Selected", "magnifier_zoom_selected",
+    menu.addMenuItem("zoom", -1, "Zoom to Selected", "magnifier_zoom_selected",
       hasSelectedRecordsWithGeometry, AbstractRecordLayer::zoomToSelected, true);
 
-    Menus.addMenuItem(menu, "zoom", "Pan to Selected", "pan_selected",
-      hasSelectedRecordsWithGeometry, AbstractRecordLayer::panToSelected, true);
+    menu.addMenuItem("zoom", -1, "Pan to Selected", "pan_selected", hasSelectedRecordsWithGeometry,
+      AbstractRecordLayer::panToSelected, true);
 
     final Predicate<AbstractRecordLayer> notReadOnly = ((Predicate<AbstractRecordLayer>)AbstractRecordLayer::isReadOnly)
       .negate();
     final Predicate<AbstractRecordLayer> canAdd = AbstractRecordLayer::isCanAddRecords;
 
-    Menus.addCheckboxMenuItem(menu, "edit", "Editable", "pencil", notReadOnly,
+    menu.addCheckboxMenuItem("edit", "Editable", "pencil", notReadOnly,
       AbstractRecordLayer::toggleEditable, AbstractRecordLayer::isEditable, false);
 
-    Menus.addMenuItem(menu, "edit", "Save Changes", "table_save", AbstractLayer::isHasChanges,
+    menu.addMenuItem("edit", -1, "Save Changes", "table_save", AbstractLayer::isHasChanges,
       AbstractLayer::saveChanges, true);
 
-    Menus.addMenuItem(menu, "edit", "Cancel Changes", "table_cancel", AbstractLayer::isHasChanges,
+    menu.addMenuItem("edit", -1, "Cancel Changes", "table_cancel", AbstractLayer::isHasChanges,
       AbstractRecordLayer::cancelChanges, true);
 
-    Menus.addMenuItem(menu, "edit", "Add New Record", "table_row_insert", canAdd,
+    menu.addMenuItem("edit", -1, "Add New Record", "table_row_insert", canAdd,
       AbstractRecordLayer::addNewRecord, false);
 
-    Menus.addMenuItem(menu, "edit", "Delete Selected Records", "table_row_delete",
+    menu.addComponentFactory("edit", new EditRecordMenu(false));
+
+    menu.addMenuItem("edit", -1, "Delete Selected Records", "table_row_delete",
       hasSelectedRecords.and(AbstractRecordLayer::isCanDeleteRecords), layer -> {
         final List<LayerRecord> selectedRecords = layer.getSelectedRecords();
         layer.deleteRecordsWithConfirm(selectedRecords);
       }, true);
 
-    Menus.addMenuItem(menu, "edit", "Merge Selected Records", "table_row_merge",
+    menu.addMenuItem("edit", -1, "Merge Selected Records", "table_row_merge",
       AbstractRecordLayer::isCanMergeRecords, AbstractRecordLayer::mergeSelectedRecords, false);
 
-    Menus.addMenuItem(menu, "dnd", "Copy Selected Records", "page_copy", hasSelectedRecords,
+    menu.addMenuItem("dnd", -1, "Copy Selected Records", "page_copy", hasSelectedRecords,
       AbstractRecordLayer::copySelectedRecords, true);
 
-    Menus.addMenuItem(menu, "dnd", "Paste New Records", "paste_plain",
+    menu.addMenuItem("dnd", -1, "Paste New Records", "paste_plain",
       canAdd.and(AbstractRecordLayer::isCanPasteRecords), AbstractRecordLayer::pasteRecords, true);
 
-    Menus.addMenuItem(menu, "layer", 0, "Layer Style", "palette",
-      AbstractRecordLayer::isHasGeometry,
+    menu.addMenuItem("layer", 0, "Layer Style", "palette", AbstractRecordLayer::isHasGeometry,
       (final AbstractRecordLayer layer) -> layer.showProperties("Style"), false);
 
     PreferenceFields.addField("com.revolsys.gis", PREFERENCE_CONFIRM_DELETE_RECORDS);
@@ -385,20 +385,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     setSelectSupported(true);
     setQuerySupported(true);
     setRenderer(new GeometryStyleRecordLayerRenderer(this));
-  }
-
-  private void actionFlipFields(final LayerRecord record) {
-    final DirectionalFields property = DirectionalFields.getProperty(record);
-    property.reverseFieldValues(record);
-  }
-
-  private void actionFlipLineOrientation(final LayerRecord record) {
-    final DirectionalFields property = DirectionalFields.getProperty(record);
-    property.reverseGeometry(record);
-  }
-
-  private void actionFlipRecordOrientation(final LayerRecord record) {
-    DirectionalFields.reverse(record);
   }
 
   @Override
@@ -1802,8 +1788,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final Predicate<LayerRecord> notDeleted = ((Predicate<LayerRecord>)this::isDeleted).negate();
       final Predicate<LayerRecord> modifiedOrDeleted = modified.or(LayerRecord::isDeleted);
 
-      final EnableCheck editableEnableCheck = this::isEditable;
-
       menu.addGroup(0, "default");
       menu.addGroup(1, "record");
       menu.addGroup(2, "dnd");
@@ -1824,29 +1808,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             mapPanel.panToRecord(record);
           }
         });
-        final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
-        editMenu.setEnableCheck(LayerRecordMenu.enableCheck(notDeleted));
-        final DataType geometryDataType = recordDefinition.getGeometryField().getDataType();
-        if (geometryDataType == DataTypes.LINE_STRING
-          || geometryDataType == DataTypes.MULTI_LINE_STRING) {
-          if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
-            LayerRecordMenu.addMenuItem(editMenu, "geometry", LayerRecordForm.FLIP_RECORD_NAME,
-              LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck,
-              this::actionFlipRecordOrientation);
-
-            LayerRecordMenu.addMenuItem(editMenu, "geometry",
-              LayerRecordForm.FLIP_LINE_ORIENTATION_NAME,
-              LayerRecordForm.FLIP_LINE_ORIENTATION_ICON, editableEnableCheck,
-              this::actionFlipLineOrientation);
-
-            LayerRecordMenu.addMenuItem(editMenu, "geometry", LayerRecordForm.FLIP_FIELDS_NAME,
-              LayerRecordForm.FLIP_FIELDS_ICON, editableEnableCheck, this::actionFlipFields);
-          } else {
-            LayerRecordMenu.addMenuItem(editMenu, "geometry", "Flip Line Orientation", "flip_line",
-              editableEnableCheck, this::actionFlipLineOrientation);
-          }
-        }
-        menu.addComponentFactory("record", editMenu);
+        menu.addComponentFactory("record", new EditRecordMenu(true));
       }
       menu.addMenuItem("record", "Delete Record", "table_row_delete", LayerRecord::isDeletable,
         this::deleteRecordWithConfirm);
@@ -2185,6 +2147,39 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected LayerRecordForm newDefaultForm(final LayerRecord record) {
     return new LayerRecordForm(this, record);
+  }
+
+  protected void newEditRecordsMenu(final EditRecordMenu editMenu,
+    final List<LayerRecord> records) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+
+    if (recordDefinition.hasGeometryField()) {
+      final EnableCheck editableEnableCheck = this::isEditable;
+
+      final DataType geometryDataType = recordDefinition.getGeometryField().getDataType();
+      if (geometryDataType == DataTypes.LINE_STRING
+        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+        if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
+          editMenu.addMenuItem("geometry", LayerRecordForm.FLIP_RECORD_NAME,
+            LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck, DirectionalFields::reverse);
+
+          editMenu.addMenuItem("geometry", LayerRecordForm.FLIP_LINE_ORIENTATION_NAME,
+            LayerRecordForm.FLIP_LINE_ORIENTATION_ICON, editableEnableCheck,
+            DirectionalFields::reverseGeometry);
+
+          editMenu.addMenuItem("geometry", LayerRecordForm.FLIP_FIELDS_NAME,
+            LayerRecordForm.FLIP_FIELDS_ICON, editableEnableCheck,
+            DirectionalFields::reverseFieldValues);
+        } else {
+          editMenu.addMenuItem("geometry", "Flip Line Orientation", "flip_line",
+            editableEnableCheck, DirectionalFields::reverseGeometry);
+        }
+      }
+      if (!(geometryDataType == DataTypes.POINT || geometryDataType == DataTypes.MULTI_POINT)) {
+        editMenu.addMenuItem("geometry", "Generalize Vertices", "flip_line", editableEnableCheck,
+          RecordLayerActions::generalize);
+      }
+    }
   }
 
   public LayerRecordForm newForm(final LayerRecord record) {
