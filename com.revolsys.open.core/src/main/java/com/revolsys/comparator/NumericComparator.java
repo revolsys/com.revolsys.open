@@ -47,9 +47,13 @@ public class NumericComparator<T> implements Comparator<T> {
     } else if (value2 == null) {
       return 1;
     } else {
-      final BigDecimal number1 = BigDecimals.toValid(value1);
-      final BigDecimal number2 = BigDecimals.toValid(value2);
-      return number1.compareTo(number2);
+      try {
+        final BigDecimal number1 = BigDecimals.toValid(value1);
+        final BigDecimal number2 = BigDecimals.toValid(value2);
+        return number1.compareTo(number2);
+      } catch (final Exception e) {
+        return value1.toString().compareTo(value2.toString());
+      }
     }
   }
 
