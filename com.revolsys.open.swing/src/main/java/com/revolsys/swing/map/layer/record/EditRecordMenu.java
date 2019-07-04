@@ -94,7 +94,7 @@ public class EditRecordMenu extends MenuFactory {
       clear();
       if (this.layer != null && !this.layer.isDeleted() && !this.records.isEmpty()) {
         setEnableCheck(EnableCheck.ENABLED);
-        this.layer.newEditRecordsMenu(this, this.records);
+        this.layer.initEditRecordsMenu(this, this.records);
       } else {
         setEnableCheck(EnableCheck.DISABLED);
       }

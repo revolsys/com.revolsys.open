@@ -1771,6 +1771,39 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
+  protected void initEditRecordsMenu(final EditRecordMenu editMenu,
+    final List<LayerRecord> records) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+
+    if (recordDefinition.hasGeometryField()) {
+      final EnableCheck editableEnableCheck = this::isEditable;
+
+      final DataType geometryDataType = recordDefinition.getGeometryField().getDataType();
+      if (geometryDataType == DataTypes.LINE_STRING
+        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+        if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
+          editMenu.addMenuItem("geometry", LayerRecordForm.FLIP_RECORD_NAME,
+            LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck, DirectionalFields::reverse);
+
+          editMenu.addMenuItem("geometry", LayerRecordForm.FLIP_LINE_ORIENTATION_NAME,
+            LayerRecordForm.FLIP_LINE_ORIENTATION_ICON, editableEnableCheck,
+            DirectionalFields::reverseGeometry);
+
+          editMenu.addMenuItem("geometry", LayerRecordForm.FLIP_FIELDS_NAME,
+            LayerRecordForm.FLIP_FIELDS_ICON, editableEnableCheck,
+            DirectionalFields::reverseFieldValues);
+        } else {
+          editMenu.addMenuItem("geometry", "Flip Line Orientation", "flip_line",
+            editableEnableCheck, DirectionalFields::reverseGeometry);
+        }
+      }
+      if (!(geometryDataType == DataTypes.POINT || geometryDataType == DataTypes.MULTI_POINT)) {
+        editMenu.addMenuItem("geometry", "Generalize Vertices", "generalize_line",
+          editableEnableCheck, RecordLayerActions::generalize);
+      }
+    }
+  }
+
   @Override
   protected boolean initializeDo() {
     initRecordMenu();
@@ -2147,39 +2180,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected LayerRecordForm newDefaultForm(final LayerRecord record) {
     return new LayerRecordForm(this, record);
-  }
-
-  protected void newEditRecordsMenu(final EditRecordMenu editMenu,
-    final List<LayerRecord> records) {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-
-    if (recordDefinition.hasGeometryField()) {
-      final EnableCheck editableEnableCheck = this::isEditable;
-
-      final DataType geometryDataType = recordDefinition.getGeometryField().getDataType();
-      if (geometryDataType == DataTypes.LINE_STRING
-        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
-        if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
-          editMenu.addMenuItem("geometry", LayerRecordForm.FLIP_RECORD_NAME,
-            LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck, DirectionalFields::reverse);
-
-          editMenu.addMenuItem("geometry", LayerRecordForm.FLIP_LINE_ORIENTATION_NAME,
-            LayerRecordForm.FLIP_LINE_ORIENTATION_ICON, editableEnableCheck,
-            DirectionalFields::reverseGeometry);
-
-          editMenu.addMenuItem("geometry", LayerRecordForm.FLIP_FIELDS_NAME,
-            LayerRecordForm.FLIP_FIELDS_ICON, editableEnableCheck,
-            DirectionalFields::reverseFieldValues);
-        } else {
-          editMenu.addMenuItem("geometry", "Flip Line Orientation", "flip_line",
-            editableEnableCheck, DirectionalFields::reverseGeometry);
-        }
-      }
-      if (!(geometryDataType == DataTypes.POINT || geometryDataType == DataTypes.MULTI_POINT)) {
-        editMenu.addMenuItem("geometry", "Generalize Vertices", "flip_line", editableEnableCheck,
-          RecordLayerActions::generalize);
-      }
-    }
   }
 
   public LayerRecordForm newForm(final LayerRecord record) {
