@@ -207,7 +207,7 @@ public class Polygonizer {
 
   public GeometryFactory getGeometryFactory() {
     if (this.graph == null) {
-      return GeometryFactory.DEFAULT;
+      return GeometryFactory.DEFAULT_3D;
     } else {
       return this.graph.getGeometryFactory();
     }

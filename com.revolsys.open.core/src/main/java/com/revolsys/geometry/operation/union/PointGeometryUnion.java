@@ -79,7 +79,7 @@ public class PointGeometryUnion {
     for (int i = 0; i < this.pointGeom.getGeometryCount(); i++) {
       final Point point = (Point)this.pointGeom.getGeometry(i);
       final Point coord = point.getPoint();
-      final Location loc = locater.locate(coord, this.otherGeom);
+      final Location loc = locater.locate(this.otherGeom, coord);
       if (loc == Location.EXTERIOR) {
         exteriorCoords.add(coord);
       }

@@ -36,7 +36,6 @@ import java.util.Collection;
 import java.util.Comparator;
 
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.util.MathUtil;
 
 /**
  * Useful utility functions for handling Point arrays
@@ -180,46 +179,6 @@ public class CoordinateArrays {
       }
     }
     return true;
-  }
-
-  /**
-   * Extracts a subsequence of the input {@link Coordinates} array
-   * from indices <code>start</code> to
-   * <code>end</code> (inclusive).
-   * The input indices are clamped to the array size;
-   * If the end index is less than the start index,
-   * the extracted array will be empty.
-   *
-   * @param pts the input array
-   * @param start the index of the start of the subsequence to extract
-   * @param end the index of the end of the subsequence to extract
-   * @return a subsequence of the input array
-   */
-  public static Point[] extract(final Point[] pts, int start, int end) {
-    start = MathUtil.clamp(start, 0, pts.length);
-    end = MathUtil.clamp(end, -1, pts.length);
-
-    int npts = end - start + 1;
-    if (end < 0) {
-      npts = 0;
-    }
-    if (start >= pts.length) {
-      npts = 0;
-    }
-    if (end < start) {
-      npts = 0;
-    }
-
-    final Point[] extractPts = new Point[npts];
-    if (npts == 0) {
-      return extractPts;
-    }
-
-    int iPts = 0;
-    for (int i = start; i <= end; i++) {
-      extractPts[iPts++] = pts[i];
-    }
-    return extractPts;
   }
 
   /**

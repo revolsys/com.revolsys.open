@@ -13,6 +13,11 @@ public class LineSegmentDoubleGF extends LineSegmentDouble {
   public LineSegmentDoubleGF() {
   }
 
+  public LineSegmentDoubleGF(final GeometryFactory geometryFactory) {
+    super(geometryFactory.getAxisCount());
+    setGeometryFactory(geometryFactory);
+  }
+
   public LineSegmentDoubleGF(final GeometryFactory geometryFactory, final int axisCount,
     final double... coordinates) {
     super(geometryFactory, axisCount, coordinates);
@@ -44,7 +49,7 @@ public class LineSegmentDoubleGF extends LineSegmentDouble {
   }
 
   public LineSegmentDoubleGF(final Point coordinates1, final Point coordinates2) {
-    this(null, coordinates1, coordinates2);
+    this(coordinates1.getGeometryFactory(), coordinates1, coordinates2);
   }
 
   @Override
@@ -66,7 +71,7 @@ public class LineSegmentDoubleGF extends LineSegmentDouble {
 
   private void setGeometryFactory(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
-      this.geometryFactory = GeometryFactory.DEFAULT;
+      this.geometryFactory = GeometryFactory.DEFAULT_3D;
     } else {
       this.geometryFactory = geometryFactory;
     }

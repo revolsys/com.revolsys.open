@@ -34,7 +34,7 @@ package com.revolsys.geometry.precision;
 
 import com.revolsys.geometry.index.strtree.ItemBoundable;
 import com.revolsys.geometry.index.strtree.ItemDistance;
-import com.revolsys.geometry.index.strtree.STRtree;
+import com.revolsys.geometry.index.strtree.StrTree;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -100,7 +100,7 @@ import com.revolsys.geometry.operation.distance.FacetSequenceTreeBuilder;
  * {@link #getDistance()} and {@link #getLine()}.
  * <p>
  * The computation of Minimum Clearance utilizes
- * the {@link STRtree#nearestNeighbour(ItemDistance)}
+ * the {@link StrTree#nearestNeighbour(ItemDistance)}
  * method to provide good performance even for
  * large inputs.
  * <p>
@@ -214,7 +214,7 @@ public class MinimumClearance {
           final Point p1 = fs1.getCoordinate(i1);
           final Point p2 = fs2.getCoordinate(i2);
           if (!p1.equals(2, p2)) {
-            final double d = p1.distance(p2);
+            final double d = p1.distancePoint(p2);
             if (d < this.minDist) {
               this.minDist = d;
               this.minPts[0] = p1;
@@ -288,7 +288,7 @@ public class MinimumClearance {
       return;
     }
 
-    final STRtree geomTree = FacetSequenceTreeBuilder.build(this.inputGeom);
+    final StrTree geomTree = FacetSequenceTreeBuilder.build(this.inputGeom);
 
     final Object[] nearest = geomTree.nearestNeighbour(new MinClearanceDistance());
     final MinClearanceDistance mcd = new MinClearanceDistance();

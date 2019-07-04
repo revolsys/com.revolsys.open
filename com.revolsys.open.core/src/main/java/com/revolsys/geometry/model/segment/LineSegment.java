@@ -1,5 +1,6 @@
 package com.revolsys.geometry.model.segment;
 
+import org.jeometry.common.math.Angle;
 import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.algorithm.CGAlgorithms;
@@ -7,7 +8,6 @@ import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
 import com.revolsys.geometry.algorithm.HCoordinate;
 import com.revolsys.geometry.algorithm.NotRepresentableException;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
-import com.revolsys.geometry.cs.projection.ProjectionFactory;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -18,9 +18,8 @@ import com.revolsys.geometry.model.Side;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.util.BoundingBoxUtil;
-import com.revolsys.math.Angle;
-import com.revolsys.util.MathUtil;
+import com.revolsys.geometry.util.Points;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.Property;
 
 public interface LineSegment extends LineString {
@@ -104,7 +103,7 @@ public interface LineSegment extends LineString {
     final double y1 = getY(0);
     final double x2 = getX(1);
     final double y2 = getY(1);
-    return Angle.angle2d(x1, x2, y1, y2);
+    return Angle.angle2d(x1, y1, x2, y2);
   }
 
   /**
@@ -144,12 +143,12 @@ public interface LineSegment extends LineString {
     final Point lineStart = line.getPoint(0);
     final Point lineEnd = line.getPoint(1);
     final Point close00 = closestPoint(lineStart);
-    minDistance = close00.distance(lineStart);
+    minDistance = close00.distancePoint(lineStart);
     closestPt[0] = close00;
     closestPt[1] = lineStart;
 
     final Point close01 = closestPoint(lineEnd);
-    dist = close01.distance(lineEnd);
+    dist = close01.distancePoint(lineEnd);
     if (dist < minDistance) {
       minDistance = dist;
       closestPt[0] = close01;
@@ -158,7 +157,7 @@ public interface LineSegment extends LineString {
 
     final Point start = getPoint(0);
     final Point close10 = line.closestPoint(start);
-    dist = close10.distance(start);
+    dist = close10.distancePoint(start);
     if (dist < minDistance) {
       minDistance = dist;
       closestPt[0] = start;
@@ -166,7 +165,7 @@ public interface LineSegment extends LineString {
     }
 
     final Point close11 = line.closestPoint(start);
-    dist = close11.distance(start);
+    dist = close11.distancePoint(start);
     if (dist < minDistance) {
       minDistance = dist;
       closestPt[0] = start;
@@ -215,8 +214,8 @@ public interface LineSegment extends LineString {
     if (geometryFactory == factory) {
       return (V)this;
     } else {
-      final Point point1 = ProjectionFactory.convert(getPoint(0), factory, geometryFactory);
-      final Point point2 = ProjectionFactory.convert(getPoint(1), factory, geometryFactory);
+      final Point point1 = getPoint(0).convertGeometry(geometryFactory);
+      final Point point2 = getPoint(1).convertGeometry(geometryFactory);
       return (V)new LineSegmentDoubleGF(geometryFactory, point1, point2);
     }
   }
@@ -243,20 +242,6 @@ public interface LineSegment extends LineString {
     final double line2Y2 = convertedLine.getY(1);
     return LineSegmentUtil.distanceLineLine(line1X1, line1Y1, line1X2, line1Y2, line2X1, line2Y1,
       line2X2, line2Y2);
-  }
-
-  /**
-   * Computes the distance between this line segment and a given point.
-   *
-   * @return the distance from this segment to the given point
-   */
-  @Override
-  default double distance(Point point) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    point = point.convertGeometry(geometryFactory, 2);
-    final double x = point.getX();
-    final double y = point.getY();
-    return distance(x, y);
   }
 
   /**
@@ -295,6 +280,20 @@ public interface LineSegment extends LineString {
    */
   default double distancePerpendicular(final Point p) {
     return CGAlgorithms.distancePointLinePerpendicular(p, getP0(), getP1());
+  }
+
+  /**
+   * Computes the distance between this line segment and a given point.
+   *
+   * @return the distance from this segment to the given point
+   */
+  @Override
+  default double distancePoint(Point point) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    point = point.convertGeometry(geometryFactory, 2);
+    final double x = point.getX();
+    final double y = point.getY();
+    return distance(x, y);
   }
 
   default boolean equals(final LineSegment segment) {
@@ -356,7 +355,7 @@ public interface LineSegment extends LineString {
         final Point currentIntersection = currentIntersections.getPoint(0);
         if (intersection == null) {
           intersection = currentIntersection;
-        } else if (point1.distance(currentIntersection) < point1.distance(intersection)) {
+        } else if (point1.distancePoint(currentIntersection) < point1.distancePoint(intersection)) {
           intersection = currentIntersection;
         }
       }
@@ -370,11 +369,11 @@ public interface LineSegment extends LineString {
 
   default LineSegment getIntersection(BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    boundingBox = boundingBox.convert(geometryFactory);
+    boundingBox = boundingBox.bboxToCs(geometryFactory);
     final Point lineStart = getPoint(0);
     final Point lineEnd = getPoint(1);
-    final boolean contains1 = boundingBox.covers(lineStart);
-    final boolean contains2 = boundingBox.covers(lineEnd);
+    final boolean contains1 = boundingBox.bboxCovers(lineStart);
+    final boolean contains2 = boundingBox.bboxCovers(lineEnd);
     if (contains1) {
       if (contains2) {
         return this;
@@ -408,7 +407,7 @@ public interface LineSegment extends LineString {
     final double line2y1 = lineSegment2.getY(0);
     final double line2x2 = lineSegment2.getX(1);
     final double line2y2 = lineSegment2.getY(1);
-    if (BoundingBoxUtil.intersectsMinMax(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
+    if (RectangleUtil.intersectsMinMax(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
       line2x2, line2y2)) {
       int intersectionCount = 0;
       final int axisCount = geometryFactory.getAxisCount();
@@ -475,9 +474,8 @@ public interface LineSegment extends LineString {
       } else if (intersectionCount == 1) {
         return geometryFactory.point(coordinates);
       } else if (intersectionCount == 2) {
-        final double distance1 = MathUtil.distance(line1x1, line1y1, coordinates[0],
-          coordinates[1]);
-        final double distance2 = MathUtil.distance(line1x1, line1y1, coordinates[axisCount],
+        final double distance1 = Points.distance(line1x1, line1y1, coordinates[0], coordinates[1]);
+        final double distance2 = Points.distance(line1x1, line1y1, coordinates[axisCount],
           coordinates[axisCount + 1]);
         if (distance1 > distance2) {
           CoordinatesListUtil.switchCoordinates(coordinates, axisCount, 0, 1);
@@ -498,7 +496,7 @@ public interface LineSegment extends LineString {
     final double y1 = getY(0);
     final double x2 = getX(1);
     final double y2 = getY(1);
-    return MathUtil.distance(x1, y1, x2, y2);
+    return Points.distance(x1, y1, x2, y2);
   }
 
   default double getOrientaton() {
@@ -577,14 +575,25 @@ public interface LineSegment extends LineString {
     return Double.isNaN(getCoordinate(0, 1));
   }
 
-  default boolean isEndPoint(final Point point) {
-    if (equalsVertex(2, 0, point)) {
+  default boolean isEndPoint(final double x, final double y) {
+    if (equalsVertex(0, x, y)) {
       return true;
-    } else if (equalsVertex(2, -1, point)) {
+    } else if (equalsVertex(1, x, y)) {
       return true;
     } else {
       return false;
     }
+  }
+
+  default boolean isEndPoint(final Point point) {
+    if (point == null) {
+      return false;
+    } else {
+      final double x = point.getX();
+      final double y = point.getY();
+      return isEndPoint(x, y);
+    }
+
   }
 
   /**
@@ -870,6 +879,11 @@ public interface LineSegment extends LineString {
     }
 
     return newPoint(x, y);
+  }
+
+  default Point project(final double x, final double y) {
+    final double projectionFactor = projectionFactor(x, y);
+    return pointAlong(projectionFactor);
   }
 
   /**

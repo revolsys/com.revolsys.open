@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
 import java.awt.Color;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
@@ -47,10 +48,15 @@ public class ModeAllPaged extends ModeAbstractCached {
     addListeners( //
       Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_INSERTED,
         this::addCachedRecords), //
-      Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_DELETED,
-        this::recordsDeleted) //
+      newRecordsDeletedListener(layer)//
     );
     final RecordLayerTableModel model = getTableModel();
+    for (final String propertyName : new String[] {
+      "filter", AbstractRecordLayer.RECORDS_CHANGED
+    }) {
+      addListeners( //
+        Property.addListenerRunnable(layer, propertyName, this::refresh));
+    }
     addListeners( //
       Property.addListenerRunnable(model, "filter", this::refresh) //
     );
@@ -76,9 +82,10 @@ public class ModeAllPaged extends ModeAbstractCached {
   }
 
   @Override
-  public void exportRecords(final Query query, final Object target) {
+  public void exportRecords(final Query query, final Collection<String> fieldNames,
+    final Object target) {
     final AbstractRecordLayer layer = getLayer();
-    layer.exportRecords(query, target);
+    layer.exportRecords(query, fieldNames, target);
   }
 
   protected boolean filterTestModified(final Condition filter, final LayerRecord modifiedRecord) {

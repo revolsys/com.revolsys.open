@@ -35,7 +35,7 @@ package com.revolsys.geometry.index.strtree;
 
 /**
  * A function method which computes the distance
- * between two {@link ItemBoundable}s in an {@link STRtree}.
+ * between two {@link ItemBoundable}s in an {@link StrTree}.
  * Used for Nearest Neighbour searches.
  *
  * @author Martin Davis

@@ -42,7 +42,7 @@ public class TextLineConverter implements OsnConverter {
       fieldName = iterator.nextFieldName();
     }
     if (!values.isEmpty()) {
-      geometry.setUserData(values);
+      geometry.setUserDataOld(values);
     }
     return geometry;
   }

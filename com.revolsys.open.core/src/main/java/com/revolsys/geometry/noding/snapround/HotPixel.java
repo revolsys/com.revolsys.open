@@ -37,7 +37,7 @@ import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.util.Assert;
@@ -149,9 +149,9 @@ public class HotPixel {
   public BoundingBox getSafeEnvelope() {
     if (this.safeEnv == null) {
       final double safeTolerance = SAFE_ENV_EXPANSION_FACTOR / this.scaleFactor;
-      this.safeEnv = new BoundingBoxDoubleGf(2, this.originalPt.getX() - safeTolerance,
-        this.originalPt.getY() - safeTolerance, this.originalPt.getX() + safeTolerance,
-        this.originalPt.getY() + safeTolerance);
+      this.safeEnv = BoundingBoxDoubleXY.newBoundingBoxDoubleXY(
+        this.originalPt.getX() - safeTolerance, this.originalPt.getY() - safeTolerance,
+        this.originalPt.getX() + safeTolerance, this.originalPt.getY() + safeTolerance);
     }
     return this.safeEnv;
   }
@@ -230,12 +230,12 @@ public class HotPixel {
     boolean intersectsLeft = false;
     boolean intersectsBottom = false;
 
-    this.li.computeIntersection(p0, p1, this.corner[0], this.corner[1]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[0], this.corner[1]);
     if (this.li.isProper()) {
       return true;
     }
 
-    this.li.computeIntersection(p0, p1, this.corner[1], this.corner[2]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[1], this.corner[2]);
     if (this.li.isProper()) {
       return true;
     }
@@ -243,7 +243,7 @@ public class HotPixel {
       intersectsLeft = true;
     }
 
-    this.li.computeIntersection(p0, p1, this.corner[2], this.corner[3]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[2], this.corner[3]);
     if (this.li.isProper()) {
       return true;
     }
@@ -251,7 +251,7 @@ public class HotPixel {
       intersectsBottom = true;
     }
 
-    this.li.computeIntersection(p0, p1, this.corner[3], this.corner[0]);
+    this.li.computeIntersectionPoints(p0, p1, this.corner[3], this.corner[0]);
     if (this.li.isProper()) {
       return true;
     }

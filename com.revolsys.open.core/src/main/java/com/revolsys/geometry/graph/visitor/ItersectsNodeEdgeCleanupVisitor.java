@@ -47,7 +47,7 @@ public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record
           Node<Record> node1 = nodes.get(i);
           for (int j = i + 1; j < nodes.size(); j++) {
             final Node<Record> node2 = nodes.get(j);
-            if (node1.distance(node2) < 2) {
+            if (node1.distancePoint(node2) < 2) {
               if (edge.distance(node1) <= edge.distance(node2)) {
                 nodes.remove(j);
               } else {
@@ -60,9 +60,9 @@ public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record
       }
       if (nodes.size() == 1) {
         final Node<Record> node = nodes.get(0);
-        if (node.distance(fromNode) <= 10) {
+        if (node.distancePoint(fromNode) <= 10) {
           moveEndUndershoots(typePath, fromNode, node);
-        } else if (node.distance(toNode) <= 10) {
+        } else if (node.distancePoint(toNode) <= 10) {
           moveEndUndershoots(typePath, toNode, node);
         } else {
           graph.splitEdge(edge, nodes);

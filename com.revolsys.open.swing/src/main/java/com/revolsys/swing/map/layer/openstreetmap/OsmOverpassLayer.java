@@ -6,12 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.record.io.format.openstreetmap.model.OsmConstants;
 import com.revolsys.record.io.format.openstreetmap.model.OsmDocument;
 import com.revolsys.record.io.format.openstreetmap.model.OsmElement;
@@ -67,7 +66,7 @@ public class OsmOverpassLayer extends AbstractRecordLayer {
           for (final OsmElement record : document.getRecords()) {
             final Geometry geometry = record.getGeometry();
             if (geometry != null && !geometry.isEmpty()) {
-              if (boundingBox.intersects(geometry.getBoundingBox())) {
+              if (boundingBox.bboxIntersects(geometry.getBoundingBox())) {
                 final Identifier identifier = record.getIdentifier();
                 // final OsmProxyLayerRecord layerRecord = new
                 // OsmProxyLayerRecord(
@@ -98,7 +97,7 @@ public class OsmOverpassLayer extends AbstractRecordLayer {
   }
 
   public List<BoundingBox> getTileBoundingBoxes(BoundingBox boundingBox) {
-    boundingBox = boundingBox.convert(OsmConstants.WGS84_2D);
+    boundingBox = boundingBox.bboxToCs(OsmConstants.WGS84_2D);
     final List<BoundingBox> boundingBoxes = new ArrayList<>();
     final double minX = Math.floor(boundingBox.getMinX() * TILE_SCALE_X) / TILE_SCALE_X;
     final double minY = Math.floor(boundingBox.getMinY() * TILE_SCALE_Y) / TILE_SCALE_Y;
@@ -112,8 +111,8 @@ public class OsmOverpassLayer extends AbstractRecordLayer {
       for (double x = minX; x < maxX;) {
         indexX++;
         final double nextX = Doubles.makePrecise(TILE_SCALE_X, minX + indexX * TILE_WIDTH);
-        final BoundingBoxDoubleGf tileBoundingBox = new BoundingBoxDoubleGf(OsmConstants.WGS84_2D,
-          2, x, y, nextX, nextY);
+        final BoundingBox tileBoundingBox = OsmConstants.WGS84_2D.newBoundingBox(x, y, nextX,
+          nextY);
         boundingBoxes.add(tileBoundingBox);
         x = nextX;
       }

@@ -33,7 +33,7 @@
 
 package com.revolsys.geometry.operation.distance;
 
-import com.revolsys.geometry.index.strtree.STRtree;
+import com.revolsys.geometry.index.strtree.StrTree;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -45,8 +45,8 @@ public class FacetSequenceTreeBuilder {
   // Seems to be better to use a minimum node capacity
   private static final int STR_TREE_NODE_CAPACITY = 4;
 
-  public static STRtree build(final Geometry g) {
-    final STRtree tree = new STRtree(STR_TREE_NODE_CAPACITY);
+  public static StrTree build(final Geometry g) {
+    final StrTree tree = new StrTree(STR_TREE_NODE_CAPACITY);
     for (final LineString line : g.getGeometryComponents(LineString.class)) {
       int i = 0;
       final int size = line.getVertexCount();
@@ -58,13 +58,13 @@ public class FacetSequenceTreeBuilder {
           end = size;
         }
         final FacetSequence facetSequence = new LineFacetSequence(line, i, end);
-        tree.insert(facetSequence.getEnvelope(), facetSequence);
+        tree.insertItem(facetSequence.getEnvelope(), facetSequence);
         i = i + FACET_SEQUENCE_SIZE;
       }
     }
     for (final Point point : g.getGeometries(Point.class)) {
       final PointFacetSequence facetSequence = new PointFacetSequence(point);
-      tree.insert(facetSequence.getEnvelope(), facetSequence);
+      tree.insertItem(facetSequence.getEnvelope(), facetSequence);
     }
     tree.build();
     return tree;

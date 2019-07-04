@@ -123,7 +123,7 @@ public interface EsriGeodatabaseXmlConstants {
 
   QName EDIATBLE = new QName(_NAMESPACE_URI, "Editable", _NAMESPACE_PREFIX);
 
-  QName ENVELOPE = new QName(_NAMESPACE_URI, "BoundingBoxDoubleGf", _NAMESPACE_PREFIX);
+  QName ENVELOPE = new QName(_NAMESPACE_URI, "BoundingBoxDoubleGeometryFactory", _NAMESPACE_PREFIX);
 
   QName ENVELOPE_N = new QName(_NAMESPACE_URI, "EnvelopeN", _NAMESPACE_PREFIX);
 
@@ -415,7 +415,7 @@ public interface EsriGeodatabaseXmlConstants {
   Collection<DataType> XML_SCHEMA_DATA_TYPES = Arrays.asList(DataTypes.ANY_URI,
     DataTypes.BASE64_BINARY, DataTypes.BOOLEAN, DataTypes.BYTE, DataTypes.DATE, DataTypes.DATE_TIME,
     DataTypes.DECIMAL, DataTypes.DOUBLE, DataTypes.DURATION, DataTypes.FLOAT, DataTypes.INT,
-    DataTypes.INTEGER, DataTypes.LONG, DataTypes.QNAME, DataTypes.SHORT, DataTypes.STRING);
+    DataTypes.BIG_INTEGER, DataTypes.LONG, DataTypes.QNAME, DataTypes.SHORT, DataTypes.STRING);
 
   QName XY_SCALE = new QName(_NAMESPACE_URI, "XYScale", _NAMESPACE_PREFIX);
 

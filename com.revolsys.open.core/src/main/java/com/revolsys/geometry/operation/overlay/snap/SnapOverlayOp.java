@@ -44,7 +44,7 @@ import com.revolsys.geometry.precision.CommonBitsRemover;
  * This is less performant than the standard JTS overlay code,
  * and may even introduce errors which were not present in the original data.
  * For this reason, this class should only be used
- * if the standard overlay code fails to produce a correct result.
+ * if the standard overlay code fails to produce a correct intersectionCount.
  *
  * @author Martin Davis
  * @version 1.7

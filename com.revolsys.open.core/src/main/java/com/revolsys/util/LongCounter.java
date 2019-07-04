@@ -3,9 +3,7 @@ package com.revolsys.util;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class LongCounter extends AtomicLong implements Counter {
-  /**
-   *
-   */
+
   private static final long serialVersionUID = 1L;
 
   private final String name;
@@ -32,6 +30,11 @@ public class LongCounter extends AtomicLong implements Counter {
   @Override
   public long add(final Number count) {
     return addAndGet(count.longValue());
+  }
+
+  @Override
+  public long decrement() {
+    return decrementAndGet();
   }
 
   @Override

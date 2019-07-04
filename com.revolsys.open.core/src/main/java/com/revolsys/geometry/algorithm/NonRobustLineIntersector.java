@@ -96,22 +96,22 @@ public class NonRobustLineIntersector extends LineIntersector {
 
     // check for single point intersection
     if (q4 == p1) {
-      this.pa = p1.newPointDouble();
+      this.pa = p1;
       return POINT_INTERSECTION;
     }
     if (q3 == p2) {
-      this.pa = p2.newPointDouble();
+      this.pa = p2;
       return POINT_INTERSECTION;
     }
 
     // intersection MUST be a segment - compute endpoints
-    this.pa = p1.newPointDouble();
+    this.pa = p1;
     if (t3 > r1) {
-      this.pa = q3.newPointDouble();
+      this.pa = q3;
     }
-    this.pb = p2.newPointDouble();
+    this.pb = p2;
     if (t4 < r2) {
-      this.pb = q4.newPointDouble();
+      this.pb = q4;
     }
     return COLLINEAR_INTERSECTION;
   }
@@ -216,7 +216,47 @@ public class NonRobustLineIntersector extends LineIntersector {
   }
 
   @Override
-  public void computeIntersection(final Point p, final Point p1, final Point p2) {
+  public boolean computeIntersection(final double x, final double y, final double x1,
+    final double y1, final double x2, final double y2) {
+    this.isProper = false;
+
+    /*
+     * Compute a1, b1, c1, where line joining points 1 and 2 is
+     * "a1 x  +  b1 y  +  c1  =  0".
+     */
+    final double a1 = y2 - y1;
+    final double b1 = x1 - x2;
+    final double c1 = x2 * y1 - x1 * y2;
+
+    /*
+     * Compute r3 and r4.
+     */
+    final double r = a1 * x + b1 * y + c1;
+
+    // if r != 0 the point does not lie on the line
+    if (r != 0) {
+      this.intersectionCount = NO_INTERSECTION;
+      return false;
+    }
+
+    // Point lies on line - check to see whether it lies in line segment.
+
+    final double dist = rParameter(x, y, x1, y1, x2, y2);
+    if (dist < 0.0 || dist > 1.0) {
+      this.intersectionCount = NO_INTERSECTION;
+      return false;
+    }
+
+    this.isProper = true;
+    if (x == x1 && y == y1 || x == x2 && y == y2) {
+      this.isProper = false;
+    }
+    this.intersectionCount = POINT_INTERSECTION;
+    return true;
+  }
+
+  @Override
+  public void computeIntersectionPoints(final Point p, final Point p1, final Point p2) {
     double a1;
     double b1;
     double c1;
@@ -244,7 +284,7 @@ public class NonRobustLineIntersector extends LineIntersector {
 
     // if r != 0 the point does not lie on the line
     if (r != 0) {
-      this.result = NO_INTERSECTION;
+      this.intersectionCount = NO_INTERSECTION;
       return;
     }
 
@@ -252,7 +292,7 @@ public class NonRobustLineIntersector extends LineIntersector {
 
     final double dist = rParameter(p1, p2, p);
     if (dist < 0.0 || dist > 1.0) {
-      this.result = NO_INTERSECTION;
+      this.intersectionCount = NO_INTERSECTION;
       return;
     }
 
@@ -260,7 +300,28 @@ public class NonRobustLineIntersector extends LineIntersector {
     if (p.equals(p1) || p.equals(p2)) {
       this.isProper = false;
     }
-    this.result = POINT_INTERSECTION;
+    this.intersectionCount = POINT_INTERSECTION;
+  }
+
+  /**
+   *  RParameter computes the parameter for the point p
+   *  in the parameterized equation
+   *  of the line from p1 to p2.
+   *  This is equal to the 'distance' of p along p1-p2
+   */
+  private double rParameter(final double x, final double y, final double x1, final double y1,
+    final double x2, final double y2) {
+    final double dx = Math.abs(x2 - x1);
+    final double dy = Math.abs(y2 - y1);
+    // compute maximum delta, for numerical stability
+    // also handle case of p1-p2 being vertical or horizontal
+    double r;
+    if (dx > dy) {
+      r = (x - x1) / (x2 - x1);
+    } else {
+      r = (y - y1) / (y2 - y1);
+    }
+    return r;
   }
 
   /**

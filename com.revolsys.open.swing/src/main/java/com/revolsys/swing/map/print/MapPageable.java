@@ -8,9 +8,9 @@ import java.awt.print.Printable;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
-import com.revolsys.geometry.cs.unit.CustomUnits;
+import org.jeometry.coordinatesystem.model.unit.CustomUnits;
+
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.util.QuantityType;
 
@@ -19,7 +19,6 @@ import tec.uom.se.quantity.Quantities;
 import tec.uom.se.unit.Units;
 
 public class MapPageable implements Pageable {
-
   private final Rectangle2D.Double contentRect;
 
   private double coreCellsPerHeight;
@@ -104,14 +103,14 @@ public class MapPageable implements Pageable {
     final double totalModelWidth = this.numXPages * this.coreCellsPerWidth
       * this.modelGridSizeMetres;
     if (this.mapBoundingBox.getWidth() < totalModelWidth) {
-      final double expandDistance = (totalModelWidth - this.mapBoundingBox.getWidth()) / 2;
-      this.mapBoundingBox = this.mapBoundingBox.expand(expandDistance, 0);
+      final double deltaX = (totalModelWidth - this.mapBoundingBox.getWidth()) / 2;
+      this.mapBoundingBox = this.mapBoundingBox.bboxEdit(editor -> editor.expandDeltaX(deltaX));
     }
     final double totalModelHeight = this.numYPages * this.coreCellsPerHeight
       * this.modelGridSizeMetres;
     if (this.mapBoundingBox.getHeight() < totalModelHeight) {
-      final double expandDistance = (totalModelHeight - this.mapBoundingBox.getHeight()) / 2;
-      this.mapBoundingBox = this.mapBoundingBox.expand(0, expandDistance);
+      final double deltaY = (totalModelHeight - this.mapBoundingBox.getHeight()) / 2;
+      this.mapBoundingBox = this.mapBoundingBox.bboxEdit(editor -> editor.expandDeltaY(deltaY));
     }
 
     this.numPages = this.numXPages * this.numYPages;
@@ -145,8 +144,8 @@ public class MapPageable implements Pageable {
       - pageXOffset;
     final double y = startY + row * this.modelGridSizeMetres * this.coreCellsPerHeight
       - pageYOffset;
-    final BoundingBox pageBoundingBox = new BoundingBoxDoubleGf(this.map.getGeometryFactory(), 2, x,
-      y, x + this.modelPageWidth, y + this.modelPageHeight);
+    final BoundingBox pageBoundingBox = this.map.getGeometryFactory()
+      .newBoundingBox(x, y, x + this.modelPageWidth, y + this.modelPageHeight);
     return new MapPrintable(this.map, column, this.numYPages - row, pageBoundingBox,
       this.contentRect, this.dpi, this.rulerSizePixels, this.modelGridSizeMetres, this.scale);
   }

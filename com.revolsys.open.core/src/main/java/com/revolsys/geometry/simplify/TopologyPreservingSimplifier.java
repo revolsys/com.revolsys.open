@@ -52,9 +52,9 @@ import com.revolsys.geometry.model.util.GeometryTransformer;
  * <p>
  * If the input is a {@link Polygonal} geometry
  * <ul>
- * <li>The result has the same number of shells and holes as the input,
+ * <li>the result has the same number of shells and holes as the input,
  * with the same topological structure
- * <li>The result rings touch at <b>no more</b> than the number of touching points in the input
+ * <li>the result rings touch at <b>no more</b> than the number of touching points in the input
  * (although they may touch at fewer points).
  * The key implication of this statement is that if the
  * input is topologically valid, so is the simplified output.
@@ -131,7 +131,7 @@ public class TopologyPreservingSimplifier {
   }
 
   public Geometry getResultGeometry() {
-    // empty input produces an empty result
+    // empty input produces an empty intersectionCount
     if (this.geometry.isEmpty()) {
       return this.geometry.clone();
     } else {

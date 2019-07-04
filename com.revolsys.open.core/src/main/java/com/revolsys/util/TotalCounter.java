@@ -1,46 +1,55 @@
 package com.revolsys.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class TotalCounter implements Counter {
-  private final Counter counter;
 
-  private final Counter total;
+  private final String name;
 
-  public TotalCounter(final Counter total, final Counter counter) {
-    this.total = total;
-    this.counter = counter;
+  private List<Counter> counters = new ArrayList<>();
+
+  public TotalCounter(final String name, final List<Counter> counters) {
+    this.name = name;
+    this.counters = counters;
   }
 
   @Override
   public long add() {
-    this.counter.add();
-    return this.total.add();
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public long add(final long count) {
-    this.counter.add(count);
-    return this.total.add(count);
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public long add(final Number count) {
-    this.counter.add(count);
-    return this.total.add(count);
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public long decrement() {
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public long get() {
-    return this.total.get();
+    long count = 0;
+    for (final Counter counter : this.counters) {
+      count += counter.get();
+    }
+    return count;
   }
 
   @Override
   public String getName() {
-    return this.total.getName();
+    return this.name;
   }
 
   @Override
   public String toString() {
-    return this.total.toString();
+    return this.name + "=" + get();
   }
-
 }

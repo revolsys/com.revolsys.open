@@ -16,7 +16,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.PreDestroy;
 
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
@@ -29,6 +28,7 @@ import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.record.ArrayRecord;
@@ -615,7 +615,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
       return "table";
     } else {
       final DataType dataType = geometryField.getDataType();
-      if (dataType.equals(DataTypes.GEOMETRY_COLLECTION)) {
+      if (dataType.equals(GeometryDataTypes.GEOMETRY_COLLECTION)) {
         return "table_geometry";
       } else {
         return "table_" + dataType.toString().toLowerCase();

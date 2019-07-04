@@ -2,11 +2,7 @@ package com.revolsys.collection.range;
 
 import org.jeometry.common.number.Integers;
 
-/**
- *
- * Ranges are immutable
- */
-public class IntRange extends AbstractRange<Integer> {
+public class IntRange extends AbstractNumberRange<Integer> {
   private int from;
 
   private int to;
@@ -46,6 +42,15 @@ public class IntRange extends AbstractRange<Integer> {
   @Override
   public Integer getTo() {
     return this.to;
+  }
+
+  @Override
+  protected AbstractNumberRange<?> newNumberRange(final long from, final long to) {
+    if (from < Integer.MIN_VALUE || to > Integer.MAX_VALUE) {
+      return new LongRange(from, to);
+    } else {
+      return new IntRange((int)from, (int)to);
+    }
   }
 
   @Override

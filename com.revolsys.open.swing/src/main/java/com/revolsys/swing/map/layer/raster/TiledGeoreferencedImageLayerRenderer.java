@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer.raster;
 
-import java.awt.Graphics2D;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
@@ -9,9 +8,11 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.ImageViewport;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayer;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
+import com.revolsys.swing.map.view.ViewRenderer;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
+import com.revolsys.util.BooleanCancellable;
 import com.revolsys.util.Cancellable;
 
 public class TiledGeoreferencedImageLayerRenderer<T extends GeoreferencedImageMapTile>
@@ -26,20 +27,16 @@ public class TiledGeoreferencedImageLayerRenderer<T extends GeoreferencedImageMa
   }
 
   @Override
-  protected void renderTile(final Viewport2D viewport, final Cancellable cancellable,
-    final T tile) {
+  protected void renderTile(final ViewRenderer view, final Cancellable cancellable, final T tile) {
     final GeoreferencedImage image = tile.getData();
-    final Graphics2D graphics = viewport.getGraphics();
-    if (graphics != null) {
-      viewport.drawImage(image, false);
-    }
+    view.drawImage(image, false);
   }
 
   @Override
-  protected void renderTiles(final Viewport2D viewport, final Cancellable cancellable,
+  protected void renderTiles(final ViewRenderer view, final BooleanCancellable cancellable,
     final List<T> mapTiles) {
     final AbstractTiledLayer<GeoreferencedImage, T> layer = getLayer();
-    if (layer.isProjectionRequired(viewport)) {
+    if (layer.isProjectionRequired(view)) {
       final GeometryFactory geometryFactory = layer.getGeometryFactory();
       final BoundingBox boundingBox = geometryFactory.bboxEditor()
         .addAllBbox(mapTiles)
@@ -47,19 +44,19 @@ public class TiledGeoreferencedImageLayerRenderer<T extends GeoreferencedImageMa
       final double resolution = getLayerResolution();
       final int width = (int)Math.round(boundingBox.getWidth() / resolution);
       final int height = (int)Math.round(boundingBox.getHeight() / resolution);
-      try (
-        final ImageViewport imageViewport = new ImageViewport(layer.getProject(), width, height,
-          boundingBox)) {
-        super.renderTiles(imageViewport, cancellable, mapTiles);
-        final GeoreferencedImage mergedImage = imageViewport.getGeoreferencedImage();
-        final GeoreferencedImage projectedImage = mergedImage.imageToCs(viewport);
-        final Graphics2D graphics = viewport.getGraphics();
-        if (graphics != null) {
-          viewport.drawImage(projectedImage, false);
+      if (width > 0 && height > 0) {
+        try (
+          final ImageViewport imageViewport = new ImageViewport(layer.getProject(), width, height,
+            boundingBox)) {
+          final Graphics2DViewRenderer imageView = imageViewport.newViewRenderer();
+          super.renderTiles(imageView, cancellable, mapTiles);
+          final GeoreferencedImage mergedImage = imageViewport.getGeoreferencedImage();
+          final GeoreferencedImage projectedImage = mergedImage.imageToCs(view);
+          view.drawImage(projectedImage, false);
         }
       }
     } else {
-      super.renderTiles(viewport, cancellable, mapTiles);
+      super.renderTiles(view, cancellable, mapTiles);
     }
   }
 

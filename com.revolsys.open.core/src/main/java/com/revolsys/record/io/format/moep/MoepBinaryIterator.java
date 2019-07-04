@@ -10,8 +10,9 @@ import java.util.NoSuchElementException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -190,7 +191,7 @@ public class MoepBinaryIterator extends BaseObjectWithProperties implements Iter
     final double centreX = readLEInt(this.in);
     final double centreY = readLEInt(this.in);
     this.center = new PointDouble(centreX, centreY);
-    this.factory = GeometryFactory.fixed(coordinateSystem.getCoordinateSystemId(), 1.0, 1.0);
+    this.factory = GeometryFactory.fixed3d(1.0, 1.0, 1.0);
     setProperty(IoConstants.GEOMETRY_FACTORY, this.factory);
   }
 

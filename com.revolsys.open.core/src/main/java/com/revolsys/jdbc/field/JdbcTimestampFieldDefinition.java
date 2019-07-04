@@ -7,9 +7,8 @@ import java.sql.Timestamp;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.date.Dates;
 
-import com.revolsys.record.Record;
-import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 
 public class JdbcTimestampFieldDefinition extends JdbcFieldDefinition {
@@ -25,11 +24,9 @@ public class JdbcTimestampFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
-    final Timestamp value = resultSet.getTimestamp(columnIndex);
-    setValue(record, value);
-    return columnIndex + 1;
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    return resultSet.getTimestamp(columnIndex);
   }
 
   @Override

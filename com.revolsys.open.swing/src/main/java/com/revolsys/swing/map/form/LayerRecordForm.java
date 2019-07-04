@@ -48,6 +48,7 @@ import javax.swing.undo.UndoableEdit;
 
 import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
@@ -56,7 +57,7 @@ import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.identifier.Identifier;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
@@ -153,8 +154,6 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
 
   private final Map<String, Field> fields = new LinkedHashMap<>();
 
-  private boolean settingRecord = false;
-
   private final ThreadLocal<Set<String>> fieldsToValidate = new ThreadLocal<>();
 
   private final Map<String, Integer> fieldTabIndex = new HashMap<>();
@@ -196,6 +195,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
   private ToolBar toolBar;
 
   private UndoManager undoManager = new RecordLayerFormUndoManager(this);
+
+  private boolean settingRecord = false;
 
   public LayerRecordForm(final AbstractRecordLayer layer) {
     ProjectFrame.addSaveActions(this, layer.getProject());
@@ -243,6 +244,16 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
   protected void actionAddOk() {
     final AbstractRecordLayer layer = getLayer();
     final LayerRecord record = getRecord();
+    if (layer.isNew(record)) {
+      final List<String> idFieldNames = this.recordDefinition.getIdFieldNames();
+      Identifier identifier = record.getIdentifier();
+      if (identifier == null && !idFieldNames.isEmpty()) {
+        identifier = this.recordStore.newPrimaryIdentifier(layer.getPathName());
+        if (identifier != null) {
+          identifier.setIdentifier(record, idFieldNames);
+        }
+      }
+    }
     layer.saveChanges(record);
     layer.setSelectedRecords(record);
     layer.showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED, true);
@@ -538,8 +549,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     // Geometry manipulation
     if (hasGeometry) {
       final DataType geometryDataType = geometryField.getDataType();
-      if (geometryDataType == DataTypes.LINE_STRING
-        || geometryDataType == DataTypes.MULTI_LINE_STRING) {
+      if (geometryDataType == GeometryDataTypes.LINE_STRING
+        || geometryDataType == GeometryDataTypes.MULTI_LINE_STRING) {
         if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
           this.toolBar.addButton("geometry", FLIP_RECORD_NAME, FLIP_RECORD_ICON, editable,
             this::flipRecordOrientation);
@@ -1446,8 +1457,8 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
 
   public boolean showAddDialog() {
     final String title = "Add New " + getName();
-    final Window window = SwingUtil.getActiveWindow();
-    final JDialog dialog = new JDialog(window, title, ModalityType.APPLICATION_MODAL);
+    final Window activeWindow = SwingUtil.getActiveWindow();
+    final JDialog dialog = new JDialog(activeWindow, title, ModalityType.APPLICATION_MODAL);
     dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     dialog.setLayout(new BorderLayout());
 
@@ -1460,7 +1471,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     buttons.add(this.addOkButton);
 
     dialog.pack();
-    dialog.setLocation(50, 50);
+    SwingUtil.setLocationOffset(dialog, 50, 50);
     dialog.addWindowListener(this);
     dialog.setVisible(true);
     SwingUtil.dispose(dialog);

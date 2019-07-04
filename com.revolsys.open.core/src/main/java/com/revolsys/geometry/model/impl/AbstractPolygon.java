@@ -32,8 +32,9 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
@@ -81,7 +82,7 @@ public abstract class AbstractPolygon implements Polygon {
     try {
       return (Polygon)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -132,7 +133,8 @@ public abstract class AbstractPolygon implements Polygon {
 
   @Override
   public int hashCode() {
-    return getBoundingBox().hashCode();
+    final BoundingBox boundingBox = getBoundingBox();
+    return boundingBox.hashCode();
   }
 
   @Override

@@ -71,7 +71,7 @@ public class MapGridGeometrySheetFilter implements Predicate<Record> {
       final Geometry geometry = object.getGeometry();
       if (geometry != null) {
         final Geometry geographicsGeometry = geometry
-          .convertGeometry(GeometryFactory.floating3(4326));
+          .convertGeometry(GeometryFactory.floating3d(4326));
         final Point centroid = geographicsGeometry.getCentroid().getPoint();
         final String geometrySheet = this.grid.getMapTileName(centroid.getX(), centroid.getY());
         if (geometrySheet != null) {

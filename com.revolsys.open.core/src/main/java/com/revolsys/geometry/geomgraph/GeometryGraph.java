@@ -339,7 +339,7 @@ public class GeometryGraph extends PlanarGraph {
     final Point[] points = new Point[nodes.size()];
     int i = 0;
     for (final Node node : nodes) {
-      points[i++] = node.getPoint().newPointDouble();
+      points[i++] = node.getPoint();
     }
     return points;
   }
@@ -424,7 +424,7 @@ public class GeometryGraph extends PlanarGraph {
       }
       return this.areaPtLocator.locate(pt);
     }
-    return this.ptLocator.locate(pt, this.geometry);
+    return this.ptLocator.locate(this.geometry, pt);
   }
 
   private EdgeSetIntersector newEdgeSetIntersector() {

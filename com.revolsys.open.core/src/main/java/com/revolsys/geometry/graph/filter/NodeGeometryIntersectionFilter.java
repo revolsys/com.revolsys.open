@@ -29,7 +29,7 @@ public class NodeGeometryIntersectionFilter<T> implements Predicate<Node<T>> {
   public boolean test(final Node<T> node) {
     final Point coordinates = node;
     final Point point = this.geometryFactory.point(coordinates);
-    final boolean intersects = this.preparedGeometry.intersects(point);
+    final boolean intersects = this.preparedGeometry.bboxIntersects(point);
     return intersects;
   }
 }

@@ -58,7 +58,7 @@ public class ShapefileRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordWriter newRecordWriter() {
+  public RecordWriter newRecordWriter(final boolean throwExceptions) {
     return this.writer;
   }
 

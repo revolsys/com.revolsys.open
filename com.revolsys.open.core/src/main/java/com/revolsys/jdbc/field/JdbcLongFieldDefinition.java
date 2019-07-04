@@ -7,29 +7,27 @@ import java.util.Map;
 
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.record.Record;
-
 public class JdbcLongFieldDefinition extends JdbcFieldDefinition {
   public JdbcLongFieldDefinition(final String dbName, final String name, final int sqlType,
-    final int length, final boolean required, final String description,
-    final Map<String, Object> properties) {
-    super(dbName, name, DataTypes.LONG, sqlType, length, 0, required, description, properties);
+    final boolean required, final String description, final Map<String, Object> properties) {
+    super(dbName, name, DataTypes.LONG, sqlType, 20, 0, required, description, properties);
   }
 
   @Override
   public JdbcLongFieldDefinition clone() {
-    return new JdbcLongFieldDefinition(getDbName(), getName(), getSqlType(), getLength(),
-      isRequired(), getDescription(), getProperties());
+    return new JdbcLongFieldDefinition(getDbName(), getName(), getSqlType(), isRequired(),
+      getDescription(), getProperties());
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
-    final long longValue = resultSet.getLong(columnIndex);
-    if (!resultSet.wasNull()) {
-      setValue(record, Long.valueOf(longValue));
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    final long value = resultSet.getLong(columnIndex);
+    if (resultSet.wasNull()) {
+      return null;
+    } else {
+      return Long.valueOf(value);
     }
-    return columnIndex + 1;
   }
 
   @Override

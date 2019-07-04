@@ -74,13 +74,13 @@ public class BasicSegmentString implements SegmentString {
   }
 
   @Override
-  public Point getPoint(final int i) {
-    return this.points.getPoint(i);
+  public LineString getLineString() {
+    return this.points;
   }
 
   @Override
-  public LineString getPoints() {
-    return this.points;
+  public Point getPoint(final int i) {
+    return this.points.getPoint(i);
   }
 
   /**

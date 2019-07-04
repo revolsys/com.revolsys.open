@@ -7,9 +7,9 @@ import com.revolsys.record.Record;
 public class LabelCountIterator implements Iterator<Record> {
   private final Iterator<Record> iterator;
 
-  private LabelCountMap labelCountMap;
+  private LabelCounters labelCountMap;
 
-  public LabelCountIterator(final Iterator<Record> iterator, final LabelCountMap labelCountMap) {
+  public LabelCountIterator(final Iterator<Record> iterator, final LabelCounters labelCountMap) {
     this.iterator = iterator;
     setStatistics(labelCountMap);
   }
@@ -17,7 +17,7 @@ public class LabelCountIterator implements Iterator<Record> {
   /**
    * @return the stats
    */
-  public LabelCountMap getStatistics() {
+  public LabelCounters getStatistics() {
     return this.labelCountMap;
   }
 
@@ -47,7 +47,7 @@ public class LabelCountIterator implements Iterator<Record> {
   /**
    * @param stats the stats to set
    */
-  public void setStatistics(final LabelCountMap labelCountMap) {
+  public void setStatistics(final LabelCounters labelCountMap) {
     this.labelCountMap = labelCountMap;
     labelCountMap.connect();
   }

@@ -4,20 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jeometry.common.number.Doubles;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
   private static final CoordinateSystem COORDINATE_SYSTEM = EpsgCoordinateSystems
     .getCoordinateSystem(4326);
 
-  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3(4326);
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(4326);
 
   public static final UtmRectangularMapGrid INSTANCE = new UtmRectangularMapGrid();
 
@@ -32,8 +31,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
   public BoundingBox getBoundingBox(final String mapTileName) {
     final double lat = getLatitude(mapTileName);
     final double lon = getLongitude(mapTileName);
-    return new BoundingBoxDoubleGf(GEOMETRY_FACTORY, 2, lon, lat, lon - this.tileWidth,
-      lat + this.tileHeight);
+    return GEOMETRY_FACTORY.newBoundingBox(lon, lat, lon - this.tileWidth, lat + this.tileHeight);
   }
 
   @Override
@@ -178,7 +176,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
   @Override
   public List<RectangularMapTile> getTiles(final BoundingBox boundingBox) {
     final com.revolsys.geometry.model.BoundingBox envelope = boundingBox
-      .convert(getGeometryFactory());
+      .bboxToCs(getGeometryFactory());
     final List<RectangularMapTile> tiles = new ArrayList<>();
     final int minXCeil = (int)Math.ceil(envelope.getMinX() / this.tileWidth);
     final double minX = minXCeil * this.tileWidth;

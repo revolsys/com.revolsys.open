@@ -50,7 +50,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.io.page.PageValueManager;
@@ -60,7 +59,6 @@ import com.revolsys.predicate.Predicates;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.util.ExitLoopException;
-import com.revolsys.util.MathUtil;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class Graph<T> extends BaseObjectWithProperties implements GeometryFactoryProxy {
@@ -99,7 +97,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
 
   private Map<Integer, Edge<T>> edgesById = new IntHashMap<>();
 
-  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private final int id = GRAPH_IDS.incrementAndGet();
 
@@ -121,7 +119,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
 
   private Map<Point, Integer> nodesIdsByCoordinates = new TreeMap<>();
 
-  private GeometryFactory precisionModel = GeometryFactory.DEFAULT;
+  private GeometryFactory precisionModel = GeometryFactory.DEFAULT_3D;
 
   public Graph() {
     this(true);
@@ -333,7 +331,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
   }
 
   public List<Node<T>> findNodes(BoundingBox boundingBox) {
-    boundingBox = boundingBox.convert(getGeometryFactory());
+    boundingBox = boundingBox.bboxToCs(getGeometryFactory());
     return NodeWithinBoundingBoxVisitor.getNodes(this, boundingBox);
   }
 
@@ -403,8 +401,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
     final Consumer<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<>(point, distance,
       results);
-    BoundingBox envelope = new BoundingBoxDoubleGf(point);
-    envelope = envelope.expand(distance);
+    final BoundingBox envelope = point.bboxEdit(editor -> editor.expand(distance));
     getNodeIndex().forEach(visitor, envelope);
     final List<Node<T>> nodes = results.getList();
     Collections.sort(nodes);
@@ -567,7 +564,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     double closestDistance = Double.MAX_VALUE;
     for (final Node<T> matchNode : nodes) {
       if (matchNode != node) {
-        final double distance = node.distance(matchNode);
+        final double distance = node.distancePoint(matchNode);
         if (distance < closestDistance) {
           closestDistance = distance;
         }
@@ -784,6 +781,14 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     return this.maxEdgesInMemory;
   }
 
+  public int getNextEdgeId() {
+    return this.nextEdgeId;
+  }
+
+  public int getNextNodeId() {
+    return this.nextNodeId;
+  }
+
   public Node<T> getNode(final int nodeId) {
     return this.nodesById.get(nodeId);
   }
@@ -807,6 +812,10 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
       this.nodeListeners.nodeEvent(node, null, null, NodeEvent.NODE_ADDED, null);
     }
     return node;
+  }
+
+  public int getNodeCount() {
+    return this.nodesById.size();
   }
 
   public Collection<Integer> getNodeIds() {
@@ -1062,16 +1071,16 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     final Point point2 = node2.get3dCoordinates(typePath);
 
     final Graph<Record> graph = node1.getGraph();
-    final Point midPoint = LineSegmentUtil.midPoint(GeometryFactory.fixed(0, 1000.0, 1.0), node2,
-      node1);
+    final Point midPoint = LineSegmentUtil.midPoint(GeometryFactory.fixed3d(1000.0, 1000.0, 1.0),
+      node2, node1);
     final double x = midPoint.getX();
     final double y = midPoint.getY();
     final double z1 = point1.getZ();
     final double z2 = point2.getZ();
     double z;
-    if (z1 == 0 || MathUtil.isNanOrInfinite(z1)) {
+    if (z1 == 0 || !Double.isFinite(z1)) {
       z = z2;
-    } else if (z2 == 0 || MathUtil.isNanOrInfinite(z1)) {
+    } else if (z2 == 0 || !Double.isFinite(z1)) {
       z = z1;
     } else {
       z = Double.NaN;
@@ -1134,13 +1143,13 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     final Point midPoint = LineSegmentUtil.midPoint(precisionModel, node1, node2);
     if (!node1.equals(2, midPoint)) {
       if (movedNodes != null) {
-        movedNodes.put(node1.newPointDouble(), midPoint);
+        movedNodes.put(node1, midPoint);
       }
       node1.move(midPoint);
     }
     if (!node2.equals(2, midPoint)) {
       if (movedNodes != null) {
-        movedNodes.put(node2.newPointDouble(), midPoint);
+        movedNodes.put(node2, midPoint);
       }
       node2.move(midPoint);
     }

@@ -442,12 +442,6 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return this.enableCheck;
   }
 
-  /*
-   * public void setGroupEnabled(final String groupName, final boolean enabled)
-   * { final List<Component> components = getGroup(groupName); for (final
-   * Component component : components) { component.setEnabled(enabled); } }
-   */
-
   public MenuFactory getFactory(final String name) {
     for (final List<ComponentFactory<?>> group : this.groups.values()) {
       for (final ComponentFactory<?> factory : group) {

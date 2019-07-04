@@ -7,7 +7,13 @@ public interface Counter {
 
   long add(final Number count);
 
+  long decrement();
+
   long get();
 
   String getName();
+
+  default Counter newNegative() {
+    return new NegativeCounter(getName(), this);
+  }
 }

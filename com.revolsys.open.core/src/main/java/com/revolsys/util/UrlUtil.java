@@ -37,6 +37,7 @@ import java.util.regex.Pattern;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.net.UrlProxy;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;

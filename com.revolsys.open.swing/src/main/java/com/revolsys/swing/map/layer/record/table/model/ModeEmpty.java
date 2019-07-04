@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
 import java.awt.Color;
+import java.util.Collection;
 import java.util.function.Consumer;
 
 import javax.swing.DefaultListSelectionModel;
@@ -14,7 +15,8 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public class ModeEmpty implements TableRecordsMode {
   @Override
-  public void exportRecords(final Query query, final Object target) {
+  public void exportRecords(final Query query, final Collection<String> fieldNames,
+    final Object target) {
   }
 
   @Override

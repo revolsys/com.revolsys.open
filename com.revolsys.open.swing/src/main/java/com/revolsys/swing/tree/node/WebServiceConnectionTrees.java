@@ -4,8 +4,8 @@ import org.jeometry.common.io.PathName;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.connection.ConnectionRegistry;
 import com.revolsys.gis.wms.WmsClient;
-import com.revolsys.io.connection.ConnectionRegistry;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.mapguide.MapGuideWebService;
 import com.revolsys.swing.Borders;
@@ -32,31 +32,28 @@ import com.revolsys.webservice.WebServiceResource;
 public class WebServiceConnectionTrees extends ConnectionManagerTrees {
 
   static {
-    final MenuFactory connectionRegistryMenu = MenuFactory
-      .getMenu(WebServiceConnectionRegistry.class);
+    MenuFactory.addMenuInitializer(WebServiceConnectionRegistry.class, (menu) -> {
 
-    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 0,
-      "Add ArcGIS REST Connection", "world:add", ConnectionRegistry::isEditable,
-      WebServiceConnectionTrees::addArcGISRestConnection);
+      TreeNodes.addMenuItemNodeValue(menu, "default", 0, "Add ArcGIS REST Connection", "world:add",
+        ConnectionRegistry::isEditable, WebServiceConnectionTrees::addArcGISRestConnection);
 
-    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 1, "Add OGC WMS Connection",
-      "world:add", ConnectionRegistry::isEditable, WebServiceConnectionTrees::addOgcWmsConnection);
+      TreeNodes.addMenuItemNodeValue(menu, "default", 1, "Add OGC WMS Connection", "world:add",
+        ConnectionRegistry::isEditable, WebServiceConnectionTrees::addOgcWmsConnection);
 
-    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 2, "Add MapGuide Connection",
-      "world:add", ConnectionRegistry::isEditable,
-      WebServiceConnectionTrees::addMapGuideRestConnection);
+      TreeNodes.addMenuItemNodeValue(menu, "default", 2, "Add MapGuide Connection", "world:add",
+        ConnectionRegistry::isEditable, WebServiceConnectionTrees::addMapGuideRestConnection);
 
-    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 3, "Import Connection...",
-      "world:import", WebServiceConnectionRegistry::isEditable,
-      FolderConnectionsTrees::importConnection);
+      TreeNodes.addMenuItemNodeValue(menu, "default", 3, "Import Connection...", "world:import",
+        WebServiceConnectionRegistry::isEditable, FolderConnectionsTrees::importConnection);
+    });
 
     // WebServiceConnection
-    final MenuFactory connectionMenu = MenuFactory.getMenu(WebServiceConnection.class);
-    TreeNodes.addMenuItemNodeValue(connectionMenu, "default", 0, "Edit Connection", "world:edit",
-      WebServiceConnection::isEditable, WebServiceConnectionTrees::editConnection);
-    TreeNodes.<WebServiceConnection> addMenuItemNodeValue(connectionMenu, "default", 1,
-      "Export Connection", "world:export", ConnectionManagerTrees::exportConnection);
-
+    MenuFactory.addMenuInitializer(WebServiceConnection.class, (menu) -> {
+      TreeNodes.addMenuItemNodeValue(menu, "default", 0, "Edit Connection", "world:edit",
+        WebServiceConnection::isEditable, WebServiceConnectionTrees::editConnection);
+      TreeNodes.<WebServiceConnection> addMenuItemNodeValue(menu, "default", 1, "Export Connection",
+        "world:export", ConnectionManagerTrees::exportConnection);
+    });
   }
 
   private static void addArcGISRestConnection(final WebServiceConnectionRegistry registry) {

@@ -238,7 +238,7 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
       final Number configRange = getProperty(LOOK_AT_RANGE_PROPERTY);
       final long range;
       if (configRange == null) {
-        range = KmlXmlWriter.getLookAtRange(boundingBox);
+        range = Kml.getLookAtRange(boundingBox);
       } else {
         range = configRange.longValue();
       }

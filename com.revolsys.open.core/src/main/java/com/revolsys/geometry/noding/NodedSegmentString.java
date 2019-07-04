@@ -161,6 +161,11 @@ public class NodedSegmentString implements NodableSegmentString {
     return this.data;
   }
 
+  @Override
+  public LineString getLineString() {
+    return this.points;
+  }
+
   public SegmentNodeList getNodeList() {
     return this.nodeList;
   }
@@ -168,11 +173,6 @@ public class NodedSegmentString implements NodableSegmentString {
   @Override
   public Point getPoint(final int i) {
     return this.points.getPoint(i);
-  }
-
-  @Override
-  public LineString getPoints() {
-    return this.points;
   }
 
   /**

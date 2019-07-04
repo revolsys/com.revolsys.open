@@ -1,21 +1,50 @@
 package com.revolsys.util;
 
+import java.util.Map;
+
+import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.data.type.ObjectDataType;
+
+import com.revolsys.elevation.gridded.GriddedElevationModel;
+import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.grid.CustomRectangularMapGrid;
 import com.revolsys.gis.wms.WmsClient;
+import com.revolsys.io.IoFactoryRegistry;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.raster.commonsimaging.CommonsImagingServiceInitializer;
 import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.mapguide.MapGuideWebService;
+import com.revolsys.record.io.format.scaledint.ScaledIntegerPointCloud;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
 
 public class RsCoreServiceInitializer implements ServiceInitializer {
+
   @Override
   public void initializeService() {
+    DataTypes.registerDataTypes(RsCoreDataTypes.class);
+    DataTypes.registerDataTypes(GeometryDataTypes.class);
+    ObjectDataType.setToObjectFunction(value -> {
+      if (value instanceof Map<?, ?>) {
+        @SuppressWarnings("unchecked")
+        final Map<String, ? extends Object> map = (Map<String, ? extends Object>)value;
+        final String type = MapObjectFactory.getType(map);
+        if (type != null) {
+          final Object object = MapObjectFactory.toObject(map);
+          if (object != null) {
+            return object;
+          }
+        }
+      }
+      return value;
+    });
+
     MapObjectFactoryRegistry.newFactory("geometryFactory", "Geometry Factory", config -> {
       return GeometryFactory.newGeometryFactory(config);
     });
@@ -67,9 +96,9 @@ public class RsCoreServiceInitializer implements ServiceInitializer {
   }
 
   private void ioFactory() {
-    // IoFactoryRegistry.addFactory(new ScaledIntegerPointCloud());
-    // GriddedElevationModel.serviceInit();
-    // TriangulatedIrregularNetwork.serviceInit();
+    IoFactoryRegistry.addFactory(new ScaledIntegerPointCloud());
+    GriddedElevationModel.serviceInit();
+    TriangulatedIrregularNetwork.serviceInit();
     CommonsImagingServiceInitializer.serviceInit();
   }
 

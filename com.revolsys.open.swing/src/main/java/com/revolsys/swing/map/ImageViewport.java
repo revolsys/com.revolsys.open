@@ -4,11 +4,17 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewport;
 
-public class ImageViewport extends GraphicsViewport2D {
-  private final BufferedImage image;
+public class ImageViewport extends Graphics2DViewport {
+  private BufferedImage image;
+
+  public ImageViewport(final int width, final int height) {
+    this(null, width, height, new BoundingBoxDoubleXY(0, 0, width, height));
+  }
 
   public ImageViewport(final Project project, final int width, final int height,
     final BoundingBox boundingBox) {
@@ -18,18 +24,20 @@ public class ImageViewport extends GraphicsViewport2D {
   public ImageViewport(final Project project, final int width, final int height,
     final BoundingBox boundingBox, final int imageType) {
     super(project, width, height, boundingBox);
-    this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);
-    setGraphics((Graphics2D)this.image.getGraphics());
+    newImage(width, height, imageType);
   }
 
   public ImageViewport(final Viewport2D parentViewport) {
-    this(parentViewport.getProject(), parentViewport.getViewWidthPixels(),
-      parentViewport.getViewHeightPixels(), parentViewport.getBoundingBox());
+    this(parentViewport, BufferedImage.TYPE_INT_ARGB_PRE);
   }
 
   public ImageViewport(final Viewport2D parentViewport, final int imageType) {
-    this(parentViewport.getProject(), parentViewport.getViewWidthPixels(),
-      parentViewport.getViewHeightPixels(), parentViewport.getBoundingBox(), imageType);
+    super(parentViewport);
+    final int viewWidthPixels = this.cacheBoundingBox.getViewWidthPixels();
+    final int viewHeightPixels = this.cacheBoundingBox.getViewHeightPixels();
+    if (viewWidthPixels > 0 && viewHeightPixels > 0) {
+      newImage(viewWidthPixels, viewHeightPixels, BufferedImage.TYPE_INT_ARGB_PRE);
+    }
   }
 
   public BufferedGeoreferencedImage getGeoreferencedImage() {
@@ -39,5 +47,12 @@ public class ImageViewport extends GraphicsViewport2D {
 
   public BufferedImage getImage() {
     return this.image;
+  }
+
+  private void newImage(final int viewWidthPixels, final int viewHeightPixels,
+    final int imageType) {
+    this.image = new BufferedImage(viewWidthPixels, viewHeightPixels, imageType);
+    final Graphics2D graphics = (Graphics2D)this.image.getGraphics();
+    setGraphics(graphics);
   }
 }

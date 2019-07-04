@@ -8,7 +8,6 @@ import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
 
@@ -17,15 +16,16 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge
     final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
     final Point point = node;
-    BoundingBox env = new BoundingBoxDoubleGf(point);
-    env = env.expand(maxDistance);
+    final BoundingBox env = point.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     graph.getEdgeIndex()
       .forEach(new EdgeLessThanDistanceToNodeVisitor<>(node, maxDistance, results), env);
     return results.getList();
 
   }
 
-  private BoundingBox envelope;
+  private final BoundingBox boundingBox;
 
   private final double maxDistance;
 
@@ -37,14 +37,15 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge
     this.node = node;
     this.maxDistance = maxDistance;
     final Point point = node;
-    this.envelope = new BoundingBoxDoubleGf(point);
-    this.envelope = this.envelope.expand(maxDistance);
+    this.boundingBox = point.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
   }
 
   @Override
   public void accept(final Edge<T> edge) {
     final com.revolsys.geometry.model.BoundingBox envelope = edge.getBoundingBox();
-    if (this.envelope.distance(envelope) < this.maxDistance) {
+    if (this.boundingBox.bboxDistance(envelope) < this.maxDistance) {
       if (!edge.hasNode(this.node)) {
         if (edge.isLessThanDistance(this.node, this.maxDistance)) {
           super.accept(edge);

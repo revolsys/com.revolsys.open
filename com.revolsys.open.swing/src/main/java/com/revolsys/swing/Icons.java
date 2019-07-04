@@ -7,7 +7,6 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
@@ -16,14 +15,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 
 import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.logging.Logs;
 
+import com.revolsys.raster.BufferedImages;
 import com.revolsys.util.IconNameProxy;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
@@ -254,20 +254,24 @@ public class Icons {
 
   public static Icon getIconWithBadge(final String iconName, final String badgeName) {
     final Icon icon = getIcon(iconName);
+    if (icon == null) {
+      Logs.error(Icons.class, "Cannot find icon: " + iconName);
+      return getIconWithBadge("page_white", badgeName);
+    }
     return getIconWithBadge(icon, badgeName);
   }
 
   protected static BufferedImage getImage(final InputStream in) {
     if (in != null) {
       try {
-        final BufferedImage image = ImageIO.read(in);
+        final BufferedImage image = BufferedImages.readImageIo(in);
         final BufferedImage convertedImg = new BufferedImage(image.getWidth(), image.getHeight(),
           BufferedImage.TYPE_INT_ARGB);
         final Graphics graphics = convertedImg.getGraphics();
         graphics.drawImage(image, 0, 0, null);
         graphics.dispose();
         return convertedImg;
-      } catch (final IOException e) {
+      } catch (final Exception e) {
       }
     }
     return null;

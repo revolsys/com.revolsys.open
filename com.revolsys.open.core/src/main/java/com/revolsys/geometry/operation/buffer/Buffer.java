@@ -40,6 +40,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
 import com.revolsys.geometry.algorithm.LineIntersector;
@@ -70,7 +72,6 @@ import com.revolsys.geometry.noding.SegmentString;
 import com.revolsys.geometry.noding.snapround.MCIndexSnapRounder;
 import com.revolsys.geometry.operation.overlay.OverlayNodeFactory;
 import com.revolsys.geometry.operation.overlay.PolygonBuilder;
-import com.revolsys.util.MathUtil;
 
 //import debug.*;
 
@@ -85,7 +86,7 @@ import com.revolsys.util.MathUtil;
  * operation of postive and negative buffering
  * is referred to as <i>erosion</i> and <i>dilation</i>
  * <p>
- * The buffer operation always returns a polygonal result.
+ * The buffer operation always returns a polygonal intersectionCount.
  * The negative or zero-distance buffer of lines and points is always an empty {@link Polygon}.
  * <p>
  * Since true buffer curves may contain circular arcs,
@@ -234,7 +235,7 @@ public class Buffer {
         || vertexCount == 2 && !segment.getPoint(0).equals(2, segment.getPoint(1))) {
         final Label oldLabel = (Label)segment.getData();
         final Label label = new Label(oldLabel);
-        final LineString points = segment.getPoints();
+        final LineString points = segment.getLineString();
         final Edge edge = new Edge(points, label);
         insertUniqueEdge(edges, edge);
       }
@@ -266,7 +267,7 @@ public class Buffer {
     final Point stabbingRayLeftPt) {
     final List<DepthSegment> segments = new ArrayList<>();
     for (final BufferSubgraph graph : graphs) {
-      final BoundingBox env = graph.getEnvelope();
+      final BoundingBox env = graph.getBoundingBox();
       if (stabbingRayLeftPt.getY() >= env.getMinY() && stabbingRayLeftPt.getY() <= env.getMaxY()) {
         final List<DirectedEdge> edges = graph.getDirectedEdges();
         for (final DirectedEdge edge : edges) {
@@ -425,7 +426,7 @@ public class Buffer {
   private static double precisionScaleFactor(final Geometry geometry, final double distance,
     final int maxPrecisionDigits) {
     final BoundingBox boundingBox = geometry.getBoundingBox();
-    final double envMax = MathUtil.max(Math.abs(boundingBox.getMaxX()),
+    final double envMax = Doubles.max(Math.abs(boundingBox.getMaxX()),
       Math.abs(boundingBox.getMaxY()), Math.abs(boundingBox.getMinX()),
       Math.abs(boundingBox.getMinY()));
 

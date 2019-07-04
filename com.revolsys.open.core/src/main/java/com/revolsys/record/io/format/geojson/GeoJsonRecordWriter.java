@@ -3,6 +3,8 @@ package com.revolsys.record.io.format.geojson;
 import java.io.BufferedWriter;
 import java.io.Writer;
 
+import org.jeometry.common.math.Angle;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -12,15 +14,14 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
+import com.revolsys.geometry.util.Points;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
-import com.revolsys.math.Angle;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.cogojson.CogoJson;
 import com.revolsys.record.io.format.json.JsonWriter;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.MathUtil;
 
 public class GeoJsonRecordWriter extends AbstractRecordWriter {
 
@@ -87,7 +88,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
         final double currentX = x;
         final double previousX = line.getX(i - 1);
         final double previousY = line.getY(i - 1);
-        x = MathUtil.distance(previousX, previousY, currentX, y);
+        x = Points.distance(previousX, previousY, currentX, y);
         y = Angle.angleNorthDegrees(previousX, previousY, currentX, y);
       }
 

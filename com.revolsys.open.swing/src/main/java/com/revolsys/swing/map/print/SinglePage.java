@@ -16,24 +16,25 @@ import javax.print.attribute.PrintRequestAttributeSet;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.swing.map.GraphicsViewport2D;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.ViewportCacheBoundingBox;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewport;
 import com.revolsys.swing.parallel.Invoke;
 
-public class SinglePage extends GraphicsViewport2D implements Pageable, Printable {
+public class SinglePage extends Graphics2DViewport implements Pageable, Printable {
 
   public static void print() {
     final Project project = Project.get();
     final Viewport2D viewport = project.getViewport();
-    final int viewWidth = viewport.getViewWidthPixels();
-    final int viewHeight = viewport.getViewHeightPixels();
-    final BoundingBox boundingBox = viewport.getBoundingBox();
-    final double scaleForVisible = viewport.getScaleForVisible();
+    final ViewportCacheBoundingBox cacheBoundingBox = viewport.getCacheBoundingBox();
+    final BoundingBox boundingBox = cacheBoundingBox.getBoundingBox();
+    final int viewWidth = cacheBoundingBox.getViewWidthPixels();
+    final int viewHeight = cacheBoundingBox.getViewHeightPixels();
+    final double scaleForVisible = cacheBoundingBox.getScale();
 
     final PrinterJob job = PrinterJob.getPrinterJob();
 
@@ -68,10 +69,15 @@ public class SinglePage extends GraphicsViewport2D implements Pageable, Printabl
 
   private final double scaleForVisible;
 
-  public SinglePage(final Project project, final BoundingBox boundingBox, final int viewWidth,
-    final int viewHeight, final double scaleForVisible) {
+  public SinglePage(final Project project, final BoundingBox boundingBox, final double viewWidth,
+    final double viewHeight, final double scaleForVisible) {
     super(project, viewWidth, viewHeight, boundingBox);
     this.scaleForVisible = scaleForVisible;
+  }
+
+  @Override
+  public double getMetresPerPixel() {
+    return 2.54e-3 / 72;
   }
 
   @Override
@@ -83,8 +89,8 @@ public class SinglePage extends GraphicsViewport2D implements Pageable, Printabl
   public PageFormat getPageFormat(final int pageIndex) {
     final PageFormat pageFormat = new PageFormat();
     final Paper paper = new Paper();
-    final int viewWidth = getViewWidthPixels();
-    final int viewHeight = getViewHeightPixels();
+    final double viewWidth = getViewWidthPixels();
+    final double viewHeight = getViewHeightPixels();
     double width;
     double height;
     if (viewWidth > viewHeight) {
@@ -102,11 +108,6 @@ public class SinglePage extends GraphicsViewport2D implements Pageable, Printabl
   }
 
   @Override
-  protected double getPixelsPerYUnit(final double viewHeight, final double mapHeight) {
-    return -viewHeight / mapHeight;
-  }
-
-  @Override
   public Printable getPrintable(final int pageIndex) {
     if (pageIndex == 0) {
       return this;
@@ -116,29 +117,27 @@ public class SinglePage extends GraphicsViewport2D implements Pageable, Printabl
   }
 
   @Override
-  public double getScaleForVisible() {
-    return this.scaleForVisible;
-  }
-
-  @Override
-  public boolean isHidden(final AbstractRecordLayer layer, final LayerRecord record) {
-    return false;
+  public Graphics2DViewRenderer newViewRenderer(final Graphics graphics) {
+    final Graphics2DViewRenderer renderer = new Graphics2DViewRenderer(this, (Graphics2D)graphics);
+    renderer.setShowHiddenRecords(true);
+    return renderer;
   }
 
   @Override
   public int print(final Graphics graphics, final PageFormat pageFormat, final int pageIndex)
     throws PrinterException {
     if (pageIndex == 0) {
-      setGraphics((Graphics2D)graphics);
+      final Graphics2DViewRenderer view = newViewRenderer(graphics);
+      view.setScaleForVisible(this.scaleForVisible);
       final int translateX = (int)pageFormat.getImageableX();
       final int translateY = (int)pageFormat.getImageableY();
       graphics.translate(translateX - 1, translateY - 1);
       final Project project = getProject();
       final MapPanel mapPanel = project.getMapPanel();
       final Layer baseMapLayer = mapPanel.getBaseMapLayer();
-      render(baseMapLayer);
+      view.renderLayer(baseMapLayer);
 
-      render(project);
+      view.renderLayer(project);
       return PAGE_EXISTS;
     } else {
       return NO_SUCH_PAGE;

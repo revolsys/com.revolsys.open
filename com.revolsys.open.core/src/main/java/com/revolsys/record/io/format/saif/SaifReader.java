@@ -567,7 +567,8 @@ public class SaifReader extends AbstractReader<Record>
         loadSchema();
         loadExportedObjects();
         loadSrid();
-        final GeometryFactory geometryFactory = GeometryFactory.fixed(this.srid, 1.0, 1.0);
+        final int coordinateSystemId = this.srid;
+        final GeometryFactory geometryFactory = GeometryFactory.fixed3d(1.0, 1.0, 1.0);
 
         for (final RecordDefinition recordDefinition : ((RecordDefinitionFactoryImpl)this.recordDefinitionFactory)
           .getRecordDefinitions()) {

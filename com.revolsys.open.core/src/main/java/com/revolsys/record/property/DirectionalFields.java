@@ -113,21 +113,21 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     return property.getMergedRecordReverseLongest(record1, record2);
   }
 
-  public static void reverse(final Record record) {
-    final DirectionalFields property = getProperty(record);
-    property.reverseFieldValuesAndGeometry(record);
-  }
-
-  public static void reverseFieldValues(final Record record) {
+  public static void reverseFieldValuesRecord(final Record record) {
     final DirectionalFields property = getProperty(record);
     final Map<String, Object> map = record;
     property.reverseFieldValues(map);
   }
 
-  public static void reverseGeometry(final Record record) {
+  public static void reverseGeometryRecord(final Record record) {
     final DirectionalFields property = getProperty(record);
     final Map<String, Object> map = record;
     property.reverseGeometry(map);
+  }
+
+  public static void reverseRecord(final Record record) {
+    final DirectionalFields property = getProperty(record);
+    property.reverseFieldValuesAndGeometry(record);
   }
 
   private final Map<String, Map<Object, Object>> directionalFieldValues = new HashMap<>();
@@ -524,8 +524,8 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
       toRecord = record1;
       newLine = line1.merge(point, line2);
     } else {
-      final Vertex line1To = line1.getVertex(-1);
-      final Vertex line2To = line2.getVertex(-1);
+      final Vertex line1To = line1.getToVertex(0);
+      final Vertex line2To = line2.getToVertex(0);
       if (line1To.equals(2, line2To) && line1To.equals(2, point)) {
         record2 = getReverse(record2);
         line2 = record2.getGeometry();
@@ -891,7 +891,7 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
   public void setSplitFieldValues(final LineString oldLine, final Point splitPoint,
     final Map<String, Object> newRecord, final LineString newLine) {
     final boolean firstPoint = newLine.equalsVertex(2, 0, splitPoint);
-    final boolean toPoint = newLine.equalsVertex(2, -1, splitPoint);
+    final boolean toPoint = newLine.equalsVertex(2, newLine.getLastVertexIndex(), splitPoint);
     if (firstPoint) {
       if (!toPoint) {
         clearFromFields(newRecord);

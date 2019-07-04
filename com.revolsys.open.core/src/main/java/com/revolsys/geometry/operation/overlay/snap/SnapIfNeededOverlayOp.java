@@ -88,7 +88,7 @@ public class SnapIfNeededOverlayOp {
       final boolean isValid = true;
       // not needed if noding validation is used
       // boolean isValid = OverlayResultValidator.isValid(geom[0], geom[1],
-      // OverlayOp.INTERSECTION, result);
+      // OverlayOp.INTERSECTION, intersectionCount);
       if (isValid) {
         isSuccess = true;
       }

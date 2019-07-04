@@ -32,7 +32,7 @@ public class ToolTipOverlay extends AbstractOverlay {
     repaint();
   }
 
-  public void setText(final Point2D point, final CharSequence text) {
+  public void setText(int x, int y, final CharSequence text) {
     this.label.setText(text.toString());
     this.label.setVisible(true);
     final Dimension preferredSize = this.label.getPreferredSize();
@@ -43,8 +43,6 @@ public class ToolTipOverlay extends AbstractOverlay {
     final int offset = 50;
     final int overlayWidth = getWidth() - offset;
     final int overlayHeight = getHeight() - offset;
-    int x = (int)point.getX();
-    int y = (int)point.getY();
     if (x > offset) {
       x += offset;
     }
@@ -64,5 +62,11 @@ public class ToolTipOverlay extends AbstractOverlay {
 
     getMap().moveToFront(this);
     repaint();
+  }
+
+  public void setText(final Point2D point, final CharSequence text) {
+    final int x = (int)point.getX();
+    final int y = (int)point.getY();
+    setText(x, y, text);
   }
 }

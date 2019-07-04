@@ -32,19 +32,25 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.function.Consumer4Double;
+import org.jeometry.common.function.Function4Double;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.prep.PreparedMultiLineString;
 
 /**
  * Models a collection of (@link LineString}s.
@@ -61,10 +67,6 @@ public class MultiLineStringImpl implements MultiLineString {
    */
   private BoundingBox boundingBox;
 
-  /**
-   * An object reference which can be used to carry ancillary data defined
-   * by the client.
-   */
   private Object userData;
 
   private final GeometryFactory geometryFactory;
@@ -74,7 +76,7 @@ public class MultiLineStringImpl implements MultiLineString {
   public MultiLineStringImpl(final GeometryFactory geometryFactory, final LineString... lines) {
     this.geometryFactory = geometryFactory;
     if (lines == null || lines.length == 0) {
-      this.lines = null;
+      throw new IllegalArgumentException("MultiLineString must not be empty");
     } else if (Geometry.hasNullElements(lines)) {
       throw new IllegalArgumentException("geometries must not contain null elements");
     } else {
@@ -97,7 +99,7 @@ public class MultiLineStringImpl implements MultiLineString {
     try {
       return (Lineal)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -141,13 +143,82 @@ public class MultiLineStringImpl implements MultiLineString {
   }
 
   @Override
+  public <R> R findSegment(final Function4Double<R> action) {
+    for (final Geometry geometry : this.lines) {
+      final R result = geometry.findSegment(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    for (final Geometry geometry : this.lines) {
+      final R result = geometry.findVertex(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public void forEachGeometry(final Consumer<Geometry> action) {
+    if (this.lines != null) {
+      for (final Geometry geometry : this.lines) {
+        action.accept(geometry);
+      }
+    }
+  }
+
+  @Override
+  public void forEachSegment(final Consumer4Double action) {
+    for (final Geometry geometry : this.lines) {
+      geometry.forEachSegment(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    for (final LineString line : this.lines) {
+      line.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final Consumer3Double action) {
+    for (final Geometry geometry : this.lines) {
+      geometry.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
+    for (final Geometry geometry : this.lines) {
+      geometry.forEachVertex(coordinatesOperation, point, action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperationPoint coordinates,
+    final Consumer<CoordinatesOperationPoint> action) {
+    for (final Geometry geometry : this.lines) {
+      geometry.forEachVertex(coordinates, action);
+    }
+  }
+
+  @Override
+  public int getAxisCount() {
+    return this.geometryFactory.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     if (this.boundingBox == null) {
-      if (isEmpty()) {
-        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
-      } else {
-        this.boundingBox = newBoundingBox();
-      }
+      this.boundingBox = newBoundingBox();
     }
     return this.boundingBox;
   }
@@ -155,30 +226,18 @@ public class MultiLineStringImpl implements MultiLineString {
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    if (this.lines == null) {
-      return new ArrayList<>();
-    } else {
-      return (List<V>)new ArrayList<>(Arrays.asList(this.lines));
-    }
+    return (List<V>)Lists.newArray(this.lines);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry(final int n) {
-    if (this.lines == null) {
-      return null;
-    } else {
-      return (V)this.lines[n];
-    }
+    return (V)this.lines[n];
   }
 
   @Override
   public int getGeometryCount() {
-    if (this.lines == null) {
-      return 0;
-    } else {
-      return this.lines.length;
-    }
+    return this.lines.length;
   }
 
   @Override
@@ -186,13 +245,13 @@ public class MultiLineStringImpl implements MultiLineString {
     return this.geometryFactory;
   }
 
-  /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
   @Override
-  public Object getUserData() {
+  public int getLineStringCount() {
+    return this.lines.length;
+  }
+
+  @Override
+  public Object getUserDataOld() {
     return this.userData;
   }
 
@@ -209,26 +268,11 @@ public class MultiLineStringImpl implements MultiLineString {
 
   @Override
   public boolean isEmpty() {
-    return this.lines == null;
+    return false;
   }
 
   @Override
-  public Lineal prepare() {
-    return new PreparedMultiLineString(this);
-  }
-
-  /**
-   * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Point Reference System.
-   * <p>
-   * Note that user data objects are not present in geometries created by
-   * construction methods.
-   *
-   * @param userData an object, the semantics for which are defined by the
-   * application using this Geometry
-   */
-  @Override
-  public void setUserData(final Object userData) {
+  public void setUserDataOld(final Object userData) {
     this.userData = userData;
   }
 

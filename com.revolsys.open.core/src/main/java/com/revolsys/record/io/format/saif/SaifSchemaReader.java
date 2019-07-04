@@ -41,6 +41,7 @@ import org.jeometry.common.data.type.EnumerationDataType;
 import org.jeometry.common.data.type.SimpleDataType;
 import org.jeometry.common.io.PathName;
 
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.saif.util.CsnIterator;
 import com.revolsys.record.property.FieldProperties;
@@ -63,15 +64,15 @@ public class SaifSchemaReader {
   static {
     addType("/Boolean", DataTypes.BOOLEAN);
     addType("/Numeric", DataTypes.DECIMAL);
-    addType("/Integer", DataTypes.INTEGER);
+    addType("/Integer", DataTypes.BIG_INTEGER);
     addType("/Integer8", DataTypes.BYTE);
     addType("/Integer16", DataTypes.SHORT);
     addType("/Integer32", DataTypes.INT);
     addType("/Integer64", DataTypes.LONG);
-    addType("/Integer8Unsigned", DataTypes.INTEGER);
-    addType("/Integer16Unsigned", DataTypes.INTEGER);
-    addType("/Integer32Unsigned", DataTypes.INTEGER);
-    addType("/Integer64Unsigned", DataTypes.INTEGER);
+    addType("/Integer8Unsigned", DataTypes.BIG_INTEGER);
+    addType("/Integer16Unsigned", DataTypes.BIG_INTEGER);
+    addType("/Integer32Unsigned", DataTypes.BIG_INTEGER);
+    addType("/Integer64Unsigned", DataTypes.BIG_INTEGER);
     addType("/Real", DataTypes.DECIMAL);
     addType("/Real32", DataTypes.FLOAT);
     addType("/Real64", DataTypes.DOUBLE);
@@ -102,7 +103,7 @@ public class SaifSchemaReader {
     this.schema.addRecordDefinition(exportedObjectHandle);
     exportedObjectHandle.addField("referenceID", DataTypes.STRING, true);
     exportedObjectHandle.addField("type", DataTypes.STRING, true);
-    exportedObjectHandle.addField("offset", DataTypes.INTEGER, true);
+    exportedObjectHandle.addField("offset", DataTypes.BIG_INTEGER, true);
     exportedObjectHandle.addField("sharable", DataTypes.BOOLEAN, true);
   }
 
@@ -151,7 +152,7 @@ public class SaifSchemaReader {
               final String typePath = iterator.getPathValue();
               DataType dataType = nameTypeMap.get(typePath);
               if (typePath.equals(SPATIAL_OBJECT) || typePath.equals(TEXT_OR_SYMBOL_OBJECT)) {
-                dataType = DataTypes.GEOMETRY;
+                dataType = GeometryDataTypes.GEOMETRY;
                 this.currentClass.setGeometryFieldIndex(this.currentClass.getFieldCount());
               } else if (dataType == null) {
                 dataType = new SimpleDataType(typePath, Record.class);
@@ -167,7 +168,7 @@ public class SaifSchemaReader {
                 final DataType collectionDataType = nameTypeMap.get(collectionType);
                 DataType contentDataType = nameTypeMap.get(contentTypeName);
                 if (contentDataType == null) {
-                  contentDataType = DataTypes.RECORD;
+                  contentDataType = GeometryDataTypes.RECORD;
                 }
                 this.currentClass.addField(fieldName,
                   new CollectionDataType(collectionDataType.getName(),

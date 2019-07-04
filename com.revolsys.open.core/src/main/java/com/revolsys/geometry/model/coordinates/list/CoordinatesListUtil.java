@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.math.Angle;
 import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.algorithm.RobustDeterminant;
@@ -12,17 +13,14 @@ import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.graph.linestring.LineStringGraph;
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.math.Angle;
 
 public class CoordinatesListUtil {
   public static final String COORDINATE_DISTANCE = "coordinateDistance";
@@ -38,7 +36,7 @@ public class CoordinatesListUtil {
     final double y1 = points.getY(i1);
     final double x2 = points.getX(i2);
     final double y2 = points.getY(i2);
-    final double angle = Angle.angle2d(x1, x2, y1, y2);
+    final double angle = Angle.angle2d(x1, y1, x2, y2);
     return angle;
   }
 
@@ -53,7 +51,7 @@ public class CoordinatesListUtil {
       y2 = points.getY(j);
       j++;
     } while (x1 == x2 && y1 == y2 && j < points.getVertexCount());
-    final double angle = Angle.angle2d(x1, x2, y1, y2);
+    final double angle = Angle.angle2d(x1, y1, x2, y2);
     return angle;
   }
 
@@ -69,7 +67,7 @@ public class CoordinatesListUtil {
         y2 = points.getY(j);
         j--;
       } while (x1 == x2 && y1 == y2 && j > -1);
-      final double angle = Angle.angle2d(x1, x2, y1, y2);
+      final double angle = Angle.angle2d(x1, y1, x2, y2);
       return angle;
     } else {
       throw new IllegalArgumentException("Index must be > 0 to calculate previous angle");
@@ -204,24 +202,18 @@ public class CoordinatesListUtil {
     return false;
   }
 
-  public static BoundingBox getBoundingBox(final GeometryFactory geometryFactory,
-    final LineString points) {
-    final BoundingBox boundingBox = new BoundingBoxDoubleGf(geometryFactory, points);
-    return boundingBox;
+  public static Point[] getPointArray(final Geometry geometry) {
+    return getPointArray(geometry, geometry.getVertexCount());
   }
 
-  public static Point[] getCoordinateArray(final Geometry geometry) {
-    return getCoordinates(geometry, geometry.getVertexCount());
-  }
-
-  public static Point[] getCoordinates(final Geometry g, final int vertexCount) {
+  public static Point[] getPointArray(final Geometry geometry, final int vertexCount) {
     final List<Point> coordinates = new ArrayList<>();
     final int i = 0;
-    for (final Vertex vertex : g.vertices()) {
+    for (final Vertex vertex : geometry.vertices()) {
       if (i > vertexCount) {
         break;
       }
-      coordinates.add(vertex.newPointDouble());
+      coordinates.add(vertex);
     }
     return coordinates.toArray(new Point[coordinates.size()]);
   }
@@ -307,13 +299,13 @@ public class CoordinatesListUtil {
         final Point midPoint = LineSegmentUtil.midPoint(precisionModel, node1, node2);
         if (!node1.equals(2, midPoint)) {
           if (movedNodes != null) {
-            movedNodes.put(node1.newPointDouble(), midPoint);
+            movedNodes.put(node1, midPoint);
           }
           node1.move(midPoint);
         }
         if (!node2.equals(2, midPoint)) {
           if (movedNodes != null) {
-            movedNodes.put(node2.newPointDouble(), midPoint);
+            movedNodes.put(node2, midPoint);
           }
           node2.move(midPoint);
         }

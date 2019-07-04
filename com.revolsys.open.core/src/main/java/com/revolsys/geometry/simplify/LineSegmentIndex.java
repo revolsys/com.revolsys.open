@@ -38,10 +38,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import com.revolsys.geometry.index.quadtree.QuadTree;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 
 /**
  * An spatial index on a set of {@link LineSegmentDouble}s.
@@ -58,7 +58,7 @@ class LineSegmentIndex {
   }
 
   public void add(final LineSegment seg) {
-    this.index.insert(new BoundingBoxDoubleGf(seg.getP0(), seg.getP1()), seg);
+    this.index.insertItem(BoundingBox.bboxNew(seg.getP0(), seg.getP1()), seg);
   }
 
   public void add(final TaggedLineString line) {
@@ -69,10 +69,10 @@ class LineSegmentIndex {
   }
 
   public List query(final LineSegment querySeg) {
-    final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(querySeg.getP0(), querySeg.getP1());
+    final BoundingBox env = BoundingBox.bboxNew(querySeg.getP0(), querySeg.getP1());
 
     final LineSegmentVisitor visitor = new LineSegmentVisitor(querySeg);
-    this.index.forEach(visitor, env);
+    this.index.forEach(env, visitor);
     final List itemsFound = visitor.getItems();
 
     // List listQueryItems = index.query(env);
@@ -84,7 +84,7 @@ class LineSegmentIndex {
   }
 
   public void remove(final LineSegment seg) {
-    this.index.removeItem(new BoundingBoxDoubleGf(seg.getP0(), seg.getP1()), seg);
+    this.index.removeItem(BoundingBox.bboxNew(seg.getP0(), seg.getP1()), seg);
   }
 }
 
@@ -104,7 +104,7 @@ class LineSegmentVisitor implements Consumer<LineSegment> {
 
   @Override
   public void accept(final LineSegment seg) {
-    if (BoundingBoxUtil.intersects(seg.getP0(), seg.getP1(), this.querySeg.getP0(),
+    if (RectangleUtil.intersects(seg.getP0(), seg.getP1(), this.querySeg.getP0(),
       this.querySeg.getP1())) {
       this.items.add(seg);
     }

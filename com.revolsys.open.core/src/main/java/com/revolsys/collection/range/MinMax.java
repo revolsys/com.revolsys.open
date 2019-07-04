@@ -1,5 +1,6 @@
 package com.revolsys.collection.range;
 
+import org.jeometry.common.number.Integers;
 import org.jeometry.common.number.Numbers;
 
 import com.revolsys.util.Emptyable;
@@ -210,7 +211,7 @@ public class MinMax extends IntRange implements Cloneable, Emptyable {
   }
 
   public boolean overlaps(final int min, final int max) {
-    return Numbers.overlaps(getMin(), getMax(), min, max);
+    return Integers.overlaps(getMin(), getMax(), min, max);
   }
 
   public boolean overlaps(final MinMax minMax) {

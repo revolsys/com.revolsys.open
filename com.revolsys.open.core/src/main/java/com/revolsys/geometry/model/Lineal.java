@@ -38,7 +38,12 @@ import java.util.function.Function;
 
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.geometry.algorithm.index.LineSegmentIndex;
+import com.revolsys.geometry.graph.linemerge.LineMerger;
+import com.revolsys.geometry.index.LineSegmentIndex;
+import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
+import com.revolsys.geometry.model.editor.GeometryCollectionImplEditor;
+import com.revolsys.geometry.model.editor.LinealEditor;
+import com.revolsys.geometry.model.editor.MultiLineStringEditor;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -64,7 +69,7 @@ public interface Lineal extends Geometry {
       if (segment.getLength() == 0) {
         errors.add(new DuplicateVertexError(segment.getGeometryVertex(0)));
       } else {
-        final List<LineSegment> segments = index.queryBoundingBox(segment);
+        final List<LineSegment> segments = index.getItems(segment);
         for (final LineSegment lineSegment : segments) {
           final Segment segment2 = (Segment)lineSegment;
           final int partIndex2 = segment2.getPartIndex();
@@ -120,8 +125,7 @@ public interface Lineal extends Geometry {
                     final Vertex vertex = segment.getGeometryVertex(1);
                     error = new SelfIntersectionVertexError(vertex);
                   } else {
-                    error = new SelfIntersectionPointError(lineal,
-                      pointIntersection.newPointDouble());
+                    error = new SelfIntersectionPointError(lineal, pointIntersection);
                   }
                   errors.add(error);
                   if (shortCircuit) {
@@ -180,7 +184,7 @@ public interface Lineal extends Geometry {
         "Expecting a Lineal geometry not " + geometry.getGeometryType() + "\n" + geometry);
     } else {
       final String string = DataTypes.toString(value);
-      final Geometry geometry = GeometryFactory.DEFAULT.geometry(string, false);
+      final Geometry geometry = GeometryFactory.DEFAULT_3D.geometry(string, false);
       return (G)newLineal(geometry);
     }
   }
@@ -193,12 +197,85 @@ public interface Lineal extends Geometry {
 
   Lineal applyLineal(final Function<LineString, LineString> function);
 
+  double getCoordinate(int partIndex, int vertexIndex, int axisIndex);
+
   LineString getLineString(int partIndex);
+
+  default double getM(final int partIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, vertexIndex, M);
+  }
+
+  default double getX(final int partIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, vertexIndex, X);
+  }
+
+  default double getY(final int partIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, vertexIndex, Y);
+  }
+
+  default double getZ(final int partIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, vertexIndex, Z);
+  }
 
   boolean isClosed();
 
   Iterable<LineString> lineStrings();
 
+  default Lineal mergeLines() {
+    if (isEmpty()) {
+      return this;
+    } else {
+      final LineMerger merger = new LineMerger(this);
+      return merger.getLineal();
+    }
+  }
+
+  @Override
+  Lineal newGeometry(final GeometryFactory geometryFactory);
+
+  @Override
+  default LinealEditor newGeometryEditor() {
+    return new MultiLineStringEditor(this);
+  }
+
+  @Override
+  default LinealEditor newGeometryEditor(final AbstractGeometryEditor<?> parentEditor) {
+    return new MultiLineStringEditor((GeometryCollectionImplEditor)parentEditor, this);
+  }
+
+  @Override
+  default LinealEditor newGeometryEditor(final int axisCount) {
+    final LinealEditor geometryEditor = newGeometryEditor();
+    geometryEditor.setAxisCount(axisCount);
+    return geometryEditor;
+  }
+
+  default Lineal newLineal(final GeometryFactory geometryFactory, final LineString... lines) {
+    return geometryFactory.lineal(lines);
+  }
+
   @Override
   Lineal normalize();
+
+  default double setCoordinate(final int partIndex, final int vertexIndex, final int axisIndex,
+    final double coordinate) {
+    throw new UnsupportedOperationException();
+  }
+
+  default double setM(final int partIndex, final int vertexIndex, final double m) {
+    return setCoordinate(partIndex, vertexIndex, M, m);
+  }
+
+  default double setX(final int partIndex, final int vertexIndex, final double x) {
+    return setCoordinate(partIndex, vertexIndex, X, x);
+  }
+
+  default double setY(final int partIndex, final int vertexIndex, final double y) {
+    return setCoordinate(partIndex, vertexIndex, Y, y);
+  }
+
+  default double setZ(final int partIndex, final int vertexIndex, final double z) {
+    return setCoordinate(partIndex, vertexIndex, Z, z);
+  }
+
 }

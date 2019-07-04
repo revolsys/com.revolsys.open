@@ -1,109 +1,24 @@
 package com.revolsys.jdbc.field;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.identifier.Identifier;
-import com.revolsys.identifier.TypedIdentifier;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 
 public class JdbcFieldDefinition extends FieldDefinition {
-  public static final String UNKNOWN = "UNKNOWN";
-
-  private static final JdbcFieldDefinition FIELD_UNKNOWN = new JdbcFieldDefinition();
-
-  private static final JdbcBooleanFieldDefinition FIELD_BOOLEAN = new JdbcBooleanFieldDefinition(
-    UNKNOWN, UNKNOWN, Types.BIT, -1, false, null, null);
-
-  private static final JdbcTimestampFieldDefinition FIELD_TIMESTAMP = new JdbcTimestampFieldDefinition(
-    UNKNOWN, UNKNOWN, -1, false, null, null);
-
-  private static final JdbcDateFieldDefinition FIELD_DATE = new JdbcDateFieldDefinition(UNKNOWN,
-    UNKNOWN, -1, false, null, null);
-
-  private static final JdbcBigDecimalFieldDefinition FIELD_BIG_DECIMAL = new JdbcBigDecimalFieldDefinition(
-    UNKNOWN, UNKNOWN, Types.NUMERIC, -1, -1, false, null, null);
-
-  private static final JdbcFloatFieldDefinition FIELD_FLOAT = new JdbcFloatFieldDefinition(UNKNOWN,
-    UNKNOWN, Types.FLOAT, -1, false, null, null);
-
-  private static final JdbcDoubleFieldDefinition FIELD_DOUBLE = new JdbcDoubleFieldDefinition(
-    UNKNOWN, UNKNOWN, Types.DOUBLE, -1, false, null, null);
-
-  private static final JdbcByteFieldDefinition FIELD_BYTE = new JdbcByteFieldDefinition(UNKNOWN,
-    UNKNOWN, Types.TINYINT, -1, false, null, null);
-
-  private static final JdbcShortFieldDefinition FIELD_SHORT = new JdbcShortFieldDefinition(UNKNOWN,
-    UNKNOWN, Types.SMALLINT, -1, false, null, null);
-
-  private static final JdbcIntegerFieldDefinition FIELD_INTEGER = new JdbcIntegerFieldDefinition(
-    UNKNOWN, UNKNOWN, Types.INTEGER, -1, false, null, null);
-
-  private static final JdbcLongFieldDefinition FIELD_LONG = new JdbcLongFieldDefinition(UNKNOWN,
-    UNKNOWN, Types.BIGINT, -1, false, null, null);
-
-  private static final JdbcStringFieldDefinition FIELD_STRING = new JdbcStringFieldDefinition(
-    UNKNOWN, UNKNOWN, Types.CHAR, -1, false, null, null);
-
-  private static final JdbcFieldDefinition FIELD_OBJECT = new JdbcFieldDefinition(UNKNOWN, UNKNOWN,
-    DataTypes.OBJECT, Types.OTHER, 0, 0, false, null, null);
-
-  public static JdbcFieldDefinition newFieldDefinition(Object value) {
-    if (value instanceof TypedIdentifier) {
-      return FIELD_STRING;
-    } else if (value instanceof Identifier) {
-      final Identifier identifier = (Identifier)value;
-      value = identifier.toSingleValue();
-    }
-    if (value == null) {
-      return FIELD_OBJECT;
-    } else if (value instanceof CharSequence) {
-      return FIELD_STRING;
-    } else if (value instanceof BigInteger) {
-      return FIELD_LONG;
-    } else if (value instanceof Long) {
-      return FIELD_LONG;
-    } else if (value instanceof Integer) {
-      return FIELD_INTEGER;
-    } else if (value instanceof Short) {
-      return FIELD_SHORT;
-    } else if (value instanceof Byte) {
-      return FIELD_BYTE;
-    } else if (value instanceof Double) {
-      return FIELD_DOUBLE;
-    } else if (value instanceof Float) {
-      return FIELD_FLOAT;
-    } else if (value instanceof BigDecimal) {
-      return FIELD_BIG_DECIMAL;
-    } else if (value instanceof Date) {
-      return FIELD_DATE;
-    } else if (value instanceof java.util.Date) {
-      return FIELD_TIMESTAMP;
-    } else if (value instanceof Boolean) {
-      return FIELD_BOOLEAN;
-    } else {
-      return FIELD_UNKNOWN;
-    }
-  }
-
   private String dbName;
 
   private boolean quoteName = false;
 
   private int sqlType;
 
-  private JdbcFieldDefinition() {
-    setName(UNKNOWN);
+  JdbcFieldDefinition() {
+    setName(JdbcFieldDefinitions.UNKNOWN);
   }
 
   public JdbcFieldDefinition(final String dbName, final String name, final DataType type,
@@ -158,27 +73,42 @@ public class JdbcFieldDefinition extends FieldDefinition {
     return this.sqlType;
   }
 
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    return resultSet.getObject(columnIndex);
+  }
+
   public boolean isQuoteName() {
     return this.quoteName;
   }
 
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
-    final Object value = resultSet.getObject(columnIndex);
-    setValue(record, value);
+    final Record record, final boolean internStrings) throws SQLException {
+    final Object value = getValueFromResultSet(resultSet, columnIndex, internStrings);
+    final int index = getIndex();
+    record.setValue(index, value);
     return columnIndex + 1;
+  }
+
+  public int setInsertPreparedStatementValue(final PreparedStatement statement,
+    final int parameterIndex, final Object value) throws SQLException {
+    return setPreparedStatementValue(statement, parameterIndex, value);
   }
 
   public int setInsertPreparedStatementValue(final PreparedStatement statement,
     final int parameterIndex, final Record record) throws SQLException {
     final String name = getName();
     final Object value = record.getValue(name);
-    return setPreparedStatementValue(statement, parameterIndex, value);
+    return setInsertPreparedStatementValue(statement, parameterIndex, value);
   }
 
   public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
     final Object value) throws SQLException {
-    statement.setObject(parameterIndex, value);
+    if (value == null) {
+      statement.setNull(parameterIndex, this.sqlType);
+    } else {
+      statement.setObject(parameterIndex, value);
+    }
     return parameterIndex + 1;
   }
 

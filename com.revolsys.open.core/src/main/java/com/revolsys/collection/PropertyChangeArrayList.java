@@ -2,10 +2,10 @@ package com.revolsys.collection;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import com.revolsys.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 
 public class PropertyChangeArrayList<T> extends ArrayList<T>

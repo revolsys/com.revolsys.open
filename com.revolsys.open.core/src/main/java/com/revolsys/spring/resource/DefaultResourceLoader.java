@@ -19,13 +19,13 @@ public class DefaultResourceLoader implements ResourceLoader {
 
     @Override
     public Resource createRelative(final String relativePath) {
-      final String pathToUse = StringUtils.applyRelativePath(getPath(), relativePath);
+      final String pathToUse = StringUtils.applyRelativePath(getClassPath(), relativePath);
       return new ClassPathContextResource(pathToUse, getClassLoader());
     }
 
     @Override
     public String getPathWithinContext() {
-      return getPath();
+      return getClassPath();
     }
   }
 

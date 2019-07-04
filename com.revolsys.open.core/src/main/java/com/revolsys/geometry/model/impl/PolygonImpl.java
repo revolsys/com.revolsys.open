@@ -33,6 +33,15 @@
 package com.revolsys.geometry.model.impl;
 
 import java.util.List;
+import java.util.function.Consumer;
+
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.function.Consumer4Double;
+import org.jeometry.common.function.Function4Double;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.BoundingBox;
@@ -81,8 +90,15 @@ public class PolygonImpl extends AbstractPolygon {
 
   private Object userData;
 
-  public PolygonImpl(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
+  public PolygonImpl(final GeometryFactory factory, final LinearRing ring) {
+    this.geometryFactory = factory;
+    if (ring == null || ring.isEmpty()) {
+      throw new IllegalArgumentException("Polygon ring must not be empty");
+    } else {
+      this.rings = new LinearRing[] {
+        ring
+      };
+    }
   }
 
   /**
@@ -96,22 +112,15 @@ public class PolygonImpl extends AbstractPolygon {
    *      , or <code>null</code> or empty <code>LinearRing</code>s if the empty
    *      geometry is to be created.
    */
-  public PolygonImpl(final GeometryFactory factory, final LinearRing... rings) {
+  public PolygonImpl(final GeometryFactory factory, final LinearRing[] rings, final int ringCount) {
     this.geometryFactory = factory;
-    if (rings == null || rings.length == 0) {
-
-    } else if (Geometry.hasNullElements(rings)) {
-      throw new IllegalArgumentException("rings must not contain null elements");
+    if (rings == null || ringCount == 0) {
+      throw new IllegalArgumentException("Polygon must not be empty");
     } else {
-      if (rings[0].isEmpty()) {
-        for (int i = 1; i < rings.length; i++) {
-          final LinearRing ring = rings[i];
-          if (!ring.isEmpty()) {
-            throw new IllegalArgumentException("shell is empty but hole " + (i - 1) + " is not");
-          }
-        }
-      } else {
-        this.rings = rings;
+      this.rings = new LinearRing[ringCount];
+      for (int i = 0; i < rings.length; i++) {
+        final LinearRing ring = rings[i];
+        this.rings[i] = ring;
       }
     }
   }
@@ -125,25 +134,100 @@ public class PolygonImpl extends AbstractPolygon {
   @Override
   public PolygonImpl clone() {
     final PolygonImpl poly = (PolygonImpl)super.clone();
-    if (this.rings != null) {
-      poly.rings = this.rings.clone();
-      for (int i = 0; i < this.rings.length; i++) {
-        poly.rings[i] = this.rings[i].clone();
-      }
+    poly.rings = this.rings.clone();
+    for (int i = 0; i < this.rings.length; i++) {
+      poly.rings[i] = this.rings[i].clone();
     }
     return poly;
   }
 
   @Override
-  public BoundingBox getBoundingBox() {
-    if (this.boundingBox == null) {
-      if (isEmpty()) {
-        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
-      } else {
-        this.boundingBox = newBoundingBox();
+  public <R> R findSegment(final Function4Double<R> action) {
+    for (final Geometry geometry : this.rings) {
+      final R result = geometry.findSegment(action);
+      if (result != null) {
+        return result;
       }
     }
+    return null;
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    for (final Geometry geometry : this.rings) {
+      final R result = geometry.findVertex(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public void forEachGeometry(final Consumer<Geometry> action) {
+    for (final LinearRing ring : this.rings) {
+      ring.forEachGeometry(action);
+    }
+  }
+
+  @Override
+  public void forEachSegment(final Consumer4Double action) {
+    for (final Geometry geometry : this.rings) {
+      geometry.forEachSegment(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    for (final LinearRing ring : this.rings) {
+      ring.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final Consumer3Double action) {
+    for (final Geometry geometry : this.rings) {
+      geometry.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
+    for (final Geometry geometry : this.rings) {
+      geometry.forEachVertex(coordinatesOperation, point, action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperationPoint coordinates,
+    final Consumer<CoordinatesOperationPoint> action) {
+    for (final Geometry geometry : this.rings) {
+      geometry.forEachVertex(coordinates, action);
+    }
+  }
+
+  @Override
+  public int getAxisCount() {
+    return this.geometryFactory.getAxisCount();
+  }
+
+  @Override
+  public BoundingBox getBoundingBox() {
+    if (this.boundingBox == null) {
+      this.boundingBox = newBoundingBox();
+    }
     return this.boundingBox;
+  }
+
+  @Override
+  public double getCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,
+    final int axisIndex) {
+    if (partIndex == 0) {
+      return getCoordinate(ringIndex, vertexIndex, axisIndex);
+    } else {
+      return Double.NaN;
+    }
   }
 
   @Override
@@ -153,7 +237,7 @@ public class PolygonImpl extends AbstractPolygon {
 
   @Override
   public LinearRing getRing(final int ringIndex) {
-    if (this.rings == null || ringIndex < 0 || ringIndex >= this.rings.length) {
+    if (ringIndex < 0 || ringIndex >= this.rings.length) {
       return null;
     } else {
       return this.rings[ringIndex];
@@ -162,11 +246,7 @@ public class PolygonImpl extends AbstractPolygon {
 
   @Override
   public int getRingCount() {
-    if (this.rings == null) {
-      return 0;
-    } else {
-      return this.rings.length;
-    }
+    return this.rings.length;
   }
 
   @Override
@@ -174,33 +254,18 @@ public class PolygonImpl extends AbstractPolygon {
     return Lists.newArray(this.rings);
   }
 
-  /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
   @Override
-  public Object getUserData() {
+  public Object getUserDataOld() {
     return this.userData;
   }
 
   @Override
   public boolean isEmpty() {
-    return this.rings == null;
+    return false;
   }
 
-  /**
-   * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Point Reference System.
-   * <p>
-   * Note that user data objects are not present in geometries created by
-   * construction methods.
-   *
-   * @param userData an object, the semantics for which are defined by the
-   * application using this Geometry
-   */
   @Override
-  public void setUserData(final Object userData) {
+  public void setUserDataOld(final Object userData) {
     this.userData = userData;
   }
 }

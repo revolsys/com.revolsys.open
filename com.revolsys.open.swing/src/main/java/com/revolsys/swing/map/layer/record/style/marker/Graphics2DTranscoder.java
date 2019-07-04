@@ -22,8 +22,6 @@ public class Graphics2DTranscoder extends SVGAbstractTranscoder {
   @Override
   protected void transcode(final Document document, final String uri, final TranscoderOutput output)
     throws TranscoderException {
-
-    // Sets up root, curTxf & curAoi
     super.transcode(document, uri, output);
     this.graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
       RenderingHints.VALUE_ANTIALIAS_ON);
@@ -34,11 +32,11 @@ public class Graphics2DTranscoder extends SVGAbstractTranscoder {
 
     final AffineTransform t = this.graphics.getTransform();
     final Shape clip = this.graphics.getClip();
-    if (this.curTxf != null) {
-      this.graphics.transform(this.curTxf);
-    }
 
     try {
+      if (this.curTxf != null) {
+        this.graphics.transform(this.curTxf);
+      }
       this.root.paint(this.graphics);
     } catch (final Exception e) {
       Logs.error(this, e);

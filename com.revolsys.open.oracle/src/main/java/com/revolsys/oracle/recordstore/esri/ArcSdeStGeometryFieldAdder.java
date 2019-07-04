@@ -10,7 +10,6 @@ import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
 import com.revolsys.record.property.FieldProperties;
-import com.revolsys.record.schema.FieldDefinition;
 
 public class ArcSdeStGeometryFieldAdder extends JdbcFieldAdder {
   public ArcSdeStGeometryFieldAdder(final AbstractJdbcRecordStore recordStore) {
@@ -18,9 +17,9 @@ public class ArcSdeStGeometryFieldAdder extends JdbcFieldAdder {
   }
 
   @Override
-  public FieldDefinition addField(final AbstractJdbcRecordStore recordStore,
+  public ArcSdeStGeometryFieldDefinition newField(final AbstractJdbcRecordStore recordStore,
     final JdbcRecordDefinition recordDefinition, final String dbName, final String name,
-    final String dataTypeName, final int sqlType, final int length, final int scale,
+    final String dbDataType, final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
     final JdbcRecordStoreSchema schema = recordDefinition.getSchema();
     final PathName typePath = recordDefinition.getPathName();
@@ -52,12 +51,10 @@ public class ArcSdeStGeometryFieldAdder extends JdbcFieldAdder {
     final GeometryFactory geometryFactory = JdbcFieldAdder.getColumnProperty(schema, typePath,
       columnName, JdbcFieldAdder.GEOMETRY_FACTORY);
 
-    final FieldDefinition fieldDefinition = new ArcSdeStGeometryFieldDefinition(dbName, name,
+    final ArcSdeStGeometryFieldDefinition field = new ArcSdeStGeometryFieldDefinition(dbName, name,
       dataType, required, description, null, spatialReference, axisCount);
-
-    recordDefinition.addField(fieldDefinition);
-    fieldDefinition.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
-    return fieldDefinition;
+    field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+    return field;
   }
 
 }

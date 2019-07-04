@@ -7,7 +7,7 @@ import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.io.connection.AbstractConnection;
+import com.revolsys.connection.AbstractConnection;
 import com.revolsys.io.map.MapObjectFactory;
 
 public class WebServiceConnection extends

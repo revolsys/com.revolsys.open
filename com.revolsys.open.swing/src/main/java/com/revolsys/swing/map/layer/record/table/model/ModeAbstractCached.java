@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -54,19 +55,6 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
     final AbstractRecordLayer layer = getLayer();
     final PropertyChangeListener recordFieldListener = this::recordFieldChanged;
     layer.addPropertyChangeListener(recordFieldListener);
-
-    addListeners( //
-      Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_DELETED,
-        this::recordsDeleted) //
-    );
-
-    for (final String propertyName : new String[] {
-      "filter", AbstractRecordLayer.RECORDS_CHANGED
-    }) {
-      addListeners( //
-        Property.addListenerRunnable(layer, propertyName, this::refresh));
-    }
-
     addListeners( //
       Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORD_UPDATED,
         this::recordUpdated), //
@@ -138,12 +126,13 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
   }
 
   @Override
-  public void exportRecords(final Query query, final Object target) {
+  public void exportRecords(final Query query, final Collection<String> fieldNames,
+    final Object target) {
     final Condition filter = query.getWhereCondition();
     final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
     final AbstractRecordLayer layer = getLayer();
     final Iterable<LayerRecord> records = new ListByIndexIterator<>(this.records);
-    layer.exportRecords(records, filter, orderBy, target);
+    layer.exportRecords(records, filter, fieldNames, orderBy, target);
   }
 
   protected void fireRecordUpdated(final int index) {
@@ -246,6 +235,11 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
     }
   }
 
+  protected PropertyChangeListener newRecordsDeletedListener(final AbstractRecordLayer layer) {
+    return Property.<List<LayerRecord>> addListenerNewValueSource(layer,
+      AbstractRecordLayer.RECORDS_DELETED, this::recordsDeleted);
+  }
+
   protected ListSelectionModel newSelectionModel(final RecordLayerTableModel tableModel) {
     return new RecordLayerListSelectionModel(tableModel);
   }
@@ -338,4 +332,5 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
     this.recordCount = recordCount;
     this.model.firePropertyChange("rowCount", oldValue, getRecordCount());
   }
+
 }

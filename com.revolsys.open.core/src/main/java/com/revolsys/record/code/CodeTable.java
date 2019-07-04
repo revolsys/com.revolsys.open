@@ -12,13 +12,13 @@ import java.util.Set;
 
 import javax.swing.JComponent;
 
+import org.jeometry.common.compare.CompareUtil;
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.beans.Classes;
 import com.revolsys.collection.list.Lists;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.util.CompareUtil;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
 
@@ -184,6 +184,15 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
     return getValues(identifier);
   }
 
+  @Override
+  default boolean isEmpty() {
+    return false;
+  }
+
+  default boolean isLoadAll() {
+    return true;
+  }
+
   default boolean isLoaded() {
     return true;
   }
@@ -197,7 +206,7 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
 
   default void refreshIfNeeded() {
     synchronized (this) {
-      if (!isLoaded()) {
+      if (!isLoaded() && !isLoading()) {
         refresh();
       }
     }

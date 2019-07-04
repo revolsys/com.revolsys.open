@@ -9,17 +9,16 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
-import com.revolsys.geometry.io.GeometryReaderFactory;
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;
+import com.revolsys.record.io.GeometryRecordReaderFactory;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
-public class Gml extends AbstractIoFactoryWithCoordinateSystem
-  implements RecordWriterFactory, GeometryReaderFactory {
+public class Gml extends GeometryRecordReaderFactory implements RecordWriterFactory {
   public static final String _NS_PREFIX = "gml";
 
   public static final String _NS_URI = "http://www.opengis.net/gml";
@@ -92,9 +91,13 @@ public class Gml extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
-  public GeometryReader newGeometryReader(final Resource resource) {
-    final GmlGeometryReader iterator = new GmlGeometryReader(resource);
-    return iterator;
+  public boolean isReadFromZipFileSupported() {
+    return true;
+  }
+
+  @Override
+  public GeometryReader newGeometryReader(final Resource resource, final MapEx properties) {
+    return new GmlGeometryReader(resource, properties);
   }
 
   @Override

@@ -82,11 +82,11 @@ class EnvelopeIntersectsVisitor extends ShortCircuitedGeometryVisitor {
     final BoundingBox elementEnv = element.getBoundingBox();
 
     // disjoint => no intersection
-    if (!this.rectEnv.intersects(elementEnv)) {
+    if (!this.rectEnv.bboxIntersects(elementEnv)) {
       return;
     }
     // rectangle contains target env => must intersect
-    if (this.rectEnv.covers(elementEnv)) {
+    if (this.rectEnv.bboxCovers(elementEnv)) {
       this.intersects = true;
       return;
     }
@@ -157,19 +157,20 @@ class GeometryContainsPointVisitor extends ShortCircuitedGeometryVisitor {
 
     // skip if envelopes do not intersect
     final BoundingBox elementEnv = geom.getBoundingBox();
-    if (!this.rectEnv.intersects(elementEnv)) {
+    if (!this.rectEnv.bboxIntersects(elementEnv)) {
       return;
     }
 
     // test each corner of rectangle for inclusion
     for (int i = 0; i < 4; i++) {
       final Point rectPt = this.rectSeq.getPoint(i);
-      if (!elementEnv.covers(rectPt)) {
+      if (!elementEnv.bboxCovers(rectPt)) {
         continue;
       }
       // check rect point in poly (rect is known not to touch polygon at this
       // point)
-      if (SimplePointInAreaLocator.containsPointInPolygon(rectPt, (Polygon)geom)) {
+      if (SimplePointInAreaLocator.containsPointInPolygon((Polygon)geom, rectPt.getX(),
+        rectPt.getY())) {
         this.containsPoint = true;
         return;
       }
@@ -200,7 +201,7 @@ public class RectangleIntersects {
    *          a Geometry of any type
    * @return true if the geometries intersect
    */
-  public static boolean intersects(final Polygon rectangle, final Geometry b) {
+  public static boolean rectangleIntersects(final Polygon rectangle, final Geometry b) {
     final RectangleIntersects rp = new RectangleIntersects(rectangle);
     return rp.intersects(b);
   }
@@ -228,7 +229,7 @@ public class RectangleIntersects {
    * @return true if the geometry intersects the query rectangle
    */
   public boolean intersects(final Geometry geom) {
-    if (!this.rectEnv.intersects(geom.getBoundingBox())) {
+    if (!this.rectEnv.bboxIntersects(geom.getBoundingBox())) {
       return false;
     }
 
@@ -337,7 +338,7 @@ class RectangleIntersectsSegmentVisitor extends ShortCircuitedGeometryVisitor {
      * so it is worth checking this simple condition.
      */
     final BoundingBox elementEnv = geom.getBoundingBox();
-    if (!this.rectEnv.intersects(elementEnv)) {
+    if (!this.rectEnv.bboxIntersects(elementEnv)) {
       return;
     }
 

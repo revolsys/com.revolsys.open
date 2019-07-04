@@ -83,7 +83,7 @@ public class IsValidOp {
     // instance?)
     for (final Point testPoint : testPoints) {
       if (!eiList.isIntersection(testPoint)) {
-        return testPoint.newPointDouble();
+        return testPoint;
       }
     }
     return null;

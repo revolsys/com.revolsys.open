@@ -1,9 +1,9 @@
 package com.revolsys.parallel.process;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.revolsys.parallel.channel.Channel;
-import com.revolsys.util.function.Consumer2;
 
 public class LambdaInProcess<T> extends BaseInProcess<T> {
 
@@ -13,7 +13,7 @@ public class LambdaInProcess<T> extends BaseInProcess<T> {
   private Consumer<Channel<T>> preRun = (c) -> {
   };
 
-  private Consumer2<Channel<T>, T> process = (c, o) -> {
+  private BiConsumer<Channel<T>, T> process = (c, o) -> {
   };
 
   public LambdaInProcess() {
@@ -58,13 +58,13 @@ public class LambdaInProcess<T> extends BaseInProcess<T> {
     return this;
   }
 
-  public LambdaInProcess<T> setProcess(final Consumer<T> process) {
-    this.process = (in, object) -> process.accept(object);
+  public LambdaInProcess<T> setProcess(final BiConsumer<Channel<T>, T> process) {
+    this.process = process;
     return this;
   }
 
-  public LambdaInProcess<T> setProcess(final Consumer2<Channel<T>, T> process) {
-    this.process = process;
+  public LambdaInProcess<T> setProcess(final Consumer<T> process) {
+    this.process = (in, object) -> process.accept(object);
     return this;
   }
 }

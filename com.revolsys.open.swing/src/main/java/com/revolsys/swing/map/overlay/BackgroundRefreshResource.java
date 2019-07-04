@@ -1,47 +1,44 @@
 package com.revolsys.swing.map.overlay;
 
-import com.revolsys.beans.PropertyChangeSupport;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.swing.SwingWorker;
 
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.parallel.SupplierConsumerMaxThreadsSwingWorker;
+import com.revolsys.util.Cancellable;
 
 public class BackgroundRefreshResource<T> implements PropertyChangeSupportProxy {
-  private T resource;
+  private final String description;
+
+  private final String key;
+
+  private final Function<Cancellable, T> newResourceFactory;
 
   private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
-  private final Supplier<T> newResourceFactory;
+  private long refreshIndexCurrent = Long.MIN_VALUE;
 
   private long refreshIndexLast = Long.MIN_VALUE;
 
   private final AtomicLong refreshIndexNext = new AtomicLong(Long.MIN_VALUE);
 
-  private long refreshIndexCurrent = Long.MIN_VALUE;
+  private T resource;
 
   private SwingWorker<T, Void> worker;
 
-  private final String key;
+  private final Object refreshSync = new Object();
 
-  private final String description;
-
-  public BackgroundRefreshResource(final String description, final Supplier<T> newResourceFactory) {
+  public BackgroundRefreshResource(final String description,
+    final Function<Cancellable, T> newResourceFactory) {
     this.description = description;
     this.key = description;
     this.newResourceFactory = newResourceFactory;
-  }
-
-  protected boolean canRefreshFinish(final long refreshIndex) {
-    if (refreshIndex >= this.refreshIndexLast) {
-      this.refreshIndexLast = refreshIndex;
-      return true;
-    } else {
-      return false;
-    }
   }
 
   @Override
@@ -53,26 +50,43 @@ public class BackgroundRefreshResource<T> implements PropertyChangeSupportProxy 
     return this.resource;
   }
 
-  public void refresh() {
-    long refreshIndex;
+  public boolean isNew() {
     synchronized (this.refreshIndexNext) {
-      if (this.worker != null && !this.worker.isDone()
-        && this.refreshIndexNext.get() > this.refreshIndexCurrent) {
-        return;
+      if (this.resource == null) {
+        return this.refreshIndexNext.get() == Long.MIN_VALUE;
       } else {
-        refreshIndex = this.refreshIndexNext.incrementAndGet();
+        return false;
       }
     }
-    if (this.worker != null) {
-      this.worker.cancel(true);
+  }
+
+  public void refresh() {
+    synchronized (this.refreshSync) {
+
+      SwingWorker<T, Void> worker;
+      long refreshIndex;
+      synchronized (this.refreshIndexNext) {
+        worker = this.worker;
+        if (worker != null && !worker.isDone()
+          && this.refreshIndexNext.get() > this.refreshIndexCurrent) {
+          return;
+        } else {
+          refreshIndex = this.refreshIndexNext.incrementAndGet();
+        }
+      }
+      if (worker != null) {
+        worker.cancel(true);
+      }
+      final Supplier<T> backgroundTask = () -> refreshBackground(refreshIndex);
+      final Consumer<T> doneTask = resource -> refreshUi(refreshIndex, resource);
+      worker = new SupplierConsumerMaxThreadsSwingWorker<>(this.key, 1,
+        "Refresh: " + this.description, backgroundTask, doneTask);
+      Invoke.worker(worker);
+      synchronized (this.refreshIndexNext) {
+        this.worker = worker;
+      }
     }
-    this.worker = new SupplierConsumerMaxThreadsSwingWorker<>(this.key, 1,
-      "Refresh: " + this.description, () -> {
-        return refreshBackground(refreshIndex);
-      }, (resource) -> {
-        refreshUi(refreshIndex, resource);
-      });
-    Invoke.worker(this.worker);
+
   }
 
   private T refreshBackground(final long refreshIndex) {
@@ -83,7 +97,8 @@ public class BackgroundRefreshResource<T> implements PropertyChangeSupportProxy 
         return null;
       }
     }
-    return this.newResourceFactory.get();
+    final Cancellable cancellable = () -> this.refreshIndexNext.get() > refreshIndex;
+    return this.newResourceFactory.apply(cancellable);
   }
 
   private void refreshUi(final long refreshIndex, final T resource) {
@@ -91,12 +106,12 @@ public class BackgroundRefreshResource<T> implements PropertyChangeSupportProxy 
       final T oldValue = this.resource;
       boolean changed = false;
       synchronized (this.refreshIndexNext) {
-        if (refreshIndex == this.refreshIndexNext.get()) {
-          this.worker = null;
-        }
         if (refreshIndex > this.refreshIndexLast) {
           this.refreshIndexLast = refreshIndex;
           this.resource = resource;
+        }
+        if (refreshIndex == this.refreshIndexNext.get()) {
+          this.worker = null;
           changed = true;
         }
       }

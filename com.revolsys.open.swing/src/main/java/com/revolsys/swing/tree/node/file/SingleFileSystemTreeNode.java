@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.swing.tree.BaseTreeNode;
 
@@ -20,7 +20,7 @@ public class SingleFileSystemTreeNode extends PathTreeNode {
     try {
       this.fileSystem = FileSystems.newFileSystem(path, null);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

@@ -1,9 +1,7 @@
 package com.revolsys.swing.map.layer.record.style;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Shape;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -18,20 +16,23 @@ import javax.swing.Icon;
 
 import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.function.BiFunctionDouble;
 import org.jeometry.common.logging.Logs;
+import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.cs.unit.CustomUnits;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.marker.AbstractMarker;
+import com.revolsys.swing.map.layer.record.style.marker.GeometryMarker;
 import com.revolsys.swing.map.layer.record.style.marker.ImageMarker;
 import com.revolsys.swing.map.layer.record.style.marker.Marker;
-import com.revolsys.swing.map.layer.record.style.marker.ShapeMarker;
-import com.revolsys.swing.map.symbol.SymbolLibrary;
+import com.revolsys.swing.map.layer.record.style.marker.MarkerLibrary;
+import com.revolsys.swing.map.layer.record.style.marker.MarkerRenderer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
@@ -42,7 +43,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
 
   private static final Map<String, Object> DEFAULT_VALUES = new TreeMap<>();
 
-  public static final AbstractMarker ELLIPSE = new ShapeMarker("ellipse");
+  public static final Marker ELLIPSE = MarkerLibrary.findMarker("ellipse");
 
   public static final Quantity<Length> ONE_PIXEL = Quantities.getQuantity(1, CustomUnits.PIXEL);
 
@@ -94,22 +95,22 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     }
   }
 
-  public static MarkerStyle marker(final AbstractMarker marker, final double markerSize,
+  public static MarkerStyle marker(final BiFunctionDouble<Geometry> newMarkerFunction,
+    final double markerSize, final Color lineColor, final double lineWidth, final Color fillColor) {
+    final AbstractMarker marker = new GeometryMarker(newMarkerFunction);
+    return marker(marker, markerSize, lineColor, fillColor);
+  }
+
+  public static MarkerStyle marker(final Marker marker, final double markerSize,
     final Color lineColor, final Color fillColor) {
     final MarkerStyle style = new MarkerStyle();
     style.setMarker(marker, markerSize, lineColor, fillColor);
     return style;
   }
 
-  public static MarkerStyle marker(final Shape shape, final double markerSize,
-    final Color lineColor, final double lineWidth, final Color fillColor) {
-    final AbstractMarker marker = new ShapeMarker(shape);
-    return marker(marker, markerSize, lineColor, fillColor);
-  }
-
   public static MarkerStyle marker(final String markerName, final double markerSize,
     final Color lineColor, final double lineWidth, final Color fillColor) {
-    final AbstractMarker marker = new ShapeMarker(markerName);
+    final Marker marker = MarkerLibrary.findMarker(markerName);
     final MarkerStyle style = marker(marker, markerSize, lineColor, fillColor);
     style.setMarkerLineWidth(Quantities.getQuantity(lineWidth, CustomUnits.PIXEL));
     return style;
@@ -278,7 +279,24 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     return this.marker.newIcon(this);
   }
 
-  public void setMarker(final AbstractMarker marker, final double markerSize, final Color lineColor,
+  public MarkerRenderer newMarkerRenderer(final ViewRenderer view) {
+    return this.marker.newMarkerRenderer(view, this);
+  }
+
+  public void setMarker(final Marker marker) {
+    final Marker oldMarker = this.marker;
+    final String oldMarkerType = this.markerType;
+    this.marker = getWithDefault(marker, ELLIPSE);
+    if (marker != null && marker.isUseMarkerName()) {
+      this.markerType = marker.getName();
+    } else {
+      this.markerType = "ellipse";
+    }
+    firePropertyChange("marker", oldMarker, this.marker);
+    firePropertyChange("markerType", oldMarkerType, this.markerType);
+  }
+
+  public void setMarker(final Marker marker, final double markerSize, final Color lineColor,
     final Color fillColor) {
     setMarker(marker);
     setMarkerWidth(Quantities.getQuantity(markerSize, CustomUnits.PIXEL));
@@ -289,23 +307,10 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     setMarkerFill(fillColor);
   }
 
-  public void setMarker(final Marker marker) {
-    final Marker oldMarker = this.marker;
-    final String oldMarkerType = this.markerType;
-    this.marker = getWithDefault(marker, ELLIPSE);
-    if (marker != null && marker.isUseMarkerType()) {
-      this.markerType = marker.getMarkerType();
-    } else {
-      this.markerType = "ellipse";
-    }
-    firePropertyChange("marker", oldMarker, this.marker);
-    firePropertyChange("markerType", oldMarkerType, this.markerType);
-  }
-
   @SuppressWarnings("unchecked")
   public <V extends MarkerStyle> V setMarker(final String markerName, final double markerSize,
     final Color lineColor, final double lineWidth, final Color fillColor) {
-    final AbstractMarker marker = new ShapeMarker(markerName);
+    final Marker marker = MarkerLibrary.findMarker(markerName);
     setMarker(marker, markerSize, lineColor, fillColor);
     setMarkerLineWidth(Quantities.getQuantity(lineWidth, CustomUnits.PIXEL));
     return (V)this;
@@ -380,7 +385,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     setMarker(new ImageMarker(this.markerFileResource));
   }
 
-  public void setMarkerFill(final Color markerFill) {
+  public MarkerStyle setMarkerFill(final Color markerFill) {
     final Object oldMarkerFill = this.markerFill;
     final Object oldMarkerFillOpacity = this.markerFillOpacity;
     if (markerFill == null) {
@@ -391,6 +396,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     }
     firePropertyChange("markerFill", oldMarkerFill, this.markerFill);
     firePropertyChange("markerFillOpacity", oldMarkerFillOpacity, this.markerFillOpacity);
+    return this;
   }
 
   public void setMarkerFillOpacity(final double markerFillOpacity) {
@@ -414,7 +420,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     }
   }
 
-  public boolean setMarkerFillStyle(final Viewport2D viewport, final Graphics2D graphics) {
+  public boolean setMarkerFillStyle(final ViewRenderer view, final Graphics2D graphics) {
     if (this.markerFill.getAlpha() == 0) {
       return false;
     } else {
@@ -446,7 +452,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     firePropertyChange("markerIgnorePlacement", oldValue, this.markerIgnorePlacement);
   }
 
-  public void setMarkerLineColor(final Color markerLineColor) {
+  public MarkerStyle setMarkerLineColor(final Color markerLineColor) {
     final Object oldMarkerLineColor = this.markerLineColor;
     final Object oldMarkerLineOpacity = this.markerLineOpacity;
     if (markerLineColor == null) {
@@ -457,6 +463,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     }
     firePropertyChange("markerLineColor", oldMarkerLineColor, this.markerLineColor);
     firePropertyChange("markerLineOpacity", oldMarkerLineOpacity, this.markerLineOpacity);
+    return this;
   }
 
   public void setMarkerLineOpacity(final double markerLineOpacity) {
@@ -477,19 +484,6 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
       this.markerLineColor = WebColors.newAlpha(this.markerLineColor, this.markerLineOpacity);
       firePropertyChange("markerLineColor", oldMarkerLineColor, this.markerLineColor);
       firePropertyChange("markerLineOpacity", oldMarkerLineOpacity, this.markerLineOpacity);
-    }
-  }
-
-  public boolean setMarkerLineStyle(final Viewport2D viewport, final Graphics2D graphics) {
-    final Color color = getMarkerLineColor();
-    if (color.getAlpha() == 0) {
-      return false;
-    } else {
-      graphics.setColor(color);
-      final float width = (float)Viewport2D.toDisplayValue(viewport, this.markerLineWidth);
-      final BasicStroke basicStroke = new BasicStroke(width);
-      graphics.setStroke(basicStroke);
-      return true;
     }
   }
 
@@ -563,7 +557,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
     final Object oldValue = this.markerType;
     this.markerType = getWithDefault(markerType, "ellipse");
     firePropertyChange("markerType", oldValue, this.markerType);
-    final Marker marker = SymbolLibrary.newMarker(markerType);
+    final Marker marker = MarkerLibrary.newMarker(markerType);
     setMarker(marker);
   }
 
@@ -606,6 +600,9 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
           addToMap(map, name, value);
         }
       }
+    }
+    if (this.marker != null && this.marker.isUseMarkerName()) {
+      map.remove("marker");
     }
     return map;
   }

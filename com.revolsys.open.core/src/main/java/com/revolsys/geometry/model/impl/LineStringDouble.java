@@ -3,19 +3,64 @@ package com.revolsys.geometry.model.impl;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
+
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.function.Consumer4Double;
+import org.jeometry.common.function.Function4Double;
+import org.jeometry.common.number.Doubles;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.util.MathUtil;
 
 public class LineStringDouble extends AbstractLineString {
   private static final long serialVersionUID = 7579865828939708871L;
 
-  private final int axisCount;
+  private static final double[] EMPTY_COORDINATES = new double[0];
 
-  private double[] coordinates;
+  public static LineStringDouble newLineStringDouble(final int axisCount, final int vertexCount,
+    final double... coordinates) {
+    if (coordinates == null || coordinates.length == 0) {
+      return new LineStringDouble(axisCount);
+    } else {
+      assert axisCount >= 2;
+      final int coordinateCount = vertexCount * axisCount;
+      if (coordinates.length % axisCount != 0) {
+        throw new IllegalArgumentException("coordinates.length=" + coordinates.length
+          + " must be a multiple of axisCount=" + axisCount);
+      } else if (coordinateCount == coordinates.length) {
+        return new LineStringDouble(axisCount, vertexCount, coordinates);
+      } else if (coordinateCount > coordinates.length) {
+        throw new IllegalArgumentException("axisCount=" + axisCount + " * vertexCount="
+          + vertexCount + " > coordinates.length=" + coordinates.length);
+      } else {
+        final double[] copyCoordinates = new double[coordinateCount];
+        System.arraycopy(coordinates, 0, copyCoordinates, 0, coordinateCount);
+        return new LineStringDouble(axisCount, vertexCount, copyCoordinates);
+      }
+
+    }
+  }
+
+  protected final int axisCount;
+
+  protected final int vertexCount;
+
+  protected double[] coordinates;
+
+  private Object userData;
+
+  public LineStringDouble(final int axisCount) {
+    this.axisCount = axisCount;
+    this.vertexCount = 0;
+    this.coordinates = EMPTY_COORDINATES;
+  }
 
   public LineStringDouble(final int axisCount, final Collection<Point> points) {
     this(points.size(), axisCount);
@@ -28,11 +73,13 @@ public class LineStringDouble extends AbstractLineString {
   public LineStringDouble(final int axisCount, final double... coordinates) {
     if (coordinates == null || coordinates.length == 0) {
       this.axisCount = 2;
-      this.coordinates = null;
+      this.coordinates = EMPTY_COORDINATES;
+      this.vertexCount = 0;
     } else {
       assert axisCount >= 2;
       this.axisCount = axisCount;
       this.coordinates = coordinates;
+      this.vertexCount = coordinates.length / axisCount;
     }
   }
 
@@ -40,30 +87,14 @@ public class LineStringDouble extends AbstractLineString {
     assert axisCount >= 2;
     assert size >= 0;
     this.coordinates = new double[size * axisCount];
-    this.axisCount = (byte)axisCount;
+    this.axisCount = axisCount;
+    this.vertexCount = this.coordinates.length / axisCount;
   }
 
   public LineStringDouble(final int axisCount, final int vertexCount, final double... coordinates) {
-    if (coordinates == null || coordinates.length == 0) {
-      this.axisCount = 2;
-      this.coordinates = null;
-    } else {
-      assert axisCount >= 2;
-      this.axisCount = (byte)axisCount;
-      final int coordinateCount = vertexCount * axisCount;
-      if (coordinates.length % axisCount != 0) {
-        throw new IllegalArgumentException("coordinates.length=" + coordinates.length
-          + " must be a multiple of axisCount=" + axisCount);
-      } else if (coordinateCount == coordinates.length) {
-        this.coordinates = coordinates;
-      } else if (coordinateCount > coordinates.length) {
-        throw new IllegalArgumentException("axisCount=" + axisCount + " * vertexCount="
-          + vertexCount + " > coordinates.length=" + coordinates.length);
-      } else {
-        this.coordinates = new double[coordinateCount];
-        System.arraycopy(coordinates, 0, this.coordinates, 0, coordinateCount);
-      }
-    }
+    this.axisCount = axisCount;
+    this.vertexCount = vertexCount;
+    this.coordinates = coordinates;
   }
 
   public LineStringDouble(final int axisCount, final LineString points) {
@@ -73,7 +104,7 @@ public class LineStringDouble extends AbstractLineString {
   }
 
   public LineStringDouble(final int axisCount, final List<? extends Number> coordinates) {
-    this(axisCount, MathUtil.toDoubleArray(coordinates));
+    this(axisCount, Doubles.toDoubleArray(coordinates));
   }
 
   public LineStringDouble(final int axisCount, final Point... points) {
@@ -96,15 +127,219 @@ public class LineStringDouble extends AbstractLineString {
   }
 
   @Override
+  public double[] convertCoordinates(GeometryFactory geometryFactory, final int axisCount) {
+    final GeometryFactory sourceGeometryFactory = getGeometryFactory();
+    final double[] sourceCoordinates = this.coordinates;
+    if (isEmpty()) {
+      return sourceCoordinates;
+    } else {
+      final int sourceAxisCount = this.axisCount;
+      final int vertexCount = this.vertexCount;
+      geometryFactory = getNonZeroGeometryFactory(geometryFactory);
+      final int targetAxisCount = axisCount;
+      final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
+        .getCoordinatesOperation(geometryFactory);
+      if (coordinatesOperation == null) {
+        if (sourceAxisCount == geometryFactory.getAxisCount()) {
+          return sourceCoordinates;
+        } else {
+          return getCoordinates(targetAxisCount);
+        }
+      } else {
+        final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
+        final double[] targetCoordinates = new double[targetAxisCount * vertexCount];
+        int targetOffset = 0;
+        int sourceOffset = 0;
+        for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+          point.setPoint(this.coordinates, sourceOffset, sourceAxisCount);
+          coordinatesOperation.perform(point);
+          point.copyCoordinatesTo(targetCoordinates, targetOffset, targetAxisCount);
+          targetOffset += targetAxisCount;
+          sourceOffset += sourceAxisCount;
+        }
+        return targetCoordinates;
+      }
+    }
+  }
+
+  @Override
+  public void copyPoint(final int vertexIndex, final int axisCount, final double[] coordinates) {
+    if (vertexIndex < this.vertexCount) {
+      System.arraycopy(this.coordinates, vertexIndex * this.axisCount, coordinates, 0, axisCount);
+    } else {
+      Arrays.fill(coordinates, 0, axisCount, Double.NaN);
+    }
+  }
+
+  @Override
+  public <R> R findSegment(final Function4Double<R> action) {
+    final int vertexCount = this.vertexCount;
+    final int axisCount = this.axisCount;
+    final int axisIgnoreCount = axisCount - 2;
+    final double[] coordinates = this.coordinates;
+    int coordinateIndex = 0;
+    double x1 = coordinates[coordinateIndex++];
+    double y1 = coordinates[coordinateIndex++];
+    coordinateIndex += axisIgnoreCount;
+    for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+      final double x2 = coordinates[coordinateIndex++];
+      final double y2 = coordinates[coordinateIndex++];
+      final R result = action.accept(x1, y1, x2, y2);
+      if (result != null) {
+        return result;
+      }
+      coordinateIndex += axisIgnoreCount;
+      x1 = x2;
+      y1 = y2;
+    }
+    return null;
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    final int vertexCount = this.vertexCount;
+    final int axisIgnoreCount = this.axisCount - 2;
+    final double[] coordinates = this.coordinates;
+    int coordinateIndex = 0;
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = coordinates[coordinateIndex++];
+      final double y = coordinates[coordinateIndex++];
+      final R result = action.accept(x, y);
+      if (result != null) {
+        return result;
+      }
+      coordinateIndex += axisIgnoreCount;
+    }
+    return null;
+  }
+
+  @Override
+  public void forEachLineVertex(final BiConsumerDouble firstPointAction,
+    final BiConsumerDouble action) {
+    final int vertexCount = this.vertexCount;
+    final int axisIgnoreCount = this.axisCount - 2;
+    final double[] coordinates = this.coordinates;
+    int coordinateIndex = 0;
+    final double x1 = coordinates[coordinateIndex++];
+    final double y1 = coordinates[coordinateIndex++];
+    firstPointAction.accept(x1, y1);
+    coordinateIndex += axisIgnoreCount;
+    for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = coordinates[coordinateIndex++];
+      final double y = coordinates[coordinateIndex++];
+      action.accept(x, y);
+      coordinateIndex += axisIgnoreCount;
+    }
+  }
+
+  @Override
+  public void forEachSegment(final Consumer4Double action) {
+    final int vertexCount = this.vertexCount;
+    final int axisCount = this.axisCount;
+    final int axisIgnoreCount = axisCount - 2;
+    final double[] coordinates = this.coordinates;
+    int coordinateIndex = 0;
+    double x1 = coordinates[coordinateIndex++];
+    double y1 = coordinates[coordinateIndex++];
+    coordinateIndex += axisIgnoreCount;
+    for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+      final double x2 = coordinates[coordinateIndex++];
+      final double y2 = coordinates[coordinateIndex++];
+      action.accept(x1, y1, x2, y2);
+      coordinateIndex += axisIgnoreCount;
+      x1 = x2;
+      y1 = y2;
+    }
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    final int vertexCount = this.vertexCount;
+    final int axisIgnoreCount = this.axisCount - 2;
+    final double[] coordinates = this.coordinates;
+    int coordinateIndex = 0;
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = coordinates[coordinateIndex++];
+      final double y = coordinates[coordinateIndex++];
+      action.accept(x, y);
+      coordinateIndex += axisIgnoreCount;
+    }
+  }
+
+  @Override
+  public void forEachVertex(final Consumer3Double action) {
+    final int vertexCount = this.vertexCount;
+    final double[] coordinates = this.coordinates;
+    final int axisCount = this.axisCount;
+    int coordinateIndex = 0;
+    if (axisCount < 3) {
+      for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+        final double x = coordinates[coordinateIndex++];
+        final double y = coordinates[coordinateIndex++];
+        action.accept(x, y, Double.NaN);
+      }
+    } else {
+      final int axisIgnoreCount = axisCount - 3;
+      for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+        final double x = coordinates[coordinateIndex++];
+        final double y = coordinates[coordinateIndex++];
+        final double z = coordinates[coordinateIndex++];
+        action.accept(x, y, z);
+        coordinateIndex += axisIgnoreCount;
+      }
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
+    final int axisCount = getAxisCount();
+    final int coordinateCount = this.vertexCount * axisCount;
+    final double[] coordinates = this.coordinates;
+    for (int coordinateOffset = 0; coordinateOffset < coordinateCount; coordinateOffset += axisCount) {
+      point.setPoint(coordinates, coordinateOffset, axisCount);
+      coordinatesOperation.perform(point);
+      action.accept(point);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperationPoint point,
+    final Consumer<CoordinatesOperationPoint> action) {
+    final int axisCount = getAxisCount();
+    final int coordinateCount = this.vertexCount * axisCount;
+    final double[] coordinates = this.coordinates;
+    for (int coordinateOffset = 0; coordinateOffset < coordinateCount; coordinateOffset += axisCount) {
+      point.setPoint(coordinates, coordinateOffset, axisCount);
+      action.accept(point);
+    }
+  }
+
+  @Override
   public int getAxisCount() {
     return this.axisCount;
   }
 
   @Override
-  public double getCoordinate(final int index, final int axisIndex) {
+  public double getCoordinate(int vertexIndex, final int axisIndex) {
+    final int axisCount = this.axisCount;
+    if (axisIndex < axisCount) {
+      final int vertexCount = getVertexCount();
+      if (vertexIndex < vertexCount) {
+        while (vertexIndex < 0) {
+          vertexIndex += vertexCount;
+        }
+        return this.coordinates[vertexIndex * axisCount + axisIndex];
+      }
+    }
+    return Double.NaN;
+  }
+
+  @Override
+  public double getCoordinateFast(final int vertexIndex, final int axisIndex) {
     final int axisCount = getAxisCount();
     if (axisIndex < axisCount) {
-      return this.coordinates[index * axisCount + axisIndex];
+      return this.coordinates[vertexIndex * axisCount + axisIndex];
     } else {
       return Double.NaN;
     }
@@ -112,16 +347,15 @@ public class LineStringDouble extends AbstractLineString {
 
   @Override
   public double[] getCoordinates() {
-    final double[] coordinates = new double[this.coordinates.length];
-    System.arraycopy(this.coordinates, 0, coordinates, 0, coordinates.length);
-    return coordinates;
+    return this.coordinates.clone();
   }
 
   @Override
   public GeometryFactory getGeometryFactory() {
-    if (this.axisCount == 2) {
+    final int axisCount = this.axisCount;
+    if (axisCount == 2) {
       return GeometryFactory.DEFAULT_2D;
-    } else if (this.axisCount == 3) {
+    } else if (axisCount == 2) {
       return GeometryFactory.DEFAULT_3D;
     } else {
       return GeometryFactory.floating(0, this.axisCount);
@@ -129,16 +363,52 @@ public class LineStringDouble extends AbstractLineString {
   }
 
   @Override
-  public int getVertexCount() {
-    if (this.axisCount < 2 || this.coordinates == null) {
+  public int getSegmentCount() {
+    final int vertexCount = this.vertexCount;
+    if (vertexCount == 0) {
       return 0;
     } else {
-      return this.coordinates.length / this.axisCount;
+      return vertexCount - 1;
+    }
+  }
+
+  @Override
+  public Object getUserDataOld() {
+    return this.userData;
+  }
+
+  @Override
+  public int getVertexCount() {
+    return this.vertexCount;
+  }
+
+  @Override
+  public double getX(final int vertexIndex) {
+    return this.coordinates[vertexIndex * this.axisCount];
+  }
+
+  @Override
+  public double getY(final int vertexIndex) {
+    return this.coordinates[vertexIndex * this.axisCount + 1];
+  }
+
+  @Override
+  public double getZ(final int vertexIndex) {
+    final int axisCount = this.axisCount;
+    if (axisCount > 2) {
+      return this.coordinates[vertexIndex * axisCount + 2];
+    } else {
+      return Double.NaN;
     }
   }
 
   @Override
   public boolean isEmpty() {
-    return this.coordinates == null;
+    return this.vertexCount == 0;
+  }
+
+  @Override
+  public void setUserDataOld(final Object userData) {
+    this.userData = userData;
   }
 }

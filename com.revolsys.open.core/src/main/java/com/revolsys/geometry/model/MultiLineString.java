@@ -33,7 +33,6 @@
 package com.revolsys.geometry.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,10 +41,9 @@ import java.util.function.Function;
 import javax.measure.Unit;
 import javax.measure.quantity.Area;
 
-import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
-
 import com.revolsys.geometry.graph.linemerge.LineMerger;
+import com.revolsys.geometry.model.editor.MultiLineStringEditor;
+import com.revolsys.geometry.model.prep.PreparedMultiLineString;
 import com.revolsys.geometry.model.segment.MultiLineStringSegment;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiLineStringVertex;
@@ -92,9 +90,9 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   @Override
   default double distance(Geometry geometry, final double terminateDistance) {
     if (isEmpty()) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(geometry)) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       geometry = geometry.convertGeometry(geometryFactory, 2);
@@ -152,8 +150,18 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   }
 
   @Override
-  default DataType getDataType() {
-    return DataTypes.MULTI_LINE_STRING;
+  default double getCoordinate(final int partIndex, final int vertexIndex, final int axisIndex) {
+    final LineString line = getGeometry(partIndex);
+    if (line == null) {
+      return Double.NaN;
+    } else {
+      return line.getCoordinate(vertexIndex, axisIndex);
+    }
+  }
+
+  @Override
+  default GeometryDataType<MultiLineString, MultiLineStringEditor> getDataType() {
+    return GeometryDataTypes.MULTI_LINE_STRING;
   }
 
   @Override
@@ -166,6 +174,8 @@ public interface MultiLineString extends GeometryCollection, Lineal {
     return (LineString)getGeometry(partIndex);
   }
 
+  int getLineStringCount();
+
   @SuppressWarnings({
     "unchecked", "rawtypes"
   })
@@ -175,19 +185,16 @@ public interface MultiLineString extends GeometryCollection, Lineal {
 
   @Override
   default Segment getSegment(final int... segmentId) {
-    if (segmentId == null || segmentId.length != 2) {
-      return null;
-    } else {
-      final int partIndex = segmentId[0];
-      if (partIndex >= 0 && partIndex < getGeometryCount()) {
-        final LineString line = getLineString(partIndex);
-        final int segmentIndex = segmentId[1];
-        if (segmentIndex >= 0 && segmentIndex < line.getSegmentCount()) {
-          return new MultiLineStringSegment(this, segmentId);
-        }
+    final int[] newId = GeometryCollection.cleanPartId(2, segmentId);
+    final int partIndex = newId[0];
+    if (partIndex >= 0 && partIndex < getGeometryCount()) {
+      final LineString line = getLineString(partIndex);
+      final int segmentIndex = newId[1];
+      if (segmentIndex >= 0 && segmentIndex < line.getSegmentCount()) {
+        return new MultiLineStringSegment(this, partIndex, segmentIndex);
       }
-      return null;
     }
+    return null;
   }
 
   @Override
@@ -200,46 +207,74 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   }
 
   @Override
-  default Vertex getToVertex(int... vertexId) {
-    if (vertexId == null || vertexId.length != 2) {
-      return null;
-    } else {
-      final int partIndex = vertexId[0];
-      if (partIndex >= 0 && partIndex < getGeometryCount()) {
-        final LineString line = getLineString(partIndex);
-        int vertexIndex = vertexId[1];
-        final int vertexCount = line.getVertexCount();
-        vertexIndex = vertexCount - 1 - vertexIndex;
-        if (vertexIndex <= vertexCount) {
-          while (vertexIndex < 0) {
-            vertexIndex += vertexCount - 1;
-          }
-          vertexId = Geometry.setVertexIndex(vertexId, vertexIndex);
-          return new MultiLineStringVertex(this, vertexId);
-        }
+  default Vertex getToVertex(final int... vertexId) {
+    final int[] newId = GeometryCollection.cleanPartId(2, vertexId);
+    final int partIndex = newId[0];
+    final int geometryCount = getGeometryCount();
+    if (partIndex >= 0 && partIndex < geometryCount) {
+      final LineString line = getLineString(partIndex);
+      int vertexIndex = newId[1];
+      final int vertexCount = line.getVertexCount();
+      vertexIndex = vertexCount - 1 - vertexIndex;
+      if (vertexIndex >= 0 && vertexIndex < vertexCount) {
+        newId[1] = vertexIndex;
+        return new MultiLineStringVertex(this, newId);
       }
-      return null;
     }
+    return null;
   }
 
   @Override
   default Vertex getVertex(final int... vertexId) {
-    if (vertexId == null || vertexId.length != 2) {
-      return null;
-    } else {
-      final int partIndex = vertexId[0];
+    final int[] newId = GeometryCollection.cleanPartId(2, vertexId);
+    final int partIndex = newId[0];
+    final int geometryCount = getGeometryCount();
+    if (partIndex >= 0 && partIndex < geometryCount) {
       if (partIndex >= 0 && partIndex < getGeometryCount()) {
+        final int vertexIndex = newId[1];
         final LineString line = getLineString(partIndex);
-        int vertexIndex = vertexId[1];
         final int vertexCount = line.getVertexCount();
-        if (vertexIndex <= vertexCount) {
-          while (vertexIndex < 0) {
-            vertexIndex += vertexCount - 1;
-          }
-          return new MultiLineStringVertex(this, vertexId);
+        if (vertexIndex >= 0 && vertexIndex < vertexCount) {
+          return new MultiLineStringVertex(this, newId);
         }
       }
-      return null;
+    }
+    return null;
+  }
+
+  @Override
+  default boolean hasInvalidXyCoordinates() {
+    for (final LineString line : lineStrings()) {
+      if (line.hasInvalidXyCoordinates()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  default Geometry intersectionBbox(final BoundingBox boundingBox) {
+    notNullSameCs(boundingBox);
+    if (bboxCoveredBy(boundingBox)) {
+      return this;
+    } else {
+      boolean modified = false;
+      final List<Geometry> parts = new ArrayList<>();
+      for (final Geometry part : getLineStrings()) {
+        final Geometry partIntersection = part.intersectionBbox(boundingBox);
+        if (partIntersection != part) {
+          modified = true;
+        }
+        if (!partIntersection.isEmpty()) {
+          parts.add(partIntersection);
+        }
+      }
+      if (modified) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.geometry(parts);
+      } else {
+        return this;
+      }
     }
   }
 
@@ -272,37 +307,6 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   @Override
   default Iterable<LineString> lineStrings() {
     return getGeometries();
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V moveVertex(final Point newPoint, final int... vertexId) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
-    } else if (vertexId.length == 2) {
-      if (isEmpty()) {
-        throw new IllegalArgumentException("Cannot move vertex for empty Lineal");
-      } else {
-        final int partIndex = vertexId[0];
-        final int vertexIndex = vertexId[1];
-        final int partCount = getGeometryCount();
-        if (partIndex >= 0 && partIndex < partCount) {
-          final GeometryFactory geometryFactory = getGeometryFactory();
-
-          final LineString line = getLineString(partIndex);
-          final LineString newLine = line.moveVertex(newPoint, vertexIndex);
-          final List<LineString> lines = new ArrayList<>(getLineStrings());
-          lines.set(partIndex, newLine);
-          return (V)geometryFactory.lineal(lines);
-        } else {
-          throw new IllegalArgumentException(
-            "Part index must be between 0 and " + partCount + " not " + partIndex);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for Lineals must have length 2. " + Arrays.toString(vertexId));
-    }
   }
 
   @Override
@@ -352,8 +356,8 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       return this;
     } else {
       final List<LineString> geometries = new ArrayList<>();
-      for (final Geometry part : geometries()) {
-        final LineString normalizedPart = (LineString)part.normalize();
+      for (final LineString part : lineStrings()) {
+        final LineString normalizedPart = part.normalize();
         geometries.add(normalizedPart);
       }
       Collections.sort(geometries);
@@ -361,6 +365,11 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       final Lineal normalizedGeometry = geometryFactory.lineal(geometries);
       return normalizedGeometry;
     }
+  }
+
+  @Override
+  default Lineal prepare() {
+    return new PreparedMultiLineString(this);
   }
 
   @Override

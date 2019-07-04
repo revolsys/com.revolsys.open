@@ -11,19 +11,17 @@ import java.util.Queue;
 
 import javax.xml.stream.XMLStreamException;
 
-import com.revolsys.io.FileUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordReader;
-import com.revolsys.record.io.format.gpx.GpxConstants;
+import com.revolsys.record.io.format.gpx.GpxIterator;
 import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
 public class TcxIterator extends BaseObjectWithProperties
   implements Iterator<Record>, RecordReader {
-
   private String baseName;
 
   private Record currentRecord;
@@ -59,7 +57,7 @@ public class TcxIterator extends BaseObjectWithProperties
     throws IOException {
     this(StaxReader.newXmlReader(resource));
     this.typePath = path;
-    this.baseName = FileUtil.getBaseName(resource.getFilename());
+    this.baseName = resource.getBaseName();
   }
 
   public TcxIterator(final StaxReader in) {
@@ -81,7 +79,7 @@ public class TcxIterator extends BaseObjectWithProperties
 
   @Override
   public RecordDefinition getRecordDefinition() {
-    return GpxConstants.GPX_TYPE;
+    return GpxIterator.GPX_TYPE;
   }
 
   public String getSchemaName() {

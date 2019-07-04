@@ -217,7 +217,7 @@ public class DistanceWithPoints {
 
   private boolean computeLineLine(final LineString line1, final LineString line2) {
     if (this.minDistance == Double.MAX_VALUE
-      || line1.getBoundingBox().distance(line2.getBoundingBox()) <= this.minDistance) {
+      || line1.getBoundingBox().bboxDistance(line2.getBoundingBox()) <= this.minDistance) {
       for (final Segment segment1 : line1.segments()) {
         for (final Segment segment2 : line2.segments()) {
           final double dist = segment1.distance(segment2);
@@ -238,7 +238,7 @@ public class DistanceWithPoints {
 
   private boolean computeLinePoint(final LineString line, final Point point) {
     if (this.minDistance == Double.MAX_VALUE
-      || line.getBoundingBox().distance(point) <= this.minDistance) {
+      || line.getBoundingBox().bboxDistance(point) <= this.minDistance) {
       for (final Segment segment : line.segments()) {
         final double distance = segment.distance(point);
         if (distance < this.minDistance) {
@@ -279,7 +279,8 @@ public class DistanceWithPoints {
 
   private boolean computePointLine(final Point point, final LineString line) {
     final BoundingBox boundingBox = line.getBoundingBox();
-    if (this.minDistance == Double.MAX_VALUE || boundingBox.distance(point) <= this.minDistance) {
+    if (this.minDistance == Double.MAX_VALUE
+      || boundingBox.bboxDistance(point) <= this.minDistance) {
       for (final Segment segment : line.segments()) {
         final double distance = segment.distance(point);
         if (distance < this.minDistance) {
@@ -310,7 +311,7 @@ public class DistanceWithPoints {
   private boolean computePointsPoints(final List<Point> points1, final List<Point> points2) {
     for (final Point point1 : points1) {
       for (final Point point2 : points2) {
-        final double dist = point1.distance(point2);
+        final double dist = point1.distancePoint(point2);
         if (dist < this.minDistance) {
           this.minDistance = dist;
           this.minDistancePoint1 = point1;

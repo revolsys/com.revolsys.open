@@ -9,6 +9,7 @@ import org.jeometry.common.awt.WebColors;
 
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.node.ListTreeNode;
 import com.revolsys.swing.tree.node.OpenStateTreeNode;
@@ -28,6 +29,16 @@ public abstract class AbstractLayerTreeNode extends ListTreeNode implements Open
   @SuppressWarnings("unchecked")
   public <V extends Layer> V getLayer() {
     return (V)getUserData();
+  }
+
+  @Override
+  public MenuFactory getMenu() {
+    final Layer layer = getLayer();
+    if (layer == null) {
+      return super.getMenu();
+    } else {
+      return layer.getMenu();
+    }
   }
 
   @Override

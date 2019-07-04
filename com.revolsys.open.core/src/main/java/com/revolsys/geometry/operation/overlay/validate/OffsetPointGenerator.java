@@ -48,7 +48,7 @@ import com.revolsys.geometry.model.segment.Segment;
  * from both sides of the midpoint of
  * all segments in a {@link Geometry}.
  * Can be used to generate probe points for
- * determining whether a polygonal overlay result
+ * determining whether a polygonal overlay intersectionCount
  * is incorrect.
  * The input geometry may have any orientation for its rings,
  * but {@link #setSidesToGenerate(boolean, boolean)} is

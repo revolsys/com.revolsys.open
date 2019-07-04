@@ -6,14 +6,14 @@ import java.util.Map;
 
 import javax.annotation.PreDestroy;
 
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.io.PathName;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
@@ -23,7 +23,7 @@ import com.revolsys.record.schema.AbstractRecordStore;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.util.count.CategoryLabelCountMap;
-import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 
 public class DelegatingRecordStore extends AbstractRecordStore {
   private final AbstractRecordStore recordStore;
@@ -164,7 +164,7 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public LabelCountMap getStatistics(final String name) {
+  public LabelCounters getStatistics(final String name) {
     return this.recordStore.getStatistics(name);
   }
 
@@ -200,7 +200,7 @@ public class DelegatingRecordStore extends AbstractRecordStore {
 
   @Override
   public Query newQuery(final String typePath, final String whereClause,
-    final BoundingBoxDoubleGf boundingBox) {
+    final BoundingBox boundingBox) {
     return this.recordStore.newQuery(typePath, whereClause, boundingBox);
   }
 
@@ -220,8 +220,8 @@ public class DelegatingRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordWriter newRecordWriter() {
-    return this.recordStore.newRecordWriter();
+  public RecordWriter newRecordWriter(final boolean throwExceptions) {
+    return this.recordStore.newRecordWriter(throwExceptions);
   }
 
   @Override

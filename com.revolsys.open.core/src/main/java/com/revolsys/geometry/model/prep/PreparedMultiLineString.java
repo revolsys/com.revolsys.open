@@ -34,14 +34,11 @@ package com.revolsys.geometry.model.prep;
 
 import java.util.List;
 
-import org.jeometry.common.exception.WrappedException;
-
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.MultiLineString;
-import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.geometry.model.impl.MultiLineStringImpl;
 import com.revolsys.geometry.noding.FastSegmentSetIntersectionFinder;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.noding.SegmentStringUtil;
@@ -54,21 +51,22 @@ import com.revolsys.geometry.noding.SegmentStringUtil;
  * @author mbdavis
  *
  */
-public class PreparedMultiLineString implements MultiLineString {
+public class PreparedMultiLineString extends MultiLineStringImpl {
   private static final long serialVersionUID = 1L;
 
-  /**
-   * An object reference which can be used to carry ancillary data defined
-   * by the client.
-   */
-  private Object userData;
-
-  private final Lineal lineal;
+  private static LineString[] prepareLineStrings(final MultiLineString multiLineString) {
+    final LineString[] polygons = new LineString[multiLineString.getLineStringCount()];
+    for (int i = 0; i < polygons.length; i++) {
+      final LineString polygon = multiLineString.getLineString(i);
+      polygons[i] = polygon.prepare();
+    }
+    return polygons;
+  }
 
   private FastSegmentSetIntersectionFinder segIntFinder = null;
 
-  public PreparedMultiLineString(final Lineal lineal) {
-    this.lineal = lineal;
+  public PreparedMultiLineString(final MultiLineString multiLineString) {
+    super(multiLineString.getGeometryFactory(), prepareLineStrings(multiLineString));
   }
 
   /**
@@ -78,76 +76,8 @@ public class PreparedMultiLineString implements MultiLineString {
    * @return a clone of this instance
    */
   @Override
-  public Lineal clone() {
-    try {
-      return (Lineal)super.clone();
-    } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
-    }
-  }
-
-  /**
-   * Tests whether this geometry is structurally and numerically equal
-   * to a given <code>Object</code>.
-   * If the argument <code>Object</code> is not a <code>Geometry</code>,
-   * the result is <code>false</code>.
-   * Otherwise, the result is computed using
-   * {@link #equals(2,Geometry)}.
-   * <p>
-   * This method is provided to fulfill the Java contract
-   * for value-based object equality.
-   * In conjunction with {@link #hashCode()}
-   * it provides semantics which are most useful
-   * for using
-   * <code>Geometry</code>s as keys and values in Java collections.
-   * <p>
-   * Note that to produce the expected result the input geometries
-   * should be in normal form.  It is the caller's
-   * responsibility to perform this where required
-   * (using {@link Geometry#norm()
-   * or {@link #normalize()} as appropriate).
-   *
-   * @param other the Object to compare
-   * @return true if this geometry is exactly equal to the argument
-   *
-   * @see #equals(2,Geometry)
-   * @see #hashCode()
-   * @see #norm()
-   * @see #normalize()
-   */
-  @Override
-  public boolean equals(final Object other) {
-    if (other instanceof Geometry) {
-      final Geometry geometry = (Geometry)other;
-      return equals(2, geometry);
-    } else {
-      return false;
-    }
-  }
-
-  @Override
-  public BoundingBox getBoundingBox() {
-    return this.lineal.getBoundingBox();
-  }
-
-  @Override
-  public <V extends Geometry> List<V> getGeometries() {
-    return this.lineal.getGeometries();
-  }
-
-  @Override
-  public <V extends Geometry> V getGeometry(final int partIndex) {
-    return this.lineal.getGeometry(partIndex);
-  }
-
-  @Override
-  public int getGeometryCount() {
-    return this.lineal.getGeometryCount();
-  }
-
-  @Override
-  public GeometryFactory getGeometryFactory() {
-    return this.lineal.getGeometryFactory();
+  public PreparedMultiLineString clone() {
+    return (PreparedMultiLineString)super.clone();
   }
 
   public synchronized FastSegmentSetIntersectionFinder getIntersectionFinder() {
@@ -159,35 +89,14 @@ public class PreparedMultiLineString implements MultiLineString {
      */
     if (this.segIntFinder == null) {
       this.segIntFinder = new FastSegmentSetIntersectionFinder(
-        SegmentStringUtil.extractSegmentStrings(this.lineal));
+        SegmentStringUtil.extractSegmentStrings(this));
     }
     return this.segIntFinder;
   }
 
-  /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
-  @Override
-  public Object getUserData() {
-    return this.userData;
-  }
-
-  /**
-   * Gets a hash code for the Geometry.
-   *
-   * @return an integer value suitable for use as a hashcode
-   */
-
-  @Override
-  public int hashCode() {
-    return this.lineal.hashCode();
-  };
-
   @Override
   public boolean intersects(final Geometry geometry) {
-    if (envelopesIntersect(geometry)) {
+    if (bboxIntersects(geometry)) {
       /**
        * If any segments intersect, obviously intersects = true
        */
@@ -240,37 +149,18 @@ public class PreparedMultiLineString implements MultiLineString {
      * This could be optimized by using the segment index on the lineal target.
      * However, it seems like the L/P case would be pretty rare in practice.
      */
-    for (final Vertex vertex : geometry.vertices()) {
-      if (this.lineal.intersects(vertex)) {
-        return true;
+    return Boolean.TRUE == geometry.findVertex((x, y) -> {
+      if (intersects(x, y)) {
+        return Boolean.TRUE;
+      } else {
+        return null;
       }
-    }
-    return false;
+    });
   }
 
   @Override
-  public boolean isEmpty() {
-    return this.lineal.isEmpty();
-  }
-
-  @Override
-  public Lineal prepare() {
+  public PreparedMultiLineString prepare() {
     return this;
-  }
-
-  /**
-   * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Point Reference System.
-   * <p>
-   * Note that user data objects are not present in geometries created by
-   * construction methods.
-   *
-   * @param userData an object, the semantics for which are defined by the
-   * application using this Geometry
-   */
-  @Override
-  public void setUserData(final Object userData) {
-    this.userData = userData;
   }
 
   @Override

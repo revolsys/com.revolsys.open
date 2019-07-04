@@ -24,11 +24,15 @@ import javax.swing.JLabel;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.logging.Logs;
+import org.jeometry.common.net.UrlProxy;
 
+import com.revolsys.connection.file.FileConnectionManager;
+import com.revolsys.connection.file.FolderConnectionRegistry;
+import com.revolsys.elevation.cloud.PointCloudReadFactory;
+import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
+import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReaderFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.file.FileConnectionManager;
-import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
@@ -53,7 +57,6 @@ import com.revolsys.swing.tree.node.FunctionChildrenTreeNode;
 import com.revolsys.swing.tree.node.LazyLoadTreeNode;
 import com.revolsys.swing.tree.node.record.PathRecordStoreTreeNode;
 import com.revolsys.util.Property;
-import com.revolsys.util.UrlProxy;
 
 public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   private static JFileChooser chooser;
@@ -423,7 +426,13 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
         return false;
       } else if (IoFactory.hasFactory(GeoreferencedImageReadFactory.class, path)) {
         return true;
+      } else if (IoFactory.hasFactory(PointCloudReadFactory.class, path)) {
+        return true;
       } else if (IoFactory.hasFactory(RecordReaderFactory.class, path)) {
+        return true;
+      } else if (IoFactory.hasFactory(GriddedElevationModelReaderFactory.class, path)) {
+        return true;
+      } else if (IoFactory.hasFactory(TriangulatedIrregularNetworkReaderFactory.class, path)) {
         return true;
       }
     }

@@ -199,8 +199,10 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
         sortController.resetSortOrders();
         for (final Entry<Integer, SortOrder> entry : model.getSortedColumns().entrySet()) {
           final int index = entry.getKey();
-          final SortOrder sortOrder = entry.getValue();
-          sortController.setSortOrder(index, sortOrder);
+          if (index < model.getColumnCount()) {
+            final SortOrder sortOrder = entry.getValue();
+            sortController.setSortOrder(index, sortOrder);
+          }
         }
       }
     }

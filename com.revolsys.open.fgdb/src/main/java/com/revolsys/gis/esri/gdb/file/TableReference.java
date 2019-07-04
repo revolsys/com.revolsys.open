@@ -195,7 +195,7 @@ public class TableReference extends CloseableValueHolder<Table> {
     this.lockCount++;
     if (!locked) {
       this.recordStore.lockTable(table);
-      setLoadOnlyMode(true);
+      table.setLoadOnlyMode(true);
     }
     return this.locker;
   }
@@ -209,8 +209,8 @@ public class TableReference extends CloseableValueHolder<Table> {
           this.lockCount = 0;
           final Table table = this.value;
           if (table != null && locked) {
+            table.setLoadOnlyMode(false);
             this.recordStore.unlockTable(table);
-            setLoadOnlyMode(false);
           }
         }
       }

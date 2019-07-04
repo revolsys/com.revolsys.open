@@ -6,20 +6,18 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
-import com.revolsys.record.Record;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.util.Property;
 
 public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   private final int axisCount;
 
-  private final GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory;
 
   private final int srid;
 
@@ -29,8 +27,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     final GeometryFactory geometryFactory) {
     super(dbName, name, dataType, sqlType, 0, 0, required, description, properties);
     this.srid = srid;
-    this.geometryFactory = geometryFactory;
-    setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+    this.geometryFactory = geometryFactory.convertAxisCount(axisCount);
     this.axisCount = axisCount;
   }
 
@@ -39,6 +36,10 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     return new PostgreSQLGeometryJdbcFieldDefinition(getDbName(), getName(), getDataType(),
       getSqlType(), isRequired(), getDescription(), getProperties(), this.srid, this.axisCount,
       this.geometryFactory);
+  }
+
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
   }
 
   public Object getInsertUpdateValue(final Object value) throws SQLException {
@@ -54,7 +55,7 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       }
     } else if (value instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)value;
-      boundingBox = boundingBox.convert(this.geometryFactory);
+      boundingBox = boundingBox.bboxToCs(this.geometryFactory);
       return new PostgreSQLBoundingBoxWrapper(boundingBox);
     } else if (Property.hasValue(value)) {
       return value;
@@ -64,19 +65,22 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object) throws SQLException {
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
     final Object postgresValue = resultSet.getObject(columnIndex);
     final Object value = toJava(postgresValue);
-    object.setValue(getIndex(), value);
-    return columnIndex + 1;
+    return value;
+  }
+
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    if (geometryFactory != null) {
+      this.geometryFactory = geometryFactory.convertAxisCount(this.axisCount);
+    }
   }
 
   @Override
   public int setInsertPreparedStatementValue(final PreparedStatement statement,
-    final int parameterIndex, final Record record) throws SQLException {
-    final String name = getName();
-    final Object value = record.getValue(name);
+    final int parameterIndex, final Object value) throws SQLException {
     final Object jdbcValue = getInsertUpdateValue(value);
     if (jdbcValue == null) {
       final int sqlType = getSqlType();
@@ -116,12 +120,12 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       if (geometry.isEmpty()) {
         return null;
       } else {
-        final DataType dataType = DataTypes.GEOMETRY;
+        final DataType dataType = GeometryDataTypes.GEOMETRY;
         return new PostgreSQLGeometryWrapper(dataType, this.geometryFactory, geometry);
       }
     } else if (object instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)object;
-      boundingBox = boundingBox.convert(this.geometryFactory);
+      boundingBox = boundingBox.bboxToCs(this.geometryFactory);
       return new PostgreSQLBoundingBoxWrapper(boundingBox);
     } else {
       return object;

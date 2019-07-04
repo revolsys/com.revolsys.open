@@ -5,11 +5,11 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Reader;
 import com.revolsys.io.map.MapReader;
@@ -19,11 +19,9 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.SupplierWithProperties;
+import com.revolsys.util.SupplierWithProperties;
 
-public interface RecordReaderFactory
-  extends GeometryReaderFactory, MapReaderFactory, IoFactoryWithCoordinateSystem {
-
+public interface RecordReaderFactory extends GeometryReaderFactory, MapReaderFactory {
   @SuppressWarnings("unchecked")
   static Supplier<RecordReader> newRecordReaderSupplier(
     final Map<String, ? extends Object> properties) {
@@ -45,9 +43,12 @@ public interface RecordReaderFactory
     final String fileExtension = Maps.getString(properties, "fileExtension", defaultFileExtension);
     final Supplier<RecordReader> factory = () -> {
       final RecordReader reader;
-      if ("zip".equals(fileExtension)) {
+      if ("zip".equalsIgnoreCase(fileExtension)) {
         final String baseFileExtension = (String)properties.get("baseFileExtension");
-        final String baseName = (String)properties.get("baseName");
+        String baseName = (String)properties.get("baseName");
+        if (!Property.hasValue(baseName)) {
+          baseName = (String)properties.get("baseFileName");
+        }
         if (Property.hasValue(baseName)) {
           reader = RecordReader.newZipRecordReader(source, baseName, baseFileExtension);
         } else {
@@ -107,8 +108,15 @@ public interface RecordReaderFactory
 
   @Override
   default GeometryReader newGeometryReader(final Resource resource) {
-    final Reader<Record> recordReader = newRecordReader(resource);
-    final RecordGeometryReader geometryReader = new RecordGeometryReader(recordReader);
+    final RecordReader recordReader = newRecordReader(resource);
+    final RecordReaderGeometryReader geometryReader = new RecordReaderGeometryReader(recordReader);
+    return geometryReader;
+  }
+
+  @Override
+  default GeometryReader newGeometryReader(final Resource resource, final MapEx properties) {
+    final RecordReader recordReader = newRecordReader(resource, ArrayRecord.FACTORY, properties);
+    final RecordReaderGeometryReader geometryReader = new RecordReaderGeometryReader(recordReader);
     return geometryReader;
   }
 
@@ -147,8 +155,9 @@ public interface RecordReaderFactory
   default RecordReader newRecordReader(final Object source,
     final RecordFactory<? extends Record> factory) {
     final Resource resource = Resource.getResource(source);
-    return newRecordReader(resource, factory);
+    return newRecordReader(resource, factory, MapEx.EMPTY);
   }
 
-  RecordReader newRecordReader(Resource resource, RecordFactory<? extends Record> factory);
+  RecordReader newRecordReader(Resource resource, RecordFactory<? extends Record> factory,
+    MapEx properties);
 }

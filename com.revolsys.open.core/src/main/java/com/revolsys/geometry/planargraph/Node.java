@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * A node in a {@link PlanarGraph}is a location where 0 or more {@link Edge}s
@@ -70,6 +71,13 @@ public class Node extends GraphComponent {
   /**
    * Constructs a Node with the given location.
    */
+  public Node(final double x, final double y) {
+    this(new PointDoubleXY(x, y), new DirectedEdgeStar());
+  }
+
+  /**
+  * Constructs a Node with the given location.
+  */
   public Node(final Point pt) {
     this(pt, new DirectedEdgeStar());
   }

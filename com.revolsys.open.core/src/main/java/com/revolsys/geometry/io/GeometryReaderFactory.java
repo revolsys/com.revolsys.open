@@ -1,5 +1,6 @@
 package com.revolsys.geometry.io;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.spring.resource.Resource;
@@ -10,5 +11,9 @@ public interface GeometryReaderFactory extends FileIoFactory, IoFactoryWithCoord
     return newGeometryReader(resource);
   }
 
-  GeometryReader newGeometryReader(final Resource resource);
+  default GeometryReader newGeometryReader(final Resource resource) {
+    return newGeometryReader(resource, MapEx.EMPTY);
+  }
+
+  GeometryReader newGeometryReader(final Resource resource, MapEx properties);
 }

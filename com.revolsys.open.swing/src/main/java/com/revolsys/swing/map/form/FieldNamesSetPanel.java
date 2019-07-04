@@ -107,10 +107,10 @@ public class FieldNamesSetPanel extends ValueField
     toolBar.setOpaque(false);
     toolBar.addComponent("default", this.fieldNamesSetNamesField);
     this.renameButton = toolBar.addButtonTitleIcon("default", "Rename Field Set",
-      "fields_filter_edit", () -> actionRename());
+      "fields_filter:edit", () -> actionRename());
     this.deleteButton = toolBar.addButtonTitleIcon("default", "Delete Field Set",
-      "fields_filter_delete", () -> actionDelete());
-    toolBar.addButtonTitleIcon("default", "Add Field Set", "fields_filter_add", () -> actionAdd());
+      "fields_filter:delete", () -> actionDelete());
+    toolBar.addButtonTitleIcon("default", "Add Field Set", "fields_filter:add", () -> actionAdd());
 
     add(toolBar);
 

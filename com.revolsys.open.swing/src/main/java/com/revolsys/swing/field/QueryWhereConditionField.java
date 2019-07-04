@@ -37,6 +37,7 @@ import javax.swing.text.JTextComponent;
 
 import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
@@ -66,7 +67,6 @@ import com.akiban.sql.parser.StatementNode;
 import com.akiban.sql.parser.UserTypeConstantNode;
 import com.akiban.sql.parser.ValueNode;
 import com.akiban.sql.parser.ValueNodeList;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.And;
 import com.revolsys.record.query.Between;
@@ -93,7 +93,6 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.swing.map.layer.record.component.RecordLayerFields;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
@@ -102,16 +101,6 @@ public class QueryWhereConditionField extends ValueField
   implements MouseListener, CaretListener, ItemListener, PropertyChangeListener, DocumentListener {
 
   private static final long serialVersionUID = 1L;
-
-  public static JComponent newSearchField(final AbstractRecordLayer layer,
-    final FieldDefinition fieldDefinition, final CodeTable codeTable) {
-    if (fieldDefinition == null) {
-      return new TextField(20);
-    } else {
-      final String fieldName = fieldDefinition.getName();
-      return RecordLayerFields.newCompactField(layer, fieldName, true);
-    }
-  }
 
   private JComponent searchField;
 
@@ -669,7 +658,7 @@ public class QueryWhereConditionField extends ValueField
     this.searchFieldPanel.removeAll();
     final String fieldName = fieldDefinition.getName();
     this.codeTable = this.recordDefinition.getCodeTableByFieldName(fieldName);
-    this.searchField = newSearchField(this.layer, fieldDefinition, this.codeTable);
+    this.searchField = this.layer.newSearchField(fieldDefinition, this.codeTable);
 
     final boolean oldFieldComparable = this.fieldComparable;
     this.fieldComparable = false;

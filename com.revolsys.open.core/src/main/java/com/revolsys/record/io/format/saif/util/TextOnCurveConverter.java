@@ -52,9 +52,9 @@ public class TextOnCurveConverter implements OsnConverter {
     for (int i = 0; i < points.size(); i++) {
       final Point originalPoint = points.get(0);
       final Point geometryPoint = (Point)geometry.getGeometry(i);
-      geometryPoint.setUserData(originalPoint.getUserData());
+      geometryPoint.setUserDataOld(originalPoint.getUserDataOld());
     }
-    geometry.setUserData(values);
+    geometry.setUserDataOld(values);
     return geometry;
   }
 

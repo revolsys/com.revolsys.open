@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -229,6 +231,20 @@ public interface Lists {
     };
   }
 
+  static <V> List<V> filter(final Iterable<V> list, final Predicate<? super V> filter) {
+    if (list == null) {
+      return Collections.emptyList();
+    } else {
+      final List<V> newList = new ArrayList<>();
+      for (final V value : list) {
+        if (filter.test(value)) {
+          newList.add(value);
+        }
+      }
+      return newList;
+    }
+  }
+
   static int getClassCount(final List<?> list, final Class<?> clazz) {
     int count = 0;
     for (int i = 0; i < list.size(); i++) {
@@ -273,6 +289,12 @@ public interface Lists {
   public static <V> LinkedList<V> linked(@SuppressWarnings("unchecked") final V... values) {
     final LinkedList<V> list = new LinkedList<>();
     addAll(list, values);
+    return list;
+  }
+
+  public static <V> ArrayList<V> newArray(final Consumer<Consumer<V>> action) {
+    final ArrayList<V> list = new ArrayList<>();
+    action.accept(list::add);
     return list;
   }
 

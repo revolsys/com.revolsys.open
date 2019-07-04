@@ -246,7 +246,7 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
   private void showErrorDialog(final String title,
     final Consumer<RecordValidationDialog> successAction,
     final Consumer<RecordValidationDialog> cancelAction) {
-    Invoke.andWait(() -> {
+    Invoke.later(() -> {
       final String layerPath = this.layer.getPath();
 
       final Window window = SwingUtil.getActiveWindow();

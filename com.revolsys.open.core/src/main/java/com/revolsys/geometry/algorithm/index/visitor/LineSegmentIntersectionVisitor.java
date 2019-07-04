@@ -19,7 +19,7 @@ public class LineSegmentIntersectionVisitor implements Consumer<LineSegment> {
 
   @Override
   public void accept(final LineSegment segment) {
-    if (segment.getBoundingBox().intersects(this.querySeg.getBoundingBox())) {
+    if (segment.getBoundingBox().bboxIntersects(this.querySeg.getBoundingBox())) {
       final Geometry intersection = this.querySeg.getIntersection(segment);
       if (intersection != null && intersection.isEmpty()) {
         this.intersections.add(intersection);

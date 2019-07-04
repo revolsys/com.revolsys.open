@@ -26,14 +26,13 @@ import com.revolsys.util.Property;
 public class FileRecordLayer extends ListRecordLayer {
 
   static {
-    final Class<AbstractRecordLayer> clazz = AbstractRecordLayer.class;
-    final MenuFactory menu = MenuFactory.getMenu(clazz);
-    menu.<FileRecordLayer> addMenuItem("refresh", "Reload from File",
-      Icons.getIconWithBadge("page", "refresh"), FileRecordLayer::revertDo, true);
+    MenuFactory.addMenuInitializer(FileRecordLayer.class,
+      menu -> menu.<FileRecordLayer> addMenuItem("refresh", "Reload from File",
+        Icons.getIconWithBadge("page", "refresh"), FileRecordLayer::revertDo, true));
   }
 
-  public static FileRecordLayer newLayer(final Map<String, ? extends Object> properties) {
-    return new FileRecordLayer(properties);
+  public static FileRecordLayer newLayer(final Map<String, ? extends Object> config) {
+    return new FileRecordLayer(config);
   }
 
   private Resource resource;
@@ -100,6 +99,7 @@ public class FileRecordLayer extends ListRecordLayer {
             final Map<String, Object> properties = getProperties();
             reader.setProperties(properties);
             final RecordDefinition recordDefinition = reader.getRecordDefinition();
+
             setRecordDefinition(recordDefinition);
             if (recordDefinition == null) {
               Logs.error(this, "No record definition found for: " + this.url);
@@ -126,17 +126,20 @@ public class FileRecordLayer extends ListRecordLayer {
                       }
                     }
                   }
-
-                  newRecordInternal(record);
+                  if (isDeleted()) {
+                    return false;
+                  } else {
+                    addNewRecordPersisted(record);
+                  }
                 }
               }
             }
             refreshBoundingBox();
-            initRecordMenu();
+            initializeMenus();
             setExists(true);
             return true;
           }
-        } catch (final Throwable e) {
+        } catch (final RuntimeException e) {
           Logs.error(this, "Error reading: " + this.resource, e);
         } finally {
           refresh();

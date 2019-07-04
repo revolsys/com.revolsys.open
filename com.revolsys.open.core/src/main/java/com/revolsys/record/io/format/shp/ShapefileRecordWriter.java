@@ -26,10 +26,12 @@ import java.lang.reflect.Method;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Integers;
+import org.jeometry.common.number.Shorts;
 
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.endian.EndianOutput;
@@ -40,13 +42,12 @@ import com.revolsys.record.io.format.xbase.XbaseRecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.MathUtil;
 
 public class ShapefileRecordWriter extends XbaseRecordWriter {
 
   private static final ShapefileGeometryUtil SHP_WRITER = ShapefileGeometryUtil.SHP_INSTANCE;
 
-  private BoundingBox envelope = BoundingBox.EMPTY;
+  private BoundingBox envelope = BoundingBox.empty();
 
   private DataType geometryDataType;
 
@@ -106,7 +107,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
   }
 
   private void doubleNotNaN(final ResourceEndianOutput out, final double value) throws IOException {
-    if (MathUtil.isNanOrInfinite(value)) {
+    if (!Double.isFinite(value)) {
       out.writeLEDouble(0);
     } else {
       out.writeLEDouble(value);
@@ -152,7 +153,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
         }
         if (this.geometryDataType == null) {
           this.geometryDataType = record.getRecordDefinition().getGeometryField().getDataType();
-          if (DataTypes.GEOMETRY.equals(this.geometryDataType)) {
+          if (GeometryDataTypes.GEOMETRY.equals(this.geometryDataType)) {
             final String geometryType = geometry.getGeometryType();
             this.geometryDataType = DataTypes.getDataType(geometryType);
           }
@@ -162,7 +163,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
         this.geometryWriteMethod = ShapefileGeometryUtil.getWriteMethod(this.geometryFactory,
           this.geometryDataType);
       }
-      EsriCoordinateSystems.writePrjFile(this.resource, this.geometryFactory);
+      this.geometryFactory.writePrjFile(this.resource);
     }
   }
 
@@ -208,9 +209,9 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
       }
       if (this.indexOut != null) {
         final long recordLength = this.out.getFilePointer() - recordIndex;
-        final int offsetShort = (int)(recordIndex / MathUtil.BYTES_IN_SHORT);
+        final int offsetShort = (int)(recordIndex / Shorts.BYTES_IN_SHORT);
         this.indexOut.writeInt(offsetShort);
-        final int lengthShort = (int)(recordLength / MathUtil.BYTES_IN_SHORT) - 4;
+        final int lengthShort = (int)(recordLength / Shorts.BYTES_IN_SHORT) - 4;
         this.indexOut.writeInt(lengthShort);
       }
       return true;
@@ -234,7 +235,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
   }
 
   private int writeNull(final EndianOutput out) throws IOException {
-    final int recordLength = MathUtil.BYTES_IN_INT;
+    final int recordLength = Integers.BYTES_IN_INT;
     out.writeInt(recordLength);
     out.writeLEInt(ShapefileConstants.NULL_SHAPE);
     return ShapefileConstants.NULL_SHAPE;

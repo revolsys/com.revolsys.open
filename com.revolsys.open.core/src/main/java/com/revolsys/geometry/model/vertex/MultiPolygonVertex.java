@@ -22,20 +22,20 @@ public class MultiPolygonVertex extends AbstractVertex {
   }
 
   @Override
-  public double getCoordinate(final int index) {
+  public double getCoordinate(final int axisIndex) {
     final Polygon polygon = getPolygon();
     final LinearRing ring = polygon.getRing(this.ringIndex);
     if (ring == null) {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     } else {
-      return ring.getCoordinate(this.vertexIndex, index);
+      return ring.getCoordinate(this.vertexIndex, axisIndex);
     }
   }
 
   @Override
   public double getLineCoordinateRelative(final int vertexOffset, final int axisIndex) {
     if (isEmpty()) {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     } else {
       final int vertexIndex = getVertexIndex();
       final LinearRing getLine = getRing();
@@ -112,6 +112,28 @@ public class MultiPolygonVertex extends AbstractVertex {
   }
 
   @Override
+  public double getX() {
+    final Polygon polygon = getPolygon();
+    final LinearRing ring = polygon.getRing(this.ringIndex);
+    if (ring == null) {
+      return java.lang.Double.NaN;
+    } else {
+      return ring.getX(this.vertexIndex);
+    }
+  }
+
+  @Override
+  public double getY() {
+    final Polygon polygon = getPolygon();
+    final LinearRing ring = polygon.getRing(this.ringIndex);
+    if (ring == null) {
+      return java.lang.Double.NaN;
+    } else {
+      return ring.getY(this.vertexIndex);
+    }
+  }
+
+  @Override
   public boolean hasNext() {
     if (getGeometry().isEmpty()) {
       return false;
@@ -181,9 +203,17 @@ public class MultiPolygonVertex extends AbstractVertex {
     throw new UnsupportedOperationException("Removing vertices not supported");
   }
 
+  @Override
+  public double setCoordinate(final int axisIndex, final double coordinate) {
+    final Polygonal Polygonal = getPolygonal();
+    return Polygonal.setCoordinate(this.partIndex, this.ringIndex, this.vertexIndex, axisIndex,
+      coordinate);
+  }
+
   public void setVertexId(final int... vertexId) {
     this.partIndex = vertexId[0];
     this.ringIndex = vertexId[1];
     this.vertexIndex = vertexId[2];
   }
+
 }

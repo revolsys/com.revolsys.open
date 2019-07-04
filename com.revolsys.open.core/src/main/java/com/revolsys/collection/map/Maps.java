@@ -385,6 +385,27 @@ public interface Maps {
     }
   }
 
+  static <K> Double getDouble(final Map<K, ? extends Object> map, final K name) {
+    final Object value = get(map, name);
+    if (value == null) {
+      return null;
+    } else if (value instanceof Number) {
+      final Number number = (Number)value;
+      return number.doubleValue();
+    } else {
+      final String stringValue = value.toString();
+      if (Property.hasValue(stringValue)) {
+        try {
+          return Double.valueOf(stringValue);
+        } catch (final NumberFormatException e) {
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }
+  }
+
   static Double getDouble(final Map<String, ? extends Object> map, final String name) {
     final Object value = get(map, name);
     if (value == null) {

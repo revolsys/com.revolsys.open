@@ -339,6 +339,10 @@ public class StaxReader extends StreamReaderDelegate implements BaseCloseable {
    */
   public void requireLocalName(final QName element) {
     final String localPart = element.getLocalPart();
+    requireLocalName(localPart);
+  }
+
+  public void requireLocalName(final String localPart) {
     require(XMLStreamConstants.START_ELEMENT, null, localPart);
   }
 
@@ -480,9 +484,9 @@ public class StaxReader extends StreamReaderDelegate implements BaseCloseable {
       next();
       if (this.depth < depth) {
         return false;
-      } else if (getEventType() == END_DOCUMENT) {
+      } else if (getEventType() == XMLStreamConstants.END_DOCUMENT) {
         return false;
-      } else if (getEventType() == START_ELEMENT) {
+      } else if (getEventType() == XMLStreamConstants.START_ELEMENT) {
         final QName currentElement = getName();
         if (currentElement.equals(elementName)) {
           return true;
@@ -497,9 +501,9 @@ public class StaxReader extends StreamReaderDelegate implements BaseCloseable {
       next();
       if (this.depth < depth) {
         return false;
-      } else if (getEventType() == END_DOCUMENT) {
+      } else if (getEventType() == XMLStreamConstants.END_DOCUMENT) {
         return false;
-      } else if (getEventType() == START_ELEMENT) {
+      } else if (getEventType() == XMLStreamConstants.START_ELEMENT) {
         final QName currentElement = getName();
         if (isStartElementLocalName(localName)) {
           return true;

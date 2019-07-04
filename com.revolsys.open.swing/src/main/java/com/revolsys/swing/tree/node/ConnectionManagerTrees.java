@@ -2,16 +2,17 @@ package com.revolsys.swing.tree.node;
 
 import java.awt.Window;
 import java.io.File;
+import java.nio.file.Path;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
+import com.revolsys.connection.AbstractConnection;
+import com.revolsys.connection.AbstractConnectionRegistry;
+import com.revolsys.connection.Connection;
+import com.revolsys.connection.ConnectionRegistry;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.connection.AbstractConnection;
-import com.revolsys.io.connection.AbstractConnectionRegistry;
-import com.revolsys.io.connection.Connection;
-import com.revolsys.io.connection.ConnectionRegistry;
+import com.revolsys.io.filter.FileNameExtensionFilter;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
@@ -21,15 +22,16 @@ public class ConnectionManagerTrees {
 
   static {
     // AbstractConnectionRegistry
-    final MenuFactory connectionRegistryMenu = MenuFactory
-      .getMenu(AbstractConnectionRegistry.class);
-    LazyLoadTreeNode.addRefreshMenuItem(connectionRegistryMenu);
+    MenuFactory.addMenuInitializer(AbstractConnectionRegistry.class, (menu) -> {
+      LazyLoadTreeNode.addRefreshMenuItem(menu);
+    });
 
     // AbstractConnection
-    final MenuFactory connectionMenu = MenuFactory.getMenu(AbstractConnection.class);
-    LazyLoadTreeNode.addRefreshMenuItem(connectionMenu);
-    TreeNodes.addMenuItemNodeValue(connectionMenu, "default", "Delete Connection", "delete",
-      Connection::isEditable, ConnectionManagerTrees::deleteConnection);
+    MenuFactory.addMenuInitializer(AbstractConnection.class, (menu) -> {
+      LazyLoadTreeNode.addRefreshMenuItem(menu);
+      TreeNodes.addMenuItemNodeValue(menu, "default", "Delete Connection", "delete",
+        Connection::isEditable, ConnectionManagerTrees::deleteConnection);
+    });
   }
 
   private static void deleteConnection(final Connection connection) {
@@ -112,7 +114,8 @@ public class ConnectionManagerTrees {
     if (status == JFileChooser.APPROVE_OPTION) {
       Invoke.background("Import " + name, () -> {
         for (final File file : fileChooser.getSelectedFiles()) {
-          connectionRegistry.importConnection(file);
+          final Path path = file.toPath();
+          connectionRegistry.importConnection(path);
         }
       });
     }

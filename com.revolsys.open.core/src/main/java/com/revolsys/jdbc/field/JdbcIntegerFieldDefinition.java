@@ -7,29 +7,27 @@ import java.util.Map;
 
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.record.Record;
-
 public class JdbcIntegerFieldDefinition extends JdbcFieldDefinition {
   public JdbcIntegerFieldDefinition(final String dbName, final String name, final int sqlType,
-    final int length, final boolean required, final String description,
-    final Map<String, Object> properties) {
-    super(dbName, name, DataTypes.INT, sqlType, length, 0, required, description, properties);
+    final boolean required, final String description, final Map<String, Object> properties) {
+    super(dbName, name, DataTypes.INT, sqlType, 11, 0, required, description, properties);
   }
 
   @Override
   public JdbcIntegerFieldDefinition clone() {
-    return new JdbcIntegerFieldDefinition(getDbName(), getName(), getSqlType(), getLength(),
-      isRequired(), getDescription(), getProperties());
+    return new JdbcIntegerFieldDefinition(getDbName(), getName(), getSqlType(), isRequired(),
+      getDescription(), getProperties());
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
     final int value = resultSet.getInt(columnIndex);
-    if (!resultSet.wasNull()) {
-      setValue(record, Integer.valueOf(value));
+    if (resultSet.wasNull()) {
+      return null;
+    } else {
+      return Integer.valueOf(value);
     }
-    return columnIndex + 1;
   }
 
   @Override

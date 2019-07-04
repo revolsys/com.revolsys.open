@@ -28,7 +28,6 @@ import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapReaderFactory;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
-import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
@@ -46,7 +45,7 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
     } else {
       final File file = FileUtil.getFile(directory, path);
       if (file.exists() && !file.isDirectory()) {
-        final FileSystemResource resource = new FileSystemResource(file);
+        final PathResource resource = new PathResource(file);
         return toMap(resource);
       } else {
         return new LinkedHashMapEx();
@@ -88,7 +87,7 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
   }
 
   public static final MapEx toMap(final Resource resource) {
-    if (resource != null && (!(resource instanceof FileSystemResource) || resource.exists())) {
+    if (resource != null && (!(resource instanceof PathResource) || resource.exists())) {
       final Reader reader = resource.newBufferedReader();
       return toMap(reader);
     }
@@ -116,7 +115,7 @@ public class Json extends AbstractIoFactory implements MapReaderFactory, MapWrit
 
   public static final List<MapEx> toMapList(final Object source) {
     final Resource resource = Resource.getResource(source);
-    if (resource != null && (!(resource instanceof FileSystemResource) || resource.exists())) {
+    if (resource != null && (!(resource instanceof PathResource) || resource.exists())) {
       try (
         final BufferedReader reader = resource.newBufferedReader();
         final JsonMapReader jsonReader = new JsonMapReader(reader)) {

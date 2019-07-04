@@ -3,7 +3,7 @@ package com.revolsys.jdbc.io;
 import org.springframework.transaction.support.ResourceHolderSupport;
 
 public class JdbcWriterResourceHolder extends ResourceHolderSupport {
-  private JdbcWriterImpl writer;
+  private JdbcRecordWriter writer;
 
   public JdbcWriterResourceHolder() {
   }
@@ -15,7 +15,7 @@ public class JdbcWriterResourceHolder extends ResourceHolderSupport {
     }
   }
 
-  public JdbcWriterImpl getWriter() {
+  public JdbcRecordWriter getWriter() {
     return this.writer;
   }
 
@@ -41,11 +41,11 @@ public class JdbcWriterResourceHolder extends ResourceHolderSupport {
     }
   }
 
-  public void setWriter(final JdbcWriterImpl writer) {
+  public void setWriter(final JdbcRecordWriter writer) {
     this.writer = writer;
   }
 
-  public boolean writerEquals(final JdbcWriterImpl writer) {
+  public boolean writerEquals(final JdbcRecordWriter writer) {
     return this.writer == writer;
   }
 }

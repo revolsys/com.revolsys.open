@@ -40,7 +40,6 @@ import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.Assert;
 import com.revolsys.geometry.util.Triangles;
-import com.revolsys.math.Angle;
 
 /**
  * Computes the <b>Minimum Bounding Circle</b> (MBC)
@@ -103,7 +102,7 @@ public class MinimumBoundingCircle {
         continue;
       }
 
-      final double ang = Angle.angleBetween(P, p, Q);
+      final double ang = Point.angleBetween(P, p, Q);
       if (ang < minAng) {
         minAng = ang;
         minAngPt = p;
@@ -167,7 +166,7 @@ public class MinimumBoundingCircle {
     computeCirclePoints();
     computeCentre();
     if (this.centre != null) {
-      this.radius = this.centre.distance(this.extremalPts[0]);
+      this.radius = this.centre.distancePoint(this.extremalPts[0]);
     }
   }
 
@@ -210,7 +209,7 @@ public class MinimumBoundingCircle {
      */
     final Geometry convexHull = this.input.convexHull();
 
-    final Point[] hullPts = CoordinatesListUtil.getCoordinateArray(convexHull);
+    final Point[] hullPts = CoordinatesListUtil.getPointArray(convexHull);
 
     // strip duplicate final point, if any
     Point[] pts = hullPts;
@@ -239,25 +238,25 @@ public class MinimumBoundingCircle {
      * a pair or triplet of points which determine the minimal circle.
      * By the design of the algorithm,
      * at most <tt>pts.length</tt> iterations are required to terminate
-     * with a correct result.
+     * with a correct intersectionCount.
      */
     for (final Point pt : pts) {
       final Point R = pointWithMinAngleWithSegment(pts, P, Q);
 
       // if PRQ is obtuse, then MBC is determined by P and Q
-      if (Angle.isObtuse(P, R, Q)) {
+      if (Point.isObtuse(P, R, Q)) {
         this.extremalPts = new Point[] {
           new PointDouble(P), new PointDouble(Q)
         };
         return;
       }
       // if RPQ is obtuse, update baseline and iterate
-      if (Angle.isObtuse(R, P, Q)) {
+      if (Point.isObtuse(R, P, Q)) {
         P = R;
         continue;
       }
       // if RQP is obtuse, update baseline and iterate
-      if (Angle.isObtuse(R, Q, P)) {
+      if (Point.isObtuse(R, Q, P)) {
         Q = R;
         continue;
       }

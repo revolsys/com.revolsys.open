@@ -2,8 +2,6 @@ package com.revolsys.geometry.index.quadtree;
 
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.util.BoundingBoxUtil;
-
 public class IdObjectNode<T> extends AbstractNode<T> {
   private static final long serialVersionUID = 1L;
 
@@ -48,11 +46,14 @@ public class IdObjectNode<T> extends AbstractNode<T> {
   }
 
   @Override
-  protected void forEachItem(final QuadTree<T> tree, final Consumer<T> action) {
+  protected void forEachItem(final QuadTree<T> tree, final Consumer<? super T> action) {
+    final IdObjectQuadTree<T> idObjectTree = (IdObjectQuadTree<T>)tree;
     synchronized (this.nodes) {
-      final IdObjectQuadTree<T> idTree = (IdObjectQuadTree<T>)tree;
-      for (final Object id : this.ids) {
-        final T item = idTree.getItem(id);
+      final Object[] ids = this.ids;
+      final int itemCount = getItemCount();
+      for (int i = 0; i < itemCount; i++) {
+        final Object id = ids[i];
+        final T item = idObjectTree.getItem(id);
         action.accept(item);
       }
     }
@@ -60,13 +61,15 @@ public class IdObjectNode<T> extends AbstractNode<T> {
 
   @Override
   protected void forEachItem(final QuadTree<T> tree, final double[] bounds,
-    final Consumer<T> action) {
+    final Consumer<? super T> action) {
     synchronized (this.nodes) {
-      final IdObjectQuadTree<T> idTree = (IdObjectQuadTree<T>)tree;
-      for (final Object id : this.ids) {
-        final double[] itemBounds = idTree.getBounds(id);
-        if (BoundingBoxUtil.intersects(bounds, itemBounds)) {
-          final T item = idTree.getItem(id);
+      final IdObjectQuadTree<T> idObjectTree = (IdObjectQuadTree<T>)tree;
+      final Object[] ids = this.ids;
+      final int itemCount = getItemCount();
+      for (int i = 0; i < itemCount; i++) {
+        final Object id = ids[i];
+        if (idObjectTree.intersectsBounds(id, bounds[0], bounds[1], bounds[2], bounds[3])) {
+          final T item = idObjectTree.getItem(id);
           action.accept(item);
         }
       }

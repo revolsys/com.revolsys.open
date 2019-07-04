@@ -151,15 +151,16 @@ public class TabClosableTitle extends JLabel implements MouseListener {
   }
 
   public void setMenu(final Object menuSource) {
-    final MenuFactory menuFactory = MenuFactory.findMenu(menuSource);
-    if (menuFactory != null) {
-      setMenu(menuFactory, menuSource);
-    }
+    setMenu(null, menuSource);
   }
 
   private void showMenu(final MouseEvent event) {
-    if (this.menuFactory != null) {
-      this.menuFactory.showMenu(this.menuSource, event);
+    MenuFactory menuFactory = this.menuFactory;
+    if (menuFactory == null) {
+      menuFactory = MenuFactory.getMenu(this.menuSource);
+    }
+    if (menuFactory != null) {
+      menuFactory.showMenu(this.menuSource, event);
     }
   }
 }

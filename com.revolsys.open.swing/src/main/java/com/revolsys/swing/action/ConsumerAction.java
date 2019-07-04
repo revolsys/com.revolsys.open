@@ -142,7 +142,7 @@ public class ConsumerAction extends AbstractActionMainMenuItemFactory {
         this.handler.accept(event);
       } catch (final NoSuchElementException e) {
       } catch (final Throwable e) {
-        Logs.error(this, "Error Performing action", e);
+        Logs.error(this.handler, "Error Performing action", e);
       }
     }
   }

@@ -201,7 +201,7 @@ public class CGAlgorithms {
     for (final Segment segment : line.segments()) {
       final Point p0 = segment.getPoint(0);
       final Point p1 = segment.getPoint(1);
-      lineIntersector.computeIntersection(p, p0, p1);
+      lineIntersector.computeIntersectionPoints(p, p0, p1);
       if (lineIntersector.hasIntersection()) {
         return true;
       }

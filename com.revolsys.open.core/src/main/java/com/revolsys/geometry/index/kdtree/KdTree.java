@@ -1,234 +1,153 @@
-/*
- * The JTS Topology Suite is a collection of Java classes that
- * implement the fundamental operations required to validate a given
- * geo-spatial data set to a known topological specification.
- *
- * Copyright (C) 2001 Vivid Solutions
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- *
- * For more information, contact:
- *
- *     Vivid Solutions
- *     Suite #1A
- *     2328 Government Street
- *     Victoria BC  V8T 5G5
- *     Canada
- *
- *     (250)385-6040
- *     www.vividsolutions.com
- */
-
 package com.revolsys.geometry.index.kdtree;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
+import org.jeometry.common.function.BiFunctionDouble;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.util.Emptyable;
 
-/**
- * An implementation of a 2-D KD-Tree. KD-trees provide fast range searching on
- * point data.
- * <p>
- * This implementation supports detecting and snapping points which are closer than a given
- * tolerance value. If the same point (up to tolerance) is inserted more than once a new node is
- * not created but the count of the existing node is incremented.
- *
- *
- * @author David Skea
- * @author Martin Davis
- */
 public class KdTree implements Emptyable {
-  private final KdNode last = null;
 
-  private long numberOfNodes;
+  private long size;
 
   private KdNode root = null;
 
-  private final double tolerance;
+  private final GeometryFactory geometryFactory;
 
-  /**
-   * Creates a new instance of a KdTree
-   * with a snapping tolerance of 0.0.
-   * (I.e. distinct points will <i>not</i> be snapped)
-   */
+  private final BiFunctionDouble<KdNode> nodeFactory;
+
+  private final double scaleXY;
+
   public KdTree() {
-    this(0.0);
+    this(GeometryFactory.DEFAULT_2D);
   }
 
-  /**
-   * Creates a new instance of a KdTree, specifying a snapping distance tolerance.
-   * Point which lie closer than the tolerance to a point already
-   * in the tree will be treated as identical to the existing point.
-   *
-   * @param tolerance
-   *          the tolerance distance for considering two points equal
-   */
-  public KdTree(final double tolerance) {
-    this.tolerance = tolerance;
+  public KdTree(final BiFunctionDouble<KdNode> nodeFactory) {
+    this(nodeFactory, GeometryFactory.DEFAULT_2D);
   }
 
-  /**
-   * Inserts a new point in the kd-tree, with no data.
-   *
-   * @param p
-   *          the point to insert
-   * @return the kdnode containing the point
-   */
-  public KdNode insert(final Point p) {
-    return insert(p, null);
+  public KdTree(final BiFunctionDouble<KdNode> nodeFactory, final GeometryFactory geometryFactory) {
+    this.nodeFactory = nodeFactory;
+    this.geometryFactory = geometryFactory;
+    this.scaleXY = geometryFactory.getScaleXY();
   }
 
-  /**
-   * Inserts a new point into the kd-tree.
-   *
-   * @param p
-   *          the point to insert
-   * @param data
-   *          a data item for the point
-   * @return returns a new KdNode if a new point is inserted, else an existing
-   *         node is returned with its counter incremented. This can be checked
-   *         by testing returnedNode.getCount() > 1.
-   */
-  public KdNode insert(final Point p, final Object data) {
-    if (this.root == null) {
-      this.root = new KdNode(p, data);
-      return this.root;
+  public KdTree(final GeometryFactory geometryFactory) {
+    this(KdNode::new, geometryFactory);
+  }
+
+  public <N extends KdNode> void forEachNode(final BoundingBox boundingBox,
+    final Consumer<N> result) {
+    final double minX = boundingBox.getMinX();
+    final double minY = boundingBox.getMinY();
+    final double maxX = boundingBox.getMaxX();
+    final double maxY = boundingBox.getMaxY();
+    forEachNode(minX, minY, maxX, maxY, result);
+  }
+
+  public <N extends KdNode> void forEachNode(final BoundingBox boundingBox,
+    final Predicate<? super N> filter, final Consumer<N> result) {
+    final double minX = boundingBox.getMinX();
+    final double minY = boundingBox.getMinY();
+    final double maxX = boundingBox.getMaxX();
+    final double maxY = boundingBox.getMaxY();
+    forEachNode(minX, minY, maxX, maxY, filter, result);
+  }
+
+  public <N extends KdNode> void forEachNode(final double minX, final double minY,
+    final double maxX, final double maxY, final Consumer<N> result) {
+    if (this.root != null) {
+      this.root.forEachNode(true, minX, minY, maxX, maxY, result);
     }
-
-    KdNode currentNode = this.root;
-    KdNode leafNode = this.root;
-    boolean isOddLevel = true;
-    boolean isLessThan = true;
-
-    /**
-     * Traverse the tree,
-     * first cutting the plane left-right (by X ordinate)
-     * then top-bottom (by Y ordinate)
-     */
-    while (currentNode != this.last) {
-      // test if point is already a node
-      if (currentNode != null) {
-        final boolean isInTolerance = p.distance(currentNode.getCoordinate()) <= this.tolerance;
-
-        // check if point is already in tree (up to tolerance) and if so simply
-        // return existing node
-        if (isInTolerance) {
-          currentNode.increment();
-          return currentNode;
-        }
-      }
-
-      if (isOddLevel) {
-        isLessThan = p.getX() < currentNode.getX();
-      } else {
-        isLessThan = p.getY() < currentNode.getY();
-      }
-      leafNode = currentNode;
-      if (isLessThan) {
-        currentNode = currentNode.getLeft();
-      } else {
-        currentNode = currentNode.getRight();
-      }
-
-      isOddLevel = !isOddLevel;
-    }
-
-    // no node found, add new leaf node to tree
-    this.numberOfNodes = this.numberOfNodes + 1;
-    final KdNode node = new KdNode(p, data);
-    node.setLeft(this.last);
-    node.setRight(this.last);
-    if (isLessThan) {
-      leafNode.setLeft(node);
-    } else {
-      leafNode.setRight(node);
-    }
-    return node;
   }
 
-  /**
-   * Tests whether the index contains any items.
-   *
-   * @return true if the index does not contain any items
-   */
-  @Override
-  public boolean isEmpty() {
-    if (this.root == null) {
-      return true;
+  public <N extends KdNode> void forEachNode(final double minX, final double minY,
+    final double maxX, final double maxY, final Predicate<? super N> filter,
+    final Consumer<N> result) {
+    if (this.root != null) {
+      this.root.forEachNode(true, minX, minY, maxX, maxY, filter, result);
     }
-    return false;
   }
 
-  /**
-   * Performs a range search of the points in the index.
-   *
-   * @param queryEnv
-   *          the range rectangle to query
-   * @return a list of the KdNodes found
-   */
-  public List query(final BoundingBox queryEnv) {
-    final List result = new ArrayList();
-    queryNode(this.root, this.last, queryEnv, true, result);
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
+  }
+
+  public <N extends KdNode> List<N> getItems(final BoundingBox boundingBox) {
+    final List<N> result = new ArrayList<>();
+    final Consumer<N> action = result::add;
+    forEachNode(boundingBox, action);
     return result;
   }
 
-  /**
-   * Performs a range search of the points in the index.
-   *
-   * @param queryEnv
-   *          the range rectangle to query
-   * @param result
-   *          a list to accumulate the result nodes into
-   */
-  public void query(final BoundingBox queryEnv, final List result) {
-    queryNode(this.root, this.last, queryEnv, true, result);
+  public long getSize() {
+    return this.size;
   }
 
-  private void queryNode(final KdNode currentNode, final KdNode bottomNode,
-    final BoundingBox queryEnv, final boolean odd, final List result) {
-    if (currentNode == bottomNode) {
-      return;
+  @SuppressWarnings("unchecked")
+  public <N extends KdNode> N insertPoint(double x, double y) {
+    if (this.scaleXY > 0) {
+      x = Math.round(x * this.scaleXY) / this.scaleXY;
+      y = Math.round(y * this.scaleXY) / this.scaleXY;
     }
-
-    double min;
-    double max;
-    double discriminant;
-    if (odd) {
-      min = queryEnv.getMinX();
-      max = queryEnv.getMaxX();
-      discriminant = currentNode.getX();
+    if (this.root == null) {
+      this.root = this.nodeFactory.accept(x, y);
+      return (N)this.root;
     } else {
-      min = queryEnv.getMinY();
-      max = queryEnv.getMaxY();
-      discriminant = currentNode.getY();
-    }
-    final boolean searchLeft = min < discriminant;
-    final boolean searchRight = discriminant <= max;
 
-    if (searchLeft) {
-      queryNode(currentNode.getLeft(), bottomNode, queryEnv, !odd, result);
-    }
-    if (queryEnv.covers(currentNode.getCoordinate())) {
-      result.add(currentNode);
-    }
-    if (searchRight) {
-      queryNode(currentNode.getRight(), bottomNode, queryEnv, !odd, result);
-    }
+      KdNode currentNode = this.root;
+      KdNode leafNode = this.root;
+      boolean isAxisX = true;
+      boolean isLessThan = true;
 
+      while (currentNode != null) {
+        final double x2 = currentNode.getX();
+        final double y2 = currentNode.getY();
+        if (x2 == x && y2 == y) {
+          currentNode.increment();
+          return (N)currentNode;
+        } else {
+          if (isAxisX) {
+            isLessThan = x < x2;
+          } else {
+            isLessThan = y < y2;
+          }
+          leafNode = currentNode;
+          if (isLessThan) {
+            currentNode = currentNode.getLeft();
+          } else {
+            currentNode = currentNode.getRight();
+          }
+          isAxisX = !isAxisX;
+        }
+      }
+
+      this.size = this.size + 1;
+      final KdNode node = this.nodeFactory.accept(x, y);
+      if (isLessThan) {
+        leafNode.setLeft(node);
+      } else {
+        leafNode.setRight(node);
+      }
+      return (N)node;
+    }
+  }
+
+  public <N extends KdNode> N insertPoint(final Point point) {
+    final Point convertedPoint = point.convertPoint2d(this.geometryFactory);
+    final double x = convertedPoint.getX();
+    final double y = convertedPoint.getY();
+    return insertPoint(x, y);
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return this.size == 0;
   }
 }

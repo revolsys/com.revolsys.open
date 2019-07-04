@@ -3,47 +3,48 @@ package com.revolsys.swing.map.layer.record.renderer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.MultipleLayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.tree.BaseTree;
-import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.Function2;
 
-public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecordLayerRenderer {
+public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecordLayerRenderer
+  implements MultipleLayerRenderer<AbstractRecordLayer, AbstractRecordLayerRenderer> {
   static {
-    final MenuFactory menu = MenuFactory.getMenu(AbstractMultipleRecordLayerRenderer.class);
+    MenuFactory.addMenuInitializer(AbstractMultipleRecordLayerRenderer.class, menu -> {
 
-    addAddMenuItem(menu, "Geometry", GeometryStyleRecordLayerRenderer::new);
-    addAddMenuItem(menu, "Text", TextStyleRenderer::new);
-    addAddMenuItem(menu, "Marker", MarkerStyleRenderer::new);
-    addAddMenuItem(menu, "Multiple", MultipleRecordRenderer::new);
-    addAddMenuItem(menu, "Filter", FilterMultipleRenderer::new);
-    addAddMenuItem(menu, "Scale", ScaleMultipleRenderer::new);
+      addAddMenuItem(menu, "Geometry", GeometryStyleRecordLayerRenderer::new);
+      addAddMenuItem(menu, "Text", TextStyleRenderer::new);
+      addAddMenuItem(menu, "Marker", MarkerStyleRenderer::new);
+      addAddMenuItem(menu, "Multiple", MultipleRecordRenderer::new);
+      addAddMenuItem(menu, "Filter", FilterMultipleRenderer::new);
+      addAddMenuItem(menu, "Scale", ScaleMultipleRenderer::new);
 
-    addConvertMenuItem(menu, "Multiple", MultipleRecordRenderer.class,
-      AbstractMultipleRecordLayerRenderer::convertToMultipleStyle);
-    addConvertMenuItem(menu, "Filter", FilterMultipleRenderer.class,
-      AbstractMultipleRecordLayerRenderer::convertToFilterStyle);
-    addConvertMenuItem(menu, "Scale", ScaleMultipleRenderer.class,
-      AbstractMultipleRecordLayerRenderer::convertToScaleStyle);
+      addConvertMenuItem(menu, "Multiple", MultipleRecordRenderer.class,
+        AbstractMultipleRecordLayerRenderer::convertToMultipleStyle);
+      addConvertMenuItem(menu, "Filter", FilterMultipleRenderer.class,
+        AbstractMultipleRecordLayerRenderer::convertToFilterStyle);
+      addConvertMenuItem(menu, "Scale", ScaleMultipleRenderer.class,
+        AbstractMultipleRecordLayerRenderer::convertToScaleStyle);
+    });
   }
 
   protected static void addAddMenuItem(final MenuFactory menu, final String type,
-    final Function2<AbstractRecordLayer, AbstractMultipleRecordLayerRenderer, AbstractRecordLayerRenderer> rendererFactory) {
-    final String iconName = ("style_" + type + "_add").toLowerCase();
+    final BiFunction<AbstractRecordLayer, AbstractMultipleRecordLayerRenderer, AbstractRecordLayerRenderer> rendererFactory) {
+    final String iconName = ("style_" + type + ":add").toLowerCase();
     final String name = "Add " + type + " Style";
     menu.addMenuItem("add", name, iconName,
       (final AbstractMultipleRecordLayerRenderer parentRenderer) -> {
@@ -77,10 +78,12 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     super(type, name);
   }
 
+  @Override
   public int addRenderer(final AbstractRecordLayerRenderer renderer) {
     return addRenderer(-1, renderer);
   }
 
+  @Override
   public int addRenderer(int index, final AbstractRecordLayerRenderer renderer) {
     if (renderer == null) {
       return -1;
@@ -105,17 +108,9 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     }
   }
 
-  public void addRendererEdit(final AbstractRecordLayerRenderer renderer) {
-    addRenderer(-1, renderer);
-    final Object item = MenuFactory.getMenuSource();
-    if (item instanceof BaseTreeNode) {
-      final BaseTreeNode node = (BaseTreeNode)item;
-      final BaseTree tree = node.getTree();
-      if (tree.isPropertyEqual("treeType", Project.class.getName())) {
-        final AbstractRecordLayer layer = renderer.getLayer();
-        layer.showRendererProperties(renderer);
-      }
-    }
+  @Override
+  public boolean canAddChild(final Object object) {
+    return object instanceof AbstractRecordLayerRenderer;
   }
 
   @Override
@@ -186,62 +181,27 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     return newRenderer;
   }
 
+  private List<LayerRecord> filterRecords(final ViewRenderer view, List<LayerRecord> records) {
+    if (isHasFilter()) {
+      records = Lists.filter(view.cancellable(records), this::isFilterAccept);
+    }
+    return records;
+  }
+
   @Override
-  @SuppressWarnings("unchecked")
-  public <V extends LayerRenderer<?>> V getRenderer(final List<String> path) {
-    LayerRenderer<?> renderer = this;
-    final int pathSize = path.size();
-    for (int i = 0; i < pathSize; i++) {
-      final String name = path.get(i);
-      final String rendererName = renderer.getName();
-      if (DataType.equal(name, rendererName)) {
-        if (i < pathSize - 1) {
-          final String childName = path.get(i + 1);
-          if (renderer instanceof AbstractMultipleRecordLayerRenderer) {
-            final AbstractMultipleRecordLayerRenderer multipleRenderer = (AbstractMultipleRecordLayerRenderer)renderer;
-            renderer = multipleRenderer.getRenderer(childName);
-          }
-        }
-      } else {
-        return null;
-      }
-    }
-    return (V)renderer;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <V extends LayerRenderer<?>> V getRenderer(final String name) {
-    if (Property.hasValue(name)) {
-      for (final LayerRenderer<?> renderer : this.renderers) {
-        final String rendererName = renderer.getName();
-        if (DataType.equal(name, rendererName)) {
-          return (V)renderer;
-        }
-      }
-    }
-    return null;
-  }
-
   public List<AbstractRecordLayerRenderer> getRenderers() {
     synchronized (this.renderers) {
       return new ArrayList<>(this.renderers);
     }
   }
 
-  public boolean hasRendererWithSameName(final LayerRenderer<?> renderer, final String name) {
-    for (final AbstractRecordLayerRenderer otherRenderer : this.renderers) {
-      if (renderer != otherRenderer) {
-        final String layerName = otherRenderer.getName();
-        if (name.equals(layerName)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
   public boolean isEmpty() {
     return this.renderers.isEmpty();
+  }
+
+  @Override
+  public boolean isSameLayer(final Layer layer) {
+    return getLayer() == layer;
   }
 
   @Override
@@ -265,6 +225,7 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     }
   }
 
+  @Override
   public int removeRenderer(final AbstractRecordLayerRenderer renderer) {
     boolean removed = false;
     synchronized (this.renderers) {
@@ -279,6 +240,31 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
         firePropertyChange("renderers", index, renderer, null);
       }
       return index;
+    }
+  }
+
+  protected abstract void renderMultipleRecords(final ViewRenderer view,
+    final AbstractRecordLayer layer, final List<LayerRecord> records);
+
+  protected abstract void renderMultipleSelectedRecords(final ViewRenderer view,
+    final AbstractRecordLayer layer, final List<LayerRecord> records);
+
+  @Override
+  protected final void renderRecords(final ViewRenderer view, final AbstractRecordLayer layer,
+    List<LayerRecord> records) {
+    if (isVisible(view)) {
+      records = filterRecords(view, records);
+      renderMultipleRecords(view, layer, records);
+    }
+  }
+
+  @Override
+  protected final void renderSelectedRecordsDo(final ViewRenderer view,
+    final AbstractRecordLayer layer, List<LayerRecord> records) {
+    if (isVisible(view)) {
+      records = filterRecords(view, records);
+
+      renderMultipleSelectedRecords(view, layer, records);
     }
   }
 

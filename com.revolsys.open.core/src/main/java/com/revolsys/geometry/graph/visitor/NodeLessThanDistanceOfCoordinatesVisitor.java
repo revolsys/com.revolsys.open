@@ -9,7 +9,6 @@ import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements Consumer<Node<T>> {
@@ -18,8 +17,7 @@ public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements Consumer<Nod
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
     final Consumer<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<>(point,
       maxDistance, results);
-    BoundingBox envelope = new BoundingBoxDoubleGf(point);
-    envelope = envelope.expand(maxDistance);
+    final BoundingBox envelope = point.bboxEdit(editor -> editor.expand(maxDistance));
     final IdObjectIndex<Node<T>> nodeIndex = graph.getNodeIndex();
     nodeIndex.forEach(visitor, envelope);
     final List<Node<T>> nodes = results.getList();
@@ -42,7 +40,7 @@ public class NodeLessThanDistanceOfCoordinatesVisitor<T> implements Consumer<Nod
 
   @Override
   public void accept(final Node<T> node) {
-    final double distance = this.coordinates.distance(node);
+    final double distance = this.coordinates.distancePoint(node);
     if (distance < this.maxDistance) {
       this.matchVisitor.accept(node);
     }

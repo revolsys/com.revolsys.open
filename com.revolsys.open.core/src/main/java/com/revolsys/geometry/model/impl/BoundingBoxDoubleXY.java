@@ -37,6 +37,11 @@ import com.revolsys.geometry.model.BoundingBoxProxy;
 
 public class BoundingBoxDoubleXY extends BaseBoundingBox {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public static BoundingBox newBoundingBoxDoubleXY(double minX, double minY, double maxX,
     double maxY) {
     if (minX > maxX) {
@@ -122,6 +127,7 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     return x >= this.minX && x <= this.maxX && y >= this.minY && y <= this.maxY;
   }
 
+  @Override
   public boolean bboxCovers(final double minX, final double minY, final double maxX,
     final double maxY) {
     return this.minX <= minX && maxX <= this.maxX && this.minY <= minY && maxY <= this.maxY;

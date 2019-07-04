@@ -139,7 +139,7 @@ public class CreateObjectsWithinDistanceOfGeometry extends BaseInOutProcess<Reco
       .entrySet()) {
       final RecordDefinition newRecordDefinition = recordDefinitionGeometry.getKey();
       final Geometry intersectsGeometry = recordDefinitionGeometry.getValue();
-      if (intersectsGeometry.intersects(geometryValue)) {
+      if (intersectsGeometry.bboxIntersects(geometryValue)) {
         final Record newRecord = new ArrayRecord(newRecordDefinition, object);
         out.write(newRecord);
       }

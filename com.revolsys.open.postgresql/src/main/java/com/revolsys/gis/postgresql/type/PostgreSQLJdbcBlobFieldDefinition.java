@@ -25,6 +25,26 @@ public class PostgreSQLJdbcBlobFieldDefinition extends JdbcBlobFieldDefinition {
     super(dbName, name, sqlType, length, required, description, properties);
   }
 
+  private InputStream openInputStream(final Object value) {
+    if (value instanceof InputStream) {
+      return (InputStream)value;
+    } else if (value instanceof byte[]) {
+      final byte[] bytes = (byte[])value;
+      return new ByteArrayInputStream(bytes);
+    } else if (value instanceof CharSequence) {
+      final String string = ((CharSequence)value).toString();
+      final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+      return new ByteArrayInputStream(bytes);
+    } else {
+      try {
+        final Resource resource = Resource.getResource(value);
+        return resource.newBufferedInputStream();
+      } catch (final IllegalArgumentException e) {
+        throw new IllegalArgumentException(value.getClass() + " not valid for a blob column");
+      }
+    }
+  }
+
   @Override
   public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
     final Object value) throws SQLException {
@@ -37,25 +57,8 @@ public class PostgreSQLJdbcBlobFieldDefinition extends JdbcBlobFieldDefinition {
         blob = (Blob)value;
         statement.setBlob(parameterIndex, blob);
       } else {
-        InputStream in;
-        if (value instanceof InputStream) {
-          in = (InputStream)value;
-        } else if (value instanceof byte[]) {
-          final byte[] bytes = (byte[])value;
-          in = new ByteArrayInputStream(bytes);
-        } else if (value instanceof CharSequence) {
-          final String string = ((CharSequence)value).toString();
-          final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
-          in = new ByteArrayInputStream(bytes);
-        } else {
-          try {
-            final Resource resource = Resource.getResource(value);
-            in = resource.newBufferedInputStream();
-          } catch (final IllegalArgumentException e) {
-            throw new IllegalArgumentException(value.getClass() + " not valid for a blob column");
-          }
-        }
-        try {
+        try (
+          InputStream in = openInputStream(value)) {
           final PGConnection pgConnection = (PGConnection)((DelegatingConnection<?>)statement
             .getConnection()).getInnermostDelegate();
           final LargeObjectManager lobManager = pgConnection.getLargeObjectAPI();

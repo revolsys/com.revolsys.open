@@ -33,6 +33,7 @@
 package com.revolsys.geometry.util;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.revolsys.util.Emptyable;
 
@@ -42,8 +43,8 @@ import com.revolsys.util.Emptyable;
  * @author Martin Davis
  *
  */
-public class PriorityQueue implements Emptyable {
-  private final ArrayList items; // The queue binary heap array
+public class PriorityQueue<I extends Comparable<I>> implements Emptyable {
+  private final List<I> items; // The queue binary heap array
 
   private int size; // Number of elements in queue
 
@@ -52,7 +53,7 @@ public class PriorityQueue implements Emptyable {
    */
   public PriorityQueue() {
     this.size = 0;
-    this.items = new ArrayList();
+    this.items = new ArrayList<>();
     // create space for sentinel
     this.items.add(null);
   }
@@ -62,7 +63,7 @@ public class PriorityQueue implements Emptyable {
    * Duplicates are allowed.
    * @param x the item to insert.
    */
-  public void add(final Comparable x) {
+  public void add(final I x) {
     // increase the size of the items heap to Construct a new hole for the new
     // item
     this.items.add(null);
@@ -110,16 +111,17 @@ public class PriorityQueue implements Emptyable {
    * Remove the smallest item from the priority queue.
    * @return the smallest item, or null if empty
    */
-  public Object poll() {
+  public I poll() {
     if (isEmpty()) {
       return null;
-    }
-    final Object minItem = this.items.get(1);
-    this.items.set(1, this.items.get(this.size));
-    this.size -= 1;
-    reorder(1);
+    } else {
+      final I minItem = this.items.get(1);
+      this.items.set(1, this.items.get(this.size));
+      this.size -= 1;
+      reorder(1);
 
-    return minItem;
+      return minItem;
+    }
   }
 
   /**
@@ -129,15 +131,15 @@ public class PriorityQueue implements Emptyable {
    */
   private void reorder(int hole) {
     int child;
-    final Object tmp = this.items.get(hole);
+    final I tmp = this.items.get(hole);
 
     for (; hole * 2 <= this.size; hole = child) {
       child = hole * 2;
       if (child != this.size
-        && ((Comparable)this.items.get(child + 1)).compareTo(this.items.get(child)) < 0) {
+        && ((Comparable<I>)this.items.get(child + 1)).compareTo(this.items.get(child)) < 0) {
         child++;
       }
-      if (((Comparable)this.items.get(child)).compareTo(tmp) < 0) {
+      if (((Comparable<I>)this.items.get(child)).compareTo(tmp) < 0) {
         this.items.set(hole, this.items.get(child));
       } else {
         break;

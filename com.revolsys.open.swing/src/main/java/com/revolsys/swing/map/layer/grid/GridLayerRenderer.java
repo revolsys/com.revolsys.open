@@ -1,103 +1,169 @@
 package com.revolsys.swing.map.layer.grid;
 
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Shape;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
 import java.util.List;
+import java.util.Map;
+
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 import org.jeometry.common.awt.WebColors;
+import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Polygon;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapTile;
-import com.revolsys.io.BaseCloseable;
-import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.Icons;
+import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
-import com.revolsys.util.Cancellable;
+import com.revolsys.swing.map.layer.record.style.TextStyle;
+import com.revolsys.swing.map.view.TextStyleViewRenderer;
+import com.revolsys.swing.map.view.ViewRenderer;
+import com.revolsys.swing.menu.MenuFactory;
+
+import tec.uom.se.quantity.Quantities;
 
 public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
 
+  static {
+    final MenuFactory menu = MenuFactory.getMenu(GridLayerRenderer.class);
+
+    menu.addMenuItem("layer", "View/Edit Style", "palette", GridLayerRenderer::showProperties,
+      false);
+  }
+
+  private static final Icon ICON = Icons.getIcon("style_geometry");
+
+  private GeometryStyle geometryStyle = new GeometryStyle();
+
+  private TextStyle textStyle;
+
+  private GridLayerRenderer() {
+    super("gridLayerRenderer", "Grid Style");
+    this.geometryStyle = GeometryStyle.line(WebColors.LightGray);
+    this.geometryStyle.setPolygonFillOpacity(0);
+
+    this.textStyle = new TextStyle();
+    this.textStyle.setTextName("[formattedName]");
+    this.textStyle.setTextSize(Quantities.getQuantity(12, CustomUnits.PIXEL));
+    this.textStyle.setTextPlacementType("auto");
+    this.textStyle.setTextHorizontalAlignment("center");
+    this.textStyle.setTextVerticalAlignment("middle");
+
+    setIcon(ICON);
+  }
+
   public GridLayerRenderer(final GridLayer layer) {
-    super("grid", layer);
+    this();
+    setLayer(layer);
+  }
+
+  @SuppressWarnings("unchecked")
+  public GridLayerRenderer(final Map<String, ? extends Object> properties) {
+    this();
+    setProperties(properties);
+    final Map<String, ? extends Object> geometryStyleProperties = (Map<String, ? extends Object>)properties
+      .get("geometryStyle");
+    this.geometryStyle.setProperties(geometryStyleProperties);
+    final Map<String, ? extends Object> textStyleProperties = (Map<String, ? extends Object>)properties
+      .get("textStyle");
+    this.geometryStyle.setProperties(textStyleProperties);
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final GridLayer layer) {
+  public GridLayerRenderer clone() {
+    final GridLayerRenderer clone = (GridLayerRenderer)super.clone();
+    if (this.geometryStyle != null) {
+      clone.setGeometryStyle(this.geometryStyle.clone());
+    }
+    if (this.textStyle != null) {
+      clone.setTextStyle(this.textStyle.clone());
+    }
+    return clone;
+  }
+
+  public GeometryStyle getGeometryStyle() {
+    return this.geometryStyle;
+  }
+
+  @Override
+  public Icon getIcon() {
+    Icon icon = super.getIcon();
+    if (icon == ICON) {
+      icon = newIcon();
+      setIcon(icon);
+    }
+    return icon;
+  }
+
+  public TextStyle getTextStyle() {
+    return this.textStyle;
+  }
+
+  public Icon newIcon() {
+    final GeometryStyle geometryStyle = getGeometryStyle();
+
+    final BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+    final Graphics2D graphics = image.createGraphics();
+
+    this.textStyle.drawTextIcon(graphics, 8);
+
+    final Color color = geometryStyle.getLineColor();
+    graphics.setColor(color);
+
+    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    final Shape shape = new Rectangle2D.Double(0, 0, 15, 15);
+    graphics.draw(shape);
+
+    graphics.dispose();
+    return new ImageIcon(image);
+  }
+
+  @Override
+  public Form newStylePanel() {
+    return new GridLayerStylePanel(this);
+  }
+
+  @Override
+  public void propertyChange(final PropertyChangeEvent event) {
+    final Object source = event.getSource();
+    if (source == this.geometryStyle) {
+      refreshIcon();
+    } else if (source == this.textStyle) {
+      refreshIcon();
+    }
+    super.propertyChange(event);
+  }
+
+  protected void refreshIcon() {
+    final Icon icon = newIcon();
+    setIcon(icon);
+  }
+
+  @Override
+  public void render(final ViewRenderer view, final GridLayer layer) {
     try {
-      final double scaleForVisible = viewport.getScaleForVisible();
+      final double scaleForVisible = view.getScaleForVisible();
       if (layer.isVisible(scaleForVisible)) {
-        final BoundingBox boundingBox = viewport.getBoundingBox();
+        final TextStyleViewRenderer textStyle = view.newTextStyleViewRenderer(this.textStyle);
+        final BoundingBox boundingBox = view.getBoundingBox();
         final RectangularMapGrid grid = layer.getGrid();
         final List<RectangularMapTile> tiles = grid.getTiles(boundingBox);
-        final Graphics2D graphics = viewport.getGraphics();
-        if (graphics != null) {
-          final Font font = graphics.getFont();
-          for (final RectangularMapTile tile : cancellable.cancellable(tiles)) {
-            final BoundingBox tileBoundingBox = tile.getBoundingBox();
-            final BoundingBox intersectBoundingBox = boundingBox.intersection(tileBoundingBox);
-            if (!intersectBoundingBox.isEmpty()) {
-              final String tileName = tile.getName().toUpperCase();
-
-              final GeometryFactory geometryFactory = viewport.getGeometryFactory();
-              final Polygon polygon = tile.getPolygon(geometryFactory, 50);
-              try (
-                BaseCloseable transformCloseable = viewport.setUseModelCoordinates(true)) {
-                viewport.drawGeometryOutline(polygon, GeometryStyle.line(Color.LIGHT_GRAY));
-              }
-              final Point centroid = polygon.getCentroid();
-              final double centreX = centroid.getX();
-              final double centreY = centroid.getY();
-
-              final Font newFont = new Font(font.getName(), font.getStyle(), 12);
-              graphics.setFont(newFont);
-
-              final FontMetrics metrics = graphics.getFontMetrics();
-              final double[] coord = new double[2];
-              viewport.getModelToScreenTransform()
-                .transform(new double[] {
-                  centreX, centreY
-                }, 0, coord, 0, 1);
-              int x = (int)(coord[0] - metrics.stringWidth(tileName) / 2);
-              int y = (int)(coord[1] + metrics.getHeight() / 2);
-              final Rectangle2D bounds = metrics.getStringBounds(tileName, graphics);
-              final double width = bounds.getWidth();
-              final double height = bounds.getHeight();
-
-              if (x < 0) {
-                x = 1;
-              }
-              final int viewWidth = viewport.getViewWidthPixels();
-              if (x + width > viewWidth) {
-                x = (int)(viewWidth - width - 1);
-              }
-              if (y < height) {
-                y = (int)height + 1;
-              }
-              final int viewHeight = viewport.getViewHeightPixels();
-              if (y > viewHeight) {
-                y = viewHeight - 1;
-              }
-
-              graphics.setColor(WebColors.LightGray);
-              graphics
-                .fill(new Rectangle2D.Double(x - 2, y + bounds.getY() - 1, width + 4, height + 2));
-
-              graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-
-              graphics.setColor(Color.BLACK);
-              graphics.drawString(tileName, x, y);
-            }
-            graphics.setFont(font);
+        for (final RectangularMapTile tile : view.cancellable(tiles)) {
+          final BoundingBox tileBoundingBox = tile.getBoundingBox();
+          final BoundingBox intersectBoundingBox = boundingBox.bboxIntersection(tileBoundingBox);
+          if (!intersectBoundingBox.isEmpty()) {
+            view.drawBboxOutline(this.geometryStyle, tileBoundingBox);
+            final String label = tile.getFormattedName();
+            textStyle.drawText(label, tileBoundingBox.toRectangle());
           }
         }
       }
@@ -105,8 +171,37 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
     }
   }
 
+  public void setGeometryStyle(final GeometryStyle geometryStyle) {
+    this.geometryStyle = geometryStyle;
+    if (this.geometryStyle != null) {
+      this.geometryStyle.removePropertyChangeListener(this);
+    }
+    this.geometryStyle = geometryStyle;
+    if (this.geometryStyle != null) {
+      this.geometryStyle.addPropertyChangeListener(this);
+    }
+    firePropertyChange("geometryStyle", null, geometryStyle);
+    refreshIcon();
+  }
+
+  public void setTextStyle(final TextStyle textStyle) {
+    this.textStyle = textStyle;
+    if (this.textStyle != null) {
+      this.textStyle.removePropertyChangeListener(this);
+    }
+    this.textStyle = textStyle;
+    if (this.textStyle != null) {
+      this.textStyle.addPropertyChangeListener(this);
+    }
+    firePropertyChange("textStyle", null, textStyle);
+    refreshIcon();
+  }
+
   @Override
   public MapEx toMap() {
-    return MapEx.EMPTY;
+    final MapEx map = super.toMap();
+    addToMap(map, "geometryStyle", this.geometryStyle);
+    addToMap(map, "textStyle", this.textStyle);
+    return map;
   }
 }

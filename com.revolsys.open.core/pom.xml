@@ -41,6 +41,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.jeometry</groupId>
+      <artifactId>jeometry-coordinatesystem</artifactId>
+      <version>${org.jeometry.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
       <version>${org.apache.log4j.version}</version>

@@ -35,7 +35,6 @@ package com.revolsys.geometry.model.prep;
 import java.util.List;
 
 import com.revolsys.geometry.algorithm.locate.PointOnGeometryLocator;
-import com.revolsys.geometry.algorithm.locate.SimplePointInAreaLocator;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Polygon;
@@ -106,13 +105,23 @@ abstract class AbstractPreparedPolygonContains {
    */
   public static boolean isAnyTargetComponentInAreaTest(final Geometry testGeom,
     final Geometry targetGeom) {
-    for (final Vertex vertex : targetGeom.vertices()) {
-      final Location loc = SimplePointInAreaLocator.locate(testGeom, vertex);
-      if (loc != Location.EXTERIOR) {
+    return Boolean.TRUE == targetGeom.findVertex((x, y) -> {
+      final Location loc = testGeom.locate(x, y);
+      if (loc == Location.EXTERIOR) {
+        return null;
+      } else {
         return true;
       }
-    }
-    return false;
+    });
+    // for (final Vertex vertex : targetGeom.vertices()) {
+    // final double x = vertex.getX();
+    // final double y = vertex.getY();
+    // final Location loc = testGeom.locate(x, y);
+    // if (loc != Location.EXTERIOR) {
+    // return true;
+    // }
+    // }
+    // return false;
   }
 
   /**
@@ -160,9 +169,7 @@ abstract class AbstractPreparedPolygonContains {
   // information about geometric situation
   private boolean hasSegmentIntersection = false;
 
-  private final Geometry originalGeometry;
-
-  protected Geometry preparedGeometry;
+  protected PreparedPolygonal preparedPolygonal;
 
   /**
    * This flag controls a difference between contains and covers.
@@ -172,9 +179,8 @@ abstract class AbstractPreparedPolygonContains {
    */
   protected boolean requireSomePointInInterior = true;
 
-  public AbstractPreparedPolygonContains(final Geometry preparedPolygon, final Geometry polygon) {
-    this.preparedGeometry = preparedPolygon;
-    this.originalGeometry = polygon;
+  public AbstractPreparedPolygonContains(final PreparedPolygonal preparedPolygonal) {
+    this.preparedPolygonal = preparedPolygonal;
   }
 
   /**
@@ -273,7 +279,7 @@ abstract class AbstractPreparedPolygonContains {
     if (geometry instanceof Polygonal) {
       // TODO: generalize this to handle GeometryCollections
       final boolean isTargetInTestArea = isAnyTargetComponentInAreaTest(geometry,
-        this.preparedGeometry);
+        this.preparedPolygonal);
       if (isTargetInTestArea) {
         return false;
       }
@@ -304,27 +310,23 @@ abstract class AbstractPreparedPolygonContains {
   protected abstract boolean fullTopologicalPredicate(Geometry geom);
 
   private FastSegmentSetIntersectionFinder getIntersectionFinder() {
-    if (this.preparedGeometry instanceof PreparedPolygon) {
-      final PreparedPolygon preparedPolygon = (PreparedPolygon)this.preparedGeometry;
+    if (this.preparedPolygonal instanceof PreparedPolygon) {
+      final PreparedPolygon preparedPolygon = (PreparedPolygon)this.preparedPolygonal;
       return preparedPolygon.getIntersectionFinder();
-    } else if (this.preparedGeometry instanceof PreparedMultiPolygon) {
-      final PreparedMultiPolygon preparedPolygon = (PreparedMultiPolygon)this.preparedGeometry;
+    } else if (this.preparedPolygonal instanceof PreparedMultiPolygon) {
+      final PreparedMultiPolygon preparedPolygon = (PreparedMultiPolygon)this.preparedPolygonal;
       return preparedPolygon.getIntersectionFinder();
     } else {
       return null;
     }
   }
 
-  public Geometry getOriginalGeometry() {
-    return this.originalGeometry;
-  }
-
   private PointOnGeometryLocator getPointLocator() {
-    if (this.preparedGeometry instanceof PreparedPolygon) {
-      final PreparedPolygon preparedPolygon = (PreparedPolygon)this.preparedGeometry;
+    if (this.preparedPolygonal instanceof PreparedPolygon) {
+      final PreparedPolygon preparedPolygon = (PreparedPolygon)this.preparedPolygonal;
       return preparedPolygon.getPointLocator();
-    } else if (this.preparedGeometry instanceof PreparedMultiPolygon) {
-      final PreparedMultiPolygon preparedPolygon = (PreparedMultiPolygon)this.preparedGeometry;
+    } else if (this.preparedPolygonal instanceof PreparedMultiPolygon) {
+      final PreparedMultiPolygon preparedPolygon = (PreparedMultiPolygon)this.preparedPolygonal;
       return preparedPolygon.getPointLocator();
     } else {
       return null;
@@ -349,7 +351,7 @@ abstract class AbstractPreparedPolygonContains {
      * a proper intersection implies not contained
      * (due to the Epsilon-Neighbourhood Exterior Intersection condition)
      */
-    if (isSingleShell(this.originalGeometry)) {
+    if (isSingleShell(this.preparedPolygonal)) {
       return true;
     }
     return false;
@@ -360,13 +362,13 @@ abstract class AbstractPreparedPolygonContains {
    *
    * @return true if the geometry is a single originalGeometry with no holes
    */
-  private boolean isSingleShell(final Geometry geom) {
+  private boolean isSingleShell(final Polygonal polygonal) {
     // handles single-element MultiPolygons, as well as Polygons
-    if (geom.getGeometryCount() != 1) {
+    if (polygonal.getPolygonCount() != 1) {
       return false;
     }
 
-    final Polygon poly = (Polygon)geom.getGeometry(0);
+    final Polygon poly = polygonal.getPolygon(0);
     final int numHoles = poly.getHoleCount();
     if (numHoles == 0) {
       return true;

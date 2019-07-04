@@ -17,7 +17,7 @@ import com.revolsys.io.Writer;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.util.Property;
 import com.revolsys.util.count.LabelCountMap;
 
@@ -125,7 +125,7 @@ public class DirectoryRecordWriter extends AbstractRecordWriter {
       directory.mkdirs();
       final String fileName = getFileName(recordDefinition);
       final File file = new File(directory, fileName + this.nameSuffix + "." + this.fileExtension);
-      final FileSystemResource resource = new FileSystemResource(file);
+      final PathResource resource = new PathResource(file);
       writer = RecordWriter.newRecordWriter(recordDefinition, resource);
       if (writer == null) {
         throw new IllegalArgumentException("Unable to create writer for " + resource);

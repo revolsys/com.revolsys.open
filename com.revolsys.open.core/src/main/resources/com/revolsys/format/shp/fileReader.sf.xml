@@ -19,7 +19,7 @@
 
   <bean
     id="shapeFileStatisticsReader"
-    class="com.revolsys.gis.io.LabalCountIterable"
+    class="com.revolsys.gis.io.LabelCountIterable"
     p:iterable-ref="shapeFileReader"
   />
   

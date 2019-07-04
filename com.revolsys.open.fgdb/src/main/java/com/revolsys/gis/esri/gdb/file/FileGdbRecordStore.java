@@ -17,8 +17,11 @@ import java.util.regex.Pattern;
 
 import javax.annotation.PreDestroy;
 
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.identifier.SingleIdentifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.date.Dates;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
@@ -49,8 +52,6 @@ import com.revolsys.gis.esri.gdb.file.capi.type.OidFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.ShortFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.StringFieldDefinition;
 import com.revolsys.gis.esri.gdb.file.capi.type.XmlFieldDefinition;
-import com.revolsys.identifier.Identifier;
-import com.revolsys.identifier.SingleIdentifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.PathUtil;
@@ -97,7 +98,6 @@ import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.util.CloseableValueHolder;
-import com.revolsys.util.Dates;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.StringBuilders;
@@ -443,6 +443,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         Logs.error(this, "Error closing: " + this.fileName + " ESRI Error=" + closeResult);
       }
     }
+  }
+
+  public void compactGeodatabase() {
+    this.geodatabase.valueConsume(Geodatabase::CompactDatabase);
   }
 
   public void deleteGeodatabase() {
@@ -1101,6 +1105,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   @Override
   public FileGdbWriter newRecordWriter() {
+    return newRecordWriter(false);
+  }
+
+  @Override
+  public FileGdbWriter newRecordWriter(final boolean throwExceptions) {
     FileGdbWriter writer = getThreadProperty("writer");
     if (writer == null || writer.isClosed()) {
       writer = new FileGdbWriter(this);
@@ -1182,6 +1191,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       }
     }
     final String tableDefinition = EsriGdbXmlSerializer.toString(deTable);
+
     try {
       final String scp = schemaCatalogPath;
       threadGeodatabase(geodatabase -> {

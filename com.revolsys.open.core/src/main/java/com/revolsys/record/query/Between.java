@@ -4,11 +4,11 @@ import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
 
+import org.jeometry.common.compare.CompareUtil;
 import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.CompareUtil;
 import com.revolsys.util.JavaBeanUtil;
 
 public class Between extends Condition {

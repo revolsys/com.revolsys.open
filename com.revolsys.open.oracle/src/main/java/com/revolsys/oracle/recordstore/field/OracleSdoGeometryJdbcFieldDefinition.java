@@ -139,11 +139,13 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
-    Geometry value;
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    Object value;
     final int geometryType = resultSet.getInt(columnIndex);
-    if (!resultSet.wasNull()) {
+    if (resultSet.wasNull()) {
+      value = null;
+    } else {
       final int axisCount = geometryType / 1000;
       switch (geometryType % 1000) {
         case 1:
@@ -167,16 +169,20 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
         default:
           throw new IllegalArgumentException("Unsupported geometry type " + geometryType);
       }
-      record.setValue(getIndex(), value);
     }
+    return value;
+  }
+
+  @Override
+  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final Record record, final boolean internStrings) throws SQLException {
+    super.setFieldValueFromResultSet(resultSet, columnIndex, record, internStrings);
     return columnIndex + 6;
   }
 
   @Override
   public int setInsertPreparedStatementValue(final PreparedStatement statement,
-    final int parameterIndex, final Record record) throws SQLException {
-    final String name = getName();
-    final Object value = record.getValue(name);
+    final int parameterIndex, final Object value) throws SQLException {
     if (Property.isEmpty(value)) {
       setNull(statement, parameterIndex);
     } else {
@@ -444,7 +450,8 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       }
     } else if (object instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)object;
-      boundingBox = boundingBox.convert(this.geometryFactory, 2);
+      boundingBox = boundingBox.bboxEditor() //
+        .setGeometryFactory(this.geometryFactory);
       final double minX = boundingBox.getMinX();
       final double minY = boundingBox.getMinY();
       final double maxX = boundingBox.getMaxX();

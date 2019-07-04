@@ -62,7 +62,7 @@ public class SplitIntersectingEdgeVisitor implements Consumer<Edge<Record>> {
 
   /**
    * Split the line into segments which are either within or not within 1m of
-   * the other line. The result is a list of split lines from the line. For each
+   * the other line. the result is a list of split lines from the line. For each
    * section which is within 1m any additional noding from the other line will
    * be introduced, this may result in the line being slightly different from
    * the other line.
@@ -139,7 +139,7 @@ public class SplitIntersectingEdgeVisitor implements Consumer<Edge<Record>> {
 
   /**
    * Split each of the two lines into segments which are either within or not
-   * within 1m of the other line. The result is a list with the first element
+   * within 1m of the other line. the result is a list with the first element
    * being the list of split lines from the first line and the second element
    * being the list of split lines from the second line. For each section which
    * is within 1m any additional noding from the other line will be introduced,

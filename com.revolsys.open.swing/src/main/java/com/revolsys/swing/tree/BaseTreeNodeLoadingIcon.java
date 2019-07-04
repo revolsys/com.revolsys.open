@@ -3,7 +3,6 @@ package com.revolsys.swing.tree;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.image.ImageObserver;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -42,10 +41,7 @@ public class BaseTreeNodeLoadingIcon implements ImageObserver {
   }
 
   private static ImageIcon newIcon() {
-    final Class<?> clazz = Icons.class;
-    final String resourceName = Icons.RESOURCE_FOLDER + "loading.gif";
-    final URL resource = clazz.getResource(resourceName);
-    return new ImageIcon(resource);
+    return (ImageIcon)Icons.getIcon("loading");
   }
 
   public static synchronized void removeNode(final BaseTreeNode node) {

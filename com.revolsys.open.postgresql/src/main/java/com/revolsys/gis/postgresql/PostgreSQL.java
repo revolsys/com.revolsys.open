@@ -1,5 +1,6 @@
 package com.revolsys.gis.postgresql;
 
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -11,9 +12,17 @@ import java.util.regex.Pattern;
 import javax.sql.DataSource;
 
 import org.postgresql.Driver;
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.dao.CannotSerializeTransactionException;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataAccessResourceFailureException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DeadlockLoserDataAccessException;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.jdbc.BadSqlGrammarException;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.jdbc.io.JdbcDatabaseFactory;
+import com.revolsys.jdbc.io.AbstractJdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
@@ -21,7 +30,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 import com.revolsys.util.UrlUtil;
 
-public class PostgreSQL implements JdbcDatabaseFactory {
+public class PostgreSQL extends AbstractJdbcDatabaseFactory {
   private static final String REGEX_NAME = "\\p{IsAlphabetic}[\\p{IsAlphabetic}0-9_\\$]*";
 
   private static final Pattern PATTERN_URL = Pattern.compile("jdbc:postgresql:(?:" // Prefix
@@ -34,6 +43,25 @@ public class PostgreSQL implements JdbcDatabaseFactory {
   );
 
   private static final List<FieldDefinition> CONNECTION_FIELD_DEFINITIONS = Arrays.asList();
+
+  public PostgreSQL() {
+    addSqlStateExceptionFactories(BadSqlGrammarException::new, "03000", "42000", "42601", "42602",
+      "42622", "42804", "42P01");
+
+    addSqlStateExceptionMessageFactories(DuplicateKeyException::new, "23505");
+
+    addSqlStateExceptionMessageFactories(DataIntegrityViolationException::new, "23000", "23502",
+      "23503", "23514");
+
+    addSqlStateExceptionMessageFactories(DataAccessResourceFailureException::new, "53000", "53100",
+      "53200", "53300");
+
+    addSqlStateExceptionMessageFactories(CannotAcquireLockException::new, "55P03");
+
+    addSqlStateExceptionMessageFactories(CannotSerializeTransactionException::new, "40001");
+
+    addSqlStateExceptionMessageFactories(DeadlockLoserDataAccessException::new, "40P01");
+  }
 
   @Override
   public List<FieldDefinition> getConnectionFieldDefinitions() {
@@ -133,5 +161,11 @@ public class PostgreSQL implements JdbcDatabaseFactory {
       url.append(database);
     }
     return url.toString();
+  }
+
+  @Override
+  public DataAccessException translateException(final String task, final String sql,
+    final SQLException exception) {
+    return translateSqlStateException(task, sql, exception);
   }
 }

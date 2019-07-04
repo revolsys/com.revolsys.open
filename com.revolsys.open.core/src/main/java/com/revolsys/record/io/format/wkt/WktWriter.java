@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.model.Geometry;
@@ -15,7 +15,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.util.MathUtil;
 
 public class WktWriter {
 
@@ -24,7 +23,7 @@ public class WktWriter {
       if (i > 0) {
         wkt.append(" ");
       }
-      MathUtil.append(wkt, point.getCoordinate(i));
+      Doubles.append(wkt, point.getCoordinate(i));
     }
   }
 
@@ -151,7 +150,7 @@ public class WktWriter {
         }
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -160,7 +159,7 @@ public class WktWriter {
     try {
       write(out, lineal, axisCount);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
 
   }
@@ -190,7 +189,7 @@ public class WktWriter {
     try {
       write(out, line, axisCount);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
 
   }
@@ -211,7 +210,7 @@ public class WktWriter {
     try {
       write(out, line, axisCount);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
 
   }
@@ -241,7 +240,7 @@ public class WktWriter {
     try {
       write(out, point, axisCount);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
 
   }
@@ -263,7 +262,7 @@ public class WktWriter {
     try {
       write(out, polygon, axisCount);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
 
   }
@@ -283,7 +282,7 @@ public class WktWriter {
     try {
       write(out, polygonal, axisCount);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
 
   }
@@ -312,7 +311,7 @@ public class WktWriter {
     try {
       write(out, punctual, axisCount);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
 
   }
@@ -360,7 +359,7 @@ public class WktWriter {
     try {
       writeGeometryCollection(out, multiGeometry, axisCount);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
 
   }

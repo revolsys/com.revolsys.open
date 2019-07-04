@@ -1,18 +1,18 @@
 package com.revolsys.gis.postgresql.type;
 
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.function.Consumer3;
 import org.jeometry.common.number.Doubles;
 import org.postgresql.util.PGobject;
 
 import com.revolsys.beans.Classes;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -21,23 +21,21 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.util.MathUtil;
-import com.revolsys.util.function.Consumer3;
 
 public class PostgreSQLGeometryWrapper extends PGobject {
   private static final long serialVersionUID = 0L;
 
   private static final Map<DataType, Consumer3<PrintWriter, Geometry, Integer>> WRITER_BY_TYPE = Maps
     .<DataType, Consumer3<PrintWriter, Geometry, Integer>> buildHash() //
-    .add(DataTypes.POINT, PostgreSQLGeometryWrapper::writePoint)
-    .add(DataTypes.LINE_STRING, PostgreSQLGeometryWrapper::writeLineString)
-    .add(DataTypes.LINEAR_RING, PostgreSQLGeometryWrapper::writeLinearRing)
-    .add(DataTypes.POLYGON, PostgreSQLGeometryWrapper::writePolygon)
-    .add(DataTypes.MULTI_POINT, PostgreSQLGeometryWrapper::writeMultiPoint)
-    .add(DataTypes.MULTI_LINE_STRING, PostgreSQLGeometryWrapper::writeMultiLineString)
-    .add(DataTypes.MULTI_POLYGON, PostgreSQLGeometryWrapper::writeMultiPolygon)
-    .add(DataTypes.GEOMETRY_COLLECTION, PostgreSQLGeometryWrapper::writeGeometry)
-    .add(DataTypes.GEOMETRY, PostgreSQLGeometryWrapper::writeGeometry)
+    .add(GeometryDataTypes.POINT, PostgreSQLGeometryWrapper::writePoint)
+    .add(GeometryDataTypes.LINE_STRING, PostgreSQLGeometryWrapper::writeLineString)
+    .add(GeometryDataTypes.LINEAR_RING, PostgreSQLGeometryWrapper::writeLinearRing)
+    .add(GeometryDataTypes.POLYGON, PostgreSQLGeometryWrapper::writePolygon)
+    .add(GeometryDataTypes.MULTI_POINT, PostgreSQLGeometryWrapper::writeMultiPoint)
+    .add(GeometryDataTypes.MULTI_LINE_STRING, PostgreSQLGeometryWrapper::writeMultiLineString)
+    .add(GeometryDataTypes.MULTI_POLYGON, PostgreSQLGeometryWrapper::writeMultiPolygon)
+    .add(GeometryDataTypes.GEOMETRY_COLLECTION, PostgreSQLGeometryWrapper::writeGeometry)
+    .add(GeometryDataTypes.GEOMETRY, PostgreSQLGeometryWrapper::writeGeometry)
     .getMap();
 
   public static void append(final StringBuilder wkt, final int axisCount, final Point point) {
@@ -45,7 +43,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
       if (i > 0) {
         wkt.append(" ");
       }
-      MathUtil.append(wkt, point.getCoordinate(i));
+      Doubles.append(wkt, point.getCoordinate(i));
     }
   }
 
@@ -440,7 +438,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     final StringWriter wkt = new StringWriter();
     try (
       final PrintWriter writer = new PrintWriter(wkt)) {
-      final int srid = geometry.getCoordinateSystemId();
+      final int srid = geometry.getHorizontalCoordinateSystemId();
       if (srid > 0) {
         writer.print("SRID=");
         writer.print(srid);
@@ -485,11 +483,13 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     } else {
       wkt = value;
     }
-    if (srid != -1 && geometryFactory.getCoordinateSystemId() != srid) {
+    if (srid != -1 && geometryFactory.getHorizontalCoordinateSystemId() != srid) {
       geometryFactory = GeometryFactory.floating(srid, geometryFactory.getAxisCount());
     }
-    if (wkt.startsWith("00") || wkt.startsWith("01")) {
-      this.geometry = parseWkb(geometryFactory, wkt);
+    if (wkt.startsWith("00")) {
+      this.geometry = parseWkbBigEndian(geometryFactory, wkt);
+    } else if (wkt.startsWith("01")) {
+      this.geometry = parseWkbLittleEndian(geometryFactory, wkt);
     } else {
       this.geometry = geometryFactory.geometry(value);
     }
@@ -506,30 +506,46 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     final boolean hasM) {
     final int vertexCount = data.getInt();
     final double[] coordinates = new double[axisCount * vertexCount];
-
     int coordinateIndex = 0;
-    for (int vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex) {
-      final double x = data.getDouble();
-      coordinates[coordinateIndex++] = x;
 
-      final double y = data.getDouble();
-      coordinates[coordinateIndex++] = y;
-
-      if (hasM) {
-        if (hasZ) {
+    if (hasM) {
+      if (hasZ) {
+        for (int vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex) {
+          final double x = data.getDouble();
+          final double y = data.getDouble();
           final double z = data.getDouble();
+          final double m = data.getDouble();
+          coordinates[coordinateIndex++] = x;
+          coordinates[coordinateIndex++] = y;
           coordinates[coordinateIndex++] = z;
-
-          final double m = data.getDouble();
-          coordinates[coordinateIndex++] = m;
-        } else {
-          coordinateIndex++; // no z so increment index
-          final double m = data.getDouble();
           coordinates[coordinateIndex++] = m;
         }
-      } else if (hasZ) {
+      } else {
+        for (int vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex) {
+          final double x = data.getDouble();
+          final double y = data.getDouble();
+          final double m = data.getDouble();
+          coordinates[coordinateIndex++] = x;
+          coordinates[coordinateIndex++] = y;
+          coordinateIndex++; // Skip z
+          coordinates[coordinateIndex++] = m;
+        }
+      }
+    } else if (hasZ) {
+      for (int vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex) {
+        final double x = data.getDouble();
+        final double y = data.getDouble();
         final double z = data.getDouble();
+        coordinates[coordinateIndex++] = x;
+        coordinates[coordinateIndex++] = y;
         coordinates[coordinateIndex++] = z;
+      }
+    } else {
+      for (int vertexIndex = 0; vertexIndex < vertexCount; ++vertexIndex) {
+        final double x = data.getDouble();
+        final double y = data.getDouble();
+        coordinates[coordinateIndex++] = x;
+        coordinates[coordinateIndex++] = y;
       }
     }
     return coordinates;
@@ -548,7 +564,7 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     if (hasS) {
       final int coordinateSystemId = data.getInt();
       if (coordinateSystemId >= 0
-        && currentGeometryFactory.getCoordinateSystemId() != coordinateSystemId) {
+        && currentGeometryFactory.getHorizontalCoordinateSystemId() != coordinateSystemId) {
         currentGeometryFactory = currentGeometryFactory.convertSrid(coordinateSystemId);
       }
     }
@@ -684,9 +700,13 @@ public class PostgreSQLGeometryWrapper extends PGobject {
     return geometryFactory.polygon(rings);
   }
 
-  private Geometry parseWkb(final GeometryFactory geometryFactory, final String wkb) {
-    final InputStream in = new StringByteInputStream(wkb);
-    final ValueGetter valueGetter = ValueGetter.newValueGetter(in);
+  private Geometry parseWkbBigEndian(final GeometryFactory geometryFactory, final String wkb) {
+    final ValueGetter valueGetter = new BigEndianValueGetter(wkb);
+    return parseGeometry(geometryFactory, valueGetter);
+  }
+
+  private Geometry parseWkbLittleEndian(final GeometryFactory geometryFactory, final String wkb) {
+    final ValueGetter valueGetter = new LittleEndianValueGetter(wkb);
     return parseGeometry(geometryFactory, valueGetter);
   }
 }

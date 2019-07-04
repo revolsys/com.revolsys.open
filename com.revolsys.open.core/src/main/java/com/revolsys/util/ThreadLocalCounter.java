@@ -36,6 +36,11 @@ public class ThreadLocalCounter implements Counter {
   }
 
   @Override
+  public long decrement() {
+    return add(-1);
+  }
+
+  @Override
   public long get() {
     final Long count = this.counts.get();
     if (count == null) {

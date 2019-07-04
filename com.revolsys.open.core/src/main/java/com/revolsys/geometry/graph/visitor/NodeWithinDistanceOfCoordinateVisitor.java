@@ -22,7 +22,7 @@ public class NodeWithinDistanceOfCoordinateVisitor<T> implements Consumer<Node<T
   @Override
   public void accept(final Node<T> node) {
     final Point coordinate = node;
-    final double distance = this.coordinates.distance(coordinate);
+    final double distance = this.coordinates.distancePoint(coordinate);
     if (distance <= this.maxDistance) {
       this.matchVisitor.accept(node);
     }

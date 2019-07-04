@@ -4,10 +4,10 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryWriter;
 import com.revolsys.geometry.io.GeometryWriterFactory;
 import com.revolsys.io.FileIoFactory;
-import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.record.Records;
 import com.revolsys.record.schema.RecordDefinition;
@@ -15,6 +15,14 @@ import com.revolsys.spring.resource.Resource;
 
 public interface RecordWriterFactory
   extends FileIoFactory, GeometryWriterFactory, IoFactoryWithCoordinateSystem {
+
+  @Override
+  default GeometryWriter newGeometryWriter(final Resource resource, final MapEx properties) {
+    final RecordDefinition recordDefinition = Records.newGeometryRecordDefinition();
+    final RecordWriter recordWriter = newRecordWriter(recordDefinition, resource);
+    recordWriter.setProperties(properties);
+    return new RecordWriterGeometryWriter(recordWriter);
+  }
 
   @Override
   default GeometryWriter newGeometryWriter(final String baseName, final OutputStream out,
@@ -34,8 +42,7 @@ public interface RecordWriterFactory
   default RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
     final OutputStream out = resource.newBufferedOutputStream();
-    final String fileName = resource.getFilename();
-    final String baseName = FileUtil.getBaseName(fileName);
+    final String baseName = resource.getBaseName();
     return newRecordWriter(baseName, recordDefinition, out);
   }
 

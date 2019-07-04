@@ -1,13 +1,14 @@
 package com.revolsys.swing.tree.node.file;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import javax.swing.JFileChooser;
 
-import com.revolsys.io.connection.ConnectionRegistry;
-import com.revolsys.io.file.FileConnectionManager;
-import com.revolsys.io.file.FolderConnection;
-import com.revolsys.io.file.FolderConnectionRegistry;
+import com.revolsys.connection.ConnectionRegistry;
+import com.revolsys.connection.file.FileConnectionManager;
+import com.revolsys.connection.file.FolderConnection;
+import com.revolsys.connection.file.FolderConnectionRegistry;
+import com.revolsys.io.file.Paths;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
@@ -22,19 +23,18 @@ import com.revolsys.swing.tree.node.ConnectionManagerTrees;
 public class FolderConnectionsTrees extends ConnectionManagerTrees {
   static {
     // FolderConnectionRegistry
-    final MenuFactory connectionRegistryMenu = MenuFactory.getMenu(FolderConnectionRegistry.class);
+    MenuFactory.addMenuInitializer(FolderConnectionRegistry.class, menu -> {
+      TreeNodes.addMenuItemNodeValue(menu, "default", 0, "Add Connection", "folder:add",
+        ConnectionRegistry::isEditable, FolderConnectionsTrees::addConnection);
 
-    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 0, "Add Connection",
-      "folder:add", ConnectionRegistry::isEditable, FolderConnectionsTrees::addConnection);
-
-    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 1, "Import Connection...",
-      "folder:import", FolderConnectionRegistry::isEditable,
-      FolderConnectionsTrees::importConnection);
+      TreeNodes.addMenuItemNodeValue(menu, "default", 1, "Import Connection...", "folder:import",
+        FolderConnectionRegistry::isEditable, FolderConnectionsTrees::importConnection);
+    });
 
     // FolderConnection
-    final MenuFactory connectionMenu = MenuFactory.getMenu(FolderConnection.class);
-    TreeNodes.<FolderConnection> addMenuItemNodeValue(connectionMenu, "default", 1,
-      "Export Connection", "folder:export", ConnectionManagerTrees::exportConnection);
+    MenuFactory.addMenuInitializer(FolderConnection.class,
+      menu -> TreeNodes.<FolderConnection> addMenuItemNodeValue(menu, "default", 1,
+        "Export Connection", "folder:export", ConnectionManagerTrees::exportConnection));
   }
 
   private static void addConnection(final FolderConnectionRegistry registry) {
@@ -52,9 +52,10 @@ public class FolderConnectionsTrees extends ConnectionManagerTrees {
     GroupLayouts.makeColumns(panel, 2, true);
     panel.showDialog();
     if (panel.isSaved()) {
-      final File file = folderField.getFile();
-      if (file != null && file.exists()) {
-        registry.addConnection(nameField.getText(), file);
+      final Path file = folderField.getPath();
+      if (file != null && Paths.exists(file)) {
+        final String connectionName = nameField.getText();
+        registry.addConnection(connectionName, file);
       }
     }
   }

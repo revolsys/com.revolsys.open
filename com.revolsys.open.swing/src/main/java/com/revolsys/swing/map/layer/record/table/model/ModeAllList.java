@@ -23,10 +23,15 @@ public class ModeAllList extends ModeAbstractCached {
     addListeners( //
       Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_INSERTED,
         this::addCachedRecords), //
-      Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORDS_DELETED,
-        this::recordsDeleted) //
+      newRecordsDeletedListener(layer) //
     );
 
+    for (final String propertyName : new String[] {
+      "filter", AbstractRecordLayer.RECORDS_CHANGED
+    }) {
+      addListeners( //
+        Property.addListenerRunnable(layer, propertyName, this::refresh));
+    }
     super.activate();
   }
 

@@ -35,14 +35,20 @@ package com.revolsys.geometry.model;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
+import com.revolsys.geometry.model.editor.GeometryCollectionImplEditor;
+import com.revolsys.geometry.model.editor.MultiPolygonEditor;
+import com.revolsys.geometry.model.editor.PolygonalEditor;
 
 public interface Polygonal extends Geometry {
+
   @SuppressWarnings("unchecked")
   static <G extends Geometry> G newPolygonal(final Object value) {
     if (value == null) {
@@ -55,7 +61,7 @@ public interface Polygonal extends Geometry {
         "Expecting a Polygonal geometry not " + geometry.getGeometryType() + "\n" + geometry);
     } else {
       final String string = DataTypes.toString(value);
-      final Geometry geometry = GeometryFactory.DEFAULT.geometry(string, false);
+      final Geometry geometry = GeometryFactory.DEFAULT_3D.geometry(string, false);
       return (G)newPolygonal(geometry);
     }
   }
@@ -64,7 +70,7 @@ public interface Polygonal extends Geometry {
 
   @Override
   default boolean contains(final double x, final double y) {
-    return locate(new PointDoubleXY(x, y)) != Location.EXTERIOR;
+    return locate(x, y) != Location.EXTERIOR;
   }
 
   @Override
@@ -88,7 +94,40 @@ public interface Polygonal extends Geometry {
     return contains(x, y, width, height);
   }
 
+  default Polygonal differencePolygonal(final Geometry geometry) {
+    final Geometry difference = difference(geometry);
+    if (difference instanceof Polygonal) {
+      return (Polygonal)difference;
+    } else {
+      final List<Polygon> polygons = new ArrayList<>();
+      difference.forEachPolygon(polygons::add);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.polygonal(polygons);
+    }
+  }
+
+  @Override
+  void forEachPolygon(Consumer<Polygon> action);
+
+  default double getCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,
+    final int axisIndex) {
+    final Polygon polygon = getGeometry(partIndex);
+    if (polygon == null) {
+      return Double.NaN;
+    } else {
+      return polygon.getCoordinate(ringIndex, vertexIndex, axisIndex);
+    }
+  }
+
+  default double getM(final int partIndex, final int ringIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, ringIndex, vertexIndex, M);
+  }
+
   Polygon getPolygon(int partIndex);
+
+  default int getPolygonCount() {
+    return getGeometryCount();
+  }
 
   @SuppressWarnings({
     "unchecked", "rawtypes"
@@ -97,10 +136,107 @@ public interface Polygonal extends Geometry {
     return (List)getGeometries();
   }
 
+  default List<LinearRing> getRings() {
+    final List<LinearRing> rings = new ArrayList<>();
+    forEachPolygon(polygon -> {
+      for (final LinearRing ring : polygon.rings()) {
+        if (!ring.isEmpty()) {
+          rings.add(ring);
+        }
+      }
+    });
+    return rings;
+  }
+
+  default Lineal getRingsLineal() {
+    final List<LinearRing> rings = getRings();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.lineal(rings);
+  }
+
+  default double getX(final int partIndex, final int ringIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, ringIndex, vertexIndex, X);
+  }
+
+  default double getY(final int partIndex, final int ringIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, ringIndex, vertexIndex, Y);
+  }
+
+  default double getZ(final int partIndex, final int ringIndex, final int vertexIndex) {
+    return getCoordinate(partIndex, ringIndex, vertexIndex, Z);
+  }
+
+  default Polygonal intersectionPolygonal(final Geometry geometry) {
+    final Geometry intersection = intersection(geometry);
+    if (intersection instanceof Polygonal) {
+      return (Polygonal)intersection;
+    } else {
+      final List<Polygon> polygons = new ArrayList<>();
+      intersection.forEachPolygon(polygons::add);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      return geometryFactory.polygonal(polygons);
+    }
+  }
+
+  @Override
+  default boolean isContainedInBoundary(final BoundingBox boundingBox) {
+    return false;
+  }
+
+  @Override
+  default PolygonalEditor newGeometryEditor() {
+    return new MultiPolygonEditor(this);
+  }
+
+  @Override
+  default PolygonalEditor newGeometryEditor(final AbstractGeometryEditor<?> parentEditor) {
+    return new MultiPolygonEditor((GeometryCollectionImplEditor)parentEditor, this);
+  }
+
+  @Override
+  default PolygonalEditor newGeometryEditor(final int axisCount) {
+    final PolygonalEditor geometryEditor = newGeometryEditor();
+    geometryEditor.setAxisCount(axisCount);
+    return geometryEditor;
+  }
+
+  default Polygonal newPolygonal(final GeometryFactory geometryFactory, final Polygon... polygons) {
+    return geometryFactory.polygonal(polygons);
+  }
+
   @Override
   Polygonal normalize();
 
   default Iterable<Polygon> polygons() {
     return getGeometries();
   }
+
+  @Override
+  Polygonal prepare();
+
+  default double setCoordinate(final int partIndex, final int ringIndex, final int vertexIndex,
+    final int axisIndex, final double coordinate) {
+    throw new UnsupportedOperationException();
+  }
+
+  default double setM(final int partIndex, final int ringIndex, final int vertexIndex,
+    final double m) {
+    return setCoordinate(partIndex, ringIndex, vertexIndex, M, m);
+  }
+
+  default double setX(final int partIndex, final int ringIndex, final int vertexIndex,
+    final double x) {
+    return setCoordinate(partIndex, ringIndex, vertexIndex, X, x);
+  }
+
+  default double setY(final int partIndex, final int ringIndex, final int vertexIndex,
+    final double y) {
+    return setCoordinate(partIndex, ringIndex, vertexIndex, Y, y);
+  }
+
+  default double setZ(final int partIndex, final int ringIndex, final int vertexIndex,
+    final double z) {
+    return setCoordinate(partIndex, ringIndex, vertexIndex, Z, z);
+  }
+
 }

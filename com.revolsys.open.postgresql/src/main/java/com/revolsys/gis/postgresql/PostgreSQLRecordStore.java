@@ -7,27 +7,28 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.CollectionDataType;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.postgresql.jdbc.PgConnection;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.gis.postgresql.type.PostgreSQLArrayFieldDefinition;
 import com.revolsys.gis.postgresql.type.PostgreSQLBoundingBoxWrapper;
 import com.revolsys.gis.postgresql.type.PostgreSQLGeometryFieldAdder;
 import com.revolsys.gis.postgresql.type.PostgreSQLGeometryWrapper;
 import com.revolsys.gis.postgresql.type.PostgreSQLJdbcBlobFieldDefinition;
 import com.revolsys.gis.postgresql.type.PostgreSQLOidFieldDefinition;
 import com.revolsys.gis.postgresql.type.PostgreSQLTidWrapper;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
-import com.revolsys.jdbc.field.JdbcFieldFactory;
-import com.revolsys.jdbc.field.JdbcFieldFactoryAdder;
+import com.revolsys.jdbc.io.AbstractJdbcDatabaseFactory;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
@@ -60,14 +61,14 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     this(ArrayRecord.FACTORY);
   }
 
-  public PostgreSQLRecordStore(final DataSource dataSource) {
-    super(dataSource);
+  public PostgreSQLRecordStore(final AbstractJdbcDatabaseFactory databaseFactory,
+    final Map<String, ? extends Object> connectionProperties) {
+    super(databaseFactory, connectionProperties);
     initSettings();
   }
 
-  public PostgreSQLRecordStore(final PostgreSQL databaseFactory,
-    final Map<String, ? extends Object> connectionProperties) {
-    super(databaseFactory, connectionProperties);
+  public PostgreSQLRecordStore(final DataSource dataSource) {
+    super(dataSource);
     initSettings();
   }
 
@@ -84,19 +85,29 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
 
   @Override
   protected JdbcFieldDefinition addField(final JdbcRecordDefinition recordDefinition,
-    final String dbColumnName, final String name, final String dataType, final int sqlType,
+    final String dbColumnName, final String name, final String dbDataType, final int sqlType,
     final int length, final int scale, final boolean required, final String description) {
-    final JdbcFieldDefinition field = super.addField(recordDefinition, dbColumnName, name, dataType,
-      sqlType, length, scale, required, description);
+    final JdbcFieldDefinition field;
+    if (dbDataType.charAt(0) == '_') {
+      final String elementDbDataType = dbDataType.substring(1);
+      final JdbcFieldAdder fieldAdder = getFieldAdder(elementDbDataType);
+      final JdbcFieldDefinition elementField = fieldAdder.newField(this, recordDefinition,
+        dbColumnName, name, elementDbDataType, sqlType, length, scale, required, description);
+
+      final DataType elementDataType = elementField.getDataType();
+      final CollectionDataType listDataType = new CollectionDataType(
+        "List" + elementDataType.getName(), List.class, elementDataType);
+      field = new PostgreSQLArrayFieldDefinition(dbColumnName, name, listDataType, sqlType, length,
+        scale, required, description, elementField, getProperties());
+      recordDefinition.addField(field);
+    } else {
+      field = super.addField(recordDefinition, dbColumnName, name, dbDataType, sqlType, length,
+        scale, required, description);
+    }
     if (!dbColumnName.matches("[a-z_]+")) {
       field.setQuoteName(true);
     }
     return field;
-  }
-
-  protected void addFieldAdder(final String sqlTypeName, final JdbcFieldFactory fieldFactory) {
-    final JdbcFieldFactoryAdder fieldAdder = new JdbcFieldFactoryAdder(fieldFactory);
-    addFieldAdder(sqlTypeName, fieldAdder);
   }
 
   @Override
@@ -187,7 +198,6 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  @PostConstruct
   public void initializeDo() {
     super.initializeDo();
     final JdbcFieldAdder numberFieldAdder = new JdbcFieldAdder(DataTypes.DECIMAL);

@@ -6,9 +6,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -24,12 +26,13 @@ import com.revolsys.record.Records;
 import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.LockMode;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.CancellableProxy;
 import com.revolsys.util.Property;
-import com.revolsys.util.count.LabelCountMap;
-import com.revolsys.util.function.Function2;
+import com.revolsys.util.count.LabelCounters;
 
 public class Query extends BaseObjectWithProperties implements Cloneable, CancellableProxy {
   private static void addFilter(final Query query, final RecordDefinition recordDefinition,
@@ -107,6 +110,20 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   }
 
+  public static Query intersects(final RecordStore recordStore, final PathName path,
+    final BoundingBox boundingBox) {
+    final RecordDefinition recordDefinition = recordStore.getRecordDefinition(path);
+    final FieldDefinition geometryField = recordDefinition.getGeometryField();
+    if (geometryField == null) {
+      return null;
+    } else {
+      final EnvelopeIntersects intersects = F.envelopeIntersects(geometryField, boundingBox);
+      final Query query = new Query(recordDefinition, intersects);
+      return query;
+    }
+
+  }
+
   public static Query or(final RecordDefinition recordDefinition, final Map<String, ?> filter) {
     final Query query = new Query(recordDefinition);
     final Or or = new Or();
@@ -120,7 +137,8 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return query;
   }
 
-  public static Query where(final Function2<FieldDefinition, Object, BinaryCondition> whereFunction,
+  public static Query where(
+    final BiFunction<FieldDefinition, Object, BinaryCondition> whereFunction,
     final FieldDefinition field, final Object value) {
     final RecordDefinition recordDefinition = field.getRecordDefinition();
     final Query query = new Query(recordDefinition);
@@ -129,6 +147,8 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     query.setWhereCondition(equal);
     return query;
   }
+
+  private boolean distinct = false;
 
   private Cancellable cancellable;
 
@@ -140,11 +160,13 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   private int limit = Integer.MAX_VALUE;
 
+  private LockMode lockMode = LockMode.NONE;
+
   private boolean lockResults = false;
 
   private int offset = 0;
 
-  private Map<CharSequence, Boolean> orderBy = new HashMap<>();
+  private Map<CharSequence, Boolean> orderBy = new LinkedHashMap<>();
 
   private List<Object> parameters = new ArrayList<>();
 
@@ -152,7 +174,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   private String sql;
 
-  private LabelCountMap labelCountMap;
+  private LabelCounters labelCountMap;
 
   private PathName typeName;
 
@@ -326,6 +348,10 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this.limit;
   }
 
+  public LockMode getLockMode() {
+    return this.lockMode;
+  }
+
   public int getOffset() {
     return this.offset;
   }
@@ -351,7 +377,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this.sql;
   }
 
-  public LabelCountMap getStatistics() {
+  public LabelCounters getStatistics() {
     return this.labelCountMap;
   }
 
@@ -377,6 +403,10 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   public Condition getWhereCondition() {
     return this.whereCondition;
+  }
+
+  public boolean isDistinct() {
+    return this.distinct;
   }
 
   public boolean isLockResults() {
@@ -405,17 +435,24 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     this.cancellable = cancellable;
   }
 
+  public Query setDistinct(final boolean distinct) {
+    this.distinct = distinct;
+    return this;
+  }
+
   public Query setFieldNames(final List<String> fieldNames) {
     this.fieldNames = fieldNames;
     return this;
   }
 
   public Query setFieldNames(final String... fieldNames) {
-    return setFieldNames(Arrays.asList(fieldNames));
+    setFieldNames(Arrays.asList(fieldNames));
+    return this;
   }
 
-  public void setFromClause(final String fromClause) {
+  public Query setFromClause(final String fromClause) {
     this.fromClause = fromClause;
+    return this;
   }
 
   public Query setLimit(final int limit) {
@@ -427,12 +464,18 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this;
   }
 
+  public Query setLockMode(final LockMode lockMode) {
+    this.lockMode = lockMode;
+    return this;
+  }
+
   public void setLockResults(final boolean lockResults) {
     this.lockResults = lockResults;
   }
 
-  public void setOffset(final int offset) {
+  public Query setOffset(final int offset) {
     this.offset = offset;
+    return this;
   }
 
   public Query setOrderBy(final CharSequence field) {
@@ -479,11 +522,12 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     this.recordFactory = (RecordFactory<Record>)recordFactory;
   }
 
-  public void setSql(final String sql) {
+  public Query setSql(final String sql) {
     this.sql = sql;
+    return this;
   }
 
-  public Query setStatistics(final LabelCountMap labelCountMap) {
+  public Query setStatistics(final LabelCounters labelCountMap) {
     this.labelCountMap = labelCountMap;
     return this;
   }
@@ -496,9 +540,9 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     this.typePathAlias = typePathAlias;
   }
 
-  public void setWhere(final String where) {
+  public Query setWhere(final String where) {
     final Condition whereCondition = QueryValue.parseWhere(this.recordDefinition, where);
-    setWhereCondition(whereCondition);
+    return setWhereCondition(whereCondition);
   }
 
   public Query setWhereCondition(final Condition whereCondition) {

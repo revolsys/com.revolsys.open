@@ -31,16 +31,6 @@
   />
  
   <bean
-    id="kmlFileWriterProjectionProcess"
-    class="com.revolsys.geometry.cs.parallel.GeometryProjection"
-    p:srid-ref="4326" 
-  >
-    <property name="out">
-      <util:property-path path="kmlFileWriterProcess.in" />
-    </property>
-  </bean>
- 
-  <bean
     id="kmlFileStatisticsWriterStats"
     factory-bean="kmlFileStatisticsWriter"
     factory-method="getStatistics"

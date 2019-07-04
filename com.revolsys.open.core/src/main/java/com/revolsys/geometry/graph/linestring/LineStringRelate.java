@@ -208,9 +208,9 @@ public class LineStringRelate {
 
   private boolean isWithin(final LineStringGraph graph, final Point fromPoint, final Point toPoint,
     final Point point, final double maxDistance) {
-    if (point.distance(fromPoint) < maxDistance) {
+    if (point.distancePoint(fromPoint) < maxDistance) {
       return false;
-    } else if (point.distance(toPoint) < maxDistance) {
+    } else if (point.distancePoint(toPoint) < maxDistance) {
       return false;
     } else {
       if (!graph.findNodes(point, maxDistance).isEmpty()) {

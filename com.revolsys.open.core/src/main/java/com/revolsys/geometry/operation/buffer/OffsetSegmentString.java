@@ -123,7 +123,7 @@ class OffsetSegmentString {
     }
     // return points.get(points.size() - 1).equals(pt);
     final Point lastPt = this.points.get(this.points.size() - 1);
-    final double ptDist = pt.distance(lastPt);
+    final double ptDist = pt.distancePoint(lastPt);
     if (ptDist < this.minimimVertexDistance) {
       return true;
     }
@@ -144,7 +144,7 @@ class OffsetSegmentString {
 
   @Override
   public String toString() {
-    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
     if (this.points.size() == 1) {
       return this.points.get(0).toString();
     } else {

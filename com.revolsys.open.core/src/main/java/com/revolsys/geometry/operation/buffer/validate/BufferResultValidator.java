@@ -151,13 +151,13 @@ public class BufferResultValidator {
 
     final BoundingBox bufEnv = this.result.getBoundingBox().expand(padding);
 
-    if (!bufEnv.covers(expectedEnv)) {
+    if (!bufEnv.bboxCovers(expectedEnv)) {
       this.isValid = false;
       this.errorMsg = "Buffer envelope is incorrect";
       final GeometryFactory r = this.input.getGeometryFactory();
       this.errorIndicator = bufEnv.toGeometry();
     }
-    report("BoundingBoxDoubleGf");
+    report("BoundingBoxDoubleGeometryFactory");
   }
 
   private void checkExpectedEmpty() {

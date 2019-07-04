@@ -9,7 +9,7 @@ import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import com.revolsys.util.MathUtil;
+import org.jeometry.common.number.Doubles;
 
 /**
    Jama = Java Matrix class.
@@ -985,7 +985,7 @@ public class Matrix implements Cloneable, java.io.Serializable {
     double f = 0;
     for (int i = 0; i < this.rowCount; i++) {
       for (int j = 0; j < this.columnCount; j++) {
-        f = MathUtil.hypot(f, this.values[i][j]);
+        f = Doubles.hypot(f, this.values[i][j]);
       }
     }
     return f;

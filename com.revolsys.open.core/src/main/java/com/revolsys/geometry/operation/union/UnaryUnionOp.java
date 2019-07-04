@@ -55,7 +55,7 @@ import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
  * it is possible to take advantage of various optimizations to improve performance.
  *  {@link Geometry#isHeterogeneousGeometryCollection()}s are fully supported.
  * <p>
- * The result obeys the following contract:
+ * the result obeys the following contract:
  * <ul>
  * <li>Unioning a set of {@link Polygon}s has the effect of
  * merging the areas (i.e. the same effect as

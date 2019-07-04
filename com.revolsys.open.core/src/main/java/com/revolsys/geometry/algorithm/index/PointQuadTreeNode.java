@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.util.MathUtil;
+import com.revolsys.geometry.util.Points;
 
 public class PointQuadTreeNode<T> {
   private PointQuadTreeNode<T> northEast;
@@ -66,7 +66,7 @@ public class PointQuadTreeNode<T> {
     final double maxX = envelope.getMaxX();
     final double minY = envelope.getMinY();
     final double maxY = envelope.getMaxY();
-    if (envelope.covers(this.x, this.y)) {
+    if (envelope.bboxCovers(this.x, this.y)) {
       final PointDouble coordinates = new PointDouble(this.x, this.y);
       results.add(new SimpleImmutableEntry<Point, T>(coordinates, this.value));
     }
@@ -93,7 +93,7 @@ public class PointQuadTreeNode<T> {
     final double maxX = envelope.getMaxX();
     final double minY = envelope.getMinY();
     final double maxY = envelope.getMaxY();
-    if (envelope.covers(this.x, this.y)) {
+    if (envelope.bboxCovers(this.x, this.y)) {
       results.add(this.value);
     }
     final boolean minXLess = isLessThanX(minX);
@@ -120,7 +120,7 @@ public class PointQuadTreeNode<T> {
     final double maxX = envelope.getMaxX();
     final double minY = envelope.getMinY();
     final double maxY = envelope.getMaxY();
-    final double distance = MathUtil.distance(x, y, this.x, this.y);
+    final double distance = Points.distance(x, y, this.x, this.y);
     if (distance < maxDistance) {
       results.add(this.value);
     }
@@ -172,7 +172,7 @@ public class PointQuadTreeNode<T> {
     final double maxX = envelope.getMaxX();
     final double minY = envelope.getMinY();
     final double maxY = envelope.getMaxY();
-    if (envelope.covers(this.x, this.y)) {
+    if (envelope.bboxCovers(this.x, this.y)) {
       action.accept(this.value);
     }
     final boolean minXLess = isLessThanX(minX);

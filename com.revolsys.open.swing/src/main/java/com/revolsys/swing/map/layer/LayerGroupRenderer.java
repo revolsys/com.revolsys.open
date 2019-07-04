@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.jeometry.common.logging.Logs;
-
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.util.Cancellable;
+import com.revolsys.swing.map.view.ViewRenderer;
 
 public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
   public LayerGroupRenderer(final LayerGroup layer) {
@@ -16,25 +13,15 @@ public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
   }
 
   @Override
-  public void render(final Viewport2D viewport, final Cancellable cancellable,
-    final LayerGroup layer) {
-    final double scaleForVisible = viewport.getScaleForVisible();
+  public void render(final ViewRenderer view, final LayerGroup layer) {
+    final double scaleForVisible = view.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       final List<Layer> layers = new ArrayList<>(layer.getLayers());
       Collections.reverse(layers);
 
-      for (final Layer childLayer : cancellable.cancellable(layers)) {
+      for (final Layer childLayer : view.cancellable(layers)) {
         if (childLayer.isVisible(scaleForVisible)) {
-          try {
-            final LayerRenderer<Layer> renderer = childLayer.getRenderer();
-            if (renderer != null) {
-              renderer.render(viewport, cancellable);
-            }
-          } catch (final Throwable e) {
-            if (!cancellable.isCancelled()) {
-              Logs.error(this, "Error rendering layer: " + childLayer, e);
-            }
-          }
+          view.renderLayer(childLayer);
         }
       }
     }

@@ -10,19 +10,19 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
+import org.jeometry.coordinatesystem.io.WktCsParser;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
 
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.IntHashMap;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.WktCsParser;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.identifier.Identifier;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
@@ -223,17 +223,14 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       final Value distanceValue = (Value)withinDistance.getDistanceValue();
       final Number distance = (Number)distanceValue.getValue();
       final Object geometryObject = geometry2Value.getValue();
-      BoundingBox boundingBox;
-      if (geometryObject instanceof BoundingBox) {
-        boundingBox = (BoundingBox)geometryObject;
-      } else if (geometryObject instanceof Geometry) {
-        final Geometry geometry = (Geometry)geometryObject;
-        boundingBox = geometry.getBoundingBox();
+      BoundingBoxEditor boundingBox;
+      if (geometryObject instanceof BoundingBoxProxy) {
+        boundingBox = ((BoundingBoxProxy)geometryObject).bboxEditor();
       } else {
-        boundingBox = geometryFactory.boundingBox();
+        boundingBox = geometryFactory.bboxEditor();
       }
-      boundingBox = boundingBox.expand(distance.doubleValue());
-      boundingBox = boundingBox.convert(geometryFactory);
+      boundingBox.expandDelta(distance.doubleValue());
+      boundingBox.setGeometryFactory(geometryFactory);
       sql.append("(SDE.ST_ENVINTERSECTS(");
       column.appendSql(query, this, sql);
       sql.append(",");
@@ -286,21 +283,16 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   }
 
   public GeometryFactory getGeometryFactory(final int oracleSrid, final int axisCount,
-    final double... scales) {
-    CoordinateSystem coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(oracleSrid);
-    if (coordinateSystem == null) {
-      coordinateSystem = getCoordinateSystem(oracleSrid);
-    }
-    if (coordinateSystem == null) {
-      return GeometryFactory.fixed(0, axisCount, scales);
-    } else {
-      final int srid = coordinateSystem.getCoordinateSystemId();
-      if (srid <= 0) {
-        return GeometryFactory.fixed(coordinateSystem, axisCount, scales);
-      } else {
-        return GeometryFactory.fixed(srid, axisCount, scales);
+    final double[] scales) {
+    GeometryFactory geometryFactory = GeometryFactory.fixed(oracleSrid, axisCount, scales);
+    if (!geometryFactory.isHasHorizontalCoordinateSystem() && oracleSrid > 0) {
+      final CoordinateSystem coordinateSystem = getCoordinateSystem(oracleSrid);
+      if (coordinateSystem != null) {
+        geometryFactory = geometryFactory.convertCoordinateSystem(coordinateSystem);
       }
     }
+
+    return geometryFactory;
   }
 
   @Override

@@ -4,7 +4,9 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Set;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
@@ -34,7 +36,7 @@ public class Kmz extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
-  public GeometryReader newGeometryReader(final Resource resource) {
+  public GeometryReader newGeometryReader(final Resource resource, final MapEx properties) {
     final KmzGeometryIterator iterator = new KmzGeometryIterator(resource);
     return iterator;
   }

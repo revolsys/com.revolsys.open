@@ -3,6 +3,8 @@ package com.revolsys.record.io.format.esri.gdb.xml.model.enums;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
+import com.revolsys.geometry.model.GeometryDataTypes;
+
 public enum FieldType {
   /** Binary Large Object. */
   esriFieldTypeBlob(DataTypes.BLOB),
@@ -14,7 +16,7 @@ public enum FieldType {
   esriFieldTypeDouble(DataTypes.DOUBLE),
 
   /** Geometry. */
-  esriFieldTypeGeometry(DataTypes.GEOMETRY),
+  esriFieldTypeGeometry(GeometryDataTypes.GEOMETRY),
 
   /** ESRI Global ID. */
   esriFieldTypeGlobalID(DataTypes.UUID),
@@ -23,10 +25,10 @@ public enum FieldType {
   esriFieldTypeGUID(DataTypes.UUID),
 
   /** Long Integer. */
-  esriFieldTypeInteger(DataTypes.INTEGER),
+  esriFieldTypeInteger(DataTypes.BIG_INTEGER),
 
   /** Long Integer representing an object identifier. */
-  esriFieldTypeOID(DataTypes.INTEGER),
+  esriFieldTypeOID(DataTypes.BIG_INTEGER),
 
   /** Raster. */
   esriFieldTypeRaster(DataTypes.BLOB),

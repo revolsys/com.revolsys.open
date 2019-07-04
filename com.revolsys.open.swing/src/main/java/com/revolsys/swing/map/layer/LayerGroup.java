@@ -26,9 +26,15 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.connection.Connection;
+import com.revolsys.connection.ConnectionRegistry;
+import com.revolsys.elevation.cloud.PointCloudReadFactory;
+import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
+import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReaderFactory;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.PathUtil;
@@ -38,11 +44,14 @@ import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.format.json.Json;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.map.component.CoordinateSystemField;
+import com.revolsys.swing.map.component.GeometryFactoryField;
+import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer;
+import com.revolsys.swing.map.layer.elevation.tin.TriangulatedIrregularNetworkLayer;
+import com.revolsys.swing.map.layer.pointcloud.PointCloudLayer;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
 import com.revolsys.swing.map.layer.record.FileRecordLayer;
 import com.revolsys.swing.map.layer.record.ScratchRecordLayer;
@@ -53,6 +62,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.swing.tree.node.layer.LayerGroupTreeNode;
 import com.revolsys.util.OS;
+import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 
@@ -68,20 +78,20 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       final MenuFactory scratchMenu = new MenuFactory("Add Scratch Layer");
       scratchMenu.setIconName("map:add");
 
-      for (final DataType dataType : Arrays.asList(DataTypes.POINT, DataTypes.LINE_STRING,
-        DataTypes.POLYGON, DataTypes.MULTI_POINT, DataTypes.MULTI_LINE_STRING,
-        DataTypes.MULTI_POLYGON, DataTypes.GEOMETRY, DataTypes.GEOMETRY_COLLECTION)) {
+      for (final DataType dataType : Arrays.asList(GeometryDataTypes.POINT,
+        GeometryDataTypes.LINE_STRING, GeometryDataTypes.POLYGON, GeometryDataTypes.MULTI_POINT,
+        GeometryDataTypes.MULTI_LINE_STRING, GeometryDataTypes.MULTI_POLYGON,
+        GeometryDataTypes.GEOMETRY, GeometryDataTypes.GEOMETRY_COLLECTION)) {
         String iconName;
-        if (dataType.equals(DataTypes.GEOMETRY_COLLECTION)) {
+        if (dataType.equals(GeometryDataTypes.GEOMETRY_COLLECTION)) {
           iconName = "table_geometry";
         } else {
           iconName = "table_" + dataType.toString().toLowerCase();
         }
         scratchMenu.<LayerGroup> addMenuItem("layer", "Add " + dataType + " Layer", iconName,
           layerGroup -> {
-            CoordinateSystemField.selectHorizontalCoordinateSystem(
-              "Select coordinate system for layer", layerGroup, coordinateSystem -> {
-                final GeometryFactory geometryFactory = coordinateSystem.getGeometryFactory();
+            GeometryFactoryField.selectGeometryFactory("Select coordinate system for layer",
+              layerGroup, geometryFactory -> {
                 final Layer layer = new ScratchRecordLayer(geometryFactory, dataType);
                 layerGroup.addLayer(layer);
               });
@@ -97,7 +107,6 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
         LayerGroup::actionImportProject, false);
 
     });
-
   }
 
   private static Layer getLayer(LayerGroup group, final String name) {
@@ -128,9 +137,10 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     return null;
   }
 
-  public static LayerGroup newLayer(final Map<String, ? extends Object> properties) {
+  public static LayerGroup newLayer(final Map<String, ? extends Object> config) {
     final LayerGroup layerGroup = new LayerGroup();
-    layerGroup.loadLayers(properties);
+    final Project project = layerGroup.getProject();
+    layerGroup.loadLayers(project, config);
     return layerGroup;
   }
 
@@ -166,26 +176,39 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   private void actionImportProject() {
-    final JFileChooser fileChooser = SwingUtil.newFileChooser("Import Project",
-      "com.revolsys.swing.map.project", "directory");
+    actionImportProject("Import Project", false);
+  }
+
+  public void actionImportProject(final String title, final boolean resetProject) {
+    final Project project = getProject();
+    if (resetProject) {
+      if (!project.saveWithPrompt()) {
+        return;
+      }
+    }
+    final JFileChooser fileChooser = SwingUtil.newFileChooser(title,
+      "com.revolsys.swing.map.project", "templateDirectory");
 
     final FileNameExtensionFilter filter = new FileNameExtensionFilter("Project (*.rgmap)",
       "rgmap");
     fileChooser.setAcceptAllFileFilterUsed(true);
     fileChooser.addChoosableFileFilter(filter);
     fileChooser.setFileFilter(filter);
-    if (!OS.isMac()) {
+    if (OS.isMac()) {
+      fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+    } else {
       fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     }
     final Window window = SwingUtil.getActiveWindow();
     final int returnVal = fileChooser.showOpenDialog(window);
     if (returnVal == JFileChooser.APPROVE_OPTION) {
       final File projectDirectory = fileChooser.getSelectedFile();
+      if (projectDirectory != null) {
+        PreferencesUtil.setUserString("com.revolsys.swing.map.project", "templateDirectory",
+          projectDirectory.getParent());
+        final PathResource resource = new PathResource(projectDirectory);
 
-      if (projectDirectory != null && projectDirectory.exists()) {
-        final Project importProject = new Project();
-        importProject.readProject(projectDirectory);
-        importProject(importProject);
+        importProject(project, resource, resetProject);
       }
     }
   }
@@ -204,9 +227,19 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     final List<FileNameExtensionFilter> recordFileFilters = IoFactory
       .newFileFilters(allRecordExtensions, RecordReaderFactory.class);
 
+    final Set<String> allElevationModelExtensions = new TreeSet<>();
+    final List<FileNameExtensionFilter> elevationModelFileFilters = IoFactory
+      .newFileFilters(allElevationModelExtensions, GriddedElevationModelReaderFactory.class);
+
+    final Set<String> allTinExtensions = new TreeSet<>();
+    final List<FileNameExtensionFilter> tinFileFilters = IoFactory.newFileFilters(allTinExtensions,
+      GriddedElevationModelReaderFactory.class);
+
     final Set<String> allExtensions = new TreeSet<>();
     allExtensions.addAll(allRecordExtensions);
     allExtensions.addAll(allImageExtensions);
+    allExtensions.addAll(allElevationModelExtensions);
+    allExtensions.addAll(allTinExtensions);
     final FileNameExtensionFilter allFilter = IoFactory.newFileFilter("All Supported Files",
       allExtensions);
     fileChooser.addChoosableFileFilter(allFilter);
@@ -217,12 +250,17 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     fileChooser
       .addChoosableFileFilter(IoFactory.newFileFilter("All Image Files", allImageExtensions));
 
-    for (final FileFilter fileFilter : recordFileFilters) {
-      fileChooser.addChoosableFileFilter(fileFilter);
-    }
+    fileChooser.addChoosableFileFilter(
+      IoFactory.newFileFilter("All Gridded Elevation Model Files", allElevationModelExtensions));
 
-    for (final FileFilter fileFilter : imageFileFilters) {
-      fileChooser.addChoosableFileFilter(fileFilter);
+    fileChooser.addChoosableFileFilter(
+      IoFactory.newFileFilter("All Triangulated Irregular Network Files", allTinExtensions));
+
+    for (final List<? extends FileFilter> filters : Arrays.asList(recordFileFilters,
+      imageFileFilters, elevationModelFileFilters, tinFileFilters)) {
+      for (final FileFilter fileFilter : filters) {
+        fileChooser.addChoosableFileFilter(fileFilter);
+      }
     }
 
     fileChooser.setAcceptAllFileFilterUsed(false);
@@ -255,65 +293,59 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     }
   }
 
-  public void addLayer(int index, final Layer layer) {
+  public boolean addLayer(final int index, final Layer layer) {
+    final int addIndex;
     synchronized (this.layers) {
-      if (layer != null && !this.layers.contains(layer)) {
-        final String name = layer.getName();
-        String newName = name;
-        int i = 1;
-        while (hasLayerWithSameName(layer, newName)) {
-          newName = name + i;
-          i++;
-        }
-        layer.setName(newName);
-        if (index < this.layers.size()) {
-          this.layers.add(index, layer);
-        } else {
-          index = this.layers.size();
-          this.layers.add(layer);
-        }
-        layer.setLayerGroup(this);
-        initialize(layer);
-        fireIndexedPropertyChange("layers", index, null, layer);
-      }
+      addIndex = addLayerDo(index, layer);
+    }
+    if (addIndex > -1) {
+      fireIndexedPropertyChange("layers", addIndex, null, layer);
+      return true;
+    } else {
+      return false;
     }
   }
 
   public boolean addLayer(final Layer layer) {
-    synchronized (this.layers) {
-      if (layer == null || this.layers.contains(layer)) {
-        return false;
-      } else {
-        final int index = this.layers.size();
-        addLayer(index, layer);
-        return true;
+    return addLayer(-1, layer);
+  }
+
+  protected int addLayerDo(final int index, final Layer layer) {
+    if (layer != null && !this.layers.contains(layer)) {
+      final String name = layer.getName();
+      String newName = name;
+      int i = 1;
+      while (hasLayerWithSameName(layer, newName)) {
+        newName = name + i;
+        i++;
       }
+      layer.setName(newName);
+      int addIndex = index;
+      if (index >= 0 && index < this.layers.size()) {
+        this.layers.add(index, layer);
+      } else {
+        addIndex = this.layers.size();
+        this.layers.add(layer);
+      }
+      layer.setLayerGroup(this);
+      initialize(layer);
+      return addIndex;
+    } else {
+      return -1;
     }
   }
 
   public LayerGroup addLayerGroup(final int index, final String name) {
-    synchronized (this.layers) {
-      final Layer layer = getLayer(name);
-      if (layer == null) {
-        final LayerGroup group = new LayerGroup(name);
-        addLayer(index, group);
-        return group;
-      }
-      if (layer instanceof LayerGroup) {
-        return (LayerGroup)layer;
-      } else {
-        throw new IllegalArgumentException("Layer exists with name " + name);
-      }
-    }
-  }
-
-  public LayerGroup addLayerGroup(final String name) {
     if (Property.hasValue(name)) {
       synchronized (this.layers) {
         final Layer layer = getLayer(name);
         if (layer == null) {
           final LayerGroup group = new LayerGroup(name);
-          addLayer(group);
+          if (index < 0) {
+            addLayer(group);
+          } else {
+            addLayer(index, group);
+          }
           return group;
         }
         if (layer instanceof LayerGroup) {
@@ -325,6 +357,10 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     } else {
       return this;
     }
+  }
+
+  public LayerGroup addLayerGroup(final String name) {
+    return addLayerGroup(0, name);
   }
 
   public void addLayers(final Iterable<Layer> layers) {
@@ -350,6 +386,15 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       layerGroup.addPath(path);
     }
     path.add(this);
+  }
+
+  @Override
+  public void addVisibleBbox(final BoundingBoxEditor boundingBox) {
+    if (isExists() && isVisible()) {
+      for (final Layer layer : this) {
+        layer.addVisibleBbox(boundingBox);
+      }
+    }
   }
 
   protected <V extends Layer> void addVisibleDescendants(final List<V> layers,
@@ -407,32 +452,19 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   @Override
   public BoundingBox getBoundingBox() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boudingBox = new BoundingBoxDoubleGf(geometryFactory);
-    for (final Layer layer : this) {
-      final BoundingBox layerBoundingBox = layer.getBoundingBox();
-      if (!layerBoundingBox.isEmpty()) {
-        boudingBox = boudingBox.expandToInclude(layerBoundingBox);
-      }
-    }
-    return boudingBox;
+    return BoundingBox.bboxNew(this, this.layers);
   }
 
   @Override
   public BoundingBox getBoundingBox(final boolean visibleLayersOnly) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    BoundingBox boudingBox = new BoundingBoxDoubleGf(geometryFactory);
-    if (isExists() && (!visibleLayersOnly || isVisible())) {
-      for (final Layer layer : this) {
-        if (layer.isExists() && (!visibleLayersOnly || layer.isVisible())) {
-          final BoundingBox layerBoundingBox = layer.getBoundingBox(visibleLayersOnly);
-          if (!layerBoundingBox.isEmpty()) {
-            boudingBox = boudingBox.expandToInclude(layerBoundingBox);
-          }
-        }
-      }
+    if (visibleLayersOnly) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final BoundingBoxEditor boundingBox = geometryFactory.bboxEditor();
+      addVisibleBbox(boundingBox);
+      return boundingBox.newBoundingBox();
+    } else {
+      return getBoundingBox();
     }
-    return boudingBox;
   }
 
   @Override
@@ -479,7 +511,6 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   @Override
   public long getId() {
-    // TODO Auto-generated method stub
     return 0;
   }
 
@@ -565,14 +596,14 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   @Override
   public BoundingBox getSelectedBoundingBox() {
-    BoundingBox boundingBox = super.getSelectedBoundingBox();
+    final BoundingBoxEditor boundingBox = getGeometryFactory().bboxEditor();
     if (isExists() && isVisible()) {
       for (final Layer layer : this) {
         final BoundingBox layerBoundingBox = layer.getSelectedBoundingBox();
-        boundingBox = boundingBox.expandToInclude(layerBoundingBox);
+        boundingBox.addBbox(layerBoundingBox);
       }
     }
-    return boundingBox;
+    return boundingBox.newBoundingBox();
   }
 
   @Override
@@ -599,9 +630,59 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     return false;
   }
 
+  protected <C extends Connection> void importConnections(final String label,
+    final Project importProject, final ConnectionRegistry<C> importConnections,
+    final ConnectionRegistry<C> connections) {
+    for (final C importConnection : importConnections.getConnections()) {
+      final String connectionName = importConnection.getName();
+      final C connection = connections.getConnection(connectionName);
+      if (connection == null) {
+        final MapEx importConfig = importConnection.getConfig();
+        connections.addConnection(importConfig);
+      } else if (!importConnection.equalsConfig(connection)) {
+        Logs.error(this, "Ignore Duplicate " + label + ": " + connectionName + " from: "
+          + importProject.getResource());
+      }
+    }
+  }
+
   protected void importProject(final Project importProject) {
+    importProjectLayers(importProject, false);
+  }
+
+  protected boolean importProject(final Project rootProject, final Resource resource,
+    final boolean resetProject) {
+    if (resetProject) {
+      reset();
+    }
+    if (resource.exists()) {
+      final Project importProject = new Project("ImportProject_" + resource.getBaseName());
+      importProject.readProject(rootProject, resource);
+
+      importProject(importProject);
+      if (resetProject) {
+        setName(importProject.getName());
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  protected void importProjectLayers(final Project importProject, final boolean createGroup) {
+
     final List<Layer> importLayers = importProject.getLayers();
-    addLayers(importLayers);
+    if (!importLayers.isEmpty()) {
+      LayerGroup targetGroup;
+      if (createGroup) {
+        final String projectName = importProject.getName();
+        targetGroup = new LayerGroup(projectName);
+        addLayer(targetGroup);
+      } else {
+        targetGroup = this;
+      }
+      targetGroup.addLayers(importLayers);
+    }
   }
 
   public int indexOf(final Layer layer) {
@@ -623,6 +704,20 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   @Override
   public boolean isDeleted() {
     return this.deleted;
+  }
+
+  @Override
+  public boolean isDescendant(final Layer layer) {
+    if (layer == this) {
+      return true;
+    } else {
+      for (final Layer childLayer : this.layers) {
+        if (childLayer.isDescendant(layer)) {
+          return true;
+        }
+      }
+      return false;
+    }
   }
 
   public boolean isEmpty() {
@@ -676,8 +771,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   protected Layer loadLayer(final File file) {
-    final Resource oldResource = Resource
-      .setBaseResource(new FileSystemResource(file.getParentFile()));
+    final Resource oldResource = Resource.setBaseResource(new PathResource(file.getParentFile()));
 
     try {
       final Map<String, Object> properties = Json.toMap(file);
@@ -695,29 +789,75 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   @SuppressWarnings("unchecked")
-  protected void loadLayers(final Map<String, ? extends Object> properties) {
-    final List<String> layerFiles = (List<String>)properties.remove("layers");
-    setProperties(properties);
+  protected void loadLayers(final Project rootProject, final Map<String, ? extends Object> config) {
+    final List<String> layerFiles = (List<String>)config.remove("layers");
+    setProperties(config);
     if (layerFiles != null) {
       for (String fileName : layerFiles) {
-        if (!fileName.endsWith("rgobject")) {
-          fileName += "/rgLayerGroup.rgobject";
-        }
-        final Resource childResource = Resource.getBaseResource(fileName);
-        if (childResource.exists()) {
-          final Object object = MapObjectFactory.toObject(childResource);
-          if (object instanceof Layer) {
-            final Layer layer = (Layer)object;
-            addLayer(layer);
-          } else if (object != null) {
-            Logs.error(this, "Unexpected object type " + object.getClass() + " in " + childResource
-              + "\n" + object);
+        if (fileName.endsWith(".rgmap")) {
+          final Resource childResource = Resource.getBaseResource(fileName);
+          if (!importProject(rootProject, childResource, false)) {
+            Logs.error(LayerGroup.class, "Project not found: " + childResource);
           }
         } else {
-          Logs.error(LayerGroup.class, "Cannot find " + childResource);
+          if (!fileName.endsWith("rgobject")) {
+            fileName += "/rgLayerGroup.rgobject";
+          }
+          final Resource childResource = Resource.getBaseResource(fileName);
+          if (childResource.exists()) {
+            final Object object = MapObjectFactory.toObject(childResource);
+            if (object instanceof Layer) {
+              final Layer layer = (Layer)object;
+              addLayer(layer);
+            } else if (object != null) {
+              Logs.error(this,
+                "Unexpected object type " + object.getClass() + " in " + childResource);
+            }
+          } else {
+            Logs.error(LayerGroup.class, "Layer not found: " + childResource);
+          }
         }
       }
     }
+  }
+
+  public int openFile(final Class<? extends IoFactory> factoryClass, int index, final URL url) {
+    final String urlString = url.toString();
+    final Map<String, Object> properties = new HashMap<>();
+    properties.put("url", urlString);
+    String name = UrlUtil.getFileBaseName(url);
+    name = FileUtil.fromSafeName(name);
+    properties.put("name", name);
+    Layer layer;
+    if (factoryClass == TriangulatedIrregularNetworkReaderFactory.class) {
+      layer = new TriangulatedIrregularNetworkLayer(properties);
+    } else if (factoryClass == GriddedElevationModelReaderFactory.class) {
+      layer = new GriddedElevationModelLayer(properties);
+    } else if (factoryClass == GeoreferencedImageReadFactory.class) {
+      layer = new GeoreferencedImageLayer(properties);
+    } else if (factoryClass == PointCloudReadFactory.class) {
+      layer = new PointCloudLayer(properties);
+    } else if (factoryClass == RecordReaderFactory.class) {
+      final FileRecordLayer recordLayer = new FileRecordLayer(properties);
+      final GeometryStyleRecordLayerRenderer renderer = recordLayer.getRenderer();
+      renderer.setStyle(GeometryStyle.newStyle());
+      layer = recordLayer;
+    } else {
+      layer = null;
+    }
+    if (layer != null) {
+      layer.setProperty("showTableView", isShowNewLayerTableView());
+      if (index == -1) {
+        addLayer(layer);
+      } else {
+        addLayer(index++, layer);
+      }
+    }
+    return index;
+  }
+
+  public int openFile(final Class<? extends IoFactory> factoryClass, final URL url) {
+    return openFile(factoryClass, -1, url);
   }
 
   public void openFile(final File file) {
@@ -746,16 +886,19 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     final String urlString = url.toString();
     final Map<String, Object> properties = new HashMap<>();
     properties.put("url", urlString);
+    String name = UrlUtil.getFileBaseName(url);
+    name = FileUtil.fromSafeName(name);
+    properties.put("name", name);
     Layer layer;
-    if (IoFactory.hasFactory(GeoreferencedImageReadFactory.class, url)) {
-      String name = FileUtil.getFileName(urlString);
-      name = FileUtil.fromSafeName(name);
-      properties.put("name", name);
+    if (IoFactory.hasFactory(TriangulatedIrregularNetworkReaderFactory.class, url)) {
+      layer = new TriangulatedIrregularNetworkLayer(properties);
+    } else if (IoFactory.hasFactory(GriddedElevationModelReaderFactory.class, url)) {
+      layer = new GriddedElevationModelLayer(properties);
+    } else if (IoFactory.hasFactory(GeoreferencedImageReadFactory.class, url)) {
       layer = new GeoreferencedImageLayer(properties);
+    } else if (IoFactory.hasFactory(PointCloudReadFactory.class, url)) {
+      layer = new PointCloudLayer(properties);
     } else if (IoFactory.hasFactory(RecordReaderFactory.class, url)) {
-      String name = UrlUtil.getFileBaseName(url);
-      name = FileUtil.fromSafeName(name);
-      properties.put("name", name);
       final FileRecordLayer recordLayer = new FileRecordLayer(properties);
       final GeometryStyleRecordLayerRenderer renderer = recordLayer.getRenderer();
       renderer.setStyle(GeometryStyle.newStyle());
@@ -818,6 +961,13 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   protected void refreshDo() {
   }
 
+  public void refreshLayer(final String path) {
+    final Layer layer = getLayerByPath(path);
+    if (layer != null) {
+      layer.refresh();
+    }
+  }
+
   public Layer removeLayer(final int index) {
     synchronized (this.layers) {
       final Layer layer = this.layers.remove(index);
@@ -840,6 +990,34 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
         return true;
       }
     }
+  }
+
+  public Layer removeLayer(final String layerName) {
+    final Layer layer = getLayer(layerName);
+    if (layer == null) {
+      return null;
+    } else {
+      removeLayer(layer);
+      return layer;
+    }
+  }
+
+  public boolean removeLayer(final String layerName, final boolean delete) {
+    final Layer layer = getLayer(layerName);
+    if (layer == null) {
+      return false;
+    } else {
+      if (delete) {
+        layer.delete();
+      } else {
+        removeLayer(layer);
+      }
+      return true;
+    }
+  }
+
+  public void reset() {
+    clear();
   }
 
   public boolean saveAllSettings(final java.nio.file.Path directory) {
@@ -878,6 +1056,21 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   protected boolean saveSettingsDo(final java.nio.file.Path directory) {
     final java.nio.file.Path groupDirectory = getGroupSettingsDirectory(directory);
     return super.saveSettingsDo(groupDirectory);
+  }
+
+  public void setLayers(final List<Layer> layers) {
+    final Object oldValue;
+    synchronized (this.layers) {
+      oldValue = new ArrayList<>(this.layers);
+      this.layers.clear();
+      int index = 0;
+      for (final Object layer : layers) {
+        if (layer instanceof Layer) {
+          addLayerDo(index++, (Layer)layer);
+        }
+      }
+    }
+    firePropertyChange("layer", oldValue, layers);
   }
 
   public void setSingleLayerVisible(final boolean singleLayerVisible) {

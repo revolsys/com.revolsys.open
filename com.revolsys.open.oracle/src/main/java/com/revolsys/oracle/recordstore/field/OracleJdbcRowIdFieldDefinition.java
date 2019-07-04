@@ -38,15 +38,20 @@ public class OracleJdbcRowIdFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
     final ROWID rowId = (ROWID)resultSet.getRowId(columnIndex);
     if (rowId == null) {
-      setValue(record, null);
+      return null;
     } else {
-      setValue(record, rowId.stringValue());
+      return rowId.stringValue();
     }
-    return columnIndex + 1;
+  }
+
+  @Override
+  public int setInsertPreparedStatementValue(final PreparedStatement statement,
+    final int parameterIndex, final Object value) throws SQLException {
+    return parameterIndex;
   }
 
   @Override

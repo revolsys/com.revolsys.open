@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.jeometry.common.function.Function3;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
@@ -19,7 +20,6 @@ import com.revolsys.record.io.format.esri.rest.CatalogElement;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.Function3;
 import com.revolsys.webservice.WebServiceResource;
 
 public abstract class ArcGisRestAbstractLayerService extends ArcGisRestService

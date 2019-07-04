@@ -19,28 +19,33 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.io.FileProxy;
+import org.jeometry.common.net.UrlProxy;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.io.FileNames;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.IoFactory;
 import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.io.file.Paths;
 import com.revolsys.predicate.Predicates;
-import com.revolsys.raster.GeoreferencedImage;
-import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.util.Property;
 
-public interface Resource extends org.springframework.core.io.Resource {
+public interface Resource extends org.springframework.core.io.Resource, FileProxy, UrlProxy {
   static String CLASSPATH_URL_PREFIX = "classpath:";
 
   ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<>();
@@ -56,7 +61,7 @@ public interface Resource extends org.springframework.core.io.Resource {
   static Resource getBaseResource() {
     final Resource baseResource = Resource.BASE_RESOURCE.get();
     if (baseResource == null) {
-      return new FileSystemResource(FileUtil.getCurrentDirectory());
+      return new PathResource(FileUtil.getCurrentDirectory());
     } else {
       return baseResource;
     }
@@ -65,6 +70,21 @@ public interface Resource extends org.springframework.core.io.Resource {
   static Resource getBaseResource(final String childPath) {
     final Resource baseResource = getBaseResource();
     return baseResource.newChildResource(childPath);
+  }
+
+  static File getFileOrCreateTempFile(final Resource resource) {
+    try {
+      if (resource instanceof PathResource) {
+        return resource.getFile();
+      } else {
+        final String filename = resource.getFilename();
+        final String baseName = FileUtil.getBaseName(filename);
+        final String fileExtension = FileNames.getFileNameExtension(filename);
+        return File.createTempFile(baseName, fileExtension);
+      }
+    } catch (final IOException e) {
+      throw new RuntimeException("Unable to get file for " + resource, e);
+    }
   }
 
   static File getOrDownloadFile(final Resource resource) {
@@ -76,12 +96,14 @@ public interface Resource extends org.springframework.core.io.Resource {
   }
 
   static Resource getResource(final Object source) {
-    if (source instanceof Resource) {
+    if (source == null) {
+      return null;
+    } else if (source instanceof Resource) {
       return (Resource)source;
     } else if (source instanceof Path) {
       return new PathResource((Path)source);
     } else if (source instanceof File) {
-      return new FileSystemResource((File)source);
+      return new PathResource((File)source);
     } else if (source instanceof URL) {
       return new UrlResource((URL)source);
     } else if (source instanceof URI) {
@@ -98,13 +120,17 @@ public interface Resource extends org.springframework.core.io.Resource {
         return new ClassPathResource(springResource.getPath(), springResource.getClassLoader());
       } else if (source instanceof org.springframework.core.io.FileSystemResource) {
         final org.springframework.core.io.FileSystemResource springResource = (org.springframework.core.io.FileSystemResource)source;
-        return new FileSystemResource(springResource.getFile());
+        return new PathResource(springResource.getFile());
       } else if (source instanceof org.springframework.core.io.PathResource) {
         final org.springframework.core.io.PathResource springResource = (org.springframework.core.io.PathResource)source;
         return new PathResource(springResource.getPath());
       } else if (source instanceof org.springframework.core.io.UrlResource) {
         final org.springframework.core.io.UrlResource springResource = (org.springframework.core.io.UrlResource)source;
-        return new UrlResource(springResource.getURL());
+        try {
+          return new UrlResource(springResource.getURL());
+        } catch (final Exception e) {
+          throw Exceptions.wrap(e);
+        }
       }
     }
 
@@ -113,28 +139,31 @@ public interface Resource extends org.springframework.core.io.Resource {
 
   static Resource getResource(final String location) {
     if (Property.hasValue(location)) {
-      if (location.charAt(0) == '/' || location.length() > 1 && location.charAt(1) == ':') {
+      if (location.charAt(0) == '/' || location.length() > 1 && location.charAt(1) == ':'
+        || location.indexOf(':') == -1) {
         return new PathResource(location);
       } else if (location.startsWith(CLASSPATH_URL_PREFIX)) {
         final ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         final String path = location.substring(CLASSPATH_URL_PREFIX.length());
         return new ClassPathResource(path, classLoader);
       } else {
-        return new UrlResource(location);
+        final UrlResource urlResource = new UrlResource(location);
+        if ("file".equals(urlResource.getProtocol())) {
+          final URI uri = urlResource.getUri();
+          return new PathResource(uri);
+        }
+        return urlResource;
       }
     }
     return null;
   }
 
-  static GeoreferencedImage newGeoreferencedImage(final Object source) {
-    final Resource resource = Resource.getResource(source);
-    final GeoreferencedImageReadFactory factory = IoFactory
-      .factory(GeoreferencedImageReadFactory.class, resource);
-    if (factory == null) {
-      return null;
-    } else {
-      final GeoreferencedImage reader = factory.readGeoreferencedImage(resource);
-      return reader;
+  static Resource newResource(final ZipFile zipFile, final ZipEntry zipEntry) {
+    try {
+      final InputStream inputStream = zipFile.getInputStream(zipEntry);
+      return new InputStreamResource(inputStream);
+    } catch (final IOException e) {
+      throw Exceptions.wrap("Cannot open " + zipFile + "!" + zipEntry, e);
     }
   }
 
@@ -149,23 +178,44 @@ public interface Resource extends org.springframework.core.io.Resource {
     return FileUtil.getString(reader);
   }
 
-  default void copyFrom(final InputStream in) {
-    try (
-      final InputStream in2 = in;
-      final OutputStream out = newBufferedOutputStream();) {
-      FileUtil.copy(in2, out);
-    } catch (final IOException e) {
-      throw new WrappedException(e);
+  default boolean copyFrom(final InputStream in) {
+    if (in == null) {
+      return false;
+    } else {
+      try (
+        final InputStream in2 = in;
+        final OutputStream out = newBufferedOutputStream();) {
+        if (out == null) {
+          return false;
+        } else {
+          FileUtil.copy(in2, out);
+          return true;
+        }
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
     }
   }
 
-  default void copyFrom(final Resource source) {
-    if (source != null) {
+  default boolean copyFrom(final Object source) {
+    final Resource resource = getResource(source);
+    return copyFrom(resource);
+
+  }
+
+  default boolean copyFrom(final Resource source) {
+    if (source == null) {
+      return false;
+    } else {
       try (
         final InputStream in = source.newBufferedInputStream()) {
-        copyFrom(in);
+        if (in == null) {
+          return false;
+        } else {
+          return copyFrom(in);
+        }
       } catch (final IOException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
   }
@@ -176,14 +226,25 @@ public interface Resource extends org.springframework.core.io.Resource {
       final InputStream in = newBufferedInputStream();) {
       FileUtil.copy(in, out2);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
-  default void copyTo(final Resource target) {
-    if (target != null) {
-      target.copyFrom(this);
+  default boolean copyTo(final Resource target) {
+    if (target == null) {
+      return false;
+    } else {
+      return target.copyFrom(this);
     }
+  }
+
+  default boolean createParentDirectories() {
+    return false;
+  }
+
+  default Resource createRelative(final Object relativePath) {
+    final String path = DataTypes.toString(relativePath);
+    return createRelative(path);
   }
 
   @Override
@@ -251,6 +312,24 @@ public interface Resource extends org.springframework.core.io.Resource {
     }
   }
 
+  default java.sql.Date getLastModifiedDate() {
+    long lastModified = getLastModified();
+    if (lastModified == Long.MAX_VALUE) {
+      lastModified = 0;
+    }
+    return new java.sql.Date(lastModified);
+  }
+
+  default Date getLastModifiedDateTime() {
+    final long lastModified = getLastModified();
+    if (lastModified == Long.MAX_VALUE) {
+      return new Date(0);
+    } else {
+      return new Date(lastModified);
+    }
+  }
+
+  @Override
   default File getOrDownloadFile() {
     try {
       return getFile();
@@ -285,6 +364,16 @@ public interface Resource extends org.springframework.core.io.Resource {
     return null;
   }
 
+  default Path getPath() {
+    final File file = getFile();
+    if (file == null) {
+      return null;
+    } else {
+      return file.toPath();
+    }
+  }
+
+  @Override
   default URI getUri() {
     try {
       return getURI();
@@ -300,6 +389,11 @@ public interface Resource extends org.springframework.core.io.Resource {
     } else {
       return uri.toString();
     }
+  }
+
+  @Override
+  default URL getUrl() {
+    return getURL();
   }
 
   @Override
@@ -328,6 +422,12 @@ public interface Resource extends org.springframework.core.io.Resource {
   default OutputStream newBufferedOutputStream() {
     final OutputStream out = newOutputStream();
     return new BufferedOutputStream(out);
+  }
+
+  default <OS extends OutputStream> OS newBufferedOutputStream(
+    final Function<OutputStream, OS> factory) {
+    final OutputStream out = newBufferedOutputStream();
+    return factory.apply(out);
   }
 
   default BufferedReader newBufferedReader() {
@@ -361,6 +461,24 @@ public interface Resource extends org.springframework.core.io.Resource {
     }
   }
 
+  default ChannelWriter newChannelWriter() {
+    return newChannelWriter(8192, ByteOrder.BIG_ENDIAN);
+  }
+
+  default ChannelWriter newChannelWriter(final ByteBuffer buffer) {
+    final WritableByteChannel in = newWritableByteChannel();
+    return new ChannelWriter(in, true, buffer);
+  }
+
+  default ChannelWriter newChannelWriter(final int capacity) {
+    return newChannelWriter(capacity, ByteOrder.BIG_ENDIAN);
+  }
+
+  default ChannelWriter newChannelWriter(final int capacity, final ByteOrder byteOrder) {
+    final WritableByteChannel in = newWritableByteChannel();
+    return new ChannelWriter(in, true, capacity, byteOrder);
+  }
+
   default Resource newChildResource(final CharSequence childPath) {
     return createRelative(childPath.toString());
   }
@@ -386,8 +504,12 @@ public interface Resource extends org.springframework.core.io.Resource {
         return connection.getOutputStream();
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
+  }
+
+  default OutputStream newOutputStreamAppend() {
+    throw new UnsupportedOperationException("Cannot created appended output stream for:" + this);
   }
 
   default PrintWriter newPrintWriter() {
@@ -421,14 +543,23 @@ public interface Resource extends org.springframework.core.io.Resource {
   }
 
   default Resource newResourceChangeExtension(final String extension) {
-    final String baseName = getBaseName();
-    final String newFileName = baseName + "." + extension;
-    final Resource parent = getParent();
-    if (parent == null) {
-      return null;
+    if (extension.equals(getFileNameExtension())) {
+      return this;
     } else {
-      return parent.newChildResource(newFileName);
+      final String baseName = getBaseName();
+      final String newFileName = baseName + "." + extension;
+      final Resource parent = getParent();
+      if (parent == null) {
+        return null;
+      } else {
+        return parent.newChildResource(newFileName);
+      }
     }
+  }
+
+  default WritableByteChannel newWritableByteChannel() {
+    final OutputStream out = newOutputStream();
+    return Channels.newChannel(out);
   }
 
   default Writer newWriter() {
@@ -439,5 +570,27 @@ public interface Resource extends org.springframework.core.io.Resource {
   default Writer newWriter(final Charset charset) {
     final OutputStream stream = newOutputStream();
     return new OutputStreamWriter(stream, charset);
+  }
+
+  default Writer newWriterAppend() {
+    final OutputStream stream = newOutputStreamAppend();
+    return FileUtil.newUtf8Writer(stream);
+  }
+
+  default Path toPath() {
+    if (isFile()) {
+      final Path path = getFile().toPath();
+      if (Paths.exists(path)) {
+        try {
+          return path.toRealPath();
+        } catch (final IOException e) {
+          return path;
+        }
+      } else {
+        return path;
+      }
+    } else {
+      return null;
+    }
   }
 }

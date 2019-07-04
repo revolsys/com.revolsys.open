@@ -6,22 +6,22 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.jdesktop.swingx.treetable.AbstractTreeTableModel;
+import org.jeometry.coordinatesystem.model.CoordinateOperationMethod;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
+import org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem;
+import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.Projection;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
 
 public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
   private static final Object ROOT = new Object();
 
   private final List<GeographicCoordinateSystem> geographicCoordinateSystems;
 
-  private final Map<Projection, List<ProjectedCoordinateSystem>> projectedCoordinateSystemsByProjection = new TreeMap<>();
+  private final Map<CoordinateOperationMethod, List<ProjectedCoordinateSystem>> projectedCoordinateSystemsByProjection = new TreeMap<>();
 
-  private final List<Projection> projections = new ArrayList<>();
+  private final List<CoordinateOperationMethod> coordinateOperationMethods = new ArrayList<>();
 
   public CoordinateSystemTreeTableModel() {
     super(ROOT);
@@ -29,11 +29,12 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
 
     for (final ProjectedCoordinateSystem projectedCoordinateSystem : EpsgCoordinateSystems
       .getProjectedCoordinateSystems()) {
-      final Projection projection = projectedCoordinateSystem.getProjection();
-      Maps.addToList(this.projectedCoordinateSystemsByProjection, projection,
+      final CoordinateOperationMethod coordinateOperationMethod = projectedCoordinateSystem
+        .getCoordinateOperationMethod();
+      Maps.addToList(this.projectedCoordinateSystemsByProjection, coordinateOperationMethod,
         projectedCoordinateSystem);
     }
-    this.projections.addAll(this.projectedCoordinateSystemsByProjection.keySet());
+    this.coordinateOperationMethods.addAll(this.projectedCoordinateSystemsByProjection.keySet());
   }
 
   @Override
@@ -43,18 +44,18 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
         case 0:
           return this.geographicCoordinateSystems;
         case 1:
-          return this.projections;
+          return this.coordinateOperationMethods;
         default:
           return null;
       }
     } else if (parent == this.geographicCoordinateSystems) {
       return this.geographicCoordinateSystems.get(index);
-    } else if (parent == this.projections) {
-      return this.projections.get(index);
-    } else if (parent instanceof Projection) {
-      final Projection projection = (Projection)parent;
+    } else if (parent == this.coordinateOperationMethods) {
+      return this.coordinateOperationMethods.get(index);
+    } else if (parent instanceof CoordinateOperationMethod) {
+      final CoordinateOperationMethod coordinateOperationMethod = (CoordinateOperationMethod)parent;
       final List<ProjectedCoordinateSystem> projectedCoordinateSystems = this.projectedCoordinateSystemsByProjection
-        .get(projection);
+        .get(coordinateOperationMethod);
       if (projectedCoordinateSystems == null) {
         return null;
       } else {
@@ -71,12 +72,12 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
       return 2;
     } else if (parent == this.geographicCoordinateSystems) {
       return this.geographicCoordinateSystems.size();
-    } else if (parent == this.projections) {
-      return this.projections.size();
-    } else if (parent instanceof Projection) {
-      final Projection projection = (Projection)parent;
+    } else if (parent == this.coordinateOperationMethods) {
+      return this.coordinateOperationMethods.size();
+    } else if (parent instanceof CoordinateOperationMethod) {
+      final CoordinateOperationMethod coordinateOperationMethod = (CoordinateOperationMethod)parent;
       final List<ProjectedCoordinateSystem> projectedCoordinateSystems = this.projectedCoordinateSystemsByProjection
-        .get(projection);
+        .get(coordinateOperationMethod);
       if (projectedCoordinateSystems == null) {
         return 0;
       } else {
@@ -128,12 +129,12 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
       }
     } else if (parent == this.geographicCoordinateSystems) {
       return this.geographicCoordinateSystems.indexOf(child);
-    } else if (parent == this.projections) {
-      return this.projections.indexOf(child);
-    } else if (parent instanceof Projection) {
-      final Projection projection = (Projection)parent;
+    } else if (parent == this.coordinateOperationMethods) {
+      return this.coordinateOperationMethods.indexOf(child);
+    } else if (parent instanceof CoordinateOperationMethod) {
+      final CoordinateOperationMethod coordinateOperationMethod = (CoordinateOperationMethod)parent;
       final List<ProjectedCoordinateSystem> projectedCoordinateSystems = this.projectedCoordinateSystemsByProjection
-        .get(projection);
+        .get(coordinateOperationMethod);
       if (projectedCoordinateSystems == null) {
         return -1;
       } else {
@@ -154,14 +155,14 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
       if (column == 0) {
         return "Geographic Point Systems";
       }
-    } else if (node == this.projections) {
+    } else if (node == this.coordinateOperationMethods) {
       if (column == 0) {
         return "Projected Point Systems";
       }
-    } else if (node instanceof Projection) {
-      final Projection projection = (Projection)node;
-      if (column == 0 && projection != null) {
-        return projection.getName().replaceAll("_", " ");
+    } else if (node instanceof CoordinateOperationMethod) {
+      final CoordinateOperationMethod coordinateOperationMethod = (CoordinateOperationMethod)node;
+      if (column == 0 && coordinateOperationMethod != null) {
+        return coordinateOperationMethod.getName().replaceAll("_", " ");
       }
     } else if (node instanceof CoordinateSystem) {
       final CoordinateSystem coordinateSystem = (CoordinateSystem)node;
@@ -169,7 +170,7 @@ public class CoordinateSystemTreeTableModel extends AbstractTreeTableModel {
         final String name = coordinateSystem.getCoordinateSystemName();
         return name;
       } else if (column == 1) {
-        return coordinateSystem.getCoordinateSystemId();
+        return coordinateSystem.getHorizontalCoordinateSystemId();
       } else {
         return null;
       }

@@ -183,7 +183,7 @@ public class Centroid {
     }
     this.totalLength += lineLen;
     if (lineLen == 0.0 && line.getVertexCount() > 0) {
-      addPoint(line.getVertex(0).newPointDouble());
+      addPoint(line.getVertex(0));
     }
   }
 
@@ -199,7 +199,7 @@ public class Centroid {
 
   private void addShell(final LineString line) {
     if (line.getVertexCount() > 0) {
-      setBasePoint(line.getVertex(0).newPointDouble());
+      setBasePoint(line.getVertex(0));
     }
     final boolean isPositiveArea = line.isClockwise();
     for (final Segment segment : line.segments()) {

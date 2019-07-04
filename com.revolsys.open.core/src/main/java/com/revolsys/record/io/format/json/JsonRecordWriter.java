@@ -8,13 +8,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.number.Numbers;
 
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.record.Record;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class JsonRecordWriter extends AbstractRecordWriter {
@@ -31,42 +32,12 @@ public class JsonRecordWriter extends AbstractRecordWriter {
 
   private boolean written;
 
+  private final JsonStringEncodingWriter encodingOut;
+
   public JsonRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
     this.recordDefinition = recordDefinition;
     this.out = out;
-  }
-
-  private void charSequence(final CharSequence string) throws IOException {
-    final Writer out = this.out;
-    for (int i = 0; i < string.length(); i++) {
-      final char c = string.charAt(i);
-      switch (c) {
-        case '"':
-          out.write("\\\"");
-        break;
-        case '\\':
-          out.write("\\\\");
-        break;
-        case '\b':
-          out.write("\\b");
-        break;
-        case '\f':
-          out.write("\\f");
-        break;
-        case '\n':
-          out.write("\\n");
-        break;
-        case '\r':
-          out.write("\\r");
-        break;
-        case '\t':
-          out.write("\\t");
-        break;
-        default:
-          out.write(c);
-        break;
-      }
-    }
+    this.encodingOut = new JsonStringEncodingWriter(out);
   }
 
   @Override
@@ -88,11 +59,6 @@ public class JsonRecordWriter extends AbstractRecordWriter {
       this.out = null;
       this.recordDefinition = null;
     }
-  }
-
-  private void endAttribute() throws IOException {
-    this.out.write(",\n");
-    this.startAttribute = false;
   }
 
   private void endList() throws IOException {
@@ -126,7 +92,7 @@ public class JsonRecordWriter extends AbstractRecordWriter {
     final Writer out = this.out;
     if (isIndent()) {
       for (int i = 0; i < this.depth; i++) {
-        out.write("  ");
+        out.write(' ');
       }
     }
   }
@@ -134,10 +100,12 @@ public class JsonRecordWriter extends AbstractRecordWriter {
   private void label(final String key) throws IOException {
     final Writer out = this.out;
     indent();
-    string(key);
-    out.write(":");
+    out.write('"');
+    this.encodingOut.write(key);
+    out.write('"');
+    out.write(':');
     if (isIndent()) {
-      out.write(" ");
+      out.write(' ');
     }
     this.startAttribute = true;
   }
@@ -150,7 +118,8 @@ public class JsonRecordWriter extends AbstractRecordWriter {
     while (i < size - 1) {
       final Object value = iterator.next();
       value(null, value);
-      endAttribute();
+      this.out.write(",\n");
+      this.startAttribute = false;
       i++;
     }
     if (iterator.hasNext()) {
@@ -180,10 +149,10 @@ public class JsonRecordWriter extends AbstractRecordWriter {
     this.startAttribute = false;
   }
 
-  private void string(final CharSequence string) throws IOException {
+  private void string(final String string) throws IOException {
     final Writer out = this.out;
     out.write('"');
-    charSequence(string);
+    this.encodingOut.write(string);
     out.write('"');
   }
 
@@ -213,7 +182,7 @@ public class JsonRecordWriter extends AbstractRecordWriter {
       write(map);
     } else if (value instanceof CharSequence) {
       final CharSequence string = (CharSequence)value;
-      string(string);
+      string(string.toString());
     } else if (dataType == null) {
       string(value.toString());
     } else {
@@ -222,22 +191,27 @@ public class JsonRecordWriter extends AbstractRecordWriter {
     }
   }
 
-  private void write(final Map<String, ? extends Object> values) throws IOException {
-    startObject();
-    boolean first = true;
-    for (final Entry<String, ? extends Object> entry : values.entrySet()) {
-      final String key = entry.getKey();
-      final Object value = entry.getValue();
-      if (value != null) {
-        if (!first) {
-          endAttribute();
+  @Override
+  public void write(final Map<String, ? extends Object> values) {
+    try {
+      startObject();
+      boolean first = true;
+      for (final Entry<String, ? extends Object> entry : values.entrySet()) {
+        final String key = entry.getKey();
+        final Object value = entry.getValue();
+        if (value != null) {
+          if (!first) {
+            this.out.write(",\n");
+          }
+          label(key);
+          value(null, value);
+          first = false;
         }
-        label(key);
-        value(null, value);
-        first = false;
       }
+      endObject();
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
     }
-    endObject();
   }
 
   @Override
@@ -251,29 +225,30 @@ public class JsonRecordWriter extends AbstractRecordWriter {
       }
       startObject();
       boolean hasValue = false;
-      final int attributeCount = this.recordDefinition.getFieldCount();
-      for (int i = 0; i < attributeCount; i++) {
+      for (final FieldDefinition field : this.recordDefinition.getFields()) {
+        final int fieldIndex = field.getIndex();
         final Object value;
         if (isWriteCodeValues()) {
-          value = record.getValue(i);
+          value = record.getCodeValue(fieldIndex);
         } else {
-          value = record.getCodeValue(i);
+          value = record.getValue(fieldIndex);
         }
         if (isValueWritable(value)) {
           if (hasValue) {
-            endAttribute();
+            this.out.write(",\n");
           } else {
             hasValue = true;
           }
-          final String name = this.recordDefinition.getFieldName(i);
-          final DataType dataType = this.recordDefinition.getFieldType(i);
+          final String name = field.getName();
           label(name);
+
+          final DataType dataType = field.getDataType();
           value(dataType, value);
         }
       }
       endObject();
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

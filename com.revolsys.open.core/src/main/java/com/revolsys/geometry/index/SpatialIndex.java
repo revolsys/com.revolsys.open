@@ -33,9 +33,19 @@
 package com.revolsys.geometry.index;
 
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
+import org.jeometry.common.function.Consumer3;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.BoundingBoxProxy;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
+import com.revolsys.predicate.Predicates;
+import com.revolsys.visitor.CreateListVisitor;
+import com.revolsys.visitor.SingleObjectVisitor;
 
 /**
  * The basic operations supported by classes
@@ -48,34 +58,126 @@ import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
  *
  * @version 1.7
  */
-public interface SpatialIndex<V> {
+public interface SpatialIndex<T> extends GeometryFactoryProxy {
+
+  default boolean forEach(final BoundingBoxProxy boundingBoxProxy,
+    final Consumer<? super T> action) {
+    final BoundingBox boundingBox = convertBoundingBox(boundingBoxProxy);
+    final double minX = boundingBox.getMinX();
+    final double minY = boundingBox.getMinY();
+    final double maxX = boundingBox.getMaxX();
+    final double maxY = boundingBox.getMaxY();
+    return forEach(minX, minY, maxX, maxY, action);
+  }
+
+  default boolean forEach(final BoundingBoxProxy boundingBoxProxy,
+    final Predicate<? super T> filter, final Consumer<? super T> action) {
+    final BoundingBox boundingBox = convertBoundingBox(boundingBoxProxy);
+    final double minX = boundingBox.getMinX();
+    final double minY = boundingBox.getMinY();
+    final double maxX = boundingBox.getMaxX();
+    final double maxY = boundingBox.getMaxY();
+    return forEach(minX, minY, maxX, maxY, filter, action);
+  }
+
+  boolean forEach(final Consumer<? super T> action);
+
+  boolean forEach(double x, double y, Consumer<? super T> action);
+
+  boolean forEach(double minX, double minY, double maxX, double maxY, Consumer<? super T> action);
+
+  default boolean forEach(final double minX, final double minY, final double maxX,
+    final double maxY, final Predicate<? super T> filter, final Consumer<? super T> action) {
+    final Consumer<? super T> filteredAction = Predicates.newConsumer(filter, action);
+    return forEach(minX, minY, maxX, maxY, filteredAction);
+  }
+
+  default boolean forEach(final double x, final double y, final Predicate<? super T> filter,
+    final Consumer<? super T> action) {
+    final Consumer<? super T> filteredAction = Predicates.newConsumer(filter, action);
+    return forEach(x, y, filteredAction);
+  }
+
+  default boolean forEach(final Predicate<? super T> filter, final Consumer<? super T> action) {
+    final Consumer<? super T> filteredAction = Predicates.newConsumer(filter, action);
+    return forEach(filteredAction);
+  }
+
+  default T getFirst(final BoundingBox boundingBox, final Predicate<T> filter) {
+    final SingleObjectVisitor<T> visitor = new SingleObjectVisitor<>(filter);
+    forEach(boundingBox, visitor);
+    return visitor.getObject();
+  }
+
+  default T getFirstBoundingBox(final Geometry geometry, final Predicate<T> filter) {
+    if (geometry == null) {
+      return null;
+    } else {
+      final BoundingBox boundingBox = geometry.getBoundingBox();
+      return getFirst(boundingBox, filter);
+    }
+  }
+
+  default List<T> getItems() {
+    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
+    forEach(visitor);
+    return visitor.getList();
+  }
+
   /**
-   * Queries the index for all items whose extents intersect the given search {@link BoundingBoxDoubleGf}
+   * Queries the index for all items whose extents intersect the given search {@link BoundingBox}
    * Note that some kinds of indexes may also return objects which do not in fact
    * intersect the query envelope.
    *
-   * @param searchEnv the envelope to query for
+   * @param boundingBox the envelope to query for
    * @return a list of the items found by the query
    */
-  List<V> getItems(BoundingBox searchEnv);
+  default List<T> getItems(final BoundingBoxProxy boundingBox) {
+    return BoundingBox.newArray(this::forEach, boundingBox);
+  }
+
+  default List<T> getItems(final BoundingBoxProxy boundingBox, final Predicate<? super T> filter) {
+    final Consumer3<BoundingBoxProxy, Predicate<? super T>, Consumer<T>> forEachFunction = this::forEach;
+    return BoundingBox.<T> newArray(forEachFunction, boundingBox, filter);
+  }
+
+  default List<T> getItems(final double x, final double y) {
+    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
+    forEach(x, y, visitor);
+    return visitor.getList();
+  }
+
+  default List<T> getItems(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
+    forEach(minX, minY, maxX, maxY, visitor);
+    return visitor.getList();
+  }
+
+  default List<T> getItems(final double minX, final double minY, final double maxX,
+    final double maxY, final Predicate<? super T> filter) {
+    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
+    forEach(minX, minY, maxX, maxY, filter, visitor);
+    return visitor.getList();
+  }
+
+  default List<T> getItems(final double x, final double y, final Predicate<? super T> filter) {
+    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
+    forEach(x, y, filter, visitor);
+    return visitor.getList();
+  }
+
+  int getSize();
 
   /**
-   * Adds a spatial item with an extent specified by the given {@link BoundingBoxDoubleGf} to the index
+   * Adds a spatial item with an extent specified by the given {@link BoundingBox} to the index
    */
-  void insert(BoundingBox boundingBox, V item);
+  void insertItem(BoundingBox boundingBox, T item);
 
-  // /**
-  // * Queries the index for all items whose extents intersect the given search
-  // {@link BoundingBoxDoubleGf},
-  // * and applies an {@link ItemVisitor} to them.
-  // * Note that some kinds of indexes may also return objects which do not in
-  // fact
-  // * intersect the query envelope.
-  // *
-  // * @param searchEnv the envelope to query for
-  // * @param visitor a visitor object to apply to the items found
-  // */
-  // void query(BoundingBox searchEnv, ItemVisitor visitor);
+  default void insertItem(final BoundingBoxProxy boundingBoxProxy, final T item) {
+    final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
+    insertItem(boundingBox, item);
+  }
 
   /**
    * Removes a single item from the tree.
@@ -84,6 +186,9 @@ public interface SpatialIndex<V> {
    * @param item the item to remove
    * @return <code>true</code> if the item was found
    */
-  boolean removeItem(BoundingBox b, V item);
+  boolean removeItem(BoundingBox boundingBox, T item);
+
+  default void setGeometryFactory(final GeometryFactory geometryFactory) {
+  }
 
 }

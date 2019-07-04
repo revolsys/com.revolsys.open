@@ -13,6 +13,7 @@ import javax.swing.JComponent;
 import javax.swing.undo.UndoableEdit;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.math.MathUtil;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -27,7 +28,6 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.undo.UndoManager;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 
 public class GeometryCoordinatesTableModel extends AbstractTableModel {
@@ -247,7 +247,7 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
     if (this.geometry != geometry) {
       this.geometry = geometry;
       if (geometry == null) {
-        this.geometryFactory = GeometryFactory.DEFAULT;
+        this.geometryFactory = GeometryFactory.DEFAULT_3D;
         this.vertexIndexMap = Collections.emptyMap();
         this.vertexIndices = Collections.emptyList();
       } else {
@@ -290,14 +290,11 @@ public class GeometryCoordinatesTableModel extends AbstractTableModel {
           final int axisIndex = columnIndex - this.numIndexItems;
           final Vertex vertex = getVertex(rowIndex);
           if (vertex != null) {
-            final double[] coordinates = vertex.getCoordinates();
-            coordinates[axisIndex] = MathUtil.toDouble(value.toString());
-            final Point newPoint = this.geometryFactory.point(coordinates);
-            if (!newPoint.equalsExact(vertex)) {
-              final int[] vertexId = vertex.getVertexId();
-              final Geometry newGeometry = this.geometry.moveVertex(newPoint, vertexId);
-              setGeometry(newGeometry);
-            }
+            final double coordinate = MathUtil.toDouble(value.toString());
+            final int[] vertexId = vertex.getVertexId();
+            final Geometry newGeometry = this.geometry
+              .edit(editor -> editor.setCoordinate(vertexId, axisIndex, coordinate));
+            setGeometry(newGeometry);
           }
         }
       }

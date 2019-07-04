@@ -158,7 +158,7 @@ public class LoggingEventPanel extends JPanel {
     }
 
     if (Property.hasValue(stackTrace)) {
-      addField(this, "Stack Trace", "<pre>" + stackTrace + "</pre>", true);
+      addField(this, "Stack Trace", stackTrace, true);
       if (this.copyText.length() > 0) {
         this.copyText.append("\n");
       }

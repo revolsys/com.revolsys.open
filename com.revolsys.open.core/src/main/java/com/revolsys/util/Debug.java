@@ -39,7 +39,7 @@ public class Debug {
   }
 
   public static boolean equals(final Point coordinates1End, final double... coordinates) {
-    if (coordinates1End.equals(coordinates)) {
+    if (coordinates1End.equalsVertex(coordinates)) {
       noOp();
       return true;
     } else {

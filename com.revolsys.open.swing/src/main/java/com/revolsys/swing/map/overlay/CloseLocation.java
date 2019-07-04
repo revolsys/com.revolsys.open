@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.overlay;
 
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.collection.list.Lists;
@@ -8,7 +9,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -19,7 +19,9 @@ public class CloseLocation implements Comparable<CloseLocation> {
 
   private final AbstractRecordLayer layer;
 
-  private final Point point;
+  private final Point viewportPoint;
+
+  private final Point sourcePoint;
 
   private final LayerRecord record;
 
@@ -28,11 +30,12 @@ public class CloseLocation implements Comparable<CloseLocation> {
   private Vertex vertex;
 
   public CloseLocation(final AbstractRecordLayer layer, final LayerRecord record,
-    final Segment segment, final Point point) {
+    final Segment segment, final Point viewportPoint, final Point sourcePoint) {
     this.layer = layer;
     this.record = record;
     this.segment = segment;
-    this.point = point;
+    this.viewportPoint = viewportPoint;
+    this.sourcePoint = sourcePoint;
   }
 
   public CloseLocation(final AbstractRecordLayer layer, final LayerRecord record,
@@ -40,7 +43,8 @@ public class CloseLocation implements Comparable<CloseLocation> {
     this.layer = layer;
     this.record = record;
     this.vertex = vertex;
-    this.point = vertex;
+    this.viewportPoint = vertex;
+    this.sourcePoint = vertex;
   }
 
   @Override
@@ -67,7 +71,7 @@ public class CloseLocation implements Comparable<CloseLocation> {
         return false;
       } else if (!DataType.equal(getSegment(), location.getSegment())) {
         return false;
-      } else if (location.getPoint().equals(getPoint())) {
+      } else if (location.getViewportPoint().equals(getViewportPoint())) {
         return true;
       } else {
         return false;
@@ -130,10 +134,6 @@ public class CloseLocation implements Comparable<CloseLocation> {
     }
   }
 
-  public Point getPoint() {
-    return this.point;
-  }
-
   public LayerRecord getRecord() {
     return this.record;
   }
@@ -152,6 +152,17 @@ public class CloseLocation implements Comparable<CloseLocation> {
 
   public int[] getSegmentId() {
     return this.segment.getSegmentId();
+  }
+
+  public int[] getSegmentIdNext() {
+    final int[] segmentId = getSegmentId();
+    final int[] newId = segmentId.clone();
+    newId[newId.length - 1] = newId[newId.length - 1] + 1;
+    return newId;
+  }
+
+  public Point getSourcePoint() {
+    return this.sourcePoint;
   }
 
   public String getType() {
@@ -183,12 +194,12 @@ public class CloseLocation implements Comparable<CloseLocation> {
   }
 
   public Point getViewportPoint() {
-    return getPoint();
+    return this.viewportPoint;
   }
 
   @Override
   public int hashCode() {
-    return this.point.hashCode();
+    return this.viewportPoint.hashCode();
   }
 
   @Override

@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.revolsys.identifier.Identifier;
-import com.revolsys.util.Describable;
+import org.jeometry.common.data.Describable;
+import org.jeometry.common.data.identifier.Identifier;
 
 public interface Code extends Describable, Identifier {
 

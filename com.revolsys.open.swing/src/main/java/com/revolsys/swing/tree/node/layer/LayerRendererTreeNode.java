@@ -21,8 +21,7 @@ import javax.swing.tree.TreePath;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
-import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRecordLayerRenderer;
-import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
+import com.revolsys.swing.map.layer.MultipleLayerRenderer;
 import com.revolsys.swing.tree.BaseTreeNode;
 import com.revolsys.swing.tree.node.ListTreeNode;
 import com.revolsys.swing.tree.node.OpenStateTreeNode;
@@ -33,36 +32,34 @@ public class LayerRendererTreeNode extends ListTreeNode
     super(renderer);
     setName(renderer.getName());
     setIcon(renderer.getIcon());
-    if (renderer instanceof AbstractMultipleRecordLayerRenderer) {
+    if (renderer instanceof MultipleLayerRenderer) {
       setAllowsChildren(true);
     } else {
       setAllowsChildren(false);
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public int addChild(final int index, final Object object) {
-    if (object instanceof AbstractRecordLayerRenderer) {
-      final AbstractRecordLayerRenderer child = (AbstractRecordLayerRenderer)object;
-      final AbstractMultipleRecordLayerRenderer renderer = getMutiRenderer();
-      if (renderer != null) {
-        renderer.addRenderer(index, child);
-        return index;
-      }
+    final MultipleLayerRenderer<Layer, LayerRenderer<Layer>> renderer = getMutipleRenderer();
+    if (renderer != null && renderer.canAddChild(object)) {
+      final LayerRenderer<Layer> child = (LayerRenderer<Layer>)object;
+      renderer.addRenderer(index, child);
+      return index;
     }
 
     return -1;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public int addChild(final Object object) {
-    if (object instanceof AbstractRecordLayerRenderer) {
-      final AbstractRecordLayerRenderer child = (AbstractRecordLayerRenderer)object;
-      final AbstractMultipleRecordLayerRenderer renderer = getMutiRenderer();
-      if (renderer != null) {
-        renderer.addRenderer(child);
-        return getChildCount();
-      }
+    final MultipleLayerRenderer<Layer, LayerRenderer<Layer>> renderer = getMutipleRenderer();
+    if (renderer != null && renderer.canAddChild(object)) {
+      final LayerRenderer<Layer> child = (LayerRenderer<Layer>)object;
+      renderer.addRenderer(child);
+      return getChildCount();
     }
 
     return -1;
@@ -82,10 +79,11 @@ public class LayerRendererTreeNode extends ListTreeNode
     return icon;
   }
 
-  public AbstractMultipleRecordLayerRenderer getMutiRenderer() {
+  @SuppressWarnings("unchecked")
+  public MultipleLayerRenderer<Layer, LayerRenderer<Layer>> getMutipleRenderer() {
     final LayerRenderer<?> renderer = getRenderer();
-    if (renderer instanceof AbstractMultipleRecordLayerRenderer) {
-      return (AbstractMultipleRecordLayerRenderer)renderer;
+    if (renderer instanceof MultipleLayerRenderer) {
+      return (MultipleLayerRenderer<Layer, LayerRenderer<Layer>>)renderer;
     } else {
       return null;
     }
@@ -106,27 +104,22 @@ public class LayerRendererTreeNode extends ListTreeNode
     return renderer;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected boolean isDndDropSupported(final TransferSupport support, final TreePath dropPath,
     final TreePath childPath, final Object child) {
-    final LayerRenderer<?> renderer = getRenderer();
-
-    if (renderer instanceof AbstractMultipleRecordLayerRenderer) {
-      final AbstractMultipleRecordLayerRenderer multiRenderer = (AbstractMultipleRecordLayerRenderer)renderer;
+    final MultipleLayerRenderer<Layer, LayerRenderer<Layer>> mutipleRenderer = getMutipleRenderer();
+    if (mutipleRenderer != null && mutipleRenderer.canAddChild(child)) {
       if (super.isDndDropSupported(support, dropPath, childPath, child)) {
-        if (child instanceof AbstractRecordLayerRenderer) {
-          final AbstractRecordLayerRenderer childRenderer = (AbstractRecordLayerRenderer)child;
-          final Layer nodeLayer = multiRenderer.getLayer();
-          final Layer childLayer = childRenderer.getLayer();
-          if (childLayer != nodeLayer) {
-            if (isCopySupported(childRenderer)) {
-              support.setDropAction(DnDConstants.ACTION_COPY);
-            } else {
-              return false;
-            }
+        final LayerRenderer<Layer> childRenderer = (LayerRenderer<Layer>)child;
+        if (!mutipleRenderer.isSameLayer(childRenderer)) {
+          if (isCopySupported(childRenderer)) {
+            support.setDropAction(DnDConstants.ACTION_COPY);
+          } else {
+            return false;
           }
-          return true;
         }
+        return true;
       }
     }
     return false;
@@ -140,18 +133,17 @@ public class LayerRendererTreeNode extends ListTreeNode
 
   @Override
   protected List<BaseTreeNode> loadChildrenDo() {
-    final LayerRenderer<?> renderer = getRenderer();
+    final MultipleLayerRenderer<Layer, LayerRenderer<Layer>> mutipleRenderer = getMutipleRenderer();
 
-    if (renderer instanceof AbstractMultipleRecordLayerRenderer) {
-      final AbstractMultipleRecordLayerRenderer multiRenderer = (AbstractMultipleRecordLayerRenderer)renderer;
+    if (mutipleRenderer == null) {
+      return Collections.emptyList();
+    } else {
       final List<BaseTreeNode> nodes = new ArrayList<>();
-      for (final LayerRenderer<?> childRenderer : multiRenderer.getRenderers()) {
+      for (final LayerRenderer<?> childRenderer : mutipleRenderer.getRenderers()) {
         final LayerRendererTreeNode node = new LayerRendererTreeNode(childRenderer);
         nodes.add(node);
       }
       return nodes;
-    } else {
-      return Collections.emptyList();
     }
   }
 
@@ -198,16 +190,13 @@ public class LayerRendererTreeNode extends ListTreeNode
     nodeChanged();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public boolean removeChild(final Object object) {
-    if (object instanceof AbstractRecordLayerRenderer) {
-      final AbstractRecordLayerRenderer child = (AbstractRecordLayerRenderer)object;
-      final AbstractMultipleRecordLayerRenderer renderer = getMutiRenderer();
-      if (renderer != null) {
-        if (renderer.removeRenderer(child) != -1) {
-          return true;
-        }
-      }
+    final MultipleLayerRenderer<Layer, LayerRenderer<Layer>> renderer = getMutipleRenderer();
+    if (renderer != null && renderer.canAddChild(object)) {
+      final LayerRenderer<Layer> child = (LayerRenderer<Layer>)object;
+      return renderer.removeRenderer(child) != -1;
     }
     return false;
   }

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.ClockDirection;
@@ -77,14 +77,16 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
     final int axisCount) {
     super(dbName, name, type, -1, 0, 0, required, description, properties);
     this.spatialReference = spatialReference;
-    final GeometryFactory factory = spatialReference.getGeometryFactory();
+    final GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
 
-    if (axisCount == 3) {
-      this.geometryFactory = GeometryFactory.fixed(factory.getCoordinateSystemId(), axisCount,
-        factory.getScaleXY(), factory.getScaleZ());
+    final double scaleX = geometryFactory.getScaleX();
+    final double scaleY = geometryFactory.getScaleY();
+    final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
+    if (axisCount >= 3) {
+      final double[] scales = geometryFactory.newScales(axisCount);
+      this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, axisCount, scales);
     } else {
-      this.geometryFactory = GeometryFactory.fixed(factory.getCoordinateSystemId(), axisCount,
-        factory.getScaleXY());
+      this.geometryFactory = GeometryFactory.fixed2d(coordinateSystemId, scaleX, scaleY);
     }
     this.axisCount = axisCount;
     setProperty(FieldProperties.GEOMETRY_FACTORY, this.geometryFactory);
@@ -112,10 +114,12 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object) throws SQLException {
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
     final int geometryType = resultSet.getInt(columnIndex);
-    if (!resultSet.wasNull()) {
+    if (resultSet.wasNull()) {
+      return null;
+    } else {
       final int numPoints = resultSet.getInt(columnIndex + 1);
       final Blob blob = resultSet.getBlob(columnIndex + 2);
       try (
@@ -132,11 +136,17 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
         final GeometryFactory geometryFactory = this.geometryFactory;
         final Geometry geometry = PackedCoordinateUtil.getGeometry(pointsIn, geometryFactory,
           geometryType, numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale);
-        object.setValue(getIndex(), geometry);
+        return geometry;
       } catch (final IOException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
+  }
+
+  @Override
+  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final Record object, final boolean internStrings) throws SQLException {
+    super.setFieldValueFromResultSet(resultSet, columnIndex, object, internStrings);
     return columnIndex + 3;
   }
 
@@ -160,7 +170,7 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
 
     if (value instanceof BoundingBox) {
       final BoundingBox boundingBox = (BoundingBox)value;
-      value = boundingBox.convert(this.geometryFactory).toPolygon(1);
+      value = boundingBox.bboxToCs(this.geometryFactory).toPolygon(1);
     }
     if (value instanceof Geometry) {
       Geometry geometry = (Geometry)value;

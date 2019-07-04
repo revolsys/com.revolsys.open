@@ -116,7 +116,7 @@ public class EnvelopeIntersects extends Condition {
     if (boundingBox1 == null || boundingBox2 == null) {
       return false;
     } else {
-      return boundingBox1.intersects(boundingBox2);
+      return boundingBox1.bboxIntersects(boundingBox2);
     }
   }
 

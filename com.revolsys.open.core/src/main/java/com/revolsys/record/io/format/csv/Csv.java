@@ -17,6 +17,7 @@ import java.util.Map;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.WrappedException;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.IteratorMapReader;
 import com.revolsys.io.map.MapReader;
@@ -235,7 +236,7 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory) {
+    final RecordFactory<? extends Record> recordFactory, final MapEx properties) {
     return new CsvRecordReader(resource, recordFactory);
   }
 

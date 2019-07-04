@@ -68,7 +68,6 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
         TablePanel.eventColumn = table.convertColumnIndexToModel(eventColumn);
 
         if (e.getButton() == MouseEvent.BUTTON3) {
-          // table.getSelectionModel().setSelectionInterval(eventRow, eventRow);
           if (table.isEditing()) {
             table.getCellEditor().stopCellEditing();
           }
@@ -115,6 +114,10 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
   private ToolBar toolBar = new ToolBar();
 
   private final MenuFactory headerMenu = new MenuFactory(getClass().getName());
+
+  public TablePanel(final AbstractTableModel tableModel) {
+    this(new BaseJTable(tableModel));
+  }
 
   public TablePanel(final BaseJTable table) {
     super(new BorderLayout());
@@ -254,6 +257,13 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
   }
 
   public JPopupMenu getHeaderMenu(final int eventColumn) {
+    final AbstractTableModel tableModel = getTableModel();
+    if (tableModel != null) {
+      final JPopupMenu menu = tableModel.getHeaderMenu(eventColumn);
+      if (menu != null) {
+        return menu;
+      }
+    }
     return this.headerMenu.newJPopupMenu();
   }
 

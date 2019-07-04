@@ -1,25 +1,17 @@
 package com.revolsys.swing.map.layer.record.renderer;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.function.BiConsumer;
 
 import javax.swing.Icon;
 
-import org.jeometry.common.logging.Logs;
-
-import com.revolsys.collection.map.Maps;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.util.Cancellable;
+import com.revolsys.swing.map.view.ViewRenderer;
 
 /**
  * For each object render using the first renderer that matches the filter.
@@ -43,88 +35,60 @@ public class FilterMultipleRenderer extends AbstractMultipleRecordLayerRenderer 
     setProperties(properties);
   }
 
-  protected AbstractRecordLayerRenderer getRenderer(final AbstractRecordLayer layer,
-    final List<AbstractRecordLayerRenderer> renderers, final LayerRecord record,
-    final double scaleForVisible) {
+  private void addRecord(final List<AbstractRecordLayerRenderer> renderers,
+    final List<List<LayerRecord>> rendererRecordsLists, final LayerRecord record) {
+    int i = 0;
     for (final AbstractRecordLayerRenderer renderer : renderers) {
       if (renderer.isFilterAccept(record)) {
-        if (renderer.isVisible(record) && !layer.isHidden(record)) {
-          if (renderer.isVisible(scaleForVisible)) {
-            return renderer;
-          }
+        final List<LayerRecord> rendererRecords = rendererRecordsLists.get(i);
+        if (rendererRecords != null) {
+          rendererRecords.add(record);
         }
-        return null;
+        return;
+      }
+      i++;
+    }
+  }
+
+  private void filterRendererRecords(final ViewRenderer view, final AbstractRecordLayer layer,
+    final List<LayerRecord> records,
+    final BiConsumer<AbstractRecordLayerRenderer, List<LayerRecord>> action) {
+    final double scaleForVisible = view.getScaleForVisible();
+    final List<AbstractRecordLayerRenderer> renderers = new ArrayList<>(getRenderers());
+    final List<List<LayerRecord>> rendererRecordsLists = new ArrayList<>();
+    for (final AbstractRecordLayerRenderer renderer : renderers) {
+      if (renderer.isVisible(scaleForVisible)) {
+        rendererRecordsLists.add(new ArrayList<>());
+      } else {
+        rendererRecordsLists.add(null);
       }
     }
-    return null;
+    for (final LayerRecord record : view.cancellable(records)) {
+      addRecord(renderers, rendererRecordsLists, record);
+    }
+    int i = 0;
+    for (final AbstractRecordLayerRenderer renderer : renderers) {
+      final List<LayerRecord> rendererRecords = rendererRecordsLists.get(i);
+      if (rendererRecords != null && !rendererRecords.isEmpty()) {
+        action.accept(renderer, rendererRecords);
+      }
+      i++;
+    }
   }
 
   @Override
-  public void renderRecord(final Viewport2D viewport, final BoundingBox visibleArea,
-    final AbstractLayer layer, final LayerRecord record) {
+  protected void renderMultipleRecords(final ViewRenderer view, final AbstractRecordLayer layer,
+    final List<LayerRecord> records) {
+    filterRendererRecords(view, layer, records, (renderer, rendererRecords) -> {
+      renderer.renderRecords(view, layer, rendererRecords);
+    });
   }
 
   @Override
-  protected void renderRecords(final Viewport2D viewport, final Cancellable cancellable,
+  protected void renderMultipleSelectedRecords(final ViewRenderer view,
     final AbstractRecordLayer layer, final List<LayerRecord> records) {
-    final Map<AbstractRecordLayerRenderer, List<LayerRecord>> rendererToRecordMap = new LinkedHashMap<>();
-    final BoundingBox visibleArea = viewport.getBoundingBox();
-    final double scaleForVisible = viewport.getScaleForVisible();
-    if (isVisible(scaleForVisible)) {
-      final List<AbstractRecordLayerRenderer> renderers = new ArrayList<>(getRenderers());
-      for (final AbstractRecordLayerRenderer renderer : renderers) {
-        rendererToRecordMap.put(renderer, new ArrayList<>());
-      }
-      for (final LayerRecord record : cancellable.cancellable(records)) {
-        if (isFilterAccept(record) && !layer.isHidden(record)) {
-          final AbstractRecordLayerRenderer renderer = getRenderer(layer, renderers, record,
-            scaleForVisible);
-          if (renderer != null) {
-            Maps.addToList(rendererToRecordMap, renderer, record);
-          }
-        }
-      }
-      for (final Entry<AbstractRecordLayerRenderer, List<LayerRecord>> entry : cancellable
-        .cancellable(rendererToRecordMap.entrySet())) {
-        final AbstractRecordLayerRenderer renderer = entry.getKey();
-        final List<LayerRecord> rendererRecords = entry.getValue();
-        for (final LayerRecord record : cancellable.cancellable(rendererRecords)) {
-          try {
-            renderer.renderRecord(viewport, visibleArea, layer, record);
-          } catch (final TopologyException e) {
-          } catch (final Throwable e) {
-            if (!cancellable.isCancelled()) {
-              Logs.error(this,
-                "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
-            }
-          }
-        }
-
-      }
-    }
-  }
-
-  @Override
-  public void renderSelectedRecord(final Viewport2D viewport, final AbstractLayer layer,
-    final LayerRecord record) {
-    if (isVisible(record)) {
-      final double scaleForVisible = viewport.getScaleForVisible();
-      for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
-        if (renderer.isFilterAccept(record)) {
-          if (renderer.isVisible(record)) {
-            if (renderer.isVisible(scaleForVisible)) {
-              try {
-                renderer.renderSelectedRecord(viewport, layer, record);
-              } catch (final Throwable e) {
-                Logs.error(this,
-                  "Unabled to render " + layer.getName() + " #" + record.getIdentifier(), e);
-              }
-            }
-          }
-          // Only render using the first match
-          return;
-        }
-      }
-    }
+    filterRendererRecords(view, layer, records, (renderer, rendererRecords) -> {
+      renderer.renderSelectedRecords(view, layer, rendererRecords);
+    });
   }
 }

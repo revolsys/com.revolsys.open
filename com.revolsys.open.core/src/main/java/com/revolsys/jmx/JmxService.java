@@ -351,7 +351,7 @@ public class JmxService {
    * @param objectId The name of the object.
    * @param operationId The name of the operation.
    * @param parameters The parameters to pass to the operation.
-   * @return The result of executing the operation.
+   * @return the result of executing the operation.
    */
   public Object invokeOperation(final String serverId, final String objectId,
     final String operationId, final Map<String, String> parameters) {

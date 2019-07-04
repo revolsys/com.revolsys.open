@@ -1,28 +1,27 @@
 package com.revolsys.record.io.format.esri.gdb.xml.model;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.epsg.EpsgCoordinateSystems;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.systems.EsriCoordinateSystems;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 
-public class SpatialReference {
+public class SpatialReference implements GeometryFactoryProxy {
 
   private static final double FLOATING_SCALE = 11258999068426.238;
 
   public static SpatialReference get(final GeometryFactory geometryFactory, final String wkt) {
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem instanceof com.revolsys.geometry.cs.GeographicCoordinateSystem) {
+      if (coordinateSystem instanceof org.jeometry.coordinatesystem.model.GeographicCoordinateSystem) {
         return new GeographicCoordinateSystem(geometryFactory, wkt);
-      } else if (coordinateSystem instanceof com.revolsys.geometry.cs.ProjectedCoordinateSystem) {
+      } else if (coordinateSystem instanceof org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem) {
         return new ProjectedCoordinateSystem(geometryFactory, wkt);
       }
     }
     return null;
   }
-
-  private CoordinateSystem coordinateSystem;
 
   private GeometryFactory geometryFactory;
 
@@ -67,7 +66,7 @@ public class SpatialReference {
         final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
           .getCoordinateSystem(coordinateSystem.getCoordinateSystemId());
         if (esriCoordinateSystem != null) {
-          final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
+          final BoundingBox areaBoundingBox = geometryFactory.getAreaBoundingBox();
           this.wkt = wkt;
           this.xOrigin = areaBoundingBox.getMinX();
           this.yOrigin = areaBoundingBox.getMinY();
@@ -96,30 +95,12 @@ public class SpatialReference {
     }
   }
 
-  public CoordinateSystem getCoordinateSystem() {
-    if (this.coordinateSystem == null) {
-      this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(this.latestWKID);
-      if (this.coordinateSystem == null) {
-        this.coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(this.wkid);
-      }
-    }
-    return this.coordinateSystem;
-  }
-
+  @Override
   public GeometryFactory getGeometryFactory() {
     if (this.geometryFactory == null) {
-      final CoordinateSystem coordinateSystem = getCoordinateSystem();
-      int coordinateSystemId;
-      if (coordinateSystem == null) {
-        coordinateSystemId = 0;
-      } else {
-        coordinateSystemId = coordinateSystem.getCoordinateSystemId();
-      }
-
-      if (this.xYScale == FLOATING_SCALE) {
-        this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, 0.0, this.zScale);
-      } else {
-        this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, this.xYScale, this.zScale);
+      this.geometryFactory = newGeometryFactory(this.latestWKID);
+      if (!this.geometryFactory.isHasHorizontalCoordinateSystem()) {
+        this.geometryFactory = newGeometryFactory(this.wkid);
       }
     }
     return this.geometryFactory;
@@ -183,6 +164,17 @@ public class SpatialReference {
 
   public boolean isHighPrecision() {
     return this.highPrecision;
+  }
+
+  private GeometryFactory newGeometryFactory(final int coordinateSystemId) {
+    GeometryFactory geometryFactory;
+    if (this.xYScale == FLOATING_SCALE) {
+      geometryFactory = GeometryFactory.fixed3d(coordinateSystemId, 0.0, 0.0, this.zScale);
+    } else {
+      geometryFactory = GeometryFactory.fixed3d(coordinateSystemId, this.xYScale, this.xYScale,
+        this.zScale);
+    }
+    return geometryFactory;
   }
 
   public void setHighPrecision(final boolean highPrecision) {

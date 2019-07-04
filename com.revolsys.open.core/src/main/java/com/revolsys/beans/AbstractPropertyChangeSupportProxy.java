@@ -1,7 +1,5 @@
 package com.revolsys.beans;
 
-import com.revolsys.beans.PropertyChangeSupport;
-
 import org.jeometry.common.exception.Exceptions;
 
 public abstract class AbstractPropertyChangeSupportProxy

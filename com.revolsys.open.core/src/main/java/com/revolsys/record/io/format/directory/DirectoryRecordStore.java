@@ -30,7 +30,7 @@ import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 
 public class DirectoryRecordStore extends AbstractRecordStore {
@@ -183,7 +183,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       final File subDirectory = FileUtil.getDirectory(getDirectory(), schemaName);
       final String fileExtension = getFileExtension();
       final File file = new File(subDirectory, recordDefinition.getName() + "." + fileExtension);
-      final Resource resource = new FileSystemResource(file);
+      final Resource resource = new PathResource(file);
       writer = RecordWriter.newRecordWriter(recordDefinition, resource);
       if (writer == null) {
         throw new RuntimeException("Cannot create writer for: " + typePath);
@@ -231,7 +231,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordWriter newRecordWriter() {
+  public RecordWriter newRecordWriter(final boolean throwExceptions) {
     return new DirectoryRecordStoreWriter(this);
   }
 
@@ -257,7 +257,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     if (files != null) {
       for (final File file : files) {
         if (filter.accept(file)) {
-          final FileSystemResource resource = new FileSystemResource(file);
+          final PathResource resource = new PathResource(file);
           final RecordDefinition recordDefinition = loadRecordDefinition(schema, schemaPath,
             resource);
           if (recordDefinition != null) {

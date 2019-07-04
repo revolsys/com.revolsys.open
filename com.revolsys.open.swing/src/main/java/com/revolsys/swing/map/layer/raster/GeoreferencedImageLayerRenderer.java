@@ -5,9 +5,8 @@ import java.awt.RenderingHints;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.raster.GeoreferencedImage;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
-import com.revolsys.util.Cancellable;
+import com.revolsys.swing.map.view.ViewRenderer;
 
 public class GeoreferencedImageLayerRenderer
   extends AbstractLayerRenderer<GeoreferencedImageLayer> {
@@ -17,8 +16,7 @@ public class GeoreferencedImageLayerRenderer
   }
 
   @Override
-  public void render(final Viewport2D view, final Cancellable cancellable,
-    final GeoreferencedImageLayer layer) {
+  public void render(final ViewRenderer view, final GeoreferencedImageLayer layer) {
     final double scaleForVisible = view.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
       if (!layer.isEditable()) {
@@ -28,7 +26,7 @@ public class GeoreferencedImageLayerRenderer
           if (boundingBox == null || boundingBox.isEmpty()) {
             boundingBox = layer.fitToViewport();
           }
-          if (!cancellable.isCancelled()) {
+          if (!view.isCancelled()) {
             final double alpha = layer.getOpacity() / 255.0;
             view.drawImage(image, false, alpha, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             view.drawDifferentCoordinateSystem(boundingBox);

@@ -14,9 +14,9 @@ public class LineMatchEdgeFilter implements Predicate<Edge<LineSegmentMatch>> {
     if (distance == 0) {
       return 0;
     } else if (distance < tolerance) {
-      if (distance == node.distance(edge.getFromNode())) {
+      if (distance == node.distancePoint(edge.getFromNode())) {
         return Double.MAX_VALUE;
-      } else if (distance == node.distance(edge.getToNode())) {
+      } else if (distance == node.distancePoint(edge.getToNode())) {
         return Double.MAX_VALUE;
       } else {
         return distance;
@@ -100,7 +100,7 @@ public class LineMatchEdgeFilter implements Predicate<Edge<LineSegmentMatch>> {
 
   @Override
   public boolean test(final Edge<LineSegmentMatch> edge2) {
-    if (edge2.getBoundingBox().intersects(this.envelope)) {
+    if (edge2.getBoundingBox().bboxIntersects(this.envelope)) {
       final LineSegmentMatch edgeMatch2 = edge2.getObject();
       if (!edgeMatch2.hasSegment(this.index)) {
         final Node<LineSegmentMatch> fromNode2 = edge2.getFromNode();

@@ -22,8 +22,8 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.PasswordUtil;
@@ -111,13 +111,13 @@ public class ArcGisRestServerTileCacheLayer
   }
 
   @Override
-  public List<ArcGisRestServerTileCacheMapTile> getOverlappingMapTiles(final Viewport2D view) {
+  public List<ArcGisRestServerTileCacheMapTile> getOverlappingMapTiles(final ViewRenderer view) {
     final List<ArcGisRestServerTileCacheMapTile> tiles = new ArrayList<>();
     final MapService mapService = getMapService();
     if (mapService != null) {
       if (!isHasError()) {
         try {
-          final double viewResolution = view.getUnitsPerPixel();
+          final double viewResolution = view.getMetresPerPixel();
           final int zoomLevel = mapService.getZoomLevel(viewResolution);
           final double resolution = mapService.getResolution(zoomLevel);
           if (resolution > 0) {
@@ -153,12 +153,12 @@ public class ArcGisRestServerTileCacheLayer
   }
 
   @Override
-  public double getResolution(final Viewport2D view) {
+  public double getResolution(final ViewRenderer view) {
     final MapService mapService = getMapService();
     if (mapService == null) {
       return 0;
     } else {
-      final double metresPerPixel = view.getUnitsPerPixel();
+      final double metresPerPixel = view.getMetresPerPixel();
       final int zoomLevel = mapService.getZoomLevel(metresPerPixel);
       return mapService.getResolution(zoomLevel);
     }

@@ -14,6 +14,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.record.Record;
 import com.revolsys.record.property.RecordProperties;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class XmlRecordWriter extends AbstractRecordWriter {
@@ -126,16 +127,16 @@ public class XmlRecordWriter extends AbstractRecordWriter {
 
     this.out.startTag(qualifiedName);
 
-    final int attributeCount = this.recordDefinition.getFieldCount();
-    for (int i = 0; i < attributeCount; i++) {
+    for (final FieldDefinition field : this.recordDefinition.getFields()) {
+      final int fieldIndex = field.getIndex();
       final Object value;
       if (isWriteCodeValues()) {
-        value = record.getValue(i);
+        value = record.getCodeValue(fieldIndex);
       } else {
-        value = record.getCodeValue(i);
+        value = record.getValue(fieldIndex);
       }
       if (isValueWritable(value)) {
-        final String name = this.recordDefinition.getFieldName(i);
+        final String name = field.getName();
         final QName tagName = new QName(name);
         if (value instanceof Map) {
           @SuppressWarnings("unchecked")
@@ -149,7 +150,7 @@ public class XmlRecordWriter extends AbstractRecordWriter {
           list(list);
           this.out.endTag();
         } else {
-          final DataType dataType = this.recordDefinition.getFieldType(i);
+          final DataType dataType = field.getDataType();
           final String string = dataType.toString(value);
           this.out.nillableElement(tagName, string);
         }

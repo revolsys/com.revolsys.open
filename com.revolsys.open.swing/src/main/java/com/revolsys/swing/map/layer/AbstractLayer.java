@@ -27,13 +27,21 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
 
+import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.ScrollableSizeHint;
 import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Doubles;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.Expression;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupport;
@@ -42,15 +50,11 @@ import com.revolsys.collection.EmptyReference;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.MapSerializerMap;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
-import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.swing.Borders;
@@ -69,13 +73,12 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.component.GeometryFactoryField;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
-import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.preferences.PreferenceFields;
+import com.revolsys.swing.table.NumberTableCellRenderer;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
-import com.revolsys.util.Booleans;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.PreferenceKey;
 import com.revolsys.util.Preferences;
@@ -85,8 +88,6 @@ import com.revolsys.value.ThreadBooleanValue;
 
 public abstract class AbstractLayer extends BaseObjectWithProperties
   implements Layer, PropertyChangeListener, PropertyChangeSupportProxy, ToolTipProxy {
-  public static final Icon ICON_LAYER = Icons.getIcon("map");
-
   private static final AtomicLong ID_GEN = new AtomicLong();
 
   public static final String PLUGIN_TABLE_VIEW = "tableView";
@@ -102,30 +103,30 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       .setCategoryTitle("Layers");
 
   static {
-    final MenuFactory menu = MenuFactory.getMenu(AbstractLayer.class);
+    MenuFactory.addMenuInitializer(AbstractLayer.class, menu -> {
+      menu.addMenuItem("zoom", -1, "Zoom to Layer", "magnifier",
+        AbstractLayer::isZoomToLayerEnabled, AbstractLayer::zoomToLayer, true);
 
-    menu.addMenuItem("zoom", -1, "Zoom to Layer", "magnifier", AbstractLayer::isZoomToLayerEnabled,
-      AbstractLayer::zoomToLayer, true);
+      final Predicate<AbstractLayer> hasGeometry = AbstractLayer::isHasGeometry;
+      menu.addComponentFactory("scale", new TreeItemScaleMenu<>(true, hasGeometry,
+        AbstractLayer::getMinimumScale, AbstractLayer::setMinimumScale));
+      menu.addComponentFactory("scale", new TreeItemScaleMenu<>(false, hasGeometry,
+        AbstractLayer::getMaximumScale, AbstractLayer::setMaximumScale));
 
-    final Predicate<AbstractLayer> hasGeometry = AbstractLayer::isHasGeometry;
-    menu.addComponentFactory("scale", new TreeItemScaleMenu<>(true, hasGeometry,
-      AbstractLayer::getMinimumScale, AbstractLayer::setMinimumScale));
-    menu.addComponentFactory("scale", new TreeItemScaleMenu<>(false, hasGeometry,
-      AbstractLayer::getMaximumScale, AbstractLayer::setMaximumScale));
+      final Predicate<AbstractLayer> exists = AbstractLayer::isExists;
 
-    final Predicate<AbstractLayer> exists = AbstractLayer::isExists;
+      menu.<AbstractLayer> addMenuItem("refresh", "Refresh", "arrow_refresh",
+        AbstractLayer::refreshAll, true);
 
-    menu.<AbstractLayer> addMenuItem("refresh", "Refresh", "arrow_refresh",
-      AbstractLayer::refreshAll, true);
+      menu.<AbstractLayer> addMenuItem("layer", "Delete", "delete",
+        AbstractLayer::deleteWithConfirm, false);
 
-    menu.<AbstractLayer> addMenuItem("layer", "Delete", "delete", AbstractLayer::deleteWithConfirm,
-      false);
+      menu.<AbstractLayer> addMenuItem("layer", -1, "Layer Properties", "information", exists,
+        AbstractLayer::showProperties, false);
 
-    menu.addMenuItem("layer", -1, "Layer Properties", "information", exists,
-      AbstractLayer::showProperties, false);
-
-    PreferenceFields.addField("com.revolsys.gis", PREFERENCE_NEW_LAYERS_VISIBLE);
-    PreferenceFields.addField("com.revolsys.gis", PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW);
+      PreferenceFields.addField("com.revolsys.gis", PREFERENCE_NEW_LAYERS_VISIBLE);
+      PreferenceFields.addField("com.revolsys.gis", PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW);
+    });
   }
 
   public static boolean isShowNewLayerTableView() {
@@ -144,23 +145,25 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       .setIconName(iconName, "add");
   }
 
+  private String errorMessage;
+
+  private boolean deleted = false;
+
+  private boolean open = false;
+
   protected PropertyChangeListener beanPropertyListener = new BeanPropertyListener(this);
 
   private BoundingBox boundingBox = BoundingBox.empty();
 
-  private boolean deleted = false;
-
   private boolean editable = false;
-
-  private String errorMessage;
 
   private ThreadBooleanValue eventsEnabled = new ThreadBooleanValue(true);
 
   private boolean exists = true;
 
-  private GeometryFactory geometryFactory;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_2D;
 
-  private Icon icon = ICON_LAYER;
+  private Icon icon = Icons.getIcon("map");
 
   private long id = ID_GEN.incrementAndGet();
 
@@ -173,8 +176,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   private long minimumScale = Long.MAX_VALUE;
 
   private String name;
-
-  private boolean open = false;
 
   private Map<String, Map<String, Object>> pluginConfigByName = new TreeMap<>();
 
@@ -190,15 +191,17 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   private boolean selectable = true;
 
-  private GeometryFactory selectedGeometryFactory;
-
   private boolean selectSupported = true;
 
   private Object sync = new Object();
 
   private String type;
 
+  private MenuFactory menu;
+
   private boolean visible = Preferences.getValue("com.revolsys.gis", PREFERENCE_NEW_LAYERS_VISIBLE);
+
+  private GeometryFactory selectedGeometryFactory;
 
   protected AbstractLayer(final String type) {
     this.type = type;
@@ -208,14 +211,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   @Override
   public void activatePanelComponent(final Component component, final Map<String, Object> config) {
     setProperty("bottomTabOpen", config);
-  }
-
-  protected void addParent(final List<Layer> path) {
-    final LayerGroup parent = getLayerGroup();
-    if (parent != null) {
-      path.add(0, parent);
-      parent.addParent(path);
-    }
   }
 
   public int addRenderer(final LayerRenderer<?> child) {
@@ -243,18 +238,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       }
     }
     return false;
-  }
-
-  protected boolean checkShowProperties() {
-    boolean show = true;
-    synchronized (this) {
-      if (Booleans.getBoolean(getProperty("INTERNAL_PROPERTIES_VISIBLE"))) {
-        show = false;
-      } else {
-        setProperty("INTERNAL_PROPERTIES_VISIBLE", true);
-      }
-    }
-    return show;
   }
 
   public void clearPluginConfig(final String pluginName) {
@@ -285,12 +268,13 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   @Override
   public void delete() {
     this.deleted = true;
-    setExists(false);
-    this.beanPropertyListener = null;
     final ProjectFrame projectFrame = ProjectFrame.get(this);
     if (projectFrame != null) {
       projectFrame.removeBottomTab(this);
     }
+    setExists(false);
+    this.beanPropertyListener = null;
+
     firePropertyChange("deleted", false, true);
     final LayerGroup layerGroup = getLayerGroup();
     if (layerGroup != null) {
@@ -333,7 +317,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   protected void fireGeometryFactoryChanged(final GeometryFactory oldGeometryFactory,
     final GeometryFactory newGeometryFactory) {
     firePropertyChange("geometryFactory", oldGeometryFactory, this.geometryFactory);
-    final int coordinateSystemId = newGeometryFactory.getCoordinateSystemId();
+    final int coordinateSystemId = newGeometryFactory.getHorizontalCoordinateSystemId();
     firePropertyChange("srid", -2, coordinateSystemId);
   }
 
@@ -367,7 +351,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       return getBoundingBox();
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      return geometryFactory.newBoundingBoxEmpty();
+      return geometryFactory.bboxEmpty();
     }
   }
 
@@ -415,6 +399,17 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   @Override
+  public synchronized MenuFactory getMenu() {
+    if (this.menu == null) {
+      final Class<? extends AbstractLayer> clazz = getClass();
+      final MenuFactory parentMenu = MenuFactory.getMenu(clazz);
+      final String name = getName();
+      this.menu = new MenuFactory(name, parentMenu);
+    }
+    return this.menu;
+  }
+
+  @Override
   public long getMinimumScale() {
     return this.minimumScale;
   }
@@ -443,14 +438,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
         return path + "/" + getName();
       }
     }
-  }
-
-  @Override
-  public List<Layer> getPathList() {
-    final List<Layer> path = new ArrayList<>();
-    path.add(this);
-    addParent(path);
-    return path;
   }
 
   public Map<String, Object> getPluginConfig(final String pluginName) {
@@ -489,7 +476,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     if (geometryFactory == null) {
       return BoundingBox.empty();
     } else {
-      return geometryFactory.newBoundingBoxEmpty();
+      return geometryFactory.bboxEmpty();
     }
   }
 
@@ -527,6 +514,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   protected boolean initializeDo() {
+    initializeMenus();
     return true;
   }
 
@@ -541,12 +529,48 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       if (exists && Property.getBoolean(this, "showTableView")) {
         Invoke.later(this::showTableView);
       }
-    } catch (final Throwable e) {
+    } catch (final RuntimeException e) {
       Logs.error(this, getPath() + ": Unable to initialize layer", e);
       setExists(false);
     } finally {
       setInitialized(true);
     }
+  }
+
+  protected void initializeMenuExpressions(final List<String> menuInitializerExpressions) {
+    for (final String menuInitializerExpression : getProperty("menuInitializerExpressions",
+      Collections.<String> emptyList())) {
+      if (Property.hasValue(menuInitializerExpression)) {
+        if (!menuInitializerExpressions.contains(menuInitializerExpression)) {
+          menuInitializerExpressions.add(menuInitializerExpression);
+        }
+      }
+    }
+  }
+
+  protected void initializeMenus() {
+    final List<String> menuInitializerExpressions = new ArrayList<>();
+    initializeMenuExpressions(menuInitializerExpressions);
+
+    final EvaluationContext context = initializeMenusContext();
+
+    for (final String menuFactoryExpression : menuInitializerExpressions) {
+      try {
+        final SpelExpressionParser parser = new SpelExpressionParser();
+        final Expression expression = parser.parseExpression(menuFactoryExpression);
+
+        expression.getValue(context, Void.class);
+      } catch (final Throwable e) {
+        Logs.error(this, "Unable to create menu for " + this, e);
+      }
+    }
+  }
+
+  protected EvaluationContext initializeMenusContext() {
+    final EvaluationContext context = new StandardEvaluationContext(this);
+    final MenuFactory layerMenu = getMenu();
+    context.setVariable("layerMenu", layerMenu);
+    return context;
   }
 
   @Override
@@ -575,7 +599,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public boolean isEditable(final double scale) {
-    return isVisible(scale) && isEditable();
+    return isVisible(scale) && isEditable() && !isReadOnly();
   }
 
   public boolean isEventsEnabled() {
@@ -704,42 +728,74 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       tabPanel.addTab("Spatial", "world", panel);
 
       final JPanel extentPanel = Panels.titledTransparent("Extent");
+      extentPanel.setLayout(new BorderLayout());
       final BoundingBox boundingBox = getBoundingBox();
       if (boundingBox == null || boundingBox.isEmpty()) {
-        extentPanel.add(new JLabel("Unknown"));
+        extentPanel.add(new JLabel("Unknown"), BorderLayout.CENTER);
 
       } else {
+        final double minX = boundingBox.getMinX();
+        final double minY = boundingBox.getMinY();
+        final double maxX = boundingBox.getMaxX();
+        final double maxY = boundingBox.getMaxY();
+        final String units = " " + boundingBox.getUnit().toString();
         final JLabel extentLabel = new JLabel("<html><table cellspacing=\"3\" style=\"margin:0px\">"
           + "<tr><td>&nbsp;</td><th style=\"text-align:left\">Top:</th><td style=\"text-align:right\">"
-          + DataTypes.toString(boundingBox.getMaximum(1)) + "</td><td>&nbsp;</td></tr><tr>"
-          + "<td><b>Left</b>: " + DataTypes.toString(boundingBox.getMinimum(0))
-          + "</td><td>&nbsp;</td><td>&nbsp;</td>" + "<td><b>Right</b>: "
-          + DataTypes.toString(boundingBox.getMaximum(0)) + "</td></tr>"
+          + Doubles.toString(maxY) + units + "</td><td>&nbsp;</td></tr><tr>" + "<td><b>Left</b>: "
+          + Doubles.toString(minX) + units + "</td><td>&nbsp;</td><td>&nbsp;</td>"
+          + "<td><b>Right</b>: " + Doubles.toString(maxX) + units + "</td></tr>"
           + "<tr><td>&nbsp;</td><th>Bottom:</th><td style=\"text-align:right\">"
-          + DataTypes.toString(boundingBox.getMinimum(1)) + "</td><td>&nbsp;</td></tr><tr>"
+          + Doubles.toString(minY) + units + "</td><td>&nbsp;</td></tr><tr>"
           + "</tr></table></html>");
         extentLabel.setFont(SwingUtil.FONT);
-        extentPanel.add(extentLabel);
+        extentPanel.add(extentLabel, BorderLayout.CENTER);
 
+        final int boundingBoxAxisCount = boundingBox.getAxisCount();
+        final DefaultTableModel boundingBoxTableModel = new DefaultTableModel(new Object[] {
+          "AXIS", "MIN", "MAX"
+        }, 0);
+        boundingBoxTableModel.addRow(new Object[] {
+          "X", minX, maxX
+        });
+        boundingBoxTableModel.addRow(new Object[] {
+          "Y", minY, maxY
+        });
+        if (boundingBoxAxisCount > 2) {
+          boundingBoxTableModel.addRow(new Object[] {
+            "Z", boundingBox.getMinZ(), boundingBox.getMaxZ()
+          });
+        }
+        final JXTable boundingBoxTable = new JXTable(boundingBoxTableModel);
+        boundingBoxTable.setVisibleRowCount(3);
+        boundingBoxTable.setDefaultEditor(Object.class, null);
+        boundingBoxTable.setDefaultRenderer(Object.class, new NumberTableCellRenderer());
+        final JScrollPane boundingBoxScroll = new JScrollPane(boundingBoxTable);
+        extentPanel.add(boundingBoxScroll, BorderLayout.EAST);
+        boundingBoxTable.getColumnExt(0).setMaxWidth(31);
       }
-      GroupLayouts.makeColumns(extentPanel, 1, true);
+
       panel.add(extentPanel);
 
       final JPanel coordinateSystemPanel = Panels.titledTransparent("Coordinate System");
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem == null) {
+      if (!geometryFactory.isHasHorizontalCoordinateSystem()) {
         coordinateSystemPanel.add(new JLabel("Unknown"));
       } else {
         final int axisCount = geometryFactory.getAxisCount();
         SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "ID",
-          coordinateSystem.getCoordinateSystemId(), 10);
+          geometryFactory.getHorizontalCoordinateSystemId(), 10);
         SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "axisCount", axisCount, 10);
 
-        final double scaleXY = geometryFactory.getScaleXY();
-        if (scaleXY > 0) {
-          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleXy", scaleXY, 10);
+        final double scaleX = geometryFactory.getScaleX();
+        if (scaleX > 0) {
+          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleX", scaleX, 10);
         } else {
-          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleXy", "Floating", 10);
+          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleX", "Floating", 10);
+        }
+        final double scaleY = geometryFactory.getScaleXY();
+        if (scaleY > 0) {
+          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleY", scaleY, 10);
+        } else {
+          SwingUtil.addLabelledReadOnlyTextField(coordinateSystemPanel, "scaleY", "Floating", 10);
         }
 
         if (axisCount > 2) {
@@ -751,11 +807,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
           }
         }
 
-        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
-          .getCoordinateSystem(coordinateSystem);
         SwingUtil.addLabel(coordinateSystemPanel, "ESRI WKT");
-        final TextArea wktTextArea = new TextArea(EsriCsWktWriter.toString(esriCoordinateSystem),
-          10, 80);
+        final String wktFormatted = geometryFactory.toWktCsFormatted();
+        final TextArea wktTextArea = new TextArea(wktFormatted, 10, 80);
         wktTextArea.setEditable(false);
         wktTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 11));
         coordinateSystemPanel.add(wktTextArea);
@@ -818,16 +872,14 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     }
   }
 
+  public void redraw() {
+    firePropertyChange("redraw", false, true);
+  }
+
   @Override
   public final void refresh() {
     Invoke.background("Refresh Layer " + getName(), () -> {
-      try {
-        refreshDo();
-      } catch (final Throwable e) {
-        Logs.error(this, "Unable to refresh layer: " + getName(), e);
-      } finally {
-        refreshPostDo();
-      }
+      refreshBackground();
     });
   }
 
@@ -847,6 +899,16 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   protected void refreshAllDo() {
     refreshDo();
+  }
+
+  protected final void refreshBackground() {
+    try {
+      refreshDo();
+    } catch (final Throwable e) {
+      Logs.error(this, "Unable to refresh layer: " + getName(), e);
+    } finally {
+      refreshPostDo();
+    }
   }
 
   protected void refreshDo() {
@@ -887,7 +949,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   protected boolean saveSettingsDo(final java.nio.file.Path directory) {
     final String settingsFileName = getSettingsFileName();
     final java.nio.file.Path settingsFile = directory.resolve(settingsFileName);
-    MapObjectFactory.write(settingsFile, this);
+    writeToFile(settingsFile);
     return true;
   }
 
@@ -914,31 +976,29 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     firePropertyChange("exists", !this.exists, this.exists);
   }
 
-  protected void setGeometryFactory(final GeometryFactory geometryFactory) {
+  public final void setGeometryFactory(final GeometryFactory geometryFactory) {
     final GeometryFactory oldGeometryFactory = this.geometryFactory;
-    if (setGeometryFactoryDo(geometryFactory)) {
-      fireGeometryFactoryChanged(oldGeometryFactory, geometryFactory);
+    final GeometryFactory newGeometryFactory = setGeometryFactoryDo(geometryFactory);
+    if (newGeometryFactory != null) {
+      fireGeometryFactoryChanged(oldGeometryFactory, newGeometryFactory);
     }
   }
 
-  protected boolean setGeometryFactoryDo(final GeometryFactory geometryFactory) {
+  protected GeometryFactory setGeometryFactoryDo(final GeometryFactory geometryFactory) {
     if (geometryFactory == null) {
-      return false;
+      return null;
     } else if (geometryFactory.equals(this.geometryFactory)) {
-      return false;
+      return null;
     } else {
       this.geometryFactory = geometryFactory;
-      if (Property.isEmpty(this.boundingBox)) {
-        final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-        if (coordinateSystem != null) {
-          this.boundingBox = coordinateSystem.getAreaBoundingBox();
-        }
-      } else if (this.boundingBox != null
-        && !this.boundingBox.getGeometryFactory().isHasCoordinateSystem()
-        && geometryFactory.isHasCoordinateSystem()) {
-        this.boundingBox = this.boundingBox.convert(geometryFactory);
+      final BoundingBox boundingBox = getBoundingBox();
+      if (Property.isEmpty(boundingBox)) {
+        setBoundingBox(geometryFactory.getAreaBoundingBox());
+      } else if (!boundingBox.getGeometryFactory().isHasHorizontalCoordinateSystem()
+        && geometryFactory.isHasHorizontalCoordinateSystem()) {
+        setBoundingBox(boundingBox.bboxToCs(geometryFactory));
       }
-      return true;
+      return geometryFactory;
     }
   }
 
@@ -966,7 +1026,17 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   public void setIcon(final Icon icon) {
+    final Object oldValue = this.icon;
     this.icon = icon;
+    try (
+      final BaseCloseable eventsEnabled = eventsEnabled()) {
+      firePropertyChange("icon", oldValue, icon);
+    }
+  }
+
+  public void setIcon(final String iconName) {
+    final Icon icon = Icons.getIcon(iconName);
+    setIcon(icon);
   }
 
   protected void setInitialized(final boolean initialized) {
@@ -978,12 +1048,17 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   public void setLayerGroup(final LayerGroup layerGroup) {
     final LayerGroup old = getLayerGroup();
     if (old != layerGroup) {
+      final String oldPath = getPath();
       if (old != null) {
         Property.removeListener(this, old);
       }
       this.layerGroup = new WeakReference<>(layerGroup);
       Property.addListener(this, layerGroup);
-      firePropertyChange("layerGroup", old, layerGroup);
+      try (
+        final BaseCloseable eventsEnabled = eventsEnabled()) {
+        firePropertyChange("layerGroup", old, layerGroup);
+        firePropertyChange("path", oldPath, getPath());
+      }
     }
   }
 
@@ -1009,6 +1084,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public void setName(final String name) {
+    final String oldPath = getPath();
     final Object oldValue = this.name;
     final LayerGroup layerGroup = getLayerGroup();
     String newName = name;
@@ -1020,7 +1096,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       }
     }
     this.name = newName;
-    firePropertyChange("name", oldValue, this.name);
+    try (
+      final BaseCloseable eventsEnabled = eventsEnabled()) {
+      firePropertyChange("name", oldValue, this.name);
+      firePropertyChange("path", oldPath, getPath());
+    }
   }
 
   public boolean setNotExists(final String errorMessage) {
@@ -1050,7 +1130,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public void setProperties(final Map<String, ? extends Object> properties) {
-    if (properties == null || !this.getProperties().equals(properties)) {
+    if (properties == null || !getProperties().equals(properties)) {
       super.setProperties(properties);
       firePropertyChange("properties", null, properties);
     }
@@ -1150,49 +1230,25 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public void showProperties(final String tabName) {
-    final MapPanel map = getMapPanel();
-    if (map != null) {
-      if (this.exists) {
-        if (checkShowProperties()) {
-          try {
-            final Window window = SwingUtilities.getWindowAncestor(map);
-            final TabbedValuePanel panel = newPropertiesPanel();
-            panel.setSelectdTab(tabName);
-            panel.showDialog(window);
-            refresh();
-          } finally {
-            removeProperty("INTERNAL_PROPERTIES_VISIBLE");
+    if (this.exists) {
+      if (checkShowProperties()) {
+        try {
+          final MapPanel map = getMapPanel();
+          final Window window;
+          if (map == null) {
+            window = SwingUtil.getActiveWindow();
+          } else {
+            window = SwingUtilities.getWindowAncestor(map);
           }
+          final TabbedValuePanel panel = newPropertiesPanel();
+          panel.setSelectdTab(tabName);
+          panel.showDialog(window);
+          refresh();
+        } finally {
+          removeProperty("INTERNAL_PROPERTIES_VISIBLE");
         }
       }
     }
-  }
-
-  @Override
-  public void showRendererProperties(final LayerRenderer<?> renderer) {
-    final MapPanel map = getMapPanel();
-    if (map != null) {
-      if (this.exists) {
-        if (checkShowProperties()) {
-          try {
-            final Window window = SwingUtilities.getWindowAncestor(map);
-            final TabbedValuePanel panel = newPropertiesPanel();
-            panel.setSelectdTab("Style");
-            final LayerStylePanel stylePanel = panel.getTab("Style");
-            stylePanel.setSelectedRenderer(renderer);
-            panel.showDialog(window);
-            refresh();
-          } finally {
-            removeProperty("INTERNAL_PROPERTIES_VISIBLE");
-          }
-        }
-      }
-    }
-  }
-
-  @Override
-  public void showTableView() {
-    showTableView(MapEx.EMPTY);
   }
 
   public void toggleEditable() {
@@ -1251,9 +1307,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     if (project != null) {
       final GeometryFactory geometryFactory = project.getGeometryFactory();
       final BoundingBox layerBoundingBox = getBoundingBox();
-      final BoundingBox boundingBox = layerBoundingBox.convert(geometryFactory)
-        .clipToCoordinateSystem()
-        .expandPercent(0.1);
+      final BoundingBox boundingBox = layerBoundingBox.bboxEditor() //
+        .setGeometryFactory(geometryFactory) //
+        .clipToCoordinateSystem() //
+        .expandPercent(0.1) //
+        .newBoundingBox();
       project.setViewBoundingBox(boundingBox);
     }
   }

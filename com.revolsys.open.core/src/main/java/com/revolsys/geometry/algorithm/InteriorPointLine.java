@@ -36,7 +36,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.util.MathUtil;
+import com.revolsys.geometry.util.Points;
 
 /**
  * Computes a point in the interior of an linear geometry.
@@ -67,7 +67,7 @@ public class InteriorPointLine {
   }
 
   private void add(final double x, final double y) {
-    final double dist = MathUtil.distance(this.centroid.getX(), this.centroid.getY(), x, y);
+    final double dist = Points.distance(this.centroid.getX(), this.centroid.getY(), x, y);
     if (dist < this.minDistance) {
       this.interiorPoint = new PointDouble(x, y);
       this.minDistance = dist;

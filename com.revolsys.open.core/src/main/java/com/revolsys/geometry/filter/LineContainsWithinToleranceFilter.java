@@ -55,7 +55,7 @@ public class LineContainsWithinToleranceFilter implements Predicate<LineString> 
 
   @Override
   public boolean test(final LineString line) {
-    if (this.envelope.intersects(line.getBoundingBox())) {
+    if (this.envelope.bboxIntersects(line.getBoundingBox())) {
       final LineString points = line;
 
       final boolean contains;

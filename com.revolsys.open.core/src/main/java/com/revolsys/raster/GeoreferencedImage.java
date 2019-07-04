@@ -8,8 +8,10 @@ import java.awt.image.RenderedImage;
 import java.beans.PropertyChangeListener;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.jeometry.common.function.Consumer3;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
 import com.revolsys.collection.map.MapEx;
@@ -18,6 +20,7 @@ import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.math.matrix.Matrix;
@@ -137,77 +140,85 @@ public interface GeoreferencedImage
 
   void deleteTiePoint(MappedLocation tiePoint);
 
-  default void drawImage(final Graphics2D graphics, final BoundingBox viewBoundingBox,
-    final int viewWidth, final int viewHeight, final boolean useTransform) {
+  default void drawImage(final Consumer3<RenderedImage, BoundingBox, AffineTransform> renderer,
+    final BoundingBox viewBoundingBox, final int viewWidth, final int viewHeight,
+    final boolean useTransform) {
     if (viewBoundingBox.bboxIntersects(this) && viewWidth > 0 && viewHeight > 0) {
       if (isSameCoordinateSystem(viewBoundingBox)) {
         final RenderedImage renderedImage = getRenderedImage();
-        drawRenderedImage(renderedImage, graphics, viewBoundingBox, viewWidth, viewHeight,
+        drawRenderedImage(renderer, renderedImage, viewBoundingBox, viewWidth, viewHeight,
           useTransform);
       } else {
         final GeoreferencedImage image = imageToCs(viewBoundingBox);
-        image.drawImage(graphics, viewBoundingBox, viewWidth, viewHeight, useTransform);
-      }
-    }
-  }
-
-  default void drawRenderedImage(final RenderedImage renderedImage, BoundingBox imageBoundingBox,
-    final Graphics2D graphics, final BoundingBox viewBoundingBox, final int viewWidth,
-    final boolean useTransform) {
-    if (renderedImage != null) {
-      final int imageWidth = renderedImage.getWidth();
-      final int imageHeight = renderedImage.getHeight();
-      if (imageWidth > 0 && imageHeight > 0) {
-
-        final GeometryFactory viewGeometryFactory = viewBoundingBox.getGeometryFactory();
-        imageBoundingBox = imageBoundingBox.bboxToCs(viewGeometryFactory);
-        try {
-          final double scaleFactor = viewWidth / viewBoundingBox.getWidth();
-
-          final double imageMinX = imageBoundingBox.getMinX();
-          final double viewMinX = viewBoundingBox.getMinX();
-          final double screenX = (imageMinX - viewMinX) * scaleFactor;
-
-          final double imageMaxY = imageBoundingBox.getMaxY();
-          final double viewMaxY = viewBoundingBox.getMaxY();
-          final double screenY = -(imageMaxY - viewMaxY) * scaleFactor;
-
-          final double imageModelWidth = imageBoundingBox.getWidth();
-          final int imageScreenWidth = (int)Math.ceil(imageModelWidth * scaleFactor);
-
-          final double imageModelHeight = imageBoundingBox.getHeight();
-          final int imageScreenHeight = (int)Math.ceil(imageModelHeight * scaleFactor);
-
-          if (imageScreenWidth > 0 && imageScreenHeight > 0) {
-            if (imageScreenWidth > 0 && imageScreenHeight > 0) {
-              final double scaleX = (double)imageScreenWidth / imageWidth;
-              final double scaleY = (double)imageScreenHeight / imageHeight;
-              final AffineTransform imageTransform = new AffineTransform(scaleX, 0, 0, scaleY,
-                screenX, screenY);
-              if (useTransform) {
-                final AffineTransform geoTransform = getAffineTransformation(imageBoundingBox);
-                imageTransform.concatenate(geoTransform);
-              }
-              graphics.drawRenderedImage(renderedImage, imageTransform);
-            }
-          }
-        } catch (final Throwable e) {
-          e.printStackTrace();
+        if (image != null) {
+          image.drawImage(renderer, viewBoundingBox, viewWidth, viewHeight, useTransform);
         }
       }
     }
   }
 
-  default void drawRenderedImage(final RenderedImage renderedImage, final Graphics2D graphics,
-    final BoundingBox viewBoundingBox, final int viewWidth, final int viewHeight,
-    final boolean useTransform) {
+  default void drawRenderedImage(
+    final Consumer3<RenderedImage, BoundingBox, AffineTransform> renderer,
+    final RenderedImage renderedImage, final BoundingBox imageBoundingBox,
+    final BoundingBox viewBoundingBox, final int viewWidth, final boolean useTransform) {
+    if (renderedImage != null) {
+      final int imageWidth = renderedImage.getWidth();
+      final int imageHeight = renderedImage.getHeight();
+      if (imageWidth > 0 && imageHeight > 0) {
+        final AffineTransform geoTransform;
+        if (useTransform) {
+          geoTransform = getAffineTransformation(imageBoundingBox);
+        } else {
+          geoTransform = new AffineTransform();
+        }
+
+        renderer.accept(renderedImage, imageBoundingBox, geoTransform);
+      }
+    }
+  }
+
+  default void drawRenderedImage(
+    final Consumer3<RenderedImage, BoundingBox, AffineTransform> renderer,
+    final RenderedImage renderedImage, final BoundingBox viewBoundingBox, final int viewWidth,
+    final int viewHeight, final boolean useTransform) {
     final BoundingBox imageBoundingBox = getBoundingBox();
-    drawRenderedImage(renderedImage, imageBoundingBox, graphics, viewBoundingBox, viewWidth,
+    drawRenderedImage(renderer, renderedImage, imageBoundingBox, viewBoundingBox, viewWidth,
       useTransform);
   }
 
   default AffineTransform getAffineTransformation(final BoundingBox boundingBox) {
+    final double[] affineTransformMatrix = getAffineTransformationMatrix(boundingBox);
+    final double translateX = affineTransformMatrix[2];
+    final double translateY = affineTransformMatrix[5];
+    final double scaleX = affineTransformMatrix[0];
+    final double scaleY = affineTransformMatrix[4];
+    final double shearX = affineTransformMatrix[1];
+    final double shearY = affineTransformMatrix[3];
+    return new AffineTransform(scaleX, shearY, shearX, scaleY, translateX, translateY);
+  }
+
+  default double[] getAffineTransformationMatrix(final BoundingBox boundingBox) {
     final List<MappedLocation> mappings = new ArrayList<>(getTiePoints());
+    if (mappings.isEmpty()) {
+      if (!isSameCoordinateSystem(boundingBox)) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        final BoundingBox imageBoundingBox = getBoundingBox();
+        double sourceY = 0;
+        for (final double y : Arrays.asList(imageBoundingBox.getMinY(),
+          imageBoundingBox.getMaxY())) {
+          double sourceX = 0;
+          for (final double x : Arrays.asList(imageBoundingBox.getMinX(),
+            imageBoundingBox.getMaxX())) {
+            final Point pixel = new PointDoubleXY(sourceX, sourceY);
+            final Point targetPoint = geometryFactory.point(x, y);
+            final MappedLocation location = new MappedLocation(pixel, targetPoint);
+            mappings.add(location);
+            sourceX = getImageWidth() - 1;
+          }
+          sourceY = getImageHeight() - 1;
+        }
+      }
+    }
     final int count = mappings.size();
     final int imageWidth = getImageWidth();
     final int imageHeight = getImageHeight();
@@ -217,19 +228,15 @@ public interface GeoreferencedImage
       final Point targetPixel = tiePoint.getTargetPixel(boundingBox, imageWidth, imageHeight);
       final double translateX = targetPixel.getX() - sourcePixel.getX();
       final double translateY = sourcePixel.getY() - targetPixel.getY();
-      return new AffineTransform(1, 0, 0, 1, translateX, translateY);
+      return new double[] {
+        1, 0, translateX, 0, 1, translateY
+      };
     } else if (count < 3) {
-      return new AffineTransform();
+      return new double[] {
+        1, 0, 0, 0, 1, 0
+      };
     }
-    final double[] affineTransformMatrix = calculateLSM(boundingBox, imageWidth, imageHeight,
-      mappings);
-    final double translateX = affineTransformMatrix[2];
-    final double translateY = affineTransformMatrix[5];
-    final double scaleX = affineTransformMatrix[0];
-    final double scaleY = affineTransformMatrix[4];
-    final double shearX = affineTransformMatrix[1];
-    final double shearY = affineTransformMatrix[3];
-    return new AffineTransform(scaleX, shearY, shearX, scaleY, translateX, translateY);
+    return calculateLSM(boundingBox, imageWidth, imageHeight, mappings);
   }
 
   default BufferedImage getBufferedImage() {

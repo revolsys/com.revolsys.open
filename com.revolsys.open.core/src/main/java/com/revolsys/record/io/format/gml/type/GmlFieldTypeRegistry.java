@@ -6,6 +6,8 @@ import java.util.Map;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
+import com.revolsys.geometry.model.GeometryDataTypes;
+
 public class GmlFieldTypeRegistry {
 
   public static final GmlFieldTypeRegistry INSTANCE = new GmlFieldTypeRegistry();
@@ -23,18 +25,18 @@ public class GmlFieldTypeRegistry {
     addFieldType(new SimpleFieldType(DataTypes.DOUBLE));
     addFieldType(new SimpleFieldType(DataTypes.FLOAT));
     addFieldType(new SimpleFieldType(DataTypes.INT));
-    addFieldType(new SimpleFieldType(DataTypes.INTEGER));
+    addFieldType(new SimpleFieldType(DataTypes.BIG_INTEGER));
     addFieldType(new SimpleFieldType(DataTypes.LONG));
     addFieldType(new SimpleFieldType(DataTypes.QNAME));
     addFieldType(new SimpleFieldType(DataTypes.SHORT));
     addFieldType(new SimpleFieldType(DataTypes.STRING));
-    addFieldType(new GmlGeometryFieldType(DataTypes.GEOMETRY));
-    addFieldType(new GmlGeometryFieldType(DataTypes.POINT));
-    addFieldType(new GmlGeometryFieldType(DataTypes.LINE_STRING));
-    addFieldType(new GmlGeometryFieldType(DataTypes.POLYGON));
-    addFieldType(new GmlGeometryFieldType(DataTypes.MULTI_POINT));
-    addFieldType(new GmlGeometryFieldType(DataTypes.MULTI_LINE_STRING));
-    addFieldType(new GmlGeometryFieldType(DataTypes.MULTI_POLYGON));
+    addFieldType(new GmlGeometryFieldType(GeometryDataTypes.GEOMETRY));
+    addFieldType(new GmlGeometryFieldType(GeometryDataTypes.POINT));
+    addFieldType(new GmlGeometryFieldType(GeometryDataTypes.LINE_STRING));
+    addFieldType(new GmlGeometryFieldType(GeometryDataTypes.POLYGON));
+    addFieldType(new GmlGeometryFieldType(GeometryDataTypes.MULTI_POINT));
+    addFieldType(new GmlGeometryFieldType(GeometryDataTypes.MULTI_LINE_STRING));
+    addFieldType(new GmlGeometryFieldType(GeometryDataTypes.MULTI_POLYGON));
   }
 
   public void addFieldType(final DataType dataType, final GmlFieldType fieldType) {

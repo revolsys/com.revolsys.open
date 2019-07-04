@@ -150,12 +150,14 @@ public class FieldFilterPanel extends JComponent
     final Map<String, Object> config) {
     this(tablePanel, tableModel);
 
-    setSearchFieldName((String)config.get("searchField"));
-    final Predicate<Record> filter = AbstractRecordLayerRenderer.getFilter(this.layer, config);
-    if (filter instanceof RecordDefinitionSqlFilter) {
-      final RecordDefinitionSqlFilter sqlFilter = (RecordDefinitionSqlFilter)filter;
-      final Condition condition = sqlFilter.getCondition();
-      setFilter(condition);
+    if (!this.fieldNames.isEmpty()) {
+      setSearchFieldName((String)config.get("searchField"));
+      final Predicate<Record> filter = AbstractRecordLayerRenderer.getFilter(this.layer, config);
+      if (filter instanceof RecordDefinitionSqlFilter) {
+        final RecordDefinitionSqlFilter sqlFilter = (RecordDefinitionSqlFilter)filter;
+        final Condition condition = sqlFilter.getCondition();
+        setFilter(condition);
+      }
     }
   }
 
@@ -332,117 +334,123 @@ public class FieldFilterPanel extends JComponent
   }
 
   public void setFilter(final Condition filter) {
-    Invoke.later(() -> {
-      try (
-        BaseCloseable settingFilter = this.settingFilter.closeable(true)) {
-        setSearchFilter(filter);
-        boolean simple = false;
-        if (Property.isEmpty(filter)) {
-          final Field searchField = (Field)this.searchField;
-          if (searchField != null) {
-            searchField.setFieldValue(null);
-          }
-          setSearchOperator("=");
-          simple = true;
-        } else if (filter instanceof Not) {
-          final Not not = (Not)filter;
-          final QueryValue condition = not.getQueryValue();
-          if (condition instanceof IsNull) {
-            final IsNull isNull = (IsNull)condition;
-            final IsNotNull isNotNull = new IsNotNull(isNull.getValue());
-            setFilter(isNotNull);
-            return;
-          }
-        } else if (filter instanceof ILike) {
-          final ILike equal = (ILike)filter;
-          final QueryValue leftCondition = equal.getLeft();
-          final QueryValue rightCondition = equal.getRight();
-
-          if (leftCondition instanceof Column && rightCondition instanceof Value) {
-            final Column column = (Column)leftCondition;
-            final String searchFieldName = column.getName();
-            setSearchFieldName(searchFieldName);
-
-            if (setSearchOperator("Like")) {
-              final Value value = (Value)rightCondition;
-              final Object searchValue = value.getValue();
-              String searchText = DataTypes.toString(searchValue);
-              if (Property.hasValue(searchText)) {
-                setSearchField(this.searchTextField);
-                searchText = searchText.replaceAll("%", "");
-                final String previousSearchText = this.searchTextField.getText();
-
-                if (!DataType.equal(searchText, previousSearchText)) {
-                  this.searchTextField.setFieldValue(searchText);
-                }
-                simple = true;
-              } else {
-                setSearchFilter(null);
-              }
+    if (!this.fieldNames.isEmpty()) {
+      Invoke.later(() -> {
+        try (
+          BaseCloseable settingFilter = this.settingFilter.closeable(true)) {
+          setSearchFilter(filter);
+          boolean simple = false;
+          if (Property.isEmpty(filter)) {
+            final Field searchField = (Field)this.searchField;
+            if (searchField != null) {
+              searchField.setFieldValue(null);
             }
-          }
-        } else if (filter instanceof BinaryCondition) {
-          final BinaryCondition condition = (BinaryCondition)filter;
-          final QueryValue leftCondition = condition.getLeft();
-          final QueryValue rightCondition = condition.getRight();
-
-          if (leftCondition instanceof Column && rightCondition instanceof Value) {
-            final Column column = (Column)leftCondition;
-            final String searchFieldName = column.getName();
-            setSearchFieldName(searchFieldName);
-
-            final String searchOperator = condition.getOperator();
-            if (setSearchOperator(searchOperator)) {
-              final Value value = (Value)rightCondition;
-              final Object searchValue = value.getValue();
-
-              final String searchText = DataTypes.toString(searchValue);
-
-              final Field searchField = (Field)this.searchField;
-              final Object oldValue = searchField.getFieldValue();
-              if (!searchText.equalsIgnoreCase(DataTypes.toString(oldValue))) {
-                searchField.setFieldValue(searchText);
-              }
-              simple = true;
+            setSearchOperator("=");
+            simple = true;
+          } else if (filter instanceof Not) {
+            final Not not = (Not)filter;
+            final QueryValue condition = not.getValue();
+            if (condition instanceof IsNull) {
+              final IsNull isNull = (IsNull)condition;
+              final IsNotNull isNotNull = new IsNotNull(isNull.getValue());
+              setFilter(isNotNull);
+              return;
             }
-          }
-        } else if (filter instanceof RightUnaryCondition) {
-          final RightUnaryCondition condition = (RightUnaryCondition)filter;
-          final String operator = condition.getOperator();
-          if (filter instanceof IsNull || filter instanceof IsNotNull) {
-            final QueryValue leftValue = condition.getValue();
-            if (leftValue instanceof Column) {
-              final Column column = (Column)leftValue;
+          } else if (filter instanceof ILike) {
+            final ILike equal = (ILike)filter;
+            final QueryValue leftCondition = equal.getLeft();
+            final QueryValue rightCondition = equal.getRight();
+
+            if (leftCondition instanceof Column && rightCondition instanceof Value) {
+              final Column column = (Column)leftCondition;
               final String searchFieldName = column.getName();
               setSearchFieldName(searchFieldName);
 
-              if (setSearchOperator(operator)) {
+              if (setSearchOperator("Like")) {
+                final Value value = (Value)rightCondition;
+                final Object searchValue = value.getValue();
+                String searchText = DataTypes.toString(searchValue);
+                if (Property.hasValue(searchText)) {
+                  setSearchField(this.searchTextField);
+                  searchText = searchText.replaceAll("%", "");
+                  final String previousSearchText = this.searchTextField.getText();
+
+                  if (!DataType.equal(searchText, previousSearchText)) {
+                    this.searchTextField.setFieldValue(searchText);
+                  }
+                  simple = true;
+                } else {
+                  setSearchFilter(null);
+                }
+              }
+            }
+          } else if (filter instanceof BinaryCondition) {
+            final BinaryCondition condition = (BinaryCondition)filter;
+            final QueryValue leftCondition = condition.getLeft();
+            final QueryValue rightCondition = condition.getRight();
+
+            if (leftCondition instanceof Column && rightCondition instanceof Value) {
+              final Column column = (Column)leftCondition;
+              final String searchFieldName = column.getName();
+              setSearchFieldName(searchFieldName);
+
+              final String searchOperator = condition.getOperator();
+              if (setSearchOperator(searchOperator)) {
+                final Value value = (Value)rightCondition;
+                final Object searchValue = value.getValue();
+
+                final String searchText = DataTypes.toString(searchValue);
+
+                final Field searchField = (Field)this.searchField;
+                final Object oldValue = searchField.getFieldValue();
+                if (!searchText.equalsIgnoreCase(DataTypes.toString(oldValue))) {
+                  searchField.setFieldValue(searchText);
+                }
                 simple = true;
               }
             }
+          } else if (filter instanceof RightUnaryCondition) {
+            final RightUnaryCondition condition = (RightUnaryCondition)filter;
+            final String operator = condition.getOperator();
+            if (filter instanceof IsNull || filter instanceof IsNotNull) {
+              final QueryValue leftValue = condition.getValue();
+              if (leftValue instanceof Column) {
+                final Column column = (Column)leftValue;
+                final String searchFieldName = column.getName();
+                setSearchFieldName(searchFieldName);
+
+                if (setSearchOperator(operator)) {
+                  simple = true;
+                }
+              }
+            }
+          }
+          if (simple) {
+            this.whereLabel.setVisible(false);
+            if (this.nameField != null) {
+              this.nameField.setVisible(true);
+            }
+            if (this.operatorField != null) {
+              this.operatorField.setVisible(true);
+            }
+            this.searchFieldPanel.setVisible(true);
+          } else {
+            String filterText = filter.toString();
+            if (filterText.length() > 40) {
+              filterText = filterText.substring(0, 40) + "...";
+            }
+            this.whereLabel.setText(filterText);
+            this.whereLabel.setToolTipText(filterText);
+            this.whereLabel.setVisible(true);
+            if (this.nameField != null) {
+              this.nameField.setVisible(false);
+            }
+            this.operatorField.setVisible(false);
+            this.searchFieldPanel.setVisible(false);
           }
         }
-        if (simple) {
-          this.whereLabel.setVisible(false);
-          this.nameField.setVisible(true);
-          if (this.operatorField != null) {
-            this.operatorField.setVisible(true);
-          }
-          this.searchFieldPanel.setVisible(true);
-        } else {
-          String filterText = filter.toString();
-          if (filterText.length() > 40) {
-            filterText = filterText.substring(0, 40) + "...";
-          }
-          this.whereLabel.setText(filterText);
-          this.whereLabel.setToolTipText(filterText);
-          this.whereLabel.setVisible(true);
-          this.nameField.setVisible(false);
-          this.operatorField.setVisible(false);
-          this.searchFieldPanel.setVisible(false);
-        }
-      }
-    });
+      });
+    }
   }
 
   private void setOperatorField(final ComboBox<String> field) {
@@ -555,8 +563,7 @@ public class FieldFilterPanel extends JComponent
           }
           this.codeTable = null;
         } else {
-          searchField = QueryWhereConditionField.newSearchField(this.layer, this.field,
-            this.codeTable);
+          searchField = this.layer.newSearchField(this.field, this.codeTable);
         }
 
         setSearchField(searchField);
@@ -592,11 +599,7 @@ public class FieldFilterPanel extends JComponent
           } else {
             Object value = null;
             if (this.codeTable == null) {
-              try {
-                value = this.field.toFieldValueException(searchValue);
-              } catch (final Throwable t) {
-                return;
-              }
+              value = this.layer.getValidSearchValue(this.field, searchValue);
             } else {
               value = this.codeTable.getIdentifier(searchValue);
               if (value == null) {

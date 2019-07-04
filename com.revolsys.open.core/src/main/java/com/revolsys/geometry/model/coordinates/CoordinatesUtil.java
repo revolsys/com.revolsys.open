@@ -1,5 +1,6 @@
 package com.revolsys.geometry.model.coordinates;
 
+import org.jeometry.common.math.Angle;
 import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.algorithm.HCoordinate;
@@ -9,7 +10,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.util.MathUtil;
+import com.revolsys.geometry.util.Points;
 import com.revolsys.util.Trig;
 
 public class CoordinatesUtil {
@@ -26,7 +27,7 @@ public class CoordinatesUtil {
       } else if (Double.isNaN(value2) || Double.isNaN(value2)) {
         value = value1;
       } else {
-        value = MathUtil.avg(value1, value2);
+        value = Doubles.avg(value1, value2);
       }
       coordinates[i] = value;
     }
@@ -69,6 +70,33 @@ public class CoordinatesUtil {
     }
   }
 
+  public static int compareArcDistance(final double x1, final double y1, final double x2,
+    final double y2) {
+    // min is the minimum of all coordinates. This is used to normalize the x,y
+    // values to calculate the distance
+    double min = x1;
+    if (x2 < min) {
+      min = x2;
+    }
+    if (y1 < min) {
+      min = y1;
+    }
+    if (x2 < min) {
+      min = x2;
+    }
+
+    final double distance1 = Points.distance(min, min, x1, y1);
+
+    final double distance2 = Points.distance(min, min, x2, y2);
+    final int distanceCompare = Double.compare(distance1, distance2);
+    if (distanceCompare == 0) {
+      final int xCompare = Double.compare(x1, x2);
+      return xCompare;
+    } else {
+      return distanceCompare;
+    }
+  }
+
   public static int compareToOrigin(final Point point1, final Object other) {
     if (other instanceof Point) {
       final Point point2 = (Point)other;
@@ -81,11 +109,11 @@ public class CoordinatesUtil {
   public static int compareToOrigin(final Point point1, final Point point2) {
     final double x = point1.getX();
     final double y = point1.getY();
-    final double distance = MathUtil.distance(0, 0, x, y);
+    final double distance = Points.distance(0, 0, x, y);
 
     final double otherX = point2.getX();
     final double otherY = point2.getY();
-    final double otherDistance = MathUtil.distance(0, 0, otherX, otherY);
+    final double otherDistance = Points.distance(0, 0, otherX, otherY);
     final int distanceCompare = Double.compare(distance, otherDistance);
     if (distanceCompare == 0) {
       final int yCompare = Double.compare(y, otherY);
@@ -154,7 +182,7 @@ public class CoordinatesUtil {
   }
 
   public static double getElevation(final Point coordinate, final Point c0, final Point c1) {
-    final double fraction = coordinate.distance(c0) / c0.distance(c1);
+    final double fraction = coordinate.distancePoint(c0) / c0.distancePoint(c1);
     final double z = c0.getZ() + (c1.getZ() - c0.getZ()) * fraction;
     return z;
   }
@@ -178,7 +206,7 @@ public class CoordinatesUtil {
     final double x3 = point3.getX();
     final double y3 = point3.getY();
 
-    return MathUtil.isAcute(x1, y1, x2, y2, x3, y3);
+    return Angle.isAcute(x1, y1, x2, y2, x3, y3);
   }
 
   /**

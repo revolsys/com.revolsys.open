@@ -6,12 +6,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.io.PathName;
-
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
@@ -19,7 +15,6 @@ import com.revolsys.record.Records;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
 import com.revolsys.swing.map.layer.record.table.model.ListRecordLayerTableModel;
@@ -27,28 +22,7 @@ import com.revolsys.swing.map.layer.record.table.model.RecordLayerErrors;
 
 public class ListRecordLayer extends AbstractRecordLayer {
 
-  public static ListRecordLayer newLayer(final String name, final GeometryFactory geometryFactory,
-    final DataType geometryType) {
-    final RecordDefinitionImpl recordDefinition = newRecordDefinition(name, geometryFactory,
-      geometryType);
-    return new ListRecordLayer(recordDefinition);
-  }
-
-  public static RecordDefinitionImpl newRecordDefinition(final String name,
-    final GeometryFactory geometryFactory, final DataType geometryType) {
-    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(
-      PathName.newPathName(name));
-    recordDefinition.addField("GEOMETRY", geometryType, true);
-    recordDefinition.setGeometryFactory(geometryFactory);
-    return recordDefinition;
-  }
-
   protected List<LayerRecord> records = new ArrayList<>();
-
-  public ListRecordLayer(final Map<String, ? extends Object> properties) {
-    this("recordListLayer");
-    setProperties(properties);
-  }
 
   public ListRecordLayer(final RecordDefinition recordDefinition) {
     this("listRecordLayer");
@@ -62,21 +36,43 @@ public class ListRecordLayer extends AbstractRecordLayer {
     setEditable(true);
   }
 
+  public void addNewRecordPersisted(final Map<String, Object> values) {
+    final LayerRecord record = newRecordPersisted(values);
+    addRecord(record);
+  }
+
   protected void addRecord(final LayerRecord record) {
+    addRecordDo(record);
+    fireRecordsChanged();
+  }
+
+  protected void addRecordDo(final LayerRecord record) {
     synchronized (this.records) {
       this.records.add(record);
       expandBoundingBox(record);
     }
     addToIndex(record);
-    fireEmpty();
+  }
+
+  protected void addRecords(final List<? extends LayerRecord> records) {
+    for (final LayerRecord record : records) {
+      addRecordDo(record);
+    }
     fireRecordsChanged();
   }
 
-  protected void clearRecords() {
+  public void clearRecords() {
+    clearRecordsDo();
+    fireRecordsChanged();
+  }
+
+  protected void clearRecordsDo() {
     this.clearSelectedRecords();
-    this.records.clear();
+    synchronized (this.records) {
+      this.records.clear();
+    }
+    clearIndex();
     cleanCachedRecords();
-    fireEmpty();
   }
 
   @Override
@@ -107,15 +103,10 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   protected void expandBoundingBox(final LayerRecord record) {
-    if (record != null) {
-      BoundingBox boundingBox = getBoundingBox();
-      if (boundingBox.isEmpty()) {
-        boundingBox = Records.boundingBox(record);
-      } else {
-        boundingBox = boundingBox.expandToInclude(record);
-      }
-      setBoundingBox(boundingBox);
-    }
+    final BoundingBox boundingBox = getBoundingBox().bboxEdit(editor -> {
+      editor.addBbox(record);
+    });
+    setBoundingBox(boundingBox);
   }
 
   public void fireEmpty() {
@@ -205,11 +196,13 @@ public class ListRecordLayer extends AbstractRecordLayer {
   @Override
   public LayerRecord newLayerRecord(final Map<String, ? extends Object> values) {
     final LayerRecord record = super.newLayerRecord(values);
-    addRecord(record);
+    if (record != null) {
+      addRecord(record);
+    }
     return record;
   }
 
-  protected void newRecordInternal(final Map<String, Object> values) {
+  public LayerRecord newRecordPersisted(final Map<String, Object> values) {
     final LayerRecord record = newLayerRecord(getRecordDefinition());
     record.setState(RecordState.INITIALIZING);
     try {
@@ -217,7 +210,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
     } finally {
       record.setState(RecordState.PERSISTED);
     }
-    addRecord(record);
+    return record;
   }
 
   @Override
@@ -227,11 +220,11 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   protected void refreshBoundingBox() {
-    BoundingBox boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
-    for (final LayerRecord record : getRecords()) {
-      boundingBox = boundingBox.expandToInclude(record);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    if (geometryFactory != null) {
+      final BoundingBox boundingBox = BoundingBox.bboxNew(geometryFactory, this.records);
+      setBoundingBox(boundingBox);
     }
-    setBoundingBox(boundingBox);
   }
 
   @Override
@@ -256,4 +249,11 @@ public class ListRecordLayer extends AbstractRecordLayer {
     }
   }
 
+  public void setRecords(final List<? extends LayerRecord> records) {
+    clearRecordsDo();
+    for (final LayerRecord record : records) {
+      addRecordDo(record);
+    }
+    fireRecordsChanged();
+  }
 }

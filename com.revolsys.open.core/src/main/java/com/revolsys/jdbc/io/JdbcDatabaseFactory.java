@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import javax.sql.DataSource;
 
 import org.jeometry.common.logging.Logs;
+import org.springframework.dao.DataAccessException;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.IoFactory;
@@ -79,6 +80,12 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
     config.put("user", username);
     config.put("password", password);
     return dataSource(config);
+  }
+
+  static DataAccessException translateException(final DataSource dataSource, final String task,
+    final String sql, final SQLException exception) {
+    final JdbcDatabaseFactory databaseFactory = databaseFactory(dataSource);
+    return databaseFactory.translateException(task, sql, exception);
   }
 
   @Override
@@ -186,8 +193,14 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
     }
   }
 
+  default String newMessage(final String task, final String sql, final SQLException exception) {
+    return task + "; " + (sql != null ? "SQL [" + sql + "]; " : "") + exception.getMessage();
+  }
+
   JdbcRecordStore newRecordStore(DataSource dataSource);
 
   @Override
   JdbcRecordStore newRecordStore(Map<String, ? extends Object> connectionProperties);
+
+  DataAccessException translateException(String message, String sql, SQLException exception);
 }

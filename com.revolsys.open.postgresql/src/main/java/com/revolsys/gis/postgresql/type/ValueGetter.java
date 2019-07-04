@@ -1,95 +1,17 @@
 package com.revolsys.gis.postgresql.type;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.jeometry.common.exception.Exceptions;
-
-import com.revolsys.io.endian.EndianInputStream;
-
 public abstract class ValueGetter {
-  protected static class BigEndian extends ValueGetter {
 
-    public BigEndian(final InputStream data) {
-      super(data, true);
-    }
+  protected String data;
 
-    @Override
-    public int getInt() {
-      try {
-        return this.data.readInt();
-      } catch (final IOException e) {
-        return Exceptions.throwUncheckedException(e);
-      }
-    }
+  protected int index = 2;
 
-    @Override
-    public long getLong() {
-      try {
-        return this.data.readLELong();
-      } catch (final IOException e) {
-        return Exceptions.throwUncheckedException(e);
-      }
-    }
+  public ValueGetter(final String data) {
+    this.data = data;
   }
 
-  protected static class LittleEndian extends ValueGetter {
-    public LittleEndian(final InputStream data) {
-      super(data, false);
-    }
-
-    @Override
-    public int getInt() {
-      try {
-        return this.data.readLEInt();
-      } catch (final IOException e) {
-        return Exceptions.throwUncheckedException(e);
-      }
-    }
-
-    @Override
-    public long getLong() {
-      try {
-        return this.data.readLELong();
-      } catch (final IOException e) {
-        return Exceptions.throwUncheckedException(e);
-      }
-    }
-  }
-
-  public static ValueGetter newValueGetter(final InputStream in) {
-    try {
-      final int endianType = in.read();
-      if (endianType == 0) { // BigEndian
-        return new BigEndian(in);
-      } else if (endianType == 1) {
-        return new LittleEndian(in);
-      } else {
-        throw new IllegalArgumentException("Unknown Endian type:" + endianType);
-      }
-    } catch (final IOException e) {
-      return Exceptions.throwUncheckedException(e);
-    }
-  }
-
-  private final boolean bigEndian;
-
-  protected EndianInputStream data;
-
-  public ValueGetter(final InputStream data, final boolean bigEndian) {
-    this.data = new EndianInputStream(data);
-    this.bigEndian = bigEndian;
-  }
-
-  /**
-   * Get a byte, should be equal for all endians
-   */
-  public byte getByte() {
-    try {
-      return this.data.readByte();
-    } catch (final IOException e) {
-      return Exceptions.throwUncheckedException(e);
-    }
+  public int getByte() {
+    return (byte)read();
   }
 
   public double getDouble() {
@@ -101,7 +23,42 @@ public abstract class ValueGetter {
 
   public abstract long getLong();
 
-  public boolean isBigEndian() {
-    return this.bigEndian;
+  public abstract boolean isBigEndian();
+
+  /**
+   * Get a byte, should be equal for all endians
+   */
+  public int read() {
+    final String data = this.data;
+    int index = this.index;
+    if (this.index < data.length() - 1) {
+      int value;
+      final char highChar = data.charAt(index++);
+      if (highChar >= '0' && highChar <= '9') {
+        value = highChar - '0';
+      } else if (highChar >= 'A' && highChar <= 'F') {
+        value = highChar - 'A' + 10;
+      } else if (highChar >= 'a' && highChar <= 'f') {
+        value = highChar - 'a' + 10;
+      } else {
+        throw new IllegalArgumentException("No valid Hex char " + highChar);
+      }
+      value <<= 4;
+
+      final char lowChar = data.charAt(index++);
+      if (lowChar >= '0' && lowChar <= '9') {
+        value += lowChar - '0';
+      } else if (lowChar >= 'A' && lowChar <= 'F') {
+        value += lowChar - 'A' + 10;
+      } else if (lowChar >= 'a' && lowChar <= 'f') {
+        value += lowChar - 'a' + 10;
+      } else {
+        throw new IllegalArgumentException("No valid Hex char " + lowChar);
+      }
+      this.index = index;
+      return value;
+    } else {
+      return -1;
+    }
   }
 }

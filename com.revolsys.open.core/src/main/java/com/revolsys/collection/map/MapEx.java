@@ -6,12 +6,11 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.identifier.Identifier;
 import com.revolsys.util.Property;
-import com.revolsys.util.Strings;
 
 public interface MapEx extends MapDefault<String, Object> {
   static final MapEx EMPTY = new MapEx() {
@@ -20,10 +19,32 @@ public interface MapEx extends MapDefault<String, Object> {
       final Map<String, Object> emptyMap = Collections.emptyMap();
       return emptyMap.entrySet();
     }
+
+    @Override
+    public String toString() {
+      return "{}";
+    }
   };
+
+  static MapEx asEx(final Map<String, ? extends Object> map) {
+    if (map instanceof MapEx) {
+      return (MapEx)map;
+    } else {
+      return new LinkedHashMapEx();
+    }
+  }
 
   default MapEx add(final String key, final Object value) {
     put(key, value);
+    return this;
+  }
+
+  default MapEx addAll(final Map<String, ? extends Object> map) {
+    for (final Entry<String, ? extends Object> entry : map.entrySet()) {
+      final String key = entry.getKey();
+      final Object value = entry.getValue();
+      add(key, value);
+    }
     return this;
   }
 
@@ -32,11 +53,13 @@ public interface MapEx extends MapDefault<String, Object> {
   }
 
   default boolean getBoolean(final CharSequence name, final boolean defaultValue) {
-    final Boolean value = getBoolean(name);
+    final Object value = getValue(name, DataTypes.BOOLEAN);
     if (value == null) {
       return defaultValue;
+    } else if (value instanceof Boolean) {
+      return (Boolean)value;
     } else {
-      return value;
+      return Boolean.parseBoolean(value.toString());
     }
   }
 
@@ -161,7 +184,11 @@ public interface MapEx extends MapDefault<String, Object> {
 
   default String getUpperString(final CharSequence fieldName) {
     final String string = getString(fieldName);
-    return Strings.upperCase(string);
+    if (string == null) {
+      return null;
+    } else {
+      return string.toUpperCase();
+    }
   }
 
   /**
@@ -172,7 +199,11 @@ public interface MapEx extends MapDefault<String, Object> {
    */
   @SuppressWarnings("unchecked")
   default <T extends Object> T getValue(final CharSequence name) {
-    return (T)get(name.toString());
+    if (name == null) {
+      return null;
+    } else {
+      return (T)get(name.toString());
+    }
   }
 
   default <T extends Object> T getValue(final CharSequence name, final DataType dataType) {
@@ -197,5 +228,15 @@ public interface MapEx extends MapDefault<String, Object> {
     } else {
       return value;
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  default <T extends Object> T getValue(final String name) {
+    return (T)get(name);
+  }
+
+  default boolean hasValue(final CharSequence name) {
+    final Object value = getValue(name);
+    return value != null;
   }
 }

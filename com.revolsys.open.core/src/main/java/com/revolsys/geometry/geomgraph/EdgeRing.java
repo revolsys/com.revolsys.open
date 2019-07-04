@@ -181,7 +181,7 @@ public abstract class EdgeRing {
   public boolean containsPoint(final Point p) {
     final LinearRing shell = getLinearRing();
     final BoundingBox env = shell.getBoundingBox();
-    if (!env.covers(p)) {
+    if (!env.bboxCovers(p)) {
       return false;
     }
     if (!CGAlgorithms.isPointInRing(p, shell)) {

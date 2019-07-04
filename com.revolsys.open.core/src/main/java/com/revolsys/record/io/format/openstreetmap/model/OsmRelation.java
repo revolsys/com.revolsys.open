@@ -2,7 +2,8 @@ package com.revolsys.record.io.format.openstreetmap.model;
 
 import javax.xml.namespace.QName;
 
-import com.revolsys.identifier.Identifier;
+import org.jeometry.common.data.identifier.Identifier;
+
 import com.revolsys.record.io.format.xml.StaxReader;
 
 public class OsmRelation extends OsmElement {

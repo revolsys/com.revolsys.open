@@ -1,6 +1,7 @@
 package com.revolsys.oracle.recordstore.esri;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -66,6 +67,18 @@ public class ArcSdeObjectIdJdbcFieldDefinition extends JdbcFieldDefinition {
   public ArcSdeObjectIdJdbcFieldDefinition clone() {
     return new ArcSdeObjectIdJdbcFieldDefinition(getDbName(), getName(), getDescription(),
       getProperties(), this.schemaName, this.registrationId);
+  }
+
+  @Override
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    return resultSet.getInt(columnIndex);
+  }
+
+  @Override
+  public int setInsertPreparedStatementValue(final PreparedStatement statement,
+    final int parameterIndex, final Object value) throws SQLException {
+    return parameterIndex;
   }
 
   /**

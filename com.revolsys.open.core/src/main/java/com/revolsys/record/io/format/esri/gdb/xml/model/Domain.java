@@ -9,12 +9,13 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 
-import com.revolsys.identifier.Identifier;
+import org.jeometry.common.compare.CompareUtil;
+import org.jeometry.common.data.identifier.Identifier;
+
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.MergePolicyType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.SplitPolicyType;
-import com.revolsys.util.CompareUtil;
 
 public class Domain implements CodeTable, Cloneable {
   private List<CodedValue> codedValues = new ArrayList<>();

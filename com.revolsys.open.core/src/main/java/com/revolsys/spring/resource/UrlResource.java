@@ -11,14 +11,16 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Path;
 import java.util.Map;
 
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
 import org.springframework.util.Assert;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.file.Paths;
 import com.revolsys.util.Base64;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
@@ -59,7 +61,7 @@ public class UrlResource extends AbstractResource {
       initUrl(new URL(urlString));
       this.cleanedUrl = getCleanedUrl(this.url, urlString);
     } catch (final Throwable ex) {
-      throw new WrappedException(ex);
+      throw Exceptions.wrap(ex);
     }
   }
 
@@ -81,7 +83,7 @@ public class UrlResource extends AbstractResource {
       initUrl(uri.toURL());
       this.cleanedUrl = getCleanedUrl(this.url, uri.toString());
     } catch (final Throwable ex) {
-      throw new WrappedException(ex);
+      throw Exceptions.wrap(ex);
     }
   }
 
@@ -216,8 +218,12 @@ public class UrlResource extends AbstractResource {
             return false;
           } else {
             // Fall back to stream existence: can we open the stream?
-            final InputStream is = getInputStream();
-            is.close();
+            try (
+              final InputStream is = getInputStream()) {
+
+            } catch (final Throwable e) {
+              return false;
+            }
             return true;
           }
         }
@@ -260,10 +266,10 @@ public class UrlResource extends AbstractResource {
   @Override
   public File getFile() {
     try {
-      final URL url = getURL();
       if (isFolderConnection()) {
-        return FileUtil.getFile(url);
+        return FileUtil.getFile(this.url);
       } else {
+        final URL url = getURL();
         if (!"file".equals(url.getProtocol())) {
           throw new FileNotFoundException(getDescription() + " is not a file URL: " + url);
         }
@@ -283,7 +289,7 @@ public class UrlResource extends AbstractResource {
         }
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
 
   }
@@ -335,27 +341,47 @@ public class UrlResource extends AbstractResource {
         final File file = getFile();
         return new FileInputStream(file);
       } else {
-        final URLConnection con = this.url.openConnection();
-        con.addRequestProperty("User-Agent",
-          "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2");
-        if (con instanceof HttpURLConnection) {
-          final HttpURLConnection httpUrlConnection = (HttpURLConnection)con;
-          setAuthorization(this.url, httpUrlConnection);
+        final URLConnection con;
+        if ("ftp".equals(this.url.getProtocol()) && this.username != null) {
+          final String protocol = this.url.getProtocol();
+          final String host = this.url.getHost();
+          final int port = this.url.getPort();
+          final String path = this.url.getPath();
+          final String query = this.url.getQuery();
+          final String fragment = this.url.getRef();
+          try {
+            final String userInfo = this.username.replace(":", "%3A") + ":"
+              + this.password.replace(":", "%3A");
+            final URI uri = new URI(protocol, userInfo, host, port, path, query, fragment);
+            con = uri.toURL().openConnection();
+          } catch (final Exception e) {
+            throw Exceptions.wrap("Error opening file: " + toString(), e);
+          }
+        } else {
+          con = this.url.openConnection();
+          con.addRequestProperty("User-Agent",
+            "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2");
+          if (con instanceof HttpURLConnection) {
+            final HttpURLConnection httpUrlConnection = (HttpURLConnection)con;
+            setAuthorization(this.url, httpUrlConnection);
+          }
         }
         // ResourceUtils.useCachesIfNecessary(con);
         try {
           return con.getInputStream();
+        } catch (final FileNotFoundException e) {
+          throw Exceptions.wrap("Error opening file: " + toString(), e);
         } catch (final IOException e) {
           // Close the HTTP connection (if applicable).
           if (con instanceof HttpURLConnection) {
             final HttpURLConnection httpUrlConnection = (HttpURLConnection)con;
             httpUrlConnection.disconnect();
           }
-          throw new WrappedException(e);
+          throw Exceptions.wrap(e);
         }
       }
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -368,6 +394,20 @@ public class UrlResource extends AbstractResource {
 
   public String getPassword() {
     return this.password;
+  }
+
+  @Override
+  public Path getPath() {
+    final URI uri = getUri();
+    if (isFolderConnection()) {
+      return Paths.getPath(uri);
+    } else {
+      return Paths.getPath(uri);
+    }
+  }
+
+  public String getProtocol() {
+    return this.url.getProtocol();
   }
 
   /**

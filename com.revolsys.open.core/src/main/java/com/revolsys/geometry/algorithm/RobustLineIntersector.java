@@ -37,9 +37,8 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.CentralEndpointIntersector;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 
 /**
  * A robust version of {@link LineIntersector}.
@@ -48,7 +47,6 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
  * @see RobustDeterminant
  */
 public class RobustLineIntersector extends LineIntersector {
-
   /**
    * Finds the endpoint of the segments P and Q which
    * is closest to the other segment.
@@ -100,10 +98,10 @@ public class RobustLineIntersector extends LineIntersector {
 
   private int computeCollinearIntersection(final Point p1, final Point p2, final Point q1,
     final Point q2) {
-    final boolean p1q1p2 = BoundingBoxUtil.intersects(p1, p2, q1);
-    final boolean p1q2p2 = BoundingBoxUtil.intersects(p1, p2, q2);
-    final boolean q1p1q2 = BoundingBoxUtil.intersects(q1, q2, p1);
-    final boolean q1p2q2 = BoundingBoxUtil.intersects(q1, q2, p2);
+    final boolean p1q1p2 = RectangleUtil.intersects(p1, p2, q1);
+    final boolean p1q2p2 = RectangleUtil.intersects(p1, p2, q2);
+    final boolean q1p1q2 = RectangleUtil.intersects(q1, q2, p1);
+    final boolean q1p2q2 = RectangleUtil.intersects(q1, q2, p2);
 
     if (p1q1p2 && p1q2p2) {
       this.intPt[0] = q1;
@@ -143,7 +141,7 @@ public class RobustLineIntersector extends LineIntersector {
     this.isProper = false;
 
     // first try a fast test to see if the envelopes of the lines intersect
-    if (!BoundingBoxUtil.intersects(p1, p2, q1, q2)) {
+    if (!RectangleUtil.intersects(p1, p2, q1, q2)) {
       return NO_INTERSECTION;
     }
 
@@ -198,7 +196,7 @@ public class RobustLineIntersector extends LineIntersector {
        * and
        * LINESTRING ( -48.51001596420236 -22.063180333403878, 19.850257749638203 46.29709338043669 )
        *
-       * which used to produce the INCORRECT result: (20.31970698357233, 46.76654261437082, NaN)
+       * which used to produce the INCORRECT intersectionCount: (20.31970698357233, 46.76654261437082, NaN)
        *
        */
       if (p1.equals(2, q1) || p1.equals(2, q2)) {
@@ -227,21 +225,41 @@ public class RobustLineIntersector extends LineIntersector {
   }
 
   @Override
-  public void computeIntersection(final Point p, final Point p1, final Point p2) {
+  public boolean computeIntersection(final double x, final double y, final double x1,
+    final double y1, final double x2, final double y2) {
     this.isProper = false;
     // do between check first, since it is faster than the orientation test
-    if (BoundingBoxUtil.intersects(p1, p2, p)) {
+    if (RectangleUtil.intersects(x1, y1, x2, y2, x, y)) {
+      if (CGAlgorithmsDD.orientationIndex(x1, y1, x2, y2, x, y) == 0
+        && CGAlgorithmsDD.orientationIndex(x2, y2, x1, y1, x, y) == 0) {
+        this.isProper = true;
+        if (x == x1 && y == y1 || x == x2 && y == y2) {
+          this.isProper = false;
+        }
+        this.intersectionCount = POINT_INTERSECTION;
+        return true;
+      }
+    }
+    this.intersectionCount = NO_INTERSECTION;
+    return false;
+  }
+
+  @Override
+  public void computeIntersectionPoints(final Point p, final Point p1, final Point p2) {
+    this.isProper = false;
+    // do between check first, since it is faster than the orientation test
+    if (RectangleUtil.intersects(p1, p2, p)) {
       if (CGAlgorithmsDD.orientationIndex(p1, p2, p) == 0
         && CGAlgorithmsDD.orientationIndex(p2, p1, p) == 0) {
         this.isProper = true;
         if (p.equals(p1) || p.equals(p2)) {
           this.isProper = false;
         }
-        this.result = POINT_INTERSECTION;
+        this.intersectionCount = POINT_INTERSECTION;
         return;
       }
     }
-    this.result = NO_INTERSECTION;
+    this.intersectionCount = NO_INTERSECTION;
   }
 
   /**
@@ -278,7 +296,7 @@ public class RobustLineIntersector extends LineIntersector {
     if (!isInSegmentEnvelopes(intPt)) {
       // System.out.println("Intersection outside segment envelopes: " + intPt);
 
-      // compute a safer result
+      // compute a safer intersectionCount
       // copy the coordinate, since it may be rounded later
       intPt = new PointDouble(nearestEndpoint(p1, p2, q1, q2));
       // intPt = CentralEndpointIntersector.getIntersection(p1, p2, q1, q2);
@@ -313,8 +331,8 @@ public class RobustLineIntersector extends LineIntersector {
 
     /*
      * // equilavalent code using more modular but slower method BoundingBox
-     * env0 = new BoundingBoxDoubleGf(n00, n01); BoundingBox env1 = new
-     * BoundingBoxDoubleGf(n10, n11); BoundingBox intEnv =
+     * env0 = new BoundingBoxDoubleGeometryFactory(n00, n01); BoundingBox env1 =
+     * new BoundingBoxDoubleGeometryFactory(n10, n11); BoundingBox intEnv =
      * env0.intersection(env1); Point intMidPt = intEnv.centre(); normPt.getX()
      * = intMidPt.getX(); normPt.getY() = intMidPt.getY();
      */
@@ -342,9 +360,9 @@ public class RobustLineIntersector extends LineIntersector {
    * @return <code>true</code> if the input point lies within both input segment envelopes
    */
   private boolean isInSegmentEnvelopes(final Point intPt) {
-    final BoundingBox env0 = new BoundingBoxDoubleGf(this.inputLines[0][0], this.inputLines[0][1]);
-    final BoundingBox env1 = new BoundingBoxDoubleGf(this.inputLines[1][0], this.inputLines[1][1]);
-    return env0.covers(intPt) && env1.covers(intPt);
+    final BoundingBox env0 = BoundingBox.bboxNew(this.inputLines[0][0], this.inputLines[0][1]);
+    final BoundingBox env1 = BoundingBox.bboxNew(this.inputLines[1][0], this.inputLines[1][1]);
+    return env0.bboxCovers(intPt) && env1.bboxCovers(intPt);
   }
 
   /**
@@ -366,7 +384,7 @@ public class RobustLineIntersector extends LineIntersector {
       intPt = HCoordinate.intersection(p1, p2, q1, q2);
     } catch (final NotRepresentableException e) {
       // System.out.println("Not calculable: " + this);
-      // compute an approximate result
+      // compute an approximate intersectionCount
       intPt = CentralEndpointIntersector.getIntersection(p1, p2, q1, q2);
       // System.out.println("Snapped to " + intPt);
     }

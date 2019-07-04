@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.date.Dates;
 import org.jeometry.common.io.PathName;
 import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -18,9 +20,8 @@ import com.revolsys.collection.ListResultPager;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
@@ -29,6 +30,7 @@ import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
+import com.revolsys.record.RecordState;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.io.ListRecordReader;
@@ -40,11 +42,13 @@ import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
+import com.revolsys.transaction.Propagation;
+import com.revolsys.transaction.Transaction;
 import com.revolsys.transaction.Transactionable;
-import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 import com.revolsys.util.count.CategoryLabelCountMap;
 import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 
 public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFactory, Transactionable,
   BaseCloseable, ObjectWithProperties {
@@ -76,7 +80,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   }
 
   /**
-   * Construct a newn initialized record store.
+   * Construct a new initialized record store.
    * @param connectionProperties
    * @return
    */
@@ -90,6 +94,10 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     } else {
       return (T)factory.newRecordStore(connectionProperties);
     }
+  }
+
+  static <T extends RecordStore> T newRecordStore(final Path file) {
+    return newRecordStore(file.toUri().toString());
   }
 
   @SuppressWarnings("unchecked")
@@ -142,8 +150,10 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     if (url == null) {
       throw new IllegalArgumentException("The url parameter must be specified");
     } else {
-      for (final RecordStoreFactory factory : IoFactory.factories(RecordStoreFactory.class)) {
-        if (factory.canOpenUrl(url)) {
+      final List<RecordStoreFactory> factories = IoFactory.factories(RecordStoreFactory.class);
+      for (final RecordStoreFactory factory : factories) {
+        final boolean canOpenUrl = factory.canOpenUrl(url);
+        if (canOpenUrl) {
           return factory;
         }
       }
@@ -186,14 +196,16 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   }
 
   default void addStatistic(final String statisticName, final Record object) {
-    if (getStatistics() != null) {
-      getStatistics().addCount(statisticName, object);
+    final CategoryLabelCountMap statistics = getStatistics();
+    if (statistics != null) {
+      statistics.addCount(statisticName, object);
     }
   }
 
   default void addStatistic(final String statisticName, final String typePath, final int count) {
-    if (getStatistics() != null) {
-      getStatistics().addCount(statisticName, typePath, count);
+    final CategoryLabelCountMap statistics = getStatistics();
+    if (statistics != null) {
+      statistics.addCount(statisticName, typePath, count);
     }
   }
 
@@ -217,6 +229,11 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
       }
     }
     return false;
+  }
+
+  default boolean deleteRecord(final PathName typePath, final Object identifier) {
+    final Identifier id = Identifier.newIdentifier(identifier);
+    return deleteRecord(typePath, id);
   }
 
   default boolean deleteRecord(final Record record) {
@@ -285,28 +302,12 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   String getLabel();
 
   default Record getRecord(final PathName typePath, final Identifier id) {
-    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-    if (recordDefinition == null || id == null) {
+    final Query query = newGetRecordQuery(typePath, id);
+    if (query == null) {
       return null;
     } else {
-      final List<Object> values = id.getValues();
-      final List<String> idFieldNames = recordDefinition.getIdFieldNames();
-      if (idFieldNames.isEmpty()) {
-        throw new IllegalArgumentException(typePath + " does not have a primary key");
-      } else if (values.size() != idFieldNames.size()) {
-        throw new IllegalArgumentException(
-          id + " not a valid id for " + typePath + " requires " + idFieldNames);
-      } else {
-        final Query query = new Query(recordDefinition);
-        for (int i = 0; i < idFieldNames.size(); i++) {
-          final String name = idFieldNames.get(i);
-          final Object value = values.get(i);
-          final FieldDefinition field = recordDefinition.getField(name);
-          query.and(Q.equal(field, value));
-        }
-        final RecordReader records = getRecords(query);
-        return records.getFirst();
-      }
+      final RecordReader records = getRecords(query);
+      return records.getFirst();
     }
   }
 
@@ -354,6 +355,18 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   }
 
   RecordFactory<Record> getRecordFactory();
+
+  default Record getRecordLocked(final PathName typePath, final LockMode lockMode,
+    final Identifier id) {
+    final Query query = newGetRecordQuery(typePath, id);
+    if (query == null) {
+      return null;
+    } else {
+      query.setLockMode(lockMode);
+      final RecordReader records = getRecords(query);
+      return records.getFirst();
+    }
+  }
 
   default RecordReader getRecords(final Collection<Query> queries) {
     final RecordStoreQueryReader reader = newRecordReader();
@@ -407,9 +420,13 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   CategoryLabelCountMap getStatistics();
 
-  default LabelCountMap getStatistics(final String name) {
+  default LabelCounters getStatistics(final String name) {
     final CategoryLabelCountMap statistics = getStatistics();
-    return statistics.getLabelCountMap(name);
+    if (statistics == null) {
+      return null;
+    } else {
+      return statistics.getLabelCountMap(name);
+    }
   }
 
   @Override
@@ -454,6 +471,31 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   boolean isLoadFullSchema();
 
+  default Query newGetRecordQuery(final PathName typePath, final Identifier id) {
+    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    if (recordDefinition == null || id == null) {
+      return null;
+    } else {
+      final List<Object> values = id.getValues();
+      final List<String> idFieldNames = recordDefinition.getIdFieldNames();
+      if (idFieldNames.isEmpty()) {
+        throw new IllegalArgumentException(typePath + " does not have a primary key");
+      } else if (values.size() != idFieldNames.size()) {
+        throw new IllegalArgumentException(
+          id + " not a valid id for " + typePath + " requires " + idFieldNames);
+      } else {
+        final Query query = new Query(recordDefinition);
+        for (int i = 0; i < idFieldNames.size(); i++) {
+          final String name = idFieldNames.get(i);
+          final Object value = values.get(i);
+          final FieldDefinition field = recordDefinition.getField(name);
+          query.and(Q.equal(field, value));
+        }
+        return query;
+      }
+    }
+  }
+
   default AbstractIterator<Record> newIterator(final Query query, Map<String, Object> properties) {
     if (properties == null) {
       properties = Collections.emptyMap();
@@ -497,7 +539,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   }
 
   default Query newQuery(final String typePath, final String whereClause,
-    final BoundingBoxDoubleGf boundingBox) {
+    final BoundingBox boundingBox) {
     throw new UnsupportedOperationException();
   }
 
@@ -595,7 +637,16 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     return record;
   }
 
-  RecordWriter newRecordWriter();
+  default RecordWriter newRecordWriter() {
+    return newRecordWriter(false);
+  }
+
+  RecordWriter newRecordWriter(final boolean throwExceptions);
+
+  default RecordWriter newRecordWriter(final PathName pathName) {
+    final RecordDefinition recordDefinition = getRecordDefinition(pathName);
+    return newRecordWriter(recordDefinition);
+  }
 
   default RecordWriter newRecordWriter(final RecordDefinition recordDefinition) {
     return newRecordWriter();
@@ -605,6 +656,13 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     final RecordReader results = getRecords(query);
     final List<Record> list = results.toList();
     return new ListResultPager<>(list);
+  }
+
+  default void refreshCodeTable(final PathName pathName) {
+    final CodeTable codeTable = getCodeTable(pathName);
+    if (codeTable != null) {
+      codeTable.refresh();
+    }
   }
 
   void setLabel(String label);
@@ -617,16 +675,71 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   default void setStatistics(final String name, final LabelCountMap labelCountMap) {
     final CategoryLabelCountMap categoryLabelCountMap = getStatistics();
-    categoryLabelCountMap.setLabelCountMap(name, labelCountMap);
+    if (categoryLabelCountMap != null) {
+      categoryLabelCountMap.setLabelCounters(name, labelCountMap);
+    }
   }
 
   default void updateRecord(final Record record) {
-    throw new UnsupportedOperationException("Update not supported");
+    write(record, null);
   }
 
   default void updateRecords(final Iterable<? extends Record> records) {
-    for (final Record record : records) {
-      updateRecord(record);
+    writeAll(records, null);
+  }
+
+  default void write(final Record record, final RecordState state) {
+    try (
+      Transaction transaction = newTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
+      // It's important to have this in an inner try. Otherwise the exceptions
+      // won't get caught on closing the writer and the transaction won't get
+      // rolled back.
+      try (
+        RecordWriter writer = newRecordWriter(true)) {
+        write(writer, record, state);
+      } catch (final RuntimeException e) {
+        transaction.setRollbackOnly();
+        throw e;
+      } catch (final Error e) {
+        transaction.setRollbackOnly();
+        throw e;
+      }
     }
+  }
+
+  default Record write(final RecordWriter writer, Record record, final RecordState state) {
+    if (state == RecordState.NEW) {
+      if (record.getState() != state) {
+        record = newRecord(record);
+      }
+    } else if (state != null) {
+      record.setState(state);
+    }
+    writer.write(record);
+    return record;
+  }
+
+  default int writeAll(final Iterable<? extends Record> records, final RecordState state) {
+    int count = 0;
+    try (
+      Transaction transaction = newTransaction(Propagation.REQUIRED)) {
+      // It's important to have this in an inner try. Otherwise the exceptions
+      // won't get caught on closing the writer and the transaction won't get
+      // rolled back.
+      try (
+        final RecordWriter writer = newRecordWriter(true)) {
+        for (final Record record : records) {
+          write(writer, record, state);
+          count++;
+        }
+      } catch (final RuntimeException e) {
+        transaction.setRollbackOnly();
+        throw e;
+      } catch (final Error e) {
+        transaction.setRollbackOnly();
+        throw e;
+      }
+    }
+    return count;
   }
 }

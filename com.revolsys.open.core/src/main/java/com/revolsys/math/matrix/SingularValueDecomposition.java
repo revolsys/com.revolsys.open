@@ -1,6 +1,6 @@
 package com.revolsys.math.matrix;
 
-import com.revolsys.util.MathUtil;
+import org.jeometry.common.number.Doubles;
 
 /** Singular Value Decomposition.
 <P>
@@ -89,7 +89,7 @@ public class SingularValueDecomposition implements java.io.Serializable {
         // Compute 2-norm of k-th column without under/overflow.
         this.s[k] = 0;
         for (int i = k; i < this.m; i++) {
-          this.s[k] = MathUtil.hypot(this.s[k], A[i][k]);
+          this.s[k] = Doubles.hypot(this.s[k], A[i][k]);
         }
         if (this.s[k] != 0.0) {
           if (A[k][k] < 0.0) {
@@ -138,7 +138,7 @@ public class SingularValueDecomposition implements java.io.Serializable {
         // Compute 2-norm without under/overflow.
         e[k] = 0;
         for (int i = k + 1; i < this.n; i++) {
-          e[k] = MathUtil.hypot(e[k], e[i]);
+          e[k] = Doubles.hypot(e[k], e[i]);
         }
         if (e[k] != 0.0) {
           if (e[k + 1] < 0.0) {
@@ -321,7 +321,7 @@ public class SingularValueDecomposition implements java.io.Serializable {
           double f = e[p - 2];
           e[p - 2] = 0.0;
           for (int j = p - 2; j >= k; j--) {
-            double t = MathUtil.hypot(this.s[j], f);
+            double t = Doubles.hypot(this.s[j], f);
             final double cs = this.s[j] / t;
             final double sn = f / t;
             this.s[j] = t;
@@ -346,7 +346,7 @@ public class SingularValueDecomposition implements java.io.Serializable {
           double f = e[k - 1];
           e[k - 1] = 0.0;
           for (int j = k; j < p; j++) {
-            double t = MathUtil.hypot(this.s[j], f);
+            double t = Doubles.hypot(this.s[j], f);
             final double cs = this.s[j] / t;
             final double sn = f / t;
             this.s[j] = t;
@@ -393,7 +393,7 @@ public class SingularValueDecomposition implements java.io.Serializable {
           // Chase zeros.
 
           for (int j = k; j < p - 1; j++) {
-            double t = MathUtil.hypot(f, g);
+            double t = Doubles.hypot(f, g);
             double cs = f / t;
             double sn = g / t;
             if (j != k) {
@@ -410,7 +410,7 @@ public class SingularValueDecomposition implements java.io.Serializable {
                 this.V[i][j] = t;
               }
             }
-            t = MathUtil.hypot(f, g);
+            t = Doubles.hypot(f, g);
             cs = f / t;
             sn = g / t;
             this.s[j] = t;

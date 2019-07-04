@@ -41,7 +41,7 @@ import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.index.chain.MonotoneChain;
 import com.revolsys.geometry.index.chain.MonotoneChainBuilder;
 import com.revolsys.geometry.index.chain.MonotoneChainOverlapAction;
-import com.revolsys.geometry.index.strtree.STRtree;
+import com.revolsys.geometry.index.strtree.StrTree;
 
 /**
  * Intersects two sets of {@link SegmentString}s using a index based
@@ -72,9 +72,9 @@ public class MCIndexSegmentSetMutualIntersector implements SegmentSetMutualInter
   /**
    * The {@link SpatialIndex} used should be something that supports
    * envelope (range) queries efficiently (such as a
-   *  {@link STRtree}.
+   *  {@link StrTree}.
    */
-  private final STRtree index = new STRtree();
+  private final StrTree index = new StrTree();
 
   /**
    * Constructs a new intersector for a given set of {@link SegmentStrings}.
@@ -86,15 +86,15 @@ public class MCIndexSegmentSetMutualIntersector implements SegmentSetMutualInter
   }
 
   private void addToIndex(final SegmentString segStr) {
-    final List segChains = MonotoneChainBuilder.getChains(segStr.getPoints(), segStr);
+    final List segChains = MonotoneChainBuilder.getChains(segStr.getLineString(), segStr);
     for (final Iterator i = segChains.iterator(); i.hasNext();) {
       final MonotoneChain mc = (MonotoneChain)i.next();
-      this.index.insert(mc.getEnvelope(), mc);
+      this.index.insertItem(mc.getEnvelope(), mc);
     }
   }
 
   private void addToMonoChains(final SegmentString segStr, final List monoChains) {
-    final List segChains = MonotoneChainBuilder.getChains(segStr.getPoints(), segStr);
+    final List segChains = MonotoneChainBuilder.getChains(segStr.getLineString(), segStr);
     for (final Iterator i = segChains.iterator(); i.hasNext();) {
       final MonotoneChain mc = (MonotoneChain)i.next();
       monoChains.add(mc);

@@ -14,19 +14,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.jeometry.common.data.identifier.SingleIdentifier;
+import org.jeometry.common.data.identifier.TypedIdentifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.date.Dates;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Doubles;
 
-import com.revolsys.identifier.SingleIdentifier;
-import com.revolsys.identifier.TypedIdentifier;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.endian.ResourceEndianOutput;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 
 /**

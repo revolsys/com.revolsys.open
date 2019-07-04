@@ -24,7 +24,7 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.jdbc.io.JdbcDatabaseFactory;
+import com.revolsys.jdbc.io.AbstractJdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
@@ -38,7 +38,7 @@ import com.revolsys.util.Strings;
  * :@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCPS)(HOST=[host])(PORT=[port
  * ]))(CONNECT_DATA=(SERVICE_NAME=[service])))
  */
-public class Oracle implements JdbcDatabaseFactory {
+public class Oracle extends AbstractJdbcDatabaseFactory {
   private static final String REGEX_NAME = "[a-zA-Z0-9_\\$#\\.\\-]+";
 
   private static final String REGEX_URL_PREFIX_USER_PASSWORD = "jdbc:oracle:(?:thin|oci):" //
@@ -63,7 +63,7 @@ public class Oracle implements JdbcDatabaseFactory {
       .setDefaultValue("localhost")
       //
       .addProperty(URL_FIELD, true), //
-    new FieldDefinition("port", DataTypes.INTEGER, false) //
+    new FieldDefinition("port", DataTypes.INT, false) //
       .setMinValue(0)
       //
       .setMaxValue(65535)

@@ -204,14 +204,14 @@ public class ImageProjector {
 
     final double sourceResolutionX = this.sourceImage.getResolutionX();
     final double sourceWidth = sourceBoundingBox.getWidth() / sourceResolutionX;
-    final double width1 = p1.distance(p2);
-    final double width2 = p3.distance(p4);
+    final double width1 = p1.distancePoint(p2);
+    final double width2 = p3.distancePoint(p4);
     final double targetResolutionX = getResolution(sourceWidth, width1, width2);
 
     final double sourceResolutionY = this.sourceImage.getResolutionY();
     final double sourceHeight = sourceBoundingBox.getHeight() / sourceResolutionY;
-    final double height1 = p1.distance(p4);
-    final double height2 = p2.distance(p3);
+    final double height1 = p1.distancePoint(p4);
+    final double height2 = p2.distancePoint(p3);
     final double targetResolutionY = getResolution(sourceHeight, height1, height2);
 
     final double width = targetBoundingBox.getWidth();

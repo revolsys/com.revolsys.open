@@ -174,13 +174,13 @@ public class PolygonBuilder {
         minEnv = minShell.getLinearRing().getBoundingBox();
       }
       boolean isContained = false;
-      if (tryEnv.covers(testEnv) && CGAlgorithms.isPointInRing(testPt, tryRing)) {
+      if (tryEnv.bboxCovers(testEnv) && CGAlgorithms.isPointInRing(testPt, tryRing)) {
         isContained = true;
       }
       // check if this new containing ring is smaller than the current minimum
       // ring
       if (isContained) {
-        if (minShell == null || minEnv.covers(tryEnv)) {
+        if (minShell == null || minEnv.bboxCovers(tryEnv)) {
           minShell = tryShell;
         }
       }

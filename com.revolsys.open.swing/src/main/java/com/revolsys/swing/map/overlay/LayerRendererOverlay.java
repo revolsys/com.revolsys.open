@@ -3,7 +3,6 @@ package com.revolsys.swing.map.overlay;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
@@ -12,9 +11,16 @@ import java.util.HashSet;
 
 import javax.swing.JComponent;
 
+import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImage;
+import com.revolsys.swing.map.ComponentViewport2D;
+import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.BaseMapLayerGroup;
@@ -22,30 +28,37 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
-import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.map.view.ViewRenderer;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
+import com.revolsys.util.Cancellable;
 import com.revolsys.util.Property;
 
 /**
  * <p>A lightweight component that users the {@link Layer}'s {@link LayerRenderer} to render the layer.</p>
  */
-public class LayerRendererOverlay extends JComponent implements PropertyChangeListener {
+public class LayerRendererOverlay extends JComponent
+  implements LayerMapOverlay, PropertyChangeListener {
   private static final Collection<String> IGNORE_PROPERTY_NAMES = new HashSet<>(Arrays
     .asList("selectionCount", "hasHighlightedRecords", "highlightedCount", "scale", "loaded"));
 
   private static final long serialVersionUID = 1L;
 
-  private GeoreferencedImage image;
+  private static final GeometryStyle STYLE_AREA = GeometryStyle.polygon(WebColors.FireBrick, 1,
+    WebColors.newAlpha(WebColors.FireBrick, 16));
 
-  private LayerRendererOverlaySwingWorker imageWorker;
+  private static final GeoreferencedImage EMPTY_IMAGE = new BufferedGeoreferencedImage(
+    BoundingBox.empty(), 0, 0);
 
   private Layer layer;
 
-  private boolean loadImage = true;
+  private ComponentViewport2D viewport;
 
-  private final Object loadSync = new Object();
+  private boolean showAreaBoundingBox = false;
 
-  private Viewport2D viewport;
+  private BackgroundRefreshResource<GeoreferencedImage> cachedImage = new BackgroundRefreshResource<>(
+    "Render Layers", this::refreshImage);
 
   public LayerRendererOverlay(final MapPanel mapPanel) {
     this(mapPanel, null);
@@ -53,65 +66,62 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
 
   public LayerRendererOverlay(final MapPanel mapPanel, final Layer layer) {
     this.viewport = mapPanel.getViewport();
+
     setLayer(layer);
     Property.addListener(this.viewport, this);
     Property.addListener(this, mapPanel);
+    this.cachedImage.addPropertyChangeListener(this);
   }
 
-  public void dispose() {
+  @Override
+  public void destroy() {
     if (this.layer != null) {
       Property.removeListener(this.layer, this);
       this.layer = null;
     }
     Property.removeAllListeners(this);
-    this.image = null;
-    this.imageWorker = null;
+    this.cachedImage = null;
     this.viewport = null;
   }
 
+  @Override
   public Layer getLayer() {
     return this.layer;
-  }
-
-  public Project getProject() {
-    return this.layer.getProject();
-  }
-
-  public Viewport2D getViewport() {
-    return this.viewport;
   }
 
   @Override
   public void paintComponent(final Graphics g) {
     if (!(this.layer instanceof NullLayer)) {
-      GeoreferencedImage image;
-      synchronized (this.loadSync) {
-        image = this.image;
-
-        if ((image == null || this.loadImage) && this.imageWorker == null) {
-          final BoundingBox boundingBox = this.viewport.getBoundingBox();
-          final int viewWidthPixels = this.viewport.getViewWidthPixels();
-          final int viewHeightPixels = this.viewport.getViewHeightPixels();
-          final GeoreferencedImage loadImage = new BufferedGeoreferencedImage(boundingBox,
-            viewWidthPixels, viewHeightPixels);
-          this.imageWorker = new LayerRendererOverlaySwingWorker(this, loadImage);
-          Invoke.worker(this.imageWorker);
+      final GeoreferencedImage image = this.cachedImage.getResource();
+      if (image == null) {
+        if (this.cachedImage.isNew()) {
+          redraw();
         }
-      }
-      if (image != null) {
-        render((Graphics2D)g);
+      } else {
+        final Graphics2D graphics = (Graphics2D)g;
+        final Graphics2DViewRenderer view = this.viewport.newViewRenderer(graphics);
+        view.drawImage(image, false);
       }
     }
   }
 
   @Override
   public void propertyChange(final PropertyChangeEvent e) {
-    if (!(e.getSource() instanceof MapPanel)) {
+    final Object source = e.getSource();
+    if (source == this.cachedImage) {
+      repaint();
+    } else if (!(source instanceof MapPanel)) {
       final String propertyName = e.getPropertyName();
       if (!IGNORE_PROPERTY_NAMES.contains(propertyName)) {
         if (this.layer instanceof Project) {
+          final Project project = (Project)this.layer;
           if (AbstractTiledLayerRenderer.TILES_LOADED.equals(propertyName)) {
-            return;
+            if (source instanceof Layer) {
+              final Layer eventLayer = (Layer)source;
+              if (project.isBaseMapLayer(eventLayer)) {
+                return;
+              }
+            }
           }
         }
         redraw();
@@ -119,54 +129,61 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
     }
   }
 
+  @Override
   public void redraw() {
     final Container parent = getParent();
     if (getWidth() > 0 && getHeight() > 0) {
       if (parent != null && parent.isVisible()) {
         if (this.layer != null && this.layer.isExists() && this.layer.isVisible()) {
-          synchronized (this.loadSync) {
-            this.loadImage = true;
-            if (this.imageWorker != null) {
-              this.imageWorker.cancel(true);
-              this.imageWorker = null;
-            }
-            firePropertyChange("imageLoaded", true, false);
-          }
+          this.cachedImage.refresh();
         }
       }
     }
   }
 
+  @Override
   public void refresh() {
     if (this.layer != null) {
       this.layer.refresh();
     }
   }
 
-  private void render(final Graphics2D graphics) {
-    if (this.image != null && graphics != null) {
-      final BoundingBox viewBoundingBox = this.viewport.getBoundingBox();
-      final int viewWidth = this.viewport.getViewWidthPixels();
-      final int viewHeight = this.viewport.getViewHeightPixels();
-      graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-        RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-      this.image.drawImage(graphics, viewBoundingBox, viewWidth, viewHeight, false);
-    }
-  }
-
-  public void setImage(final LayerRendererOverlaySwingWorker imageWorker) {
-    synchronized (this.loadSync) {
-      if (this.imageWorker == imageWorker) {
-        this.image = imageWorker.getReferencedImage();
-        if (this.image != null) {
-          this.loadImage = false;
-          this.imageWorker = null;
+  private GeoreferencedImage refreshImage(final Cancellable cancellable) {
+    final Viewport2D viewport = this.viewport;
+    if (this.layer != null) {
+      try (
+        final ImageViewport imageViewport = new ImageViewport(viewport)) {
+        final ViewRenderer view = imageViewport.newViewRenderer();
+        if (view.isViewValid()) {
+          view.setCancellable(cancellable);
+          view.renderLayer(this.layer);
+          if (this.showAreaBoundingBox) {
+            final BoundingBox areaBoundingBox = view.getAreaBoundingBox();
+            if (!areaBoundingBox.isEmpty()) {
+              final Polygon viewportPolygon = view.bboxEdit(editor -> editor.expandPercent(0.1))
+                .toPolygon(0);
+              final Polygon areaPolygon = areaBoundingBox
+                .bboxEdit(editor -> editor.expandDelta(imageViewport.getUnitsPerPixel()))
+                .toPolygon(0);
+              final Geometry drawPolygon = viewportPolygon.difference(areaPolygon);
+              view.drawGeometry(drawPolygon, STYLE_AREA);
+            }
+          }
+          if (!cancellable.isCancelled()) {
+            return imageViewport.getGeoreferencedImage();
+          }
         }
-        firePropertyChange("imageLoaded", false, true);
+      } catch (final Throwable t) {
+        if (!cancellable.isCancelled()) {
+          Logs.error(this, "Unable to paint", t);
+        }
       }
+
     }
+    return EMPTY_IMAGE;
   }
 
+  @Override
   public void setLayer(final Layer layer) {
     final Layer old = this.layer;
     if (old != layer) {
@@ -175,6 +192,7 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
           old.setVisible(false);
         }
         Property.removeListener(old, this);
+
       }
       this.layer = layer;
       if (layer != null) {
@@ -186,9 +204,14 @@ public class LayerRendererOverlay extends JComponent implements PropertyChangeLi
           layer.refresh();
         }
       }
-      this.image = null;
       redraw();
       firePropertyChange("layer", old, layer);
     }
+  }
+
+  @Override
+  public void setShowAreaBoundingBox(final boolean showAreaBoundingBox) {
+    this.showAreaBoundingBox = showAreaBoundingBox;
+    redraw();
   }
 }

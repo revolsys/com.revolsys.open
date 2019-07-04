@@ -106,7 +106,7 @@ public class CentralEndpointIntersector {
     double minDist = Double.MAX_VALUE;
     Point result = null;
     for (final Point pt : pts) {
-      final double dist = p.distance(pt);
+      final double dist = p.distancePoint(pt);
       if (dist < minDist) {
         minDist = dist;
         result = pt;

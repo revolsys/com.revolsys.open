@@ -50,9 +50,9 @@ public interface SegmentString {
    */
   Object getData();
 
-  Point getPoint(int i);
+  LineString getLineString();
 
-  LineString getPoints();
+  Point getPoint(int i);
 
   boolean isClosed();
 

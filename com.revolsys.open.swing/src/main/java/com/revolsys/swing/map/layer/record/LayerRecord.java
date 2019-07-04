@@ -3,9 +3,9 @@ package com.revolsys.swing.map.layer.record;
 import java.beans.PropertyChangeEvent;
 import java.util.List;
 
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 
-import com.revolsys.identifier.Identifier;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
@@ -34,13 +34,15 @@ public interface LayerRecord extends Record {
   default void firePropertyChange(final String fieldName, final Object oldValue,
     final Object newValue) {
     final AbstractRecordLayer layer = getLayer();
-    if (layer.isEventsEnabled()) {
-      final LayerRecord record = getEventRecord();
-      final PropertyChangeEvent fieldEvent = new PropertyChangeEvent(record, fieldName, oldValue,
-        newValue);
-      layer.propertyChange(fieldEvent);
+    if (layer != null) {
+      if (layer.isEventsEnabled()) {
+        final LayerRecord record = getEventRecord();
+        final PropertyChangeEvent fieldEvent = new PropertyChangeEvent(record, fieldName, oldValue,
+          newValue);
+        layer.propertyChange(fieldEvent);
+      }
+      fireRecordUpdated();
     }
-    fireRecordUpdated();
   }
 
   default void fireRecordUpdated() {
@@ -131,6 +133,10 @@ public interface LayerRecord extends Record {
 
   default boolean isProxyRecord() {
     return false;
+  }
+
+  default boolean isSame(final LayerRecord record) {
+    return isSame((Record)record);
   }
 
   @Override

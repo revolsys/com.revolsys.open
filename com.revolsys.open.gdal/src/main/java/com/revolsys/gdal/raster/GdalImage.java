@@ -1,13 +1,15 @@
 package com.revolsys.gdal.raster;
 
 import java.awt.Dimension;
-import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.util.List;
 
 import org.gdal.gdal.Band;
 import org.gdal.gdal.Dataset;
+import org.jeometry.common.function.Consumer3;
 
 import com.revolsys.gdal.Gdal;
 import com.revolsys.geometry.model.BoundingBox;
@@ -43,8 +45,9 @@ public class GdalImage extends AbstractGeoreferencedImage {
   }
 
   @Override
-  public void drawImage(final Graphics2D graphics, final BoundingBox viewBoundingBox,
-    final int viewWidth, final int viewHeight, final boolean useTransform) {
+  public void drawImage(final Consumer3<RenderedImage, BoundingBox, AffineTransform> renderer,
+    final BoundingBox viewBoundingBox, final int viewWidth, final int viewHeight,
+    final boolean useTransform) {
     try {
       final Dataset dataset = getDataset();
 
@@ -95,7 +98,7 @@ public class GdalImage extends AbstractGeoreferencedImage {
         clipYoff, clipWidth, clipHeight, targetWidth, targetHeight);
 
       if (isSameCoordinateSystem(viewBoundingBox)) {
-        super.drawRenderedImage(bufferedImage, imageViewClipBbox, graphics, viewBoundingBox,
+        super.drawRenderedImage(renderer, bufferedImage, imageViewClipBbox, viewBoundingBox,
           viewWidth, useTransform);
       } else {
         final double newMinX = minX + clipXoff / scaleX;
@@ -104,10 +107,9 @@ public class GdalImage extends AbstractGeoreferencedImage {
         final double newMinY = newMaxY - clipHeight / scaleY;
         final BoundingBox newBoundingBox = getGeometryFactory().newBoundingBox(newMinX, newMinY,
           newMaxX, newMaxY);
-
         final GeoreferencedImage newImage = new BufferedGeoreferencedImage(newBoundingBox,
           bufferedImage);
-        newImage.drawImage(graphics, viewBoundingBox, viewWidth, viewHeight, useTransform);
+        newImage.drawImage(renderer, viewBoundingBox, viewWidth, viewHeight, useTransform);
       }
 
     } catch (final Throwable e) {

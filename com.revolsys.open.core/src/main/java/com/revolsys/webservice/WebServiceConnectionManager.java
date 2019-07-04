@@ -1,14 +1,15 @@
 package com.revolsys.webservice;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import com.revolsys.io.connection.AbstractConnectionRegistryManager;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.connection.AbstractConnectionRegistryManager;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
@@ -23,7 +24,7 @@ public class WebServiceConnectionManager
     INSTANCE = new WebServiceConnectionManager();
     final File webServicesDirectory = OS
       .getApplicationDataDirectory("com.revolsys.gis/Web Services");
-    INSTANCE.addConnectionRegistry("User", new FileSystemResource(webServicesDirectory));
+    INSTANCE.addConnectionRegistry("User", new PathResource(webServicesDirectory));
   }
 
   private static Function<WebServiceConnection, Boolean> invalidWebServiceFunction;
@@ -110,9 +111,14 @@ public class WebServiceConnectionManager
   }
 
   public WebServiceConnectionRegistry addConnectionRegistry(final String name,
-    final Resource recordStoresDirectory) {
+    final Path directory) {
+    return addConnectionRegistry(name, new PathResource(directory));
+  }
+
+  public WebServiceConnectionRegistry addConnectionRegistry(final String name,
+    final Resource directory) {
     final WebServiceConnectionRegistry registry = new WebServiceConnectionRegistry(this, name,
-      recordStoresDirectory);
+      directory);
     addConnectionRegistry(registry);
     return registry;
   }

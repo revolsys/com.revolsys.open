@@ -32,6 +32,8 @@
  */
 package com.revolsys.geometry.operation.buffer;
 
+import org.jeometry.common.math.Angle;
+
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
 import com.revolsys.geometry.algorithm.HCoordinate;
@@ -47,7 +49,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
-import com.revolsys.math.Angle;
 
 /**
  * Generates segments which form an offset curve.
@@ -169,7 +170,7 @@ class OffsetSegmentGenerator {
      * This test could probably be done more efficiently,
      * but the situation of exact collinearity should be fairly rare.
      */
-    this.li.computeIntersection(this.s0, this.s1, this.s1, this.s2);
+    this.li.computeIntersectionPoints(this.s0, this.s1, this.s1, this.s2);
     final int numInt = this.li.getIntersectionNum();
     /**
      * if numInt is < 2, the lines are parallel and in the same direction. In
@@ -283,8 +284,8 @@ class OffsetSegmentGenerator {
     /**
      * add intersection point of offset segments (if any)
      */
-    this.li.computeIntersection(this.offset0.getP0(), this.offset0.getP1(), this.offset1.getP0(),
-      this.offset1.getP1());
+    this.li.computeIntersectionPoints(this.offset0.getP0(), this.offset0.getP1(),
+      this.offset1.getP0(), this.offset1.getP1());
     if (this.li.hasIntersection()) {
       this.segList.addPt(this.li.getIntersection(0));
     } else {
@@ -317,7 +318,7 @@ class OffsetSegmentGenerator {
        * points
        */
       this.hasNarrowConcaveAngle = true;
-      if (this.offset0.getP1().distance(this.offset1.getP0()) < this.distance
+      if (this.offset0.getP1().distancePoint(this.offset1.getP0()) < this.distance
         * INSIDE_TURN_VERTEX_SNAP_DISTANCE_FACTOR) {
         this.segList.addPt(this.offset0.getP1());
       } else {
@@ -382,7 +383,7 @@ class OffsetSegmentGenerator {
     final double ang0 = basePt.angle2d(this.s0);
 
     // oriented angle between segments
-    final double angDiff = Angle.angleBetweenOriented(this.s0, basePt, this.s2);
+    final double angDiff = Point.angleBetweenOriented(this.s0, basePt, this.s2);
     // half of the interior angle
     final double angDiffHalf = angDiff / 2;
 
@@ -490,7 +491,7 @@ class OffsetSegmentGenerator {
       intPt = HCoordinate.intersection(offset0.getP0(), offset0.getP1(), offset1.getP0(),
         offset1.getP1());
 
-      final double mitreRatio = distance <= 0.0 ? 1.0 : intPt.distance(p) / Math.abs(distance);
+      final double mitreRatio = distance <= 0.0 ? 1.0 : intPt.distancePoint(p) / Math.abs(distance);
 
       if (mitreRatio > this.bufParams.getMitreLimit()) {
         isMitreWithinLimit = false;
@@ -548,7 +549,7 @@ class OffsetSegmentGenerator {
      * where the two segments are almost parallel
      * (which is hard to compute a robust intersection for).
      */
-    if (this.offset0.getP1().distance(this.offset1.getP0()) < this.distance
+    if (this.offset0.getP1().distancePoint(this.offset1.getP0()) < this.distance
       * OFFSET_SEGMENT_SEPARATION_FACTOR) {
       this.segList.addPt(this.offset0.getP1());
       return;

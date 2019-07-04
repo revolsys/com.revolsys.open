@@ -6,6 +6,7 @@ import java.util.Map;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.record.io.format.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
 
@@ -35,8 +36,8 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements EsriGeodatabaseXmlCo
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeDouble, DataTypes.DOUBLE, false, 8));
     addFieldType(
       new SimpleFieldType(FieldType.esriFieldTypeSingle, DataTypes.FLOAT, "xs:double", false, 4));
-    addFieldType(
-      new SimpleFieldType(FieldType.esriFieldTypeInteger, DataTypes.INTEGER, "xs:int", false, 4));
+    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeInteger, DataTypes.BIG_INTEGER,
+      "xs:int", false, 4));
     addFieldType(
       new SimpleFieldType(FieldType.esriFieldTypeInteger, DataTypes.LONG, "xs:int", false, 4));
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeInteger, DataTypes.INT, false, 4));
@@ -45,16 +46,22 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements EsriGeodatabaseXmlCo
     addFieldType(
       new SimpleFieldType(FieldType.esriFieldTypeSmallInteger, DataTypes.SHORT, false, 2));
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeString, DataTypes.STRING, false));
-    addFieldType(new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry, DataTypes.POINT));
-    addFieldType(new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry, DataTypes.MULTI_POINT));
-    addFieldType(new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry, DataTypes.LINE_STRING));
-    addFieldType(new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry, DataTypes.LINEAR_RING));
     addFieldType(
-      new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry, DataTypes.MULTI_LINE_STRING));
-    addFieldType(new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry, DataTypes.POLYGON));
+      new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry, GeometryDataTypes.POINT));
     addFieldType(
-      new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry, DataTypes.MULTI_POLYGON));
-    addFieldType(new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry, DataTypes.GEOMETRY));
+      new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry, GeometryDataTypes.MULTI_POINT));
+    addFieldType(
+      new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry, GeometryDataTypes.LINE_STRING));
+    addFieldType(
+      new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry, GeometryDataTypes.LINEAR_RING));
+    addFieldType(new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry,
+      GeometryDataTypes.MULTI_LINE_STRING));
+    addFieldType(
+      new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry, GeometryDataTypes.POLYGON));
+    addFieldType(
+      new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry, GeometryDataTypes.MULTI_POLYGON));
+    addFieldType(
+      new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry, GeometryDataTypes.GEOMETRY));
   }
 
   public void addFieldType(final DataType dataType, final EsriGeodatabaseXmlFieldType fieldType) {

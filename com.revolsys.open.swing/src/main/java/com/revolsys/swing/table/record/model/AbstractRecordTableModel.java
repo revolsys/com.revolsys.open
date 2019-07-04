@@ -8,11 +8,12 @@ import java.util.Set;
 
 import javax.annotation.PreDestroy;
 
+import org.jeometry.common.data.identifier.Code;
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -86,7 +87,7 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
   public abstract boolean isSelected(boolean selected, int rowIndex, int columnIndex);
 
   public void loadCodeTable(final CodeTable codeTable) {
-    if (!codeTable.isLoaded()) {
+    if (codeTable.isLoadAll() && !codeTable.isLoaded()) {
       codeTable.getCodes();
       fireTableDataChanged();
     }
@@ -134,10 +135,17 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
       if (codeTable == null) {
         text = DataTypes.toString(objectValue);
       } else {
-        if (codeTable.isLoaded()) {
+        if (!codeTable.isLoadAll() || codeTable.isLoaded()) {
           final List<Object> values = codeTable.getValues(Identifier.newIdentifier(objectValue));
           if (values == null || values.isEmpty()) {
             text = DataTypes.toString(objectValue);
+          } else if (values.size() == 1) {
+            final Object codeValue = values.get(0);
+            if (codeValue instanceof Code) {
+              text = ((Code)codeValue).getDescription();
+            } else {
+              text = DataTypes.toString(codeValue);
+            }
           } else {
             text = Strings.toString(values);
           }

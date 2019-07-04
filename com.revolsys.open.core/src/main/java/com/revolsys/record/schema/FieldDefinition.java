@@ -7,7 +7,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.jeometry.common.compare.NumericComparator;
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypeProxy;
 import org.jeometry.common.data.type.DataTypes;
@@ -16,10 +19,8 @@ import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.comparator.NumericComparator;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.operation.valid.IsValidOp;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
@@ -27,7 +28,6 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
-import com.revolsys.util.MathUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
@@ -40,8 +40,8 @@ import com.revolsys.util.Strings;
  */
 public class FieldDefinition extends BaseObjectWithProperties
   implements CharSequence, Cloneable, MapSerializer, DataTypeProxy {
-  public static FieldDefinition newFieldDefinition(final Map<String, ? extends Object> properties) {
-    return new FieldDefinition(properties);
+  public static FieldDefinition newFieldDefinition(final Map<String, ? extends Object> config) {
+    return new FieldDefinition(config);
   }
 
   private final Map<Object, Object> allowedValues = new LinkedHashMap<>();
@@ -114,19 +114,16 @@ public class FieldDefinition extends BaseObjectWithProperties
     this.length = Maps.getInteger(properties, "length", 0);
     this.scale = Maps.getInteger(properties, "scale", 0);
     this.minValue = properties.get("minValue");
+    final DataType dataType = this.type;
     if (this.minValue == null) {
-      this.minValue = MathUtil.getMinValue(getTypeClass());
+      this.minValue = dataType.getMinValue();
     } else {
-      final DataType dataType = this.type;
-      final Object value = this.minValue;
-      this.minValue = dataType.toString(value);
+      this.minValue = dataType.toObject(this.minValue);
     }
     if (this.maxValue == null) {
-      this.maxValue = MathUtil.getMaxValue(getTypeClass());
+      this.maxValue = dataType.getMaxValue();
     } else {
-      final DataType dataType = this.type;
-      final Object value = this.maxValue;
-      this.maxValue = dataType.toString(value);
+      this.maxValue = dataType.toObject(this.maxValue);
     }
   }
 
@@ -254,8 +251,8 @@ public class FieldDefinition extends BaseObjectWithProperties
       this.scale = scale;
     }
     this.description = description;
-    this.minValue = MathUtil.getMinValue(getTypeClass());
-    this.maxValue = MathUtil.getMaxValue(getTypeClass());
+    this.minValue = type.getMinValue();
+    this.maxValue = type.getMaxValue();
   }
 
   /**
@@ -269,10 +266,13 @@ public class FieldDefinition extends BaseObjectWithProperties
    *          field.
    * @param properties The meta data properties about the field.
    */
-  public FieldDefinition(final String name, final DataType type, final Integer length,
+  public FieldDefinition(final String name, DataType type, final Integer length,
     final Integer scale, final Boolean required, final String description,
     final Map<String, Object> properties) {
     setName(name);
+    if (type == null) {
+      type = DataTypes.OBJECT;
+    }
     this.type = type;
     if (required != null) {
       this.required = required;
@@ -284,9 +284,8 @@ public class FieldDefinition extends BaseObjectWithProperties
       this.scale = scale;
     }
     this.description = description;
-    final Class<?> typeClass = getTypeClass();
-    this.minValue = MathUtil.getMinValue(typeClass);
-    this.maxValue = MathUtil.getMaxValue(typeClass);
+    this.minValue = type.getMinValue();
+    this.maxValue = type.getMaxValue();
     setProperties(properties);
   }
 
@@ -544,13 +543,19 @@ public class FieldDefinition extends BaseObjectWithProperties
 
   public FieldDefinition setAllowedValues(final Collection<?> allowedValues) {
     for (final Object allowedValue : allowedValues) {
-      this.allowedValues.put(allowedValue, allowedValue);
+      final Object fieldValue = toFieldValue(allowedValue);
+      this.allowedValues.put(fieldValue, fieldValue);
     }
     return this;
   }
 
   public FieldDefinition setAllowedValues(final Map<?, ?> allowedValues) {
-    this.allowedValues.putAll(allowedValues);
+    for (final Entry<?, ?> entry : allowedValues.entrySet()) {
+      final Object allowedValue = entry.getKey();
+      final Object description = entry.getValue();
+      final Object fieldValue = toFieldValue(allowedValue);
+      this.allowedValues.put(fieldValue, description);
+    }
     return this;
   }
 

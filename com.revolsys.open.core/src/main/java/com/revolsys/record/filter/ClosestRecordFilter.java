@@ -5,7 +5,6 @@ import java.util.function.Predicate;
 import com.revolsys.geometry.index.quadtree.RecordQuadTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
@@ -60,8 +59,9 @@ public class ClosestRecordFilter implements Predicate<Record> {
   }
 
   public BoundingBox getFilterBoundingBox() {
-    final BoundingBox boundingBox = GeometryFactory.boundingBox(this.geometry);
-    return boundingBox.expand(this.maxDistance);
+    return this.geometry.bboxEditor() //
+      .expandDelta(this.maxDistance) //
+      .newBoundingBox();
   }
 
   @Override
@@ -71,7 +71,7 @@ public class ClosestRecordFilter implements Predicate<Record> {
       if (Property.hasValue(geometry)) {
         if (!(geometry instanceof Point)) {
           final BoundingBox boundingBox = geometry.getBoundingBox();
-          if (!boundingBox.isWithinDistance(this.geometry, this.maxDistance)) {
+          if (!boundingBox.bboxWithinDistance(this.geometry, this.maxDistance)) {
             return false;
           }
         }

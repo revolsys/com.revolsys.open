@@ -44,7 +44,7 @@ import com.revolsys.geometry.model.Polygon;
  * of a single point to a {@link Geometry}.
  * A {@link BoundaryNodeRule} may be specified
  * to control the evaluation of whether the point lies on the boundary or not
- * The default rule is to use the the <i>SFS Boundary Determination Rule</i>
+ * The default rule is to use the <i>SFS Boundary Determination Rule</i>
  * <p>
  * Notes:
  * <ul>
@@ -60,30 +60,43 @@ public class PointLocator {
   public PointLocator() {
   }
 
-  private int computeLocation(final Point point, final Geometry geometry) {
+  private int computeLocation(final Geometry geometry, final double x, final double y) {
     int numBoundaries = 0;
-    if (geometry instanceof Point) {
-      final Location location = point.locate((Point)geometry);
-      return updateLocationInfo(location);
-    } else if (geometry instanceof LineString) {
-      final Location location = ((LineString)geometry).locate(point);
-      return updateLocationInfo(location);
-    } else if (geometry instanceof Polygon) {
-      final Polygon polygon = (Polygon)geometry;
-      final Location location = polygon.locate(point);
-      return updateLocationInfo(location);
-    } else {
+    if (geometry.isGeometryCollection()) {
       for (final Geometry part : geometry.geometries()) {
         if (part != geometry) {
-          numBoundaries += computeLocation(point, part);
+          numBoundaries += computeLocation(part, x, y);
         }
       }
+    } else {
+      final Location location = geometry.locate(x, y);
+      return updateLocationInfo(location);
     }
     return numBoundaries;
   }
 
   public boolean intersects(final Point point, final Geometry geometry) {
-    return locate(point, geometry) != Location.EXTERIOR;
+    return locate(geometry, point) != Location.EXTERIOR;
+  }
+
+  public Location locate(final Geometry geometry, final double x, final double y) {
+    if (geometry.isEmpty()) {
+      return Location.EXTERIOR;
+    } else if (geometry instanceof LineString) {
+      return geometry.locate(x, y);
+    } else if (geometry instanceof Polygon) {
+      return geometry.locate(x, y);
+    }
+
+    this.isIn = false;
+    final int boundaryCount = computeLocation(geometry, x, y);
+    if (boundaryCount % 2 == 1) {
+      return Location.BOUNDARY;
+    } else if (boundaryCount > 0 || this.isIn) {
+      return Location.INTERIOR;
+    } else {
+      return Location.EXTERIOR;
+    }
   }
 
   /**
@@ -96,24 +109,10 @@ public class PointLocator {
    *
    * @return the {@link Location} of the point relative to the input Geometry
    */
-  public Location locate(final Point point, final Geometry geometry) {
-    if (geometry.isEmpty()) {
-      return Location.EXTERIOR;
-    } else if (geometry instanceof LineString) {
-      return geometry.locate(point);
-    } else if (geometry instanceof Polygon) {
-      return geometry.locate(point);
-    }
-
-    this.isIn = false;
-    final int boundaryCount = computeLocation(point, geometry);
-    if (boundaryCount % 2 == 1) {
-      return Location.BOUNDARY;
-    } else if (boundaryCount > 0 || this.isIn) {
-      return Location.INTERIOR;
-    } else {
-      return Location.EXTERIOR;
-    }
+  public Location locate(final Geometry geometry, final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return locate(geometry, x, y);
   }
 
   private int updateLocationInfo(final Location loc) {

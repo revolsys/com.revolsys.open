@@ -10,53 +10,32 @@ import javax.swing.JPanel;
 
 import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.swing.Panels;
 import com.revolsys.swing.field.Field;
-import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
+import com.revolsys.swing.map.layer.record.renderer.GeometryStyleLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.util.Property;
 
 public class GeometryStylePanel extends BaseStylePanel implements PropertyChangeListener {
   private static final long serialVersionUID = 1L;
 
-  private DataType geometryDataType;
+  private final DataType geometryDataType;
 
   private final GeometryStyle geometryStyle;
 
-  private final GeometryStyleRecordLayerRenderer geometryStyleRecordLayerRenderer;
+  private final GeometryStyleLayerRenderer<?> renderer;
 
   private JPanel previews;
 
-  public GeometryStylePanel(
-    final GeometryStyleRecordLayerRenderer geometryStyleRecordLayerRenderer) {
-    super(geometryStyleRecordLayerRenderer);
+  public GeometryStylePanel(final GeometryStyleLayerRenderer<?> renderer) {
+    super(renderer, true);
 
-    this.geometryStyleRecordLayerRenderer = geometryStyleRecordLayerRenderer;
-    this.geometryStyle = geometryStyleRecordLayerRenderer.getStyle();
-    final AbstractRecordLayer layer = geometryStyleRecordLayerRenderer.getLayer();
-    final RecordDefinition recordDefinition = layer.getRecordDefinition();
-    final FieldDefinition geometryField = recordDefinition.getGeometryField();
-
-    if (geometryField != null) {
-      this.geometryDataType = geometryField.getDataType();
-      if (DataTypes.GEOMETRY_COLLECTION.equals(this.geometryDataType)) {
-        this.geometryDataType = DataTypes.GEOMETRY;
-      } else if (DataTypes.MULTI_POINT.equals(this.geometryDataType)) {
-        this.geometryDataType = DataTypes.POINT;
-      } else if (DataTypes.MULTI_LINE_STRING.equals(this.geometryDataType)) {
-        this.geometryDataType = DataTypes.LINE_STRING;
-      } else if (DataTypes.MULTI_POLYGON.equals(this.geometryDataType)) {
-        this.geometryDataType = DataTypes.POLYGON;
-      }
-
-      final boolean hasLineStyle = false;
-      final boolean hasPolygonStyle = false;
-
+    this.renderer = renderer;
+    this.geometryStyle = renderer.getStyle();
+    this.geometryDataType = renderer.getGeometryType();
+    if (this.geometryDataType != null) {
       final JPanel panel = new JPanel(new BorderLayout());
       add(panel, 1);
       final JPanel stylePanels = new JPanel(new VerticalLayout(5));
@@ -69,28 +48,23 @@ public class GeometryStylePanel extends BaseStylePanel implements PropertyChange
       previewContainer.add(this.previews);
       panel.add(previewContainer, BorderLayout.EAST);
 
-      if (DataTypes.GEOMETRY.equals(this.geometryDataType)) {
+      if (GeometryDataTypes.GEOMETRY.equals(this.geometryDataType)) {
         addMarkerStylePanel(stylePanels, this.geometryStyle);
         addLineStylePanel(stylePanels, this.geometryStyle);
         addPolygonStylePanel(stylePanels, this.geometryStyle);
         this.previews.add(new MarkerStylePreview(this.geometryStyle));
-        addGeometryPreview(DataTypes.LINE_STRING);
-        addGeometryPreview(DataTypes.POLYGON);
-      } else if (DataTypes.POINT.equals(this.geometryDataType)) {
+        addGeometryPreview(GeometryDataTypes.LINE_STRING);
+        addGeometryPreview(GeometryDataTypes.POLYGON);
+      } else if (GeometryDataTypes.POINT.equals(this.geometryDataType)) {
         addMarkerStylePanel(stylePanels, this.geometryStyle);
         this.previews.add(new MarkerStylePreview(this.geometryStyle));
-      } else if (DataTypes.LINE_STRING.equals(this.geometryDataType)) {
+      } else if (GeometryDataTypes.LINE_STRING.equals(this.geometryDataType)) {
         addLineStylePanel(stylePanels, this.geometryStyle);
-        addGeometryPreview(DataTypes.LINE_STRING);
-      } else if (DataTypes.POLYGON.equals(this.geometryDataType)) {
+        addGeometryPreview(GeometryDataTypes.LINE_STRING);
+      } else if (GeometryDataTypes.POLYGON.equals(this.geometryDataType)) {
         addLineStylePanel(stylePanels, this.geometryStyle);
         addPolygonStylePanel(stylePanels, this.geometryStyle);
-        addGeometryPreview(DataTypes.POLYGON);
-      }
-
-      if (hasLineStyle) {
-      }
-      if (hasPolygonStyle) {
+        addGeometryPreview(GeometryDataTypes.POLYGON);
       }
     }
   }
@@ -117,14 +91,16 @@ public class GeometryStylePanel extends BaseStylePanel implements PropertyChange
       final Object value = event.getNewValue();
       setFieldValue(name, value);
     }
-    for (final Component preview : this.previews.getComponents()) {
-      preview.repaint();
+    if (this.previews != null) {
+      for (final Component preview : this.previews.getComponents()) {
+        preview.repaint();
+      }
     }
   }
 
   @Override
   public void save() {
     super.save();
-    this.geometryStyleRecordLayerRenderer.setStyle(this.geometryStyle);
+    this.renderer.setStyle(this.geometryStyle);
   }
 }

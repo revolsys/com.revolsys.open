@@ -22,7 +22,7 @@ public class SvgIcon extends UserAgentAdapter implements Icon {
   /**
    * The BufferedImage generated from the SVG document.
    */
-  protected BufferedImage bufferedImage;
+  protected BufferedImage image;
 
   /**
    * The width of the rendered image.
@@ -77,9 +77,9 @@ public class SvgIcon extends UserAgentAdapter implements Icon {
     final int height) throws TranscoderException {
     final SvgBufferedImageTranscoder transcoder = new SvgBufferedImageTranscoder(width, height);
     transcoder.transcode(input, null);
-    this.bufferedImage = transcoder.getImage();
-    this.width = this.bufferedImage.getWidth();
-    this.height = this.bufferedImage.getHeight();
+    this.image = transcoder.getImage();
+    this.width = this.image.getWidth();
+    this.height = this.image.getHeight();
   }
 
   /**
@@ -98,6 +98,10 @@ public class SvgIcon extends UserAgentAdapter implements Icon {
     return this.width;
   }
 
+  public BufferedImage getImage() {
+    return this.image;
+  }
+
   /**
    * Returns the default size of this user agent.
    */
@@ -111,6 +115,6 @@ public class SvgIcon extends UserAgentAdapter implements Icon {
    */
   @Override
   public void paintIcon(final Component c, final Graphics g, final int x, final int y) {
-    g.drawImage(this.bufferedImage, x, y, null);
+    g.drawImage(this.image, x, y, null);
   }
 }

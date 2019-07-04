@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.geometry.index.strtree.STRtree;
+import com.revolsys.geometry.index.strtree.StrTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -78,7 +78,7 @@ public class CascadedPolygonUnion {
    * The effectiveness of the index is somewhat sensitive
    * to the node capacity.
    * Testing indicates that a smaller capacity is better.
-   * For an STRtree, 4 is probably a good number (since
+   * For an StrTree, 4 is probably a good number (since
    * this produces 2x2 "squares").
    */
   private static final int STRTREE_NODE_CAPACITY = 4;
@@ -204,7 +204,7 @@ public class CascadedPolygonUnion {
     final List<Polygon> intersectingGeoms = new ArrayList<>();
     for (final Polygon polygon : polygonal.polygons()) {
       final BoundingBox boundingBox = polygon.getBoundingBox();
-      if (boundingBox.intersects(envelope)) {
+      if (boundingBox.bboxIntersects(envelope)) {
         intersectingGeoms.add(polygon);
       } else {
         disjointGeoms.add(polygon);
@@ -267,10 +267,10 @@ public class CascadedPolygonUnion {
        * This makes unioning more efficient, since vertices are more likely
        * to be eliminated on each round.
        */
-      final STRtree index = new STRtree(STRTREE_NODE_CAPACITY);
+      final StrTree index = new StrTree(STRTREE_NODE_CAPACITY);
       for (final Polygon polygon : this.polygons) {
         final BoundingBox boundingBox = polygon.getBoundingBox();
-        index.insert(boundingBox, polygon);
+        index.insertItem(boundingBox, polygon);
       }
       this.polygons = null;
 
@@ -309,7 +309,7 @@ public class CascadedPolygonUnion {
     final BoundingBox boundingBox1 = polygonal1.getBoundingBox();
     final BoundingBox boundingBox2 = polygonal2.getBoundingBox();
     // *
-    if (!boundingBox1.intersects(boundingBox2)) {
+    if (!boundingBox1.bboxIntersects(boundingBox2)) {
       final Polygonal polygonal = this.geometryFactory.geometry(polygonal1, polygonal2);
       return polygonal;
     } else if (polygonal1.getGeometryCount() <= 1 && polygonal2.getGeometryCount() <= 1) {
@@ -343,7 +343,7 @@ public class CascadedPolygonUnion {
 
   /**
    * Recursively unions all subtrees in the list into single geometries.
-   * The result is a list of Geometrys only
+   * the result is a list of Geometrys only
    */
   private Polygonal unionTree(final List<?> items) {
     final List<Polygonal> geoms = reduceToGeometries(items);

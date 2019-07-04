@@ -120,13 +120,14 @@ public class SegmentStringDissolver {
    * @param segString the string to dissolve
    */
   public void dissolve(final SegmentString segString) {
-    final OrientedCoordinateArray oca = new OrientedCoordinateArray(segString.getPoints());
+    final OrientedCoordinateArray oca = new OrientedCoordinateArray(segString.getLineString());
     final SegmentString existing = findMatching(oca, segString);
     if (existing == null) {
       add(oca, segString);
     } else {
       if (this.merger != null) {
-        final boolean isSameOrientation = equals(existing.getPoints(), 2, segString.getPoints());
+        final boolean isSameOrientation = equals(existing.getLineString(), 2,
+          segString.getLineString());
         this.merger.merge(existing, segString, isSameOrientation);
       }
     }

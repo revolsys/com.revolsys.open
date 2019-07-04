@@ -3,6 +3,7 @@ package com.revolsys.record.io;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryWriter;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
@@ -34,6 +35,11 @@ public class RecordWriterGeometryWriter extends AbstractWriter<Geometry> impleme
   @Override
   public <V> V getProperty(final String name) {
     return (V)this.writer.getProperty(name);
+  }
+
+  @Override
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.writer.setProperty("geometryFactory", geometryFactory);
   }
 
   @Override

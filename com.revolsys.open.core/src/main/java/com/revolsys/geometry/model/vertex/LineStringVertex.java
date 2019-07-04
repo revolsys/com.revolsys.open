@@ -7,11 +7,16 @@ import com.revolsys.geometry.model.LineString;
 public class LineStringVertex extends AbstractVertex {
   private static final long serialVersionUID = 1L;
 
-  private int vertexIndex;
+  protected int vertexIndex;
 
   public LineStringVertex(final LineString line, final int... vertexId) {
     super(line);
     setVertexId(vertexId);
+  }
+
+  public LineStringVertex(final LineString line, final int vertexIndex) {
+    super(line);
+    setVertexId(vertexIndex);
   }
 
   @Override
@@ -23,11 +28,16 @@ public class LineStringVertex extends AbstractVertex {
   @Override
   public double getLineCoordinateRelative(final int vertexOffset, final int axisIndex) {
     if (isEmpty()) {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     } else {
       final int vertexIndex = getVertexIndex();
       final LineString line = getLineString();
-      return line.getCoordinate(vertexIndex + vertexOffset, axisIndex);
+      final int newVertexIndex = vertexIndex + vertexOffset;
+      if (newVertexIndex < 0) {
+        return java.lang.Double.NaN;
+      } else {
+        return line.getCoordinate(newVertexIndex, axisIndex);
+      }
     }
   }
 
@@ -62,6 +72,23 @@ public class LineStringVertex extends AbstractVertex {
     return new int[] {
       this.vertexIndex
     };
+  }
+
+  @Override
+  public int getVertexIndex() {
+    return this.vertexIndex;
+  }
+
+  @Override
+  public double getX() {
+    final LineString line = getGeometry();
+    return line.getCoordinate(this.vertexIndex, 0);
+  }
+
+  @Override
+  public double getY() {
+    final LineString line = getGeometry();
+    return line.getCoordinate(this.vertexIndex, 1);
   }
 
   @Override
@@ -105,6 +132,12 @@ public class LineStringVertex extends AbstractVertex {
   @Override
   public void remove() {
     throw new UnsupportedOperationException("Removing vertices not supported");
+  }
+
+  @Override
+  public double setCoordinate(final int axisIndex, final double coordinate) {
+    final LineString line = getLineString();
+    return line.setCoordinate(this.vertexIndex, axisIndex, coordinate);
   }
 
   public void setVertexId(final int... vertexId) {

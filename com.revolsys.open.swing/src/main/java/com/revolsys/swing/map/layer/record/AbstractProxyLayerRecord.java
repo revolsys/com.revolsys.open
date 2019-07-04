@@ -3,7 +3,8 @@ package com.revolsys.swing.map.layer.record;
 import java.util.Collection;
 import java.util.Map;
 
-import com.revolsys.identifier.Identifier;
+import org.jeometry.common.data.identifier.Identifier;
+
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
@@ -164,6 +165,16 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
       } else {
         return layerRecord.isSame(record);
       }
+    }
+  }
+
+  @Override
+  public boolean isState(final RecordState state) {
+    final Record record = getRecord();
+    if (record == null) {
+      return state == RecordState.DELETED;
+    } else {
+      return record.isState(state);
     }
   }
 

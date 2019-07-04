@@ -46,7 +46,7 @@ import com.revolsys.util.Emptyable;
 import com.revolsys.util.ExitLoopException;
 
 /**
- * Base class for STRtree and SIRtree. STR-packed R-trees are described in:
+ * Base class for StrTree and SIRtree. STR-packed R-trees are described in:
  * P. Rigaux, Michel Scholl and Agnes Voisard. <i>Spatial Databases With
  * Application To GIS.</i> Morgan Kaufmann, San Francisco, 2002.
  * <p>
@@ -54,12 +54,11 @@ import com.revolsys.util.ExitLoopException;
  * because the STR algorithm operates on both nodes and
  * data, both of which are treated as Boundables.
  *
- * @see STRtree
- * @see SIRtree
+ * @see StrTree
  *
  * @version 1.7
  */
-public abstract class AbstractSTRtree implements Emptyable, Serializable {
+public abstract class AbstractSTRtree<I> implements Emptyable, Serializable {
 
   /**
    * A test for intersection between two bounds, necessary because subclasses
@@ -207,6 +206,14 @@ public abstract class AbstractSTRtree implements Emptyable, Serializable {
     return this.root;
   }
 
+  public int getSize() {
+    if (isEmpty()) {
+      return 0;
+    }
+    build();
+    return size(this.root);
+  }
+
   protected void insert(final Object bounds, final Object item) {
     Assert.isTrue(!this.built,
       "Cannot insert items into an STR packed R-tree after it has been built.");
@@ -334,7 +341,7 @@ public abstract class AbstractSTRtree implements Emptyable, Serializable {
   }
 
   private void query(final Object searchBounds, final AbstractNode node,
-    final Consumer<Object> action) {
+    final Consumer<? super I> action) {
     final List childBoundables = node.getChildBoundables();
     for (int i = 0; i < childBoundables.size(); i++) {
       final Boundable childBoundable = (Boundable)childBoundables.get(i);
@@ -344,7 +351,7 @@ public abstract class AbstractSTRtree implements Emptyable, Serializable {
       if (childBoundable instanceof AbstractNode) {
         query(searchBounds, (AbstractNode)childBoundable, action);
       } else if (childBoundable instanceof ItemBoundable) {
-        action.accept(((ItemBoundable)childBoundable).getItem());
+        action.accept((I)((ItemBoundable)childBoundable).getItem());
       } else {
         Assert.shouldNeverReachHere();
       }
@@ -443,14 +450,6 @@ public abstract class AbstractSTRtree implements Emptyable, Serializable {
       return true;
     }
     return false;
-  }
-
-  protected int size() {
-    if (isEmpty()) {
-      return 0;
-    }
-    build();
-    return size(this.root);
   }
 
   protected int size(final AbstractNode node) {

@@ -7,29 +7,27 @@ import java.util.Map;
 
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.record.Record;
-
 public class JdbcDoubleFieldDefinition extends JdbcFieldDefinition {
   public JdbcDoubleFieldDefinition(final String dbName, final String name, final int sqlType,
-    final int length, final boolean required, final String description,
-    final Map<String, Object> properties) {
-    super(dbName, name, DataTypes.DOUBLE, sqlType, length, 0, required, description, properties);
+    final boolean required, final String description, final Map<String, Object> properties) {
+    super(dbName, name, DataTypes.DOUBLE, sqlType, 20, 0, required, description, properties);
   }
 
   @Override
   public JdbcDoubleFieldDefinition clone() {
-    return new JdbcDoubleFieldDefinition(getDbName(), getName(), getSqlType(), getLength(),
-      isRequired(), getDescription(), getProperties());
+    return new JdbcDoubleFieldDefinition(getDbName(), getName(), getSqlType(), isRequired(),
+      getDescription(), getProperties());
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
-    final double longValue = resultSet.getDouble(columnIndex);
-    if (!resultSet.wasNull()) {
-      setValue(record, Double.valueOf(longValue));
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    final double value = resultSet.getDouble(columnIndex);
+    if (resultSet.wasNull()) {
+      return null;
+    } else {
+      return Double.valueOf(value);
     }
-    return columnIndex + 1;
   }
 
   @Override

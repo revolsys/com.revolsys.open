@@ -17,23 +17,33 @@
 package com.revolsys.spring.resource;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
 import org.springframework.core.io.WritableResource;
 import org.springframework.util.Assert;
 
 import com.revolsys.io.PathUtil;
+import com.revolsys.io.channels.Channels;
 
 /**
  * {@link Resource} implementation for {@code com.revolsys.nio.file.Path} handles.
@@ -45,7 +55,6 @@ import com.revolsys.io.PathUtil;
  * @see java.nio.file.Path
  */
 public class PathResource extends AbstractResource implements WritableResource {
-
   private final Path path;
 
   public PathResource(final File file) {
@@ -53,11 +62,6 @@ public class PathResource extends AbstractResource implements WritableResource {
   }
 
   /**
-   * Construct a new new PathResource from a PathUtil handle.
-   * <p>Note: Unlike {@link FileSystemResource}, when building relative resources
-   * via {@link #createRelative}, the relative path will be built <i>underneath</i>
-   * the given root:
-   * e.g. Paths.get("C:/dir1/"), relative path "dir2" -> "C:/dir1/dir2"!
    * @param path a PathUtil handle
    */
   public PathResource(final Path path) {
@@ -67,12 +71,8 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   /**
    * Construct a new new PathResource from a PathUtil handle.
-   * <p>Note: Unlike {@link FileSystemResource}, when building relative resources
-   * via {@link #createRelative}, the relative path will be built <i>underneath</i>
-   * the given root:
-   * e.g. Paths.get("C:/dir1/"), relative path "dir2" -> "C:/dir1/dir2"!
    * @param path a path
-   * @see com.revolsys.io.file.com.revolsys.nio.file.Paths#get(String, String...)
+   * @see com.revolsys.io.file.com.revolsys.nio.file.Paths#getPath(String, String...)
    */
   public PathResource(final String path) {
     Assert.notNull(path, "Path must not be null");
@@ -81,10 +81,6 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   /**
    * Construct a new new PathResource from a PathUtil handle.
-   * <p>Note: Unlike {@link FileSystemResource}, when building relative resources
-   * via {@link #createRelative}, the relative path will be built <i>underneath</i>
-   * the given root:
-   * e.g. Paths.get("C:/dir1/"), relative path "dir2" -> "C:/dir1/dir2"!
    * @see com.revolsys.io.file.com.revolsys.nio.file.Paths#get(URI)
    * @param uri a path URI
    */
@@ -102,17 +98,81 @@ public class PathResource extends AbstractResource implements WritableResource {
   }
 
   @Override
-  public void copyFrom(final InputStream in) {
-    final Path path = getPath();
-    final Path parent = path.getParent();
-    if (!Files.exists(parent)) {
-      try {
-        Files.createDirectories(parent);
+  public boolean copyFrom(final InputStream in) {
+    final File file = getFile();
+    final File parent = file.getParentFile();
+    if (!parent.exists()) {
+      parent.mkdirs();
+    }
+    return super.copyFrom(in);
+  }
+
+  @Override
+  public boolean copyFrom(final Resource source) {
+    if (source == null) {
+      return false;
+    } else {
+      try (
+        ReadableByteChannel in = source.newReadableByteChannel()) {
+        if (in == null) {
+          return false;
+        } else {
+          try (
+            FileChannel out = newWritableByteChannel()) {
+            final long size;
+            if (in instanceof FileChannel) {
+              size = ((FileChannel)in).size();
+            } else {
+              size = source.contentLength();
+            }
+            Channels.copy(in, out, size);
+            return true;
+          } catch (final IOException e) {
+            throw Exceptions.wrap(e);
+          }
+        }
       } catch (final IOException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
-    super.copyFrom(in);
+  }
+
+  @Override
+  public boolean copyTo(final Resource target) {
+    if (target == null) {
+      return false;
+    } else {
+      try (
+        WritableByteChannel out = target.newWritableByteChannel()) {
+        return copyTo(out);
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    }
+  }
+
+  public boolean copyTo(final WritableByteChannel out) {
+    if (out == null) {
+      return false;
+    } else {
+      try (
+        FileChannel in = newReadableByteChannel()) {
+        if (in == null) {
+          return false;
+        } else {
+          Channels.copy(in, out);
+          return true;
+        }
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    }
+  }
+
+  @Override
+  public boolean createParentDirectories() {
+    com.revolsys.io.file.Paths.createParentDirectories(this.path);
+    return true;
   }
 
   /**
@@ -133,7 +193,7 @@ public class PathResource extends AbstractResource implements WritableResource {
     } catch (final DirectoryNotEmptyException e) {
       return false;
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -151,7 +211,7 @@ public class PathResource extends AbstractResource implements WritableResource {
    */
   @Override
   public boolean exists() {
-    return Files.exists(this.path);
+    return Files.exists(this.path, com.revolsys.io.file.Paths.LINK_OPTIONS_NONE);
   }
 
   @Override
@@ -182,25 +242,24 @@ public class PathResource extends AbstractResource implements WritableResource {
    */
   @Override
   public InputStream getInputStream() {
-    if (!exists()) {
-      throw new IllegalArgumentException(getPath() + " (no such file or directory)");
-    }
-    if (Files.isDirectory(this.path)) {
-      throw new IllegalArgumentException(getPath() + " (is a directory)");
-    }
     try {
-      return Files.newInputStream(this.path);
+      return Files.newInputStream(this.path, com.revolsys.io.file.Paths.OPEN_OPTIONS_NONE);
+    } catch (final FileSystemException e) {
+      throw Exceptions.wrap("Error opening file: " + getPath(), e);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
   @Override
   public OutputStream getOutputStream() {
     try {
-      return Files.newOutputStream(getPath());
+      final Path path = this.path;
+      return Files.newOutputStream(path, com.revolsys.io.file.Paths.OPEN_OPTIONS_NONE);
+    } catch (final FileSystemException e) {
+      throw Exceptions.wrap("Error opening file: " + getPath(), e);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -217,6 +276,7 @@ public class PathResource extends AbstractResource implements WritableResource {
   /**
    * Return the file path for this resource.
    */
+  @Override
   public final Path getPath() {
     return this.path;
   }
@@ -240,7 +300,7 @@ public class PathResource extends AbstractResource implements WritableResource {
     try {
       return this.path.toUri().toURL();
     } catch (final MalformedURLException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -252,7 +312,10 @@ public class PathResource extends AbstractResource implements WritableResource {
     return this.path.hashCode();
   }
 
-  // implementation of WritableResource
+  @Override
+  public boolean isFile() {
+    return true;
+  }
 
   /**
    * This implementation checks whether the underlying file is marked as readable
@@ -285,6 +348,70 @@ public class PathResource extends AbstractResource implements WritableResource {
   @Override
   public OutputStream newOutputStream() {
     return getOutputStream();
+  }
+
+  // implementation of WritableResource
+
+  @Override
+  public OutputStream newOutputStreamAppend() {
+    try {
+      final Path path = this.path;
+      return Files.newOutputStream(path, com.revolsys.io.file.Paths.OPEN_OPTIONS_APPEND);
+    } catch (final FileSystemException e) {
+      throw Exceptions.wrap("Error opening file: " + getPath(), e);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  @Override
+  public FileChannel newReadableByteChannel() {
+    try {
+      return FileChannel.open(this.path, com.revolsys.io.file.Paths.OPEN_OPTIONS_READ_SET,
+        com.revolsys.io.file.Paths.FILE_ATTRIBUTES_NONE);
+    } catch (final NoSuchFileException e) {
+      return null;
+    } catch (final FileSystemException e) {
+      return null;
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  @Override
+  public FileChannel newWritableByteChannel() {
+    try {
+      try {
+        return FileChannel.open(this.path, com.revolsys.io.file.Paths.OPEN_OPTIONS_WRITE_SET,
+          com.revolsys.io.file.Paths.FILE_ATTRIBUTES_NONE);
+      } catch (final NoSuchFileException e) {
+        if (com.revolsys.io.file.Paths.createParentDirectories(this.path) == null) {
+          return null;
+        } else {
+          return FileChannel.open(this.path, com.revolsys.io.file.Paths.OPEN_OPTIONS_WRITE_SET,
+            com.revolsys.io.file.Paths.FILE_ATTRIBUTES_NONE);
+        }
+      }
+    } catch (final FileSystemException e) {
+      throw Exceptions.wrap("Error opening file: " + getPath(), e);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  @Override
+  public Writer newWriter() {
+    return newWriter(StandardCharsets.UTF_8);
+  }
+
+  @Override
+  public Writer newWriter(final Charset charset) {
+    try {
+      final File file = getFile();
+      return new FileWriter(file, charset);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
 }

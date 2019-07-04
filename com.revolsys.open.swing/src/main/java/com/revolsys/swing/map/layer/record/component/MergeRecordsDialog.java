@@ -25,7 +25,6 @@ import javax.swing.WindowConstants;
 
 import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.CollectionUtil;
@@ -33,6 +32,7 @@ import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.graph.RecordGraph;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
@@ -152,8 +152,8 @@ public class MergeRecordsDialog extends JDialog implements WindowListener {
       this.mergedRecords = new HashMap<>();
       if (originalRecords.size() < 2) {
         errorMessage = " at least two records must be selected to merge.";
-      } else if (!DataTypes.LINE_STRING.equals(geometryType)
-        && !DataTypes.MULTI_LINE_STRING.equals(geometryType)) {
+      } else if (!GeometryDataTypes.LINE_STRING.equals(geometryType)
+        && !GeometryDataTypes.MULTI_LINE_STRING.equals(geometryType)) {
         errorMessage = "Merging " + geometryType + " not currently supported";
       } else {
         final RecordGraph graph = new RecordGraph();

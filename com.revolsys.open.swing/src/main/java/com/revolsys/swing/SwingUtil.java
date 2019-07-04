@@ -56,12 +56,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
 import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
@@ -82,6 +82,8 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.OS;
+import com.revolsys.util.PreferenceKey;
+import com.revolsys.util.Preferences;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
@@ -136,9 +138,11 @@ public interface SwingUtil {
 
   static void addLabelledReadOnlyTextField(final JPanel container, final String fieldName,
     final Object value) {
-    final String string = DataTypes.toString(value);
-    final int length = Math.max(1, string.length());
-    addLabelledReadOnlyTextField(container, fieldName, value, length);
+    if (value != null) {
+      final String string = DataTypes.toString(value);
+      final int length = Math.max(1, string.length());
+      addLabelledReadOnlyTextField(container, fieldName, value, length);
+    }
   }
 
   static void addLabelledReadOnlyTextField(final JPanel container, final String fieldName,
@@ -200,12 +204,27 @@ public interface SwingUtil {
     setLocationCentre(bounds, window);
   }
 
-  static void autoAdjustSize(final Window window) {
+  static void autoAdjustPosition(final Window parentWindow, final Window window) {
     window.pack();
 
+    final Rectangle bounds = getScreenBounds(parentWindow);
+    final int width = Math.min(window.getWidth(), bounds.width - 100);
+    final int height = Math.min(window.getHeight(), bounds.height - 100);
+    window.setSize(width, height);
+
+    setLocationCentre(bounds, window);
+  }
+
+  static void autoAdjustSize(final Window window) {
+    window.pack();
+    final int windowX = window.getX();
+    final int windowY = window.getY();
+    final int windowWidth = window.getWidth();
+    final int windowHeight = window.getHeight();
+
     final Rectangle bounds = getScreenBounds();
-    final int width = Math.min(window.getWidth(), bounds.width - 20 - window.getX());
-    final int height = Math.max(window.getHeight(), bounds.height - 20 - window.getY());
+    final int width = Math.min(windowWidth, bounds.width - 20 - (windowX - (int)bounds.getX()));
+    final int height = Math.min(windowHeight, bounds.height - 20 - (windowY - (int)bounds.getY()));
     window.setSize(width, height);
   }
 
@@ -285,12 +304,14 @@ public interface SwingUtil {
     if (component == null) {
       component = SwingUtil.getActiveWindow();
     }
-    final Point mousePosition;
+    Point mousePosition;
     if (component == null) {
       mousePosition = null;
     } else {
       mousePosition = component.getMousePosition();
-      if (mousePosition != null) {
+      if (mousePosition == null) {
+        mousePosition = component.getLocation();
+      } else {
         SwingUtilities.convertPointToScreen(mousePosition, component);
       }
     }
@@ -299,6 +320,32 @@ public interface SwingUtil {
 
   static Rectangle getScreenBounds(final int x, final int y) {
     return getScreenBounds(new Point(x, y));
+  }
+
+  static Rectangle getScreenBounds(final int x, final int y, final int width, final int height) {
+    final Rectangle newBounds = new Rectangle(x, y, width, height);
+    Rectangle firstBounds = null;
+    final GraphicsEnvironment graphicsEnvironment = GraphicsEnvironment
+      .getLocalGraphicsEnvironment();
+    for (final GraphicsDevice device : graphicsEnvironment.getScreenDevices()) {
+      for (final GraphicsConfiguration config : device.getConfigurations()) {
+        final Rectangle bounds = config.getBounds();
+        final Rectangle intersection = bounds.intersection(newBounds);
+        if (intersection.getWidth() > 100 && intersection.getHeight() > 100) {
+          final Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(config);
+          return applyInsets(bounds, insets);
+        } else if (firstBounds == null) {
+          firstBounds = bounds;
+        }
+      }
+    }
+    final GraphicsDevice defaultScreenDevice = graphicsEnvironment.getDefaultScreenDevice();
+    for (final GraphicsConfiguration config : defaultScreenDevice.getConfigurations()) {
+      final Rectangle bounds = config.getBounds();
+      final Insets insets = Toolkit.getDefaultToolkit().getScreenInsets(config);
+      return applyInsets(bounds, insets);
+    }
+    return firstBounds;
   }
 
   /**
@@ -763,6 +810,20 @@ public interface SwingUtil {
     return fileChooser;
   }
 
+  static JFileChooser newFileChooser(final String title, final Preferences preferences,
+    final PreferenceKey preference) {
+    final JFileChooser fileChooser = new JFileChooser();
+    fileChooser.setDialogTitle(title);
+    final String currentDirectoryName = preferences.getValue(preference);
+    if (Property.hasValue(currentDirectoryName)) {
+      final File directory = new File(currentDirectoryName);
+      if (directory.exists() && directory.canRead()) {
+        fileChooser.setCurrentDirectory(directory);
+      }
+    }
+    return fileChooser;
+  }
+
   static JFileChooser newFileChooser(final String title, final String preferencesGroup,
     final String preferenceName) {
     final JFileChooser fileChooser = new JFileChooser();
@@ -896,7 +957,6 @@ public interface SwingUtil {
     y += bounds.y;
 
     window.setLocation(x, y);
-
   }
 
   static void setMaximumWidth(final JComponent component, final int width) {

@@ -9,7 +9,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.schema.RecordDefinition;
@@ -36,7 +36,7 @@ public class RecordLayerFields {
         bindings.put("fieldName", fieldName);
         return (Supplier<Field>)engine.eval(script, bindings);
       } catch (final ScriptException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
   }

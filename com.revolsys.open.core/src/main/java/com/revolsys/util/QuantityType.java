@@ -4,8 +4,7 @@ import javax.measure.Quantity;
 import javax.measure.Unit;
 
 import org.jeometry.common.data.type.DataTypes;
-
-import com.revolsys.geometry.cs.unit.CustomUnits;
+import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
 import tec.uom.se.quantity.Quantities;
 

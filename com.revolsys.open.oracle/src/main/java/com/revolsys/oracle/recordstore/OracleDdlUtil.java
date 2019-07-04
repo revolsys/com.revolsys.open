@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -50,7 +51,7 @@ public class OracleDdlUtil {
         out.print("VARCHAR2(");
         out.print(attribute.getLength());
         out.print(")");
-      } else if (dataType == DataTypes.GEOMETRY) {
+      } else if (dataType == GeometryDataTypes.GEOMETRY) {
         out.print("MDSYS.SDO_GEOMETRY");
       }
       if (attribute.isRequired()) {

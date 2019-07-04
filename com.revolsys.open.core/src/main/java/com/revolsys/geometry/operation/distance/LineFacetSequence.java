@@ -38,8 +38,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.util.MathUtil;
+import com.revolsys.geometry.util.Points;
 
 /**
  * Represents a sequence of facets (points or line segments)
@@ -120,7 +119,7 @@ public class LineFacetSequence implements FacetSequence {
         final double x2 = facetSeq.getCoordinate(0, 0);
         final double y2 = facetSeq.getCoordinate(0, 1);
 
-        return MathUtil.distance(x, x, x2, y2);
+        return Points.distance(x, x, x2, y2);
       } else {
         return PointFacetSequence.computePointLineDistance(x, y, facetSeq);
       }
@@ -146,8 +145,7 @@ public class LineFacetSequence implements FacetSequence {
 
   @Override
   public BoundingBox getEnvelope() {
-    final BoundingBoxDoubleGf env = new BoundingBoxDoubleGf(this.line);
-    return env;
+    return this.line.getBoundingBox();
   }
 
   @Override

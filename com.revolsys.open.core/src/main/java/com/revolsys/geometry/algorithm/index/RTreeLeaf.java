@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 public class RTreeLeaf<T> extends RTreeNode<T> {
 
@@ -22,7 +21,7 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
 
   public RTreeLeaf(final int size) {
     this.objects = new Object[size];
-    this.envelopes = new BoundingBoxDoubleGf[size];
+    this.envelopes = new BoundingBox[size];
   }
 
   public void add(final BoundingBox envelope, final T object) {
@@ -36,7 +35,7 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
   public void forEach(final BoundingBox envelope, final Consumer<T> action) {
     for (int i = 0; i < this.size; i++) {
       final BoundingBox objectEnvelope = this.envelopes[i];
-      if (envelope.intersects(objectEnvelope)) {
+      if (envelope.bboxIntersects(objectEnvelope)) {
         final T object = getObject(i);
         action.accept(object);
       }
@@ -48,7 +47,7 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
     final Consumer<T> action) {
     for (int i = 0; i < this.size; i++) {
       final BoundingBox objectEnvelope = this.envelopes[i];
-      if (envelope.intersects(objectEnvelope)) {
+      if (envelope.bboxIntersects(objectEnvelope)) {
         final T object = getObject(i);
         if (filter.test(object)) {
           action.accept(object);
@@ -120,7 +119,7 @@ public class RTreeLeaf<T> extends RTreeNode<T> {
 
   @Override
   protected void updateEnvelope() {
-    BoundingBox boundingBox = BoundingBox.EMPTY;
+    BoundingBox boundingBox = BoundingBox.empty();
     for (int i = 0; i < this.size; i++) {
       final BoundingBox envelope = this.envelopes[i];
       boundingBox = boundingBox.expandToInclude(envelope);

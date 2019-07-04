@@ -5,7 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 
 public class Node<T> extends AbstractNode<T> {
   private static final long serialVersionUID = 1L;
@@ -47,7 +47,7 @@ public class Node<T> extends AbstractNode<T> {
   }
 
   @Override
-  protected void forEachItem(final QuadTree<T> tree, final Consumer<T> action) {
+  protected void forEachItem(final QuadTree<T> tree, final Consumer<? super T> action) {
     final List<T> items = this.items;
     synchronized (this.nodes) {
       for (final T item : items) {
@@ -58,13 +58,13 @@ public class Node<T> extends AbstractNode<T> {
 
   @Override
   protected void forEachItem(final QuadTree<T> tree, final double[] bounds,
-    final Consumer<T> action) {
+    final Consumer<? super T> action) {
     final List<T> items = this.items;
     synchronized (this.nodes) {
       int itemIndex = 0;
       for (final T item : items) {
         final double[] itemBounds = this.boundingBoxes.get(itemIndex);
-        if (BoundingBoxUtil.intersects(bounds, itemBounds)) {
+        if (RectangleUtil.intersects(bounds, itemBounds)) {
           action.accept(item);
         }
         itemIndex++;

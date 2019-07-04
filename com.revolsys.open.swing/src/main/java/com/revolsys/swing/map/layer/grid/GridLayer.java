@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.grid;
 
 import java.util.Map;
 
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import org.jeometry.common.logging.Logs;
@@ -12,11 +13,13 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGridFactory;
 import com.revolsys.gis.grid.RectangularMapTile;
-import com.revolsys.swing.Icons;
+import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.PreferencesUtil;
@@ -24,30 +27,31 @@ import com.revolsys.util.Property;
 
 public class GridLayer extends AbstractLayer {
   static {
-    final MenuFactory menu = MenuFactory.getMenu(GridLayer.class);
-
-    menu.deleteMenuItem("zoom", "Zoom to Layer");
-    menu.deleteMenuItem("refresh", "Refresh");
-
-    menu.<GridLayer> addMenuItem("zoom", "Zoom to Mapsheet", "magnifier_zoom_grid",
-      GridLayer::zoomToSheet, false);
+    MenuFactory.addMenuInitializer(GridLayer.class, menu -> {
+      menu.deleteMenuItem("zoom", "Zoom to Layer");
+      menu.deleteMenuItem("refresh", "Refresh");
+      menu.<GridLayer> addMenuItem("zoom", "Zoom to Mapsheet", "magnifier_zoom_grid",
+        GridLayer::zoomToSheet, false);
+    });
   }
 
-  public static GridLayer newLayer(final Map<String, ? extends Object> properties) {
-    return new GridLayer(properties);
+  public static GridLayer newLayer(final Map<String, ? extends Object> config) {
+    return new GridLayer(config);
   }
 
   private String gridName;
 
   private RectangularMapGrid grid;
 
-  public GridLayer(final Map<String, ? extends Object> properties) {
+  public GridLayer(final Map<String, ? extends Object> config) {
     super("gridLayer");
-    setProperties(properties);
+    setProperties(config);
     setReadOnly(true);
     setSelectSupported(false);
-    setRenderer(new GridLayerRenderer(this));
-    setIcon(Icons.getIcon("grid"));
+    if (getRenderer() == null) {
+      setRenderer(new GridLayerRenderer(this));
+    }
+    setIcon("grid");
   }
 
   public RectangularMapGrid getGrid() {
@@ -77,12 +81,40 @@ public class GridLayer extends AbstractLayer {
     }
   }
 
+  @Override
+  public TabbedValuePanel newPropertiesPanel() {
+    final TabbedValuePanel propertiesPanel = super.newPropertiesPanel();
+    newPropertiesPanelStyle(propertiesPanel);
+    return propertiesPanel;
+  }
+
+  protected void newPropertiesPanelStyle(final TabbedValuePanel propertiesPanel) {
+    if (getRenderer() != null) {
+      final LayerStylePanel stylePanel = new LayerStylePanel(this);
+      propertiesPanel.addTab("Style", "palette", stylePanel);
+    }
+  }
+
   public void setGrid(final RectangularMapGrid grid) {
     this.grid = grid;
   }
 
   public void setGridName(final String gridName) {
     this.gridName = gridName;
+  }
+
+  @SuppressWarnings("unchecked")
+  public void setStyle(Object style) {
+    if (style instanceof Map) {
+      final Map<String, Object> map = (Map<String, Object>)style;
+      style = MapObjectFactory.toObject(map);
+    }
+    if (style instanceof GridLayerRenderer) {
+      final GridLayerRenderer renderer = (GridLayerRenderer)style;
+      setRenderer(renderer);
+    } else {
+      Logs.error(this, "Cannot create renderer for: " + style);
+    }
   }
 
   @Override
@@ -107,8 +139,11 @@ public class GridLayer extends AbstractLayer {
       final String gridName = grid.getName();
       final String preferenceName = CaseConverter.toCapitalizedWords(gridName) + "Mapsheet";
       String mapsheet = PreferencesUtil.getString(getClass(), preferenceName);
-      mapsheet = JOptionPane.showInputDialog(map,
-        "Enter name of the" + gridName + " mapsheet to zoom to", mapsheet);
+
+      final String title = "Zoom to Mapsheet: " + getName();
+      mapsheet = (String)JOptionPane.showInputDialog(map,
+        new JLabel("<html><p>" + gridName + "</p><p>Enter mapsheet to zoom to.</p></html>"), title,
+        JOptionPane.QUESTION_MESSAGE, null, null, mapsheet);
       zoomToSheet(mapsheet);
     }
   }

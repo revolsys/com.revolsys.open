@@ -19,7 +19,7 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Strings;
-import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 
 public class FileGdbQueryIterator extends AbstractIterator<Record> implements RecordReader {
 
@@ -45,7 +45,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
 
   private String sql;
 
-  private LabelCountMap labelCountMap;
+  private LabelCounters labelCountMap;
 
   private TableWrapper table;
 
@@ -194,7 +194,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
     return this.recordDefinition;
   }
 
-  public LabelCountMap getStatistics() {
+  public LabelCounters getStatistics() {
     return this.labelCountMap;
   }
 
@@ -246,7 +246,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
     }
   }
 
-  public void setStatistics(final LabelCountMap labelCountMap) {
+  public void setStatistics(final LabelCounters labelCountMap) {
     this.labelCountMap = labelCountMap;
   }
 

@@ -13,7 +13,7 @@ public class GeometryFilter {
         return false;
       } else {
         final BoundingBox geometryBoundingBox = geometry.getBoundingBox();
-        return boundingBox.intersects(geometryBoundingBox);
+        return boundingBox.bboxIntersects(geometryBoundingBox);
       }
     };
   }

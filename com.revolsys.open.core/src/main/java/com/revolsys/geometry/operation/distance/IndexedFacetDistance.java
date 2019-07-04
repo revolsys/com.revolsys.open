@@ -35,7 +35,7 @@ package com.revolsys.geometry.operation.distance;
 
 import com.revolsys.geometry.index.strtree.ItemBoundable;
 import com.revolsys.geometry.index.strtree.ItemDistance;
-import com.revolsys.geometry.index.strtree.STRtree;
+import com.revolsys.geometry.index.strtree.StrTree;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Polygonal;
@@ -81,7 +81,7 @@ public class IndexedFacetDistance {
   // TODO: implement this
   /*
    * public boolean isWithinDistance(Geometry g, double maximumDistance) {
-   * STRtree tree2 = FacetSequenceTreeBuilder.build(g); double dist =
+   * StrTree tree2 = FacetSequenceTreeBuilder.build(g); double dist =
    * findMinDistance(cachedTree.getRoot(), tree2.getRoot(), maximumDistance); if
    * (dist <= maximumDistance) return false; return true; }
    */
@@ -118,7 +118,7 @@ public class IndexedFacetDistance {
     return ((FacetSequence)o1).distance((FacetSequence)o2);
   }
 
-  private final STRtree cachedTree;
+  private final StrTree cachedTree;
 
   /**
    * Creates a new distance-finding instance for a given target {@link Geometry}.
@@ -151,7 +151,7 @@ public class IndexedFacetDistance {
   // TODO: implement this
   /*
    * public double getDistanceWithin(Geometry g, double maximumDistance) {
-   * STRtree tree2 = FacetSequenceTreeBuilder.build(g); Object[] obj =
+   * StrTree tree2 = FacetSequenceTreeBuilder.build(g); Object[] obj =
    * cachedTree.nearestNeighbours(tree2, new FacetSequenceDistance()); return
    * facetDistance(obj); }
    */
@@ -165,7 +165,7 @@ public class IndexedFacetDistance {
    * @return the computed distance
    */
   public double getDistance(final Geometry g) {
-    final STRtree tree2 = FacetSequenceTreeBuilder.build(g);
+    final StrTree tree2 = FacetSequenceTreeBuilder.build(g);
     final Object[] obj = this.cachedTree.nearestNeighbour(tree2, new FacetSequenceDistance());
     return facetDistance(obj);
   }

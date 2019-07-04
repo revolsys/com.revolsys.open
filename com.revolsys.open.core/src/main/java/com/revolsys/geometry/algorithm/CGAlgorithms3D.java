@@ -48,7 +48,7 @@ public class CGAlgorithms3D {
   public static double distance(final Point p0, final Point p1) {
     // default to 2D distance if either Z is not set
     if (Double.isNaN(p0.getZ()) || Double.isNaN(p1.getZ())) {
-      return p0.distance(p1);
+      return p0.distancePoint(p1);
     }
 
     final double dx = p0.getX() - p1.getX();

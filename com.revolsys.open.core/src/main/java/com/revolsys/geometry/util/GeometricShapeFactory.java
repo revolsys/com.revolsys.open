@@ -39,7 +39,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.util.AffineTransformation;
 
@@ -85,15 +85,15 @@ public class GeometricShapeFactory {
 
     public BoundingBox getEnvelope() {
       if (this.base != null) {
-        return new BoundingBoxDoubleGf(2, this.base.getX(), this.base.getY(),
+        return BoundingBoxDoubleXY.newBoundingBoxDoubleXY(this.base.getX(), this.base.getY(),
           this.base.getX() + this.width, this.base.getY() + this.height);
       }
       if (this.centre != null) {
-        return new BoundingBoxDoubleGf(2, this.centre.getX() - this.width / 2,
+        return BoundingBoxDoubleXY.newBoundingBoxDoubleXY(this.centre.getX() - this.width / 2,
           this.centre.getY() - this.height / 2, this.centre.getX() + this.width / 2,
           this.centre.getY() + this.height / 2);
       }
-      return new BoundingBoxDoubleGf(2, 0, 0, this.width, this.height);
+      return BoundingBoxDoubleXY.newBoundingBoxDoubleXY(0, 0, this.width, this.height);
     }
 
     public double getHeight() {
@@ -120,7 +120,7 @@ public class GeometricShapeFactory {
       this.width = env.getWidth();
       this.height = env.getHeight();
       this.base = new PointDouble(env.getMinX(), env.getMinY());
-      this.centre = env.getCentre().newPointDouble();
+      this.centre = env.getCentre();
     }
 
     public void setHeight(final double height) {
@@ -154,7 +154,7 @@ public class GeometricShapeFactory {
    * {@link GeometryFactory}.
    */
   public GeometricShapeFactory() {
-    this(GeometryFactory.DEFAULT);
+    this(GeometryFactory.DEFAULT_3D);
   }
 
   /**
@@ -289,7 +289,7 @@ public class GeometricShapeFactory {
       final double y = yRadius * Math.sin(ang) + centreY;
       pts[iPt++] = coord(x, y);
     }
-    pts[iPt] = pts[0].newPointDouble();
+    pts[iPt] = pts[0];
 
     final LinearRing ring = this.geomFact.linearRing(pts);
     final Polygon poly = this.geomFact.polygon(ring);
@@ -338,7 +338,7 @@ public class GeometricShapeFactory {
       final double y = env.getMaxY() - i * YsegLen;
       pts[ipt++] = coord(x, y);
     }
-    pts[ipt++] = pts[0].newPointDouble();
+    pts[ipt++] = pts[0];
 
     final LinearRing ring = this.geomFact.linearRing(pts);
     final Polygon poly = this.geomFact.polygon(ring);
@@ -402,7 +402,7 @@ public class GeometricShapeFactory {
       pts[6 * nSegsInOct + i] = coordTrans(-y, x, centre);
       pts[8 * nSegsInOct - i] = coordTrans(-x, y, centre);
     }
-    pts[pts.length - 1] = pts[0].newPointDouble();
+    pts[pts.length - 1] = pts[0];
 
     final LinearRing ring = this.geomFact.linearRing(pts);
     final Polygon poly = this.geomFact.polygon(ring);

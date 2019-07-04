@@ -33,7 +33,6 @@
 package com.revolsys.geometry.model;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -43,10 +42,7 @@ import javax.measure.Unit;
 import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
 
-import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
-
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.editor.MultiPointEditor;
 import com.revolsys.geometry.model.segment.Segment;
 import com.revolsys.geometry.model.vertex.MultiPointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -67,47 +63,48 @@ public interface MultiPoint extends GeometryCollection, Punctual {
     final boolean shortCircuit) {
     final Set<Point> points = new TreeSet<>();
     for (final Vertex vertex : vertices()) {
-      final Point point = new PointDouble(vertex, 2);
-      if (points.contains(point)) {
-        final DuplicateVertexError error = new DuplicateVertexError(vertex);
+      if (points.contains(vertex)) {
+        final DuplicateVertexError error = new DuplicateVertexError(vertex.clone());
         if (shortCircuit) {
           return false;
         } else {
           errors.add(error);
         }
       } else {
-        points.add(point);
+        points.add(vertex.newPoint2D());
       }
     }
     return errors.isEmpty();
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V appendVertex(final Point newPoint, final int... geometryId) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
+  Punctual clone();
+
+  @Override
+  default double distance(final double x, final double y, final double terminateDistance) {
+    if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
     } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      if (isEmpty()) {
-        return (V)newPoint.newGeometry(geometryFactory);
-      } else {
-        final List<Point> points = getPoints();
-        points.add(newPoint);
-        return (V)geometryFactory.punctual(points);
+      double minDistance = Double.MAX_VALUE;
+      for (final Point point : getPoints()) {
+        final double distance = point.distance(x, y);
+        if (distance < minDistance) {
+          minDistance = distance;
+          if (distance <= terminateDistance) {
+            return distance;
+          }
+        }
       }
+      return minDistance;
     }
   }
 
   @Override
-  Punctual clone();
-
-  @Override
   default double distance(Geometry geometry, final double terminateDistance) {
     if (isEmpty()) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(geometry)) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
       geometry = geometry.convertGeometry(geometryFactory, 2);
@@ -162,15 +159,24 @@ public interface MultiPoint extends GeometryCollection, Punctual {
     return Dimension.FALSE;
   }
 
-  /**
-   *  Returns the <code>Coordinate</code> at the given position.
-   *
-   *@param  n  the partIndex of the <code>Coordinate</code> to retrieve, beginning
-   *      at 0
-   *@return    the <code>n</code>th <code>Coordinate</code>
-   */
-  default Point getCoordinate(final int n) {
-    return getPoint(n);
+  @Override
+  default Point getCentroid() {
+    int pointCount = 0;
+    double sumX = 0;
+    double sumY = 0;
+    for (final Point point : points()) {
+      if (!point.isEmpty()) {
+        pointCount += 1;
+        final double x = point.getX();
+        final double y = point.getY();
+        sumX += x;
+        sumY += y;
+      }
+    }
+    final double centroidX = sumX / pointCount;
+    final double centroidY = sumY / pointCount;
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.point(centroidX, centroidY);
   }
 
   @Override
@@ -180,8 +186,8 @@ public interface MultiPoint extends GeometryCollection, Punctual {
   }
 
   @Override
-  default DataType getDataType() {
-    return DataTypes.MULTI_POINT;
+  default GeometryDataType<MultiPoint, MultiPointEditor> getDataType() {
+    return GeometryDataTypes.MULTI_POINT;
   }
 
   @Override
@@ -211,29 +217,57 @@ public interface MultiPoint extends GeometryCollection, Punctual {
 
   @Override
   default Vertex getToVertex(final int... vertexId) {
-    if (vertexId.length <= 2) {
-      if (vertexId.length == 1 || vertexId[1] == 0) {
-        final int vertexIndex = vertexId[0];
-        final int geometryCount = getGeometryCount();
-        if (vertexIndex >= 0 || vertexIndex < geometryCount) {
-          return new MultiPointVertex(this, geometryCount - vertexIndex - 1);
-        }
-      }
+    final int[] newVertexId = GeometryCollection.cleanPartId(1, vertexId);
+    final int vertexIndex = newVertexId[0];
+    final int geometryCount = getGeometryCount();
+    if (vertexIndex >= 0 || vertexIndex < geometryCount) {
+      return new MultiPointVertex(this, geometryCount - vertexIndex - 1);
     }
     return null;
   }
 
   @Override
   default Vertex getVertex(final int... vertexId) {
-    if (vertexId.length <= 2) {
-      if (vertexId.length == 1 || vertexId[1] == 0) {
-        final int vertexIndex = vertexId[0];
-        if (vertexIndex >= 0 || vertexIndex < getGeometryCount()) {
-          return new MultiPointVertex(this, vertexId);
-        }
-      }
+    final int[] newVertexId = GeometryCollection.cleanPartId(1, vertexId);
+    final int vertexIndex = newVertexId[0];
+    if (vertexIndex >= 0 || vertexIndex < getGeometryCount()) {
+      return new MultiPointVertex(this, newVertexId);
     }
     return null;
+  }
+
+  @Override
+  default boolean hasInvalidXyCoordinates() {
+    for (final Point point : points()) {
+      if (point.hasInvalidXyCoordinates()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  default Geometry intersectionBbox(final BoundingBox boundingBox) {
+    notNullSameCs(boundingBox);
+    if (bboxCoveredBy(boundingBox)) {
+      return this;
+    } else {
+      boolean modified = false;
+      final List<Point> parts = new ArrayList<>();
+      for (final Point point : getPoints()) {
+        if (boundingBox.bboxCovers(point)) {
+          parts.add(point);
+        } else {
+          modified = true;
+        }
+      }
+      if (modified) {
+        final GeometryFactory geometryFactory = getGeometryFactory();
+        return geometryFactory.geometry(parts);
+      } else {
+        return this;
+      }
+    }
   }
 
   @Override
@@ -259,36 +293,6 @@ public interface MultiPoint extends GeometryCollection, Punctual {
   @Override
   default boolean isValid() {
     return true;
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-
-  default <V extends Geometry> V moveVertex(Point newPoint, final int... vertexId) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return (V)this;
-    } else if (vertexId.length <= 2) {
-      if (isEmpty()) {
-        throw new IllegalArgumentException("Cannot move vertex for empty MultiPoint");
-      } else {
-        final int partIndex = vertexId[0];
-        final int partCount = getGeometryCount();
-        if (partIndex >= 0 && partIndex < partCount) {
-          final GeometryFactory geometryFactory = getGeometryFactory();
-
-          newPoint = newPoint.newGeometry(geometryFactory);
-          final List<Point> points = new ArrayList<>(getPoints());
-          points.set(partIndex, newPoint);
-          return (V)geometryFactory.punctual(points);
-        } else {
-          throw new IllegalArgumentException(
-            "Part index must be between 0 and " + partCount + " not " + partIndex);
-        }
-      }
-    } else {
-      throw new IllegalArgumentException(
-        "Vertex id's for MultiPoint must have length 1. " + Arrays.toString(vertexId));
-    }
   }
 
   @Override
@@ -347,6 +351,26 @@ public interface MultiPoint extends GeometryCollection, Punctual {
       final Punctual normalizedGeometry = geometryFactory.punctual(geometries);
       return normalizedGeometry;
     }
+  }
+
+  @Override
+  default List<Vertex> pointVertices() {
+    if (isEmpty()) {
+      return Collections.emptyList();
+    } else {
+      final int vertexCount = getVertexCount();
+      final List<Vertex> vertices = new ArrayList<>(vertexCount);
+      for (int i = 0; i < vertexCount; i++) {
+        final MultiPointVertex vertex = new MultiPointVertex(this, i);
+        vertices.add(vertex);
+      }
+      return vertices;
+    }
+  }
+
+  @Override
+  default Punctual prepare() {
+    return this;
   }
 
   @Override

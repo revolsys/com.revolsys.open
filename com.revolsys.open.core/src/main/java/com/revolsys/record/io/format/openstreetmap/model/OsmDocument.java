@@ -6,11 +6,11 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.jeometry.common.data.identifier.Identifier;
+
 import com.revolsys.collection.map.LongHashMap;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
@@ -20,7 +20,7 @@ public class OsmDocument implements OsmConstants {
 
   public static OsmDocument newDocument(final String serverUrl, BoundingBox boundingBox) {
     if (boundingBox != null) {
-      boundingBox = boundingBox.convert(OsmConstants.WGS84_2D);
+      boundingBox = boundingBox.bboxToCs(OsmConstants.WGS84_2D);
       if (!boundingBox.isEmpty()) {
         final StringBuilder url = new StringBuilder(serverUrl);
         url.append("map?bbox=");
@@ -227,8 +227,7 @@ public class OsmDocument implements OsmConstants {
     final double minY = in.getDoubleAttribute(null, "minlat");
     final double maxX = in.getDoubleAttribute(null, "maxlon");
     final double maxY = in.getDoubleAttribute(null, "maxlat");
-    final BoundingBoxDoubleGf boundingBox = new BoundingBoxDoubleGf(WGS84_2D, 2, minX, minY, maxX,
-      maxY);
+    final BoundingBox boundingBox = WGS84_2D.newBoundingBox(minX, minY, maxX, maxY);
     setBounds(boundingBox);
     in.skipSubTree();
   }

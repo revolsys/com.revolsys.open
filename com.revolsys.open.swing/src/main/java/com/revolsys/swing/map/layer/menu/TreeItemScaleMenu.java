@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.menu;
 
 import java.awt.Component;
 import java.awt.Dimension;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -14,10 +15,9 @@ import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.component.ComponentFactory;
-import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.util.function.Consumer2;
 
 public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
 
@@ -29,10 +29,10 @@ public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
 
   private String name;
 
-  private final Consumer2<T, Long> setScaleFunction;
+  private final BiConsumer<T, Long> setScaleFunction;
 
   public TreeItemScaleMenu(final boolean min, final Predicate<T> enableCheck,
-    final Function<T, Long> getScaleFunction, final Consumer2<T, Long> setScaleFunction) {
+    final Function<T, Long> getScaleFunction, final BiConsumer<T, Long> setScaleFunction) {
     this.min = min;
     this.enableCheck = enableCheck;
     this.getScaleFunction = getScaleFunction;
@@ -108,7 +108,7 @@ public class TreeItemScaleMenu<T> implements ComponentFactory<JMenu> {
       }
       addScaleMenuItem(layerScale, menu, object, 0);
       boolean scaleIncluded = layerScale == 0;
-      for (final long scale : MapPanel.SCALES) {
+      for (final long scale : Viewport2D.SCALES) {
         if (layerScale == scale) {
           scaleIncluded = true;
         } else if (!scaleIncluded) {

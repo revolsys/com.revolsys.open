@@ -70,7 +70,7 @@ public class PointPairDistance {
   }
 
   public void initialize(final Point p0, final Point p1) {
-    initialize(p0, p1, p0.distance(p1));
+    initialize(p0, p1, p0.distancePoint(p1));
   }
 
   /**
@@ -80,8 +80,8 @@ public class PointPairDistance {
    * @param distance the distance between p0 and p1
    */
   private void initialize(final Point p0, final Point p1, final double distance) {
-    this.pt[0] = p0.newPointDouble();
-    this.pt[1] = p1.newPointDouble();
+    this.pt[0] = p0;
+    this.pt[1] = p1;
     this.distance = distance;
     this.isNull = false;
   }
@@ -91,7 +91,7 @@ public class PointPairDistance {
       initialize(p0, p1);
       return;
     }
-    final double dist = p0.distance(p1);
+    final double dist = p0.distancePoint(p1);
     if (dist > this.distance) {
       initialize(p0, p1, dist);
     }
@@ -106,7 +106,7 @@ public class PointPairDistance {
       initialize(p0, p1);
       return;
     }
-    final double dist = p0.distance(p1);
+    final double dist = p0.distancePoint(p1);
     if (dist < this.distance) {
       initialize(p0, p1, dist);
     }

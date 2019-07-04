@@ -1,5 +1,7 @@
 package com.revolsys.record.io.format.gml;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -8,8 +10,12 @@ import java.util.regex.Pattern;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -23,7 +29,6 @@ import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.io.IoConstants;
 import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.MathUtil;
 
 public class GmlGeometryReader extends AbstractIterator<Geometry> implements GeometryReader {
   public static final LineString parse(final String value, final String separator,
@@ -57,7 +62,7 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
       for (final String touple : touples) {
         final String[] values = coordinatePattern.split(touple);
         if (values.length > 0) {
-          final double[] coordinates = MathUtil.toDoubleArray(values);
+          final double[] coordinates = Doubles.toDoubleArray(values);
           axisCount = Math.max(axisCount, coordinates.length);
           listOfCoordinateArrays.add(coordinates);
         }
@@ -90,12 +95,16 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
 
   private StaxReader in;
 
-  public GmlGeometryReader(final Resource resource) {
+  private Reader reader;
+
+  public GmlGeometryReader(final Resource resource, final MapEx properties) {
     try {
-      this.in = StaxReader.newXmlReader(resource);
+      this.reader = resource.newReader();
+      this.in = StaxReader.newXmlReader(this.reader);
     } catch (final Exception e) {
       throw new IllegalArgumentException("Unable to open resource " + resource);
     }
+    setProperties(properties);
   }
 
   @Override
@@ -103,8 +112,20 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
     if (this.in != null) {
       this.in.close();
     }
+    if (this.reader != null) {
+      try {
+        this.reader.close();
+      } catch (final IOException e) {
+      }
+    }
     this.geometryFactory = null;
     this.in = null;
+    this.reader = null;
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
   }
 
   private GeometryFactory getGeometryFactory(final GeometryFactory geometryFactory) {
@@ -115,11 +136,11 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
     } else {
       if (srsName.startsWith("urn:ogc:def:crs:EPSG:6.6:")) {
         final int srid = Integer.parseInt(srsName.substring("urn:ogc:def:crs:EPSG:6.6:".length()));
-        final GeometryFactory factory = GeometryFactory.floating3(srid);
+        final GeometryFactory factory = GeometryFactory.floating3d(srid);
         return factory;
       } else if (srsName.startsWith("EPSG:")) {
         final int srid = Integer.parseInt(srsName.substring("EPSG:".length()));
-        final GeometryFactory factory = GeometryFactory.floating3(srid);
+        final GeometryFactory factory = GeometryFactory.floating3d(srid);
         return factory;
       } else {
         return geometryFactory;
@@ -147,10 +168,15 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
   }
 
   @Override
+  public ClockDirection getPolygonRingDirection() {
+    return ClockDirection.COUNTER_CLOCKWISE;
+  }
+
+  @Override
   protected void initDo() {
     this.geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
     if (this.geometryFactory == null) {
-      this.geometryFactory = GeometryFactory.DEFAULT;
+      this.geometryFactory = GeometryFactory.DEFAULT_3D;
     }
   }
 
@@ -312,7 +338,7 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
   }
 
   private Polygon readPolygon(final GeometryFactory geometryFactory) throws XMLStreamException {
-    int axisCount = 0;
+    int axisCount = 2;
     final GeometryFactory factory = getGeometryFactory(geometryFactory);
     final List<LinearRing> rings = new ArrayList<>();
     final int depth = this.in.getDepth();
@@ -344,5 +370,9 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
   @Override
   public void remove() {
     throw new UnsupportedOperationException();
+  }
+
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 }

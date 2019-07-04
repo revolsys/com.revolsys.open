@@ -101,7 +101,7 @@ class EdgeRing {
           continue;
         }
         // hole must be contained in shell
-        if (!tryShellEnv.covers(testEnv)) {
+        if (!tryShellEnv.bboxCovers(testEnv)) {
           continue;
         }
 
@@ -114,7 +114,7 @@ class EdgeRing {
         // check if this new containing ring is smaller than the current minimum
         // ring
         if (isContained) {
-          if (minShell == null || minShellEnv.covers(tryShellEnv)) {
+          if (minShell == null || minShellEnv.bboxCovers(tryShellEnv)) {
             minShell = tryShell;
             minShellEnv = minShell.getRing().getBoundingBox();
           }

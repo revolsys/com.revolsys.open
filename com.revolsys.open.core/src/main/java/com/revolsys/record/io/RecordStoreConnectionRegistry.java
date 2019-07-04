@@ -1,6 +1,6 @@
 package com.revolsys.record.io;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Map;
 
@@ -8,9 +8,9 @@ import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.io.connection.AbstractConnectionRegistry;
-import com.revolsys.io.connection.ConnectionRegistry;
-import com.revolsys.io.connection.ConnectionRegistryManager;
+import com.revolsys.connection.AbstractConnectionRegistry;
+import com.revolsys.connection.ConnectionRegistry;
+import com.revolsys.connection.ConnectionRegistryManager;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.Resource;
@@ -57,7 +57,8 @@ public class RecordStoreConnectionRegistry
     this(null, name, true, readOnly, resource);
   }
 
-  public RecordStoreConnection addConnection(final Map<String, Object> config) {
+  @Override
+  public RecordStoreConnection addConnection(final MapEx config) {
     final RecordStoreConnection connection = new RecordStoreConnection(this, null, config);
     addConnection(connection);
     return connection;
@@ -73,7 +74,7 @@ public class RecordStoreConnectionRegistry
   }
 
   @Override
-  protected RecordStoreConnection loadConnection(final File connectionFile,
+  protected RecordStoreConnection loadConnection(final Path connectionFile,
     final boolean importConnection) {
     final MapEx config = Json.toMap(connectionFile);
     final String name = getConnectionName(config, connectionFile, importConnection);

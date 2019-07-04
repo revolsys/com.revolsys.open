@@ -43,6 +43,11 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implemen
   }
 
   @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
+  }
+
+  @Override
   protected Geometry getNext() throws NoSuchElementException {
     do {
       final JsonParser parser = this.in;
@@ -66,7 +71,7 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implemen
   protected void initDo() {
     this.geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
     if (this.geometryFactory == null) {
-      this.geometryFactory = GeometryFactory.floating3(4326);
+      this.geometryFactory = GeometryFactory.floating3d(4326);
     }
     if (this.in.hasNext()) {
       this.in.next();
@@ -211,10 +216,10 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implemen
           if (name.startsWith(GeoJson.URN_OGC_DEF_CRS_EPSG)) {
             final int srid = Integer
               .parseInt(name.substring(GeoJson.URN_OGC_DEF_CRS_EPSG.length()));
-            factory = GeometryFactory.floating3(srid);
+            factory = GeometryFactory.floating3d(srid);
           } else if (name.startsWith(GeoJson.EPSG)) {
             final int srid = Integer.parseInt(name.substring(GeoJson.EPSG.length()));
-            factory = GeometryFactory.floating3(srid);
+            factory = GeometryFactory.floating3d(srid);
           }
         }
       }

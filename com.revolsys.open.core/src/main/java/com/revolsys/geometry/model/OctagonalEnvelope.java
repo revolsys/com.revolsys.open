@@ -32,7 +32,6 @@
  */
 package com.revolsys.geometry.model;
 
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
@@ -80,7 +79,7 @@ public class OctagonalEnvelope {
   }
 
   /**
-   * Creates a new null bounding octagon bounding an {@link BoundingBoxDoubleGf}
+   * Creates a new null bounding octagon bounding an {@link BoundingBox}
    */
   public OctagonalEnvelope(final BoundingBox env) {
     expandToInclude(env);

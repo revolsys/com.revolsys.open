@@ -6,6 +6,31 @@ import java.util.Queue;
 
 public class RunnableSwingWorkerManager {
 
+  private class RunnableSwingWorkerProcess extends AbstractSwingWorker<Void, Void> {
+
+    @Override
+    protected Void handleBackground() {
+      final Queue<Runnable> tasks = RunnableSwingWorkerManager.this.tasks;
+      do {
+        final Runnable task;
+        synchronized (tasks) {
+          task = tasks.poll();
+          if (task == null) {
+            RunnableSwingWorkerManager.this.process = null;
+            return null;
+          }
+        }
+
+        task.run();
+      } while (true);
+    }
+
+    @Override
+    public String toString() {
+      return RunnableSwingWorkerManager.this.description;
+    }
+  }
+
   private String description;
 
   private RunnableSwingWorkerProcess process;
@@ -19,30 +44,21 @@ public class RunnableSwingWorkerManager {
   public void addTask(final Runnable task) {
     synchronized (this.tasks) {
       this.tasks.add(task);
-      if (this.process == null) {
-        this.process = new RunnableSwingWorkerProcess(this);
-        this.process.execute();
-      }
+      executeTasks();
     }
   }
 
   public void addTasks(final Collection<Runnable> tasks) {
     synchronized (this.tasks) {
       this.tasks.addAll(tasks);
-      if (this.process == null) {
-        this.process = new RunnableSwingWorkerProcess(this);
-        this.process.execute();
-      }
+      executeTasks();
     }
   }
 
-  public Runnable getNextTask() {
-    synchronized (this.tasks) {
-      final Runnable task = this.tasks.poll();
-      if (task == null) {
-        this.process = null;
-      }
-      return task;
+  private void executeTasks() {
+    if (this.process == null) {
+      this.process = new RunnableSwingWorkerProcess();
+      Invoke.worker(this.process);
     }
   }
 

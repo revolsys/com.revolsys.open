@@ -24,12 +24,11 @@ import org.xlsx4j.sml.STCellType;
 import org.xlsx4j.sml.SheetData;
 import org.xlsx4j.sml.Worksheet;
 
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
-import com.revolsys.record.io.format.csv.AbstractRecordReader;
+import com.revolsys.record.io.AbstractRecordReader;
 import com.revolsys.spring.resource.Resource;
 
 public class XlsxRecordReader extends AbstractRecordReader {
@@ -121,7 +120,7 @@ public class XlsxRecordReader extends AbstractRecordReader {
         } catch (final Throwable e) {
         }
         final GeometryFactory geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXy,
-          scaleZ);
+          scaleXy, scaleZ);
         setGeometryFactory(geometryFactory);
       }
       WorksheetPart worksheetPart = null;
@@ -152,7 +151,7 @@ public class XlsxRecordReader extends AbstractRecordReader {
 
   @Override
   protected GeometryFactory loadGeometryFactory() {
-    return EsriCoordinateSystems.getGeometryFactory(this.resource);
+    return GeometryFactory.floating2d(this.resource);
   }
 
   /**

@@ -32,9 +32,7 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Point;
 
 /**
  * Represents a single point.
@@ -49,11 +47,6 @@ import com.revolsys.geometry.model.Point;
  */
 public class PointDoubleGf extends PointDouble {
   private static final long serialVersionUID = 4902022702746614570L;
-
-  /**
-   *  The bounding box of this <code>Geometry</code>.
-   */
-  private BoundingBox boundingBox;
 
   /**
    * The {@link GeometryFactory} used to create this Geometry
@@ -85,18 +78,6 @@ public class PointDoubleGf extends PointDouble {
   }
 
   @Override
-  public BoundingBox getBoundingBox() {
-    if (this.boundingBox == null) {
-      if (isEmpty()) {
-        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
-      } else {
-        this.boundingBox = newBoundingBox();
-      }
-    }
-    return this.boundingBox;
-  }
-
-  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
@@ -107,23 +88,8 @@ public class PointDoubleGf extends PointDouble {
    * @return the user data object, or <code>null</code> if none set
    */
   @Override
-  public Object getUserData() {
+  public Object getUserDataOld() {
     return this.userData;
-  }
-
-  @Override
-  public Point move(final double... deltas) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (deltas == null || isEmpty()) {
-      return this;
-    } else {
-      final double[] coordinates = getCoordinates();
-      final int axisCount = Math.min(deltas.length, getAxisCount());
-      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-        coordinates[axisIndex] += deltas[axisIndex];
-      }
-      return geometryFactory.point(coordinates);
-    }
   }
 
   /**
@@ -137,7 +103,7 @@ public class PointDoubleGf extends PointDouble {
    * application using this Geometry
    */
   @Override
-  public void setUserData(final Object userData) {
+  public void setUserDataOld(final Object userData) {
     this.userData = userData;
   }
 

@@ -47,7 +47,7 @@ public class IntersectsFilter<T extends Geometry> implements Predicate<T> {
 
   @Override
   public boolean test(final T geometry) {
-    if (this.preparedGeometry.intersects(geometry)) {
+    if (this.preparedGeometry.bboxIntersects(geometry)) {
       return true;
     } else {
       return false;

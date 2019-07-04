@@ -14,7 +14,7 @@ public abstract class RTreeNode<T> {
   }
 
   public boolean contains(final BoundingBox boundingBox) {
-    return boundingBox.covers(boundingBox);
+    return boundingBox.bboxCovers(boundingBox);
   }
 
   public abstract void forEach(BoundingBox envelope, Consumer<T> action);

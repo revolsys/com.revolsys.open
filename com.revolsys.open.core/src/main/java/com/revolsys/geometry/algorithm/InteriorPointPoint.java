@@ -72,7 +72,7 @@ public class InteriorPointPoint {
   }
 
   private void add(final Point point) {
-    final double dist = point.distance(this.centroid);
+    final double dist = point.distancePoint(this.centroid);
     if (dist < this.minDistance) {
       this.interiorPoint = new PointDouble(point);
       this.minDistance = dist;

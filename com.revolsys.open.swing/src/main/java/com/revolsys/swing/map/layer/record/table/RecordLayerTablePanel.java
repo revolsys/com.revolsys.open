@@ -9,6 +9,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 
 import javax.swing.BorderFactory;
@@ -63,6 +65,7 @@ import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public class RecordLayerTablePanel extends TablePanel
   implements PropertyChangeListener, MapSerializer {
@@ -97,14 +100,17 @@ public class RecordLayerTablePanel extends TablePanel
 
     table.getTableCellEditor().addMouseListener(this);
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+    MenuFactory.setMenuSource(table);
 
     final MenuFactory headerMenu = getHeaderMenu();
     SetRecordsFieldValue.addMenuItem(headerMenu);
     FieldCalculator.addMenuItem(headerMenu);
     headerMenu.addMenuItem("field", "Copy Raw Values", "page_white_copy",
-      () -> actionCopyColumnValues(false));
+      () -> actionCopyColumnValues(false, false));
     headerMenu.addMenuItem("field", "Copy Display Values", "page_white_copy",
-      () -> actionCopyColumnValues(true));
+      () -> actionCopyColumnValues(true, false));
+    headerMenu.addMenuItem("field", "Copy Unique Display Values", "page_white_copy",
+      () -> actionCopyColumnValues(true, true));
 
     final LayerRecordMenu menu = this.layer.getRecordMenu();
 
@@ -127,15 +133,24 @@ public class RecordLayerTablePanel extends TablePanel
     this.tableModel.refresh();
   }
 
-  private void actionCopyColumnValues(final boolean showDisplayValues) {
+  private void actionCopyColumnValues(final boolean showDisplayValues, final boolean unique) {
     final Consumer<ProgressMonitor> action = monitor -> {
       final int columnIndex = TablePanel.getEventColumn();
-      final StringBuilder result = new StringBuilder();
-      final Consumer<String> valueAction = value -> {
-        result.append(value);
-        result.append('\n');
-        monitor.addProgress();
-      };
+      final Consumer<String> valueAction;
+      StringBuilder stringBuilder;
+      Set<String> values = null;
+      if (unique) {
+        stringBuilder = null;
+        values = new TreeSet<>();
+        valueAction = values::add;
+      } else {
+        stringBuilder = new StringBuilder();
+        valueAction = value -> {
+          stringBuilder.append(value);
+          stringBuilder.append('\n');
+          monitor.addProgress();
+        };
+      }
       if (showDisplayValues) {
         this.tableModel.forEachColumnDisplayValue(monitor, columnIndex, valueAction);
       } else {
@@ -150,8 +165,13 @@ public class RecordLayerTablePanel extends TablePanel
       }
 
       if (!monitor.isCancelled()) {
-        ClipboardUtil
-          .setContents(new StringTransferable(DataFlavor.stringFlavor, result.toString()));
+        String content;
+        if (unique) {
+          content = Strings.toString("\n", values);
+        } else {
+          content = stringBuilder.toString();
+        }
+        ClipboardUtil.setContents(new StringTransferable(DataFlavor.stringFlavor, content));
       }
     };
     final int rowCount = this.tableModel.getRowCount();
@@ -169,7 +189,7 @@ public class RecordLayerTablePanel extends TablePanel
     final JPopupMenu menu = new JPopupMenu();
 
     final JMenuItem editMenuItem = RunnableAction.newMenuItem("Edit Field Sets",
-      "fields_filter_edit", () -> {
+      "fields_filter:edit", () -> {
         final String fieldNamesSetName = FieldNamesSetPanel.showDialog(this.layer);
         if (Property.hasValue(fieldNamesSetName)) {
           this.tableModel.setFieldNamesSetName(fieldNamesSetName);
@@ -319,7 +339,7 @@ public class RecordLayerTablePanel extends TablePanel
     final TableRowCount tableRowCount = new TableRowCount(table);
     toolBar.addComponent("count", tableRowCount);
 
-    toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", this.tableModel::refresh);
+    toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", this.layer::refresh);
 
     toolBar.addButtonTitleIcon("table", "Export Records", "table_save",
       new ObjectPropertyEnableCheck(tableRowCount, "rowCount", 0, true),
@@ -364,8 +384,9 @@ public class RecordLayerTablePanel extends TablePanel
       final String key = tableRecordsMode.getKey();
       final String title = tableRecordsMode.getTitle();
       final Icon icon = tableRecordsMode.getIcon();
-      final ToggleButton button = toolBar.addToggleButton(FILTER_FIELD, -1, null, title, icon, null,
-        () -> {
+      final EnableCheck enableCheck = tableRecordsMode.getEnableCheck();
+      final ToggleButton button = toolBar.addToggleButton(FILTER_FIELD, -1, null, title, icon,
+        enableCheck, () -> {
           if (this.tableModel != null) {
             this.tableModel.setTableRecordsMode(tableRecordsMode);
           }

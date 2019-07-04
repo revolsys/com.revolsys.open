@@ -1,17 +1,22 @@
 package com.revolsys.swing.map.layer;
 
+import java.awt.Window;
 import java.beans.PropertyChangeListener;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import javax.swing.Icon;
+import javax.swing.SwingUtilities;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.Child;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.swing.component.TabbedValuePanel;
@@ -19,14 +24,41 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.ProjectFramePanel;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
+import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.util.Booleans;
 
 public interface Layer extends GeometryFactoryProxy, PropertyChangeSupportProxy,
   ObjectWithProperties, PropertyChangeListener, Comparable<Layer>, MapSerializer, Child<LayerGroup>,
-  Cloneable, ProjectFramePanel {
+  Cloneable, BoundingBoxProxy, ProjectFramePanel {
+
+  default void addParent(final List<Layer> path) {
+    final LayerGroup parent = getLayerGroup();
+    if (parent != null) {
+      path.add(0, parent);
+      parent.addParent(path);
+    }
+  }
+
+  default void addVisibleBbox(final BoundingBoxEditor boundingBox) {
+    if (isExists() && isVisible()) {
+      boundingBox.addBbox(this);
+    }
+  }
+
+  default boolean checkShowProperties() {
+    boolean show = true;
+    synchronized (this) {
+      if (Booleans.getBoolean(getProperty("INTERNAL_PROPERTIES_VISIBLE"))) {
+        show = false;
+      } else {
+        setProperty("INTERNAL_PROPERTIES_VISIBLE", true);
+      }
+    }
+    return show;
+  }
 
   void delete();
-
-  BoundingBox getBoundingBox();
 
   BoundingBox getBoundingBox(boolean visibleLayersOnly);
 
@@ -50,6 +82,8 @@ public interface Layer extends GeometryFactoryProxy, PropertyChangeSupportProxy,
 
   long getMaximumScale();
 
+  MenuFactory getMenu();
+
   long getMinimumScale();
 
   @Override
@@ -62,7 +96,12 @@ public interface Layer extends GeometryFactoryProxy, PropertyChangeSupportProxy,
   @Override
   String getPath();
 
-  List<Layer> getPathList();
+  default List<Layer> getPathList() {
+    final List<Layer> path = new ArrayList<>();
+    path.add(this);
+    addParent(path);
+    return path;
+  }
 
   Project getProject();
 
@@ -86,6 +125,10 @@ public interface Layer extends GeometryFactoryProxy, PropertyChangeSupportProxy,
   boolean isClonable();
 
   boolean isDeleted();
+
+  default boolean isDescendant(final Layer layer) {
+    return layer == this;
+  }
 
   boolean isEditable();
 
@@ -171,9 +214,28 @@ public interface Layer extends GeometryFactoryProxy, PropertyChangeSupportProxy,
 
   void showProperties(String tabName);
 
-  void showRendererProperties(final LayerRenderer<?> renderer);
+  default void showRendererProperties(final LayerRenderer<?> renderer) {
+    final MapPanel map = getMapPanel();
+    if (map != null && isExists() && checkShowProperties()) {
+      try {
+        final Window window = SwingUtilities.getWindowAncestor(map);
+        final TabbedValuePanel panel = newPropertiesPanel();
+        panel.setSelectdTab("Style");
+        final LayerStylePanel stylePanel = panel.getTab("Style");
+        if (stylePanel != null) {
+          stylePanel.setSelectedRenderer(renderer);
+          panel.showDialog(window);
+        }
+        refresh();
+      } finally {
+        removeProperty("INTERNAL_PROPERTIES_VISIBLE");
+      }
+    }
+  }
 
-  void showTableView();
+  default void showTableView() {
+    showTableView(MapEx.EMPTY);
+  }
 
   default void showTableView(final MapEx config) {
     final ProjectFrame projectFrame = ProjectFrame.get(this);

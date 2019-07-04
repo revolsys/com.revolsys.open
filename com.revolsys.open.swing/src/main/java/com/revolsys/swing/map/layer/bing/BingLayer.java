@@ -12,9 +12,8 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.parallel.ExecutorServiceFactory;
-import com.revolsys.swing.Icons;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.CaseConverter;
 
 public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
@@ -31,7 +30,7 @@ public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
 
   BingLayer() {
     super("bing");
-    setIcon(Icons.getIcon("bing"));
+    setIcon("bing");
     setGeometryFactory(GeometryFactory.worldMercator());
   }
 
@@ -72,10 +71,10 @@ public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
   }
 
   @Override
-  public List<BingMapTile> getOverlappingMapTiles(final Viewport2D view) {
+  public List<BingMapTile> getOverlappingMapTiles(final ViewRenderer view) {
     final List<BingMapTile> tiles = new ArrayList<>();
     try {
-      final double metresPerPixel = view.getUnitsPerPixel();
+      final double metresPerPixel = view.getMetresPerPixel();
       final BingClient client = this.client;
       final int zoomLevel = client.getZoomLevel(metresPerPixel);
       final double resolution = getResolution(view);
@@ -109,8 +108,8 @@ public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
   }
 
   @Override
-  public double getResolution(final Viewport2D viewport) {
-    final double metresPerPixel = viewport.getUnitsPerPixel();
+  public double getResolution(final ViewRenderer view) {
+    final double metresPerPixel = view.getMetresPerPixel();
     final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
     return this.client.getResolution(zoomLevel);
   }

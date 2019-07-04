@@ -2,39 +2,37 @@ package com.revolsys.swing.map.layer.record.renderer;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Paint;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.GeometryDataTypes;
+import com.revolsys.io.BaseCloseable;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.renderer.shape.LineStringShape;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePanel;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePreview;
+import com.revolsys.swing.map.view.ViewRenderer;
 
-public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRenderer {
+public class GeometryStyleRecordLayerRenderer extends AbstractGeometryRecordLayerRenderer
+  implements GeometryStyleLayerRenderer<AbstractRecordLayer> {
 
   private static final Icon ICON = Icons.getIcon("style_geometry");
 
@@ -58,94 +56,6 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
     path.lineTo(0, 0);
     path.closePath();
     return path;
-  }
-
-  public static final void renderGeometry(final Viewport2D viewport, final Graphics2D graphics,
-    final Geometry geometry, final GeometryStyle style) {
-    if (geometry != null) {
-      final BoundingBox viewExtent = viewport.getBoundingBox();
-      if (!viewExtent.isEmpty()) {
-        final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
-        for (int i = 0; i < geometry.getGeometryCount(); i++) {
-          final Geometry part = geometry.getGeometry(i);
-          final BoundingBox partExtent = part.getBoundingBox();
-          if (partExtent.intersects(viewExtent)) {
-            final Geometry convertedPart = part.convertGeometry(viewGeometryFactory);
-            if (convertedPart instanceof Point) {
-              final Point point = (Point)convertedPart;
-              MarkerStyleRenderer.renderMarker(viewport, graphics, point, style, 0);
-            } else if (convertedPart instanceof LineString) {
-              final LineString lineString = (LineString)convertedPart;
-              renderLineString(viewport, graphics, lineString, style);
-            } else if (convertedPart instanceof Polygon) {
-              final Polygon polygon = (Polygon)convertedPart;
-              renderPolygon(viewport, graphics, polygon, style);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  public static final void renderGeometryOutline(final Viewport2D viewport,
-    final Graphics2D graphics, final Geometry geometry, final GeometryStyle style) {
-    if (geometry != null) {
-      final BoundingBox viewExtent = viewport.getBoundingBox();
-      if (!viewExtent.isEmpty()) {
-        final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
-        for (int i = 0; i < geometry.getGeometryCount(); i++) {
-          final Geometry part = geometry.getGeometry(i);
-          final BoundingBox partExtent = part.getBoundingBox();
-          if (partExtent.intersects(viewExtent)) {
-            final Geometry convertedPart = part.convertGeometry(viewGeometryFactory);
-            if (convertedPart instanceof Point) {
-              final Point point = (Point)convertedPart;
-              MarkerStyleRenderer.renderMarker(viewport, graphics, point, style, 0);
-            } else if (convertedPart instanceof LineString) {
-              final LineString lineString = (LineString)convertedPart;
-              renderLineString(viewport, graphics, lineString, style);
-            } else if (convertedPart instanceof Polygon) {
-              final Polygon polygon = (Polygon)convertedPart;
-              for (final LinearRing ring : polygon.rings()) {
-                renderLineString(viewport, graphics, ring, style);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-
-  public static final void renderLineString(final Viewport2D viewport, final Graphics2D graphics,
-    LineString line, final GeometryStyle style) {
-    final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
-    line = line.convertGeometry(viewGeometryFactory, 2);
-    if (!line.isEmpty()) {
-      final Paint paint = graphics.getPaint();
-      try {
-        style.setLineStyle(viewport, graphics);
-        graphics.draw(line);
-      } finally {
-        graphics.setPaint(paint);
-      }
-    }
-  }
-
-  public static final void renderPolygon(final Viewport2D viewport, final Graphics2D graphics,
-    Polygon polygon, final GeometryStyle style) {
-    final GeometryFactory viewGeometryFactory = viewport.getGeometryFactory();
-    polygon = polygon.convertGeometry(viewGeometryFactory, 2);
-    if (!polygon.isEmpty()) {
-      final Paint paint = graphics.getPaint();
-      try {
-        style.setFillStyle(viewport, graphics);
-        graphics.fill(polygon);
-        style.setLineStyle(viewport, graphics);
-        graphics.draw(polygon);
-      } finally {
-        graphics.setPaint(paint);
-      }
-    }
   }
 
   private GeometryStyle style = new GeometryStyle();
@@ -188,6 +98,29 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
   }
 
   @Override
+  public DataType getGeometryType() {
+    final AbstractRecordLayer layer = getLayer();
+    final RecordDefinition recordDefinition = layer.getRecordDefinition();
+    final FieldDefinition geometryField = recordDefinition.getGeometryField();
+
+    if (geometryField != null) {
+      final DataType geometryDataType = geometryField.getDataType();
+      if (GeometryDataTypes.GEOMETRY_COLLECTION.equals(geometryDataType)) {
+        return GeometryDataTypes.GEOMETRY;
+      } else if (GeometryDataTypes.MULTI_POINT.equals(geometryDataType)) {
+        return GeometryDataTypes.POINT;
+      } else if (GeometryDataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
+        return GeometryDataTypes.LINE_STRING;
+      } else if (GeometryDataTypes.MULTI_POLYGON.equals(geometryDataType)) {
+        return GeometryDataTypes.POLYGON;
+      } else {
+        return geometryDataType;
+      }
+    }
+    return null;
+  }
+
+  @Override
   public Icon getIcon() {
     Icon icon = super.getIcon();
     if (icon == ICON) {
@@ -197,6 +130,7 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
     return icon;
   }
 
+  @Override
   public GeometryStyle getStyle() {
     return this.style;
   }
@@ -210,14 +144,14 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
       final GeometryStyle geometryStyle = getStyle();
       Shape shape = null;
       final DataType geometryDataType = layer.getGeometryType();
-      if (DataTypes.POINT.equals(geometryDataType)
-        || DataTypes.MULTI_POINT.equals(geometryDataType)) {
+      if (GeometryDataTypes.POINT.equals(geometryDataType)
+        || GeometryDataTypes.MULTI_POINT.equals(geometryDataType)) {
         return this.style.getMarker().newIcon(geometryStyle);
-      } else if (DataTypes.LINE_STRING.equals(geometryDataType)
-        || DataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
-        shape = GeometryStylePreview.getLineShape(16);
-      } else if (DataTypes.POLYGON.equals(geometryDataType)
-        || DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
+      } else if (GeometryDataTypes.LINE_STRING.equals(geometryDataType)
+        || GeometryDataTypes.MULTI_LINE_STRING.equals(geometryDataType)) {
+        shape = new LineStringShape(GeometryStylePreview.getLineString(16));
+      } else if (GeometryDataTypes.POLYGON.equals(geometryDataType)
+        || GeometryDataTypes.MULTI_POLYGON.equals(geometryDataType)) {
         shape = getPolygonShape();
       } else {
         return ICON;
@@ -227,8 +161,8 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
       final Graphics2D graphics = image.createGraphics();
       graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-      if (DataTypes.POLYGON.equals(geometryDataType)
-        || DataTypes.MULTI_POLYGON.equals(geometryDataType)) {
+      if (GeometryDataTypes.POLYGON.equals(geometryDataType)
+        || GeometryDataTypes.MULTI_POLYGON.equals(geometryDataType)) {
         graphics.setPaint(geometryStyle.getPolygonFill());
         graphics.fill(shape);
       }
@@ -257,10 +191,27 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
   }
 
   @Override
-  public void renderRecord(final Viewport2D viewport, final BoundingBox visibleArea,
-    final AbstractLayer layer, final LayerRecord record) {
-    final Geometry geometry = record.getGeometry();
-    viewport.drawGeometry(geometry, this.style);
+  protected void renderRecord(final ViewRenderer view, final AbstractRecordLayer layer,
+    final LayerRecord record, final Geometry geometry) {
+  }
+
+  @Override
+  protected void renderRecordsDo(final ViewRenderer view, final AbstractRecordLayer layer,
+    final List<LayerRecord> records) {
+    if (!records.isEmpty()) {
+      final boolean draw = this.style.getLineOpacity() > 0;
+      final boolean fill = this.style.getPolygonFillOpacity() > 0;
+      try (
+        BaseCloseable geometryListCloseable = view.drawGeometriesCloseable(this.style, true, draw,
+          fill)) {
+        for (final LayerRecord record : view.cancellable(records)) {
+          if (isVisible(record)) {
+            final Geometry geometry = record.getGeometry();
+            view.addGeometry(geometry);
+          }
+        }
+      }
+    }
   }
 
   @Override
@@ -271,6 +222,7 @@ public class GeometryStyleRecordLayerRenderer extends AbstractRecordLayerRendere
     }
   }
 
+  @Override
   public void setStyle(final GeometryStyle style) {
     if (this.style != null) {
       this.style.removePropertyChangeListener(this);

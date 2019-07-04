@@ -47,6 +47,7 @@
 
   <modules>
     <module>com.revolsys.open.core</module>
+    <module>com.revolsys.open.testapi</module>
     <module>com.revolsys.open.doclet</module>
     <module>com.revolsys.open.fgdb</module>
     <module>com.revolsys.open.gdal</module>
@@ -516,8 +517,9 @@
     <org.apache.xmlgraphics.batik.version>1.10</org.apache.xmlgraphics.batik.version>
     <org.codehaus.groovy.version>2.5.4</org.codehaus.groovy.version>
     <org.docx4java.version>6.1.0</org.docx4java.version>
+    <org.jeometry.version>TRUNK-SNAPSHOT</org.jeometry.version>
     <org.gdal.version>2.4.0</org.gdal.version>
-    <org.slf4j.version>1.7.25</org.slf4j.version>
+    <org.slf4j.version>1.7.26</org.slf4j.version>
     <org.springframework.version>5.1.3.RELEASE</org.springframework.version>
 
     <gpg.skip>true</gpg.skip>

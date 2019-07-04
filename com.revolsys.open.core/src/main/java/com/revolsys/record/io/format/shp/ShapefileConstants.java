@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
+
+import com.revolsys.geometry.model.GeometryDataTypes;
 
 public class ShapefileConstants {
   public static final Map<Integer, DataType> DATA_TYPE_MAP = new HashMap<>();
@@ -83,18 +84,18 @@ public class ShapefileConstants {
   public static final int VERSION = 1000;
 
   static {
-    DATA_TYPE_MAP.put(POINT_M_SHAPE, DataTypes.POINT);
-    DATA_TYPE_MAP.put(POINT_Z_SHAPE, DataTypes.POINT);
-    DATA_TYPE_MAP.put(POINT_SHAPE, DataTypes.POINT);
-    DATA_TYPE_MAP.put(POLYLINE_M_SHAPE, DataTypes.MULTI_LINE_STRING);
-    DATA_TYPE_MAP.put(POLYLINE_ZM_SHAPE, DataTypes.MULTI_LINE_STRING);
-    DATA_TYPE_MAP.put(POLYLINE_SHAPE, DataTypes.MULTI_LINE_STRING);
-    DATA_TYPE_MAP.put(POLYGON_M_SHAPE, DataTypes.POLYGON);
-    DATA_TYPE_MAP.put(POLYGON_ZM_SHAPE, DataTypes.POLYGON);
-    DATA_TYPE_MAP.put(POLYGON_SHAPE, DataTypes.POLYGON);
-    DATA_TYPE_MAP.put(MULTI_POINT_M_SHAPE, DataTypes.MULTI_POINT);
-    DATA_TYPE_MAP.put(MULTI_POINT_ZM_SHAPE, DataTypes.MULTI_POINT);
-    DATA_TYPE_MAP.put(MULTI_POINT_SHAPE, DataTypes.MULTI_POINT);
+    DATA_TYPE_MAP.put(POINT_M_SHAPE, GeometryDataTypes.POINT);
+    DATA_TYPE_MAP.put(POINT_Z_SHAPE, GeometryDataTypes.POINT);
+    DATA_TYPE_MAP.put(POINT_SHAPE, GeometryDataTypes.POINT);
+    DATA_TYPE_MAP.put(POLYLINE_M_SHAPE, GeometryDataTypes.MULTI_LINE_STRING);
+    DATA_TYPE_MAP.put(POLYLINE_ZM_SHAPE, GeometryDataTypes.MULTI_LINE_STRING);
+    DATA_TYPE_MAP.put(POLYLINE_SHAPE, GeometryDataTypes.MULTI_LINE_STRING);
+    DATA_TYPE_MAP.put(POLYGON_M_SHAPE, GeometryDataTypes.POLYGON);
+    DATA_TYPE_MAP.put(POLYGON_ZM_SHAPE, GeometryDataTypes.POLYGON);
+    DATA_TYPE_MAP.put(POLYGON_SHAPE, GeometryDataTypes.POLYGON);
+    DATA_TYPE_MAP.put(MULTI_POINT_M_SHAPE, GeometryDataTypes.MULTI_POINT);
+    DATA_TYPE_MAP.put(MULTI_POINT_ZM_SHAPE, GeometryDataTypes.MULTI_POINT);
+    DATA_TYPE_MAP.put(MULTI_POINT_SHAPE, GeometryDataTypes.MULTI_POINT);
   }
 
 }

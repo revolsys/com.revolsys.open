@@ -48,7 +48,7 @@ public interface WebService<V>
           }
           final String childLayerName = elements.get(i);
           resource = resource.getChild(childLayerName);
-          if (resource.isHasError()) {
+          if (resource == null || resource.isHasError()) {
             return null;
           }
         }

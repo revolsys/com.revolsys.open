@@ -38,12 +38,15 @@ import javax.measure.quantity.Area;
 import javax.measure.quantity.Length;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
+import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.geometry.model.editor.LineStringEditor;
+import com.revolsys.geometry.model.editor.LinearRingEditor;
+import com.revolsys.geometry.model.prep.PreparedLinearRing;
+import com.revolsys.geometry.model.vertex.LinearRingVertex;
 import com.revolsys.util.QuantityType;
 
 import tec.uom.se.quantity.Quantities;
@@ -78,12 +81,17 @@ public interface LinearRing extends LineString {
    *@see Point#compareTo(Object)
    */
   static int minCoordinateIndex(final LinearRing ring) {
-    Point minCoord = null;
+    double minX = ring.getX(0);
+    double minY = ring.getY(0);
     int minIndex = 0;
-    for (final Vertex vertex : ring.vertices()) {
-      if (minCoord == null || minCoord.compareTo(vertex) > 0) {
-        minCoord = vertex.newPointDouble();
-        minIndex = vertex.getVertexIndex();
+    final int vertexCount = ring.getVertexCount();
+    for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = ring.getX(vertexIndex);
+      final double y = ring.getY(vertexIndex);
+      if (CoordinatesUtil.compare(minX, minY, x, y) > 0) {
+        minIndex = vertexIndex;
+        minX = x;
+        minY = y;
       }
     }
     return minIndex;
@@ -100,7 +108,7 @@ public interface LinearRing extends LineString {
         ((Geometry)value).getGeometryType() + " cannot be converted to a LinearRing");
     } else {
       final String string = DataTypes.toString(value);
-      return (G)GeometryFactory.DEFAULT.geometry(string, false);
+      return (G)GeometryFactory.DEFAULT_3D.geometry(string, false);
     }
   }
 
@@ -112,20 +120,19 @@ public interface LinearRing extends LineString {
    *@param  firstCoordinate  the coordinate to make first
    */
   static LinearRing scroll(final LinearRing ring, final int index) {
-    final LineString points = ring;
     final int vertexCount = ring.getVertexCount();
     final int axisCount = ring.getAxisCount();
     final double[] coordinates = new double[vertexCount * axisCount];
     int newVertexIndex = 0;
     for (int vertexIndex = index; vertexIndex < vertexCount - 1; vertexIndex++) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, newVertexIndex++, points,
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, newVertexIndex++, ring,
         vertexIndex);
     }
     for (int vertexIndex = 0; vertexIndex < index; vertexIndex++) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, newVertexIndex++, points,
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, newVertexIndex++, ring,
         vertexIndex);
     }
-    CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexCount - 1, points, index);
+    CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexCount - 1, ring, index);
     final GeometryFactory geometryFactory = ring.getGeometryFactory();
     return geometryFactory.linearRing(axisCount, coordinates);
   }
@@ -133,9 +140,15 @@ public interface LinearRing extends LineString {
   @Override
   LinearRing clone();
 
+  /**
+   * Returns <code>Dimension.FALSE</code>, since by definition LinearRings do
+   * not have a boundary.
+   *
+   * @return Dimension.FALSE
+   */
   @Override
-  default LinearRing deleteVertex(final int vertexIndex) {
-    return (LinearRing)LineString.super.deleteVertex(vertexIndex);
+  default int getBoundaryDimension() {
+    return Dimension.FALSE;
   }
 
   /**
@@ -175,15 +188,15 @@ public interface LinearRing extends LineString {
 
   default double getPolygonArea(final Unit<Area> unit) {
     double area = 0;
-    final CoordinateSystem coordinateSystem = getCoordinateSystem();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
     if (coordinateSystem instanceof GeographicCoordinateSystem) {
       // TODO better algorithm than converting to world mercator
-      final GeometryFactory geometryFactory = GeometryFactory.worldMercator();
-      final LinearRing ring = convertGeometry(geometryFactory, 2);
+      final GeometryFactory geometryFactory2 = GeometryFactory.worldMercator();
+      final LinearRing ring = as2d(geometryFactory2);
       return ring.getPolygonArea(unit);
-    } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-      final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
-      final Unit<Length> lengthUnit = projectedCoordinateSystem.getLengthUnit();
+    } else if (geometryFactory.isProjected()) {
+      final Unit<Length> lengthUnit = geometryFactory.getHorizontalLengthUnit();
       @SuppressWarnings("unchecked")
       final Unit<Area> areaUnit = (Unit<Area>)lengthUnit.multiply(lengthUnit);
       area = getPolygonArea();
@@ -196,31 +209,54 @@ public interface LinearRing extends LineString {
   }
 
   @Override
+  default LinearRingVertex getToVertex(int vertexIndex) {
+    final int vertexCount = getVertexCount();
+    vertexIndex = vertexCount - vertexIndex - 1;
+    if (vertexIndex >= 0 && vertexIndex < vertexCount) {
+      return new LinearRingVertex(this, vertexIndex);
+    }
+    return null;
+  }
+
+  @Override
+  default LinearRingVertex getVertex(int vertexIndex) {
+    final int vertexCount = getVertexCount();
+    if (vertexIndex < vertexCount) {
+      while (vertexIndex < 0) {
+        vertexIndex += vertexCount;
+      }
+      return new LinearRingVertex(this, vertexIndex);
+    } else {
+      return null;
+    }
+  }
+
+  @Override
   default boolean isValid() {
     return LineString.super.isValid();
   }
 
   @Override
-  default LinearRing move(final double... deltas) {
-    return (LinearRing)LineString.super.move(deltas);
-  }
-
-  @Override
-  default LinearRing moveVertex(final Point newPoint, final int vertexIndex) {
-    return (LinearRing)LineString.super.moveVertex(newPoint, vertexIndex);
-  }
-
-  @Override
   default LinearRing newGeometry(final GeometryFactory geometryFactory) {
-    if (geometryFactory == null) {
-      return this.clone();
-    } else if (isEmpty()) {
-      return geometryFactory.linearRing();
-    } else {
-      final double[] coordinates = convertCoordinates(geometryFactory);
-      final int axisCount = getAxisCount();
-      return geometryFactory.linearRing(axisCount, coordinates);
-    }
+    return (LinearRing)LineString.super.newGeometry(geometryFactory);
+  }
+
+  @Override
+  default LinearRingEditor newGeometryEditor() {
+    return new LinearRingEditor(this);
+  }
+
+  @Override
+  default LinearRingEditor newGeometryEditor(final int axisCount) {
+    final LinearRingEditor editor = new LinearRingEditor(this);
+    editor.setAxisCount(axisCount);
+    return editor;
+  }
+
+  @Override
+  default LinearRing newLineString() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.linearRing(this);
   }
 
   @Override
@@ -231,16 +267,21 @@ public interface LinearRing extends LineString {
   }
 
   @Override
-  default LineString newLineString(final int vertexCount, final double... coordinates) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final int axisCount = getAxisCount();
-    return geometryFactory.linearRing(axisCount, vertexCount, coordinates);
+  default LineString newLineString(final GeometryFactory geometryFactory, final int axisCount,
+    final int vertexCount, final double... coordinates) {
+    final GeometryFactory geometryFactoryAxisCount = geometryFactory.convertAxisCount(axisCount);
+    return geometryFactoryAxisCount.linearRing(axisCount, vertexCount, coordinates);
   }
 
   @Override
   default LinearRing newLineStringEmpty() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return geometryFactory.linearRing(this);
+    return newLineStringEmpty(geometryFactory);
+  }
+
+  @Override
+  default LinearRing newLineStringEmpty(final GeometryFactory geometryFactory) {
+    return geometryFactory.linearRing();
   }
 
   default Polygon newPolygon() {
@@ -262,7 +303,7 @@ public interface LinearRing extends LineString {
     }
   }
 
-  default LinearRing normalize(final boolean clockwise) {
+  default LinearRing normalize(final ClockDirection clockDirection) {
     if (isEmpty()) {
       return this;
     } else {
@@ -271,12 +312,17 @@ public interface LinearRing extends LineString {
       if (index > 0) {
         ring = scroll(ring, index);
       }
-      if (ring.isCounterClockwise() == clockwise) {
-        return ring.reverse();
-      } else {
+      if (ring.getClockDirection() == clockDirection) {
         return ring;
+      } else {
+        return ring.reverse();
       }
     }
+  }
+
+  @Override
+  default LinearRing prepare() {
+    return new PreparedLinearRing(this);
   }
 
   @Override
@@ -284,32 +330,40 @@ public interface LinearRing extends LineString {
     if (isEmpty()) {
       return this;
     } else {
-      final int vertexCount = getVertexCount();
-      if (vertexCount < 3) {
-        return this;
-      } else {
-        final int axisCount = getAxisCount();
-        final double[] coordinates = new double[vertexCount * axisCount];
-        double previousX = getX(0);
-        double previousY = getY(0);
-        CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, this, 0);
-        int j = 1 + 0;
-        for (int i = 1; i < vertexCount; i++) {
-          final double x = getX(i);
-          final double y = getY(i);
-          if (x != previousX || y != previousY) {
-            CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++, this, i);
-          }
+      final LineStringEditor editor = newGeometryEditor();
+      final int axisCount = getAxisCount();
+      double previousX = getX(0);
+      double previousY = getY(0);
+      int newVertexIndex = 1;
 
-          previousX = x;
-          previousY = y;
+      final int vertexCount = getVertexCount();
+
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x = getX(vertexIndex);
+        final double y = getY(vertexIndex);
+        if (x != previousX || y != previousY) {
+          if (newVertexIndex != vertexIndex) {
+            editor.setX(newVertexIndex, x);
+            editor.setY(newVertexIndex, y);
+            for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+              final double coordinate = getCoordinate(newVertexIndex, axisIndex);
+              editor.setCoordinate(newVertexIndex, axisIndex, coordinate);
+            }
+          }
+          newVertexIndex++;
         }
-        final GeometryFactory geometryFactory = getGeometryFactory();
-        if (j < 3) {
-          return geometryFactory.linearRing();
-        } else {
-          return geometryFactory.linearRing(axisCount, j, coordinates);
-        }
+
+        previousX = x;
+        previousY = y;
+      }
+      editor.setVertexCount(newVertexIndex);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      if (newVertexIndex < 3) {
+        return geometryFactory.linearRing();
+      } else if (editor.isModified()) {
+        return editor.newLinearRing();
+      } else {
+        return this;
       }
     }
   }
@@ -317,5 +371,10 @@ public interface LinearRing extends LineString {
   @Override
   default LinearRing reverse() {
     return (LinearRing)LineString.super.reverse();
+  }
+
+  @Override
+  default LinearRingVertex vertices() {
+    return new LinearRingVertex(this, -1);
   }
 }

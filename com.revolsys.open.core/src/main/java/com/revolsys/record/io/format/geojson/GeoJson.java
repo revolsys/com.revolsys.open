@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
@@ -75,7 +76,7 @@ public class GeoJson extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
-  public GeometryReader newGeometryReader(final Resource resource) {
+  public GeometryReader newGeometryReader(final Resource resource, final MapEx properties) {
     final GeoJsonGeometryIterator iterator = new GeoJsonGeometryIterator(resource);
     return iterator;
   }

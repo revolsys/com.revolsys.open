@@ -10,9 +10,9 @@ import java.util.Map;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.parallel.RunnableSwingWorkerManager;
 import com.revolsys.util.BooleanCancellable;
 import com.revolsys.util.Cancellable;
@@ -91,10 +91,9 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
   }
 
   @Override
-  public void render(final Viewport2D view, final Cancellable cancellable,
-    final AbstractTiledLayer<D, T> layer) {
+  public void render(final ViewRenderer view, final AbstractTiledLayer<D, T> layer) {
     final GeometryFactory viewportGeometryFactory = view.getGeometryFactory();
-    final double viewResolution = view.getUnitsPerPixel();
+    final double viewResolution = view.getMetresPerPixel();
     final double layerResolution = layer.getResolution(view);
     synchronized (this.cachedTiles) {
       if (viewResolution != this.viewResolution
@@ -107,6 +106,7 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
     }
     final List<Runnable> tasks = new ArrayList<>();
     final List<T> mapTiles = layer.getOverlappingMapTiles(view);
+    final BooleanCancellable cancellable = this.cancellable;
     for (final ListIterator<T> iterator = mapTiles.listIterator(); !cancellable.isCancelled()
       && iterator.hasNext();) {
       final T mapTile = iterator.next();
@@ -131,10 +131,10 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
     }
   }
 
-  protected abstract void renderTile(final Viewport2D view, final Cancellable cancellable,
+  protected abstract void renderTile(final ViewRenderer view, final Cancellable cancellable,
     final T tile);
 
-  protected void renderTiles(final Viewport2D view, final Cancellable cancellable,
+  protected void renderTiles(final ViewRenderer view, final BooleanCancellable cancellable,
     final List<T> mapTiles) {
     for (final T mapTile : cancellable.cancellable(mapTiles)) {
       renderTile(view, cancellable, mapTile);

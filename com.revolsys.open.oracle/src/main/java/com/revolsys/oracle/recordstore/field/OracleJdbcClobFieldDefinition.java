@@ -12,8 +12,7 @@ import java.util.Collections;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
-import com.revolsys.record.Record;
-import com.revolsys.spring.resource.FileSystemResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 
 public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
@@ -24,11 +23,9 @@ public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object) throws SQLException {
-    final Clob value = resultSet.getClob(columnIndex);
-    object.setValue(getIndex(), value);
-    return columnIndex + 1;
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    return resultSet.getClob(columnIndex);
   }
 
   @Override
@@ -54,7 +51,7 @@ public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
           in = new StringReader(string);
         } else if (value instanceof File) {
           final File file = (File)value;
-          final FileSystemResource resource = new FileSystemResource(file);
+          final PathResource resource = new PathResource(file);
           in = resource.newBufferedReader();
         } else {
           throw new IllegalArgumentException("Not valid for a clob column");

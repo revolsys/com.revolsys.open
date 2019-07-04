@@ -1,13 +1,13 @@
 package com.revolsys.webservice;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.io.connection.AbstractConnectionRegistry;
-import com.revolsys.io.connection.ConnectionRegistry;
-import com.revolsys.io.connection.ConnectionRegistryManager;
+import com.revolsys.connection.AbstractConnectionRegistry;
+import com.revolsys.connection.ConnectionRegistry;
+import com.revolsys.connection.ConnectionRegistryManager;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.Resource;
 
@@ -51,6 +51,7 @@ public class WebServiceConnectionRegistry extends AbstractConnectionRegistry<Web
     this(connectionManager, name, true, false, resource);
   }
 
+  @Override
   public WebServiceConnection addConnection(final MapEx config) {
     getConnectionName(config, null, true);
     final WebServiceConnection connection = new WebServiceConnection(this, config);
@@ -74,7 +75,7 @@ public class WebServiceConnectionRegistry extends AbstractConnectionRegistry<Web
   }
 
   @Override
-  protected WebServiceConnection loadConnection(final File connectionFile,
+  protected WebServiceConnection loadConnection(final Path connectionFile,
     final boolean importConnection) {
     final MapEx config = Json.toMap(connectionFile);
     final String name = getConnectionName(config, connectionFile, importConnection);

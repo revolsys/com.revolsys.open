@@ -125,6 +125,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     return !location.equals(Location.EXTERIOR);
   }
 
+  @Override
   public Location locate(final double x, final double y) {
     final RayCrossingCounter visitor = new RayCrossingCounter(x, y);
     this.index.query(y, y, visitor);

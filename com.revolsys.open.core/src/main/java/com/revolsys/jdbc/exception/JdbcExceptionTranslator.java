@@ -3,23 +3,23 @@ package com.revolsys.jdbc.exception;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import javax.sql.DataSource;
 
-import org.jeometry.common.logging.Logs;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLErrorCodesFactory;
 
 import com.revolsys.jdbc.io.DataSourceImpl;
+import com.revolsys.log.LogAppender;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.Function2;
 
 public class JdbcExceptionTranslator extends SQLErrorCodeSQLExceptionTranslator {
-  private static final Map<String, Function2<String, SQLException, DataAccessException>> ERROR_CODE_TO_FUNCTION = new HashMap<>();
+  private static final Map<String, BiFunction<String, SQLException, DataAccessException>> ERROR_CODE_TO_FUNCTION = new HashMap<>();
 
   static {
-    Logs.setLevel(SQLErrorCodesFactory.class.getName(), "ERROR");
+    LogAppender.setLevel(SQLErrorCodesFactory.class.getName(), "ERROR");
     ERROR_CODE_TO_FUNCTION.put("org.postgresql.Driver-28000",
       UsernameOrPasswordInvalidException::new);
     ERROR_CODE_TO_FUNCTION.put("org.postgresql.Driver-28P01",
@@ -56,7 +56,7 @@ public class JdbcExceptionTranslator extends SQLErrorCodeSQLExceptionTranslator 
         return customTranslate(task, sqlState, (SQLException)cause);
       }
     }
-    final Function2<String, SQLException, DataAccessException> function = ERROR_CODE_TO_FUNCTION
+    final BiFunction<String, SQLException, DataAccessException> function = ERROR_CODE_TO_FUNCTION
       .get(this.driverClassName + "-" + sqlState);
     if (function == null) {
       return null;

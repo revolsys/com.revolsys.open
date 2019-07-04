@@ -6,8 +6,8 @@ import javax.xml.namespace.QName;
 
 import org.jeometry.common.data.type.DataType;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
@@ -22,9 +22,10 @@ import com.revolsys.record.schema.RecordDefinition;
 
 public class GmlRecordWriter extends AbstractRecordWriter {
   public static final void srsName(final XmlWriter out, final GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-    final int csId = coordinateSystem.getCoordinateSystemId();
-    out.attribute(Gml.SRS_NAME, "EPSG:" + csId);
+    final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
+    if (coordinateSystemId > 0) {
+      out.attribute(Gml.SRS_NAME, "EPSG:" + coordinateSystemId);
+    }
   }
 
   private final GmlFieldTypeRegistry fieldTypes = GmlFieldTypeRegistry.INSTANCE;
@@ -35,7 +36,7 @@ public class GmlRecordWriter extends AbstractRecordWriter {
 
   private boolean opened;
 
-  private final XmlWriter out;
+  private XmlWriter out;
 
   private QName qualifiedName;
 
@@ -66,17 +67,25 @@ public class GmlRecordWriter extends AbstractRecordWriter {
 
   @Override
   public void close() {
-    if (!this.opened) {
-      writeHeader();
-    }
+    if (this.out != null) {
+      if (!this.opened) {
+        writeHeader();
+      }
 
-    writeFooter();
-    this.out.close();
+      writeFooter();
+      this.out.close();
+      this.out = null;
+    }
   }
 
   @Override
   public void flush() {
     this.out.flush();
+  }
+
+  @Override
+  public ClockDirection getPolygonRingDirection() {
+    return ClockDirection.COUNTER_CLOCKWISE;
   }
 
   @Override
@@ -108,9 +117,9 @@ public class GmlRecordWriter extends AbstractRecordWriter {
       final String fieldName = fieldDefinition.getName();
       final Object value;
       if (isWriteCodeValues()) {
-        value = record.getValue(fieldName);
-      } else {
         value = record.getCodeValue(fieldName);
+      } else {
+        value = record.getValue(fieldName);
       }
       if (isValueWritable(value)) {
         this.out.startTag(this.namespaceUri, fieldName);
@@ -140,7 +149,7 @@ public class GmlRecordWriter extends AbstractRecordWriter {
     this.out.startTag(Gml.FEATURE_COLLECTION);
     if (this.geometryFactory != null) {
       this.out.startTag(Gml.BOUNDED_BY);
-      box(this.geometryFactory, this.geometryFactory.getCoordinateSystem().getAreaBoundingBox());
+      box(this.geometryFactory, this.geometryFactory.getAreaBoundingBox());
       this.out.endTag(Gml.BOUNDED_BY);
     }
   }

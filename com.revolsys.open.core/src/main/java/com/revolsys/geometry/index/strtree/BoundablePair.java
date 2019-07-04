@@ -36,7 +36,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.util.PriorityQueue;
 
 /**
@@ -86,10 +85,11 @@ class BoundablePair implements Comparable {
 
   /*
    * private double maxDistance() { return maximumDistance(
-   * (BoundingBoxDoubleGf) boundable1.getBounds(), (BoundingBoxDoubleGf)
-   * boundable2.getBounds()); } private static double
-   * maximumDistance(BoundingBoxDoubleGf env1, BoundingBoxDoubleGf env2) {
-   * double minx = Math.min(env1.getMinX(), env2.getMinX()); double miny =
+   * (BoundingBoxDoubleGeometryFactory) boundable1.getBounds(),
+   * (BoundingBoxDoubleGeometryFactory) boundable2.getBounds()); } private
+   * static double maximumDistance(BoundingBoxDoubleGeometryFactory env1,
+   * BoundingBoxDoubleGeometryFactory env2) { double minx =
+   * Math.min(env1.getMinX(), env2.getMinX()); double miny =
    * Math.min(env1.getMinY(), env2.getMinY()); double maxx =
    * Math.max(env1.getMaxX(), env2.getMaxX()); double maxy =
    * Math.max(env1.getMaxY(), env2.getMaxY()); Point min = new
@@ -129,7 +129,7 @@ class BoundablePair implements Comparable {
     }
     // otherwise compute distance between bounds of boundables
     return ((BoundingBox)this.boundable1.getBounds())
-      .distance((BoundingBoxDoubleGf)this.boundable2.getBounds());
+      .bboxDistance((BoundingBox)this.boundable2.getBounds());
   }
 
   private void expand(final Boundable bndComposite, final Boundable bndOther,

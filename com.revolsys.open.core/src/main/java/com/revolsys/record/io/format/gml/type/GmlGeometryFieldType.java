@@ -8,6 +8,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
+import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
@@ -159,15 +160,14 @@ public class GmlGeometryFieldType extends AbstractGmlFieldType {
     out.startTag(Gml.POLYGON);
     srsName(out, polygon, writeSrsName);
     if (!polygon.isEmpty()) {
-      final LineString shell = polygon.getShell();
+      final LinearRing shell = polygon.getShell();
       out.startTag(Gml.OUTER_BOUNDARY_IS);
       linearRing(out, shell.toCounterClockwise(), false);
       out.endTag(Gml.OUTER_BOUNDARY_IS);
 
-      for (int i = 0; i < polygon.getHoleCount(); i++) {
-        final LineString interiorRing = polygon.getHole(i);
+      for (final LinearRing hole : polygon.holes()) {
         out.startTag(Gml.INNER_BOUNDARY_IS);
-        linearRing(out, interiorRing.toClockwise(), false);
+        linearRing(out, hole.toClockwise(), false);
         out.endTag(Gml.INNER_BOUNDARY_IS);
       }
     }

@@ -32,19 +32,25 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.function.Consumer4Double;
+import org.jeometry.common.function.Function4Double;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.prep.PreparedMultiPolygon;
 
 /**
  * Models a collection of {@link Polygon}s.
@@ -61,25 +67,18 @@ import com.revolsys.geometry.model.prep.PreparedMultiPolygon;
 public class MultiPolygonImpl implements MultiPolygon {
   private static final long serialVersionUID = 8166665132445433741L;
 
-  /**
-   *  The bounding box of this <code>Geometry</code>.
-   */
   private BoundingBox boundingBox;
 
   private final GeometryFactory geometryFactory;
 
   private Polygon[] polygons;
 
-  /**
-   * An object reference which can be used to carry ancillary data defined
-   * by the client.
-   */
   private Object userData;
 
   public MultiPolygonImpl(final GeometryFactory geometryFactory, final Polygon... polygons) {
     this.geometryFactory = geometryFactory;
     if (polygons == null || polygons.length == 0) {
-      this.polygons = null;
+      throw new IllegalArgumentException("MultiPolygon must not be empty");
     } else if (Geometry.hasNullElements(polygons)) {
       throw new IllegalArgumentException("geometries must not contain null elements");
     } else {
@@ -98,7 +97,7 @@ public class MultiPolygonImpl implements MultiPolygon {
     try {
       return (Polygonal)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -142,13 +141,91 @@ public class MultiPolygonImpl implements MultiPolygon {
   }
 
   @Override
+  public <R> R findSegment(final Function4Double<R> action) {
+    for (final Geometry geometry : this.polygons) {
+      final R result = geometry.findSegment(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    for (final Geometry geometry : this.polygons) {
+      final R result = geometry.findVertex(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public void forEachGeometry(final Consumer<Geometry> action) {
+    if (this.polygons != null) {
+      for (final Polygon polygon : this.polygons) {
+        action.accept(polygon);
+      }
+    }
+  }
+
+  @Override
+  public void forEachPolygon(final Consumer<Polygon> action) {
+    if (this.polygons != null) {
+      for (final Polygon polygon : this.polygons) {
+        action.accept(polygon);
+      }
+    }
+  }
+
+  @Override
+  public void forEachSegment(final Consumer4Double action) {
+    for (final Geometry geometry : this.polygons) {
+      geometry.forEachSegment(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    for (final Polygon polygon : this.polygons) {
+      polygon.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final Consumer3Double action) {
+    for (final Geometry geometry : this.polygons) {
+      geometry.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
+    for (final Geometry geometry : this.polygons) {
+      geometry.forEachVertex(coordinatesOperation, point, action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperationPoint coordinates,
+    final Consumer<CoordinatesOperationPoint> action) {
+    for (final Geometry geometry : this.polygons) {
+      geometry.forEachVertex(coordinates, action);
+    }
+  }
+
+  @Override
+  public int getAxisCount() {
+    return this.geometryFactory.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     if (this.boundingBox == null) {
-      if (isEmpty()) {
-        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
-      } else {
-        this.boundingBox = newBoundingBox();
-      }
+      this.boundingBox = newBoundingBox();
     }
     return this.boundingBox;
   }
@@ -156,30 +233,18 @@ public class MultiPolygonImpl implements MultiPolygon {
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    if (this.polygons == null) {
-      return new ArrayList<>();
-    } else {
-      return (List<V>)new ArrayList<>(Arrays.asList(this.polygons));
-    }
+    return (List<V>)Lists.newArray(this.polygons);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry(final int n) {
-    if (this.polygons == null) {
-      return null;
-    } else {
-      return (V)this.polygons[n];
-    }
+    return (V)this.polygons[n];
   }
 
   @Override
   public int getGeometryCount() {
-    if (this.polygons == null) {
-      return 0;
-    } else {
-      return this.polygons.length;
-    }
+    return this.polygons.length;
   }
 
   @Override
@@ -187,13 +252,13 @@ public class MultiPolygonImpl implements MultiPolygon {
     return this.geometryFactory;
   }
 
-  /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
   @Override
-  public Object getUserData() {
+  public int getPolygonCount() {
+    return this.polygons.length;
+  }
+
+  @Override
+  public Object getUserDataOld() {
     return this.userData;
   }
 
@@ -209,26 +274,11 @@ public class MultiPolygonImpl implements MultiPolygon {
 
   @Override
   public boolean isEmpty() {
-    return this.polygons == null;
+    return false;
   }
 
   @Override
-  public Polygonal prepare() {
-    return new PreparedMultiPolygon(this);
-  }
-
-  /**
-   * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Point Reference System.
-   * <p>
-   * Note that user data objects are not present in geometries created by
-   * construction methods.
-   *
-   * @param userData an object, the semantics for which are defined by the
-   * application using this Geometry
-   */
-  @Override
-  public void setUserData(final Object userData) {
+  public void setUserDataOld(final Object userData) {
     this.userData = userData;
   }
 

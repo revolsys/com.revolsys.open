@@ -13,9 +13,8 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.Form;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.panel.BaseStylePanel;
-import com.revolsys.util.Cancellable;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
@@ -130,17 +129,6 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
     return renderers;
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public <V extends LayerRenderer<?>> V getRenderer(final List<String> path) {
-    if (path.isEmpty()) {
-      return null;
-    } else if (path.get(0).equals(getName())) {
-      return (V)this;
-    }
-    return null;
-  }
-
   public String getType() {
     return this.type;
   }
@@ -158,6 +146,10 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
     } else {
       return this.parent.isEditing();
     }
+  }
+
+  public boolean isHasParent() {
+    return getParent() != null;
   }
 
   @Override
@@ -183,8 +175,14 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   }
 
   @Override
+  public boolean isVisible(final ViewRenderer view) {
+    final double scaleForVisible = view.getScaleForVisible();
+    return isVisible(scaleForVisible);
+  }
+
+  @Override
   public Form newStylePanel() {
-    return new BaseStylePanel(this);
+    return new BaseStylePanel(this, true);
   }
 
   @Override
@@ -193,29 +191,37 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   }
 
   @Override
-  public final void render(final Viewport2D viewport, final Cancellable cancellable) {
+  public final void render(final ViewRenderer view) {
     final T layer = getLayer();
     if (layer != null) {
-      final double scaleForVisible = viewport.getScaleForVisible();
-      if (isVisible(scaleForVisible)) {
-        render(viewport, cancellable, layer);
+      if (isVisible(view)) {
+        render(view, layer);
       }
     }
   }
 
-  public abstract void render(Viewport2D viewport, Cancellable cancellable, T layer);
+  public abstract void render(ViewRenderer view, T layer);
 
   @Override
   public void setEditing(final boolean editing) {
     final boolean oldValue = this.editing;
     this.editing = editing;
-    firePropertyChange("editing", oldValue, this.layer);
+    firePropertyChange("editing", oldValue, this.editing);
   }
 
   public void setIcon(final Icon icon) {
     final Object oldValue = this.icon;
-    this.icon = icon;
-    firePropertyChange("icon", oldValue, icon);
+    if (icon == null) {
+      this.icon = ICON;
+    } else {
+      this.icon = icon;
+    }
+    firePropertyChange("icon", oldValue, this.icon);
+  }
+
+  public void setIcon(final String iconName) {
+    final Icon icon = Icons.getIcon(iconName);
+    setIcon(icon);
   }
 
   @Override
@@ -243,6 +249,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
     firePropertyChange("minimumScale", oldValue, minimumScale);
   }
 
+  @Override
   public void setName(final String name) {
     final String oldName = getName();
     if (Property.hasValue(name)) {

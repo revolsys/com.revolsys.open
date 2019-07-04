@@ -116,7 +116,7 @@ public class MCIndexSnapRounder implements Noder {
    * Snaps segments to the vertices of a Segment String.
    */
   private void computeVertexSnaps(final NodedSegmentString segment) {
-    final LineString points = segment.getPoints();
+    final LineString points = segment.getLineString();
     for (int i = 0; i < points.getVertexCount(); i++) {
       final Point point = points.getPoint(i);
       final HotPixel hotPixel = new HotPixel(point, this.scaleFactor, this.li);

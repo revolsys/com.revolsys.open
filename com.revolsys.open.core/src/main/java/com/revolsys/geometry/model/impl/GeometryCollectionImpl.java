@@ -33,15 +33,29 @@
 package com.revolsys.geometry.model.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.function.Consumer4Double;
+import org.jeometry.common.function.Function4Double;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
+import com.revolsys.geometry.model.GeometryDataType;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
+import com.revolsys.geometry.model.editor.GeometryCollectionImplEditor;
+import com.revolsys.geometry.model.editor.GeometryEditor;
 
 /**
  * Models a collection of {@link Geometry}s of
@@ -68,15 +82,7 @@ public class GeometryCollectionImpl implements GeometryCollection {
    */
   private final GeometryFactory geometryFactory;
 
-  /**
-   * An object reference which can be used to carry ancillary data defined
-   * by the client.
-   */
   private Object userData;
-
-  public GeometryCollectionImpl(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
-  }
 
   /**
    * @param geometries
@@ -89,7 +95,7 @@ public class GeometryCollectionImpl implements GeometryCollection {
     final Geometry[] geometries) {
     this.geometryFactory = geometryFactory;
     if (geometries == null || geometries.length == 0) {
-      this.geometries = null;
+      throw new IllegalArgumentException("GeometryCollection must not be empty");
     } else if (Geometry.hasNullElements(geometries)) {
       throw new IllegalArgumentException("geometries must not contain null elements");
     } else {
@@ -157,44 +163,120 @@ public class GeometryCollectionImpl implements GeometryCollection {
   }
 
   @Override
-  public BoundingBox getBoundingBox() {
-    if (this.boundingBox == null) {
-      if (isEmpty()) {
-        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
-      } else {
-        this.boundingBox = newBoundingBox();
+  public <R> R findSegment(final Function4Double<R> action) {
+    for (final Geometry geometry : this.geometries) {
+      final R result = geometry.findSegment(action);
+      if (result != null) {
+        return result;
       }
     }
+    return null;
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    for (final Geometry geometry : this.geometries) {
+      final R result = geometry.findVertex(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public void forEachGeometry(final Consumer<Geometry> action) {
+    if (this.geometries != null) {
+      for (final Geometry geometry : this.geometries) {
+        action.accept(geometry);
+      }
+    }
+  }
+
+  @Override
+  public void forEachPolygon(final Consumer<Polygon> action) {
+    if (this.geometries != null) {
+      for (final Geometry geometry : this.geometries) {
+        if (geometry instanceof Polygon) {
+          final Polygon polygon = (Polygon)geometry;
+          action.accept(polygon);
+        } else if (geometry instanceof GeometryCollection) {
+          geometry.forEachPolygon(action);
+        }
+      }
+    }
+  }
+
+  @Override
+  public void forEachSegment(final Consumer4Double action) {
+    for (final Geometry geometry : this.geometries) {
+      geometry.forEachSegment(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    for (final Geometry geometry : this.geometries) {
+      geometry.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final Consumer3Double action) {
+    for (final Geometry editor : this.geometries) {
+      editor.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
+    for (final Geometry geometry : this.geometries) {
+      geometry.forEachVertex(coordinatesOperation, point, action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperationPoint coordinates,
+    final Consumer<CoordinatesOperationPoint> action) {
+    for (final Geometry geometry : this.geometries) {
+      geometry.forEachVertex(coordinates, action);
+    }
+  }
+
+  @Override
+  public int getAxisCount() {
+    return this.geometryFactory.getAxisCount();
+  }
+
+  @Override
+  public BoundingBox getBoundingBox() {
+    if (this.boundingBox == null) {
+      this.boundingBox = newBoundingBox();
+    }
     return this.boundingBox;
+  }
+
+  @Override
+  public GeometryDataType<?, ?> getDataType() {
+    return GeometryDataTypes.GEOMETRY_COLLECTION;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    if (this.geometries == null) {
-      return new ArrayList<>();
-    } else {
-      return (List<V>)new ArrayList<>(Arrays.asList(this.geometries));
-    }
+    return (List<V>)Lists.newArray(this.geometries);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry(final int n) {
-    if (this.geometries == null) {
-      return null;
-    } else {
-      return (V)this.geometries[n];
-    }
+    return (V)this.geometries[n];
   }
 
   @Override
   public int getGeometryCount() {
-    if (this.geometries == null) {
-      return 0;
-    } else {
-      return this.geometries.length;
-    }
+    return this.geometries.length;
   }
 
   @Override
@@ -211,13 +293,8 @@ public class GeometryCollectionImpl implements GeometryCollection {
     return segmentCount;
   }
 
-  /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
   @Override
-  public Object getUserData() {
+  public Object getUserDataOld() {
     return this.userData;
   }
 
@@ -233,8 +310,29 @@ public class GeometryCollectionImpl implements GeometryCollection {
   }
 
   @Override
+  public Geometry intersectionBbox(final BoundingBox boundingBox) {
+    notNullSameCs(boundingBox);
+    if (bboxCoveredBy(boundingBox)) {
+      return this;
+    } else {
+      final List<Geometry> parts = new ArrayList<>();
+      for (final Geometry part : this.geometries) {
+        final Geometry partIntersection = part.intersectionBbox(boundingBox);
+        if (!partIntersection.isEmpty()) {
+          parts.add(part);
+        }
+      }
+      if (parts.size() == this.geometries.length) {
+        return this;
+      } else {
+        return this.geometryFactory.geometry(parts);
+      }
+    }
+  }
+
+  @Override
   public boolean isEmpty() {
-    return this.geometries == null;
+    return false;
   }
 
   @Override
@@ -243,22 +341,22 @@ public class GeometryCollectionImpl implements GeometryCollection {
   }
 
   @Override
+  public GeometryEditor<?> newGeometryEditor() {
+    return new GeometryCollectionImplEditor(this);
+  }
+
+  @Override
+  public GeometryEditor<?> newGeometryEditor(final AbstractGeometryEditor<?> parentEditor) {
+    return new GeometryCollectionImplEditor((GeometryCollectionImplEditor)parentEditor, this);
+  }
+
+  @Override
   public Geometry prepare() {
     return this;
   }
 
-  /**
-   * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Point Reference System.
-   * <p>
-   * Note that user data objects are not present in geometries created by
-   * construction methods.
-   *
-   * @param userData an object, the semantics for which are defined by the
-   * application using this Geometry
-   */
   @Override
-  public void setUserData(final Object userData) {
+  public void setUserDataOld(final Object userData) {
     this.userData = userData;
   }
 

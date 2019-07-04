@@ -1,6 +1,8 @@
 package com.revolsys.collection;
 
-public class ValueHolder<T> {
+import com.revolsys.util.Emptyable;
+
+public class ValueHolder<T> implements Emptyable {
   private T value;
 
   public ValueHolder() {
@@ -12,6 +14,11 @@ public class ValueHolder<T> {
 
   public T getValue() {
     return this.value;
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return this.value == null;
   }
 
   public void setValue(final T value) {

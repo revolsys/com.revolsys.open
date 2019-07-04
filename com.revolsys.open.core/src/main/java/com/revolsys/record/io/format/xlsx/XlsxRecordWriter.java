@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
+import org.docx4j.jaxb.NamespacePrefixMapperUtils;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.io3.Save;
 import org.docx4j.openpackaging.packages.SpreadsheetMLPackage;
@@ -15,7 +16,8 @@ import org.docx4j.openpackaging.parts.DocPropsCustomPart;
 import org.docx4j.openpackaging.parts.PartName;
 import org.docx4j.openpackaging.parts.SpreadsheetML.TablePart;
 import org.docx4j.openpackaging.parts.SpreadsheetML.WorksheetPart;
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Doubles;
 import org.xlsx4j.jaxb.Context;
 import org.xlsx4j.sml.CTAutoFilter;
@@ -46,6 +48,16 @@ import com.revolsys.spring.resource.Resource;
 
 public class XlsxRecordWriter extends AbstractRecordWriter {
   private static final ObjectFactory smlObjectFactory = Context.getsmlObjectFactory();
+
+  static {
+    // This method is not thread safe, so call it before we need to use it, to
+    // ensure initialization.
+    try {
+      NamespacePrefixMapperUtils.getPrefixMapper();
+    } catch (final JAXBException e) {
+      Logs.error(XlsxRecordWriter.class, "Unable to initialized DOCx4j", e);
+    }
+  }
 
   public static String getRef(long columnIndex, final int rowIndex) {
     columnIndex--;
@@ -79,7 +91,7 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
       this.spreadsheetPackage = SpreadsheetMLPackage.createPackage();
       final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
       if (geometryFactory != null) {
-        final int coordinateSystemId = geometryFactory.getCoordinateSystemId();
+        final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
         if (coordinateSystemId > 0) {
           this.spreadsheetPackage.addDocPropsCustomPart();
           final DocPropsCustomPart customProperties = this.spreadsheetPackage
@@ -101,8 +113,15 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
         }
       }
       String name = recordDefinition.getName();
-      if (name.length() > 30) {
-        name = name.substring(0, 30);
+      if (name == null) {
+        name = "Sheet1";
+      } else {
+        name = name.trim();
+        if (name.length() == 0) {
+          name = "Sheet1";
+        } else if (name.length() > 30) {
+          name = name.substring(0, 30);
+        }
       }
       final PartName spreadsheetPartName = new PartName("/xl/worksheets/sheet1.xml");
       this.sheet = this.spreadsheetPackage.createWorksheetPart(spreadsheetPartName, name, 1);
@@ -120,7 +139,7 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
       addHeaderRow(worksheet, recordDefinition);
 
     } catch (final Docx4JException | JAXBException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -225,7 +244,7 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
         } catch (final IOException e) {
         }
       } catch (final Docx4JException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       } finally {
         FileUtil.closeSilent(this.out);
         this.out = null;

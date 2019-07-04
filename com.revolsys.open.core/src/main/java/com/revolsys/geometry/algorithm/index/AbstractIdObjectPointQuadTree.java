@@ -43,7 +43,7 @@ public abstract class AbstractIdObjectPointQuadTree<T> extends AbstractPointSpat
     this.index.forEach((id) -> {
       final T object = getObject(id);
       final BoundingBox e = getEnvelope(object);
-      if (e.intersects(envelope)) {
+      if (e.bboxIntersects(envelope)) {
         action.accept(object);
       }
     }, envelope);

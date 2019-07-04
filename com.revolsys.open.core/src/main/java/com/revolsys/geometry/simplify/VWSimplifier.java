@@ -191,7 +191,7 @@ public class VWSimplifier {
    * @return the simplified geometry
    */
   public Geometry getResultGeometry() {
-    // empty input produces an empty result
+    // empty input produces an empty intersectionCount
     if (this.inputGeom.isEmpty()) {
       return this.inputGeom.clone();
     }

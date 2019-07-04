@@ -28,7 +28,7 @@ public class MarkerStylePanel extends BaseStylePanel implements PropertyChangeLi
   private JPanel previews;
 
   public MarkerStylePanel(final MarkerStyleRenderer markerStyleRenderer) {
-    super(markerStyleRenderer);
+    super(markerStyleRenderer, true);
 
     this.geometryStyleRenderer = markerStyleRenderer;
     this.markerStyle = markerStyleRenderer.getStyle();

@@ -32,6 +32,7 @@
  */
 package com.revolsys.geometry.algorithm;
 
+import java.util.Iterator;
 import java.util.function.Consumer;
 
 import com.revolsys.geometry.model.BoundingBox;
@@ -72,7 +73,7 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
 
   public static Location locatePointInRing(final LineString ring, final double x, final double y) {
     final BoundingBox boundingBox = ring.getBoundingBox();
-    if (boundingBox.intersects(x, y)) {
+    if (boundingBox.bboxCovers(x, y)) {
       final RayCrossingCounter counter = new RayCrossingCounter(x, y);
 
       double x0 = ring.getX(0);
@@ -93,6 +94,22 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
     }
   }
 
+  public static Location locatePointInRing(final Point p, final Iterable<Point> ring) {
+    final RayCrossingCounter counter = new RayCrossingCounter(p);
+    final Iterator<Point> iterator = ring.iterator();
+    if (iterator.hasNext()) {
+      final Point previousPoint = iterator.next();
+      while (iterator.hasNext()) {
+        final Point currentPoint = iterator.next();
+        counter.countSegment(currentPoint, previousPoint);
+        if (counter.isOnSegment()) {
+          return counter.getLocation();
+        }
+      }
+    }
+    return counter.getLocation();
+  }
+
   /**
    * Determines the {@link Location} of a point in a ring.
    *
@@ -108,7 +125,7 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
     } else {
       point = point.convertGeometry(ring.getGeometryFactory());
       final BoundingBox boundingBox = ring.getBoundingBox();
-      if (point.intersects(boundingBox)) {
+      if (point.intersectsBbox(boundingBox)) {
 
         final RayCrossingCounter counter = new RayCrossingCounter(point);
 

@@ -19,7 +19,7 @@ public class GeometryCollectionVertex extends AbstractVertex {
   @Override
   public double getCoordinate(final int axisIndex) {
     if (this.vertex == null) {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     } else {
       return this.vertex.getCoordinate(axisIndex);
     }
@@ -50,7 +50,7 @@ public class GeometryCollectionVertex extends AbstractVertex {
   @Override
   public double getOrientaton() {
     if (this.vertex == null) {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     } else {
       return this.vertex.getOrientaton();
     }
@@ -77,6 +77,24 @@ public class GeometryCollectionVertex extends AbstractVertex {
       vertexId[0] = this.partIndex;
       System.arraycopy(partVertexId, 0, vertexId, 1, partVertexId.length);
       return vertexId;
+    }
+  }
+
+  @Override
+  public double getX() {
+    if (this.vertex == null) {
+      return java.lang.Double.NaN;
+    } else {
+      return this.vertex.getX();
+    }
+  }
+
+  @Override
+  public double getY() {
+    if (this.vertex == null) {
+      return java.lang.Double.NaN;
+    } else {
+      return this.vertex.getY();
     }
   }
 
@@ -173,6 +191,15 @@ public class GeometryCollectionVertex extends AbstractVertex {
     throw new UnsupportedOperationException("Removing vertices not supported");
   }
 
+  @Override
+  public double setCoordinate(final int axisIndex, final double coordinate) {
+    if (this.vertex == null) {
+      return java.lang.Double.NaN;
+    } else {
+      return this.vertex.setCoordinate(axisIndex, coordinate);
+    }
+  }
+
   public void setVertexId(final int[] vertexId) {
     this.vertex = null;
     if (vertexId.length > 0) {
@@ -190,4 +217,5 @@ public class GeometryCollectionVertex extends AbstractVertex {
       this.partIndex = -2;
     }
   }
+
 }

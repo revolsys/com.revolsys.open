@@ -24,20 +24,19 @@ public class PostgreSQLOidFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
     Object value = resultSet.getObject(columnIndex);
     if (value instanceof PostgreSQLTidWrapper) {
       final PostgreSQLTidWrapper wrapper = (PostgreSQLTidWrapper)value;
       value = wrapper.getTid();
     }
-    setValue(record, value);
-    return columnIndex + 1;
+    return value;
   }
 
   @Override
   public int setInsertPreparedStatementValue(final PreparedStatement statement,
-    final int parameterIndex, final Record record) throws SQLException {
+    final int parameterIndex, final Object value) throws SQLException {
     return parameterIndex;
   }
 

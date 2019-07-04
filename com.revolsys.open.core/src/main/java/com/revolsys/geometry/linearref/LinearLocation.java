@@ -128,7 +128,8 @@ public class LinearLocation implements Comparable {
 
     final double x = (p1.getX() - p0.getX()) * frac + p0.getX();
     final double y = (p1.getY() - p0.getY()) * frac + p0.getY();
-    // interpolate Z value. If either input Z is NaN, result z will be NaN as
+    // interpolate Z value. If either input Z is NaN, result z will
+    // be NaN as
     // well.
     final double z = (p1.getZ() - p0.getZ()) * frac + p0.getZ();
     return new PointDouble(x, y, z);
@@ -360,7 +361,7 @@ public class LinearLocation implements Comparable {
 
     final Point p0 = lineComp.getPoint(segIndex);
     final Point p1 = lineComp.getPoint(segIndex + 1);
-    return p0.distance(p1);
+    return p0.distancePoint(p1);
   }
 
   /**

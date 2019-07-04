@@ -9,14 +9,16 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.RootPaneContainer;
 import javax.swing.SwingWorker;
 
+import org.jeometry.common.date.Dates;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.swing.SwingUtil;
 
-public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
+public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V>
+  implements BackgroundTask {
   private static final Cursor WAIT_CURSOR = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 
-  private final boolean logTimes = false;
+  private boolean logTimes = false;
 
   private boolean showBusyCursor = true;
 
@@ -38,12 +40,11 @@ public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
         if (this.logTimes) {
           final long time = System.currentTimeMillis();
           handleDone(result);
+          Dates.printEllapsedTime(toString(), time);
         } else {
           handleDone(result);
         }
-      } catch (final CancellationException e) {
-        handleCancelled();
-      } catch (final InterruptedException t) {
+      } catch (final CancellationException | InterruptedException e) {
         handleCancelled();
       } catch (final ExecutionException e) {
         handleException(e.getCause());
@@ -63,6 +64,7 @@ public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
       if (this.logTimes) {
         final long time = System.currentTimeMillis();
         final B result = handleBackground();
+        Dates.printEllapsedTime(toString(), time);
         return result;
       } else {
         return handleBackground();
@@ -102,8 +104,19 @@ public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
     }
   }
 
-  public String getThreadName() {
+  @Override
+  public StateValue getTaskStatus() {
+    return getState();
+  }
+
+  @Override
+  public String getTaskThreadName() {
     return this.threadName;
+  }
+
+  @Override
+  public String getTaskTitle() {
+    return toString();
   }
 
   protected B handleBackground() {
@@ -122,6 +135,15 @@ public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V> {
 
   public boolean isShowBusyCursor() {
     return this.showBusyCursor;
+  }
+
+  @Override
+  public boolean isTaskClosed() {
+    return isDone();
+  }
+
+  public void setLogTimes(final boolean logTimes) {
+    this.logTimes = logTimes;
   }
 
   protected void setShowBusyCursor(final boolean showBusyCursor) {

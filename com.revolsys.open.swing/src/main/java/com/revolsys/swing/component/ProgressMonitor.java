@@ -6,7 +6,6 @@ import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import com.revolsys.beans.PropertyChangeSupport;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -19,7 +18,9 @@ import javax.swing.JProgressBar;
 import javax.swing.UIManager;
 
 import org.jdesktop.swingx.VerticalLayout;
+import org.jeometry.common.logging.Logs;
 
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.parallel.Invoke;
@@ -34,7 +35,11 @@ public class ProgressMonitor extends JDialog implements Cancellable, WindowListe
       final ProgressMonitor progressMonitor = new ProgressMonitor(component, title, note, true,
         max);
       Invoke.background(title, () -> {
-        task.accept(progressMonitor);
+        try {
+          task.accept(progressMonitor);
+        } catch (final Exception e) {
+          Logs.error(ProgressMonitor.class, e);
+        }
         return null;
       }, r -> {
         progressMonitor.done = true;

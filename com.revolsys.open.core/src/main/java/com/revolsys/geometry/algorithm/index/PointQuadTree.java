@@ -13,7 +13,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.util.ExitLoopException;
@@ -77,7 +76,8 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
   public List<Entry<Point, T>> findEntriesWithinDistance(final Point from, final Point to,
     final double maxDistance) {
-    final BoundingBoxDoubleGf boundingBox = new BoundingBoxDoubleGf(this.geometryFactory, from, to);
+    final BoundingBox boundingBox = this.geometryFactory.newBoundingBox(from.getX(), from.getY(),
+      to.getX(), to.getY());
     final List<Entry<Point, T>> entries = new ArrayList<>();
     this.root.findEntriesWithin(entries, boundingBox);
     for (final Iterator<Entry<Point, T>> iterator = entries.iterator(); iterator.hasNext();) {
@@ -93,7 +93,8 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
 
   public List<T> findWithin(BoundingBox boundingBox) {
     if (this.geometryFactory != null) {
-      boundingBox = boundingBox.convert(this.geometryFactory);
+      final GeometryFactory geometryFactory1 = this.geometryFactory;
+      boundingBox = boundingBox.bboxToCs(geometryFactory1);
     }
     final List<T> results = new ArrayList<>();
     if (this.root != null) {
@@ -105,11 +106,10 @@ public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
   public List<T> findWithinDistance(final Point point, final double maxDistance) {
     final double x = point.getX();
     final double y = point.getY();
-    BoundingBox envelope = new BoundingBoxDoubleGf(2, x, y);
-    envelope = envelope.expand(maxDistance);
+    final BoundingBox boundingBox = BoundingBox.bboxNewDelta(x, y, maxDistance);
     final List<T> results = new ArrayList<>();
     if (this.root != null) {
-      this.root.findWithin(results, x, y, maxDistance, envelope);
+      this.root.findWithin(results, x, y, maxDistance, boundingBox);
     }
     return results;
   }

@@ -3,12 +3,12 @@ package com.revolsys.geometry.model.vertex;
 import java.awt.geom.PathIterator;
 import java.util.Iterator;
 
-import com.revolsys.geometry.model.BoundingBox;
+import org.jeometry.common.math.Angle;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryComponent;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.math.Angle;
 import com.revolsys.util.Property;
 
 public interface Vertex extends Point, Iterator<Vertex>, Iterable<Vertex>, GeometryComponent {
@@ -28,11 +28,6 @@ public interface Vertex extends Point, Iterator<Vertex>, Iterable<Vertex>, Geome
   default int getAxisCount() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     return (byte)geometryFactory.getAxisCount();
-  }
-
-  @Override
-  default BoundingBox getBoundingBox() {
-    return newBoundingBox();
   }
 
   @Override
@@ -84,12 +79,12 @@ public interface Vertex extends Point, Iterator<Vertex>, Iterable<Vertex>, Geome
     } else if (isSameCoordinateSystem(geometryFactory)) {
       return getOrientaton();
     } else {
-      final Point point1 = convertGeometry(geometryFactory, 2);
+      final Point point1 = convertPoint2d(geometryFactory);
       final double x = point1.getX();
       final double y = point1.getY();
       double angle;
       if (isTo()) {
-        final Point point2 = getLinePrevious().convertGeometry(geometryFactory, 2);
+        final Point point2 = getLinePrevious().convertPoint2d(geometryFactory);
         if (Property.hasValue(point2)) {
           final double x1 = point2.getX();
           final double y1 = point2.getY();
@@ -98,7 +93,7 @@ public interface Vertex extends Point, Iterator<Vertex>, Iterable<Vertex>, Geome
           return 0;
         }
       } else {
-        final Point point2 = getLineNext().convertGeometry(geometryFactory, 2);
+        final Point point2 = getLineNext().convertPoint2d(geometryFactory);
         if (Property.hasValue(point2)) {
           final double x1 = point2.getX();
           final double y1 = point2.getY();

@@ -1,12 +1,24 @@
 package com.revolsys.swing.map.layer.record.style;
 
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.measure.Quantity;
 import javax.measure.Unit;
@@ -14,13 +26,16 @@ import javax.measure.quantity.Length;
 
 import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
-import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.record.Record;
+import com.revolsys.swing.map.view.ViewRenderer;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
 import com.revolsys.util.Strings;
@@ -33,6 +48,8 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
   private static final String AUTO = "auto";
 
   private static final Map<String, Object> DEFAULT_VALUES = new TreeMap<>();
+
+  private static final Pattern FIELD_PATTERN = Pattern.compile("\\[([\\w.]+)\\]");
 
   private static final Set<String> PROPERTY_NAMES = new HashSet<>();
 
@@ -132,16 +149,130 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     return (TextStyle)super.clone();
   }
 
-  public Font getFont(final Viewport2D viewport) {
+  public void drawTextIcon(final Graphics2D graphics, final int size) {
+    double orientation = getTextOrientation();
+
+    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+      RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
+
+    final String textFaceName = getTextFaceName();
+    final Font font = new Font(textFaceName, 0, size);
+    graphics.setFont(font);
+    final FontMetrics fontMetrics = graphics.getFontMetrics();
+
+    int min;
+    int max;
+    int boxWidth;
+    if (size == 12) {
+      min = 0;
+      max = 15;
+      boxWidth = 16;
+    } else {
+      min = 2;
+      max = 12;
+      boxWidth = 12;
+    }
+    final String text = "A";
+    final Rectangle2D bounds = fontMetrics.getStringBounds(text, graphics);
+    final double width = bounds.getWidth();
+    final double height = fontMetrics.getAscent();
+    final String horizontalAlignment = getTextHorizontalAlignment();
+    final int x;
+    if ("right".equals(horizontalAlignment)) {
+      x = max - (int)Math.round(width);
+    } else if ("center".equals(horizontalAlignment) || "auto".equals(horizontalAlignment)) {
+      x = 8 - (int)Math.round(width / 2);
+    } else {
+      x = min;
+    }
+    final String verticalAlignment = getTextVerticalAlignment();
+    final int y;
+    if ("top".equals(verticalAlignment)) {
+      y = (int)height + min - 1;
+    } else if ("middle".equals(verticalAlignment) || "auto".equals(verticalAlignment)) {
+      y = 7 + (int)Math.round(height / 2);
+    } else {
+      y = 16 - min;
+    }
+    if (orientation != 0) {
+      if (orientation > 270) {
+        orientation -= 360;
+      }
+      graphics.rotate(-Math.toRadians(orientation), 8, 8);
+    }
+
+    final int textBoxOpacity = getTextBoxOpacity();
+    final Color textBoxColor = getTextBoxColor();
+    if (textBoxOpacity > 0 && textBoxColor != null) {
+      graphics.setPaint(textBoxColor);
+      final RoundRectangle2D.Double box = new RoundRectangle2D.Double(min, min, boxWidth, boxWidth,
+        5, 5);
+      graphics.fill(box);
+    }
+
+    final double textHaloRadius = getTextHaloRadius();
+    if (textHaloRadius > 0) {
+      final Stroke savedStroke = graphics.getStroke();
+      final Stroke outlineStroke = new BasicStroke((float)(textHaloRadius + 1),
+        BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL);
+      graphics.setColor(getTextHaloFill());
+      graphics.setStroke(outlineStroke);
+      final FontRenderContext fontRenderContext = graphics.getFontRenderContext();
+      final TextLayout textLayout = new TextLayout(text, font, fontRenderContext);
+      final Shape outlineShape = textLayout.getOutline(Graphics2DViewRenderer.IDENTITY_TRANSFORM);
+      graphics.draw(outlineShape);
+      graphics.setStroke(savedStroke);
+    }
+
+    graphics.setColor(getTextFill());
+    if (textBoxOpacity > 0 && textBoxOpacity < 255) {
+      graphics.setComposite(AlphaComposite.SrcOut);
+      graphics.drawString(text, x, y);
+      graphics.setComposite(AlphaComposite.DstOver);
+      graphics.drawString(text, x, y);
+    } else {
+      graphics.setComposite(AlphaComposite.SrcOver);
+      graphics.drawString(text, x, y);
+    }
+  }
+
+  public Font getFont(final ViewRenderer view) {
     final int style = 0;
+    final Quantity<Length> measure = this.textSize;
     // if (textStyle.getFontWeight() == FontWeight.BOLD) {
     // style += Font.BOLD;
     // }
     // if (textStyle.getFontStyle() == FontStyle.ITALIC) {
     // style += Font.ITALIC;
     // }
-    final double fontSize = Viewport2D.toDisplayValue(viewport, this.textSize);
+    final double fontSize = view.toDisplayValue(measure);
     return new Font(this.textFaceName, style, (int)Math.ceil(fontSize));
+  }
+
+  public String getLabel(final Record record) {
+    if (record == null) {
+      return "Text";
+    } else {
+      final StringBuffer label = new StringBuffer();
+      final String labelPattern = getTextName();
+      final Matcher matcher = FIELD_PATTERN.matcher(labelPattern);
+      while (matcher.find()) {
+        final String propertyName = matcher.group(1);
+        String text = "";
+        try {
+          final Object value = record.getValueByPath(propertyName);
+          if (value != null) {
+            text = DataTypes.toString(value);
+          }
+        } catch (final Throwable e) {
+        }
+        matcher.appendReplacement(label, text);
+      }
+      matcher.appendTail(label);
+
+      return label.toString().trim();
+    }
   }
 
   public Color getTextBoxColor() {
@@ -217,7 +348,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     Logs.error(this, "Error setting " + name + '=' + value, e);
   }
 
-  public void setTextBoxColor(final Color textBoxColor) {
+  public TextStyle setTextBoxColor(final Color textBoxColor) {
     final Object oldTextBoxColor = this.textBoxColor;
     final Object oldTextBoxOpacity = this.textBoxOpacity;
     if (textBoxColor == null) {
@@ -229,9 +360,10 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     }
     firePropertyChange("textBoxColor", oldTextBoxColor, this.textBoxColor);
     firePropertyChange("textBoxOpacity", oldTextBoxOpacity, this.textBoxOpacity);
+    return this;
   }
 
-  public void setTextBoxOpacity(final int textBoxOpacity) {
+  public TextStyle setTextBoxOpacity(final int textBoxOpacity) {
     final Object oldTextBoxColor = this.textBoxColor;
     final Object oldTextBoxOpacity = this.textBoxOpacity;
     if (textBoxOpacity < 0 || textBoxOpacity > 255) {
@@ -242,9 +374,10 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     }
     firePropertyChange("textBoxColor", oldTextBoxColor, this.textBoxColor);
     firePropertyChange("textBoxOpacity", oldTextBoxOpacity, this.textBoxOpacity);
+    return this;
   }
 
-  public void setTextDx(final Quantity<Length> textDx) {
+  public TextStyle setTextDx(final Quantity<Length> textDx) {
     final Object oldValue = this.textDy;
     if (textDx == null) {
       this.textDx = this.textDy;
@@ -253,9 +386,10 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     }
     firePropertyChange("textDx", oldValue, this.textDx);
     updateTextDeltaUnits(this.textDx.getUnit());
+    return this;
   }
 
-  public void setTextDy(final Quantity<Length> textDy) {
+  public TextStyle setTextDy(final Quantity<Length> textDy) {
     final Object oldValue = this.textDy;
     if (textDy == null) {
       this.textDy = this.textDx;
@@ -264,16 +398,18 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     }
     firePropertyChange("textDy", oldValue, this.textDy);
     updateTextDeltaUnits(this.textDy.getUnit());
+    return this;
   }
 
-  public void setTextFaceName(final String textFaceName) {
+  public TextStyle setTextFaceName(final String textFaceName) {
     final Object oldValue = this.textFaceName;
     this.textFaceName = textFaceName;
     this.font = null;
     firePropertyChange("textFaceName", oldValue, this.textFaceName);
+    return this;
   }
 
-  public void setTextFill(final Color fill) {
+  public TextStyle setTextFill(final Color fill) {
     final Object oldTextFill = this.textFill;
     final Object oldTextOpacity = this.textOpacity;
     if (fill == null) {
@@ -284,9 +420,10 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     }
     firePropertyChange("textFill", oldTextFill, this.textFill);
     firePropertyChange("textOpacity", oldTextOpacity, this.textOpacity);
+    return this;
   }
 
-  public void setTextHaloFill(final Color fill) {
+  public TextStyle setTextHaloFill(final Color fill) {
     final Object oldValue = this.textHaloFill;
     if (fill == null) {
       this.textHaloFill = new Color(0, 0, 0, this.textOpacity);
@@ -294,19 +431,21 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
       this.textHaloFill = WebColors.newAlpha(fill, this.textOpacity);
     }
     firePropertyChange("textHaloFill", oldValue, this.textHaloFill);
+    return this;
   }
 
-  public void setTextHaloRadius(final double textHaloRadius) {
+  public TextStyle setTextHaloRadius(final double textHaloRadius) {
     final Object oldValue = this.textHaloRadius;
     this.textHaloRadius = textHaloRadius;
     firePropertyChange("textHaloRadius", oldValue, this.textHaloRadius);
+    return this;
   }
 
-  public void setTextHaloRadius(final Quantity<Length> textHaloRadius) {
-    setTextHaloRadius(QuantityType.doubleValue(textHaloRadius, textHaloRadius.getUnit()));
+  public TextStyle setTextHaloRadius(final Quantity<Length> textHaloRadius) {
+    return setTextHaloRadius(QuantityType.doubleValue(textHaloRadius, textHaloRadius.getUnit()));
   }
 
-  public void setTextHorizontalAlignment(final String textHorizontalAlignment) {
+  public TextStyle setTextHorizontalAlignment(final String textHorizontalAlignment) {
     final Object oldValue = this.textHorizontalAlignment;
     if (Property.hasValue(textHorizontalAlignment)) {
       this.textHorizontalAlignment = textHorizontalAlignment;
@@ -314,9 +453,10 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
       this.textHorizontalAlignment = AUTO;
     }
     firePropertyChange("textHorizontalAlignment", oldValue, this.textHorizontalAlignment);
+    return this;
   }
 
-  public void setTextName(final String textName) {
+  public TextStyle setTextName(final String textName) {
     final Object oldValue = this.textName;
     if (textName == null) {
       this.textName = "";
@@ -324,9 +464,10 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
       this.textName = textName;
     }
     firePropertyChange("textName", oldValue, this.textName);
+    return this;
   }
 
-  public void setTextOpacity(final int textOpacity) {
+  public TextStyle setTextOpacity(final int textOpacity) {
     final Object oldTextFill = this.textFill;
     final Object oldTextOpacity = this.textOpacity;
     final Object oldTextHaloFill = this.textHaloFill;
@@ -340,26 +481,30 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     firePropertyChange("textFill", oldTextFill, this.textFill);
     firePropertyChange("textOpacity", oldTextOpacity, this.textOpacity);
     firePropertyChange("textHaloFill", oldTextHaloFill, this.textHaloFill);
+    return this;
   }
 
-  public void setTextOrientation(final double textOrientation) {
+  public TextStyle setTextOrientation(final double textOrientation) {
     final Object oldValue = this.textOrientation;
     this.textOrientation = textOrientation;
     firePropertyChange("textOrientation", oldValue, this.textOrientation);
+    return this;
   }
 
-  public void setTextOrientationType(final String textOrientationType) {
+  public TextStyle setTextOrientationType(final String textOrientationType) {
     final Object oldValue = this.textOrientationType;
     this.textOrientationType = textOrientationType;
     firePropertyChange("textOrientationType", oldValue, this.textOrientationType);
+    return this;
   }
 
   @Deprecated
-  public void setTextPlacement(final String textPlacementType) {
+  public TextStyle setTextPlacement(final String textPlacementType) {
     setTextPlacementType(textPlacementType);
+    return this;
   }
 
-  public void setTextPlacementType(String textPlacementType) {
+  public TextStyle setTextPlacementType(String textPlacementType) {
     final Object oldValue = this.textPlacementType;
     if (Property.hasValue(textPlacementType)) {
       textPlacementType = Strings.replaceAll(textPlacementType, "^point\\(", "vertex\\(");
@@ -368,38 +513,41 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
       this.textPlacementType = AUTO;
     }
     firePropertyChange("textPlacementType", oldValue, this.textPlacementType);
+    return this;
   }
 
-  public void setTextSize(final Quantity<Length> textSize) {
+  public TextStyle setTextSize(final Quantity<Length> textSize) {
     final Object oldValue = this.textSize;
     this.textSize = MarkerStyle.getWithDefault(textSize, MarkerStyle.TEN_PIXELS);
     this.font = null;
     firePropertyChange("textSize", oldValue, this.textSize);
+    return this;
   }
 
-  public synchronized void setTextStyle(final Viewport2D viewport, final Graphics2D graphics) {
-    if (viewport == null) {
+  public synchronized void setTextStyle(final ViewRenderer view, final Graphics2D graphics) {
+    if (view == null) {
       final Font font = new Font(this.textFaceName, 0, this.textSize.getValue().intValue());
       graphics.setFont(font);
     } else {
-      final long scale = (long)viewport.getScale();
+      final long scale = (long)view.getScale();
       if (this.font == null || this.lastScale != scale) {
         this.lastScale = scale;
         final int style = 0;
+        final Quantity<Length> measure = this.textSize;
         // if (textStyle.getFontWeight() == FontWeight.BOLD) {
         // style += Font.BOLD;
         // }
         // if (textStyle.getFontStyle() == FontStyle.ITALIC) {
         // style += Font.ITALIC;
         // }
-        final double fontSize = Viewport2D.toDisplayValue(viewport, this.textSize);
+        final double fontSize = view.toDisplayValue(measure);
         this.font = new Font(this.textFaceName, style, (int)Math.ceil(fontSize));
       }
       graphics.setFont(this.font);
     }
   }
 
-  public void setTextVerticalAlignment(final String textVerticalAlignment) {
+  public TextStyle setTextVerticalAlignment(final String textVerticalAlignment) {
     final Object oldValue = this.textVerticalAlignment;
     if (Property.hasValue(textVerticalAlignment)) {
       this.textVerticalAlignment = textVerticalAlignment;
@@ -407,6 +555,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
       this.textVerticalAlignment = AUTO;
     }
     firePropertyChange("textVerticalAlignment", oldValue, this.textVerticalAlignment);
+    return this;
   }
 
   @Override

@@ -24,22 +24,18 @@ import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Integers;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
+import com.revolsys.connection.file.FolderConnectionRegistry;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.file.FileConnectionManager;
-import com.revolsys.io.file.FolderConnectionRegistry;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.filter.FileNameExtensionFilter;
-import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.record.io.format.json.Json;
-import com.revolsys.spring.resource.FileSystemResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.SwingUtil;
@@ -58,8 +54,9 @@ public class Project extends LayerGroup {
   private static WeakReference<Project> projectReference = new WeakReference<>(null);
 
   static {
-    final MenuFactory menu = MenuFactory.getMenu(Project.class);
-    menu.deleteMenuItem("layer", "Delete");
+    MenuFactory.addMenuInitializer(Project.class, (menu) -> {
+      menu.deleteMenuItem("layer", "Delete");
+    });
   }
 
   public static synchronized void clearProject(final Project project) {
@@ -82,29 +79,36 @@ public class Project extends LayerGroup {
 
   private BaseMapLayerGroup baseMapLayers = new BaseMapLayerGroup();
 
-  private FolderConnectionRegistry folderConnections = new FolderConnectionRegistry("Project");
-
-  private WebServiceConnectionRegistry webServices = new WebServiceConnectionRegistry("Project");
+  private final FolderConnectionRegistry folderConnections;
 
   private BoundingBox initialBoundingBox;
 
-  private RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry("Project");
+  private final RecordStoreConnectionRegistry recordStores;
 
   private Resource resource;
 
   private BoundingBox viewBoundingBox = BoundingBox.empty();
 
+  private final WebServiceConnectionRegistry webServices;
+
   private Map<String, BoundingBox> zoomBookmarks = new LinkedHashMap<>();
+
+  private final String connectionRegistryName;
 
   public Project() {
     this("Project");
   }
 
-  public Project(final String name) {
-    super(name);
+  public Project(final String connectionRegistryName) {
+    super("Project");
     setType("Project");
+    this.connectionRegistryName = connectionRegistryName;
     this.baseMapLayers.setLayerGroup(this);
     setGeometryFactory(GeometryFactory.worldMercator());
+
+    this.folderConnections = new FolderConnectionRegistry(connectionRegistryName);
+    this.recordStores = new RecordStoreConnectionRegistry(connectionRegistryName);
+    this.webServices = new WebServiceConnectionRegistry(connectionRegistryName);
   }
 
   private void addChangedLayers(final LayerGroup group, final List<Layer> layersWithChanges) {
@@ -135,6 +139,20 @@ public class Project extends LayerGroup {
 
   public BaseMapLayerGroup getBaseMapLayers() {
     return this.baseMapLayers;
+  }
+
+  @Override
+  public BoundingBox getBoundingBox() {
+    final BoundingBox boundingBox = super.getBoundingBox();
+    if (boundingBox.isEmpty()) {
+      return getAreaBoundingBox();
+    } else {
+      return boundingBox;
+    }
+  }
+
+  public String getConnectionRegistryName() {
+    return this.connectionRegistryName;
   }
 
   @Override
@@ -183,16 +201,7 @@ public class Project extends LayerGroup {
       final Path directory = getSaveAsDirectory();
       return directory;
     }
-    if (this.resource instanceof FileSystemResource) {
-      final FileSystemResource fileResource = (FileSystemResource)this.resource;
-      final File directory = fileResource.getFile();
-      if (!directory.exists()) {
-        directory.mkdirs();
-      }
-      if (directory.isDirectory()) {
-        return directory.toPath();
-      }
-    } else if (this.resource instanceof PathResource) {
+    if (this.resource instanceof PathResource) {
       final PathResource pathResource = (PathResource)this.resource;
       final Path directory = pathResource.getPath();
       if (!Files.exists(directory)) {
@@ -211,6 +220,10 @@ public class Project extends LayerGroup {
 
   public RecordStoreConnectionRegistry getRecordStores() {
     return this.recordStores;
+  }
+
+  public Resource getResource() {
+    return this.resource;
   }
 
   public Path getSaveAsDirectory() {
@@ -233,7 +246,7 @@ public class Project extends LayerGroup {
         FileUtil.deleteDirectory(directory);
       }
       directory.mkdirs();
-      this.resource = new FileSystemResource(directory);
+      this.resource = new PathResource(directory);
       return directory.toPath();
     } else {
       return null;
@@ -254,12 +267,18 @@ public class Project extends LayerGroup {
 
   @Override
   protected void importProject(final Project importProject) {
-    final List<Layer> importLayers = importProject.getLayers();
-    addLayers(importLayers);
+    super.importProject(importProject);
 
-    final BaseMapLayerGroup importBaseMaps = importProject.getBaseMapLayers();
     final BaseMapLayerGroup baseMaps = getBaseMapLayers();
-    baseMaps.addLayers(importBaseMaps);
+    baseMaps.importProjectBaseMaps(importProject);
+  }
+
+  public boolean isBaseMapLayer(final Layer layer) {
+    return this.baseMapLayers.isDescendant(layer);
+  }
+
+  public boolean isSaved() {
+    return this.resource != null;
   }
 
   @Override
@@ -281,14 +300,14 @@ public class Project extends LayerGroup {
     }
   }
 
-  public BaseMapLayerGroup readBaseMapsLayers(final Resource resource) {
+  public BaseMapLayerGroup readBaseMapsLayers(final Project rootProject, final Resource resource) {
     final Resource baseMapsResource = resource.newChildResource("Base Maps");
     final Resource layerGroupResource = baseMapsResource.newChildResource("rgLayerGroup.rgobject");
     if (layerGroupResource.exists()) {
       final Resource oldResource = Resource.setBaseResource(baseMapsResource);
       try {
         final Map<String, Object> properties = Json.toMap(layerGroupResource);
-        this.baseMapLayers.loadLayers(properties);
+        this.baseMapLayers.loadLayers(rootProject, properties);
         boolean hasVisible = false;
         if (this.baseMapLayers != null) {
           for (final Layer layer : this.baseMapLayers) {
@@ -306,7 +325,7 @@ public class Project extends LayerGroup {
     return this.baseMapLayers;
   }
 
-  protected void readLayers(final Resource resource) {
+  protected void readLayers(final Project rootProject, final Resource resource) {
     final Resource layerGroupResource = resource.newChildResource("rgLayerGroup.rgobject");
     if (!layerGroupResource.exists()) {
       Logs.error(this, "File not found: " + layerGroupResource);
@@ -314,8 +333,8 @@ public class Project extends LayerGroup {
       final Resource oldResource = Resource.setBaseResource(resource);
       try {
         final Map<String, Object> properties = Json.toMap(layerGroupResource);
-        loadLayers(properties);
-      } catch (final Throwable e) {
+        loadLayers(rootProject, properties);
+      } catch (final RuntimeException e) {
         Logs.error(this, "Unable to read: " + layerGroupResource, e);
       } finally {
         Resource.setBaseResource(oldResource);
@@ -323,45 +342,53 @@ public class Project extends LayerGroup {
     }
   }
 
-  public void readProject(final Object source) {
-    this.resource = Resource.getResource(source);
+  public void readProject(final Project rootProject, final Resource resource) {
+    this.resource = resource;
     if (this.resource.exists()) {
       String name;
       try (
         final BaseCloseable booleanValueCloseable = eventsDisabled()) {
-        final Resource layersDir = this.resource.newChildResource("Layers");
-        readProperties(layersDir);
 
         final RecordStoreConnectionRegistry oldRecordStoreConnections = RecordStoreConnectionRegistry
           .getForThread();
         try {
-          final Resource recordStoresDirectory = this.resource.newChildResource("Record Stores");
-          if (!recordStoresDirectory.exists()) {
-            final Resource dataStoresDirectory = this.resource.newChildResource("Data Stores");
-            if (dataStoresDirectory.exists()) {
-              final File file = dataStoresDirectory.getFile();
-              file.renameTo(new File(file.getParentFile(), "Record Stores"));
-            }
-          }
-
           final boolean readOnly = isReadOnly();
-          final RecordStoreConnectionRegistry recordStores = new RecordStoreConnectionRegistry(
-            "Project", recordStoresDirectory, readOnly);
-          setRecordStores(recordStores);
-          RecordStoreConnectionRegistry.setForThread(recordStores);
 
           final Resource folderConnectionsDirectory = this.resource
             .newChildResource("Folder Connections");
-          this.folderConnections = new FolderConnectionRegistry("Project",
-            folderConnectionsDirectory, readOnly);
+          this.folderConnections.clear(folderConnectionsDirectory, readOnly);
+
+          final Resource recordStoresDirectory = this.resource.newChildResource("Record Stores");
+          this.recordStores.clear(recordStoresDirectory, readOnly);
 
           final Resource webServicesDirectory = this.resource.newChildResource("Web Services");
-          this.webServices = new WebServiceConnectionRegistry("Project", webServicesDirectory,
-            readOnly);
+          this.webServices.clear(webServicesDirectory, readOnly);
 
-          readLayers(layersDir);
+          if (rootProject == null) {
+            RecordStoreConnectionRegistry.setForThread(this.recordStores);
+          } else {
+            final WebServiceConnectionRegistry rootWebServices = rootProject.getWebServices();
+            importConnections("Web Service", this, this.webServices, rootWebServices);
 
-          readBaseMapsLayers(this.resource);
+            final RecordStoreConnectionRegistry rootRecordStores = rootProject.getRecordStores();
+            rootProject.importConnections("Record Store", this, this.recordStores,
+              rootRecordStores);
+
+            final FolderConnectionRegistry rootFolderConnections = rootProject
+              .getFolderConnections();
+            rootProject.importConnections("Folder Connection", this, this.folderConnections,
+              rootFolderConnections);
+          }
+          final Resource layersDir = this.resource.newChildResource("Layers");
+          final boolean hasLayers = layersDir.exists();
+          if (hasLayers) {
+            readProperties(layersDir);
+          }
+          if (hasLayers) {
+            readLayers(rootProject, layersDir);
+          }
+
+          readBaseMapsLayers(rootProject, this.resource);
         } finally {
           RecordStoreConnectionRegistry.setForThread(oldRecordStoreConnections);
         }
@@ -395,13 +422,16 @@ public class Project extends LayerGroup {
     }
   }
 
+  @Override
   public void reset() {
-    clear();
+    super.reset();
     setName("Project");
     this.baseMapLayers.clear();
-    this.recordStores = new RecordStoreConnectionRegistry("Project");
-    this.folderConnections = new FolderConnectionRegistry("Project");
-    this.webServices = new WebServiceConnectionRegistry("Project");
+
+    this.recordStores.clear();
+    this.folderConnections.clear();
+    this.webServices.clear();
+
     this.initialBoundingBox = null;
     this.resource = null;
     this.viewBoundingBox = BoundingBox.empty();
@@ -419,16 +449,9 @@ public class Project extends LayerGroup {
       final Path directory = getDirectory();
       final boolean saveAllSettings = super.saveAllSettings(directory);
       if (saveAllSettings) {
-        final RecordStoreConnectionManager recordStoreConnectionManager = RecordStoreConnectionManager
-          .get();
-        final RecordStoreConnectionRegistry recordStoreConnections = recordStoreConnectionManager
-          .getConnectionRegistry("Project");
-        recordStoreConnections.saveAs(this.resource, "Record Stores");
-
-        final FileConnectionManager fileConnectionManager = FileConnectionManager.get();
-        final FolderConnectionRegistry folderConnections = fileConnectionManager
-          .getConnectionRegistry("Project");
-        folderConnections.saveAs(this.resource, "Folder Connections");
+        this.recordStores.saveAs(this.resource, "Record Stores");
+        this.folderConnections.saveAs(this.resource, "Folder Connections");
+        this.webServices.saveAs(this.resource, "Web Services");
       }
       return saveAllSettings;
     }
@@ -568,29 +591,20 @@ public class Project extends LayerGroup {
     return result;
   }
 
-  public void setFolderConnections(final FolderConnectionRegistry folderConnections) {
-    this.folderConnections = folderConnections;
-  }
-
-  @Override
-  public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    super.setGeometryFactory(geometryFactory);
-  }
-
   @Override
   public void setProperty(final String name, final Object value) {
     if ("srid".equals(name)) {
       try {
         final Integer srid = Integers.toValid(value);
         if (srid != null) {
-          setGeometryFactory(GeometryFactory.floating3(srid));
+          setGeometryFactory(GeometryFactory.floating3d(srid));
         }
-      } catch (final Throwable t) {
+      } catch (final RuntimeException t) {
       }
     } else if ("viewBoundingBox".equals(name)) {
       if (value != null) {
-        final BoundingBox viewBoundingBox = BoundingBox.newBoundingBox(value.toString());
-        if (!BoundingBoxUtil.isEmpty(viewBoundingBox)) {
+        final BoundingBox viewBoundingBox = BoundingBox.bboxNew(value.toString());
+        if (!RectangleUtil.isEmpty(viewBoundingBox)) {
           this.initialBoundingBox = viewBoundingBox;
           setViewBoundingBoxAndGeometryFactory(viewBoundingBox);
         }
@@ -600,13 +614,9 @@ public class Project extends LayerGroup {
     }
   }
 
-  public void setRecordStores(final RecordStoreConnectionRegistry recordStores) {
-    this.recordStores = recordStores;
-  }
-
   public void setSrid(final Number srid) {
     if (srid != null) {
-      final GeometryFactory geometryFactory = GeometryFactory.floating3(srid.intValue());
+      final GeometryFactory geometryFactory = GeometryFactory.floating3d(srid.intValue());
       setGeometryFactory(geometryFactory);
     }
   }
@@ -624,13 +634,9 @@ public class Project extends LayerGroup {
       final BoundingBox oldBoundingBox = this.viewBoundingBox;
       final boolean bboxUpdated = setViewBoundingBoxDo(viewBoundingBox);
 
-      final GeometryFactory oldGeometryFactory = getGeometryFactory();
       final GeometryFactory geometryFactory = viewBoundingBox.getGeometryFactory();
-      final boolean geometryFactoryUpdated = setGeometryFactoryDo(geometryFactory);
+      setGeometryFactory(geometryFactory);
 
-      if (geometryFactoryUpdated) {
-        fireGeometryFactoryChanged(oldGeometryFactory, geometryFactory);
-      }
       if (bboxUpdated) {
         firePropertyChange("viewBoundingBox", oldBoundingBox, this.viewBoundingBox);
       }
@@ -643,27 +649,25 @@ public class Project extends LayerGroup {
     } else {
       // TODO really should be min scale
       double minDimension;
-      if (viewBoundingBox.getCoordinateSystem() instanceof GeographicCoordinateSystem) {
+      if (viewBoundingBox.getGeometryFactory().isGeographic()) {
         minDimension = 0.000005;
       } else {
         minDimension = 0.5;
       }
+      final BoundingBoxEditor bboxEditor = viewBoundingBox.bboxEditor();
       final double width = viewBoundingBox.getWidth();
       if (width < minDimension) {
-        viewBoundingBox = viewBoundingBox.expand((minDimension - width) / 2, 0);
+        bboxEditor.expandDeltaX((minDimension - width) / 2);
       }
       final double height = viewBoundingBox.getHeight();
       if (height < minDimension) {
-        viewBoundingBox = viewBoundingBox.expand(0, (minDimension - height) / 2);
+        bboxEditor.expandDeltaY((minDimension - height) / 2);
       }
+      viewBoundingBox = bboxEditor.newBoundingBox();
       final BoundingBox oldBoundingBox = this.viewBoundingBox;
       this.viewBoundingBox = viewBoundingBox;
       return !viewBoundingBox.equals(oldBoundingBox);
     }
-  }
-
-  public void setWebServices(final WebServiceConnectionRegistry webServices) {
-    this.webServices = webServices;
   }
 
   public void setZoomBookmarks(final Map<String, ?> zoomBookmarks) {
@@ -682,7 +686,7 @@ public class Project extends LayerGroup {
               boundingBox = geometry.getBoundingBox();
             } else if (object != null) {
               final String wkt = object.toString();
-              boundingBox = BoundingBox.newBoundingBox(wkt);
+              boundingBox = BoundingBox.bboxNew(wkt);
             }
             if (boundingBox != null) {
               bookmarks.put(name, boundingBox);
@@ -701,15 +705,11 @@ public class Project extends LayerGroup {
     final MapEx map = super.toMap();
 
     BoundingBox boundingBox = getViewBoundingBox();
-    if (!BoundingBoxUtil.isEmpty(boundingBox)) {
-      BoundingBox defaultBoundingBox = null;
+    if (!RectangleUtil.isEmpty(boundingBox)) {
+      final BoundingBox defaultBoundingBox = getAreaBoundingBox();
       final GeometryFactory geometryFactory = getGeometryFactory();
       if (geometryFactory != null) {
-        final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-        if (coordinateSystem != null) {
-          defaultBoundingBox = coordinateSystem.getAreaBoundingBox();
-        }
-        boundingBox = boundingBox.convert(geometryFactory);
+        boundingBox = boundingBox.bboxToCs(geometryFactory);
       }
       addToMap(map, "viewBoundingBox", boundingBox, defaultBoundingBox);
       final Map<String, BoundingBox> zoomBookmarks = getZoomBookmarks();

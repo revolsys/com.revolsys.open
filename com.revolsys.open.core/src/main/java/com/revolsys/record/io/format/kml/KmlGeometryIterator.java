@@ -23,7 +23,7 @@ import com.revolsys.util.Property;
 
 public class KmlGeometryIterator extends AbstractIterator<Geometry>
   implements GeometryReader, Kml22Constants {
-  private GeometryFactory geometryFactory = GeometryFactory.floating3(COORDINATE_SYSTEM_ID);
+  private GeometryFactory geometryFactory = GeometryFactory.floating3d(COORDINATE_SYSTEM_ID);
 
   private StaxReader in;
 
@@ -42,6 +42,11 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
     }
     this.geometryFactory = null;
     this.in = null;
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
   }
 
   @Override

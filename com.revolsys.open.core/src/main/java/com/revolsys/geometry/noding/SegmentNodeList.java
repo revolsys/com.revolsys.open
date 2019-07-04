@@ -303,7 +303,7 @@ public class SegmentNodeList implements Iterable<SegmentNode> {
       npts--;
     }
 
-    final int axisCount = this.edge.getPoints().getAxisCount();
+    final int axisCount = this.edge.getLineString().getAxisCount();
     final double[] coordinates = new double[npts * axisCount];
 
     int ipt = 0;

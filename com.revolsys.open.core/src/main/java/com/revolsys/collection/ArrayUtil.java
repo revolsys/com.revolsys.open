@@ -3,8 +3,17 @@ package com.revolsys.collection;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class ArrayUtil {
+  public static <T> void fill(final T[] array, final Supplier<T> supplier) {
+    if (array != null) {
+      for (int i = 0; i < array.length; i++) {
+        array[i] = supplier.get();
+      }
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public static <T> T[] newArray(final Class<T> clazz, final int size) {
     return (T[])Array.newInstance(clazz, size);

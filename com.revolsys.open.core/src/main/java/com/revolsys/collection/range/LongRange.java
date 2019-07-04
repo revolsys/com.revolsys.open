@@ -6,7 +6,7 @@ import org.jeometry.common.number.Numbers;
  *
  * Ranges are immutable
  */
-public class LongRange extends AbstractRange<Long> {
+public class LongRange extends AbstractNumberRange<Long> {
   private long from;
 
   private long to;
@@ -43,6 +43,11 @@ public class LongRange extends AbstractRange<Long> {
   @Override
   public Long getTo() {
     return this.to;
+  }
+
+  @Override
+  protected AbstractNumberRange<?> newNumberRange(final long from, final long to) {
+    return new LongRange(from, to);
   }
 
   @Override

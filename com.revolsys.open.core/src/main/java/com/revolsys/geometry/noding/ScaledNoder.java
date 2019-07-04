@@ -111,7 +111,7 @@ public class ScaledNoder implements Noder {
   }
 
   private NodedSegmentString rescale(final NodedSegmentString segment) {
-    final LineString points = segment.getPoints();
+    final LineString points = segment.getLineString();
     final int axisCount = points.getAxisCount();
     final int vertexCount = points.getVertexCount();
     final double[] coordinates = new double[vertexCount * axisCount];
@@ -142,7 +142,7 @@ public class ScaledNoder implements Noder {
 
   private LineString scale(final NodedSegmentString segment) {
     final int vertexCount = segment.size();
-    final int axisCount = segment.getPoints().getAxisCount();
+    final int axisCount = segment.getLineString().getAxisCount();
     final double[] coordinates = new double[vertexCount * axisCount];
     double previousX = Double.NaN;
     double previousY = Double.NaN;

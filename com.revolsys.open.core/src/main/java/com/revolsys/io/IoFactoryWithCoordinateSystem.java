@@ -2,7 +2,7 @@ package com.revolsys.io;
 
 import java.util.Set;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
 
 public interface IoFactoryWithCoordinateSystem extends IoFactory {
   Set<CoordinateSystem> getCoordinateSystems();

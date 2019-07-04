@@ -6,7 +6,7 @@ import java.util.List;
 import com.revolsys.geometry.algorithm.index.AbstractIdObjectPointQuadTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.visitor.CreateListVisitor;
 
 public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
@@ -26,11 +26,11 @@ public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
   @Override
   public BoundingBox getEnvelope(final Node<T> node) {
     if (node == null) {
-      return BoundingBox.EMPTY;
+      return BoundingBox.empty();
     } else {
       final double x = node.getX();
       final double y = node.getY();
-      final BoundingBox envelope = new BoundingBoxDoubleGf(2, x, y, x, y);
+      final BoundingBox envelope = BoundingBoxDoubleXY.newBoundingBoxDoubleXY(x, y, x, y);
       return envelope;
     }
   }

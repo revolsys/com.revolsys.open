@@ -3,18 +3,18 @@ package com.revolsys.record.io;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.io.connection.AbstractConnection;
+import com.revolsys.connection.AbstractConnection;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.Function2;
 
 public class RecordStoreConnection
   extends AbstractConnection<RecordStoreConnection, RecordStoreConnectionRegistry>
@@ -65,12 +65,12 @@ public class RecordStoreConnection
     synchronized (this) {
       if (this.recordStore == null || this.recordStore.isClosed()) {
         this.recordStore = null;
-        final Function2<RecordStoreConnection, Throwable, Boolean> invalidRecordStoreFunction = RecordStoreConnectionManager
+        final BiFunction<RecordStoreConnection, Throwable, Boolean> invalidRecordStoreFunction = RecordStoreConnectionManager
           .getInvalidRecordStoreFunction();
         Throwable savedException = null;
         do {
           try {
-            this.recordStore = MapObjectFactory.toObject(toMapInternal());
+            this.recordStore = newRecordStore();
             this.recordStore.setRecordStoreConnection(this);
             return this.recordStore;
           } catch (final Throwable e) {
@@ -86,6 +86,11 @@ public class RecordStoreConnection
 
   public boolean isSavePassword() {
     return this.savePassword;
+  }
+
+  public RecordStore newRecordStore() {
+    final MapEx config = toMapInternal();
+    return MapObjectFactory.toObject(config);
   }
 
   @Override

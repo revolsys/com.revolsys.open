@@ -54,7 +54,7 @@ import com.revolsys.geometry.model.impl.PointDouble;
 public class LineSegmentDouble extends AbstractLineSegment {
   private static final long serialVersionUID = 1L;
 
-  private double[] coordinates;
+  protected double[] coordinates;
 
   public LineSegmentDouble() {
     this.coordinates = null;

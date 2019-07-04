@@ -3,7 +3,6 @@ package com.revolsys.swing.table.object;
 import java.beans.IndexedPropertyChangeEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import com.revolsys.beans.PropertyChangeSupport;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,6 +11,7 @@ import java.util.List;
 
 import javax.annotation.PreDestroy;
 
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.swing.table.AbstractTableModel;

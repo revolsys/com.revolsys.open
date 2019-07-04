@@ -8,7 +8,9 @@ import java.util.List;
 import javax.swing.AbstractListModel;
 import javax.swing.ComboBoxModel;
 
-import com.revolsys.identifier.Identifier;
+import org.jdesktop.swingx.autocomplete.ComboBoxCellEditor;
+import org.jeometry.common.data.identifier.Identifier;
+
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
@@ -18,11 +20,25 @@ public class CodeTableComboBoxModel extends AbstractListModel<Identifier>
   implements ComboBoxModel<Identifier>, PropertyChangeListener, Closeable {
   private static final long serialVersionUID = 1L;
 
+  public static ComboBoxCellEditor newCellEditor(final CodeTable codeTable) {
+    return newCellEditor(codeTable.getName(), codeTable, false, false);
+  }
+
+  public static ComboBoxCellEditor newCellEditor(final String fieldName, final CodeTable codeTable,
+    final boolean allowNull, final boolean idSuffix) {
+    final ComboBox<Identifier> comboBox = newComboBox(fieldName, codeTable, allowNull, idSuffix);
+    return new ComboBoxCellEditor(comboBox);
+  }
+
+  public static ComboBox<Identifier> newComboBox(final CodeTable codeTable) {
+    return newComboBox(codeTable.getName(), codeTable, false, false);
+  }
+
   public static ComboBox<Identifier> newComboBox(final String fieldName, final CodeTable codeTable,
     final boolean allowNull, final boolean idSuffix) {
     final CodeTableComboBoxModel model = new CodeTableComboBoxModel(codeTable, allowNull);
 
-    final ComboBox<Identifier> comboBox = ComboBox.newComboBox(fieldName, model, (id) -> {
+    final ComboBox<Identifier> comboBox = ComboBox.newComboBox(fieldName, model, id -> {
       if (id == null || id == Identifier.NULL) {
         return null;
       } else {
@@ -32,7 +48,7 @@ public class CodeTableComboBoxModel extends AbstractListModel<Identifier>
         } else {
           final String string = Strings.toString(":", values);
           if (idSuffix) {
-            return string + " (" + id + ")";
+            return string + " (" + ((Identifier)id).toIdString() + ")";
           } else {
             return string;
           }

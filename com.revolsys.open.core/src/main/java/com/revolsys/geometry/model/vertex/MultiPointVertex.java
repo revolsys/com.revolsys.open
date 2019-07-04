@@ -47,6 +47,18 @@ public class MultiPointVertex extends AbstractVertex {
   }
 
   @Override
+  public double getX() {
+    final Punctual punctual = getPunctual();
+    return punctual.getX(this.partIndex);
+  }
+
+  @Override
+  public double getY() {
+    final Punctual punctual = getPunctual();
+    return punctual.getY(this.partIndex);
+  }
+
+  @Override
   public boolean hasNext() {
     final Punctual punctual = getPunctual();
     if (punctual.isEmpty()) {
@@ -79,6 +91,12 @@ public class MultiPointVertex extends AbstractVertex {
   @Override
   public void remove() {
     throw new UnsupportedOperationException("Removing vertices not supported");
+  }
+
+  @Override
+  public double setCoordinate(final int axisIndex, final double coordinate) {
+    final Punctual punctual = getPunctual();
+    return punctual.setCoordinate(this.partIndex, axisIndex, coordinate);
   }
 
   public void setPartIndex(final int partIndex) {

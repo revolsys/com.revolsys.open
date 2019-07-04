@@ -79,7 +79,7 @@ public class RectangleContains {
 
   public boolean contains(final Geometry geom) {
     // the test geometry must be wholly contained in the rectangle envelope
-    if (!this.rectEnv.covers(geom.getBoundingBox())) {
+    if (!this.rectEnv.bboxCovers(geom.getBoundingBox())) {
       return false;
     }
 

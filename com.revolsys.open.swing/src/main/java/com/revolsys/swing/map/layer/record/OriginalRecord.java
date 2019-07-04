@@ -29,6 +29,11 @@ public class OriginalRecord extends AbstractRecord {
   }
 
   @Override
+  public boolean isState(final RecordState state) {
+    return this.record.isState(state);
+  }
+
+  @Override
   public RecordState setState(final RecordState state) {
     throw new UnsupportedOperationException();
   }

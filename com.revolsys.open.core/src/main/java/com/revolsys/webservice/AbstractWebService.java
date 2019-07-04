@@ -84,6 +84,7 @@ public abstract class AbstractWebService<V> extends BaseObjectWithProperties
     this.password = PasswordUtil.decrypt(password);
     final UrlResource serviceUrl = this.serviceUrl;
     if (serviceUrl != null) {
+
       String username = this.username;
       if (username == null) {
         username = serviceUrl.getUsername();

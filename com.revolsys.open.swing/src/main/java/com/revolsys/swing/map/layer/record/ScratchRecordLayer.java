@@ -7,6 +7,7 @@ import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.menu.MenuFactory;
@@ -17,9 +18,8 @@ public class ScratchRecordLayer extends ListRecordLayer {
     MenuFactory.addMenuInitializer(ScratchRecordLayer.class, menu -> {
       menu.deleteMenuItem("edit", "Save Changes");
       menu.deleteMenuItem("edit", "Cancel Changes");
-      final MenuFactory menu1 = menu;
 
-      menu1.addMenuItem("edit", -1, "Delete All Records", "table:delete",
+      menu.addMenuItem("edit", -1, "Delete All Records", "table:delete",
         ScratchRecordLayer::isCanDeleteRecords, layer -> {
           if (layer.confirmDeleteRecords(layer.records)) {
             layer.clearRecords();
@@ -45,7 +45,7 @@ public class ScratchRecordLayer extends ListRecordLayer {
 
   public ScratchRecordLayer(final Map<String, ? extends Object> config) {
     super(TYPE_NAME);
-    this.geometryType = DataTypes.GEOMETRY;
+    this.geometryType = GeometryDataTypes.GEOMETRY;
     setProperties(config);
   }
 
@@ -64,16 +64,11 @@ public class ScratchRecordLayer extends ListRecordLayer {
     return super.initializeDo();
   }
 
-  @Override
-  public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    super.setGeometryFactory(geometryFactory);
-  }
-
   public void setGeometryTypeName(final String geometryTypeName) {
     this.geometryType = DataTypes.getDataType(geometryTypeName);
     if (this.geometryType == null
       || !Geometry.class.isAssignableFrom(this.geometryType.getJavaClass())) {
-      this.geometryType = DataTypes.GEOMETRY;
+      this.geometryType = GeometryDataTypes.GEOMETRY;
     }
   }
 

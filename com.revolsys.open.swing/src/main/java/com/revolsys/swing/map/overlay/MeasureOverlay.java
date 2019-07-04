@@ -24,30 +24,26 @@ import javax.measure.quantity.Length;
 
 import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.number.Doubles;
+import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.unit.CustomUnits;
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
+import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
-import com.revolsys.io.BaseCloseable;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.MapPanel;
-import com.revolsys.swing.map.Viewport2D;
-import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
-import com.revolsys.swing.map.layer.record.renderer.TextStyleRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
+import com.revolsys.swing.map.overlay.record.SelectedRecordsVertexRenderer;
+import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 
 import tec.uom.se.quantity.Quantities;
 import tec.uom.se.unit.Units;
@@ -111,7 +107,7 @@ public class MeasureOverlay extends AbstractOverlay {
   }
 
   private Geometry deleteVertex() {
-    Geometry geometry = getMeasureGeometry();
+    final Geometry geometry = getMeasureGeometry();
 
     for (final CloseLocation location : getMouseOverLocations()) {
       final int[] vertexId = location.getVertexId();
@@ -150,7 +146,11 @@ public class MeasureOverlay extends AbstractOverlay {
           }
         }
         try {
-          geometry = geometry.deleteVertex(vertexId);
+          final GeometryEditor<?> geometryEditor = geometry.newGeometryEditor();
+          geometryEditor.deleteVertex(vertexId);
+          if (geometryEditor.isModified()) {
+            return geometryEditor.newGeometry();
+          }
         } catch (final Exception e) {
           Toolkit.getDefaultToolkit().beep();
           return geometry;
@@ -183,7 +183,7 @@ public class MeasureOverlay extends AbstractOverlay {
     } else {
       previousPointOffset = -1;
     }
-    final GeometryFactory geometryFactory = getGeometryFactory();
+    final GeometryFactory geometryFactory = getGeometryFactory2d();
     if (geometry instanceof Point) {
     } else {
       final Point point = getPoint(geometryFactory, event);
@@ -257,7 +257,7 @@ public class MeasureOverlay extends AbstractOverlay {
         }
         if (clickCount == 1) {
           final Geometry measureGeometry = getMeasureGeometry();
-          final GeometryFactory geometryFactory = getGeometryFactory();
+          final GeometryFactory geometryFactory = getGeometryFactory2d();
           if (measureGeometry.isEmpty()) {
             setMeasureGeometry(point);
           } else if (measureGeometry instanceof Point) {
@@ -266,12 +266,13 @@ public class MeasureOverlay extends AbstractOverlay {
               final LineString line = geometryFactory.lineString(from, point);
               setMeasureGeometry(line);
             }
-          } else if (this.measureDataType == DataTypes.LINE_STRING) {
+          } else if (this.measureDataType == GeometryDataTypes.LINE_STRING) {
             if (measureGeometry instanceof LineString) {
               LineString line = (LineString)measureGeometry;
               final Point to = line.getToPoint();
               if (!to.equals(point)) {
-                line = line.appendVertex(point);
+                final Point newPoint = point;
+                line = line.editLine(editor -> editor.appendVertex(newPoint));
                 setMeasureGeometry(line);
               }
             }
@@ -280,19 +281,23 @@ public class MeasureOverlay extends AbstractOverlay {
               LineString line = (LineString)measureGeometry;
               final Point from = line.getToVertex(0);
               if (!from.equals(point)) {
-                line = line.appendVertex(point);
+                final Point newPoint = point;
+                line = line.editLine(editor -> editor.appendVertex(newPoint));
                 setMeasureGeometry(line);
               }
               if (line.getVertexCount() > 2) {
                 if (!line.isClosed()) {
                   final Vertex firstPoint = line.getVertex(0);
-                  line = line.appendVertex(firstPoint);
+                  line = line.editLine(editor -> editor.appendVertex(firstPoint));
                 }
                 setMeasureGeometry(geometryFactory.polygon(line));
               }
             } else if (measureGeometry instanceof Polygon) {
               final Polygon polygon = (Polygon)measureGeometry;
-              setMeasureGeometry(polygon.appendVertex(point, 0));
+              final Point newPoint = point;
+              setMeasureGeometry(polygon.edit(editor -> editor.appendVertex(new int[] {
+                0
+              }, newPoint)));
             }
           }
           event.consume();
@@ -312,7 +317,6 @@ public class MeasureOverlay extends AbstractOverlay {
         modeMeasureUpdateXorGeometry();
       } else {
         getMap().clearToolTipText();
-        final BoundingBox boundingBox = getHotspotBoundingBox(event);
 
         Geometry xorGeometry = null;
         for (final CloseLocation location : getMouseOverLocations()) {
@@ -326,7 +330,7 @@ public class MeasureOverlay extends AbstractOverlay {
           }
         }
         setXorGeometry(xorGeometry);
-        if (!hasSnapPoint(event, boundingBox)) {
+        if (!hasSnapPoint()) {
           setMapCursor(CURSOR_NODE_ADD);
         }
         return true;
@@ -341,24 +345,25 @@ public class MeasureOverlay extends AbstractOverlay {
         if (event.getButton() == MouseEvent.BUTTON1) {
           for (final CloseLocation location : getMouseOverLocations()) {
             final Geometry geometry = location.getGeometry();
-            final GeometryFactory geometryFactory = getGeometryFactory();
+            final GeometryFactory geometryFactory = getGeometryFactory2d();
             final Point point;
             if (getSnapPoint() == null) {
               point = getPoint(geometryFactory, event);
             } else {
               point = getSnapPoint().newGeometry(geometryFactory);
             }
-            final int[] vertexIndex = location.getVertexId();
-            Geometry newGeometry;
+            final int[] vertexId = location.getVertexId();
+            final GeometryEditor<?> geometryEditor = geometry.newGeometryEditor();
             final Point newPoint = point;
-            if (vertexIndex == null) {
+            if (vertexId == null) {
               final int[] segmentIndex = location.getSegmentId();
-              final int[] newIndex = segmentIndex.clone();
-              newIndex[newIndex.length - 1] = newIndex[newIndex.length - 1] + 1;
-              newGeometry = geometry.insertVertex(newPoint, newIndex);
+              final int[] newVertexId = segmentIndex.clone();
+              newVertexId[newVertexId.length - 1] = newVertexId[newVertexId.length - 1] + 1;
+              geometryEditor.insertVertex(newVertexId, newPoint);
             } else {
-              newGeometry = geometry.moveVertex(newPoint, vertexIndex);
+              geometryEditor.setVertex(vertexId, newPoint);
             }
+            final Geometry newGeometry = geometryEditor.newGeometry();
             setMeasureGeometry(newGeometry);
           }
           return true;
@@ -371,9 +376,8 @@ public class MeasureOverlay extends AbstractOverlay {
 
   protected boolean modeMeasureMove(final MouseEvent event) {
     if (isOverlayAction(MEASURE)) {
-      final BoundingBox boundingBox = getHotspotBoundingBox();
-      final CloseLocation location = getMap().findCloseLocation(null, null, this.measureGeometry,
-        boundingBox);
+      final MapPanel map = getMap();
+      final CloseLocation location = map.findCloseLocation(null, null, this.measureGeometry);
       final List<CloseLocation> locations = new ArrayList<>();
       if (location != null) {
         locations.add(location);
@@ -403,9 +407,8 @@ public class MeasureOverlay extends AbstractOverlay {
   }
 
   protected void modeMeasureUpdateXorGeometry() {
-    final BoundingBox boundingBox = getHotspotBoundingBox();
     final Point point = getOverlayPoint();
-    if (!hasSnapPoint(boundingBox)) {
+    if (!hasSnapPoint()) {
       setMapCursor(CURSOR);
     }
     Geometry xorGeometry = null;
@@ -421,17 +424,17 @@ public class MeasureOverlay extends AbstractOverlay {
         fromPoint = this.measureGeometry.getVertex(0, 0);
         toPoint = this.measureGeometry.getToVertex(0, 0);
       }
-      final GeometryFactory geometryFactory = getGeometryFactory();
+      final GeometryFactory geometryFactory = getGeometryFactory2d();
       if (toPoint != null && !toPoint.isEmpty()) {
         if (this.measureGeometry instanceof Point) {
           xorGeometry = geometryFactory.lineString(toPoint, point);
         } else {
-          if (toPoint.equals(fromPoint) || this.measureDataType == DataTypes.LINE_STRING) {
+          if (toPoint.equals(fromPoint) || this.measureDataType == GeometryDataTypes.LINE_STRING) {
             xorGeometry = newXorLine(geometryFactory, toPoint, point);
           } else {
             final Point p1 = geometryFactory.point(toPoint);
             final Point p3 = geometryFactory.point(fromPoint);
-            final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory();
+            final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory2d();
             xorGeometry = viewportGeometryFactory.lineString(p1, point, p3);
           }
         }
@@ -482,19 +485,12 @@ public class MeasureOverlay extends AbstractOverlay {
   }
 
   @Override
-  protected void paintComponent(final Viewport2D viewport, final Graphics2D graphics) {
+  protected void paintComponent(final Graphics2DViewRenderer view, final Graphics2D graphics) {
     if (!this.measureGeometry.isEmpty()) {
-      final GeometryFactory viewportGeometryFactory = viewport
-        .getRoundedGeometryFactory(getViewportGeometryFactory());
-      try (
-        BaseCloseable transformCloseable = viewport.setUseModelCoordinates(graphics, true)) {
-        MEASURE_RENDERER.paintSelected(viewport, graphics, viewportGeometryFactory,
-          this.measureGeometry);
-        if (this.measureGeometry instanceof Polygon) {
-          final Polygon polygon = (Polygon)this.measureGeometry;
-          GeometryStyleRecordLayerRenderer.renderPolygon(viewport, graphics, polygon,
-            POLYGON_STYLE);
-        }
+      MEASURE_RENDERER.paintSelected(view, this.measureGeometry);
+      if (this.measureGeometry instanceof Polygon) {
+        final Polygon polygon = (Polygon)this.measureGeometry;
+        view.drawGeometry(polygon, POLYGON_STYLE);
       }
 
       if (!(this.measureGeometry instanceof Punctual)) {
@@ -505,20 +501,21 @@ public class MeasureOverlay extends AbstractOverlay {
 
         Point textPoint;
         measureTextStyle.setTextHorizontalAlignment("right");
-        if (this.measureDataType == DataTypes.POLYGON && this.measureGeometry instanceof Polygon) {
+        if (this.measureDataType == GeometryDataTypes.POLYGON
+          && this.measureGeometry instanceof Polygon) {
           measureTextStyle.setTextDx(Quantities.getQuantity(-5, CustomUnits.PIXEL));
           measureTextStyle.setTextPlacementType("vertex(n-1)");
           measureTextStyle.setTextVerticalAlignment("middle");
-          textPoint = this.measureGeometry.getVertex(0, -2);
+          textPoint = this.measureGeometry.getToVertex(0, 1);
         } else {
           measureTextStyle.setTextDx(Quantities.getQuantity(-7, CustomUnits.PIXEL));
           measureTextStyle.setTextDy(Quantities.getQuantity(-2, CustomUnits.PIXEL));
           measureTextStyle.setTextPlacementType("vertex(n)");
           measureTextStyle.setTextVerticalAlignment("top");
-          textPoint = this.measureGeometry.getVertex(-1);
+          textPoint = this.measureGeometry.getToVertex(0);
         }
-        TextStyleRenderer.renderText(viewport, graphics, this.measureLabel, textPoint,
-          measureTextStyle);
+        view.newTextStyleViewRenderer(measureTextStyle)//
+          .drawText(this.measureLabel, textPoint);
       }
     }
     drawXorGeometry(graphics);
@@ -559,9 +556,9 @@ public class MeasureOverlay extends AbstractOverlay {
       } else {
 
         Unit<Length> lengthUnit = Units.METRE;
-        final CoordinateSystem coordinateSystem = measureGeometry.getCoordinateSystem();
-        if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-          lengthUnit = coordinateSystem.getLengthUnit();
+        final GeometryFactory geometryFactory = measureGeometry.getGeometryFactory();
+        if (geometryFactory.isProjected()) {
+          lengthUnit = geometryFactory.getHorizontalLengthUnit();
         }
         final double length = measureGeometry.getLength(lengthUnit);
 
@@ -576,7 +573,8 @@ public class MeasureOverlay extends AbstractOverlay {
           label.append(lengthString);
           label.append(unitString);
 
-          if (this.measureDataType == DataTypes.POLYGON && measureGeometry instanceof Polygon) {
+          if (this.measureDataType == GeometryDataTypes.POLYGON
+            && measureGeometry instanceof Polygon) {
             final String areaString = MEASURE_FORMAT.format(Doubles.makePrecise(100, area));
             label.append(" \n");
             label.append(areaString);

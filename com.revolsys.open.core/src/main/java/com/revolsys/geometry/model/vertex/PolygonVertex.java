@@ -22,20 +22,20 @@ public class PolygonVertex extends AbstractVertex {
   }
 
   @Override
-  public double getCoordinate(final int index) {
+  public double getCoordinate(final int axisIndex) {
     final Polygon polygon = getPolygon();
     final LinearRing ring = polygon.getRing(this.ringIndex);
     if (ring == null) {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     } else {
-      return ring.getCoordinate(this.vertexIndex, index);
+      return ring.getCoordinate(this.vertexIndex, axisIndex);
     }
   }
 
   @Override
   public double getLineCoordinateRelative(final int vertexOffset, final int axisIndex) {
     if (isEmpty()) {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     } else {
       final int vertexIndex = getVertexIndex();
       final LinearRing line = getRing();
@@ -48,10 +48,10 @@ public class PolygonVertex extends AbstractVertex {
     final LineString ring = getRing();
     if (ring != null) {
       int newVertexIndex = this.vertexIndex + 1;
-      if (newVertexIndex >= ring.getVertexCount() - 1) {
-        newVertexIndex -= ring.getVertexCount();
-      }
-      if (newVertexIndex < ring.getVertexCount() - 1) {
+      final int vertexCount = ring.getVertexCount();
+      if (newVertexIndex == vertexCount - 1) {
+        newVertexIndex = 1;
+      } else if (newVertexIndex < vertexCount - 1) {
         return new PolygonVertex(getPolygon(), this.ringIndex, newVertexIndex);
       }
     }
@@ -96,6 +96,28 @@ public class PolygonVertex extends AbstractVertex {
   @Override
   public int getVertexIndex() {
     return this.vertexIndex;
+  }
+
+  @Override
+  public double getX() {
+    final Polygon polygon = getPolygon();
+    final LinearRing ring = polygon.getRing(this.ringIndex);
+    if (ring == null) {
+      return java.lang.Double.NaN;
+    } else {
+      return ring.getX(this.vertexIndex);
+    }
+  }
+
+  @Override
+  public double getY() {
+    final Polygon polygon = getPolygon();
+    final LinearRing ring = polygon.getRing(this.ringIndex);
+    if (ring == null) {
+      return java.lang.Double.NaN;
+    } else {
+      return ring.getY(this.vertexIndex);
+    }
   }
 
   @Override
@@ -151,6 +173,12 @@ public class PolygonVertex extends AbstractVertex {
   @Override
   public void remove() {
     throw new UnsupportedOperationException("Removing vertices not supported");
+  }
+
+  @Override
+  public double setCoordinate(final int axisIndex, final double coordinate) {
+    final Polygon polygon = getPolygon();
+    return polygon.setCoordinate(this.ringIndex, this.vertexIndex, axisIndex, coordinate);
   }
 
   public void setVertexId(final int... vertexId) {

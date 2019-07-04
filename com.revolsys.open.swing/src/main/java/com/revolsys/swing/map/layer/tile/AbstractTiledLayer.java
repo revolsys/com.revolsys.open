@@ -6,9 +6,9 @@ import java.util.List;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.BaseMapLayer;
+import com.revolsys.swing.map.view.ViewRenderer;
 
 public abstract class AbstractTiledLayer<D, T extends AbstractMapTile<D>> extends AbstractLayer
   implements BaseMapLayer {
@@ -22,9 +22,9 @@ public abstract class AbstractTiledLayer<D, T extends AbstractMapTile<D>> extend
     setRenderer(newRenderer());
   }
 
-  public abstract List<T> getOverlappingMapTiles(final Viewport2D view);
+  public abstract List<T> getOverlappingMapTiles(final ViewRenderer view);
 
-  public abstract double getResolution(final Viewport2D view);
+  public abstract double getResolution(final ViewRenderer view);
 
   public boolean isHasError() {
     return this.hasError;

@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.openstreetmap;
 
-import com.revolsys.identifier.Identifier;
+import org.jeometry.common.data.identifier.Identifier;
+
 import com.revolsys.record.io.format.openstreetmap.model.OsmDocument;
 import com.revolsys.record.io.format.openstreetmap.model.OsmElement;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;

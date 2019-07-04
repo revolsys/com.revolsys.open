@@ -2,6 +2,8 @@ package com.revolsys.swing.field;
 
 import java.awt.Color;
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -112,6 +114,15 @@ public class FileField extends ValueField implements Field {
 
   public String getFilePath() {
     return this.fileName.getText();
+  }
+
+  public Path getPath() {
+    final String path = getFilePath();
+    if (Property.hasValue(path)) {
+      return Paths.get(path);
+    } else {
+      return null;
+    }
   }
 
   @Override

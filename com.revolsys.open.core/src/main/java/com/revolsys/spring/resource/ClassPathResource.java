@@ -11,6 +11,10 @@ import org.springframework.util.StringUtils;
 
 public class ClassPathResource extends AbstractResource {
 
+  public static ClassPathResource newInPackage(final Class<?> clazz, final String name) {
+    return new ClassPathResource(name, clazz);
+  }
+
   private ClassLoader classLoader;
 
   private Class<?> clazz;
@@ -78,6 +82,10 @@ public class ClassPathResource extends AbstractResource {
     return this.clazz != null ? this.clazz.getClassLoader() : this.classLoader;
   }
 
+  public final String getClassPath() {
+    return this.path;
+  }
+
   @Override
   public String getDescription() {
     final StringBuilder builder = new StringBuilder();
@@ -109,14 +117,9 @@ public class ClassPathResource extends AbstractResource {
       is = ClassLoader.getSystemResourceAsStream(this.path);
     }
     if (is == null) {
-      throw new IllegalArgumentException(
-        getDescription() + " cannot be opened because it does not exist");
+      throw new NoSuchResourceException(this);
     }
     return is;
-  }
-
-  public final String getPath() {
-    return this.path;
   }
 
   @Override
@@ -130,8 +133,7 @@ public class ClassPathResource extends AbstractResource {
       url = ClassLoader.getSystemResource(this.path);
     }
     if (url == null) {
-      throw new IllegalArgumentException(
-        getDescription() + " cannot be resolved to URL because it does not exist");
+      throw new NoSuchResourceException(this);
     }
     return url;
   }

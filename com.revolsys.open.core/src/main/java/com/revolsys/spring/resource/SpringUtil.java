@@ -45,7 +45,7 @@ public class SpringUtil {
 
   public static File getFileOrCreateTempFile(final Resource resource) {
     try {
-      if (resource instanceof FileSystemResource) {
+      if (resource instanceof PathResource) {
         return resource.getFile();
       } else {
         final String filename = resource.getFilename();

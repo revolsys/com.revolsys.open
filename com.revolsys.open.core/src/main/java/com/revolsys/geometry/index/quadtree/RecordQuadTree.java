@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.Record;
@@ -42,7 +43,7 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
       final Geometry geometry = record.getGeometry();
       if (geometry != null && !geometry.isEmpty()) {
         final BoundingBox boundingBox = geometry.getBoundingBox();
-        insert(boundingBox, record);
+        insertItem(boundingBox, record);
       }
     }
   }
@@ -56,7 +57,7 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
   }
 
   @Override
-  public List<R> getItems(final BoundingBox boundingBox) {
+  public List<R> getItems(final BoundingBoxProxy boundingBox) {
     final List<R> results = super.getItems(boundingBox);
     for (final Iterator<R> iterator = results.iterator(); iterator.hasNext();) {
       final R record = iterator.next();
@@ -64,8 +65,7 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
       if (geometry == null) {
         iterator.remove();
       } else {
-        final BoundingBox recordBoundingBox = geometry.getBoundingBox();
-        if (!boundingBox.intersects(recordBoundingBox)) {
+        if (!boundingBox.bboxIntersects(geometry)) {
           iterator.remove();
         }
       }
@@ -86,7 +86,7 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
 
   public void query(final Geometry geometry, final Consumer<R> visitor) {
     final BoundingBox boundingBox = geometry.getBoundingBox();
-    forEach(visitor, boundingBox);
+    forEach(boundingBox, visitor);
   }
 
   public List<R> queryEnvelope(final R record) {
@@ -118,7 +118,7 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
 
   public List<R> queryIntersects(final BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final BoundingBox convertedBoundingBox = boundingBox.convert(geometryFactory);
+    final BoundingBox convertedBoundingBox = boundingBox.bboxToCs(geometryFactory);
     if (convertedBoundingBox.isEmpty()) {
       return Arrays.asList();
     } else {
@@ -143,7 +143,7 @@ public class RecordQuadTree<R extends Record> extends QuadTree<R> {
   public List<R> queryList(final BoundingBox boundingBox, final Predicate<R> filter,
     final Comparator<R> comparator) {
     final CreateListVisitor<R> listVisitor = new CreateListVisitor<>(filter);
-    forEach(listVisitor, boundingBox);
+    forEach(boundingBox, listVisitor);
     final List<R> list = listVisitor.getList();
     if (comparator != null) {
       Collections.sort(list, comparator);

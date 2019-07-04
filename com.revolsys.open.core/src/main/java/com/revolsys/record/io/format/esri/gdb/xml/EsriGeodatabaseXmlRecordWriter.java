@@ -6,15 +6,14 @@ import java.util.UUID;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.date.Dates;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Doubles;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
-import com.revolsys.geometry.cs.esri.EsriCsWktWriter;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
@@ -31,7 +30,6 @@ import com.revolsys.record.io.format.xml.XsiConstants;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.Dates;
 
 public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
   implements EsriGeodatabaseXmlConstants {
@@ -98,7 +96,8 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
       }
     }
     if (this.recordDefinition.getField("OBJECTID") == null) {
-      final EsriGeodatabaseXmlFieldType fieldType = this.fieldTypes.getFieldType(DataTypes.INTEGER);
+      final EsriGeodatabaseXmlFieldType fieldType = this.fieldTypes
+        .getFieldType(DataTypes.BIG_INTEGER);
       fieldType.writeValue(this.out, this.objectId++);
     }
 
@@ -117,15 +116,15 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
       if (this.fieldTypes.getFieldType(geometryDataType) != null) {
         hasGeometry = true;
 
-        if (geometryDataType.equals(DataTypes.POINT)) {
+        if (geometryDataType.equals(GeometryDataTypes.POINT)) {
           this.geometryType = GEOMETRY_TYPE_POINT;
-        } else if (geometryDataType.equals(DataTypes.MULTI_POINT)) {
+        } else if (geometryDataType.equals(GeometryDataTypes.MULTI_POINT)) {
           this.geometryType = GEOMETRY_TYPE_MULTI_POINT;
-        } else if (geometryDataType.equals(DataTypes.LINE_STRING)) {
+        } else if (geometryDataType.equals(GeometryDataTypes.LINE_STRING)) {
           this.geometryType = GEOMETRY_TYPE_POLYLINE;
-        } else if (geometryDataType.equals(DataTypes.MULTI_LINE_STRING)) {
+        } else if (geometryDataType.equals(GeometryDataTypes.MULTI_LINE_STRING)) {
           this.geometryType = GEOMETRY_TYPE_POLYLINE;
-        } else if (geometryDataType.equals(DataTypes.POLYGON)) {
+        } else if (geometryDataType.equals(GeometryDataTypes.POLYGON)) {
           this.geometryType = GEOMETRY_TYPE_POLYGON;
         } else {
           if (geometry instanceof Point) {
@@ -232,7 +231,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     if (geometryFactory != null) {
       final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
       if (coordinateSystem != null) {
-        final BoundingBox boundingBox = coordinateSystem.getAreaBoundingBox();
+        final BoundingBox boundingBox = geometryFactory.getAreaBoundingBox();
         this.out.startTag(EXTENT);
         this.out.attribute(XsiConstants.TYPE, ENVELOPE_N_TYPE);
         this.out.element(X_MIN, boundingBox.getMinX());
@@ -362,34 +361,30 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
 
   public void writeSpatialReference(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem != null) {
-        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
-          .getCoordinateSystem(coordinateSystem);
-        if (esriCoordinateSystem != null) {
-          this.out.startTag(SPATIAL_REFERENCE);
-          if (esriCoordinateSystem instanceof ProjectedCoordinateSystem) {
-            this.out.attribute(XsiConstants.TYPE, PROJECTED_COORDINATE_SYSTEM_TYPE);
-          } else {
-            this.out.attribute(XsiConstants.TYPE, GEOGRAPHIC_COORDINATE_SYSTEM_TYPE);
-          }
-          this.out.element(WKT, EsriCsWktWriter.toWkt(esriCoordinateSystem));
-          this.out.element(X_ORIGIN, 0);
-          this.out.element(Y_ORIGIN, 0);
-          final double scaleXy = geometryFactory.getScaleXY();
-          this.out.element(XY_SCALE, (int)scaleXy);
-          this.out.element(Z_ORIGIN, 0);
-          final double scaleZ = geometryFactory.getScaleZ();
-          this.out.element(Z_SCALE, (int)scaleZ);
-          this.out.element(M_ORIGIN, 0);
-          this.out.element(M_SCALE, 1);
-          this.out.element(XY_TOLERANCE, Doubles.toString(1.0 / scaleXy * 2.0));
-          this.out.element(Z_TOLERANCE, Doubles.toString(1.0 / scaleZ * 2.0));
-          this.out.element(M_TOLERANCE, 1);
-          this.out.element(HIGH_PRECISION, true);
-          this.out.element(WKID, coordinateSystem.getCoordinateSystemId());
-          this.out.endTag(SPATIAL_REFERENCE);
+      if (geometryFactory.isHasHorizontalCoordinateSystem()) {
+        final String wkt = geometryFactory.toWktCs();
+        this.out.startTag(SPATIAL_REFERENCE);
+        if (geometryFactory.isProjected()) {
+          this.out.attribute(XsiConstants.TYPE, PROJECTED_COORDINATE_SYSTEM_TYPE);
+        } else {
+          this.out.attribute(XsiConstants.TYPE, GEOGRAPHIC_COORDINATE_SYSTEM_TYPE);
         }
+        this.out.element(WKT, wkt);
+        this.out.element(X_ORIGIN, 0);
+        this.out.element(Y_ORIGIN, 0);
+        final double scaleXy = geometryFactory.getScaleXY();
+        this.out.element(XY_SCALE, (int)scaleXy);
+        this.out.element(Z_ORIGIN, 0);
+        final double scaleZ = geometryFactory.getScaleZ();
+        this.out.element(Z_SCALE, (int)scaleZ);
+        this.out.element(M_ORIGIN, 0);
+        this.out.element(M_SCALE, 1);
+        this.out.element(XY_TOLERANCE, Doubles.toString(1.0 / scaleXy * 2.0));
+        this.out.element(Z_TOLERANCE, Doubles.toString(1.0 / scaleZ * 2.0));
+        this.out.element(M_TOLERANCE, 1);
+        this.out.element(HIGH_PRECISION, true);
+        this.out.element(WKID, geometryFactory.getHorizontalCoordinateSystemId());
+        this.out.endTag(SPATIAL_REFERENCE);
       }
     }
   }

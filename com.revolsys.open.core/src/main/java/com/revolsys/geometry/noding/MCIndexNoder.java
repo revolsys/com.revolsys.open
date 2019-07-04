@@ -40,14 +40,14 @@ import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.index.chain.MonotoneChain;
 import com.revolsys.geometry.index.chain.MonotoneChainBuilder;
 import com.revolsys.geometry.index.chain.MonotoneChainOverlapAction;
-import com.revolsys.geometry.index.strtree.STRtree;
+import com.revolsys.geometry.index.strtree.StrTree;
 
 /**
  * Nodes a set of {@link SegmentString}s using a index based
  * on {@link MonotoneChain}s and a {@link SpatialIndex}.
  * The {@link SpatialIndex} used should be something that supports
  * envelope (range) queries efficiently (such as a <code>Quadtree</code>}
- * or {@link STRtree} (which is the default index provided).
+ * or {@link StrTree} (which is the default index provided).
  *
  * @version 1.7
  */
@@ -71,7 +71,7 @@ public class MCIndexNoder extends SinglePassNoder {
 
   private int idCounter = 0;
 
-  private final SpatialIndex index = new STRtree();
+  private final SpatialIndex index = new StrTree();
 
   private final List<MonotoneChain> monoChains = new ArrayList<>();
 
@@ -85,11 +85,11 @@ public class MCIndexNoder extends SinglePassNoder {
   }
 
   private void add(final SegmentString segStr) {
-    final List<MonotoneChain> segChains = MonotoneChainBuilder.getChains(segStr.getPoints(),
+    final List<MonotoneChain> segChains = MonotoneChainBuilder.getChains(segStr.getLineString(),
       segStr);
     for (final MonotoneChain mc : segChains) {
       mc.setId(this.idCounter++);
-      this.index.insert(mc.getEnvelope(), mc);
+      this.index.insertItem(mc.getEnvelope(), mc);
       this.monoChains.add(mc);
     }
   }

@@ -234,7 +234,7 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
     // compute location only on demand
     if (this.ptInAreaLocation[geomIndex] == Location.NONE) {
       this.ptInAreaLocation[geomIndex] = SimplePointInAreaLocator
-        .locate(geom[geomIndex].getGeometry(), p);
+        .locate(geom[geomIndex].getGeometry(), p.getX(), p.getY());
     }
     return this.ptInAreaLocation[geomIndex];
   }

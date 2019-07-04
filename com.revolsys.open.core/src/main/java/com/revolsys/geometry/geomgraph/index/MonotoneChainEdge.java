@@ -35,7 +35,6 @@ package com.revolsys.geometry.geomgraph.index;
 import com.revolsys.geometry.geomgraph.Edge;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 
 /**
  * MonotoneChains are a way of partitioning the segments of an edge to
@@ -89,9 +88,9 @@ public class MonotoneChainEdge {
       return;
     }
     // nothing to do if the envelopes of these chains don't overlap
-    final BoundingBox env1 = new BoundingBoxDoubleGf(p00, p01);
-    final BoundingBox env2 = new BoundingBoxDoubleGf(p10, p11);
-    if (!env1.intersects(env2)) {
+    final BoundingBox env1 = BoundingBox.bboxNew(p00, p01);
+    final BoundingBox env2 = BoundingBox.bboxNew(p10, p11);
+    if (!env1.bboxIntersects(env2)) {
       return;
     }
 

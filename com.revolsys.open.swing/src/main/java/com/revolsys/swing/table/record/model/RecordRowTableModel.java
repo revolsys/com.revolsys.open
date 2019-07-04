@@ -14,11 +14,12 @@ import javax.swing.SortOrder;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.date.Dates;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.code.CodeTable;
@@ -29,7 +30,6 @@ import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.record.RecordRowTable;
-import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
@@ -196,6 +196,10 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     return null;
   }
 
+  public List<String> getFieldNames() {
+    return this.fieldNames;
+  }
+
   @Override
   public Object getPrototypeValue(final int columnIndex) {
     FieldDefinition fieldDefinition = getColumnFieldDefinition(columnIndex);
@@ -298,6 +302,11 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     return records;
   }
 
+  protected Object getRecordValue(final Record record, final String name) {
+    final Object value = record.getValue(name);
+    return value;
+  }
+
   public Map<Integer, SortOrder> getSortedColumns() {
     return this.sortedColumns;
   }
@@ -326,8 +335,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
         return LOADING_VALUE;
       } else {
         final String name = getColumnFieldName(columnIndex);
-        final Object value = record.getValue(name);
-        return value;
+        return getRecordValue(record, name);
       }
     }
   }

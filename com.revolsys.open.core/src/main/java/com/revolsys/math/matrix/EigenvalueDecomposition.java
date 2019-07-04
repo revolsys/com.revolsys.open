@@ -1,6 +1,6 @@
 package com.revolsys.math.matrix;
 
-import com.revolsys.util.MathUtil;
+import org.jeometry.common.number.Doubles;
 
 /** Eigenvalues and eigenvectors of a real matrix.
 <P>
@@ -759,7 +759,7 @@ public class EigenvalueDecomposition implements java.io.Serializable {
 
           double g = this.d[l];
           double p = (this.d[l + 1] - g) / (2.0 * this.e[l]);
-          double r = MathUtil.hypot(p, 1.0);
+          double r = Doubles.hypot(p, 1.0);
           if (p < 0) {
             r = -r;
           }
@@ -787,7 +787,7 @@ public class EigenvalueDecomposition implements java.io.Serializable {
             s2 = s;
             g = c * this.e[i];
             h = c * p;
-            r = MathUtil.hypot(p, this.e[i]);
+            r = Doubles.hypot(p, this.e[i]);
             this.e[i + 1] = s * r;
             s = this.e[i] / r;
             c = p / r;

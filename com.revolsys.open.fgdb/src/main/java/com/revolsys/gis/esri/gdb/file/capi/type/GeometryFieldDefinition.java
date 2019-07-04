@@ -1,21 +1,21 @@
 package com.revolsys.gis.esri.gdb.file.capi.type;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.function.Function3;
 
 import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.EndianInput;
-import com.revolsys.io.FileUtil;
-import com.revolsys.io.endian.EndianInputStream;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.record.Record;
@@ -23,8 +23,7 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
 import com.revolsys.record.io.format.esri.gdb.xml.model.GeometryDef;
 import com.revolsys.record.io.format.esri.gdb.xml.model.SpatialReference;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.GeometryType;
-import com.revolsys.record.io.format.shp.ShapefileConstants;
-import com.revolsys.record.io.format.shp.ShapefileGeometryUtil;
+import com.revolsys.record.io.format.shp.ShapefileGeometryHandler;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.util.Booleans;
 
@@ -32,23 +31,29 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   public static final Map<GeometryType, DataType> GEOMETRY_TYPE_DATA_TYPE_MAP = new LinkedHashMap<>();
 
-  private static final ShapefileGeometryUtil SHP_UTIL = new ShapefileGeometryUtil(false);
+  private static final ShapefileGeometryHandler SHAPEFILE_GEOMETRY_HANDLER = new ShapefileGeometryHandler(
+    false);
 
   static {
-    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPoint, DataTypes.POINT);
-    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryMultipoint, DataTypes.MULTI_POINT);
-    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolyline, DataTypes.MULTI_LINE_STRING);
-    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolygon, DataTypes.MULTI_POLYGON);
+    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPoint, GeometryDataTypes.POINT);
+    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryMultipoint,
+      GeometryDataTypes.MULTI_POINT);
+    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolyline,
+      GeometryDataTypes.MULTI_LINE_STRING);
+    GEOMETRY_TYPE_DATA_TYPE_MAP.put(GeometryType.esriGeometryPolygon,
+      GeometryDataTypes.MULTI_POLYGON);
   }
 
-  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT;
+  private static final Integer MINUS1 = -1;
 
-  private Method readMethod;
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
-  private Method writeMethod;
+  private BiConsumer<EndianOutput, Geometry> writeFunction;
+
+  private Function3<GeometryFactory, ByteBuffer, Integer, Geometry> readFunction;
 
   public GeometryFieldDefinition(final int fieldNumber, final Field field) {
-    super(fieldNumber, field.getName(), DataTypes.GEOMETRY,
+    super(fieldNumber, field.getName(), GeometryDataTypes.GEOMETRY,
       Booleans.getBoolean(field.getRequired()) || !field.isIsNullable());
     final GeometryDef geometryDef = field.getGeometryDef();
     if (geometryDef == null) {
@@ -74,20 +79,19 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
           axisCount = 4;
         }
         if (axisCount != this.geometryFactory.getAxisCount()) {
-          final int srid = this.geometryFactory.getCoordinateSystemId();
-          final double scaleXY = this.geometryFactory.getScaleXY();
-          final double scaleZ = this.geometryFactory.getScaleZ();
-          this.geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleXY, scaleZ);
+          final int srid = this.geometryFactory.getHorizontalCoordinateSystemId();
+          final double[] scales = this.geometryFactory.newScales(axisCount);
+          this.geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
         }
         setProperty(FieldProperties.GEOMETRY_FACTORY, this.geometryFactory);
 
         final String geometryTypeKey = dataType.toString() + hasZ + hasM;
-        this.readMethod = ShapefileGeometryUtil.getReadMethod(geometryTypeKey);
-        if (this.readMethod == null) {
+        this.readFunction = SHAPEFILE_GEOMETRY_HANDLER.getReadFunction(geometryTypeKey);
+        if (this.readFunction == null) {
           throw new IllegalArgumentException("No read method for geometry type " + geometryTypeKey);
         }
-        this.writeMethod = ShapefileGeometryUtil.getWriteMethod(geometryTypeKey);
-        if (this.writeMethod == null) {
+        this.writeFunction = SHAPEFILE_GEOMETRY_HANDLER.getWriteFunction(geometryTypeKey);
+        if (this.writeFunction == null) {
           throw new IllegalArgumentException(
             "No write method for geometry type " + geometryTypeKey);
         }
@@ -111,35 +115,30 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
         bytes = row.getGeometry();
       }
     }
-    final ByteArrayInputStream byteIn = new ByteArrayInputStream(bytes);
-    final EndianInput in = new EndianInputStream(byteIn);
-    try {
-      final int type = in.readLEInt();
-      if (type == 0) {
-        final DataType dataType = getDataType();
-        if (DataTypes.POINT.equals(dataType)) {
-          return this.geometryFactory.point();
-        } else if (DataTypes.MULTI_POINT.equals(dataType)) {
-          return this.geometryFactory.point();
-        } else if (DataTypes.LINE_STRING.equals(dataType)) {
-          return this.geometryFactory.lineString();
-        } else if (DataTypes.MULTI_LINE_STRING.equals(dataType)) {
-          return this.geometryFactory.lineString();
-        } else if (DataTypes.POLYGON.equals(dataType)) {
-          return this.geometryFactory.polygon();
-        } else if (DataTypes.MULTI_POLYGON.equals(dataType)) {
-          return this.geometryFactory.polygon();
-        } else {
-          return null;
-        }
+    final ByteBuffer buffer = ByteBuffer.wrap(bytes);
+    buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+    final int geometryType = buffer.getInt();
+    if (geometryType == 0) {
+      final DataType dataType = getDataType();
+      if (GeometryDataTypes.POINT.equals(dataType)) {
+        return this.geometryFactory.point();
+      } else if (GeometryDataTypes.MULTI_POINT.equals(dataType)) {
+        return this.geometryFactory.point();
+      } else if (GeometryDataTypes.LINE_STRING.equals(dataType)) {
+        return this.geometryFactory.lineString();
+      } else if (GeometryDataTypes.MULTI_LINE_STRING.equals(dataType)) {
+        return this.geometryFactory.lineString();
+      } else if (GeometryDataTypes.POLYGON.equals(dataType)) {
+        return this.geometryFactory.polygon();
+      } else if (GeometryDataTypes.MULTI_POLYGON.equals(dataType)) {
+        return this.geometryFactory.polygon();
       } else {
-        final Geometry geometry = SHP_UTIL.read(this.readMethod, this.geometryFactory, in, -1);
-        return geometry;
+        return null;
       }
-    } catch (final IOException e) {
-      throw new RuntimeException(e);
-    } finally {
-      FileUtil.closeSilent(in);
+    } else {
+      final Geometry geometry = this.readFunction.apply(this.geometryFactory, buffer, MINUS1);
+      return geometry;
     }
   }
 
@@ -153,14 +152,21 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
       if (projectedGeometry.isEmpty()) {
         setNull(row);
       } else {
-        final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-        final EndianOutput out = new EndianOutputStream(byteOut);
+        byte[] bytes;
         if (geometry.isEmpty()) {
-          out.writeLEInt(ShapefileConstants.NULL_SHAPE);
+          bytes = new byte[] {
+            0, 0, 0, 0
+          };
         } else {
-          SHP_UTIL.write(this.writeMethod, out, projectedGeometry);
+          try (
+            final ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+            final EndianOutput out = new EndianOutputStream(byteOut)) {
+            this.writeFunction.accept(out, projectedGeometry);
+            bytes = byteOut.toByteArray();
+          } catch (final IOException e) {
+            throw Exceptions.wrap(e);
+          }
         }
-        final byte[] bytes = byteOut.toByteArray();
         synchronized (row) {
           row.setGeometry(bytes);
         }

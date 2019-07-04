@@ -18,6 +18,7 @@ package com.revolsys.beans.propertyeditor;
 
 import javax.xml.namespace.QName;
 
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.io.PathName;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyEditorRegistrar;
@@ -25,7 +26,6 @@ import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
-import com.revolsys.identifier.Identifier;
 import com.revolsys.spring.resource.Resource;
 
 public class ResourceEditorRegistrar implements PropertyEditorRegistrar, BeanFactoryPostProcessor {

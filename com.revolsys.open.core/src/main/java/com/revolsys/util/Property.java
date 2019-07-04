@@ -7,7 +7,6 @@ import java.beans.Introspector;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeListenerProxy;
-import com.revolsys.beans.PropertyChangeSupport;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -17,6 +16,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import javax.swing.JComponent;
@@ -30,13 +31,12 @@ import org.jeometry.common.number.Integers;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import com.revolsys.beans.NonWeakListener;
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.beans.ProxyPropertyChangeListener;
 import com.revolsys.beans.WeakPropertyChangeListener;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.Record;
-import com.revolsys.util.function.Consumer2;
-import com.revolsys.util.function.Function2;
 
 public interface Property {
   class NewValueListener<V> implements PropertyChangeListener, NonWeakListener {
@@ -53,7 +53,7 @@ public interface Property {
     public boolean equals(final Object other) {
       if (other instanceof NewValueListener) {
         final NewValueListener<?> listener = (NewValueListener<?>)other;
-        if (listener.consumer == consumer) {
+        if (listener.consumer == this.consumer) {
           return true;
         }
       }
@@ -62,7 +62,7 @@ public interface Property {
 
     @Override
     public int hashCode() {
-      return consumer.hashCode();
+      return this.consumer.hashCode();
     }
 
     @SuppressWarnings("unchecked")
@@ -72,7 +72,7 @@ public interface Property {
       if (this.source == null || this.source == source) {
         try {
           final V newValue = (V)event.getNewValue();
-          consumer.accept(newValue);
+          this.consumer.accept(newValue);
         } catch (final Throwable e) {
           Logs.error(this, "Error invoking listener", e);
         }
@@ -81,11 +81,11 @@ public interface Property {
   }
 
   class OldAndNewValueListener<V1, V2> implements PropertyChangeListener, NonWeakListener {
-    private final Consumer2<V1, V2> consumer;
+    private final BiConsumer<V1, V2> consumer;
 
     private final Object source;
 
-    public OldAndNewValueListener(final Consumer2<V1, V2> consumer, final Object source) {
+    public OldAndNewValueListener(final BiConsumer<V1, V2> consumer, final Object source) {
       this.consumer = consumer;
       this.source = source;
     }
@@ -94,7 +94,7 @@ public interface Property {
     public boolean equals(final Object other) {
       if (other instanceof OldAndNewValueListener) {
         final OldAndNewValueListener<?, ?> listener = (OldAndNewValueListener<?, ?>)other;
-        if (listener.consumer == consumer) {
+        if (listener.consumer == this.consumer) {
           return true;
         }
       }
@@ -103,7 +103,7 @@ public interface Property {
 
     @Override
     public int hashCode() {
-      return consumer.hashCode();
+      return this.consumer.hashCode();
     }
 
     @SuppressWarnings("unchecked")
@@ -114,7 +114,7 @@ public interface Property {
         try {
           final V1 oldValue = (V1)event.getOldValue();
           final V2 newValue = (V2)event.getNewValue();
-          consumer.accept(oldValue, newValue);
+          this.consumer.accept(oldValue, newValue);
         } catch (final Throwable e) {
           Logs.error(this, "Error invoking listener", e);
         }
@@ -133,7 +133,7 @@ public interface Property {
     public boolean equals(final Object other) {
       if (other instanceof RunnableListener) {
         final RunnableListener listener = (RunnableListener)other;
-        if (listener.runnable == runnable) {
+        if (listener.runnable == this.runnable) {
           return true;
         }
       }
@@ -142,13 +142,13 @@ public interface Property {
 
     @Override
     public int hashCode() {
-      return runnable.hashCode();
+      return this.runnable.hashCode();
     }
 
     @Override
     public void propertyChange(final PropertyChangeEvent event) {
       try {
-        runnable.run();
+        this.runnable.run();
       } catch (final Throwable e) {
         Logs.error(this, "Error invoking listener", e);
       }
@@ -166,7 +166,7 @@ public interface Property {
     public boolean equals(final Object other) {
       if (other instanceof SourceListener) {
         final SourceListener<?> listener = (SourceListener<?>)other;
-        if (listener.consumer == consumer) {
+        if (listener.consumer == this.consumer) {
           return true;
         }
       }
@@ -175,7 +175,7 @@ public interface Property {
 
     @Override
     public int hashCode() {
-      return consumer.hashCode();
+      return this.consumer.hashCode();
     }
 
     @SuppressWarnings("unchecked")
@@ -183,7 +183,7 @@ public interface Property {
     public void propertyChange(final PropertyChangeEvent event) {
       try {
         final V source = (V)event.getSource();
-        consumer.accept(source);
+        this.consumer.accept(source);
       } catch (final Throwable e) {
         Logs.error(this, "Error invoking listener", e);
       }
@@ -279,7 +279,7 @@ public interface Property {
 
   // Only on source
   static <V1, V2> PropertyChangeListener addListenerOldAndNewValueSource(final Object source,
-    final String propertyName, final Consumer2<V1, V2> consumer) {
+    final String propertyName, final BiConsumer<V1, V2> consumer) {
     if (source != null && consumer != null) {
       final PropertyChangeListener listener = new OldAndNewValueListener<>(consumer, source);
       addListener(source, propertyName, listener);
@@ -805,7 +805,7 @@ public interface Property {
     }
   }
 
-  static <V> PropertyChangeListener newListener(final Consumer2<String, V> consumer) {
+  static <V> PropertyChangeListener newListener(final BiConsumer<String, V> consumer) {
     return (event) -> {
       final String propertyName = event.getPropertyName();
       @SuppressWarnings("unchecked")
@@ -814,7 +814,7 @@ public interface Property {
     };
   }
 
-  static <V> PropertyChangeListener newListener(final Function2<String, V, ?> function) {
+  static <V> PropertyChangeListener newListener(final BiFunction<String, V, ?> function) {
     return (event) -> {
       final String propertyName = event.getPropertyName();
       @SuppressWarnings("unchecked")

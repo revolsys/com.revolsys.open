@@ -1,6 +1,5 @@
 package com.revolsys.record.io.format.esri.gdb.xml.model;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 
 public class EnvelopeN extends Envelope {
@@ -26,9 +25,8 @@ public class EnvelopeN extends Envelope {
   }
 
   public EnvelopeN(final SpatialReference spatialReference) {
-    final CoordinateSystem coordinateSystem = spatialReference.getCoordinateSystem();
-    if (coordinateSystem != null) {
-      final BoundingBox boundingBox = coordinateSystem.getAreaBoundingBox();
+    if (spatialReference.isHasHorizontalCoordinateSystem()) {
+      final BoundingBox boundingBox = spatialReference.getAreaBoundingBox();
       this.xMin = boundingBox.getMinX();
       this.yMin = boundingBox.getMinY();
       this.xMax = boundingBox.getMaxX();

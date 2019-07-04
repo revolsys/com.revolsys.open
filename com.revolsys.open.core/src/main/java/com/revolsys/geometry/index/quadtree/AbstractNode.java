@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 
 import com.revolsys.geometry.index.DoubleBits;
 import com.revolsys.geometry.index.IntervalSize;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.Emptyable;
 
 public abstract class AbstractNode<T> implements Emptyable, Serializable {
@@ -129,7 +129,7 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     return this;
   }
 
-  public void forEach(final QuadTree<T> tree, final Consumer<T> action) {
+  public void forEach(final QuadTree<T> tree, final Consumer<? super T> action) {
     forEachItem(tree, action);
 
     for (final AbstractNode<T> node : this.nodes) {
@@ -139,7 +139,8 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     }
   }
 
-  public void forEach(final QuadTree<T> tree, final double[] bounds, final Consumer<T> action) {
+  public void forEach(final QuadTree<T> tree, final double[] bounds,
+    final Consumer<? super T> action) {
     if (isSearchMatch(bounds)) {
       forEachItem(tree, bounds, action);
 
@@ -151,10 +152,10 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     }
   }
 
-  protected abstract void forEachItem(QuadTree<T> tree, Consumer<T> action);
+  protected abstract void forEachItem(QuadTree<T> tree, Consumer<? super T> action);
 
   protected abstract void forEachItem(final QuadTree<T> tree, final double[] bounds,
-    final Consumer<T> action);
+    final Consumer<? super T> action);
 
   private double getCentreX() {
     if (isRoot()) {
@@ -253,7 +254,7 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
       final double maxY2 = bounds[3];
       final AbstractNode<T>[] nodes = this.nodes;
       AbstractNode<T> node = nodes[index];
-      if (node == null || !BoundingBoxUtil.covers(node.minX, node.minY, node.maxX, node.maxY, minX2,
+      if (node == null || !RectangleUtil.covers(node.minX, node.minY, node.maxX, node.maxY, minX2,
         minY2, maxX2, maxY2)) {
         node = newNodeExpanded(node, bounds);
         nodes[index] = node;
@@ -305,8 +306,8 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
     final double maxY = bounds[3];
     int level = computeQuadLevel(bounds);
     setBounds(minX, minY, newBounds, level);
-    while (!BoundingBoxUtil.covers(newBounds[0], newBounds[1], newBounds[2], newBounds[3], minX,
-      minY, maxX, maxY)) {
+    while (!RectangleUtil.covers(newBounds[0], newBounds[1], newBounds[2], newBounds[3], minX, minY,
+      maxX, maxY)) {
       level++;
       setBounds(minX, minY, newBounds, level);
     }
@@ -319,10 +320,10 @@ public abstract class AbstractNode<T> implements Emptyable, Serializable {
   public AbstractNode<T> newNodeExpanded(final AbstractNode<T> node, double[] bounds) {
     bounds = bounds.clone();
     if (node != null) {
-      BoundingBoxUtil.expand(bounds, 2, 0, node.minX);
-      BoundingBoxUtil.expand(bounds, 2, 0, node.maxX);
-      BoundingBoxUtil.expand(bounds, 2, 1, node.minY);
-      BoundingBoxUtil.expand(bounds, 2, 1, node.maxY);
+      RectangleUtil.expand(bounds, 2, 0, node.minX);
+      RectangleUtil.expand(bounds, 2, 0, node.maxX);
+      RectangleUtil.expand(bounds, 2, 1, node.minY);
+      RectangleUtil.expand(bounds, 2, 1, node.maxY);
     }
 
     final AbstractNode<T> largerNode = newNode(bounds);

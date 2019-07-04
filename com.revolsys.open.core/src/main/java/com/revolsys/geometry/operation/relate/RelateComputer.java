@@ -112,7 +112,7 @@ public class RelateComputer {
     // if the Geometries don't overlap there is nothing to do
     if (!this.arg[0].getGeometry()
       .getBoundingBox()
-      .intersects(this.arg[1].getGeometry().getBoundingBox())) {
+      .bboxIntersects(this.arg[1].getGeometry().getBoundingBox())) {
       computeDisjointIM(im);
       return im;
     }
@@ -301,7 +301,7 @@ public class RelateComputer {
       // PointLocator?
       // Possibly should use ptInArea locator instead? We probably know here
       // that the edge does not touch the bdy of the target Geometry
-      final Location loc = this.ptLocator.locate(e.getPoint(), target);
+      final Location loc = this.ptLocator.locate(target, e.getPoint());
       e.getLabel().setAllLocations(targetIndex, loc);
     } else {
       e.getLabel().setAllLocations(targetIndex, Location.EXTERIOR);
@@ -330,7 +330,7 @@ public class RelateComputer {
    * Label an isolated node with its relationship to the target geometry.
    */
   private void labelIsolatedNode(final Node n, final int targetIndex) {
-    final Location loc = this.ptLocator.locate(n.getPoint(), this.arg[targetIndex].getGeometry());
+    final Location loc = this.ptLocator.locate(this.arg[targetIndex].getGeometry(), n.getPoint());
     n.getLabel().setAllLocations(targetIndex, loc);
     // debugPrintln(n.getLabel());
   }

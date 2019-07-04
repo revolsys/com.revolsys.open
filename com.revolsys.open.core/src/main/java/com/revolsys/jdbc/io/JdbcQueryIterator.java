@@ -27,11 +27,13 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 
 public class JdbcQueryIterator extends AbstractIterator<Record> implements RecordReader {
   public static Record getNextRecord(final JdbcRecordStore recordStore,
     final RecordDefinition recordDefinition, final List<FieldDefinition> fields,
-    final RecordFactory<Record> recordFactory, final ResultSet resultSet) {
+    final RecordFactory<Record> recordFactory, final ResultSet resultSet,
+    final boolean internStrings) {
     final Record record = recordFactory.newRecord(recordDefinition);
     if (record != null) {
       record.setState(RecordState.INITIALIZING);
@@ -39,7 +41,8 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
       for (final FieldDefinition field : fields) {
         final JdbcFieldDefinition jdbcField = (JdbcFieldDefinition)field;
         try {
-          columnIndex = jdbcField.setFieldValueFromResultSet(resultSet, columnIndex, record);
+          columnIndex = jdbcField.setFieldValueFromResultSet(resultSet, columnIndex, record,
+            internStrings);
         } catch (final SQLException e) {
           throw new RuntimeException(
             "Unable to get value " + (columnIndex + 1) + " from result set", e);
@@ -57,6 +60,8 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
 
     return statement.executeQuery();
   }
+
+  private boolean internStrings;
 
   private JdbcConnection connection;
 
@@ -80,13 +85,14 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
 
   private PreparedStatement statement;
 
-  private LabelCountMap labelCountMap;
+  private LabelCounters labelCountMap;
 
   public JdbcQueryIterator(final JdbcRecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
     super();
 
     final boolean autoCommit = Booleans.getBoolean(properties.get("autoCommit"));
+    this.internStrings = Booleans.getBoolean(properties.get("internStrings"));
     this.connection = recordStore.getJdbcConnection(autoCommit);
     this.recordFactory = query.getRecordFactory();
     if (this.recordFactory == null) {
@@ -96,7 +102,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
     this.query = query;
     this.labelCountMap = query.getStatistics();
     if (this.labelCountMap == null) {
-      this.labelCountMap = (LabelCountMap)properties.get(LabelCountMap.class.getName());
+      this.labelCountMap = (LabelCounters)properties.get(LabelCountMap.class.getName());
     }
   }
 
@@ -130,7 +136,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
     try {
       if (this.resultSet != null && this.resultSet.next() && !this.query.isCancelled()) {
         final Record record = getNextRecord(this.recordStore, this.recordDefinition, this.fields,
-          this.recordFactory, this.resultSet);
+          this.recordFactory, this.resultSet, this.internStrings);
         if (this.labelCountMap != null) {
           this.labelCountMap.addCount(record);
         }
@@ -182,7 +188,11 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
     String dbTableName;
     if (this.recordDefinition == null) {
       final PathName pathName = PathName.newPathName(tableName);
-      dbTableName = pathName.getName();
+      if (pathName == null) {
+        dbTableName = null;
+      } else {
+        dbTableName = pathName.getName();
+      }
     } else {
       dbTableName = this.recordDefinition.getDbTableName();
     }
@@ -240,6 +250,14 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
   @Override
   protected void initDo() {
     this.resultSet = getResultSet();
+  }
+
+  public boolean isInternStrings() {
+    return this.internStrings;
+  }
+
+  public void setInternStrings(final boolean internStrings) {
+    this.internStrings = internStrings;
   }
 
   protected void setQuery(final Query query) {

@@ -3,13 +3,13 @@ package com.revolsys.oracle.recordstore;
 import java.io.PrintWriter;
 import java.util.List;
 
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDdlWriter;
@@ -62,17 +62,17 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       final String name = geometryField.getName();
       String geometryType = "GEOMETRY";
       final DataType dataType = geometryField.getDataType();
-      if (dataType == DataTypes.POINT) {
+      if (dataType == GeometryDataTypes.POINT) {
         geometryType = "POINT";
-      } else if (dataType == DataTypes.LINE_STRING) {
+      } else if (dataType == GeometryDataTypes.LINE_STRING) {
         geometryType = "LINESTRING";
-      } else if (dataType == DataTypes.POLYGON) {
+      } else if (dataType == GeometryDataTypes.POLYGON) {
         geometryType = "POLYGON";
-      } else if (dataType == DataTypes.MULTI_POINT) {
+      } else if (dataType == GeometryDataTypes.MULTI_POINT) {
         geometryType = "MULTIPOINT";
-      } else if (dataType == DataTypes.MULTI_LINE_STRING) {
+      } else if (dataType == GeometryDataTypes.MULTI_LINE_STRING) {
         geometryType = "MULTILINESTRING";
-      } else if (dataType == DataTypes.MULTI_POLYGON) {
+      } else if (dataType == GeometryDataTypes.MULTI_POLYGON) {
         geometryType = "MULTIPOLYGON";
       }
       out.print("select addgeometrycolumn('");
@@ -82,8 +82,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       out.print("','");
       out.print(name.toLowerCase());
       out.print("',");
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      out.print(coordinateSystem.getCoordinateSystemId());
+      out.print(geometryFactory.getHorizontalCoordinateSystemId());
       out.print(",'");
       out.print(geometryType);
       out.print("', ");
@@ -143,7 +142,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       out.print("VARCHAR2(");
       out.print(attribute.getLength());
       out.print(")");
-    } else if (dataType == DataTypes.INTEGER) {
+    } else if (dataType == DataTypes.BIG_INTEGER) {
       out.print("NUMBER(");
       out.print(attribute.getLength());
       out.print(')');
@@ -183,8 +182,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       final String name = geometryField.getName();
       final int axisCount = geometryFactory.getAxisCount();
       final DataType dataType = geometryField.getDataType();
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      final int srid = coordinateSystem.getCoordinateSystemId();
+      final int srid = geometryFactory.getHorizontalCoordinateSystemId();
 
       out.print(
         "INSERT INTO USER_SDO_GEOM_METADATA(TABLE_NAME, COLUMN_NAME, DIMINFO, SRID) VALUES('");

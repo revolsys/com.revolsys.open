@@ -7,29 +7,27 @@ import java.util.Map;
 
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.record.Record;
-
 public class JdbcByteFieldDefinition extends JdbcFieldDefinition {
   public JdbcByteFieldDefinition(final String dbName, final String name, final int sqlType,
-    final int length, final boolean required, final String description,
-    final Map<String, Object> properties) {
-    super(dbName, name, DataTypes.BYTE, sqlType, length, 0, required, description, properties);
+    final boolean required, final String description, final Map<String, Object> properties) {
+    super(dbName, name, DataTypes.BYTE, sqlType, 4, 0, required, description, properties);
   }
 
   @Override
   public JdbcByteFieldDefinition clone() {
-    return new JdbcByteFieldDefinition(getDbName(), getName(), getSqlType(), getLength(),
-      isRequired(), getDescription(), getProperties());
+    return new JdbcByteFieldDefinition(getDbName(), getName(), getSqlType(), isRequired(),
+      getDescription(), getProperties());
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
-    final byte byteValue = resultSet.getByte(columnIndex);
-    if (!resultSet.wasNull()) {
-      setValue(record, Byte.valueOf(byteValue));
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    final byte value = resultSet.getByte(columnIndex);
+    if (resultSet.wasNull()) {
+      return null;
+    } else {
+      return Byte.valueOf(value);
     }
-    return columnIndex + 1;
   }
 
   @Override

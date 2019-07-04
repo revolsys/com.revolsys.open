@@ -32,13 +32,14 @@
  */
 package com.revolsys.geometry.math;
 
+import org.jeometry.common.math.Angle;
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.geometry.algorithm.RobustDeterminant;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.Assert;
-import com.revolsys.math.Angle;
-import com.revolsys.util.MathUtil;
 
 /**
  * A 2-dimensional mathematical vector represented by double-precision X and Y components.
@@ -134,7 +135,7 @@ public class Vector2D {
   }
 
   public double angle(final Vector2D v) {
-    return Angle.diff(v.angle(), angle());
+    return Angle.angleDiff(v.angle(), angle());
   }
 
   public double angleTo(final Vector2D v) {
@@ -239,8 +240,8 @@ public class Vector2D {
   public int hashCode() {
     // Algorithm from Effective Java by Joshua Bloch
     int result = 17;
-    result = 37 * result + MathUtil.hashCode(this.x);
-    result = 37 * result + MathUtil.hashCode(this.y);
+    result = 37 * result + Doubles.hashCode(this.x);
+    result = 37 * result + Doubles.hashCode(this.y);
     return result;
   }
 

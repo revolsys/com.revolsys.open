@@ -22,7 +22,7 @@ import com.revolsys.record.query.Query;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
-import com.revolsys.util.function.SupplierWithProperties;
+import com.revolsys.util.SupplierWithProperties;
 import com.revolsys.webservice.WebServiceResource;
 
 public class ArcGisRestCatalog extends ArcGisResponse<CatalogElement> {

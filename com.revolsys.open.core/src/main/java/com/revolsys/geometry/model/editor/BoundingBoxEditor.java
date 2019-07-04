@@ -2,19 +2,24 @@ package com.revolsys.geometry.model.editor;
 
 import java.util.Arrays;
 
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.util.function.BiConsumerDouble;
 
 public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumerDouble {
+
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
   private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_2D;
 
@@ -171,7 +176,6 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
   /**
    * If the coordinate system is a projected coordinate system then clip to the {@link CoordinateSystem#getAreaBoundingBox()}.
    */
-  @Override
   public BoundingBoxEditor clipToCoordinateSystem() {
     final BoundingBox areaBoundingBox = getAreaBoundingBox();
     if (areaBoundingBox != null && !areaBoundingBox.isEmpty()) {
@@ -241,7 +245,6 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
     return this;
   }
 
-  @Override
   public BoundingBoxEditor expandPercent(final double factor) {
     return expandPercent(factor, factor);
   }
@@ -270,7 +273,6 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
    * @param xDisplacement The distance to move the min/max x coordinates.
    * @param yDisplacement The distance to move the min/max y coordinates.
    */
-  @Override
   public BoundingBoxEditor move(final double xDisplacement, final double yDisplacement) {
     if (isEmpty() || xDisplacement == 0 && yDisplacement == 0) {
     } else {

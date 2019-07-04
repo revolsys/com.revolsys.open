@@ -555,7 +555,7 @@ public class OverlayOp extends GeometryGraphOperation {
    */
   private boolean isCovered(final Point coord, final List<? extends Geometry> geometries) {
     for (final Geometry geometry : geometries) {
-      final Location loc = this.ptLocator.locate(coord, geometry);
+      final Location loc = this.ptLocator.locate(geometry, coord);
       if (loc != Location.EXTERIOR) {
         return true;
       }
@@ -596,7 +596,7 @@ public class OverlayOp extends GeometryGraphOperation {
    * Label an isolated node with its relationship to the target geometry.
    */
   private void labelIncompleteNode(final Node n, final int targetIndex) {
-    final Location loc = this.ptLocator.locate(n.getPoint(), this.arg[targetIndex].getGeometry());
+    final Location loc = this.ptLocator.locate(this.arg[targetIndex].getGeometry(), n.getPoint());
 
     // MD - 2008-10-24 - experimental for now
     // int loc = arg[targetIndex].locate(n.getCoordinate());

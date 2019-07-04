@@ -24,7 +24,7 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
   public T add(final T object) {
     final BoundingBox envelope = getEnvelope(object);
     final int id = getId(object);
-    this.index.insert(envelope, id);
+    this.index.insertItem(envelope, id);
     return object;
   }
 
@@ -35,13 +35,13 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
 
   @Override
   public void forEach(final Consumer<? super T> action, final BoundingBox envelope) {
-    this.index.forEach((id) -> {
+    this.index.forEach(envelope, (id) -> {
       final T object = getObject(id);
       final BoundingBox e = getEnvelope(object);
-      if (e.intersects(envelope)) {
+      if (e.bboxIntersects(envelope)) {
         action.accept(object);
       }
-    }, envelope);
+    });
   }
 
   @Override

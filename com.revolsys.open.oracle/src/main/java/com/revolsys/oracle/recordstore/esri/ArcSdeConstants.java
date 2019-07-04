@@ -5,9 +5,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.oracle.recordstore.OracleRecordStore;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
@@ -67,25 +67,26 @@ public final class ArcSdeConstants {
   public static final int SURFACE = 4;
 
   static {
-    DATA_TYPE_MAP.put(POINT, DataTypes.POINT);
-    DATA_TYPE_MAP.put(LINESTRING, DataTypes.LINE_STRING);
-    DATA_TYPE_MAP.put(POLYGON, DataTypes.POLYGON);
-    DATA_TYPE_MAP.put(MULTI_POINT, DataTypes.MULTI_POINT);
-    DATA_TYPE_MAP.put(MULTI_LINESTRING, DataTypes.MULTI_LINE_STRING);
-    DATA_TYPE_MAP.put(MULTI_POLYGON, DataTypes.MULTI_POLYGON);
+    DATA_TYPE_MAP.put(POINT, GeometryDataTypes.POINT);
+    DATA_TYPE_MAP.put(LINESTRING, GeometryDataTypes.LINE_STRING);
+    DATA_TYPE_MAP.put(POLYGON, GeometryDataTypes.POLYGON);
+    DATA_TYPE_MAP.put(MULTI_POINT, GeometryDataTypes.MULTI_POINT);
+    DATA_TYPE_MAP.put(MULTI_LINESTRING, GeometryDataTypes.MULTI_LINE_STRING);
+    DATA_TYPE_MAP.put(MULTI_POLYGON, GeometryDataTypes.MULTI_POLYGON);
 
-    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.POINT, ST_GEOMETRY_POINT);
-    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.MULTI_POINT, ST_GEOMETRY_MULTI_POINT);
-    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.LINE_STRING, ST_GEOMETRY_LINESTRING);
-    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.MULTI_LINE_STRING, ST_GEOMETRY_MULTI_LINESTRING);
-    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.POLYGON, ST_GEOMETRY_POLYGON);
-    GEOMETRY_DATA_TYPE_ST_TYPE.put(DataTypes.MULTI_POLYGON, ST_GEOMETRY_MULTI_POLYGON);
+    GEOMETRY_DATA_TYPE_ST_TYPE.put(GeometryDataTypes.POINT, ST_GEOMETRY_POINT);
+    GEOMETRY_DATA_TYPE_ST_TYPE.put(GeometryDataTypes.MULTI_POINT, ST_GEOMETRY_MULTI_POINT);
+    GEOMETRY_DATA_TYPE_ST_TYPE.put(GeometryDataTypes.LINE_STRING, ST_GEOMETRY_LINESTRING);
+    GEOMETRY_DATA_TYPE_ST_TYPE.put(GeometryDataTypes.MULTI_LINE_STRING,
+      ST_GEOMETRY_MULTI_LINESTRING);
+    GEOMETRY_DATA_TYPE_ST_TYPE.put(GeometryDataTypes.POLYGON, ST_GEOMETRY_POLYGON);
+    GEOMETRY_DATA_TYPE_ST_TYPE.put(GeometryDataTypes.MULTI_POLYGON, ST_GEOMETRY_MULTI_POLYGON);
   }
 
   public static DataType getGeometryDataType(final int geometryType) {
     final DataType dataType = DATA_TYPE_MAP.get(geometryType);
     if (dataType == null) {
-      return DataTypes.GEOMETRY;
+      return GeometryDataTypes.GEOMETRY;
     } else {
       return dataType;
     }

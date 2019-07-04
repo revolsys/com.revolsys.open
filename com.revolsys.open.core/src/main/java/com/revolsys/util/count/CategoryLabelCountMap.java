@@ -34,12 +34,12 @@ public class CategoryLabelCountMap implements Emptyable {
 
   private int providerCount = 0;
 
-  private final Map<String, LabelCountMap> labelCountMapByCategory = new TreeMap<>();
+  private final Map<String, LabelCounters> labelCountMapByCategory = new TreeMap<>();
 
   public CategoryLabelCountMap() {
   }
 
-  public CategoryLabelCountMap(final Map<String, LabelCountMap> counts) {
+  public CategoryLabelCountMap(final Map<String, LabelCounters> counts) {
     if (counts != null) {
       this.labelCountMapByCategory.putAll(counts);
     }
@@ -50,50 +50,57 @@ public class CategoryLabelCountMap implements Emptyable {
   }
 
   public void addCount(final CharSequence category, final CharSequence label) {
-    final LabelCountMap labelCountMap = getLabelCountMap(category);
+    final LabelCounters labelCountMap = getLabelCountMap(category);
     labelCountMap.addCount(label);
   }
 
   public void addCount(final CharSequence category, final CharSequence label, final long count) {
-    final LabelCountMap labelCountMap = getLabelCountMap(category);
+    final LabelCounters labelCountMap = getLabelCountMap(category);
     labelCountMap.addCount(label, count);
   }
 
   public void addCount(final CharSequence category, final PathNameProxy pathNameProxy) {
-    final LabelCountMap labelCountMap = getLabelCountMap(category);
+    final LabelCounters labelCountMap = getLabelCountMap(category);
     labelCountMap.addCount(pathNameProxy);
 
   }
 
   public void addCount(final CharSequence category, final PathNameProxy pathNameProxy,
     final long count) {
-    final LabelCountMap labelCountMap = getLabelCountMap(category);
+    final LabelCounters labelCountMap = getLabelCountMap(category);
     labelCountMap.addCount(pathNameProxy, count);
   }
 
   public void addCounts(final CategoryLabelCountMap counts) {
     synchronized (counts) {
-      for (final Entry<String, LabelCountMap> entry : counts.labelCountMapByCategory.entrySet()) {
+      for (final Entry<String, LabelCounters> entry : counts.labelCountMapByCategory.entrySet()) {
         final String category = entry.getKey();
-        final LabelCountMap labelCountMap = entry.getValue();
+        final LabelCounters labelCountMap = entry.getValue();
         addCounts(category, labelCountMap);
       }
     }
   }
 
-  public void addCounts(final String category, final LabelCountMap labelCountMap) {
-    final LabelCountMap thisLabelCountMap = getLabelCountMap(category);
+  public void addCounts(final String category, final LabelCounters labelCountMap) {
+    final LabelCounters thisLabelCountMap = getLabelCountMap(category);
     thisLabelCountMap.addCounts(labelCountMap);
   }
 
   public synchronized void addCountsText(final StringBuilder sb) {
-    for (final LabelCountMap labelCountMap : this.labelCountMapByCategory.values()) {
+    for (final LabelCounters labelCountMap : this.labelCountMapByCategory.values()) {
       labelCountMap.addCountsText(sb);
     }
   }
 
   public void clear() {
     this.labelCountMapByCategory.clear();
+  }
+
+  public void clearCounts(final CharSequence category) {
+    final LabelCounters labelCountMap = this.labelCountMapByCategory.get(category);
+    if (labelCountMap != null) {
+      labelCountMap.clearCounts();
+    }
   }
 
   @PostConstruct
@@ -105,7 +112,7 @@ public class CategoryLabelCountMap implements Emptyable {
   public synchronized void disconnect() {
     this.providerCount--;
     if (this.providerCount <= 0) {
-      for (final LabelCountMap labelCountMap : this.labelCountMapByCategory.values()) {
+      for (final LabelCounters labelCountMap : this.labelCountMapByCategory.values()) {
         labelCountMap.disconnect();
       }
     }
@@ -116,7 +123,7 @@ public class CategoryLabelCountMap implements Emptyable {
   }
 
   public Long getCount(final CharSequence category, final CharSequence label) {
-    final LabelCountMap labelCountMap = getLabelCountMap(category);
+    final LabelCounters labelCountMap = getLabelCountMap(category);
     if (labelCountMap == null) {
       return null;
     } else {
@@ -130,12 +137,12 @@ public class CategoryLabelCountMap implements Emptyable {
     return sb.toString();
   }
 
-  public synchronized LabelCountMap getLabelCountMap(final CharSequence category) {
+  public synchronized LabelCounters getLabelCountMap(final CharSequence category) {
     if (category == null) {
       return null;
     } else {
       final String categoryString = Strings.toString(" ", this.prefix, category);
-      LabelCountMap labelCountMap = this.labelCountMapByCategory.get(categoryString);
+      LabelCounters labelCountMap = this.labelCountMapByCategory.get(categoryString);
       if (labelCountMap == null) {
         labelCountMap = new LabelCountMap(categoryString);
         labelCountMap.setLogCounts(this.logCounts);
@@ -158,8 +165,8 @@ public class CategoryLabelCountMap implements Emptyable {
     return this.labelCountMapByCategory.isEmpty();
   }
 
-  public synchronized void setLabelCountMap(final CharSequence category,
-    final LabelCountMap labelCountMap) {
+  public synchronized void setLabelCounters(final CharSequence category,
+    final LabelCounters labelCountMap) {
     if (category != null) {
       final String categoryName = Strings.toString(" ", this.prefix, category);
       labelCountMap.setLogCounts(this.logCounts);
@@ -167,13 +174,14 @@ public class CategoryLabelCountMap implements Emptyable {
     }
   }
 
-  public void setLabelTitle(final String labelTitle) {
+  public CategoryLabelCountMap setLabelTitle(final String labelTitle) {
     this.labelTitle = labelTitle;
+    return this;
   }
 
   public synchronized void setLogCounts(final boolean logCounts) {
     this.logCounts = logCounts;
-    for (final LabelCountMap labelCountMap : this.labelCountMapByCategory.values()) {
+    for (final LabelCounters labelCountMap : this.labelCountMapByCategory.values()) {
       labelCountMap.setLogCounts(logCounts);
     }
   }
@@ -197,9 +205,9 @@ public class CategoryLabelCountMap implements Emptyable {
       TsvWriter tsv = Tsv.plainWriter(out)) {
       tsv.write(Arrays.asList(titles));
       long total = 0;
-      for (final Entry<String, LabelCountMap> entry : this.labelCountMapByCategory.entrySet()) {
+      for (final Entry<String, LabelCounters> entry : this.labelCountMapByCategory.entrySet()) {
         final String category = entry.getKey();
-        final LabelCountMap labelCountMap = entry.getValue();
+        final LabelCounters labelCountMap = entry.getValue();
         for (final String label : labelCountMap.getLabels()) {
           final long count = labelCountMap.getCount(label);
           total += count;
@@ -221,7 +229,7 @@ public class CategoryLabelCountMap implements Emptyable {
     final Set<String> allLabels = new TreeSet<>();
     final List<String> matchedCategoryNames = new ArrayList<>();
     for (final String categoryName : categoryNames) {
-      final LabelCountMap labelCountMap = this.labelCountMapByCategory.get(categoryName);
+      final LabelCounters labelCountMap = this.labelCountMapByCategory.get(categoryName);
       if (labelCountMap != null) {
         matchedCategoryNames.add(categoryName);
         recordDefinitionBuilder.addField(categoryName, DataTypes.LONG, 10);

@@ -46,7 +46,7 @@ public class ReverseRecordFieldsUndo extends AbstractUndoableEdit {
 
   @Override
   protected void redoDo() {
-    DirectionalFields.reverseFieldValues(this.record);
+    DirectionalFields.reverseFieldValuesRecord(this.record);
   }
 
   @Override
@@ -56,6 +56,6 @@ public class ReverseRecordFieldsUndo extends AbstractUndoableEdit {
 
   @Override
   protected void undoDo() {
-    DirectionalFields.reverseFieldValues(this.record);
+    DirectionalFields.reverseFieldValuesRecord(this.record);
   }
 }

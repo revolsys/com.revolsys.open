@@ -116,7 +116,7 @@ public final class LineStringUtil {
           if (from.equals(2, point)) {
             return Collections.<GeometryComponent, Double> singletonMap(from, 0.0);
           } else {
-            closestDistance = from.distance(point);
+            closestDistance = from.distancePoint(point);
             closestComponent = from;
           }
         }
@@ -124,7 +124,7 @@ public final class LineStringUtil {
         if (to.equals(2, point)) {
           return Collections.<GeometryComponent, Double> singletonMap(to, 0.0);
         } else {
-          final double toDistance = geometryFactory.makePrecise(0, to.distance(point));
+          final double toDistance = geometryFactory.makePrecise(0, to.distancePoint(point));
           if (toDistance <= closestDistance) {
             if (!(closestComponent instanceof Vertex) || toDistance < closestDistance) {
               closestComponent = to;
@@ -147,8 +147,8 @@ public final class LineStringUtil {
 
   public static Point getClosestEndsCoordinates(final LineString line, final Point coordinates) {
     final Point fromCoordinates = line.getPoint(0);
-    final Point toCoordinates = line.getPoint(-1);
-    if (fromCoordinates.distance(coordinates) <= toCoordinates.distance(coordinates)) {
+    final Point toCoordinates = line.getToPoint();
+    if (fromCoordinates.distancePoint(coordinates) <= toCoordinates.distancePoint(coordinates)) {
       return fromCoordinates;
     } else {
       return toCoordinates;
@@ -182,7 +182,7 @@ public final class LineStringUtil {
       for (int i2 = 1; i2 < numCoordinates2; i2++) {
         final Point currentCoord2 = coordinates2.getPoint(i2);
 
-        intersector.computeIntersection(previousCoord1, currentCoord1, previousCoord2,
+        intersector.computeIntersectionPoints(previousCoord1, currentCoord1, previousCoord2,
           currentCoord2);
         final int numIntersections = intersector.getIntersectionNum();
         if (intersector.hasIntersection()) {
@@ -226,7 +226,7 @@ public final class LineStringUtil {
     if (point1.equals(2, point2)) {
       fraction = 0.5;
     } else {
-      fraction = point.distance(point1) / point1.distance(point2);
+      fraction = point.distancePoint(point1) / point1.distancePoint(point2);
     }
     final double z = z1 + (z2 - z1) * fraction;
     return z;
@@ -237,7 +237,7 @@ public final class LineStringUtil {
     if (fromPoint) {
       return line.getPoint(0);
     } else {
-      return line.getPoint(-1);
+      return line.getToPoint();
     }
   }
 
@@ -261,7 +261,7 @@ public final class LineStringUtil {
   }
 
   public static boolean intersects(final LineString line1, final LineString line2) {
-    if (line1.getBoundingBox().intersects(line2.getBoundingBox())) {
+    if (line1.getBoundingBox().bboxIntersects(line2.getBoundingBox())) {
       final LineMatchGraph<LineString> graph = new LineMatchGraph<>(line2);
       for (final LineString line : line1.segments()) {
         if (graph.add(line)) {
@@ -278,7 +278,7 @@ public final class LineStringUtil {
     if (isEndsWithinDistance(line2, fromPoint, maxDistance)) {
       return true;
     } else {
-      final Point toPoint = line1.getPoint(-1);
+      final Point toPoint = line1.getToPoint();
       if (isEndsWithinDistance(line2, toPoint, maxDistance)) {
         return true;
       } else {
@@ -290,11 +290,11 @@ public final class LineStringUtil {
   public static boolean isEndsWithinDistance(final LineString line, final Point point,
     final double maxDistance) {
     final Point fromPoint = line.getPoint(0);
-    if (fromPoint.distance(point) < maxDistance) {
+    if (fromPoint.distancePoint(point) < maxDistance) {
       return true;
     } else {
-      final Point toPoint = line.getPoint(-1);
-      if (toPoint.distance(point) < maxDistance) {
+      final Point toPoint = line.getToPoint();
+      if (toPoint.distancePoint(point) < maxDistance) {
         return true;
       } else {
         return false;
@@ -306,7 +306,7 @@ public final class LineStringUtil {
     final double maxDistance) {
     final Point fromPoint = line1.getPoint(0);
     if (isWithinDistanceOfEnds(fromPoint, line2, maxDistance)) {
-      final Point toPoint = line1.getPoint(-1);
+      final Point toPoint = line1.getToPoint();
       return isWithinDistanceOfEnds(toPoint, line2, maxDistance);
     } else {
       return false;
@@ -377,7 +377,7 @@ public final class LineStringUtil {
   public static boolean isWithinDistance(final Point point, final LineString line, final int index,
     final double maxDistance) {
     final Point point2 = line.getVertex(index);
-    return point.distance(point2) < maxDistance;
+    return point.distancePoint(point2) < maxDistance;
   }
 
   public static boolean isWithinDistanceOfEnds(final Point point, final LineString line,
@@ -404,7 +404,7 @@ public final class LineStringUtil {
           i++;
         } while (point1.equals(point2));
       } else {
-        point1 = line.getPoint(-1);
+        point1 = line.getToPoint();
         int i = -2;
         do {
           point2 = line.getPoint(i);
@@ -433,7 +433,7 @@ public final class LineStringUtil {
       final List<Point> intersections = new ArrayList<>();
       for (final Geometry intersection : intersectionPoints) {
         for (final Point point : intersection.vertices()) {
-          intersections.add(point.newPointDouble());
+          intersections.add(point);
         }
       }
       if (intersections.size() > 0) {
@@ -442,11 +442,11 @@ public final class LineStringUtil {
         }
         for (final Point intersection : intersections) {
           if (!(index.isWithinDistance(c0) && index.isWithinDistance(c1))) {
-            if (i == 1 && intersection.distance(firstCoordinate) < tolerance) {
-            } else if (i == lastIndex && intersection.distance(lastCoordinate) < tolerance) {
+            if (i == 1 && intersection.distancePoint(firstCoordinate) < tolerance) {
+            } else if (i == lastIndex && intersection.distancePoint(lastCoordinate) < tolerance) {
             } else {
-              final double d0 = intersection.distance(c0);
-              final double d1 = intersection.distance(c1);
+              final double d0 = intersection.distancePoint(c0);
+              final double d1 = intersection.distancePoint(c1);
               if (d0 <= tolerance) {
                 if (d1 > tolerance) {
                   addLineString(geometryFactory, points, startCoordinate, startIndex, i - 1, null,

@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.record.Record;
 import com.revolsys.util.Property;
 
 public class JdbcStringFieldDefinition extends JdbcFieldDefinition {
@@ -27,14 +26,13 @@ public class JdbcStringFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
     String value = resultSet.getString(columnIndex);
-    if (this.intern) {
+    if (value != null && (this.intern || internStrings)) {
       value = value.intern();
     }
-    setValue(record, value);
-    return columnIndex + 1;
+    return value;
   }
 
   @Override

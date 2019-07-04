@@ -22,7 +22,7 @@ import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 
 public class OgrQueryIterator extends AbstractIterator<Record> {
 
@@ -46,7 +46,7 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
 
   private OgrRecordStore recordStore;
 
-  private LabelCountMap labelCountMap;
+  private LabelCounters labelCountMap;
 
   protected OgrQueryIterator(final OgrRecordStore recordStore, final Query query) {
     this.recordStore = recordStore;

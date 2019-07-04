@@ -13,31 +13,31 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
 
+import org.jeometry.common.compare.CompareUtil;
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.comparator.StringNumberComparator;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.geometry.util.GeometryProperties;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
-import com.revolsys.util.CompareUtil;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
 public interface Records {
   static BoundingBox boundingBox(final Iterable<? extends Record> records) {
-    BoundingBox boundingBox = BoundingBox.EMPTY;
+    BoundingBox boundingBox = BoundingBox.empty();
     for (final Record record : records) {
       boundingBox = boundingBox.expandToInclude(boundingBox(record));
     }
@@ -51,7 +51,7 @@ public interface Records {
         return geometry.getBoundingBox();
       }
     }
-    return BoundingBox.EMPTY;
+    return BoundingBox.empty();
   }
 
   static int compareNullFirst(final Record record1, final Record record2, final String fieldName) {
@@ -315,7 +315,7 @@ public interface Records {
   static Geometry getGeometry(final Collection<?> records) {
     final List<Geometry> geometries = getGeometries(records);
     if (geometries.isEmpty()) {
-      return GeometryFactory.DEFAULT.geometry();
+      return GeometryFactory.DEFAULT_3D.geometry();
     } else {
       final GeometryFactory geometryFactory = geometries.get(0).getGeometryFactory();
       return geometryFactory.geometry(geometries);
@@ -534,7 +534,7 @@ public interface Records {
         try {
           final Geometry geometry = record.getGeometry();
           if (geometry != null) {
-            return geometry.intersects(boundingBox);
+            return geometry.intersectsBbox(boundingBox);
           }
         } catch (final Throwable t) {
         }
@@ -579,7 +579,7 @@ public interface Records {
             final Geometry convertedGeometry2 = geometry2.convertGeometry(geometryFactory);
             if (convertedGeometry2 != null) {
               try {
-                return geometry.intersects(convertedGeometry2);
+                return geometry.bboxIntersects(convertedGeometry2);
               } catch (final TopologyException e) {
                 return true;
               }
@@ -595,7 +595,8 @@ public interface Records {
   }
 
   static RecordDefinition newGeometryRecordDefinition() {
-    final FieldDefinition geometryField = new FieldDefinition("geometry", DataTypes.GEOMETRY, true);
+    final FieldDefinition geometryField = new FieldDefinition("geometry",
+      GeometryDataTypes.GEOMETRY, true);
     return new RecordDefinitionImpl(PathName.newPathName("/Feature"), geometryField);
   }
 

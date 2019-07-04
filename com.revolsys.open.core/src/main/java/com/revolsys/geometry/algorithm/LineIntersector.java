@@ -166,11 +166,9 @@ public abstract class LineIntersector {
 
   protected Point pb;
 
-  protected int result;
+  protected int intersectionCount;
 
   private double scale;
-
-  // public int numIntersects = 0;
 
   public LineIntersector() {
     this.intPt[0] = new PointDouble();
@@ -178,7 +176,7 @@ public abstract class LineIntersector {
     // alias the intersection points for ease of reference
     this.pa = this.intPt[0];
     this.pb = this.intPt[1];
-    this.result = 0;
+    this.intersectionCount = 0;
   }
 
   public LineIntersector(final double scale) {
@@ -187,25 +185,29 @@ public abstract class LineIntersector {
 
   protected abstract int computeIntersect(Point p1, Point p2, Point q1, Point q2);
 
+  public abstract boolean computeIntersection(double x, double y, double x1, double y1, double x2,
+    double y2);
+
   /**
    * Compute the intersection of a point p and the line p1-p2.
    * This function computes the boolean value of the hasIntersection test.
    * The actual value of the intersection (if there is one)
    * is equal to the value of <code>p</code>.
    */
-  public abstract void computeIntersection(Point p, Point p1, Point p2);
+  public abstract void computeIntersectionPoints(Point p, Point p1, Point p2);
 
   /**
    * Computes the intersection of the lines p1-p2 and p3-p4.
    * This function computes both the boolean value of the hasIntersection test
    * and the (approximate) value of the intersection point itself (if there is one).
    */
-  public void computeIntersection(final Point p1, final Point p2, final Point p3, final Point p4) {
+  public void computeIntersectionPoints(final Point p1, final Point p2, final Point p3,
+    final Point p4) {
     this.inputLines[0][0] = p1;
     this.inputLines[0][1] = p2;
     this.inputLines[1][0] = p3;
     this.inputLines[1][1] = p4;
-    this.result = computeIntersect(p1, p2, p3, p4);
+    this.intersectionCount = computeIntersect(p1, p2, p3, p4);
     // numIntersects++;
   }
 
@@ -279,12 +281,6 @@ public abstract class LineIntersector {
     return this.intPt[intIndex];
   }
 
-  /*
-   * public String toString() { String str = inputLines[0][0] + "-" +
-   * inputLines[0][1] + " " + inputLines[1][0] + "-" + inputLines[1][1] + " : "
-   * + getTopologySummary(); return str; }
-   */
-
   /**
    * Computes the intIndex'th intersection point in the direction of
    * a specified input line segment
@@ -300,13 +296,24 @@ public abstract class LineIntersector {
     return this.intPt[this.intLineIndex[segmentIndex][intIndex]];
   }
 
+  /*
+   * public String toString() { String str = inputLines[0][0] + "-" +
+   * inputLines[0][1] + " " + inputLines[1][0] + "-" + inputLines[1][1] + " : "
+   * + getTopologySummary(); return str; }
+   */
+
+  public int getIntersectionCount() {
+    return this.intersectionCount;
+  }
+  // public int numIntersects = 0;
+
   /**
    * Returns the number of intersection points found.  This will be either 0, 1 or 2.
    *
    * @return the number of intersection points found (0, 1, or 2)
    */
   public int getIntersectionNum() {
-    return this.result;
+    return this.intersectionCount;
   }
 
   public double getScale() {
@@ -333,11 +340,11 @@ public abstract class LineIntersector {
    * @return true if the input geometries intersect
    */
   public boolean hasIntersection() {
-    return this.result != NO_INTERSECTION;
+    return this.intersectionCount != NO_INTERSECTION;
   }
 
   protected boolean isCollinear() {
-    return this.result == COLLINEAR_INTERSECTION;
+    return this.intersectionCount == COLLINEAR_INTERSECTION;
   }
 
   protected boolean isEndPoint() {
@@ -365,7 +372,7 @@ public abstract class LineIntersector {
    * @return <code>true</code> if either intersection point is in the interior of the input segment
    */
   public boolean isInteriorIntersection(final int inputLineIndex) {
-    for (int i = 0; i < this.result; i++) {
+    for (int i = 0; i < this.intersectionCount; i++) {
       if (!(this.intPt[i].equals(2, this.inputLines[inputLineIndex][0])
         || this.intPt[i].equals(2, this.inputLines[inputLineIndex][1]))) {
         return true;
@@ -384,7 +391,7 @@ public abstract class LineIntersector {
    * @return true if the input point is one of the intersection points.
    */
   public boolean isIntersection(final Point pt) {
-    for (int i = 0; i < this.result; i++) {
+    for (int i = 0; i < this.intersectionCount; i++) {
       if (this.intPt[i].equals(2, pt)) {
         return true;
       }

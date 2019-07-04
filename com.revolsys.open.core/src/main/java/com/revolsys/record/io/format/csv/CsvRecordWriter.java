@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.WrappedException;
 
-import com.revolsys.geometry.cs.esri.EsriCoordinateSystems;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractRecordWriter;
@@ -42,7 +41,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     this(recordDefinition, resource.newWriter(), fieldSeparator, useQuotes, ewkt);
     setResource(resource);
     final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
-    EsriCoordinateSystems.writePrjFile(resource, geometryFactory);
+    geometryFactory.writePrjFile(resource);
   }
 
   public CsvRecordWriter(final RecordDefinition recordDefinition, final Writer out,

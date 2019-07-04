@@ -46,7 +46,7 @@ public class ContourConverter extends ArcConverter {
     }
     if (geometry != null) {
       if (!values.isEmpty()) {
-        geometry.setUserData(values);
+        geometry.setUserDataOld(values);
       }
     }
     return geometry;

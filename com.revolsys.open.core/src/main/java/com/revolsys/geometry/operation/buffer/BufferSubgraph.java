@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+import org.jeometry.common.function.BiConsumerDouble;
+
 import com.revolsys.geometry.geomgraph.DirectedEdge;
 import com.revolsys.geometry.geomgraph.DirectedEdgeStar;
 import com.revolsys.geometry.geomgraph.Edge;
@@ -52,8 +54,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.TopologyException;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 
 //import debug.*;
 
@@ -69,10 +70,13 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
  *
  * @version 1.7
  */
-class BufferSubgraph implements Comparable {
-  private final List<DirectedEdge> dirEdgeList = new ArrayList<>();
+class BufferSubgraph extends BoundingBoxDoubleXY implements Comparable {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
-  private BoundingBox env = null;
+  private final List<DirectedEdge> dirEdgeList = new ArrayList<>();
 
   private final RightmostEdgeFinder finder;
 
@@ -269,34 +273,27 @@ class BufferSubgraph implements Comparable {
     }
   }
 
-  public List<DirectedEdge> getDirectedEdges() {
-    return this.dirEdgeList;
-  }
-
   /**
    * Computes the envelope of the edges in the subgraph.
    * The envelope is cached after being computed.
    *
    * @return the envelope of the graph.
    */
-  public BoundingBox getEnvelope() {
-    if (this.env == null) {
-      double[] bounds = null;
+  @Override
+  public BoundingBox getBoundingBox() {
+    if (isEmpty()) {
       for (final DirectedEdge dirEdge : this.dirEdgeList) {
         final Edge edge = dirEdge.getEdge();
         final LineString points = edge.getLine();
-        for (int i = 0; i < points.getVertexCount(); i++) {
-          final Point point = points.getPoint(i);
-          if (bounds == null) {
-            bounds = BoundingBoxUtil.newBounds(2, point);
-          } else {
-            BoundingBoxUtil.expand(bounds, 2, point);
-          }
-        }
+        final BiConsumerDouble action = this::expandBbox;
+        points.forEachVertex(action);
       }
-      this.env = new BoundingBoxDoubleGf(2, bounds);
     }
-    return this.env;
+    return this;
+  }
+
+  public List<DirectedEdge> getDirectedEdges() {
+    return this.dirEdgeList;
   }
 
   public List<Node> getNodes() {

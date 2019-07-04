@@ -7,19 +7,20 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.identifier.TypedIdentifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.date.Dates;
 
-import com.revolsys.identifier.Identifier;
-import com.revolsys.identifier.TypedIdentifier;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.jdbc.field.JdbcFieldDefinitions;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.Dates;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
@@ -52,7 +53,7 @@ public class Value implements QueryValue {
   }
 
   public Value(final Object value) {
-    this(JdbcFieldDefinition.newFieldDefinition(value), value);
+    this(JdbcFieldDefinitions.newFieldDefinition(value), value);
   }
 
   @Override
@@ -153,7 +154,7 @@ public class Value implements QueryValue {
       if (field instanceof JdbcFieldDefinition) {
         this.jdbcField = (JdbcFieldDefinition)field;
       } else {
-        this.jdbcField = JdbcFieldDefinition.newFieldDefinition(this.queryValue);
+        this.jdbcField = JdbcFieldDefinitions.newFieldDefinition(this.queryValue);
       }
 
       CodeTable codeTable = null;
@@ -202,8 +203,8 @@ public class Value implements QueryValue {
 
   public void setValue(Object value) {
     value = getValue(value);
-    if (this.fieldDefinition.getName() == JdbcFieldDefinition.UNKNOWN) {
-      this.fieldDefinition = JdbcFieldDefinition.newFieldDefinition(value);
+    if (this.fieldDefinition.getName() == JdbcFieldDefinitions.UNKNOWN) {
+      this.fieldDefinition = JdbcFieldDefinitions.newFieldDefinition(value);
     }
     setQueryValue(value);
   }

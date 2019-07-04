@@ -35,10 +35,9 @@ package com.revolsys.geometry.index.chain;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
-import com.revolsys.geometry.util.BoundingBoxUtil;
+import com.revolsys.geometry.util.RectangleUtil;
 
 /**
  * Monotone Chains are a way of partitioning the segments of a linestring to
@@ -66,7 +65,7 @@ import com.revolsys.geometry.util.BoundingBoxUtil;
  *
  * MonotoneChains support the following kinds of queries:
  * <ul>
- * <li>BoundingBoxDoubleGf select: determine all the segments in the chain which
+ * <li>BoundingBoxDoubleGeometryFactory select: determine all the segments in the chain which
  * intersect a given envelope
  * <li>Overlap: determine all the pairs of segments in two chains whose
  * envelopes overlap
@@ -86,7 +85,7 @@ public class MonotoneChain {
 
   private Object context = null;// user-defined information
 
-  private BoundingBoxDoubleGf env = null;
+  private BoundingBox env = null;
 
   private int id;// useful for optimizing chain comparisons
 
@@ -113,7 +112,7 @@ public class MonotoneChain {
       return;
     }
     // nothing to do if the envelopes of these chains don't overlap
-    if (BoundingBoxUtil.intersects(p00, p01, p10, p11)) {
+    if (RectangleUtil.intersects(p00, p01, p10, p11)) {
 
       // the chains overlap, so split each in half and iterate (binary search)
       final int mid0 = (start0 + end0) / 2;
@@ -162,7 +161,7 @@ public class MonotoneChain {
     final MonotoneChainSelectAction mcs) {
     final Point p0 = this.points.getPoint(start0);
     final Point p1 = this.points.getPoint(end0);
-    mcs.tempEnv1 = new BoundingBoxDoubleGf(p0, p1);
+    mcs.tempEnv1 = BoundingBox.bboxNew(p0, p1);
 
     // Debug.println("trying:" + p0 + p1 + " [ " + start0 + ", " + end0 + " ]");
     // terminating condition for the recursion
@@ -172,7 +171,7 @@ public class MonotoneChain {
       return;
     }
     // nothing to do if the envelopes don't overlap
-    if (!searchEnv.intersects(mcs.tempEnv1)) {
+    if (!searchEnv.bboxIntersects(mcs.tempEnv1)) {
       return;
     }
 
@@ -210,11 +209,11 @@ public class MonotoneChain {
     return this.end;
   }
 
-  public BoundingBoxDoubleGf getEnvelope() {
+  public BoundingBox getEnvelope() {
     if (this.env == null) {
       final Point p0 = this.points.getPoint(this.start);
       final Point p1 = this.points.getPoint(this.end);
-      this.env = new BoundingBoxDoubleGf(p0, p1);
+      this.env = BoundingBox.bboxNew(p0, p1);
     }
     return this.env;
   }

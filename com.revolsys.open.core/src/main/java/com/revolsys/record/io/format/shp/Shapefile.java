@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.AbstractRecordIoFactory;
@@ -32,7 +33,7 @@ public class Shapefile extends AbstractRecordIoFactory implements RecordWriterFa
 
   @Override
   public RecordReader newRecordReader(final Resource resource,
-    final RecordFactory<? extends Record> recordFactory) {
+    final RecordFactory<? extends Record> recordFactory, final MapEx properties) {
     try {
       return new ShapefileRecordReader(resource, recordFactory);
     } catch (final IOException e) {

@@ -42,7 +42,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
   public void forEach(final BoundingBox envelope, final Consumer<T> action) {
     for (int i = 0; i < this.size; i++) {
       final RTreeNode<T> node = this.nodes[i];
-      if (envelope.intersects(node.getBoundingBox())) {
+      if (envelope.bboxIntersects(node.getBoundingBox())) {
         node.forEach(envelope, action);
       }
     }
@@ -53,7 +53,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
     final Consumer<T> action) {
     for (int i = 0; i < this.size; i++) {
       final RTreeNode<T> node = this.nodes[i];
-      if (envelope.intersects(node.getBoundingBox())) {
+      if (envelope.bboxIntersects(node.getBoundingBox())) {
         node.forEach(envelope, filter, action);
       }
     }
@@ -145,7 +145,7 @@ public class RTreeBranch<T> extends RTreeNode<T> implements Iterable<RTreeNode<T
 
   @Override
   protected void updateEnvelope() {
-    BoundingBox boundingBox = BoundingBox.EMPTY;
+    BoundingBox boundingBox = BoundingBox.empty();
     for (int i = 0; i < this.size; i++) {
       final BoundingBox envelope = this.nodes[i].getBoundingBox();
       boundingBox = boundingBox.expandToInclude(envelope);

@@ -96,11 +96,15 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
         if (Property.hasValue(this.connectionName)) {
           final WebService<?> webService = WebServiceConnectionManager
             .getWebService(this.connectionName);
-          if (webService instanceof WmsClient) {
+          if (webService == null) {
+            Logs.error(this,
+              getPath() + ": Web service " + this.connectionName + ": no connection configured");
+            return false;
+          } else if (webService instanceof WmsClient) {
             wmsClient = (WmsClient)webService;
           } else {
             Logs.error(this,
-              getPath() + ": Web service " + this.connectionName + " is not a OGS WMS service");
+              getPath() + ": Web service " + this.connectionName + ": is not a OGS WMS service");
             return false;
           }
         } else if (Property.hasValue(this.serviceUrl)) {
@@ -161,15 +165,15 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
     } else {
       setExists(true);
       final WmsClient wmsClient = wmsLayerDefinition.getWmsClient();
-      final String name = wmsClient.getName();
-      if (Property.hasValue(name)) {
-        this.connectionName = name;
+      final String connectionName = wmsClient.getName();
+      if (Property.hasValue(connectionName)) {
+        this.connectionName = connectionName;
         this.serviceUrl = null;
       } else {
         this.serviceUrl = wmsClient.getServiceUrl().toString();
       }
       final String layerTitle = wmsLayerDefinition.getTitle();
-      if (getName() == null) {
+      if (!Property.hasValue(getName())) {
         setName(layerTitle);
       }
       this.layerName = wmsLayerDefinition.getName();

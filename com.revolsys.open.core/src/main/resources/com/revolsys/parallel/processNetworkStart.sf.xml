@@ -11,7 +11,7 @@
 
   <bean
     name="com.revolsys.parallel.process.ProcessNetwork"
-    class="com.revolsys.parallel.process.ProcessNetwork"
+    class="com.revolsys.parallel.process.SpringProcessNetwork"
     id="processNetwork"
     p:autoStart="true"
     p:name="processNetwork" />

@@ -43,11 +43,17 @@ import com.revolsys.geometry.model.Point;
  * @author Martin Davis
  */
 public interface PointOnGeometryLocator {
+  Location locate(double x, double y);
+
   /**
    * Determines the {@link Location} of a point in the {@link Geometry}.
    *
    * @param p the point to test
    * @return the location of the point in the geometry
    */
-  Location locate(Point p);
+  default Location locate(final Point p) {
+    final double x = p.getX();
+    final double y = p.getY();
+    return locate(x, y);
+  }
 }

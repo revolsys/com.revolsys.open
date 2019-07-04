@@ -186,7 +186,7 @@ public class Bintree {
   /**
    * Removes a single item from the tree.
    *
-   * @param itemEnv the BoundingBoxDoubleGf of the item to be removed
+   * @param itemEnv the BoundingBoxDoubleGeometryFactory of the item to be removed
    * @param item the item to remove
    * @return <code>true</code> if the item was found (and thus removed)
    */

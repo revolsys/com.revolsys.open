@@ -32,8 +32,9 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 
 /**
@@ -61,7 +62,7 @@ public abstract class AbstractPoint implements Point {
     try {
       return (Point)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -70,6 +71,9 @@ public abstract class AbstractPoint implements Point {
     if (other instanceof Point) {
       final Point point = (Point)other;
       return equals(point);
+    } else if (other instanceof BoundingBox) {
+      final BoundingBox boundingBox = (BoundingBox)other;
+      return bboxEquals(boundingBox);
     } else {
       return false;
     }
@@ -77,14 +81,7 @@ public abstract class AbstractPoint implements Point {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    long temp;
-    temp = Double.doubleToLongBits(getX());
-    result = prime * result + (int)(temp ^ temp >>> 32);
-    temp = Double.doubleToLongBits(getY());
-    result = prime * result + (int)(temp ^ temp >>> 32);
-    return result;
+    return Point.hashCode(this);
   }
 
   @Override

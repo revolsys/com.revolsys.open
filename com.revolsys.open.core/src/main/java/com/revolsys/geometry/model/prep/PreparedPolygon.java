@@ -40,15 +40,15 @@ import com.revolsys.geometry.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LinearRing;
+import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.impl.AbstractPolygon;
+import com.revolsys.geometry.model.impl.PolygonImpl;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.noding.FastSegmentSetIntersectionFinder;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.noding.SegmentStringUtil;
-import com.revolsys.geometry.operation.predicate.RectangleContains;
 import com.revolsys.geometry.operation.predicate.RectangleIntersects;
 
 /**
@@ -63,31 +63,39 @@ import com.revolsys.geometry.operation.predicate.RectangleIntersects;
  * @author mbdavis
  *
  */
-public class PreparedPolygon extends AbstractPolygon {
+public class PreparedPolygon extends PolygonImpl implements PreparedPolygonal {
   private static final long serialVersionUID = 1L;
+
+  private static LinearRing[] prepareRings(final Polygon polygon) {
+    final LinearRing[] rings = new LinearRing[polygon.getRingCount()];
+    for (int i = 0; i < rings.length; i++) {
+      final LinearRing ring = polygon.getRing(i);
+      rings[i] = ring.prepare();
+    }
+    return rings;
+  }
 
   private final boolean isRectangle;
 
-  private PointOnGeometryLocator pia = null;
-
-  private final Polygon polygon;
+  private PointOnGeometryLocator pointLocator = null;
 
   // create these lazily, since they are expensive
   private FastSegmentSetIntersectionFinder segIntFinder = null;
 
   public PreparedPolygon(final Polygon polygon) {
-    this.polygon = polygon;
+    super(polygon.getGeometryFactory(), prepareRings(polygon), polygon.getRingCount());
     this.isRectangle = polygon.isRectangle();
   }
 
   @Override
-  public boolean contains(final Geometry g) {
-    if (envelopeCovers(g)) {
+  public boolean contains(final Geometry geometry) {
+    if (bboxCovers(geometry)) {
       if (this.isRectangle) {
-        return RectangleContains.contains(getPolygon(), g);
+        final BoundingBox boundingBox = getBoundingBox();
+        return boundingBox.containsSFS(geometry);
       } else {
-        final PreparedPolygonContains contains = new PreparedPolygonContains(this, getPolygon());
-        return contains.contains(g);
+        final PreparedPolygonContains contains = new PreparedPolygonContains(this);
+        return contains.contains(geometry);
       }
     } else {
       return false;
@@ -97,7 +105,7 @@ public class PreparedPolygon extends AbstractPolygon {
   @Override
   public boolean containsProperly(final Geometry geometry) {
     // short-circuit test
-    if (envelopeCovers(geometry)) {
+    if (bboxCovers(geometry)) {
       /**
        * Do point-in-poly tests first, since they are cheaper and may result
        * in a quick negative result.
@@ -141,18 +149,13 @@ public class PreparedPolygon extends AbstractPolygon {
 
   @Override
   public boolean covers(final Geometry geometry) {
-    if (!envelopeCovers(geometry)) {
+    if (!bboxCovers(geometry)) {
       return false;
     } else if (this.isRectangle) {
       return true;
     } else {
-      return new PreparedPolygonCovers(this, this.polygon).covers(geometry);
+      return new PreparedPolygonCovers(this).covers(geometry);
     }
-  }
-
-  @Override
-  public BoundingBox getBoundingBox() {
-    return this.polygon.getBoundingBox();
   }
 
   /**
@@ -169,21 +172,17 @@ public class PreparedPolygon extends AbstractPolygon {
      */
     if (this.segIntFinder == null) {
       this.segIntFinder = new FastSegmentSetIntersectionFinder(
-        SegmentStringUtil.extractSegmentStrings(getPolygon()));
+        SegmentStringUtil.extractSegmentStrings(this));
     }
     return this.segIntFinder;
   }
 
   public synchronized PointOnGeometryLocator getPointLocator() {
-    if (this.pia == null) {
-      this.pia = new IndexedPointInAreaLocator(getPolygon());
+    if (this.pointLocator == null) {
+      this.pointLocator = new IndexedPointInAreaLocator(this);
     }
 
-    return this.pia;
-  }
-
-  public Polygon getPolygon() {
-    return this.polygon;
+    return this.pointLocator;
   }
 
   /**
@@ -198,31 +197,16 @@ public class PreparedPolygon extends AbstractPolygon {
   public List<Point> getRepresentativePoints() {
     final List<Point> points = new ArrayList<>();
     for (final Vertex vertex : vertices()) {
-      points.add(vertex.newPointDouble());
+      points.add(vertex.newPoint2D());
     }
     return points;
   }
 
   @Override
-  public LinearRing getRing(final int ringIndex) {
-    return this.polygon.getRing(ringIndex);
-  }
-
-  @Override
-  public int getRingCount() {
-    return this.polygon.getRingCount();
-  }
-
-  @Override
-  public List<LinearRing> getRings() {
-    return this.polygon.getRings();
-  }
-
-  @Override
   public boolean intersects(final Geometry geometry) {
-    if (envelopesIntersect(geometry)) {
+    if (bboxIntersects(geometry)) {
       if (this.isRectangle) {
-        return RectangleIntersects.intersects(getPolygon(), geometry);
+        return RectangleIntersects.rectangleIntersects(this, geometry);
       } else {
         final PointOnGeometryLocator pointLocator = getPointLocator();
         /**
@@ -281,7 +265,31 @@ public class PreparedPolygon extends AbstractPolygon {
   }
 
   @Override
-  public Polygon prepare() {
+  public boolean isRectangle() {
+    return this.isRectangle;
+  }
+
+  @Override
+  public Location locate(final double x, final double y) {
+    final PointOnGeometryLocator pointLocator = getPointLocator();
+    return pointLocator.locate(x, y);
+  }
+
+  @Override
+  public Location locate(final Point point) {
+    final PointOnGeometryLocator pointLocator = getPointLocator();
+    return pointLocator.locate(point);
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  public Polygon newPolygon(final LinearRing... rings) {
+    final Polygon polygon = super.newPolygon(rings);
+    return polygon.prepare();
+  }
+
+  @Override
+  public PreparedPolygon prepare() {
     return this;
   }
 }

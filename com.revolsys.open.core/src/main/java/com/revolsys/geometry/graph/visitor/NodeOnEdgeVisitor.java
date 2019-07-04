@@ -11,7 +11,6 @@ import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
 import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.visitor.CreateListVisitor;
 import com.revolsys.visitor.DelegatingVisitor;
@@ -21,8 +20,7 @@ public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
     final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
     final Point point = node;
-    BoundingBox boundingBox = new BoundingBoxDoubleGf(point);
-    boundingBox = boundingBox.expand(maxDistance);
+    final BoundingBox boundingBox = point.bboxEdit(editor -> editor.expand(maxDistance));
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
     final NodeOnEdgeVisitor<T> visitor = new NodeOnEdgeVisitor<>(node, boundingBox, maxDistance,
       results);
@@ -54,7 +52,7 @@ public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
   public void accept(final Edge<T> edge) {
     if (!edge.hasNode(this.node)) {
       final LineString line = edge.getLine();
-      if (line.getBoundingBox().intersects(this.boundingBox)) {
+      if (line.getBoundingBox().bboxIntersects(this.boundingBox)) {
         if (LineStringUtil.isPointOnLine(line, this.point, this.maxDistance)) {
           super.accept(edge);
         }

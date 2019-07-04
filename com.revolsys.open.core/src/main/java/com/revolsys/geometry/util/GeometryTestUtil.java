@@ -1,12 +1,11 @@
 package com.revolsys.geometry.util;
 
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.number.Doubles;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -21,17 +20,17 @@ public class GeometryTestUtil {
   @SuppressWarnings("unchecked")
   public static <G extends Geometry> G geometry(final GeometryFactory geometryFactory,
     final DataType geometryType, final int axisCount, final int partCount, final int ringCount) {
-    if (DataTypes.POINT.equals(geometryType)) {
+    if (GeometryDataTypes.POINT.equals(geometryType)) {
       return (G)point(geometryFactory, axisCount);
-    } else if (DataTypes.MULTI_POINT.equals(geometryType)) {
+    } else if (GeometryDataTypes.MULTI_POINT.equals(geometryType)) {
       return (G)multiPoint(geometryFactory, axisCount, partCount);
-    } else if (DataTypes.LINE_STRING.equals(geometryType)) {
+    } else if (GeometryDataTypes.LINE_STRING.equals(geometryType)) {
       return (G)lineString(geometryFactory, axisCount);
-    } else if (DataTypes.MULTI_LINE_STRING.equals(geometryType)) {
+    } else if (GeometryDataTypes.MULTI_LINE_STRING.equals(geometryType)) {
       return (G)multiLineString(geometryFactory, axisCount, partCount);
-    } else if (DataTypes.POLYGON.equals(geometryType)) {
+    } else if (GeometryDataTypes.POLYGON.equals(geometryType)) {
       return (G)polygon(geometryFactory, axisCount, ringCount);
-    } else if (DataTypes.MULTI_POLYGON.equals(geometryType)) {
+    } else if (GeometryDataTypes.MULTI_POLYGON.equals(geometryType)) {
       return (G)multiPolygon(geometryFactory, axisCount, partCount, ringCount);
     } else {
       return null;
@@ -39,8 +38,7 @@ public class GeometryTestUtil {
   }
 
   private static Point getCentre(final GeometryFactory geometryFactory) {
-    final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-    final BoundingBox areaBoundingBox = coordinateSystem.getAreaBoundingBox();
+    final BoundingBox areaBoundingBox = geometryFactory.getAreaBoundingBox();
     final Point centre = areaBoundingBox.getCentre();
     return centre;
   }

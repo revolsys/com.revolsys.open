@@ -32,12 +32,16 @@
  */
 package com.revolsys.geometry.model.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -64,16 +68,12 @@ public class MultiPointImpl implements MultiPoint {
 
   private Point[] points;
 
-  /**
-   * An object reference which can be used to carry ancillary data defined
-   * by the client.
-   */
   private Object userData;
 
   public MultiPointImpl(final GeometryFactory geometryFactory, final Point... points) {
     this.geometryFactory = geometryFactory;
     if (points == null || points.length == 0) {
-      this.points = null;
+      throw new IllegalArgumentException("MultiLineString must not be empty");
     } else if (Geometry.hasNullElements(points)) {
       throw new IllegalArgumentException("geometries must not contain null elements");
     } else {
@@ -89,11 +89,8 @@ public class MultiPointImpl implements MultiPoint {
    */
   @Override
   public Punctual clone() {
-    try {
-      return (Punctual)super.clone();
-    } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
-    }
+    final Point[] newPoints = this.points.clone();
+    return newPunctual(this.geometryFactory, newPoints);
   }
 
   /**
@@ -136,13 +133,64 @@ public class MultiPointImpl implements MultiPoint {
   }
 
   @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    for (final Geometry geometry : this.points) {
+      final R result = geometry.findVertex(action);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
+  }
+
+  @Override
+  public void forEachGeometry(final Consumer<Geometry> action) {
+    if (this.points != null) {
+      for (final Geometry geometry : this.points) {
+        action.accept(geometry);
+      }
+    }
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    for (final Point point : this.points) {
+      point.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final Consumer3Double action) {
+    for (final Geometry geometry : this.points) {
+      geometry.forEachVertex(action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
+    for (final Geometry geometry : this.points) {
+      geometry.forEachVertex(coordinatesOperation, point, action);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperationPoint coordinates,
+    final Consumer<CoordinatesOperationPoint> action) {
+    for (final Geometry geometry : this.points) {
+      geometry.forEachVertex(coordinates, action);
+    }
+  }
+
+  @Override
+  public int getAxisCount() {
+    return this.geometryFactory.getAxisCount();
+  }
+
+  @Override
   public BoundingBox getBoundingBox() {
     if (this.boundingBox == null) {
-      if (isEmpty()) {
-        this.boundingBox = new BoundingBoxDoubleGf(getGeometryFactory());
-      } else {
-        this.boundingBox = newBoundingBox();
-      }
+      this.boundingBox = newBoundingBox();
     }
     return this.boundingBox;
   }
@@ -150,30 +198,18 @@ public class MultiPointImpl implements MultiPoint {
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> List<V> getGeometries() {
-    if (this.points == null) {
-      return new ArrayList<>();
-    } else {
-      return (List<V>)new ArrayList<>(Arrays.asList(this.points));
-    }
+    return (List<V>)Lists.newArray(this.points);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <V extends Geometry> V getGeometry(final int n) {
-    if (this.points == null) {
-      return null;
-    } else {
-      return (V)this.points[n];
-    }
+    return (V)this.points[n];
   }
 
   @Override
   public int getGeometryCount() {
-    if (this.points == null) {
-      return 0;
-    } else {
-      return this.points.length;
-    }
+    return this.points.length;
   }
 
   @Override
@@ -181,13 +217,8 @@ public class MultiPointImpl implements MultiPoint {
     return this.geometryFactory;
   }
 
-  /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
   @Override
-  public Object getUserData() {
+  public Object getUserDataOld() {
     return this.userData;
   }
 
@@ -204,26 +235,11 @@ public class MultiPointImpl implements MultiPoint {
 
   @Override
   public boolean isEmpty() {
-    return this.points == null;
+    return false;
   }
 
   @Override
-  public Geometry prepare() {
-    return this;
-  }
-
-  /**
-   * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Point Reference System.
-   * <p>
-   * Note that user data objects are not present in geometries created by
-   * construction methods.
-   *
-   * @param userData an object, the semantics for which are defined by the
-   * application using this Geometry
-   */
-  @Override
-  public void setUserData(final Object userData) {
+  public void setUserDataOld(final Object userData) {
     this.userData = userData;
   }
 

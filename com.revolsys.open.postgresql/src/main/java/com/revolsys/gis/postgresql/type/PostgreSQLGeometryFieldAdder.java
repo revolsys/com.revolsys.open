@@ -4,32 +4,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.postgresql.PostgreSQLRecordStore;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
+import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
 import com.revolsys.record.property.FieldProperties;
-import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.util.Property;
 
 public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
   private static final Map<String, DataType> DATA_TYPE_MAP = new HashMap<>();
 
   static {
-    DATA_TYPE_MAP.put("GEOMETRY", DataTypes.GEOMETRY);
-    DATA_TYPE_MAP.put("POINT", DataTypes.POINT);
-    DATA_TYPE_MAP.put("LINESTRING", DataTypes.LINE_STRING);
-    DATA_TYPE_MAP.put("POLYGON", DataTypes.POLYGON);
-    DATA_TYPE_MAP.put("MULTIPOINT", DataTypes.MULTI_POINT);
-    DATA_TYPE_MAP.put("MULTILINESTRING", DataTypes.MULTI_LINE_STRING);
-    DATA_TYPE_MAP.put("MULTIPOLYGON", DataTypes.MULTI_POLYGON);
+    DATA_TYPE_MAP.put("GEOMETRY", GeometryDataTypes.GEOMETRY);
+    DATA_TYPE_MAP.put("POINT", GeometryDataTypes.POINT);
+    DATA_TYPE_MAP.put("LINESTRING", GeometryDataTypes.LINE_STRING);
+    DATA_TYPE_MAP.put("POLYGON", GeometryDataTypes.POLYGON);
+    DATA_TYPE_MAP.put("MULTIPOINT", GeometryDataTypes.MULTI_POINT);
+    DATA_TYPE_MAP.put("MULTILINESTRING", GeometryDataTypes.MULTI_LINE_STRING);
+    DATA_TYPE_MAP.put("MULTIPOLYGON", GeometryDataTypes.MULTI_POLYGON);
   }
 
   private final PostgreSQLRecordStore recordStore;
@@ -39,9 +39,9 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
   }
 
   @Override
-  public FieldDefinition addField(final AbstractJdbcRecordStore recordStore,
+  public JdbcFieldDefinition newField(final AbstractJdbcRecordStore recordStore,
     final JdbcRecordDefinition recordDefinition, final String dbName, final String name,
-    final String dataTypeName, final int sqlType, final int length, final int scale,
+    final String dbDataType, final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
     final JdbcRecordStoreSchema schema = recordDefinition.getSchema();
     final PathName typePath = recordDefinition.getPathName();
@@ -68,16 +68,16 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
 
       final DataType dataType = DATA_TYPE_MAP.get(type);
       final GeometryFactory storeGeometryFactory = this.recordStore.getGeometryFactory();
-      final GeometryFactory geometryFactory;
-      if (storeGeometryFactory == null) {
-        geometryFactory = GeometryFactory.floating(srid, axisCount);
-      } else {
-        geometryFactory = GeometryFactory.fixed(srid, axisCount, storeGeometryFactory.getScaleXY(),
-          storeGeometryFactory.getScaleZ());
+      GeometryFactory geometryFactory = GeometryFactory.floating(srid, axisCount);
+      if (storeGeometryFactory != null) {
+        if (storeGeometryFactory.isSameCoordinateSystem(geometryFactory)) {
+          final double[] scales = storeGeometryFactory.newScales(axisCount);
+          geometryFactory = storeGeometryFactory.convertAxisCountAndScales(axisCount, scales);
+        }
       }
-      final FieldDefinition field = new PostgreSQLGeometryJdbcFieldDefinition(dbName, name,
-        dataType, sqlType, required, description, null, srid, axisCount, geometryFactory);
-      recordDefinition.addField(field);
+      final PostgreSQLGeometryJdbcFieldDefinition field = new PostgreSQLGeometryJdbcFieldDefinition(
+        dbName, name, dataType, sqlType, required, description, null, srid, axisCount,
+        geometryFactory);
       field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
       return field;
     } catch (final Throwable e) {
@@ -86,4 +86,5 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
       return null;
     }
   }
+
 }

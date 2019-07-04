@@ -37,26 +37,37 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import javax.measure.Quantity;
 import javax.measure.Unit;
 import javax.measure.quantity.Length;
 
-import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.function.Consumer4Double;
+import org.jeometry.common.math.Angle;
 import org.jeometry.common.number.Doubles;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
-import com.revolsys.geometry.cs.CoordinateSystem;
-import com.revolsys.geometry.cs.GeographicCoordinateSystem;
-import com.revolsys.geometry.cs.ProjectedCoordinateSystem;
+import com.revolsys.geometry.algorithm.LineIntersector;
+import com.revolsys.geometry.algorithm.LineStringLocation;
+import com.revolsys.geometry.algorithm.RayCrossingCounter;
+import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
+import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleGf;
-import com.revolsys.geometry.model.impl.LineStringDoubleBuilder;
+import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
+import com.revolsys.geometry.model.editor.LineStringEditor;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.metrics.PointLineStringMetrics;
 import com.revolsys.geometry.model.prep.PreparedLineString;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
@@ -66,8 +77,12 @@ import com.revolsys.geometry.model.vertex.AbstractVertex;
 import com.revolsys.geometry.model.vertex.LineStringVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.operation.BoundaryOp;
+import com.revolsys.geometry.operation.RectangleIntersection;
+import com.revolsys.geometry.operation.overlay.OverlayOp;
+import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
 import com.revolsys.geometry.util.GeometryProperties;
-import com.revolsys.util.MathUtil;
+import com.revolsys.geometry.util.Points;
+import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
@@ -90,6 +105,33 @@ import tec.uom.se.unit.Units;
  * @version 1.7
  */
 public interface LineString extends Lineal {
+  /**
+   * Code taken from DRA FME scripts to calculate angles.
+   *
+   * @param points
+   * @param i1
+   * @param i2
+   * @return
+   */
+  static double getAngle(final LineString points, final int i1, final int i2, final boolean start) {
+    final double x1 = points.getX(i1);
+    final double y1 = points.getY(i1);
+    final double x2 = points.getX(i2);
+    final double y2 = points.getY(i2);
+    if (Points.distance(x1, y1, x2, y2) == 0) { // TODO
+      if (start) {
+        if (i2 + 1 < points.getVertexCount()) {
+          return getAngle(points, i1, i2 + 1, start);
+        }
+      } else {
+        if (i1 - 1 > 0) {
+          return getAngle(points, i1 - 1, i2, start);
+        }
+      }
+    }
+    return Angle.angleNorthDegrees(x1, y1, x2, y2);
+  }
+
   @SuppressWarnings("unchecked")
   static <G extends Geometry> G newLineString(final Object value) {
     if (value == null) {
@@ -101,35 +143,7 @@ public interface LineString extends Lineal {
         ((Geometry)value).getGeometryType() + " cannot be converted to a LineString");
     } else {
       final String string = DataTypes.toString(value);
-      return (G)GeometryFactory.DEFAULT.geometry(string, false);
-    }
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V appendVertex(Point newPoint, final int... geometryId) {
-    if (geometryId.length == 0) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      if (newPoint == null || newPoint.isEmpty()) {
-        return (V)this;
-      } else if (isEmpty()) {
-        return newPoint.convertGeometry(geometryFactory);
-      } else {
-        newPoint = newPoint.convertGeometry(geometryFactory);
-        final int vertexCount = getVertexCount();
-        final double[] coordinates = getCoordinates();
-        final int axisCount = getAxisCount();
-        final double[] newCoordinates = new double[axisCount * (vertexCount + 1)];
-
-        final int length = vertexCount * axisCount;
-        System.arraycopy(coordinates, 0, newCoordinates, 0, length);
-        CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, vertexCount, newPoint);
-
-        return (V)newLineString(newCoordinates);
-      }
-    } else {
-      throw new IllegalArgumentException("Geometry id's for " + getGeometryType()
-        + " must have length 0. " + Arrays.toString(geometryId));
+      return (G)GeometryFactory.DEFAULT_3D.geometry(string, false);
     }
   }
 
@@ -143,8 +157,7 @@ public interface LineString extends Lineal {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final int axisCount = geometryFactory.getAxisCount();
     final int vertexCount = getVertexCount();
-    final LineStringDoubleBuilder newLine = new LineStringDoubleBuilder(geometryFactory,
-      vertexCount);
+    final LineStringEditor newLine = new LineStringEditor(geometryFactory, vertexCount);
     double x1 = getX(0);
     double y1 = getY(0);
     newLine.appendVertex(x1, y1);
@@ -156,7 +169,7 @@ public interface LineString extends Lineal {
     for (int vertexIndex = 1; vertexIndex < lastVertexIndex; vertexIndex++) {
       final double x2 = getX(vertexIndex);
       final double y2 = getY(vertexIndex);
-      if (MathUtil.distance(x1, y1, x2, y2) < maxDistance) {
+      if (Points.distance(x1, y1, x2, y2) < maxDistance) {
         // Skip vertex
       } else {
         newLine.appendVertex(x2, y2);
@@ -171,7 +184,7 @@ public interface LineString extends Lineal {
     }
     final double xn = getX(lastVertexIndex);
     final double yn = getY(lastVertexIndex);
-    if (lastVertexIndex > 2 && MathUtil.distance(x1, y1, xn, yn) < maxDistance) {
+    if (lastVertexIndex > 2 && Points.distance(x1, y1, xn, yn) < maxDistance) {
       final int newVertexIndex = newLine.getLastVertexIndex();
       for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
         final double coordinate = getCoordinate(lastVertexIndex, axisIndex);
@@ -218,23 +231,43 @@ public interface LineString extends Lineal {
     }
   }
 
-  default double[] convertCoordinates(GeometryFactory geometryFactory) {
+  default int compareVertex(final int vertexIndex1, final int vertexIndex2) {
+    final double x1 = getX(vertexIndex1);
+    final double y1 = getY(vertexIndex1);
+    final double x2 = getX(vertexIndex2);
+    final double y2 = getY(vertexIndex2);
+    return CoordinatesUtil.compare(x1, y1, x2, y2);
+  }
+
+  default int compareVertex(final int vertexIndex1, final LineString line2,
+    final int vertexIndex2) {
+    final double x1 = getX(vertexIndex1);
+    final double y1 = getY(vertexIndex1);
+    final double x2 = line2.getX(vertexIndex2);
+    final double y2 = line2.getY(vertexIndex2);
+    return CoordinatesUtil.compare(x1, y1, x2, y2);
+  }
+
+  default double[] convertCoordinates(GeometryFactory geometryFactory, final int axisCount) {
     final GeometryFactory sourceGeometryFactory = getGeometryFactory();
-    final double[] coordinates = getCoordinates();
+    final double[] targetCoordinates = getCoordinates(axisCount);
     if (isEmpty()) {
-      return coordinates;
+      return targetCoordinates;
     } else {
-      geometryFactory = Geometry.getNonZeroGeometryFactory(this, geometryFactory);
-      double[] targetCoordinates;
+      geometryFactory = getNonZeroGeometryFactory(geometryFactory);
       final CoordinatesOperation coordinatesOperation = sourceGeometryFactory
         .getCoordinatesOperation(geometryFactory);
       if (coordinatesOperation == null) {
-        return coordinates;
+        return targetCoordinates;
       } else {
-        final int sourceAxisCount = getAxisCount();
-        targetCoordinates = new double[sourceAxisCount * getVertexCount()];
-        coordinatesOperation.perform(sourceAxisCount, coordinates, sourceAxisCount,
-          targetCoordinates);
+        final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
+        final int coordinateCount = getVertexCount() * axisCount;
+        for (int coordinateOffset = 0; coordinateOffset < coordinateCount; coordinateOffset += axisCount) {
+          point.setPoint(targetCoordinates, coordinateOffset, axisCount);
+          coordinatesOperation.perform(point);
+          point.copyCoordinatesTo(targetCoordinates, coordinateOffset, axisCount);
+        }
+
         return targetCoordinates;
       }
     }
@@ -244,21 +277,27 @@ public interface LineString extends Lineal {
     final GeometryFactory geometryFactory, final double[] targetCoordinates) {
     final double x = getX(vertexIndex);
     final double y = getY(vertexIndex);
-    targetCoordinates[X] = x;
-    targetCoordinates[Y] = y;
+    final CoordinatesOperationPoint point = new CoordinatesOperationPoint(x, y);
     final CoordinatesOperation coordinatesOperation = getGeometryFactory()
       .getCoordinatesOperation(geometryFactory);
     if (coordinatesOperation != null) {
-      coordinatesOperation.perform(2, targetCoordinates, 2, targetCoordinates);
+      coordinatesOperation.perform(point);
     }
+    point.copyCoordinatesTo(targetCoordinates, 2);
   }
 
   default int copyCoordinates(final int axisCount, final double nanValue,
+    final double[] destCoordinates, final int destOffset) {
+    final int vertexCount = getVertexCount();
+    return copyCoordinates(axisCount, vertexCount, nanValue, destCoordinates, destOffset);
+  }
+
+  default int copyCoordinates(final int axisCount, final int vertexCount, final double nanValue,
     final double[] destCoordinates, int destOffset) {
     if (isEmpty()) {
       return destOffset;
     } else {
-      for (int vertexIndex = 0; vertexIndex < getVertexCount(); vertexIndex++) {
+      for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
         for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
           double coordinate = getCoordinate(vertexIndex, axisIndex);
           if (Double.isNaN(coordinate)) {
@@ -289,48 +328,20 @@ public interface LineString extends Lineal {
     }
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V deleteVertex(final int... vertexId) {
-    if (vertexId.length == 1) {
-      final int vertexIndex = vertexId[0];
-      return (V)deleteVertex(vertexIndex);
-    } else {
-      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
-        + " must have length 1. " + Arrays.toString(vertexId));
-    }
-  }
-
-  default LineString deleteVertex(final int vertexIndex) {
-    if (isEmpty()) {
-      throw new IllegalArgumentException("Cannot delete vertex for empty LineString");
-    } else {
-      final int vertexCount = getVertexCount();
-      if (vertexCount <= 2) {
-        throw new IllegalArgumentException("LineString must have a minimum of 2 vertices");
-      } else if (vertexIndex >= 0 && vertexIndex < vertexCount) {
-        final double[] coordinates = getCoordinates();
-        final int axisCount = getAxisCount();
-        final double[] newCoordinates = new double[axisCount * (vertexCount - 1)];
-        final int beforeLength = vertexIndex * axisCount;
-        if (vertexIndex > 0) {
-          System.arraycopy(coordinates, 0, newCoordinates, 0, beforeLength);
-        }
-        final int sourceIndex = (vertexIndex + 1) * axisCount;
-        final int length = (vertexCount - vertexIndex - 1) * axisCount;
-        System.arraycopy(coordinates, sourceIndex, newCoordinates, beforeLength, length);
-
-        return newLineString(newCoordinates);
-      } else {
-        throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
+  default void copyPoint(final int vertexIndex, final int axisCount, final double[] coordinates) {
+    if (vertexIndex < getVertexCount()) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        coordinates[axisIndex] = getCoordinate(vertexIndex, axisIndex);
       }
     }
   }
 
+  @Override
   default double distance(final double x, final double y) {
     return distance(x, y, 0);
   }
 
+  @Override
   default double distance(final double x, final double y, final double terminateDistance) {
     if (isEmpty()) {
       return Double.POSITIVE_INFINITY;
@@ -369,51 +380,55 @@ public interface LineString extends Lineal {
     }
   }
 
-  default double distance(LineString line, final double terminateDistance) {
+  default double distance(final LineString line, final double terminateDistance) {
     if (isEmpty()) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(line)) {
-      return 0.0;
+      return Double.POSITIVE_INFINITY;
     } else {
       final GeometryFactory geometryFactory = getGeometryFactory();
-      line = line.convertGeometry(geometryFactory, 2);
-      double minDistance = Double.MAX_VALUE;
-      for (final Segment segment1 : segments()) {
-        for (final Segment segment2 : line.segments()) {
-          final double distance = segment1.distance(segment2);
+      double minDistance = Double.POSITIVE_INFINITY;
+      final int vertexCount1 = getVertexCount();
+      final int vertexCount2 = line.getVertexCount();
+      final CoordinatesOperation coordinatesOperation = getGeometryFactory()
+        .getCoordinatesOperation(geometryFactory);
+      double line2x1 = line.getX(0);
+      double line2y1 = line.getY(0);
+      CoordinatesOperationPoint point = null;
+      if (coordinatesOperation != null) {
+        point = new CoordinatesOperationPoint(line2x1, line2y1);
+        coordinatesOperation.perform(point);
+        line2x1 = point.x;
+        line2y1 = point.y;
+      }
+      for (int vertexIndex2 = 1; vertexIndex2 < vertexCount2; vertexIndex2++) {
+        double line2x2 = line.getX(vertexIndex2);
+        double line2y2 = line.getY(vertexIndex2);
+        if (coordinatesOperation != null) {
+          point.setPoint(line2x2, line2y2);
+          coordinatesOperation.perform(point);
+          line2x2 = point.x;
+          line2y2 = point.y;
+        }
+        double line1x1 = getX(0);
+        double line1y1 = getY(0);
+        for (int vertexIndex1 = 1; vertexIndex1 < vertexCount1; vertexIndex1++) {
+          final double line1x2 = getX(vertexIndex1);
+          final double line1y2 = getY(vertexIndex1);
+
+          final double distance = LineSegmentUtil.distanceLineLine(line1x1, line1y1, line1x2,
+            line1y2, line2x1, line2y1, line2x2, line2y2);
           if (distance < minDistance) {
             minDistance = distance;
             if (minDistance <= terminateDistance) {
               return minDistance;
             }
           }
+          line1x1 = line1x2;
+          line1y1 = line1y2;
         }
-      }
-      return minDistance;
-    }
-  }
-
-  default double distance(final Point point) {
-    return distance(point, 0.0);
-  }
-
-  default double distance(Point point, final double terminateDistance) {
-    if (isEmpty()) {
-      return 0.0;
-    } else if (Property.isEmpty(point)) {
-      return 0.0;
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convertGeometry(geometryFactory, 2);
-      double minDistance = Double.MAX_VALUE;
-      for (final Segment segment : segments()) {
-        final double distance = segment.distance(point);
-        if (distance < minDistance) {
-          minDistance = distance;
-          if (minDistance <= terminateDistance) {
-            return minDistance;
-          }
-        }
+        line2x1 = line2x2;
+        line2y1 = line2y2;
       }
       return minDistance;
     }
@@ -426,52 +441,77 @@ public interface LineString extends Lineal {
       double distanceAlongSegments = 0;
       double closestDistance = Double.MAX_VALUE;
       double distanceAlong = 0;
-      final double resolutionXy = getGeometryFactory().getResolutionXy();
-      for (final Segment segment : segments()) {
-        if (segment.equalsVertex(0, point)) {
-          return distanceAlongSegments;
-        } else {
-          final double segmentLength = segment.getLength();
-          final double distance = segment.distance(point);
-          final double projectionFactor = segment.projectionFactor(point);
-          if (distance < resolutionXy) {
-            return distanceAlongSegments + segment.getPoint(0).distance(point);
-          } else if (distance < closestDistance) {
-            closestDistance = distance;
-            if (projectionFactor == 0) {
-              distanceAlong = distanceAlongSegments;
-            } else if (projectionFactor < 0) {
-              if (segment.getSegmentIndex() == 0) {
-                distanceAlong = segmentLength * projectionFactor;
-              } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final double x = point.getX();
+      final double y = point.getY();
+      final double resolutionXy = geometryFactory.getResolutionX();
+      final int vertexCount = getVertexCount();
+      if (vertexCount > 0) {
+        double x1 = getX(0);
+        double y1 = getY(0);
+        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+          final double x2 = getX(vertexIndex);
+          final double y2 = getY(vertexIndex);
+          if (x1 == x && y1 == y) {
+            return distanceAlongSegments;
+          } else {
+            final double segmentLength = Points.distance(x1, y1, x2, y2);
+            final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+            final double projectionFactor = LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
+            if (distance < resolutionXy) {
+              return distanceAlongSegments + Points.distance(x1, y1, x, y);
+            } else if (distance < closestDistance) {
+              closestDistance = distance;
+              if (projectionFactor == 0) {
                 distanceAlong = distanceAlongSegments;
-              }
-            } else if (projectionFactor >= 1) {
-              if (segment.isLineEnd()) {
-                distanceAlong = distanceAlongSegments + segmentLength * projectionFactor;
+              } else if (projectionFactor < 0) {
+                if (vertexIndex == 1) {
+                  distanceAlong = segmentLength * projectionFactor;
+                } else {
+                  distanceAlong = distanceAlongSegments;
+                }
+              } else if (projectionFactor >= 1) {
+                if (vertexIndex == vertexCount - 1) {
+                  distanceAlong = distanceAlongSegments + segmentLength * projectionFactor;
+                } else {
+                  distanceAlong = distanceAlongSegments + segmentLength;
+                }
               } else {
-                distanceAlong = distanceAlongSegments + segmentLength;
+                distanceAlong = distanceAlongSegments + segmentLength * projectionFactor;
               }
-            } else {
-              distanceAlong = distanceAlongSegments + segmentLength * projectionFactor;
             }
+            distanceAlongSegments += segmentLength;
           }
-          distanceAlongSegments += segmentLength;
+
+          x1 = x2;
+          y1 = y2;
         }
       }
       return distanceAlong;
     }
   }
 
+  default double distanceVertex(final int index, final double x, final double y) {
+    final double x1 = getX(index);
+    final double y1 = getY(index);
+    return Points.distance(x1, y1, x, y);
+  }
+
   default double distanceVertex(final int index, final Point point) {
-    if (index < getVertexCount()) {
-      final double x1 = getX(index);
-      final double y1 = getY(index);
-      final double x2 = point.getX();
-      final double y2 = point.getY();
-      return MathUtil.distance(x1, y1, x2, y2);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Point convertedPoint = point.convertPoint2d(geometryFactory);
+    final double x = convertedPoint.getX();
+    final double y = convertedPoint.getY();
+    return distanceVertex(index, x, y);
+  }
+
+  default LineString editLine(final Consumer<LineStringEditor> edit) {
+    final LineStringEditor editor = newGeometryEditor();
+    edit.accept(editor);
+    if (editor.isModified()) {
+      return editor.newGeometry();
     } else {
-      return Double.NaN;
+      return this;
     }
   }
 
@@ -554,6 +594,33 @@ public interface LineString extends Lineal {
     }
   }
 
+  default boolean equalsVertex(final int vertexIndex, final double x, final double y) {
+    final double x1 = getX(vertexIndex);
+    if (Double.compare(x, x1) == 0) {
+      final double y1 = getY(vertexIndex);
+      if (Double.compare(y, y1) == 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  default boolean equalsVertex(final int axisCount, final int vertexIndex,
+    final double... coordinates) {
+    if (isEmpty() || coordinates == null || coordinates.length < axisCount) {
+      return false;
+    } else {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        final double coordinate = coordinates[axisIndex];
+        final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
+        if (!Doubles.equal(coordinate, matchCoordinate)) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+
   default boolean equalsVertex(final int axisCount, final int vertexIndex1,
     final int vertexIndex2) {
     if (isEmpty()) {
@@ -580,20 +647,24 @@ public interface LineString extends Lineal {
     }
   }
 
-  default boolean equalsVertex(final int axisCount, final int vertexIndex, Point point) {
+  default boolean equalsVertex(final int axisCount, final int vertexIndex, final Point point) {
     if (isEmpty() || Property.isEmpty(point)) {
       return false;
     } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convertGeometry(geometryFactory, axisCount);
-      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-        final double coordinate = point.getCoordinate(axisIndex);
-        final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
-        if (!Doubles.equal(coordinate, matchCoordinate)) {
-          return false;
+      final Point projectedPoint = point.as2d(this);
+      if (getX(vertexIndex) == projectedPoint.getX()) {
+        if (getY(vertexIndex) == projectedPoint.getY()) {
+          for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+            final double coordinate = point.getCoordinate(axisIndex);
+            final double matchCoordinate = getCoordinate(vertexIndex, axisIndex);
+            if (!Doubles.equal(coordinate, matchCoordinate)) {
+              return false;
+            }
+          }
+          return true;
         }
       }
-      return true;
+      return false;
     }
   }
 
@@ -606,6 +677,31 @@ public interface LineString extends Lineal {
     }
   }
 
+  default boolean equalsVertex2d(final int vertexIndex, final double x, final double y) {
+    final double x1 = getX(vertexIndex);
+    if (x1 == x) {
+      final double y1 = getY(vertexIndex);
+      if (y1 == y) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  default boolean equalsVertex2d(final int vertexIndex1, final int vertexIndex2) {
+    final double x1 = getX(vertexIndex1);
+    final double x2 = getX(vertexIndex2);
+    if (x1 == x2) {
+      final double y1 = getY(vertexIndex1);
+      final double y2 = getY(vertexIndex2);
+      if (y1 == y2) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   default Pair<GeometryComponent, Double> findClosestGeometryComponent(final double x,
     final double y) {
     if (isEmpty()) {
@@ -620,7 +716,7 @@ public interface LineString extends Lineal {
         final AbstractVertex closestVertex = getVertex(0);
         return new Pair<>(closestVertex, 0.0);
       } else {
-        double closestDistance = geometryFactory.makePrecise(0, MathUtil.distance(x, y, x1, y1));
+        double closestDistance = geometryFactory.makePrecise(0, Points.distance(x, y, x1, y1));
 
         final int vertexCount = getVertexCount();
         for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
@@ -630,8 +726,7 @@ public interface LineString extends Lineal {
             final AbstractVertex closestVertex = getVertex(vertexIndex);
             return new Pair<>(closestVertex, 0.0);
           } else {
-            final double toDistance = geometryFactory.makePrecise(0,
-              MathUtil.distance(x, y, x2, y2));
+            final double toDistance = geometryFactory.makePrecise(0, Points.distance(x, y, x2, y2));
             if (toDistance <= closestDistance) {
               if (!closestIsVertex || toDistance < closestDistance) {
                 closestIndex = vertexIndex;
@@ -664,10 +759,92 @@ public interface LineString extends Lineal {
     }
   }
 
+  @Override
   default Pair<GeometryComponent, Double> findClosestGeometryComponent(Point point) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     point = point.convertPoint2d(geometryFactory);
     return findClosestGeometryComponent(point.getX(), point.getY());
+  }
+
+  default void forEachLineVertex(final BiConsumerDouble firstPointAction,
+    final BiConsumerDouble action) {
+    if (!isEmpty()) {
+      final int vertexCount = getVertexCount();
+      final double x1 = getX(0);
+      final double y1 = getY(0);
+      firstPointAction.accept(x1, y1);
+      for (int i = 0; i < vertexCount; i++) {
+        final double x = getX(i);
+        final double y = getY(i);
+        action.accept(x, y);
+      }
+    }
+  }
+
+  @Override
+  default void forEachSegment(final Consumer4Double action) {
+    final int vertexCount = getVertexCount();
+    double x1 = getX(0);
+    double y1 = getY(0);
+    for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+      final double x2 = getX(vertexIndex);
+      final double y2 = getY(vertexIndex);
+      action.accept(x1, y1, x2, y2);
+      x1 = x2;
+      y1 = y2;
+    }
+  }
+
+  @Override
+  default void forEachVertex(final BiConsumerDouble action) {
+    if (!isEmpty()) {
+      final int vertexCount = getVertexCount();
+      for (int i = 0; i < vertexCount; i++) {
+        final double x1 = getX(i);
+        final double y1 = getY(i);
+        action.accept(x1, y1);
+      }
+    }
+  }
+
+  @Override
+  default void forEachVertex(final Consumer3Double action) {
+    if (!isEmpty()) {
+      final int vertexCount = getVertexCount();
+      for (int i = 0; i < vertexCount; i++) {
+        final double x = getX(i);
+        final double y = getY(i);
+        final double z = getZ(i);
+        action.accept(x, y, z);
+      }
+    }
+  }
+
+  @Override
+  default void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
+    final int vertexCount = getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += 1) {
+      final double x = getCoordinate(vertexIndex, 0);
+      final double y = getCoordinate(vertexIndex, 1);
+      final double z = getCoordinate(vertexIndex, 2);
+      point.setPoint(x, y, z);
+      coordinatesOperation.perform(point);
+      action.accept(point);
+    }
+  }
+
+  @Override
+  default void forEachVertex(final CoordinatesOperationPoint point,
+    final Consumer<CoordinatesOperationPoint> action) {
+    final int vertexCount = getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex += 1) {
+      final double x = getCoordinate(vertexIndex, 0);
+      final double y = getCoordinate(vertexIndex, 1);
+      final double z = getCoordinate(vertexIndex, 2);
+      point.setPoint(x, y, z);
+      action.accept(point);
+    }
   }
 
   /**
@@ -709,18 +886,26 @@ public interface LineString extends Lineal {
 
     // find distinct point before highest point
     int iPrev = hiIndex;
+    double xPrev;
+    double yPrev;
     do {
       iPrev = iPrev - 1;
       if (iPrev < 0) {
         iPrev = pointCount;
       }
-    } while (equalsVertex(iPrev, hiPtX, hiPtY) && iPrev != hiIndex);
+      xPrev = getX(iPrev);
+      yPrev = getY(iPrev);
+    } while (xPrev == hiPtX && yPrev == hiPtY && iPrev != hiIndex);
 
     // find distinct point after highest point
     int iNext = hiIndex;
+    double xNext;
+    double yNext;
     do {
       iNext = (iNext + 1) % pointCount;
-    } while (equalsVertex(iNext, hiPtX, hiPtY) && iNext != hiIndex);
+      xNext = getX(iNext);
+      yNext = getY(iNext);
+    } while (xNext == hiPtX && yNext == hiPtY && iNext != hiIndex);
 
     /**
      * This check catches cases where the ring contains an A-B-A configuration
@@ -728,11 +913,13 @@ public interface LineString extends Lineal {
      * (including the case where the input array has fewer than 4 elements), or
      * it contains coincident line segments.
      */
-    if (equalsVertex(iPrev, hiPtX, hiPtY) || equalsVertex(iNext, hiPtX, hiPtY)
-      || equalsVertex(2, iPrev, iNext)) {
+    if (xPrev == hiPtX && yPrev == hiPtY) {
+      return ClockDirection.CLOCKWISE;
+    } else if (xNext == hiPtX && yNext == hiPtY) {
+      return ClockDirection.CLOCKWISE;
+    } else if (xNext == xPrev && yNext == yPrev) {
       return ClockDirection.CLOCKWISE;
     }
-
     final int disc = orientationIndex(iPrev, hiIndex, iNext);
 
     /**
@@ -761,6 +948,19 @@ public interface LineString extends Lineal {
 
   double getCoordinate(int vertexIndex, final int axisIndex);
 
+  @Override
+  default double getCoordinate(final int partIndex, final int vertexIndex, final int axisIndex) {
+    if (partIndex == 0) {
+      return getCoordinate(vertexIndex, axisIndex);
+    } else {
+      return Double.NaN;
+    }
+  }
+
+  default double getCoordinateFast(final int vertexIndex, final int axisIndex) {
+    return getCoordinate(vertexIndex, axisIndex);
+  }
+
   double[] getCoordinates();
 
   default double[] getCoordinates(final int axisCount) {
@@ -769,9 +969,10 @@ public interface LineString extends Lineal {
     } else if (isEmpty()) {
       return new double[0];
     } else {
-      final double[] coordinates = new double[axisCount * getVertexCount()];
+      final int vertexCount = getVertexCount();
+      final double[] coordinates = new double[axisCount * vertexCount];
       int i = 0;
-      for (int vertexIndex = 0; vertexIndex < getVertexCount(); vertexIndex++) {
+      for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
         for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
           final double coordinate = getCoordinate(vertexIndex, axisIndex);
           coordinates[i++] = coordinate;
@@ -782,8 +983,8 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  default DataType getDataType() {
-    return DataTypes.LINE_STRING;
+  default GeometryDataType<LineString, LineStringEditor> getDataType() {
+    return GeometryDataTypes.LINE_STRING;
   }
 
   @Override
@@ -832,9 +1033,11 @@ public interface LineString extends Lineal {
 
   @Override
   default double getLength(final Unit<Length> unit) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
     double length = 0;
-    final CoordinateSystem coordinateSystem = getCoordinateSystem();
-    if (coordinateSystem instanceof GeographicCoordinateSystem) {
+    final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
+    if (geometryFactory.isGeographic()) {
+      final GeographicCoordinateSystem geographicCoordinateSystem = (GeographicCoordinateSystem)coordinateSystem;
       final int vertexCount = getVertexCount();
       if (vertexCount > 1) {
         double lon0 = getX(0);
@@ -842,16 +1045,15 @@ public interface LineString extends Lineal {
         for (int i = 1; i < vertexCount; i++) {
           final double lon1 = getX(i);
           final double lat1 = getY(i);
-          length += GeographicCoordinateSystem.distanceMetres(lon0, lat0, lon1, lat1);
+          length += geographicCoordinateSystem.distanceMetres(lon0, lat0, lon1, lat1);
           lon0 = lon1;
           lat0 = lat1;
         }
       }
       final Quantity<Length> lengthMeasure = Quantities.getQuantity(length, Units.METRE);
       length = QuantityType.doubleValue(lengthMeasure, unit);
-    } else if (coordinateSystem instanceof ProjectedCoordinateSystem) {
-      final ProjectedCoordinateSystem projectedCoordinateSystem = (ProjectedCoordinateSystem)coordinateSystem;
-      final Unit<Length> lengthUnit = projectedCoordinateSystem.getLengthUnit();
+    } else if (geometryFactory.isProjected()) {
+      final Unit<Length> lengthUnit = geometryFactory.getHorizontalLengthUnit();
 
       length = getLength();
       final Quantity<Length> lengthMeasure = Quantities.getQuantity(length, lengthUnit);
@@ -871,16 +1073,138 @@ public interface LineString extends Lineal {
     }
   }
 
+  /**
+   * Get the
+   * @author Paul Austin <paul.austin@revolsys.com>
+   * @param x
+   * @param y
+   * @param maxDistance
+   * @return
+   */
+  default LineStringLocation getLineStringLocation(final double x, final double y) {
+    double minDistance = Double.POSITIVE_INFINITY;
+    int minSegmentIndex = 0;
+    double minFraction = -1.0;
+
+    double x1 = getX(0);
+    double y1 = getY(0);
+    if (x1 == x && y1 == y) {
+      minDistance = 0;
+      minFraction = 0;
+    } else {
+      final int vertexCount = getVertexCount();
+      for (int vertexIndex = 1; vertexIndex < vertexCount && minDistance > 0; vertexIndex++) {
+        final double x2 = getX(vertexIndex);
+        final double y2 = getY(vertexIndex);
+        if (x2 == x && y2 == y) {
+          minSegmentIndex = vertexIndex - 1;
+          minDistance = 0;
+          minFraction = 1.0;
+        } else {
+          final double segmentDistance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+          if (segmentDistance < minDistance) {
+            minSegmentIndex = vertexIndex - 1;
+            minFraction = LineSegmentUtil.segmentFractionOnLine(x1, y1, x2, y2, x, y);
+            minDistance = segmentDistance;
+          }
+          x1 = x2;
+          y1 = y2;
+        }
+      }
+    }
+    if (minFraction >= 0) {
+      return new LineStringLocation(this, minSegmentIndex, minFraction, minDistance);
+    } else {
+      return null;
+    }
+  }
+
   default double getM(final int vertexIndex) {
     return getCoordinate(vertexIndex, 3);
   }
 
+  /**
+   * Computes the Maximal Nearest Subline of a given linestring relative to
+   * another linestring. The Maximal Nearest Subline of A relative to B is the
+   * shortest subline of A which contains all the points of A which are the
+   * nearest points to the points in B. This effectively "trims" the ends of A
+   * which are not near to B.
+   * <p>
+   * An exact computation of the MNS would require computing a line Voronoi. For
+   * this reason, the algorithm used in this class is heuristic-based. It may
+   * compute a geometry which is shorter than the actual MNS.
+   */
+  default LineString getMaximalNearestSubline(LineString line) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    line = line.convertGeometry(geometryFactory);
+    LineStringLocation fromLocation = null;
+
+    LineStringLocation toLocation = null;
+
+    /**
+    * The basic strategy is to pick test points on B and find their nearest
+    * point on A. The interval containing these nearest points is approximately
+    * the MaximalNeareastSubline of A.
+    */
+
+    {
+
+      final int vertexCount2 = line.getVertexCount();
+      for (int vertexIndex2 = 0; vertexIndex2 < vertexCount2; vertexIndex2++) {
+        final double x = line.getX(vertexIndex2);
+        final double y = line.getY(vertexIndex2);
+        final LineStringLocation location = getLineStringLocation(x, y);
+        if (location != null) {
+          if (fromLocation == null || location.compareTo(fromLocation) < 0) {
+            fromLocation = location;
+          }
+          if (toLocation == null || location.compareTo(toLocation) > 0) {
+            toLocation = location;
+          }
+        }
+      }
+    }
+
+    /**
+    * Heuristic #2: find the nearest point on B to all vertices of A and use
+    * those points of B as test points. For efficiency use only vertices of A
+    * outside current max interval.
+    */
+    if (fromLocation != null) {
+      final int vertexCount1 = getVertexCount();
+      for (int vertexIndex1 = 0; vertexIndex1 < vertexCount1; vertexIndex1++) {
+        final double x = getX(vertexIndex1);
+        final double y = getY(vertexIndex1);
+
+        if (vertexIndex1 <= fromLocation.getSegmentIndex()
+          || vertexIndex1 > toLocation.getSegmentIndex()) {
+          final LineStringLocation location2 = line.getLineStringLocation(x, y);
+          if (location2 != null) {
+            final Point point2 = location2.getPoint();
+            final double x2 = point2.getX();
+            final double y2 = point2.getY();
+            final LineStringLocation location = getLineStringLocation(x2, y2);
+            if (fromLocation == null || location.compareTo(fromLocation) < 0) {
+              fromLocation = location;
+            }
+            if (toLocation == null || location.compareTo(toLocation) > 0) {
+              toLocation = location;
+            }
+          }
+        }
+      }
+    }
+    return subLine(fromLocation, toLocation);
+  }
+
   default PointLineStringMetrics getMetrics(Point point) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    point = point.convertGeometry(geometryFactory, 2);
+    point = point.as2d(geometryFactory);
     if (isEmpty() && point.isEmpty()) {
       return PointLineStringMetrics.EMPTY;
     } else {
+      final double x = point.getX();
+      final double y = point.getY();
       double lineLength = 0;
       double closestDistance = Double.MAX_VALUE;
       double distanceAlong = 0;
@@ -891,50 +1215,60 @@ public interface LineString extends Lineal {
       } else {
         resolutionXy = 0.001;
       }
-      for (final Segment segment : segments()) {
-        final double distance = segment.distance(point);
-        final double segmentLength = segment.getLength();
-        final double projectionFactor = segment.projectionFactor(point);
-        final boolean isEnd = segment.isLineEnd();
-        if (segment.isLineStart()) {
-          if (isEnd || projectionFactor <= 1) {
-            if (distance < resolutionXy) {
-              side = null;
-            } else {
-              side = segment.getSide(point);
-            }
-            closestDistance = distance;
-            if (projectionFactor <= 1 || isEnd) {
-              distanceAlong = segmentLength * projectionFactor;
-            } else {
-              distanceAlong = segmentLength;
-            }
-          }
-        } else if (distance < closestDistance) {
-          if (isEnd || projectionFactor <= 1) {
-            closestDistance = distance;
-            if (distance == 0 || distance < resolutionXy) {
-              side = null;
-            } else {
-              side = segment.getSide(point);
-            }
-            // TODO handle intermediate cases right right hand bends in lines
-            if (projectionFactor == 0) {
-              distanceAlong = lineLength;
-            } else if (projectionFactor < 0) {
-              distanceAlong = lineLength;
-            } else if (projectionFactor >= 1) {
-              if (isEnd) {
-                distanceAlong = lineLength + segmentLength * projectionFactor;
+      final int vertexCount = getVertexCount();
+      if (vertexCount > 0) {
+        double x1 = getX(0);
+        double y1 = getY(0);
+        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+          final double x2 = getX(vertexIndex);
+          final double y2 = getY(vertexIndex);
+
+          final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+          final double segmentLength = Points.distance(x1, y1, x2, y2);
+          final double projectionFactor = LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
+          final boolean isEnd = vertexIndex == vertexCount - 1;
+          if (vertexIndex == 1) {
+            if (isEnd || projectionFactor <= 1) {
+              if (distance < resolutionXy) {
+                side = null;
               } else {
-                distanceAlong = lineLength + segmentLength;
+                side = Side.getSide(x1, y1, x2, y2, x, y);
               }
-            } else {
-              distanceAlong = lineLength + segmentLength * projectionFactor;
+              closestDistance = distance;
+              if (projectionFactor <= 1 || isEnd) {
+                distanceAlong = segmentLength * projectionFactor;
+              } else {
+                distanceAlong = segmentLength;
+              }
+            }
+          } else if (distance < closestDistance) {
+            if (isEnd || projectionFactor <= 1) {
+              closestDistance = distance;
+              if (distance == 0 || distance < resolutionXy) {
+                side = null;
+              } else {
+                side = Side.getSide(x1, y1, x2, y2, x, y);
+              }
+              // TODO handle intermediate cases right right hand bends in lines
+              if (projectionFactor == 0) {
+                distanceAlong = lineLength;
+              } else if (projectionFactor < 0) {
+                distanceAlong = lineLength;
+              } else if (projectionFactor >= 1) {
+                if (isEnd) {
+                  distanceAlong = lineLength + segmentLength * projectionFactor;
+                } else {
+                  distanceAlong = lineLength + segmentLength;
+                }
+              } else {
+                distanceAlong = lineLength + segmentLength * projectionFactor;
+              }
             }
           }
+          lineLength += segmentLength;
+          x1 = x2;
+          y1 = y2;
         }
-        lineLength += segmentLength;
       }
       return new PointLineStringMetrics(lineLength, distanceAlong, closestDistance, side);
     }
@@ -965,10 +1299,11 @@ public interface LineString extends Lineal {
     if (isEmpty()) {
       return null;
     } else {
+      final int vertexCount = getVertexCount();
       while (vertexIndex < 0) {
-        vertexIndex += getVertexCount();
+        vertexIndex += vertexCount;
       }
-      if (vertexIndex > getVertexCount()) {
+      if (vertexIndex > vertexCount) {
         return null;
       } else {
         final int axisCount = getAxisCount();
@@ -980,6 +1315,18 @@ public interface LineString extends Lineal {
         return geometryFactory.point(coordinates);
       }
     }
+  }
+
+  /**
+   * Get a {@link PointDoubleXY} for the vertex.
+   *
+   * @param vertexIndex
+   * @return
+   */
+  default PointDoubleXY getPoint2D(final int vertexIndex) {
+    final double x = getX(vertexIndex);
+    final double y = getY(vertexIndex);
+    return new PointDoubleXY(x, y);
   }
 
   @Override
@@ -996,7 +1343,7 @@ public interface LineString extends Lineal {
         for (int i = 1; i < numPoints && currentLength < midPointLength; i++) {
           final Point p1 = getPoint(i - 1);
           final Point p2 = getPoint(i);
-          final double segmentLength = p1.distance(p2);
+          final double segmentLength = p1.distancePoint(p2);
           if (segmentLength + currentLength >= midPointLength) {
             final Point midPoint = LineSegmentUtil.project(geometryFactory, p1, p2,
               (midPointLength - currentLength) / segmentLength);
@@ -1036,11 +1383,10 @@ public interface LineString extends Lineal {
     }
   }
 
-  default Side getSide(Point point) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    point = point.convertGeometry(geometryFactory, 2);
+  default Side getSide(final double x, final double y) {
     Side side = null;
-    if (!isEmpty() && !point.isEmpty()) {
+    if (!isEmpty()) {
+      final GeometryFactory geometryFactory = getGeometryFactory();
       double closestDistance = Double.MAX_VALUE;
       final double resolutionXy;
       if (geometryFactory.isGeographic()) {
@@ -1048,32 +1394,53 @@ public interface LineString extends Lineal {
       } else {
         resolutionXy = 0.001;
       }
-      for (final Segment segment : segments()) {
-        final double distance = segment.distance(point);
-        final double projectionFactor = segment.projectionFactor(point);
-        final boolean isEnd = segment.isLineEnd();
-        if (segment.isLineStart()) {
-          if (isEnd || projectionFactor <= 1) {
-            if (distance < resolutionXy) {
-              side = null;
-            } else {
-              side = segment.getSide(point);
+      final int vertexCount = getVertexCount();
+      final int lastVertexIndex = vertexCount - 1;
+      if (vertexCount > 1) {
+        final double x1 = getX(0);
+        final double y1 = getY(0);
+        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+          final double x2 = getX(vertexIndex);
+          final double y2 = getY(vertexIndex);
+
+          final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+          final double projectionFactor = LineSegmentUtil.projectionFactor(x1, y1, x2, y2, x, y);
+          final boolean isEnd = vertexCount == lastVertexIndex;
+          if (vertexIndex == 1) {
+            if (isEnd || projectionFactor <= 1) {
+              if (distance < resolutionXy) {
+                side = null;
+              } else {
+                side = Side.getSide(x1, y1, x2, y2, x, y);
+              }
+              closestDistance = distance;
             }
-            closestDistance = distance;
-          }
-        } else if (distance < closestDistance) {
-          if (isEnd || projectionFactor <= 1) {
-            closestDistance = distance;
-            if (distance == 0 || distance < resolutionXy) {
-              side = null;
-            } else {
-              side = segment.getSide(point);
+          } else if (distance < closestDistance) {
+            if (isEnd || projectionFactor <= 1) {
+              closestDistance = distance;
+              if (distance == 0 || distance < resolutionXy) {
+                side = null;
+              } else {
+                side = Side.getSide(x1, y1, x2, y2, x, y);
+              }
             }
           }
         }
       }
     }
     return side;
+  }
+
+  default Side getSide(Point point) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    point = point.convertGeometry(geometryFactory, 2);
+    if (point.isEmpty()) {
+      return null;
+    } else {
+      final double x = point.getX();
+      final double y = point.getY();
+      return getSide(x, y);
+    }
   }
 
   default Point getToPoint() {
@@ -1088,15 +1455,17 @@ public interface LineString extends Lineal {
   @Override
   default AbstractVertex getToVertex(final int... vertexId) {
     if (vertexId.length == 1) {
-      int vertexIndex = vertexId[0];
-      final int vertexCount = getVertexCount();
-      vertexIndex = vertexCount - vertexIndex - 1;
-      if (vertexIndex < vertexCount) {
-        while (vertexIndex < 0) {
-          vertexIndex += vertexCount;
-        }
-        return new LineStringVertex(this, vertexIndex);
-      }
+      final int vertexIndex = vertexId[0];
+      return getToVertex(vertexIndex);
+    }
+    return null;
+  }
+
+  default AbstractVertex getToVertex(int vertexIndex) {
+    final int vertexCount = getVertexCount();
+    vertexIndex = vertexCount - vertexIndex - 1;
+    if (vertexIndex >= 0 && vertexIndex < vertexCount) {
+      return new LineStringVertex(this, vertexIndex);
     }
     return null;
   }
@@ -1104,28 +1473,80 @@ public interface LineString extends Lineal {
   @Override
   default AbstractVertex getVertex(final int... vertexId) {
     if (vertexId.length == 1) {
-      int vertexIndex = vertexId[0];
-      final int vertexCount = getVertexCount();
-      if (vertexIndex < vertexCount) {
-        while (vertexIndex < 0) {
-          vertexIndex += vertexCount;
-        }
-        return new LineStringVertex(this, vertexIndex);
-      }
+      final int vertexIndex = vertexId[0];
+      return getVertex(vertexIndex);
+    } else {
+      return null;
     }
-    return null;
+  }
+
+  default AbstractVertex getVertex(int vertexIndex) {
+    final int vertexCount = getVertexCount();
+    if (vertexIndex < vertexCount) {
+      while (vertexIndex < 0) {
+        vertexIndex += vertexCount;
+      }
+      return new LineStringVertex(this, vertexIndex);
+    } else {
+      return null;
+    }
+  }
+
+  default double getX(final End end) {
+    if (end.isFrom()) {
+      return getX(0);
+    } else {
+      final int lastVertexIndex = getLastVertexIndex();
+      return getX(lastVertexIndex);
+    }
   }
 
   default double getX(final int vertexIndex) {
-    return getCoordinate(vertexIndex, 0);
+    return getCoordinate(vertexIndex, X);
+  }
+
+  default double getY(final End end) {
+    if (end.isFrom()) {
+      return getY(0);
+    } else {
+      final int lastVertexIndex = getLastVertexIndex();
+      return getY(lastVertexIndex);
+    }
   }
 
   default double getY(final int vertexIndex) {
-    return getCoordinate(vertexIndex, 1);
+    return getCoordinate(vertexIndex, Y);
   }
 
   default double getZ(final int vertexIndex) {
-    return getCoordinate(vertexIndex, 2);
+    return getCoordinate(vertexIndex, Z);
+  }
+
+  @Override
+  default boolean hasInvalidXyCoordinates() {
+    final int vertexCount = getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = getX(vertexIndex);
+      if (!Double.isFinite(x)) {
+        return true;
+      }
+      final double y = getY(vertexIndex);
+
+      if (!Double.isFinite(y)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  default boolean hasVertex(final double x, final double y) {
+    final int vertexCount = getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      if (equalsVertex2d(vertexIndex, x, y)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   default boolean hasVertex(final Point point) {
@@ -1139,63 +1560,69 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V insertVertex(Point newPoint, final int... vertexId) {
-    if (vertexId.length == 1) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      if (newPoint == null || newPoint.isEmpty()) {
-        return (V)this;
-      } else if (isEmpty()) {
-        return newPoint.convertGeometry(geometryFactory);
-      } else {
-        newPoint = newPoint.convertGeometry(geometryFactory);
-        final int vertexCount = getVertexCount();
-        final double[] coordinates = getCoordinates();
-        final int axisCount = getAxisCount();
-        final double[] newCoordinates = new double[axisCount * (vertexCount + 1)];
-
-        final int vertexIndex = vertexId[0];
-
-        final int beforeLength = vertexIndex * axisCount;
-        System.arraycopy(coordinates, 0, newCoordinates, 0, beforeLength);
-
-        CoordinatesListUtil.setCoordinates(newCoordinates, axisCount, vertexIndex, newPoint);
-
-        final int afterSourceIndex = vertexIndex * axisCount;
-        final int afterNewIndex = (vertexIndex + 1) * axisCount;
-        final int afterLength = (vertexCount - vertexIndex) * axisCount;
-        System.arraycopy(coordinates, afterSourceIndex, newCoordinates, afterNewIndex, afterLength);
-
-        return (V)newLineString(newCoordinates);
-      }
+  default Geometry intersectionBbox(final BoundingBox boundingBox) {
+    notNullSameCs(boundingBox);
+    if (bboxCoveredBy(boundingBox)) {
+      return this;
     } else {
-      throw new IllegalArgumentException("Geometry id's for " + getGeometryType()
-        + " must have length 1. " + Arrays.toString(vertexId));
+      if (isEmpty()) {
+        return this;
+      } else if (this instanceof LinearRing) {
+        return SnapIfNeededOverlayOp.overlayOp(this, boundingBox.toRectangle(),
+          OverlayOp.INTERSECTION);
+      } else {
+        final RectangleIntersection rectangleIntersection = new RectangleIntersection();
+        return rectangleIntersection.intersectionLine(this, boundingBox);
+      }
     }
   }
 
   @Override
-  default boolean intersects(final BoundingBox boundingBox) {
+  default boolean intersectsBbox(final BoundingBox boundingBox) {
     if (isEmpty() || boundingBox.isEmpty()) {
       return false;
     } else {
-      final GeometryFactory geometryFactory = boundingBox.getGeometryFactory().convertAxisCount(2);
-      double previousX = Double.NaN;
-      double previousY = Double.NaN;
+      final double minX = boundingBox.getMinX();
+      final double maxX = boundingBox.getMaxX();
+      final double minY = boundingBox.getMinY();
+      final double maxY = boundingBox.getMaxY();
+      final int vertexCount = getVertexCount();
+      final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
+      final CoordinatesOperation coordinatesOperation = getCoordinatesOperation(geometryFactory);
+      if (coordinatesOperation == null) {
+        double previousX = getX(0);
+        double previousY = getY(0);
 
-      final double[] coordinates = new double[2];
-      for (final Vertex vertex : vertices()) {
-        vertex.copyCoordinates(geometryFactory, coordinates);
-        final double x = coordinates[0];
-        final double y = coordinates[1];
-        if (!Double.isNaN(previousX)) {
-          if (boundingBox.intersects(previousX, previousY, x, y)) {
+        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+          final double x = getX(vertexIndex);
+          final double y = getY(vertexIndex);
+          if (RectangleUtil.intersectsLine(minX, minY, maxX, maxY, //
+            previousX, previousY, x, y)) {
             return true;
           }
+          previousX = x;
+          previousY = y;
         }
-        previousX = x;
-        previousY = y;
+      } else {
+        final CoordinatesOperationPoint point = new CoordinatesOperationPoint(getX(0), getY(0));
+        coordinatesOperation.perform(point);
+        double previousX = point.x;
+        double previousY = point.y;
+
+        for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+          point.setPoint(getX(vertexIndex), getY(vertexIndex));
+          coordinatesOperation.perform(point);
+          final double x = point.x;
+          final double y = point.y;
+          if (RectangleUtil.intersectsLine(minX, minY, maxX, maxY, //
+            previousX, previousY, x, y)) {
+            return true;
+          }
+          previousX = x;
+          previousY = y;
+        }
       }
+
       return false;
     }
   }
@@ -1210,14 +1637,62 @@ public interface LineString extends Lineal {
     if (isEmpty()) {
       return false;
     } else {
-      final double x1 = getCoordinate(0, 0);
-      final double xn = getCoordinate(-1, 0);
+      final int lastIndex = getVertexCount() - 1;
+      final double x1 = getX(0);
+      final double xn = getX(lastIndex);
       if (x1 == xn) {
-        final double y1 = getCoordinate(0, 1);
-        final double yn = getCoordinate(-1, 1);
+        final double y1 = getY(0);
+        final double yn = getY(lastIndex);
         if (y1 == yn) {
           return true;
         }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Tests if a linestring is completely contained in the boundary of the target rectangle.
+   * @param boundingBox TODO
+    * @return true if the linestring is contained in the boundary
+   */
+  @Override
+  default boolean isContainedInBoundary(final BoundingBox boundingBox) {
+    final int vertexCount = getVertexCount();
+    if (vertexCount > 0) {
+      final double minX = boundingBox.getMinX();
+      final double minY = boundingBox.getMinY();
+      final double maxX = boundingBox.getMaxX();
+      final double maxY = boundingBox.getMaxY();
+      double previousX = getX(0);
+      double previousY = getY(0);
+      boolean hadSegment = false;
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x = getX(vertexIndex);
+        final double y = getY(vertexIndex);
+        if (!(x == previousX && y == previousY)) {
+          hadSegment = true;
+
+          // we already know that the segment is contained in the rectangle
+          // envelope
+          if (previousX == x) {
+            if (previousX == minX || previousX == maxX) {
+              return true;
+            }
+          } else if (previousY == y) {
+            if (previousY == minY || previousY == maxY) {
+              return true;
+            }
+          }
+          previousX = x;
+          previousY = y;
+        }
+      }
+      if (!hadSegment) {
+        if (previousX == minX || previousX == maxX || previousY == minY || previousY == maxY) {
+          return true;
+        }
+
       }
     }
     return false;
@@ -1239,18 +1714,73 @@ public interface LineString extends Lineal {
   }
 
   default boolean isLeft(final Point point) {
-    for (final Segment segment : segments()) {
-      if (!new LineSegmentDouble(segment.getPoint(0), point).crosses(this)
-        && !new LineSegmentDouble(segment.getPoint(1), point).crosses(this)) {
-        final int orientation = segment.orientationIndex(point);
-        if (orientation == 1) {
-          return true;
-        } else {
-          return false;
+    final double x = point.getX();
+    final double y = point.getY();
+    final int vertexCount = getVertexCount();
+    if (vertexCount > 1) {
+      double x1 = getX(0);
+      double y1 = getY(0);
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x2 = getX(vertexIndex);
+        final double y2 = getY(vertexIndex);
+        if (!crosses(new LineSegmentDouble(2, x1, y1, x, y))
+          && !crosses(new LineSegmentDouble(2, x2, y2, x, y))) {
+          final int orientation = LineSegmentUtil.orientationIndex(x1, y1, x2, y2, x, y);
+          if (orientation == 1) {
+            return true;
+          } else {
+            return false;
+          }
         }
+        x1 = x2;
+        y1 = y2;
+      }
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  default boolean isOnLine(final double x, final double y) {
+    final LineIntersector lineIntersector = new RobustLineIntersector();
+    double x1 = getX(0);
+    double y1 = getY(0);
+    final int vertexCount = getVertexCount();
+    for (int i = 1; i < vertexCount; i++) {
+      final double x2 = getX(i);
+      final double y2 = getY(i);
+      if (lineIntersector.computeIntersection(x, y, x1, y1, x2, y2)) {
+        return true;
+      } else {
+        x1 = x2;
+        y1 = y2;
       }
     }
-    return true;
+    return false;
+  }
+
+  /**
+   * Tests whether a point lies on the line segments defined by a list of
+   * coordinates.
+   *
+   * @return true if the point is a vertex of the line or lies in the interior
+   *         of a line segment in the linestring
+   */
+  default boolean isOnLine(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return isOnLine(x, y);
+  }
+
+  default boolean isPointInRing(final double x, final double y) {
+    return RayCrossingCounter.locatePointInRing(this, x, y) != Location.EXTERIOR;
+  }
+
+  default boolean isPointInRing(Point point) {
+    point = toCoordinateSystem(point);
+    final double x = point.getX();
+    final double y = point.getY();
+    return isPointInRing(x, y);
   }
 
   default boolean isRing() {
@@ -1263,15 +1793,32 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  default Location locate(final Point point) {
+  default Location locate(final double x, final double y) {
     // bounding-box check
-    if (point.intersects(getBoundingBox())) {
+    final BoundingBox boundingBox = getBoundingBox();
+    if (boundingBox.bboxCovers(x, y)) {
       if (!isClosed()) {
-        if (point.equals(getVertex(0)) || point.equals(getVertex(-1))) {
+        if (equalsVertex2d(0, x, y) || equalsVertex2d(getLastVertexIndex(), x, y)) {
           return Location.BOUNDARY;
         }
       }
-      if (CGAlgorithms.isOnLine(point, this)) {
+      if (isOnLine(x, y)) {
+        return Location.INTERIOR;
+      }
+    }
+    return Location.EXTERIOR;
+  }
+
+  @Override
+  default Location locate(final Point point) {
+    // bounding-box check
+    if (point.intersectsBbox(getBoundingBox())) {
+      if (!isClosed()) {
+        if (equals(2, 0, point) || equals(2, getVertexCount() - 1, point)) {
+          return Location.BOUNDARY;
+        }
+      }
+      if (isOnLine(point)) {
         return Location.INTERIOR;
       }
     }
@@ -1298,9 +1845,9 @@ public interface LineString extends Lineal {
 
     int newVertexCount = 0;
     final Point line1From = getVertex(0);
-    final Point line1To = getVertex(-1);
+    final Point line1To = getVertex(getVertexCount() - 1);
     final Point line2From = line2.getVertex(0);
-    final Point line2To = line2.getVertex(-1);
+    final Point line2To = line2.getVertex(line2.getVertexCount() - 1);
     if (line1From.equals(2, line2To)) {
       newVertexCount = CoordinatesListUtil.append(axisCount, line2, 0, coordinates, 0,
         vertexCount2);
@@ -1341,9 +1888,9 @@ public interface LineString extends Lineal {
 
       int newVertexCount = 0;
       final Point line1From = getVertex(0);
-      final Point line1To = getVertex(-1);
+      final Point line1To = getVertex(getVertexCount() - 1);
       final Point line2From = line2.getVertex(0);
-      final Point line2To = line2.getVertex(-1);
+      final Point line2To = line2.getVertex(line2.getVertexCount() - 1);
       if (line1To.equals(2, line2From) && line1To.equals(2, point)) {
         // -->*--> = ---->
         newVertexCount = CoordinatesListUtil.append(axisCount, this, 0, coordinates, 0,
@@ -1378,70 +1925,8 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  default LineString move(final double... deltas) {
-    if (deltas == null || isEmpty()) {
-      return this;
-    } else {
-      final double[] coordinates = moveCoordinates(deltas);
-      return newLineString(coordinates);
-    }
-  }
-
-  default double[] moveCoordinates(final double... deltas) {
-    final double[] coordinates = getCoordinates();
-    final int vertexCount = getVertexCount();
-    final int axisCount = getAxisCount();
-    final int deltaCount = Math.min(deltas.length, getAxisCount());
-    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
-      for (int axisIndex = 0; axisIndex < deltaCount; axisIndex++) {
-        coordinates[vertexIndex * axisCount + axisIndex] += deltas[axisIndex];
-      }
-    }
-    return coordinates;
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  default <V extends Geometry> V moveVertex(final Point newPoint, final int... vertexId) {
-    if (vertexId.length == 1) {
-      final int vertexIndex = vertexId[0];
-      return (V)moveVertex(newPoint, vertexIndex);
-    } else {
-      throw new IllegalArgumentException("Vertex id's for " + getGeometryType()
-        + " must have length 1. " + Arrays.toString(vertexId));
-    }
-  }
-
-  default LineString moveVertex(Point newPoint, final int vertexIndex) {
-    if (newPoint == null || newPoint.isEmpty()) {
-      return this;
-    } else if (isEmpty()) {
-      throw new IllegalArgumentException("Cannot move vertex for empty LineString");
-    } else {
-      final int vertexCount = getVertexCount();
-      if (vertexIndex >= 0 && vertexIndex < vertexCount) {
-        final GeometryFactory geometryFactory = getGeometryFactory();
-        newPoint = newPoint.convertGeometry(geometryFactory);
-
-        final double[] coordinates = getCoordinates();
-        final int axisCount = getAxisCount();
-        CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex, newPoint);
-        return newLineString(coordinates);
-      } else {
-        throw new IllegalArgumentException("Vertex index must be between 0 and " + vertexCount);
-      }
-    }
-  }
-
-  @Override
-  default BoundingBox newBoundingBox() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (isEmpty()) {
-      return new BoundingBoxDoubleGf(geometryFactory);
-    } else {
-      final Iterable<Vertex> vertices = vertices();
-      return new BoundingBoxDoubleGf(geometryFactory, vertices);
-    }
+  default Lineal mergeLines() {
+    return this;
   }
 
   @Override
@@ -1449,12 +1934,30 @@ public interface LineString extends Lineal {
     if (geometryFactory == null) {
       return this.clone();
     } else if (isEmpty()) {
-      return geometryFactory.lineString();
+      return newLineStringEmpty(geometryFactory);
     } else {
-      final double[] coordinates = convertCoordinates(geometryFactory);
-      final int axisCount = getAxisCount();
-      return geometryFactory.lineString(axisCount, coordinates);
+      final int axisCount = geometryFactory.getAxisCount();
+      final double[] coordinates = convertCoordinates(geometryFactory, axisCount);
+      final int vertexCount = getVertexCount();
+      return newLineString(geometryFactory, axisCount, vertexCount, coordinates);
     }
+  }
+
+  @Override
+  default LineStringEditor newGeometryEditor() {
+    return new LineStringEditor(this);
+  }
+
+  @Override
+  default LineStringEditor newGeometryEditor(final AbstractGeometryEditor<?> parentEditor) {
+    return new LineStringEditor(parentEditor, this);
+  }
+
+  @Override
+  default LineStringEditor newGeometryEditor(final int axisCount) {
+    final LineStringEditor geometryEditor = newGeometryEditor();
+    geometryEditor.setAxisCount(axisCount);
+    return geometryEditor;
   }
 
   /**
@@ -1475,17 +1978,37 @@ public interface LineString extends Lineal {
   default LineString newLineString(final double... coordinates) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final int axisCount = getAxisCount();
-    return geometryFactory.lineString(axisCount, coordinates);
+    final int vertexCount = coordinates.length / axisCount;
+    return newLineString(geometryFactory, axisCount, vertexCount, coordinates);
+  }
+
+  default LineString newLineString(final GeometryFactory geometryFactory) {
+    return geometryFactory.lineString(this);
+  }
+
+  default LineString newLineString(final GeometryFactory geometryFactory, final int axisCount,
+    final int vertexCount, final double... coordinates) {
+    final GeometryFactory geometryFactoryAxisCount = geometryFactory.convertAxisCount(axisCount);
+    return geometryFactoryAxisCount.lineString(axisCount, vertexCount, coordinates);
   }
 
   default LineString newLineString(final int vertexCount, final double... coordinates) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final int axisCount = getAxisCount();
-    return geometryFactory.lineString(axisCount, vertexCount, coordinates);
+    return newLineString(geometryFactory, axisCount, vertexCount, coordinates);
   }
 
+  /**
+   * Create a new {@link LineString} of this {@link LineString} using this geometry's geometry factory.
+   *
+   * @return The new line string.
+   */
   default LineString newLineStringEmpty() {
     final GeometryFactory geometryFactory = getGeometryFactory();
+    return newLineStringEmpty(geometryFactory);
+  }
+
+  default LineString newLineStringEmpty(final GeometryFactory geometryFactory) {
     return geometryFactory.lineString();
   }
 
@@ -1623,6 +2146,88 @@ public interface LineString extends Lineal {
     return new LineStringSegment(this, -1);
   }
 
+  default double setCoordinate(final int vertexIndex, final int axisIndex,
+    final double coordinate) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  default double setCoordinate(final int partIndex, final int vertexIndex, final int axisIndex,
+    final double coordinate) {
+    if (partIndex == 0) {
+      return setCoordinate(vertexIndex, axisIndex, coordinate);
+    } else {
+      throw new ArrayIndexOutOfBoundsException(partIndex);
+    }
+  }
+
+  default double setM(final int vertexIndex, final double m) {
+    return setCoordinate(vertexIndex, M, m);
+  }
+
+  default double setX(final int vertexIndex, final double x) {
+    return setCoordinate(vertexIndex, X, x);
+  }
+
+  default double setY(final int vertexIndex, final double y) {
+    return setCoordinate(vertexIndex, Y, y);
+  }
+
+  default double setZ(final int vertexIndex, final double z) {
+    return setCoordinate(vertexIndex, Z, z);
+  }
+
+  default List<LineString> split(final Iterable<LineStringLocation> splitLocations) {
+    final Set<LineStringLocation> locations = new TreeSet<>();
+    for (final LineStringLocation location : splitLocations) {
+      if (location.getLine() == this) {
+        if (location.isFromVertex()) {
+          // Don't split at the start
+        } else if (location.isToVertex()) {
+          // Don't split at the end
+        } else {
+          locations.add(location);
+        }
+      }
+    }
+    if (locations.isEmpty()) {
+      return Collections.singletonList(this);
+    } else {
+      final List<LineString> newLines = new ArrayList<>();
+      LineStringLocation previousLocation = null;
+      for (final LineStringLocation location : locations) {
+        final LineString newLine = subLine(previousLocation, location);
+        if (!newLine.isEmpty()) {
+          newLines.add(newLine);
+        }
+        previousLocation = location;
+      }
+      final LineString newLine = subLine(previousLocation, null);
+      if (!newLine.isEmpty()) {
+        newLines.add(newLine);
+      }
+      return newLines;
+    }
+  }
+
+  default List<LineString> split(final LineStringLocation location) {
+    if (location == null || location.isFromVertex() || location.isToVertex()) {
+      return Collections.singletonList(this);
+    } else {
+      final List<LineString> newLines = new ArrayList<>(2);
+
+      final LineString newLine1 = subLine(null, location);
+      if (!newLine1.isEmpty()) {
+        newLines.add(newLine1);
+      }
+      final LineString newLine2 = subLine(location, null);
+      if (!newLine2.isEmpty()) {
+        newLines.add(newLine2);
+      }
+      return newLines;
+    }
+  }
+
   default List<LineString> split(Point point) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     point = point.convertGeometry(geometryFactory);
@@ -1674,6 +2279,56 @@ public interface LineString extends Lineal {
 
   default LineString subLine(final int vertexCount, final Point toPoint) {
     return subLine(null, 0, vertexCount, toPoint);
+  }
+
+  default LineString subLine(final LineStringLocation fromLocation,
+    final LineStringLocation toLocation) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final LineStringEditor lineBuilder = new LineStringEditor(geometryFactory);
+
+    int vertexIndexFrom;
+    if (fromLocation == null || fromLocation.getLine() != this) {
+      vertexIndexFrom = 0;
+    } else {
+      vertexIndexFrom = fromLocation.getSegmentIndex();
+      if (fromLocation.getSegmentFraction() > 0.0) {
+        vertexIndexFrom += 1;
+      }
+      if (!fromLocation.isVertex()) {
+        final Point point = fromLocation.getPoint();
+        lineBuilder.appendVertex(point, false);
+      }
+    }
+
+    Point toPoint;
+    int vertexIndexTo;
+    if (toLocation == null) {
+      vertexIndexTo = getVertexCount() - 1;
+      toPoint = null;
+    } else {
+      vertexIndexTo = toLocation.getSegmentIndex();
+      if (toLocation.getSegmentFraction() >= 1.0) {
+        vertexIndexTo += 1;
+      }
+      if (toLocation.isVertex()) {
+        toPoint = null;
+      } else {
+        toPoint = toLocation.getPoint();
+      }
+    }
+
+    for (int vertexIndex = vertexIndexFrom; vertexIndex <= vertexIndexTo; vertexIndex++) {
+      final Point point = getPoint(vertexIndex);
+      lineBuilder.appendVertex(point, false);
+    }
+    if (toPoint != null) {
+      lineBuilder.appendVertex(toPoint, false);
+    }
+    if (lineBuilder.getVertexCount() < 2) {
+      return lineBuilder.newLineStringEmpty();
+    } else {
+      return lineBuilder.newLineString();
+    }
   }
 
   default LineString subLine(final Point fromPoint, final int fromVertexIndex, int vertexCount,
@@ -1763,7 +2418,7 @@ public interface LineString extends Lineal {
       return null;
     } else if (equalsVertex(0, point)) {
       return End.FROM;
-    } else if (equalsVertex(-1, point)) {
+    } else if (equalsVertex(getVertexCount() - 1, point)) {
       return End.TO;
     } else {
       return null;

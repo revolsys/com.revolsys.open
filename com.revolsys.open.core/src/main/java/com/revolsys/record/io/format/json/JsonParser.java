@@ -2,7 +2,6 @@ package com.revolsys.record.io.format.json;
 
 import java.io.BufferedReader;
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -17,11 +16,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.number.Doubles;
+import org.jeometry.common.number.Integers;
+
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.MathUtil;
 
 public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   public enum EventType {
@@ -62,28 +64,33 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   }
 
   @SuppressWarnings("unchecked")
-  public static <V> V read(final Object in) {
+  public static <V> V read(final Object source) {
     Reader reader;
-    if (in instanceof Clob) {
+    if (source instanceof Clob) {
       try {
-        reader = ((Clob)in).getCharacterStream();
+        reader = ((Clob)source).getCharacterStream();
       } catch (final SQLException e) {
         throw new RuntimeException("Unable to read clob", e);
       }
-    } else if (in instanceof Reader) {
-      reader = (Reader)in;
-    } else if (in instanceof File) {
-      final File file = (File)in;
-      reader = FileUtil.getReader(file);
+    } else if (source instanceof Reader) {
+      reader = (Reader)source;
+    } else if (source instanceof CharSequence) {
+      reader = new StringReader(source.toString());
     } else {
-      reader = new StringReader(in.toString());
+      try {
+        final Resource resource = Resource.getResource(source);
+        reader = resource.newBufferedReader();
+      } catch (final WrappedException e) {
+        reader = new StringReader(source.toString());
+      }
     }
     try {
-      return (V)read(reader);
+      final V value = (V)read(reader);
+      return value;
     } finally {
-      if (in instanceof Clob) {
+      if (source instanceof Clob) {
         try {
-          final Clob clob = (Clob)in;
+          final Clob clob = (Clob)source;
           clob.free();
         } catch (final SQLException e) {
           throw new RuntimeException("Unable to free clob resources", e);
@@ -94,17 +101,19 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
 
   @SuppressWarnings("unchecked")
   public static <V> V read(final Reader in) {
-    final JsonParser parser = new JsonParser(in);
-    try {
+    try (
+      final JsonParser parser = new JsonParser(in)) {
       if (parser.hasNext()) {
         final EventType event = parser.next();
         if (event == EventType.startDocument) {
-          return (V)parser.getValue();
+          final V value = (V)parser.getValue();
+          if (parser.hasNext() && parser.next() != EventType.endDocument) {
+            throw new IllegalStateException("Extra content at end of file: " + parser);
+          }
+          return value;
         }
       }
       return null;
-    } finally {
-      parser.close();
     }
   }
 
@@ -154,21 +163,29 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
       EventType event = getEvent();
       final List<Object> list = new ArrayList<>();
       do {
-        final Object value = this.getValue();
+        final Object value = getValue();
         if (value instanceof EventType) {
           event = (EventType)value;
-
+          if (event == EventType.comma) {
+            throw new IllegalStateException(
+              "Missing value before ',' " + FileUtil.getString(this.reader, 80));
+          } else if (event == EventType.endArray) {
+            if (!list.isEmpty()) {
+              throw new IllegalStateException(
+                "Missing value after ',' and before ']' " + FileUtil.getString(this.reader, 80));
+            }
+          }
         } else {
           list.add(value);
           event = next();
         }
       } while (event == EventType.comma);
       if (event != EventType.endArray) {
-        throw new IllegalStateException("Exepecting end array, not:" + event);
+        throw new IllegalStateException("Exepecting end array, not '" + this + ']');
       }
       return list;
     } else {
-      throw new IllegalStateException("Exepecting start array, not:" + getEvent());
+      throw new IllegalStateException("Exepecting start array, not: " + this);
     }
 
   }
@@ -201,7 +218,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
         throw new IllegalStateException("Exepecting end array, not: " + event);
       }
 
-      return MathUtil.toDoubleArray(list);
+      return Doubles.toDoubleArray(list);
     } else if (getEvent() == EventType.nullValue) {
       return null;
     } else {
@@ -232,7 +249,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
         throw new IllegalStateException("Exepecting end array, not: " + event);
       }
 
-      return MathUtil.toIntArray(list);
+      return Integers.toIntArray(list);
     } else if (getEvent() == EventType.nullValue) {
       return null;
     } else {
@@ -473,6 +490,20 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
         switch (this.currentCharacter) {
           case -1:
           break;
+          case 'b':
+            text.setLength(text.length() - 1);
+          break;
+          case '"':
+            text.append('"');
+          break;
+          case '/':
+            text.append('/');
+          break;
+          case '\\':
+            text.append('\\');
+          break;
+          case 'f':
+            text.append('\f');
           case 'n':
             text.append('\n');
           break;
@@ -481,9 +512,6 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
           break;
           case 't':
             text.append('\t');
-          break;
-          case 'b':
-            text.setLength(text.length() - 1);
           break;
           case 'u':
             final char[] buf = new char[4];
@@ -501,8 +529,8 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
             }
           break;
           default:
-            text.append((char)this.currentCharacter);
-          break;
+            throw new IllegalStateException(
+              "Invalid escape character: \\" + (char)this.currentCharacter);
         }
       } else {
         text.append((char)this.currentCharacter);
@@ -607,6 +635,6 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   @Override
   public String toString() {
     return this.currentEvent + " : " + this.currentValue + " "
-      + Character.toString((char)this.currentCharacter);
+      + Character.toString((char)this.currentCharacter) + FileUtil.getString(this.reader, 80);
   }
 }

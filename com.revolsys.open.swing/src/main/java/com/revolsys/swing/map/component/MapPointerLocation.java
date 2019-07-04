@@ -11,7 +11,6 @@ import javax.swing.border.BevelBorder;
 
 import org.jeometry.common.number.Doubles;
 
-import com.revolsys.geometry.cs.CoordinateSystem;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.swing.map.MapPanel;
@@ -79,18 +78,17 @@ public class MapPointerLocation extends JLabel implements MouseMotionListener {
     }
     geometryFactory = geometryFactory.convertAxisCount(2);
     if (geometryFactory.isGeographic()) {
-      geometryFactory = geometryFactory.convertScales(10000000);
+      geometryFactory = geometryFactory.convertScales(10000000.0, 10000000.0);
     } else if (this.geographics) {
       geometryFactory = geometryFactory.getGeographicGeometryFactory();
-      geometryFactory = geometryFactory.convertScales(10000000);
+      geometryFactory = geometryFactory.convertScales(10000000.0, 10000000.0);
     } else {
-      geometryFactory = geometryFactory.convertScales(1000);
+      geometryFactory = geometryFactory.convertScales(1000.0, 1000.0);
     }
     if (geometryFactory != this.geometryFactory) {
-      final int srid = geometryFactory.getCoordinateSystemId();
+      final int srid = geometryFactory.getHorizontalCoordinateSystemId();
       this.geometryFactory = geometryFactory;
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      this.setToolTipText(coordinateSystem.getCoordinateSystemName());
+      this.setToolTipText(geometryFactory.getHorizontalCoordinateSystemName());
       this.title = String.valueOf(srid);
       final Point mapLocation = geometryFactory.point(this.mapLocation);
       setMapLocation(mapLocation);

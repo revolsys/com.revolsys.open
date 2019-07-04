@@ -32,32 +32,32 @@ public class RecordStoreConnectionTrees extends ConnectionManagerTrees {
 
   static {
     // RecordStoreConnectionRegistry
-    final MenuFactory connectionRegistryMenu = MenuFactory
-      .getMenu(RecordStoreConnectionRegistry.class);
+    MenuFactory.addMenuInitializer(RecordStoreConnectionRegistry.class, (menu) -> {
+      TreeNodes.addMenuItemNodeValue(menu, "default", 0, "Add Connection", "database:add",
+        RecordStoreConnectionRegistry::isEditable, RecordStoreConnectionTrees::addConnection);
 
-    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 0, "Add Connection",
-      "database_add", RecordStoreConnectionRegistry::isEditable,
-      RecordStoreConnectionTrees::addConnection);
-
-    TreeNodes.addMenuItemNodeValue(connectionRegistryMenu, "default", 1, "Import Connection...",
-      "database:import", RecordStoreConnectionRegistry::isEditable,
-      RecordStoreConnectionTrees::importConnection);
+      TreeNodes.addMenuItemNodeValue(menu, "default", 1, "Import Connection...", "database:import",
+        RecordStoreConnectionRegistry::isEditable, RecordStoreConnectionTrees::importConnection);
+    });
 
     // RecordStoreConnection
-    final MenuFactory connectionMenu = MenuFactory.getMenu(RecordStoreConnection.class);
-    TreeNodes.addMenuItemNodeValue(connectionMenu, "default", 0, "Edit Connection", "database_edit",
-      RecordStoreConnection::isEditable, RecordStoreConnectionTrees::editConnection);
+    MenuFactory.addMenuInitializer(RecordStoreConnection.class, (menu) -> {
+      TreeNodes.addMenuItemNodeValue(menu, "default", 0, "Edit Connection", "database_edit",
+        RecordStoreConnection::isEditable, RecordStoreConnectionTrees::editConnection);
 
-    final MenuFactory recordStoreSchemaMenu = MenuFactory.getMenu(RecordStoreSchema.class);
-    LazyLoadTreeNode.addRefreshMenuItem(recordStoreSchemaMenu);
+      TreeNodes.<RecordStoreConnection> addMenuItemNodeValue(menu, "default", 1,
+        "Export Connection", "database:export", ConnectionManagerTrees::exportConnection);
+    });
 
-    TreeNodes.<RecordStoreConnection> addMenuItemNodeValue(connectionMenu, "default", 1,
-      "Export Connection", "database:export", ConnectionManagerTrees::exportConnection);
+    MenuFactory.addMenuInitializer(RecordStoreSchema.class, (menu) -> {
+      LazyLoadTreeNode.addRefreshMenuItem(menu);
+    });
 
-    final MenuFactory recordDefinitionMenu = MenuFactory.getMenu(RecordDefinitionImpl.class);
-    TreeNodes.addMenuItemNodeValue(recordDefinitionMenu, "default", "Add Record Layer", "map:add",
-      RecordStoreConnectionTrees::addLayer);
-    LazyLoadTreeNode.addRefreshMenuItem(recordDefinitionMenu);
+    MenuFactory.addMenuInitializer(RecordDefinitionImpl.class, (menu) -> {
+      TreeNodes.addMenuItemNodeValue(menu, "default", "Add Record Layer", "map:add",
+        RecordStoreConnectionTrees::addLayer);
+      // LazyLoadTreeNode.addRefreshMenuItem(menu);
+    });
   }
 
   private static void addConnection(final RecordStoreConnectionRegistry registry) {

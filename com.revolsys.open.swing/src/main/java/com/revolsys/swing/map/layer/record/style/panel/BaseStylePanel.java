@@ -7,6 +7,7 @@ import java.awt.Dimension;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -23,8 +24,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import org.jdesktop.swingx.VerticalLayout;
+import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
-import com.revolsys.geometry.cs.unit.CustomUnits;
 import com.revolsys.geometry.model.LineCap;
 import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.swing.Icons;
@@ -42,7 +43,7 @@ import com.revolsys.swing.field.FunctionStringConverter;
 import com.revolsys.swing.field.LengthMeasureTextField;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
-import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.component.MapScale;
 import com.revolsys.swing.map.component.MarkerField;
 import com.revolsys.swing.map.layer.Layer;
@@ -50,8 +51,10 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
+import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
+import com.revolsys.util.PropertyDescriptorCache;
 
 public class BaseStylePanel extends Form implements PropertyChangeListener {
   public static final List<Action> HORIZONTAL_ALIGNMENT_ACTIONS = getTextAlignActions("left",
@@ -99,15 +102,18 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
 
   private final LayerRenderer<?> renderer;
 
-  public BaseStylePanel(final LayerRenderer<?> renderer) {
+  public BaseStylePanel(final LayerRenderer<?> renderer, final boolean showScaleFields) {
     super(new VerticalLayout());
     this.renderer = renderer;
     addReadOnlyFieldName("type");
     Property.addListener(renderer, this);
-
     addPanel(this, "General", renderer, "name", "type", "visible");
-    addPanel(this, "Scales", renderer, "minimumScale", "maximumScale");
-    addPanel(this, "Filter", renderer, "queryFilter");
+    if (showScaleFields) {
+      addPanel(this, "Scales", renderer, "minimumScale", "maximumScale");
+    }
+    if (PropertyDescriptorCache.getPropertyDescriptor(renderer, "queryFilter") != null) {
+      addPanel(this, "Filter", renderer, "queryFilter");
+    }
   }
 
   protected void addCheckBoxField(final JPanel container, final Object object,
@@ -156,10 +162,15 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
   }
 
   protected void addFields(final JPanel container, final Object object,
-    final String... fieldNames) {
+    final List<String> fieldNames) {
     for (final String fieldName : fieldNames) {
       addField(container, object, fieldName);
     }
+  }
+
+  protected void addFields(final JPanel container, final Object object,
+    final String... fieldNames) {
+    addFields(container, object, Arrays.asList(fieldNames));
   }
 
   protected void addLengthMeasureField(final JPanel container, final Object object,
@@ -201,13 +212,18 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
   }
 
   protected JPanel addPanel(final Container container, final String title, final Object object,
-    final String... fieldNames) {
+    final List<String> fieldNames) {
     final JPanel panel = Panels.titledTransparent(title);
 
     addFields(panel, object, fieldNames);
     GroupLayouts.makeColumns(panel, 2, true);
     container.add(panel);
     return panel;
+  }
+
+  protected JPanel addPanel(final Container container, final String title, final Object object,
+    final String... fieldNames) {
+    return addPanel(container, title, object, Arrays.asList(fieldNames));
   }
 
   protected void addPolygonStylePanel(final JPanel stylePanels, final GeometryStyle geometryStyle) {
@@ -227,15 +243,24 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
     container.add(field);
   }
 
+  protected void addTextStylePanels(final JPanel stylePanels, final TextStyle textStyle) {
+    addPanel(stylePanels, "Text Label", textStyle, "textName", "textSize", "textFaceName");
+    addPanel(stylePanels, "Text Color", textStyle, "textFill", "textBoxColor", "textHaloFill",
+      "textHaloRadius");
+    addPanel(stylePanels, "Text Position", textStyle, "textHorizontalAlignment",
+      "textVerticalAlignment", "textDx", "textDy", "textOrientationType", "textOrientation",
+      "textPlacementType");
+  }
+
   @SuppressWarnings("unchecked")
   public <L extends Layer> L getLayer() {
-    final LayerRenderer<Layer> renderer = getRenderer();
+    final LayerRenderer<?> renderer = getRenderer();
     return (L)renderer.getLayer();
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends LayerRenderer<Layer>> T getRenderer() {
-    return (T)this.renderer;
+  public <L extends Layer, R extends LayerRenderer<L>> R getRenderer() {
+    return (R)this.renderer;
   }
 
   @SuppressWarnings("unchecked")
@@ -286,7 +311,7 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
     } else if (Quantity.class.equals(fieldClass)) {
       field = new LengthMeasureTextField(fieldName, (Quantity<Length>)value, CustomUnits.PIXEL);
     } else {
-      field = new TextField(fieldName, value, 20);
+      field = new TextField(fieldName, value, 40);
     }
     return field;
   }
@@ -312,7 +337,7 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
   private Field newScaleField(final String fieldName, final Long value) {
     final List<Long> scales = new ArrayList<>();
     scales.add(Long.MAX_VALUE);
-    scales.addAll(MapPanel.SCALES);
+    scales.addAll(Viewport2D.SCALES);
     final ComboBox<Long> field = ComboBox.newComboBox(fieldName, scales, MapScale::formatScale);
     ((FunctionStringConverter<?>)field.getRenderer()).setHorizontalAlignment(SwingConstants.RIGHT);
     ((JTextField)field.getEditor().getEditorComponent())
@@ -347,7 +372,7 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
   protected boolean rendererPropertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();
     if (source instanceof Field) {
-      final LayerRenderer<Layer> renderer = getRenderer();
+      final LayerRenderer<?> renderer = getRenderer();
       final Field field = (Field)source;
       final String fieldName = field.getFieldName();
       final Object fieldValue = field.getFieldValue();

@@ -40,7 +40,7 @@ public class OrientedArcConverter extends ArcConverter {
       }
       name = iterator.nextFieldName();
     }
-    geometry.setUserData(values);
+    geometry.setUserDataOld(values);
     return geometry;
   }
 

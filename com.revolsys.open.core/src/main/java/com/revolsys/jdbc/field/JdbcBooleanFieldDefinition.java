@@ -7,8 +7,6 @@ import java.util.Map;
 
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.record.Record;
-
 public class JdbcBooleanFieldDefinition extends JdbcFieldDefinition {
   public JdbcBooleanFieldDefinition(final String dbName, final String name, final int sqlType,
     final int length, final boolean required, final String description,
@@ -23,13 +21,14 @@ public class JdbcBooleanFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record) throws SQLException {
-    final boolean booleanValue = resultSet.getBoolean(columnIndex);
-    if (!resultSet.wasNull()) {
-      setValue(record, booleanValue);
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    final boolean value = resultSet.getBoolean(columnIndex);
+    if (resultSet.wasNull()) {
+      return null;
+    } else {
+      return value;
     }
-    return columnIndex + 1;
   }
 
   @Override

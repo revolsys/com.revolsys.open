@@ -21,7 +21,7 @@ public class LineSegmentIntersectionVisitor extends AbstractEdgeListenerVisitor<
   @Override
   public void accept(final Edge<LineSegment> edge) {
     final LineSegment lineSegment = edge.getObject();
-    if (lineSegment.getBoundingBox().intersects(this.querySeg.getBoundingBox())) {
+    if (lineSegment.getBoundingBox().bboxIntersects(this.querySeg.getBoundingBox())) {
       final Geometry intersection = this.querySeg.getIntersection(lineSegment);
       if (intersection != null && !intersection.isEmpty()) {
         this.intersections.add(intersection);

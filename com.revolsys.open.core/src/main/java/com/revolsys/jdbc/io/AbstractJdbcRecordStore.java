@@ -21,6 +21,8 @@ import java.util.UUID;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
@@ -32,12 +34,13 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.identifier.Identifier;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.jdbc.field.JdbcFieldFactory;
+import com.revolsys.jdbc.field.JdbcFieldFactoryAdder;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -55,7 +58,6 @@ import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
-import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
@@ -148,11 +150,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   protected JdbcFieldDefinition addField(final JdbcRecordDefinition recordDefinition,
     final String dbColumnName, final String name, final String dataType, final int sqlType,
     final int length, final int scale, final boolean required, final String description) {
-    JdbcFieldAdder attributeAdder = this.fieldDefinitionAdders.get(dataType);
-    if (attributeAdder == null) {
-      attributeAdder = new JdbcFieldAdder(DataTypes.OBJECT);
-    }
-    return (JdbcFieldDefinition)attributeAdder.addField(this, recordDefinition, dbColumnName, name,
+    final JdbcFieldAdder fieldAdder = getFieldAdder(dataType);
+    return (JdbcFieldDefinition)fieldAdder.addField(this, recordDefinition, dbColumnName, name,
       dataType, sqlType, length, scale, required, description);
   }
 
@@ -168,8 +167,18 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       description);
   }
 
+  protected void addFieldAdder(final String sqlTypeName, final DataType dataType) {
+    final JdbcFieldAdder adder = new JdbcFieldAdder(dataType);
+    this.fieldDefinitionAdders.put(sqlTypeName, adder);
+  }
+
   public void addFieldAdder(final String sqlTypeName, final JdbcFieldAdder adder) {
     this.fieldDefinitionAdders.put(sqlTypeName, adder);
+  }
+
+  protected void addFieldAdder(final String sqlTypeName, final JdbcFieldFactory fieldFactory) {
+    final JdbcFieldFactoryAdder fieldAdder = new JdbcFieldFactoryAdder(fieldFactory);
+    addFieldAdder(sqlTypeName, fieldAdder);
   }
 
   /**
@@ -311,6 +320,14 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     }
   }
 
+  public JdbcFieldAdder getFieldAdder(final String dataType) {
+    JdbcFieldAdder fieldAdder = this.fieldDefinitionAdders.get(dataType);
+    if (fieldAdder == null) {
+      fieldAdder = new JdbcFieldAdder(DataTypes.OBJECT);
+    }
+    return fieldAdder;
+  }
+
   @Override
   public String getGeneratePrimaryKeySql(final JdbcRecordDefinition recordDefinition) {
     throw new UnsupportedOperationException(
@@ -432,7 +449,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  protected void initializeDo() {
+  public void initializeDo() {
     super.initializeDo();
     if (this.dataSource != null) {
       this.transactionManager = new DataSourceTransactionManager(this.dataSource);
@@ -629,11 +646,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  public RecordWriter newRecordWriter() {
-    return newRecordWriter(false);
-  }
-
-  protected RecordWriter newRecordWriter(final boolean throwExceptions) {
+  public RecordWriter newRecordWriter(final boolean throwExceptions) {
     if (TransactionSynchronizationManager.isSynchronizationActive()) {
       Object writerKey;
       if (throwExceptions) {
@@ -664,8 +677,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     }
   }
 
-  protected JdbcWriterImpl newRecordWriter(final int batchSize) {
-    final JdbcWriterImpl writer = new JdbcWriterImpl(this);
+  protected JdbcRecordWriter newRecordWriter(final int batchSize) {
+    final JdbcRecordWriter writer = new JdbcRecordWriter(this);
     writer.setSqlPrefix(this.sqlPrefix);
     writer.setSqlSuffix(this.sqlSuffix);
     writer.setBatchSize(batchSize);
@@ -673,6 +686,11 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     writer.setFlushBetweenTypes(this.flushBetweenTypes);
     writer.setQuoteColumnNames(false);
     return writer;
+  }
+
+  @Override
+  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition) {
+    return new JdbcRecordWriter(this, recordDefinition);
   }
 
   @Override
@@ -848,68 +866,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     this.sqlSuffix = sqlSuffix;
   }
 
-  @Override
-  public void updateRecord(final Record record) {
-    write(record, null);
+  protected void setUsesSchema(final boolean usesSchema) {
   }
 
-  @Override
-  public void updateRecords(final Iterable<? extends Record> records) {
-    writeAll(records, null);
-  }
-
-  protected void write(final Record record, final RecordState state) {
-    try (
-      Transaction transaction = newTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
-      // It's important to have this in an inner try. Otherwise the exceptions
-      // won't get caught on closing the writer and the transaction won't get
-      // rolled back.
-      try (
-        RecordWriter writer = newRecordWriter(true)) {
-        write(writer, record, state);
-      } catch (final RuntimeException e) {
-        transaction.setRollbackOnly();
-        throw e;
-      } catch (final Error e) {
-        transaction.setRollbackOnly();
-        throw e;
-      }
-    }
-  }
-
-  protected Record write(final RecordWriter writer, Record record, final RecordState state) {
-    if (state == RecordState.NEW) {
-      if (record.getState() != state) {
-        record = newRecord(record);
-      }
-    } else if (state != null) {
-      record.setState(state);
-    }
-    writer.write(record);
-    return record;
-  }
-
-  protected int writeAll(final Iterable<? extends Record> records, final RecordState state) {
-    int count = 0;
-    try (
-      Transaction transaction = newTransaction(Propagation.REQUIRED)) {
-      // It's important to have this in an inner try. Otherwise the exceptions
-      // won't get caught on closing the writer and the transaction won't get
-      // rolled back.
-      try (
-        final RecordWriter writer = newRecordWriter(true)) {
-        for (final Record record : records) {
-          write(writer, record, state);
-          count++;
-        }
-      } catch (final RuntimeException e) {
-        transaction.setRollbackOnly();
-        throw e;
-      } catch (final Error e) {
-        transaction.setRollbackOnly();
-        throw e;
-      }
-    }
-    return count;
-  }
 }
