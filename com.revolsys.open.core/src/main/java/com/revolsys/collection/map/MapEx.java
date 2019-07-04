@@ -27,6 +27,19 @@ public interface MapEx extends MapDefault<String, Object> {
     return this;
   }
 
+  default Boolean getBoolean(final CharSequence name) {
+    return getValue(name, DataTypes.BOOLEAN);
+  }
+
+  default boolean getBoolean(final CharSequence name, final boolean defaultValue) {
+    final Boolean value = getBoolean(name);
+    if (value == null) {
+      return defaultValue;
+    } else {
+      return value;
+    }
+  }
+
   default Byte getByte(final CharSequence name) {
     return getValue(name, DataTypes.BYTE);
   }

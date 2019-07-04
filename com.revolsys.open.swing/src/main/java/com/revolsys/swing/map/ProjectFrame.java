@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.ActionMap;
@@ -41,6 +40,7 @@ import javax.swing.tree.TreePath;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.util.BoundingBoxUtil;
@@ -227,10 +227,10 @@ public class ProjectFrame extends BaseFrame {
     }
   }
 
-  public void addBottomTab(final ProjectFramePanel panel, final Map<String, Object> config) {
+  public void addBottomTab(final ProjectFramePanel panel, final MapEx config) {
     Invoke.later(() -> {
       final TabbedPane tabs = getBottomTabs();
-
+      final boolean selectTab = config.getBoolean("selectTab", true);
       final Object tableView = panel.getProperty(BOTTOM_TAB);
       Component component = null;
       if (tableView instanceof Component) {
@@ -273,13 +273,15 @@ public class ProjectFrame extends BaseFrame {
           final TabClosableTitle tab = tabs.addClosableTab(name, icon, panelComponent, closeAction);
           tab.setMenu(panel);
 
-          tabs.setSelectedIndex(tabIndex);
+          if (selectTab) {
+            tabs.setSelectedIndex(tabIndex);
+          }
         }
-      } else
-
-      {
+      } else {
         panel.activatePanelComponent(component, config);
-        tabs.setSelectedComponent(component);
+        if (selectTab) {
+          tabs.setSelectedComponent(component);
+        }
       }
     });
   }
@@ -583,7 +585,7 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected MapPanel newMapPanel() {
-    this.mapPanel = new MapPanel(this.preferences, this.project);
+    this.mapPanel = new MapPanel(this, this.preferences, this.project);
     if (OS.isMac()) {
       // Make border on right/bottom to match the JTabbedPane UI on a mac
       this.mapPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 9, 9));

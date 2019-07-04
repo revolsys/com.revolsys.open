@@ -67,7 +67,6 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.listener.BeanPropertyListener;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
-import com.revolsys.swing.map.ProjectFramePanel;
 import com.revolsys.swing.map.component.GeometryFactoryField;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
@@ -85,8 +84,8 @@ import com.revolsys.util.Property;
 import com.revolsys.util.ToolTipProxy;
 import com.revolsys.value.ThreadBooleanValue;
 
-public abstract class AbstractLayer extends BaseObjectWithProperties implements Layer,
-  PropertyChangeListener, PropertyChangeSupportProxy, ProjectFramePanel, ToolTipProxy {
+public abstract class AbstractLayer extends BaseObjectWithProperties
+  implements Layer, PropertyChangeListener, PropertyChangeSupportProxy, ToolTipProxy {
   public static final Icon ICON_LAYER = Icons.getIcon("map");
 
   private static final AtomicLong ID_GEN = new AtomicLong();
@@ -1194,15 +1193,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   @Override
   public void showTableView() {
-    showTableView(Collections.emptyMap());
-  }
-
-  @Override
-  public void showTableView(final Map<String, Object> config) {
-    final ProjectFrame projectFrame = ProjectFrame.get(this);
-    if (projectFrame != null) {
-      projectFrame.addBottomTab(this, config);
-    }
+    showTableView(MapEx.EMPTY);
   }
 
   public void toggleEditable() {

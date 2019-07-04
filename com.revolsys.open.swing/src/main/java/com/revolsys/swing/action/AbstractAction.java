@@ -7,7 +7,6 @@ import java.beans.PropertyChangeListener;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
-import javax.swing.JToggleButton;
 import javax.swing.KeyStroke;
 
 import com.revolsys.i18n.I18nCharSequence;
@@ -117,7 +116,7 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
     return menuItem;
   }
 
-  public JToggleButton newToggleButton() {
+  public ToggleButton newToggleButton() {
     final ToggleButton button = new ToggleButton(this);
     return button;
   }

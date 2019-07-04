@@ -1,8 +1,11 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
+import java.awt.Color;
 import java.util.List;
 
 import javax.swing.Icon;
+
+import org.jeometry.common.awt.WebColors;
 
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -25,6 +28,11 @@ public class ModeAllList extends ModeAbstractCached {
     );
 
     super.activate();
+  }
+
+  @Override
+  public Color getBorderColor() {
+    return WebColors.Blue;
   }
 
   @Override

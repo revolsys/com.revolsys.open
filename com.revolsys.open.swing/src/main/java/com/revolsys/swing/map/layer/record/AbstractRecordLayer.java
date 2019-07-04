@@ -45,6 +45,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.set.Sets;
@@ -548,11 +549,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return added;
   }
 
-  public void addSelectedRecords(final BoundingBox boundingBox) {
+  public boolean addSelectedRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
       final List<LayerRecord> records = getRecordsVisible(boundingBox);
       addSelectedRecords(records);
       postSelectByBoundingBox(records);
+      return isHasSelectedRecordsWithGeometry();
+    } else {
+      return false;
     }
   }
 
@@ -2419,7 +2423,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         saveChanges(validRecords);
         addSelectedRecords(validRecords);
         zoomToRecords(validRecords);
-        showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
+        showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED, true);
         firePropertyChange(RECORDS_INSERTED, null, validRecords);
       }
       // Delete any invalid records
@@ -2486,7 +2490,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected void postSelectByBoundingBox(final List<LayerRecord> records) {
     if (isHasSelectedRecordsWithGeometry()) {
-      showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
+      showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED, false);
     }
     if (!records.isEmpty()) {
       firePropertyChange("selectedRecordsByBoundingBox", false, true);
@@ -3038,11 +3042,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public void setSelectedRecords(final BoundingBox boundingBox) {
+  public boolean setSelectedRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
       final List<LayerRecord> records = getRecordsVisible(boundingBox);
       setSelectedRecords(records);
       postSelectByBoundingBox(records);
+      return !records.isEmpty();
+    } else {
+      return false;
     }
   }
 
@@ -3244,11 +3251,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void showRecordsTable() {
-    showRecordsTable(null);
+    showRecordsTable(null, true);
   }
 
-  public void showRecordsTable(final String fieldFilterMode) {
-    final Map<String, Object> config = Maps.newLinkedHash("fieldFilterMode", fieldFilterMode);
+  public void showRecordsTable(final String fieldFilterMode, final boolean selectTab) {
+    final MapEx config = new LinkedHashMapEx("fieldFilterMode", fieldFilterMode);
+    if (!selectTab) {
+      config.put("selectTab", false);
+    }
     showTableView(config);
   }
 
@@ -3381,9 +3391,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (isSelectable()) {
       final List<LayerRecord> records = getRecordsVisible(boundingBox);
       unSelectRecords(records);
-      if (isHasSelectedRecordsWithGeometry()) {
-        showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
-      }
     }
   }
 

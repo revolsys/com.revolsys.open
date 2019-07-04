@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
+import java.awt.Color;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
@@ -11,6 +12,7 @@ import java.util.function.Consumer;
 import javax.swing.Icon;
 import javax.swing.SwingWorker;
 
+import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.LruMap;
@@ -93,6 +95,11 @@ public class ModeAllPaged extends ModeAbstractCached {
   public void forEachRecord(final Query query, final Consumer<? super LayerRecord> action) {
     final AbstractRecordLayer layer = getLayer();
     layer.forEachRecord(query, action);
+  }
+
+  @Override
+  public Color getBorderColor() {
+    return WebColors.Blue;
   }
 
   @Override

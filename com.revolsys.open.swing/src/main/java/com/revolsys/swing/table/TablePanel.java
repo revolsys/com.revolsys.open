@@ -108,7 +108,7 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
     }
   };
 
-  private JScrollPane scrollPane;
+  protected JScrollPane scrollPane;
 
   private BaseJTable table;
 

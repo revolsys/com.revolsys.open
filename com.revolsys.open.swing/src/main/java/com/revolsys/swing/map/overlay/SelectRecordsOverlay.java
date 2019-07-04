@@ -2,6 +2,7 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -32,8 +33,10 @@ import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.record.Record;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.TabbedPane;
 import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
@@ -43,6 +46,8 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
+import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
+import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 import com.revolsys.value.ThreadBooleanValue;
@@ -118,26 +123,21 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     this.imageSelected.addPropertyChangeListener(this);
   }
 
-  public void addSelectedRecords(final BoundingBox boundingBox) {
-    final LayerGroup project = getProject();
-    addSelectedRecords(project, boundingBox);
-    final LayerRendererOverlay overlay = getMap().getLayerOverlay();
-    overlay.redraw();
-  }
-
-  private void addSelectedRecords(final LayerGroup group, final BoundingBox boundingBox) {
-
+  private void addSelectedRecords(final List<AbstractRecordLayer> layersWithSelectedRecords,
+    final LayerGroup group, final BoundingBox boundingBox) {
     final double scale = getViewport().getScale();
     final List<Layer> layers = group.getLayers();
     Collections.reverse(layers);
     for (final Layer layer : layers) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
-        addSelectedRecords(childGroup, boundingBox);
+        addSelectedRecords(layersWithSelectedRecords, childGroup, boundingBox);
       } else if (layer instanceof AbstractRecordLayer) {
         final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
         if (recordLayer.isSelectable(scale)) {
-          recordLayer.addSelectedRecords(boundingBox);
+          if (recordLayer.addSelectedRecords(boundingBox)) {
+            layersWithSelectedRecords.add(recordLayer);
+          }
         }
       }
     }
@@ -149,13 +149,44 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   protected void doSelectRecords(final InputEvent event, final BoundingBox boundingBox) {
-    if (SwingUtil.isShiftDown(event)) {
-      Invoke.background("Select records", () -> addSelectedRecords(boundingBox));
-    } else if (SwingUtil.isAltDown(event)) {
+    final boolean modeAdd = SwingUtil.isShiftDown(event);
+    if (!modeAdd && SwingUtil.isAltDown(event)) {
       Invoke.background("Unselect records", () -> unSelectRecords(boundingBox));
     } else {
-      Invoke.background("Select records", () -> selectRecords(boundingBox));
+      final ProjectFrame projectFrame = getProjectFrame();
+      final TabbedPane bottomTabs = projectFrame.getBottomTabs();
+      RecordLayerTablePanel panel;
+      final Component selectedTab = bottomTabs.getSelectedComponent();
+      if (selectedTab instanceof RecordLayerTablePanel) {
+        panel = (RecordLayerTablePanel)selectedTab;
+      } else {
+        panel = null;
+      }
+
+      Invoke.background("Select records", () -> {
+        final List<AbstractRecordLayer> layersWithSelectedRecords = new ArrayList<>();
+        try (
+          BaseCloseable closeable = this.selectingRecords.closeable(true)) {
+          final LayerGroup project = getProject();
+          if (modeAdd) {
+            addSelectedRecords(layersWithSelectedRecords, project, boundingBox);
+          } else {
+            selectRecords(layersWithSelectedRecords, project, boundingBox);
+          }
+
+          final LayerRendererOverlay overlay = getMap().getLayerOverlay();
+          overlay.redraw();
+          redrawAndRepaint();
+        }
+        return layersWithSelectedRecords;
+      }, layers -> {
+        if ((panel == null || !layers.contains(panel.getLayer())) && !layers.isEmpty()) {
+          final AbstractRecordLayer layer = layers.get(layers.size() - 1);
+          layer.showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED, true);
+        }
+      });
     }
+
   }
 
   @Override
@@ -469,29 +500,21 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     return false;
   }
 
-  public void selectRecords(final BoundingBox boundingBox) {
-    try (
-      BaseCloseable closeable = this.selectingRecords.closeable(true)) {
-      final LayerGroup project = getProject();
-      selectRecords(project, boundingBox);
-      final LayerRendererOverlay overlay = getMap().getLayerOverlay();
-      overlay.redraw();
-      redrawAndRepaint();
-    }
-  }
-
-  private void selectRecords(final LayerGroup group, final BoundingBox boundingBox) {
+  private void selectRecords(final List<AbstractRecordLayer> layersWithSelectedRecords,
+    final LayerGroup group, final BoundingBox boundingBox) {
     final double scale = getViewport().getScale();
     final List<Layer> layers = group.getLayers();
     Collections.reverse(layers);
     for (final Layer layer : layers) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
-        selectRecords(childGroup, boundingBox);
+        selectRecords(layersWithSelectedRecords, childGroup, boundingBox);
       } else if (layer instanceof AbstractRecordLayer) {
         final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
         if (recordLayer.isSelectable(scale)) {
-          recordLayer.setSelectedRecords(boundingBox);
+          if (recordLayer.setSelectedRecords(boundingBox)) {
+            layersWithSelectedRecords.add(recordLayer);
+          }
         } else {
           recordLayer.clearSelectedRecords();
         }
@@ -537,7 +560,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     }
   }
 
-  public void unSelectRecords(final BoundingBox boundingBox) {
+  private void unSelectRecords(final BoundingBox boundingBox) {
     final LayerGroup project = getProject();
     unSelectRecords(project, boundingBox);
     final LayerRendererOverlay overlay = getMap().getLayerOverlay();

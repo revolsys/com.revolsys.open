@@ -199,8 +199,12 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private final BasePanel layeredPanel;
 
-  public MapPanel(final Preferences preferences, final Project project) {
+  private final ProjectFrame projectFrame;
+
+  public MapPanel(final ProjectFrame projectFrame, final Preferences preferences,
+    final Project project) {
     super(new BorderLayout());
+    this.projectFrame = projectFrame;
     this.preferences = preferences;
     this.project = project;
     this.selectedRecordsIndex = new LayerRecordQuadTree(project.getGeometryFactory());
@@ -645,6 +649,10 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   public Project getProject() {
     return this.project;
+  }
+
+  public ProjectFrame getProjectFrame() {
+    return this.projectFrame;
   }
 
   public JPanel getRightStatusBar() {

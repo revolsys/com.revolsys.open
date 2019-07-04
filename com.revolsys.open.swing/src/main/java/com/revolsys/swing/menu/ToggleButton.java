@@ -1,11 +1,13 @@
 package com.revolsys.swing.menu;
 
+import java.awt.Graphics;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.Icon;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
+import javax.swing.border.Border;
 
 import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -16,6 +18,8 @@ public class ToggleButton extends JToggleButton implements PropertyChangeListene
   private static final long serialVersionUID = 1L;
 
   private EnableCheck enableCheck;
+
+  private Border insideBorder;
 
   public ToggleButton(final AbstractAction action) {
     super(action);
@@ -35,6 +39,14 @@ public class ToggleButton extends JToggleButton implements PropertyChangeListene
   }
 
   @Override
+  protected void paintComponent(final Graphics g) {
+    super.paintComponent(g);
+    if (this.insideBorder != null) {
+      this.insideBorder.paintBorder(this, g, 2, 2, getWidth() - 4, getHeight() - 4);
+    }
+  }
+
+  @Override
   public void propertyChange(final PropertyChangeEvent evt) {
     final boolean enabled = this.enableCheck.isEnabled();
     Invoke.later(() -> {
@@ -47,5 +59,9 @@ public class ToggleButton extends JToggleButton implements PropertyChangeListene
     this.enableCheck = enableCheck;
     Property.addListener(enableCheck, "enabled", this);
     setEnabled(enableCheck == null || this.enableCheck.isEnabled());
+  }
+
+  public void setInsideBorder(final Border insideBorder) {
+    this.insideBorder = insideBorder;
   }
 }
