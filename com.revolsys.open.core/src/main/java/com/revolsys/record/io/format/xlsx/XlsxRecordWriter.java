@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
+import org.docx4j.jaxb.NamespacePrefixMapperUtils;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.io3.Save;
 import org.docx4j.openpackaging.packages.SpreadsheetMLPackage;
@@ -16,6 +17,7 @@ import org.docx4j.openpackaging.parts.PartName;
 import org.docx4j.openpackaging.parts.SpreadsheetML.TablePart;
 import org.docx4j.openpackaging.parts.SpreadsheetML.WorksheetPart;
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Doubles;
 import org.xlsx4j.jaxb.Context;
 import org.xlsx4j.sml.CTAutoFilter;
@@ -46,6 +48,16 @@ import com.revolsys.spring.resource.Resource;
 
 public class XlsxRecordWriter extends AbstractRecordWriter {
   private static final ObjectFactory smlObjectFactory = Context.getsmlObjectFactory();
+
+  static {
+    // This method is not thread safe, so call it before we need to use it, to
+    // ensure initialization.
+    try {
+      NamespacePrefixMapperUtils.getPrefixMapper();
+    } catch (final JAXBException e) {
+      Logs.error(XlsxRecordWriter.class, "Unable to initialized DOCx4j", e);
+    }
+  }
 
   public static String getRef(long columnIndex, final int rowIndex) {
     columnIndex--;

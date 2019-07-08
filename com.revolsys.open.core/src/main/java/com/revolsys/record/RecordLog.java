@@ -14,6 +14,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
+import com.revolsys.io.file.AtomicPathUpdator;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -55,11 +56,21 @@ public class RecordLog implements BaseCloseable {
 
   private final Map<RecordDefinition, RecordDefinitionImpl> logRecordDefinitionMap = new HashMap<>();
 
-  private Writer<Record> writer;
+  private RecordWriter writer;
 
   private boolean usesLocality;
 
+  private AtomicPathUpdator pathUpdator;
+
   public RecordLog() {
+  }
+
+  public RecordLog(final AtomicPathUpdator pathUpdator, final Record record) {
+    this.pathUpdator = pathUpdator;
+    final Path errorFile = pathUpdator.getPath();
+    this.usesLocality = true;
+    final RecordDefinition logRecordDefinition = getLogRecordDefinition(record);
+    this.writer = RecordWriter.newRecordWriter(logRecordDefinition, errorFile);
   }
 
   public RecordLog(final boolean usesLocality) {
@@ -73,18 +84,24 @@ public class RecordLog implements BaseCloseable {
     this.writer = RecordWriter.newRecordWriter(logRecordDefinition, path);
   }
 
-  public RecordLog(final Writer<Record> writer) {
+  public RecordLog(final RecordWriter writer) {
     this.writer = writer;
   }
 
   @Override
-  public void close() {
-    final Writer<Record> writer = this.writer;
+  public synchronized void close() {
+    final RecordWriter writer = this.writer;
     if (writer != null) {
+      this.writer = null;
       writer.flush();
       writer.close();
     }
     this.logRecordDefinitionMap.clear();
+    final AtomicPathUpdator pathUpdator = this.pathUpdator;
+    if (pathUpdator != null) {
+      this.pathUpdator = null;
+      pathUpdator.close();
+    }
   }
 
   public synchronized void error(final Object message, final Record record) {
@@ -168,7 +185,7 @@ public class RecordLog implements BaseCloseable {
     }
   }
 
-  public void setWriter(final Writer<Record> writer) {
+  public void setWriter(final RecordWriter writer) {
     this.writer = writer;
   }
 
