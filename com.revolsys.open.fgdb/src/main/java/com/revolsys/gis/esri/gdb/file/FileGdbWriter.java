@@ -162,4 +162,5 @@ public class FileGdbWriter extends AbstractRecordWriter {
       insertRecord(record);
     }
   }
+
 }

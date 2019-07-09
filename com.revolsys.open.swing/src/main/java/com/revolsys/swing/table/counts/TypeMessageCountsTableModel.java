@@ -7,9 +7,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.collection.map.Maps;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.format.tsv.Tsv;
 import com.revolsys.record.io.format.tsv.TsvWriter;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionBuilder;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.util.Counter;
@@ -144,6 +149,33 @@ public class TypeMessageCountsTableModel extends AbstractTableModel {
         }
       }
       tsv.write(null, "Total", total);
+    }
+  }
+
+  public void writeCounts(final Object target) {
+    final RecordDefinitionBuilder recordDefinitionBuilder = new RecordDefinitionBuilder("Counts");
+    recordDefinitionBuilder.addField(COLUMN_NAMES[0], DataTypes.STRING, 50);
+    recordDefinitionBuilder.addField(COLUMN_NAMES[1], DataTypes.STRING, 50);
+    recordDefinitionBuilder.addField(COLUMN_NAMES[2], DataTypes.LONG);
+
+    final RecordDefinition recordDefinition = recordDefinitionBuilder.getRecordDefinition();
+    try (
+      RecordWriter recordWriter = RecordWriter.newRecordWriter(recordDefinition, target)) {
+      long total = 0;
+      for (final Entry<String, Map<String, Integer>> typeEntry : this.indexByTypeAndMessage
+        .entrySet()) {
+        final String type = typeEntry.getKey();
+        final Map<String, Integer> indexByMessage = typeEntry.getValue();
+        for (final Entry<String, Integer> messageEntry : indexByMessage.entrySet()) {
+          final String message = messageEntry.getKey();
+          final Integer index = messageEntry.getValue();
+          final Counter counter = this.counters.get(index);
+          final long count = counter.get();
+          total += count;
+          recordWriter.write(type, message, count);
+        }
+      }
+      recordWriter.write(null, "Total", total);
     }
   }
 

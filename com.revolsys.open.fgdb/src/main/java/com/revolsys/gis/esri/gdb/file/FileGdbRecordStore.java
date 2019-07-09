@@ -445,6 +445,10 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
+  public void compactGeodatabase() {
+    this.geodatabase.valueConsume(Geodatabase::CompactDatabase);
+  }
+
   public void deleteGeodatabase() {
     this.createMissingRecordStore = false;
     this.createMissingTables = false;
@@ -1185,6 +1189,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       }
     }
     final String tableDefinition = EsriGdbXmlSerializer.toString(deTable);
+
     try {
       final String scp = schemaCatalogPath;
       threadGeodatabase(geodatabase -> {
