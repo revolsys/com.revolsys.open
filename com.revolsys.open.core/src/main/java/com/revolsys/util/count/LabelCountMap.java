@@ -112,4 +112,10 @@ public class LabelCountMap extends AbstractLabelCounters {
   public boolean isEmpty() {
     return this.counterByLabel.isEmpty();
   }
+
+  @Override
+  public synchronized void setCounter(final CharSequence label, final Counter counter) {
+    final String labelString = label.toString();
+    this.counterByLabel.put(labelString, counter);
+  }
 }

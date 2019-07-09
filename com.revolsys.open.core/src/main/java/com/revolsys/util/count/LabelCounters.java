@@ -72,6 +72,10 @@ public interface LabelCounters {
 
   String logCounts();
 
+  default void setCounter(final CharSequence label, final Counter counter) {
+    throw new UnsupportedOperationException();
+  }
+
   void setLogCounts(boolean logCounts);
 
   void setMessage(String message);

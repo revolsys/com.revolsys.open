@@ -328,6 +328,12 @@ public class LabelCountMapTableModel extends AbstractTableModel {
     column.setPreferredWidth(width);
   }
 
+  public void setCounter(final CharSequence label, final CharSequence countName,
+    final Counter counter) {
+    final LabelCounters labelCountMap = getLabelCountMap(label, countName);
+    labelCountMap.setCounter(label, counter);
+  }
+
   public void setStatistics(final String statisticName, final LabelCounters labelCountMap) {
     addCountNameColumn(statisticName);
     this.categoryLabelCountMap.setLabelCounters(statisticName, labelCountMap);

@@ -79,6 +79,25 @@ public class AtomicPathUpdator implements BaseCloseable {
     }
   }
 
+  public void deleteFiles() {
+    final Path tempDirectory = this.tempDirectory;
+    try {
+      if (!isCancelled()) {
+        try {
+          Files.list(tempDirectory).forEach(tempPath -> {
+            final Path relativePath = tempDirectory.relativize(tempPath);
+            final Path targetPath = this.targetDirectory.resolve(relativePath);
+            Paths.deleteDirectories(targetPath);
+          });
+        } catch (final IOException e) {
+          throw Exceptions.wrap(e);
+        }
+      }
+    } finally {
+      Paths.deleteDirectories(tempDirectory);
+    }
+  }
+
   public Path getPath() {
     return this.path;
   }
