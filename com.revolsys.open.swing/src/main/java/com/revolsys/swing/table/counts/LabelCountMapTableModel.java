@@ -344,8 +344,10 @@ public class LabelCountMapTableModel extends AbstractTableModel {
   }
 
   public void writeCounts(final Object target) {
-    final String labelTitle = getLabelTitle();
-    this.categoryLabelCountMap.writeCounts(target, labelTitle, this.countNames);
+    if (getRowCount() > 0) {
+      final String labelTitle = getLabelTitle();
+      this.categoryLabelCountMap.writeCounts(target, labelTitle, this.countNames);
+    }
   }
 
 }
