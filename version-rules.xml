@@ -37,5 +37,10 @@
         <ignoreVersion type="regex">.*-EDR</ignoreVersion>
       </ignoreVersions>
     </rule>
+    <rule groupId="org.docx4j" artifactId="docx4j-JAXB-MOXy" comparisonMethod="maven">
+      <ignoreVersions>
+        <ignoreVersion type="regex">11.*</ignoreVersion>
+      </ignoreVersions>
+    </rule>
   </rules>
 </ruleset>

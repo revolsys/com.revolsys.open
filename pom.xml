@@ -74,7 +74,7 @@
             <configuration>
               <rules>
                 <requireMavenVersion>
-                  <version>3.5.0</version>
+                  <version>3.5.4</version>
                 </requireMavenVersion>
                 <requireJavaVersion>
                   <version>11</version>
@@ -106,7 +106,7 @@
       <plugin>
         <groupId>pl.project13.maven</groupId>
         <artifactId>git-commit-id-plugin</artifactId>
-        <version>2.2.5</version>
+        <version>3.0.0</version>
         <executions>
           <execution>
             <id>get-the-git-infos</id>
@@ -123,7 +123,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.1.1</version>
+        <version>3.1.2</version>
         <configuration>
           <archive>
             <manifestEntries>
@@ -141,7 +141,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.0.1</version>
+        <version>3.1.0</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -154,7 +154,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.0.1</version>
+        <version>3.1.1</version>
         <configuration>
           <failOnError>false</failOnError>
           <quiet>yes</quiet>
@@ -223,7 +223,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>1.19</version>
+        <version>2.0.0</version>
         <!-- <executions> <execution> <id>aggregate-add-third-party</id> <inherited>true</inherited> 
           <phase>install</phase> <configuration> <force>true</force> <outputDirectory>src/license/</outputDirectory> 
           <useMissingFile>true</useMissingFile> <licenseMerges> <licenseMerge>apache_2_0|apache_v2</licenseMerge> 
@@ -242,7 +242,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M2</version>
+        <version>3.0.0-M3</version>
         <configuration>
           <argLine>
             --illegal-access=permit
@@ -361,7 +361,7 @@
       <dependency>
         <groupId>org.docx4j</groupId>
         <artifactId>docx4j-JAXB-MOXy</artifactId>
-        <version>8.1.0</version>
+        <version>8.1.1</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
@@ -542,7 +542,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <org.apache.log4j.version>2.11.2</org.apache.log4j.version>
+    <org.apache.log4j.version>2.12.0</org.apache.log4j.version>
     <org.gdal.version>2.4.0</org.gdal.version>
     <org.jeometry.version>TRUNK-SNAPSHOT</org.jeometry.version>
     <org.springframework.version>5.1.6.RELEASE</org.springframework.version>
