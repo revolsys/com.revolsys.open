@@ -96,7 +96,7 @@ public class MediaTypeUtil {
     for (final String source : mediaTypeOrder) {
       if (source.equals("pathExtension")) {
         final String requestUri = urlPathHelper.getRequestUri(request);
-        final String filename = FileUtil.getBaseName(requestUri);
+        final String filename = FileUtil.getFileName(requestUri);
         final MediaType mediaType = getMediaTypeFromFilename(extensionToMediaTypeMap, filename);
         if (mediaType != null) {
           mediaTypes.add(mediaType);
