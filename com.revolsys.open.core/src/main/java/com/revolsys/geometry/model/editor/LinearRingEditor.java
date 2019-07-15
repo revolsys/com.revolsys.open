@@ -151,14 +151,14 @@ public class LinearRingEditor extends LineStringEditor implements LinearRing {
   }
 
   @Override
-  public double setZ(final int vertexIndex, final double m) {
+  public double setZ(final int vertexIndex, final double z) {
     final int lastVertexIndex = getLastVertexIndex();
     if (vertexIndex == 0 || vertexIndex == lastVertexIndex) {
       // Ensure valid loop
-      super.setZ(0, m);
-      return super.setZ(lastVertexIndex, m);
+      super.setZ(0, z);
+      return super.setZ(lastVertexIndex, z);
     } else {
-      return super.setZ(vertexIndex, m);
+      return super.setZ(vertexIndex, z);
     }
   }
 

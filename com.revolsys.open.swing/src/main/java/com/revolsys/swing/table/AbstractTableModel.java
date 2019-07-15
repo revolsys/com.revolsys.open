@@ -15,7 +15,7 @@ import javax.swing.table.TableColumnModel;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
-import org.jeometry.common.function.IntBiConsumer;
+import org.jeometry.common.function.BiConsumerInt;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.beans.PropertyChangeSupport;
@@ -46,6 +46,27 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
   }
 
   /**
+   * Add a menu item that will invoke the specific action with the {@link TablePanel#getEventRow()}
+   * and {@link TablePanel#getEventColumn()}.
+   *
+   * @param groupName
+   * @param index
+   * @param title
+   * @param iconName
+   * @param action
+   */
+  public void addMenuItem(final String groupName, final int index, final String title,
+    final String iconName, final BiConsumerInt action) {
+    getMenu().addMenuItem(groupName, index, title, iconName, () -> {
+      final int eventRow = TablePanel.getEventRow();
+      final int eventColumn = TablePanel.getEventColumn();
+      if (eventRow > -1 && eventColumn > -1) {
+        action.accept(eventRow, eventColumn);
+      }
+    });
+  }
+
+  /**
   * Add a menu item that will invoke the specific action with the {@link TablePanel#getEventRow()}
   * and {@link TablePanel#getEventColumn()}.
   *
@@ -61,27 +82,6 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
       final BaseJTable eventTable = TablePanel.getEventTable();
       if (eventTable != null) {
         action.accept(eventTable);
-      }
-    });
-  }
-
-  /**
-   * Add a menu item that will invoke the specific action with the {@link TablePanel#getEventRow()}
-   * and {@link TablePanel#getEventColumn()}.
-   *
-   * @param groupName
-   * @param index
-   * @param title
-   * @param iconName
-   * @param action
-   */
-  public void addMenuItem(final String groupName, final int index, final String title,
-    final String iconName, final IntBiConsumer action) {
-    getMenu().addMenuItem(groupName, index, title, iconName, () -> {
-      final int eventRow = TablePanel.getEventRow();
-      final int eventColumn = TablePanel.getEventColumn();
-      if (eventRow > -1 && eventColumn > -1) {
-        action.accept(eventRow, eventColumn);
       }
     });
   }
@@ -107,20 +107,6 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
   }
 
   /**
-   * Add a menu item that will invoke the specific action with the {@link TablePanel#getEventTable()}.
-   *
-   * @param groupName
-   * @param index
-   * @param title
-   * @param iconName
-   * @param action
-   */
-  public void addMenuItem(final String groupName, final String title, final String iconName,
-    final Consumer<BaseJTable> action) {
-    addMenuItem(groupName, -1, title, iconName, action);
-  }
-
-  /**
    * Add a menu item that will invoke the specific action with the {@link TablePanel#getEventRow()}
    * and {@link TablePanel#getEventColumn()}.
    *
@@ -131,7 +117,21 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
    * @param action
    */
   public void addMenuItem(final String groupName, final String title, final String iconName,
-    final IntBiConsumer action) {
+    final BiConsumerInt action) {
+    addMenuItem(groupName, -1, title, iconName, action);
+  }
+
+  /**
+   * Add a menu item that will invoke the specific action with the {@link TablePanel#getEventTable()}.
+   *
+   * @param groupName
+   * @param index
+   * @param title
+   * @param iconName
+   * @param action
+   */
+  public void addMenuItem(final String groupName, final String title, final String iconName,
+    final Consumer<BaseJTable> action) {
     addMenuItem(groupName, -1, title, iconName, action);
   }
 

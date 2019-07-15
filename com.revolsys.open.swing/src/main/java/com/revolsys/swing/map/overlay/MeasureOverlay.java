@@ -146,7 +146,7 @@ public class MeasureOverlay extends AbstractOverlay {
           }
         }
         try {
-          final GeometryEditor geometryEditor = geometry.newGeometryEditor();
+          final GeometryEditor<?> geometryEditor = geometry.newGeometryEditor();
           geometryEditor.deleteVertex(vertexId);
           if (geometryEditor.isModified()) {
             return geometryEditor.newGeometry();

@@ -60,7 +60,6 @@ import org.jeometry.common.function.Consumer3Double;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.io.EsriCsWktWriter;
-import org.jeometry.coordinatesystem.io.WktCsParser;
 import org.jeometry.coordinatesystem.model.Area;
 import org.jeometry.coordinatesystem.model.CompoundCoordinateSystem;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
@@ -546,10 +545,10 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
           if (cause instanceof FileNotFoundException) {
           } else if (cause instanceof FileSystemException) {
           } else {
-            Logs.error(WktCsParser.class, "Unable to load projection from " + projResource, e);
+            Logs.error(GeometryFactory.class, "Unable to load projection from " + projResource, e);
           }
         } catch (final Exception e) {
-          Logs.error(WktCsParser.class, "Unable to load projection from " + projResource, e);
+          Logs.error(GeometryFactory.class, "Unable to load projection from " + projResource, e);
         }
       }
       return null;
