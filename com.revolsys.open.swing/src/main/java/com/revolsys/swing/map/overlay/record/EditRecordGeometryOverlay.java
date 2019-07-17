@@ -109,6 +109,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   private static final long serialVersionUID = 1L;
 
+  private static final MarkerStyle GEOMETRY_INSERT_VERTEX_STYLE = MarkerStyle.marker("xLine", 9,
+    WebColors.Blue, 3, WebColors.Blue);
+
   private int actionId = 0;
 
   private AddGeometryCompleteAction addCompleteAction;
@@ -135,9 +138,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   private Point moveGeometryStart;
 
   private GeometryEditor<?> addGeometryEditor;
-
-  private final MarkerStyle GEOMETRY_INSERT_VERTEX_STYLE = MarkerStyle.marker("xLine", 9,
-    WebColors.Blue, 3, WebColors.Blue);
 
   public EditRecordGeometryOverlay(final MapPanel map) {
     super(map);
@@ -1135,7 +1135,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             final double orientation = location.getSegment().getOrientaton();
             final Point pointOnLine = location.getViewportPoint();
             try (
-              MarkerRenderer markerRenderer = this.GEOMETRY_INSERT_VERTEX_STYLE
+              MarkerRenderer markerRenderer = GEOMETRY_INSERT_VERTEX_STYLE
                 .newMarkerRenderer(view)) {
               markerRenderer.renderMarkerPoint(pointOnLine, orientation);
             }

@@ -48,6 +48,7 @@ import com.revolsys.swing.listener.BaseMouseListener;
 import com.revolsys.swing.listener.BaseMouseMotionListener;
 import com.revolsys.swing.map.ComponentViewport2D;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -416,6 +417,10 @@ public class AbstractOverlay extends JComponent implements MapOverlay, PropertyC
 
   public Project getProject() {
     return this.map.getProject();
+  }
+
+  public ProjectFrame getProjectFrame() {
+    return this.map.getProjectFrame();
   }
 
   protected List<LayerRecord> getSelectedRecords(final BoundingBox boundingBox) {
