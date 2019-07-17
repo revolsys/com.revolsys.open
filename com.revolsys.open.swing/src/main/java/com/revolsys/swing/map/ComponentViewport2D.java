@@ -24,8 +24,6 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
 
   private final JComponent component;
 
-  private int maxIntegerDigits;
-
   private final GlobalBooleanValue componentResizing = new GlobalBooleanValue(false);
 
   public ComponentViewport2D(final Project project, final JComponent component) {
@@ -83,17 +81,6 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
   protected void setGeometryFactoryPreEvent(final GeometryFactory geometryFactory) {
     if (geometryFactory.isHasHorizontalCoordinateSystem()) {
       final BoundingBox areaBoundingBox = geometryFactory.getAreaBoundingBox();
-      final double minX = areaBoundingBox.getMinX();
-      final double maxX = areaBoundingBox.getMaxX();
-      final double minY = areaBoundingBox.getMinY();
-      final double maxY = areaBoundingBox.getMaxY();
-      final double logMinX = Math.log10(Math.abs(minX));
-      final double logMinY = Math.log10(Math.abs(minY));
-      final double logMaxX = Math.log10(Math.abs(maxX));
-      final double logMaxY = Math.log10(Math.abs(maxY));
-      final double maxLog = Math
-        .abs(Math.max(Math.max(logMinX, logMinY), Math.max(logMaxX, logMaxY)));
-      this.maxIntegerDigits = (int)Math.floor(maxLog + 1);
       final BoundingBox boundingBox = getBoundingBox();
       if (Property.hasValue(boundingBox)) {
         final BoundingBox newBoundingBox = boundingBox.bboxToCs(geometryFactory);
@@ -143,9 +130,7 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
       final int viewWidth = this.component.getWidth() - insets.left - insets.right;
       final int viewHeight = this.component.getHeight() - insets.top - insets.bottom;
 
-      setViewWidth(viewWidth);
-      setViewHeight(viewHeight);
-      setBoundingBox(getBoundingBox());
+      resetView(viewWidth, viewHeight);
 
       update();
     }

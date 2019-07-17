@@ -465,6 +465,14 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     return new Graphics2DViewRenderer(this, (Graphics2D)graphics);
   }
 
+  protected synchronized void resetView(final double viewWidth, final double viewHeight) {
+    this.viewWidth = viewWidth;
+    this.viewHeight = viewHeight;
+    this.unitsPerPixel = 0;
+    final BoundingBox boundingBox = getBoundingBox();
+    setBoundingBox(boundingBox);
+  }
+
   public BoundingBox setBoundingBox(BoundingBox boundingBox) {
     if (boundingBox != null && !boundingBox.isEmpty()
       && (!this.boundingBox.equals(boundingBox) || this.unitsPerPixel == 0)) {
@@ -727,14 +735,6 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
       this.screenToModelTransform = null;
       this.scale = 0;
     }
-  }
-
-  protected synchronized void setViewHeight(final double height) {
-    this.viewHeight = height;
-  }
-
-  protected synchronized void setViewWidth(final double width) {
-    this.viewWidth = width;
   }
 
   public void setZoomByUnitsPerPixel(final boolean zoomByUnitsPerPixel) {
