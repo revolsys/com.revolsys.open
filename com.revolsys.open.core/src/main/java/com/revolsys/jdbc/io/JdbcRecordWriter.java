@@ -15,8 +15,6 @@ import javax.sql.DataSource;
 
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 
 import com.revolsys.collection.map.Maps;
@@ -35,7 +33,6 @@ import com.revolsys.transaction.Transaction;
 import com.revolsys.util.count.CategoryLabelCountMap;
 
 public class JdbcRecordWriter extends AbstractRecordWriter {
-  private static final Logger LOG = LoggerFactory.getLogger(JdbcRecordWriter.class);
 
   private int batchSize = 1;
 
