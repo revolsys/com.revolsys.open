@@ -130,7 +130,7 @@ public class TableReference extends CloseableValueHolder<Table> {
   }
 
   synchronized void setLoadOnlyMode(final boolean loadOnly) {
-    // valtable.setLoadOnlyMode(loadOnly);
+    // table.setLoadOnlyMode(loadOnly);
   }
 
   @Override
