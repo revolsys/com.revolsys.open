@@ -9,6 +9,7 @@ import java.util.List;
 import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.jdbc.field.JdbcFieldDefinitions;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
 
@@ -81,7 +82,7 @@ public class SqlCondition implements Condition {
       }
 
       if (jdbcAttribute == null) {
-        jdbcAttribute = JdbcFieldDefinition.newFieldDefinition(value);
+        jdbcAttribute = JdbcFieldDefinitions.newFieldDefinition(value);
       }
       try {
         index = jdbcAttribute.setPreparedStatementValue(statement, index, value);
