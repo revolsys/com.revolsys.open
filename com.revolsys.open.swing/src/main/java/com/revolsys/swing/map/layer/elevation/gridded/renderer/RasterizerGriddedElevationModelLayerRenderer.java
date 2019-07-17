@@ -25,14 +25,13 @@ import com.revolsys.swing.map.layer.elevation.gridded.renderer.jocl.GriddedEleva
 import com.revolsys.swing.map.layer.elevation.gridded.renderer.jocl.JoclGriddedElevationModelImageRasterizer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 
 public class RasterizerGriddedElevationModelLayerRenderer
   extends AbstractGriddedElevationModelLayerRenderer {
 
   static {
     MenuFactory.addMenuInitializer(RasterizerGriddedElevationModelLayerRenderer.class,
-      menu -> Menus.addMenuItem(menu, "layer", "Delete", "delete",
+      menu -> menu.addMenuItem("layer", -1, "Delete", "delete",
         RasterizerGriddedElevationModelLayerRenderer::isHasParent,
         RasterizerGriddedElevationModelLayerRenderer::delete, true));
   }
@@ -41,7 +40,7 @@ public class RasterizerGriddedElevationModelLayerRenderer
     final BiFunction<ElevationModelLayer, IMultipleGriddedElevationModelLayerRenderer, AbstractGriddedElevationModelLayerRenderer> rendererFactory) {
     final String iconName = ("style_" + type.replace(' ', '_') + ":add").toLowerCase();
     final String name = "Add " + type + " Style";
-    Menus.addMenuItem(menu, "add", name, iconName,
+    menu.addMenuItem("add", name, iconName,
       (final IMultipleGriddedElevationModelLayerRenderer parentRenderer) -> {
         final ElevationModelLayer layer = parentRenderer.getLayer();
         final AbstractGriddedElevationModelLayerRenderer newRenderer = rendererFactory.apply(layer,

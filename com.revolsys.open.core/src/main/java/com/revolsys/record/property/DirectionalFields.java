@@ -113,7 +113,19 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     return property.getMergedRecordReverseLongest(record1, record2);
   }
 
-  public static void reverse(final Record record) {
+  public static void reverseFieldValuesRecord(final Record record) {
+    final DirectionalFields property = getProperty(record);
+    final Map<String, Object> map = record;
+    property.reverseFieldValues(map);
+  }
+
+  public static void reverseGeometryRecord(final Record record) {
+    final DirectionalFields property = getProperty(record);
+    final Map<String, Object> map = record;
+    property.reverseGeometry(map);
+  }
+
+  public static void reverseRecord(final Record record) {
     final DirectionalFields property = getProperty(record);
     property.reverseFieldValuesAndGeometry(record);
   }

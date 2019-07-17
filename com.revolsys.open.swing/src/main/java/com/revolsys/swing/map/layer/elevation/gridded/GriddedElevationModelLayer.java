@@ -43,7 +43,6 @@ import com.revolsys.swing.map.layer.elevation.gridded.renderer.RasterizerGridded
 import com.revolsys.swing.map.layer.elevation.gridded.renderer.TiledMultipleGriddedElevationModelLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
@@ -61,14 +60,14 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
       .negate();
     final Predicate<GriddedElevationModelLayer> editable = GriddedElevationModelLayer::isEditable;
 
-    Menus.<GriddedElevationModelLayer> addCheckboxMenuItem(menu, "edit", "Editable", "pencil",
-      notReadOnly, GriddedElevationModelLayer::toggleEditable, editable, true);
+    menu.<GriddedElevationModelLayer> addCheckboxMenuItem("edit", "Editable", "pencil", notReadOnly,
+      GriddedElevationModelLayer::toggleEditable, editable, true);
 
-    Menus.<GriddedElevationModelLayer> addMenuItem(menu, "edit", "Save As...", "disk",
+    menu.<GriddedElevationModelLayer> addMenuItem("edit", "Save As...", "disk",
       GriddedElevationModelLayer::saveAs, true);
 
-    Menus.<GriddedElevationModelLayer> addMenuItem(menu, "refresh", "Reload from File",
-      "page:refresh", GriddedElevationModelLayer::revertDo, true);
+    menu.<GriddedElevationModelLayer> addMenuItem("refresh", "Reload from File", "page:refresh",
+      GriddedElevationModelLayer::revertDo, true);
   }
 
   private static void actionExport(final PathTreeNode node) {

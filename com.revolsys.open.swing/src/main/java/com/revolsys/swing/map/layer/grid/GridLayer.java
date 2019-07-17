@@ -21,7 +21,6 @@ import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
@@ -31,7 +30,7 @@ public class GridLayer extends AbstractLayer {
     MenuFactory.addMenuInitializer(GridLayer.class, menu -> {
       menu.deleteMenuItem("zoom", "Zoom to Layer");
       menu.deleteMenuItem("refresh", "Refresh");
-      Menus.<GridLayer> addMenuItem(menu, "zoom", "Zoom to Mapsheet", "magnifier_zoom_grid",
+      menu.<GridLayer> addMenuItem("zoom", "Zoom to Mapsheet", "magnifier_zoom_grid",
         GridLayer::zoomToSheet, false);
     });
   }

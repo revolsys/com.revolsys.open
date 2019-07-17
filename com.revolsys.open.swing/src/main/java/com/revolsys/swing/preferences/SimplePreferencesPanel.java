@@ -4,8 +4,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.jeometry.common.data.type.DataType;
-
 import com.revolsys.swing.field.Field;
 import com.revolsys.util.PreferenceKey;
 
@@ -18,21 +16,9 @@ public class SimplePreferencesPanel extends AbstractPreferencesPanel {
     super(title, null);
   }
 
-  public void addPreference(final String applicationName, final PreferenceKey preferenceKey,
-    final DataType valueClass, final Object defaultValue) {
-    final Preference preference = new Preference(applicationName, preferenceKey, valueClass,
-      defaultValue);
-    if (!this.preferences.contains(preference)) {
-      this.preferences.add(preference);
-      addField(preference.getField());
-    }
-  }
-
   public Preference addPreference(final String applicationName, final PreferenceKey preferenceKey,
-    final DataType valueClass, final Object defaultValue,
     final Function<Preference, Field> fieldFactory) {
-    final Preference preference = new Preference(applicationName, preferenceKey, valueClass,
-      defaultValue, fieldFactory);
+    final Preference preference = new Preference(applicationName, preferenceKey, fieldFactory);
     if (this.preferences.contains(preference)) {
       for (final Preference preference2 : this.preferences) {
         if (preference2.equals(preference)) {

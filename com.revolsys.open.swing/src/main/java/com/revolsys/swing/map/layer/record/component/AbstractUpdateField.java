@@ -32,7 +32,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerErrors;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
-import com.revolsys.swing.menu.Menus;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.TablePanel;
 
@@ -40,7 +40,7 @@ public abstract class AbstractUpdateField extends JDialog {
   private static final long serialVersionUID = 1L;
 
   protected static EnableCheck newEnableCheck() {
-    final EnableCheck enableCheck = Menus.enableCheck((final RecordLayerTable table) -> {
+    final EnableCheck enableCheck = MenuFactory.enableCheck((final RecordLayerTable table) -> {
       final int columnIndex = TablePanel.getEventColumn();
       final RecordLayerTableModel tableModel = table.getModel();
       if (tableModel.isFieldEditable(columnIndex)) {
@@ -96,8 +96,8 @@ public abstract class AbstractUpdateField extends JDialog {
       final int confirm = JOptionPane.showConfirmDialog(this,
         "<html>Update <b style='color:#32CD32'>" + this.recordCountString
           + "</b> records? This may take a long time or fail if there are many records.</html>",
-        "Update Records?", JOptionPane.OK_CANCEL_OPTION);
-      if (confirm != JOptionPane.OK_OPTION) {
+        "Update Records?", JOptionPane.YES_NO_OPTION);
+      if (confirm != JOptionPane.YES_OPTION) {
         setVisible(false);
         return;
       }

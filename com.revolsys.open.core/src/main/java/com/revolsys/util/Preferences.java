@@ -8,43 +8,15 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.record.io.format.json.Json;
 
 public class Preferences {
+  public static <V> V getValue(final String applicationId, final PreferenceKey key) {
+    final Preferences preferences = new Preferences(applicationId);
+    return preferences.getValue(key);
+  }
 
   private String applicationId;
 
   public Preferences(final String applicationId) {
     this.applicationId = applicationId;
-  }
-
-  public boolean getBoolean(final PreferenceKey preference) {
-    final Object value = getValue(preference);
-    return !Booleans.isFalse(value);
-  }
-
-  public boolean getBoolean(final PreferenceKey preference, final boolean defaultValue) {
-    final Object value = getValue(preference);
-    if (value == null) {
-      return defaultValue;
-    } else {
-      return !Booleans.isFalse(value);
-    }
-  }
-
-  public Integer getInt(final PreferenceKey preference) {
-    final Object value = getValue(preference);
-    if (value == null) {
-      return null;
-    } else {
-      return Integer.valueOf(value.toString());
-    }
-  }
-
-  public int getInt(final PreferenceKey preference, final int defaultValue) {
-    final Object value = getValue(preference);
-    if (value == null) {
-      return defaultValue;
-    } else {
-      return Integer.valueOf(value.toString());
-    }
   }
 
   public File getPreferenceFile(final PreferenceKey preference) {
@@ -82,18 +54,16 @@ public class Preferences {
     return directory;
   }
 
-  public <T> T getValue(final PreferenceKey preference) {
-    return getValue(preference, null);
-  }
-
   @SuppressWarnings("unchecked")
-  public <T> T getValue(final PreferenceKey preference, final T defaultValue) {
+  public <T> T getValue(final PreferenceKey preference) {
     final Map<String, Object> preferences = getPreferences(preference);
+    final T defaultValue = (T)preference.getDefaultValue();
     if (preferences == null) {
       return defaultValue;
     } else {
       final String name = preference.getName();
-      return (T)preferences.getOrDefault(name, defaultValue);
+      final Object value = preferences.getOrDefault(name, defaultValue);
+      return (T)preference.toValidValue(value);
     }
   }
 

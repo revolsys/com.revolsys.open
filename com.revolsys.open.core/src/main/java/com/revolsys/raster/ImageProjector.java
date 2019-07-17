@@ -5,7 +5,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 
@@ -193,8 +192,6 @@ public class ImageProjector {
 
   private final AffineTransform transform = new AffineTransform();
 
-  private final int step = 50;
-
   private final SourceXGrid sourceXGrid;
 
   private final SourceYGrid sourceYGrid;
@@ -379,53 +376,6 @@ public class ImageProjector {
     // g2.draw(targetTriangle);
   }
 
-  private void drawTriangle2(final int x1, final int y1, final int x2, final int y2, final int x3,
-    final int y3) {
-
-    final double[][] a = new double[][] {
-      {
-        this.sourceXGrid.getValue(x1, y1), this.sourceYGrid.getValue(x1, y1), 1
-      }, {
-        this.sourceXGrid.getValue(x2, y2), this.sourceYGrid.getValue(x2, y2), 1
-      }, {
-        this.sourceXGrid.getValue(x3, y3), this.sourceYGrid.getValue(x3, y3), 1
-      }
-    };
-
-    gauss(a);
-
-    final double x1Percent = this.targetXGrid.getValue(x1, y1);
-    final double x2Percent = this.targetXGrid.getValue(x2, y2);
-    final double x3Percent = this.targetXGrid.getValue(x3, y3);
-    final double[] bx = new double[] {
-      x1Percent, x2Percent, x3Percent
-    };
-    final double[] x = solve(a, bx);
-
-    final double y1Percent = this.targetYGrid.getValue(x1, y1);
-    final double y2Percent = this.targetYGrid.getValue(x2, y2);
-    final double y3Percent = this.targetYGrid.getValue(x3, y3);
-    final double[] by = new double[] {
-      y1Percent, y2Percent, y3Percent
-    };
-    final double[] y = solve(a, by);
-
-    // System.out.println(Arrays.toString(x));
-    // System.out.println(Arrays.toString(y));
-
-    this.transform.setTransform(x[0], y[0], x[1], y[1], x[2], y[2]);
-    this.transform.scale(this.targetImageWidth, this.targetImageHeight);
-    final Graphics2D g2 = this.g2;
-    this.targetTriangle.setCorners(x1Percent * this.targetImageWidth,
-      y1Percent * this.targetImageHeight, x2Percent * this.targetImageWidth,
-      y2Percent * this.targetImageHeight, x3Percent * this.targetImageWidth,
-      y3Percent * this.targetImageHeight);
-    g2.setClip(this.targetTriangle);
-    // g2.drawImage(this.sourceBufferdImage, this.transform, null);
-    // g2.setColor(WebColors.Yellow);
-    // g2.draw(this.targetTriangle);
-  }
-
   private double getResolution(final double originalDistance, final double distance1,
     final double distance2) {
     final double targetPixelSize1 = distance1 / originalDistance;
@@ -437,12 +387,6 @@ public class ImageProjector {
       targetPixelSize = targetPixelSize2;
     }
     return targetPixelSize;
-  }
-
-  private void lineTo(final GeneralPath path, final int gridD, final int gridY) {
-    final double x = this.targetXGrid.getValue(gridD, gridY) * this.targetImageWidth;
-    final double y = this.targetYGrid.getValue(gridD, gridY) * this.targetImageHeight;
-    path.lineTo(x, y);
   }
 
   public GeoreferencedImage newImage() {

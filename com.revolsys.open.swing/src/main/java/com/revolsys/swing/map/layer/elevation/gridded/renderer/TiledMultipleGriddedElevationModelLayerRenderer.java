@@ -27,7 +27,6 @@ import com.revolsys.swing.map.layer.tile.AbstractTiledLayer;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.BooleanCancellable;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.JavaBeanUtil;
@@ -38,7 +37,7 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
   implements IMultipleGriddedElevationModelLayerRenderer, GriddedElevationModelZRange {
   static {
     MenuFactory.addMenuInitializer(TiledMultipleGriddedElevationModelLayerRenderer.class, menu -> {
-      Menus.addMenuItem(menu, "layer", "View/Edit Style", "palette",
+      menu.addMenuItem("layer", -1, "View/Edit Style", "palette",
         ((Predicate<TiledMultipleGriddedElevationModelLayerRenderer>)TiledMultipleGriddedElevationModelLayerRenderer::isEditing)
           .negate(),
         TiledMultipleGriddedElevationModelLayerRenderer::showProperties, false);

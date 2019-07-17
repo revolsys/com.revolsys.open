@@ -516,11 +516,11 @@ public class Project extends LayerGroup {
                 + Strings.toString("</li>\n<li>", layersWithChanges) + "</li></ul></body></html>");
 
             final int option2 = JOptionPane.showConfirmDialog(mapPanel, message2, "Ignore Changes",
-              JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-            if (option2 == JOptionPane.CANCEL_OPTION) {
-              return false;
-            } else {
+              JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (option2 == JOptionPane.YES_OPTION) {
               return true;
+            } else {
+              return false;
             }
           }
         }
@@ -572,11 +572,11 @@ public class Project extends LayerGroup {
             + "<p><b>Do you want to ignore any changes and continue?</b></p></body></html>");
 
           final int option2 = JOptionPane.showConfirmDialog(mapPanel, message2, "Ignore Changes",
-            JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-          if (option2 == JOptionPane.CANCEL_OPTION) {
-            return false;
-          } else {
+            JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+          if (option2 == JOptionPane.YES_OPTION) {
             return true;
+          } else {
+            return false;
           }
         }
       }

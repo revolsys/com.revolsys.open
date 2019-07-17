@@ -18,7 +18,6 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
@@ -47,7 +46,7 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     final BiFunction<AbstractRecordLayer, AbstractMultipleRecordLayerRenderer, AbstractRecordLayerRenderer> rendererFactory) {
     final String iconName = ("style_" + type + ":add").toLowerCase();
     final String name = "Add " + type + " Style";
-    Menus.addMenuItem(menu, "add", name, iconName,
+    menu.addMenuItem("add", name, iconName,
       (final AbstractMultipleRecordLayerRenderer parentRenderer) -> {
         final AbstractRecordLayer layer = parentRenderer.getLayer();
         final AbstractRecordLayerRenderer newRenderer = rendererFactory.apply(layer,
@@ -64,7 +63,7 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
       return renderer.getClass() != rendererClass;
     };
     final String name = "Convert to " + type + " Style";
-    Menus.addMenuItem(menu, "convert", name, iconName, enabledFilter, consumer, false);
+    menu.addMenuItem("convert", -1, name, iconName, enabledFilter, consumer, false);
   }
 
   private List<AbstractRecordLayerRenderer> renderers = new ArrayList<>();

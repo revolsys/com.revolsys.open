@@ -39,6 +39,7 @@ import javax.swing.undo.UndoableEdit;
 import org.jeometry.common.compare.CompareUtil;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 import org.springframework.expression.EvaluationContext;
@@ -47,6 +48,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.set.Sets;
@@ -93,6 +95,7 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.dnd.transferable.RecordReaderTransferable;
 import com.revolsys.swing.dnd.transferable.StringTransferable;
+import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.io.SwingIo;
 import com.revolsys.swing.layout.GroupLayouts;
@@ -124,14 +127,17 @@ import com.revolsys.swing.map.layer.record.table.model.RecordValidationDialog;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
 import com.revolsys.swing.map.overlay.CloseLocation;
+import com.revolsys.swing.map.overlay.ShortestRouteOverlay;
 import com.revolsys.swing.map.overlay.record.EditRecordGeometryOverlay;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.menu.WrappedMenuFactory;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.preferences.PreferenceFields;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.undo.SetRecordFieldValueUndo;
 import com.revolsys.util.Label;
+import com.revolsys.util.PreferenceKey;
+import com.revolsys.util.Preferences;
 import com.revolsys.util.Property;
 import com.revolsys.util.ShortCounter;
 
@@ -140,6 +146,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public static final String ALL = "All";
 
   public static final String FORM_FACTORY_EXPRESSION = "formFactoryExpression";
+
+  public static final String PREFERENCE_PATH = "/com/revolsys/gis/layer/record";
+
+  public static final PreferenceKey PREFERENCE_CONFIRM_DELETE_RECORDS = new PreferenceKey(
+    PREFERENCE_PATH, "confirmDeleteRecords", DataTypes.BOOLEAN, false)//
+      .setCategoryTitle("Layers");
 
   public static final String RECORD_CACHE_MODIFIED = "recordCacheModified";
 
@@ -160,55 +172,63 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       menu.setName("Layer");
       menu.addGroup(0, "table");
       menu.addGroup(2, "edit");
-      menu.addGroup(3, "dnd");
+      menu.addGroup(3, "tools");
+      menu.addGroup(4, "dnd");
 
       final Predicate<AbstractRecordLayer> exists = AbstractRecordLayer::isExists;
 
-      Menus.addMenuItem(menu, "table", "View Records", "table_go", exists,
+      menu.addMenuItem("table", -1, "View Records", "table_go", exists,
         AbstractRecordLayer::showRecordsTable, false);
 
       final Predicate<AbstractRecordLayer> hasSelectedRecords = AbstractRecordLayer::isHasSelectedRecords;
       final Predicate<AbstractRecordLayer> hasSelectedRecordsWithGeometry = AbstractRecordLayer::isHasSelectedRecordsWithGeometry;
 
-      Menus.addMenuItem(menu, "zoom", "Zoom to Selected", "magnifier_zoom_selected",
+      menu.addMenuItem("zoom", -1, "Zoom to Selected", "magnifier_zoom_selected",
         hasSelectedRecordsWithGeometry, AbstractRecordLayer::zoomToSelected, true);
 
-      Menus.addMenuItem(menu, "zoom", "Pan to Selected", "pan_selected",
+      menu.addMenuItem("zoom", -1, "Pan to Selected", "pan_selected",
         hasSelectedRecordsWithGeometry, AbstractRecordLayer::panToSelected, true);
 
       final Predicate<AbstractRecordLayer> notReadOnly = ((Predicate<AbstractRecordLayer>)AbstractRecordLayer::isReadOnly)
         .negate();
       final Predicate<AbstractRecordLayer> canAdd = AbstractRecordLayer::isCanAddRecords;
 
-      Menus.addCheckboxMenuItem(menu, "edit", "Editable", "pencil", notReadOnly,
+      menu.addCheckboxMenuItem("edit", "Editable", "pencil", notReadOnly,
         AbstractRecordLayer::toggleEditable, AbstractRecordLayer::isEditable, false);
 
-      Menus.addMenuItem(menu, "edit", "Save Changes", "table_save", AbstractLayer::isHasChanges,
+      menu.addMenuItem("edit", -1, "Save Changes", "table_save", AbstractLayer::isHasChanges,
         AbstractLayer::saveChanges, true);
 
-      Menus.addMenuItem(menu, "edit", "Cancel Changes", "table_cancel", AbstractLayer::isHasChanges,
+      menu.addMenuItem("edit", -1, "Cancel Changes", "table_cancel", AbstractLayer::isHasChanges,
         AbstractRecordLayer::cancelChanges, true);
 
-      Menus.addMenuItem(menu, "edit", "Add New Record", "table_row_insert", canAdd,
+      menu.addMenuItem("edit", -1, "Add New Record", "table_row_insert", canAdd,
         AbstractRecordLayer::addNewRecord, false);
 
-      Menus.addMenuItem(menu, "edit", "Delete Selected Records", "table_row_delete",
-        hasSelectedRecords.and(AbstractRecordLayer::isCanDeleteRecords),
-        AbstractRecordLayer::deleteSelectedRecords, true);
+      menu.addComponentFactory("edit", new EditRecordMenu(false));
 
-      Menus.addMenuItem(menu, "edit", "Merge Selected Records", "table_row_merge",
+      menu.addMenuItem("edit", -1, "Delete Selected Records", "table_row_delete",
+        hasSelectedRecords.and(AbstractRecordLayer::isCanDeleteRecords), layer -> {
+          final List<LayerRecord> selectedRecords = layer.getSelectedRecords();
+          layer.deleteRecordsWithConfirm(selectedRecords);
+        }, true);
+
+      menu.addMenuItem("edit", -1, "Merge Selected Records", "table_row_merge",
         AbstractRecordLayer::isCanMergeRecords, AbstractRecordLayer::mergeSelectedRecords, false);
 
-      Menus.addMenuItem(menu, "dnd", "Copy Selected Records", "page_copy", hasSelectedRecords,
+      menu.addComponentFactory("tools", new RecordRouteMenu());
+
+      menu.addMenuItem("dnd", -1, "Copy Selected Records", "page_copy", hasSelectedRecords,
         AbstractRecordLayer::copySelectedRecords, true);
 
-      Menus.addMenuItem(menu, "dnd", "Paste New Records", "paste_plain",
+      menu.addMenuItem("dnd", -1, "Paste New Records", "paste_plain",
         canAdd.and(AbstractRecordLayer::isCanPasteRecords), AbstractRecordLayer::pasteRecords,
         true);
 
-      Menus.addMenuItem(menu, "layer", 0, "Layer Style", "palette",
-        AbstractRecordLayer::isHasGeometry,
+      menu.addMenuItem("layer", 0, "Layer Style", "palette", AbstractRecordLayer::isHasGeometry,
         (final AbstractRecordLayer layer) -> layer.showProperties("Style"), false);
+
+      PreferenceFields.addField("com.revolsys.gis", PREFERENCE_CONFIRM_DELETE_RECORDS);
     });
   }
 
@@ -259,6 +279,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     addVisibleLayers(layers, group, scale);
     return layers;
   }
+
+  private boolean confirmDeleteRecords;
 
   private final Label cacheIdDeleted = new Label("deleted");
 
@@ -330,20 +352,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     setSelectSupported(true);
     setQuerySupported(true);
     setRenderer(new GeometryStyleRecordLayerRenderer(this));
-  }
-
-  private void actionFlipFields(final LayerRecord record) {
-    final DirectionalFields property = DirectionalFields.getProperty(record);
-    property.reverseFieldValues(record);
-  }
-
-  private void actionFlipLineOrientation(final LayerRecord record) {
-    final DirectionalFields property = DirectionalFields.getProperty(record);
-    property.reverseGeometry(record);
-  }
-
-  private void actionFlipRecordOrientation(final LayerRecord record) {
-    DirectionalFields.reverse(record);
   }
 
   @Override
@@ -494,11 +502,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return added;
   }
 
-  public void addSelectedRecords(final BoundingBox boundingBox) {
+  public boolean addSelectedRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
       final List<LayerRecord> records = getRecordsVisible(boundingBox);
       addSelectedRecords(records);
       postSelectByBoundingBox(records);
+      return isHasSelectedRecordsWithGeometry();
+    } else {
+      return false;
     }
   }
 
@@ -654,6 +665,24 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return clone;
   }
 
+  protected boolean confirmDeleteRecords(final Collection<? extends LayerRecord> records) {
+    return confirmDeleteRecords("", records);
+  }
+
+  protected boolean confirmDeleteRecords(final String suffix,
+    final Collection<? extends LayerRecord> records) {
+    final int recordCount = records.size();
+    final boolean globalConfirmDeleteRecords = Preferences.getValue("com.revolsys.gis",
+      PREFERENCE_CONFIRM_DELETE_RECORDS);
+    if (globalConfirmDeleteRecords || this.confirmDeleteRecords) {
+      final int confirm = JOptionPane.showConfirmDialog(getMapPanel(),
+        "Delete " + recordCount + " records" + suffix + "? This action cannot be undone.",
+        "Delete Records" + suffix, JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+      return confirm == JOptionPane.YES_OPTION;
+    }
+    return true;
+  }
+
   public void copyRecordGeometry(final LayerRecord record) {
     final Geometry geometry = record.getGeometry();
     if (geometry != null) {
@@ -784,9 +813,18 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public void deleteSelectedRecords() {
-    final List<LayerRecord> selectedRecords = getSelectedRecords();
-    deleteRecords(selectedRecords);
+  public boolean deleteRecordsWithConfirm(final Collection<? extends LayerRecord> records) {
+    if (confirmDeleteRecords(records)) {
+      deleteRecords(records);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public boolean deleteRecordWithConfirm(final LayerRecord record) {
+    final List<LayerRecord> records = Collections.singletonList(record);
+    return deleteRecordsWithConfirm(records);
   }
 
   public void exportRecords(final Iterable<LayerRecord> records,
@@ -1616,6 +1654,42 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
+  protected void initEditRecordsMenu(final EditRecordMenu editMenu,
+    final List<LayerRecord> records) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+
+    if (recordDefinition.hasGeometryField()) {
+      final EnableCheck editableEnableCheck = this::isEditable;
+
+      final DataType geometryDataType = recordDefinition.getGeometryField().getDataType();
+      if (geometryDataType == GeometryDataTypes.LINE_STRING
+        || geometryDataType == GeometryDataTypes.MULTI_LINE_STRING) {
+        final Consumer<Record> reverseGeometryConsumer = DirectionalFields::reverseGeometryRecord;
+        if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
+          final Consumer<Record> reverse = DirectionalFields::reverseRecord;
+          editMenu.addMenuItemRecord("geometry", LayerRecordForm.FLIP_RECORD_NAME,
+            LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck, reverse);
+
+          editMenu.addMenuItemRecord("geometry", LayerRecordForm.FLIP_LINE_ORIENTATION_NAME,
+            LayerRecordForm.FLIP_LINE_ORIENTATION_ICON, editableEnableCheck,
+            reverseGeometryConsumer);
+
+          final Consumer<Record> reverseFieldValues = DirectionalFields::reverseFieldValuesRecord;
+          editMenu.addMenuItemRecord("geometry", LayerRecordForm.FLIP_FIELDS_NAME,
+            LayerRecordForm.FLIP_FIELDS_ICON, editableEnableCheck, reverseFieldValues);
+        } else {
+          editMenu.addMenuItemRecord("geometry", "Flip Line Orientation", "flip_line",
+            editableEnableCheck, reverseGeometryConsumer);
+        }
+      }
+      if (!(geometryDataType == GeometryDataTypes.POINT
+        || geometryDataType == GeometryDataTypes.MULTI_POINT)) {
+        editMenu.addMenuItemRecords("geometry", "Generalize Vertices", "generalize_line",
+          editableEnableCheck, RecordLayerActions::generalize);
+      }
+    }
+  }
+
   @Override
   protected void initializeMenuExpressions(final List<String> menuInitializerExpressions) {
     for (final String menuInitializerExpression : this.recordDefinition
@@ -1654,8 +1728,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final Predicate<LayerRecord> notDeleted = ((Predicate<LayerRecord>)this::isDeleted).negate();
       final Predicate<LayerRecord> modifiedOrDeleted = modified.or(LayerRecord::isDeleted);
 
-      final EnableCheck editableEnableCheck = this::isEditable;
-
       menu.addGroup(0, "default");
       menu.addGroup(1, "record");
       menu.addGroup(2, "dnd");
@@ -1676,32 +1748,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             mapPanel.panToRecord(record);
           }
         });
-        final MenuFactory editMenu = new MenuFactory("Edit Record Operations");
-        editMenu.setEnableCheck(LayerRecordMenu.enableCheck(notDeleted));
-        final DataType geometryDataType = recordDefinition.getGeometryField().getDataType();
-        if (geometryDataType == GeometryDataTypes.LINE_STRING
-          || geometryDataType == GeometryDataTypes.MULTI_LINE_STRING) {
-          if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
-            LayerRecordMenu.addMenuItem(editMenu, "geometry", LayerRecordForm.FLIP_RECORD_NAME,
-              LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck,
-              this::actionFlipRecordOrientation);
-
-            LayerRecordMenu.addMenuItem(editMenu, "geometry",
-              LayerRecordForm.FLIP_LINE_ORIENTATION_NAME,
-              LayerRecordForm.FLIP_LINE_ORIENTATION_ICON, editableEnableCheck,
-              this::actionFlipLineOrientation);
-
-            LayerRecordMenu.addMenuItem(editMenu, "geometry", LayerRecordForm.FLIP_FIELDS_NAME,
-              LayerRecordForm.FLIP_FIELDS_ICON, editableEnableCheck, this::actionFlipFields);
-          } else {
-            LayerRecordMenu.addMenuItem(editMenu, "geometry", "Flip Line Orientation", "flip_line",
-              editableEnableCheck, this::actionFlipLineOrientation);
-          }
-        }
-        menu.addComponentFactory("record", editMenu);
+        menu.addComponentFactory("record", new EditRecordMenu(true));
       }
       menu.addMenuItem("record", "Delete Record", "table_row_delete", LayerRecord::isDeletable,
-        this::deleteRecord);
+        this::deleteRecordWithConfirm);
 
       menu.addMenuItem("record", "Revert Record", "arrow_revert", modifiedOrDeleted,
         LayerRecord::revertChanges);
@@ -1709,6 +1759,27 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final Predicate<LayerRecord> hasModifiedEmptyFields = LayerRecord::isHasModifiedEmptyFields;
       menu.addMenuItem("record", "Revert Empty Fields", "field_empty_revert",
         hasModifiedEmptyFields, LayerRecord::revertEmptyFields);
+
+      final DataType geometryType = getGeometryType();
+      if (geometryType == GeometryDataTypes.LINE_STRING
+        || geometryType == GeometryDataTypes.MULTI_LINE_STRING
+        || geometryType == GeometryDataTypes.LINE_STRING
+        || geometryType == GeometryDataTypes.GEOMETRY_COLLECTION) {
+        final MapPanel map = getMapPanel();
+        final ShortestRouteOverlay shortestRouteOverlay = map
+          .getMapOverlay(ShortestRouteOverlay.class);
+
+        menu.addMenuItem("route", "Route From Record", "route_from", (final LayerRecord record) -> {
+          shortestRouteOverlay.setRecord1(record);
+        });
+
+        final Predicate<LayerRecord> routeMode = record -> shortestRouteOverlay.isHasRecord1();
+
+        menu.addMenuItem("route", "Route To Record", "route_to", routeMode,
+          (final LayerRecord record) -> {
+            shortestRouteOverlay.setRecord2(record);
+          });
+      }
 
       menu.addMenuItem("dnd", "Copy Record", "page_copy", this::copyRecordToClipboard);
 
@@ -1881,6 +1952,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @Override
   public boolean isClonable() {
     return true;
+  }
+
+  public boolean isConfirmDeleteRecords() {
+    return this.confirmDeleteRecords;
   }
 
   public boolean isDeleted(final LayerRecord record) {
@@ -2141,6 +2216,19 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return filterPanel;
   }
 
+  @Override
+  protected ValueField newPropertiesTabGeneralPanelGeneral(final BasePanel parent) {
+    final ValueField panel = super.newPropertiesTabGeneralPanelGeneral(parent);
+
+    final Field confirmDeleteField = (Field)SwingUtil.addObjectField(panel, this,
+      "confirmDeleteRecords", DataTypes.BOOLEAN);
+    Property.addListener(confirmDeleteField, "confirmDeleteRecords", this.beanPropertyListener);
+
+    GroupLayouts.makeColumns(panel, 2, true);
+
+    return panel;
+  }
+
   @SuppressWarnings("unchecked")
   protected <R extends LayerRecord> R newProxyLayerRecord(final LayerRecord record) {
     return (R)record;
@@ -2290,7 +2378,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         saveChanges(validRecords);
         addSelectedRecords(validRecords);
         zoomToRecords(validRecords);
-        showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
+        showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED, true);
         firePropertyChange(RECORDS_INSERTED, null, validRecords);
       }
       // Delete any invalid records
@@ -2357,7 +2445,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected void postSelectByBoundingBox(final List<LayerRecord> records) {
     if (isHasSelectedRecordsWithGeometry()) {
-      showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
+      showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED, false);
     }
     if (!records.isEmpty()) {
       firePropertyChange("selectedRecordsByBoundingBox", false, true);
@@ -2565,7 +2653,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public final boolean saveChanges(final Collection<? extends LayerRecord> records) {
+  public boolean saveChanges(final Collection<? extends LayerRecord> records) {
     try {
       if (records.isEmpty()) {
         return true;
@@ -2700,6 +2788,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void setCanPasteRecords(final boolean canPasteRecords) {
     this.canPasteRecords = canPasteRecords;
+  }
+
+  public void setConfirmDeleteRecords(final boolean confirmDeleteRecords) {
+    this.confirmDeleteRecords = confirmDeleteRecords;
   }
 
   @Override
@@ -2913,11 +3005,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public void setSelectedRecords(final BoundingBox boundingBox) {
+  public boolean setSelectedRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
       final List<LayerRecord> records = getRecordsVisible(boundingBox);
       setSelectedRecords(records);
       postSelectByBoundingBox(records);
+      return !records.isEmpty();
+    } else {
+      return false;
     }
   }
 
@@ -3119,11 +3214,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void showRecordsTable() {
-    showRecordsTable(null);
+    showRecordsTable(null, true);
   }
 
-  public void showRecordsTable(final String fieldFilterMode) {
-    final Map<String, Object> config = Maps.newLinkedHash("fieldFilterMode", fieldFilterMode);
+  public void showRecordsTable(final String fieldFilterMode, final boolean selectTab) {
+    final MapEx config = new LinkedHashMapEx("fieldFilterMode", fieldFilterMode);
+    if (!selectTab) {
+      config.put("selectTab", false);
+    }
     showTableView(config);
   }
 
@@ -3228,6 +3326,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     addToMap(map, "fieldNamesSets", getFieldNamesSets());
     addToMap(map, "fieldColumnWidths", getFieldColumnWidths());
     addToMap(map, "useFieldTitles", this.useFieldTitles);
+    addToMap(map, "confirmDeleteRecords", this.confirmDeleteRecords, false);
     map.remove("filter");
     String where;
     if (Property.isEmpty(this.filter)) {
@@ -3255,9 +3354,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (isSelectable()) {
       final List<LayerRecord> records = getRecordsVisible(boundingBox);
       unSelectRecords(records);
-      if (isHasSelectedRecordsWithGeometry()) {
-        showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
-      }
     }
   }
 

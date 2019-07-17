@@ -28,7 +28,6 @@ import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.view.TextStyleViewRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 
 import tec.uom.se.quantity.Quantities;
 
@@ -37,8 +36,8 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
   static {
     final MenuFactory menu = MenuFactory.getMenu(GridLayerRenderer.class);
 
-    Menus.addMenuItem(menu, "layer", "View/Edit Style", "palette",
-      GridLayerRenderer::showProperties, false);
+    menu.addMenuItem("layer", "View/Edit Style", "palette", GridLayerRenderer::showProperties,
+      false);
   }
 
   private static final Icon ICON = Icons.getIcon("style_geometry");

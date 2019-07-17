@@ -110,17 +110,17 @@ public interface MapDefault<K, V> extends Map<K, V> {
 
           @Override
           public boolean hasNext() {
-            return interator.hasNext();
+            return this.interator.hasNext();
           }
 
           @Override
           public K next() {
-            return interator.next().getKey();
+            return this.interator.next().getKey();
           }
 
           @Override
           public void remove() {
-            interator.remove();
+            this.interator.remove();
           }
         };
       }
@@ -272,17 +272,17 @@ public interface MapDefault<K, V> extends Map<K, V> {
 
           @Override
           public boolean hasNext() {
-            return iterator.hasNext();
+            return this.iterator.hasNext();
           }
 
           @Override
           public V next() {
-            return iterator.next().getValue();
+            return this.iterator.next().getValue();
           }
 
           @Override
           public void remove() {
-            iterator.remove();
+            this.iterator.remove();
           }
         };
       }

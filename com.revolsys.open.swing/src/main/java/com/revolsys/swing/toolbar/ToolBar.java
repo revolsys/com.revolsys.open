@@ -6,7 +6,6 @@ import java.util.List;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.JButton;
-import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
 import com.revolsys.swing.Icons;
@@ -14,6 +13,7 @@ import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentGroup;
+import com.revolsys.swing.menu.ToggleButton;
 import com.revolsys.util.Property;
 
 public class ToolBar extends JToolBar {
@@ -131,12 +131,12 @@ public class ToolBar extends JToolBar {
     this.groups.addGroup(groupName);
   }
 
-  public JToggleButton addToggleButton(final String groupName, final int index, final String name,
+  public ToggleButton addToggleButton(final String groupName, final int index, final String name,
     final String title, final Icon icon, final EnableCheck enableCheck, final Runnable runnable) {
     final RunnableAction action = new RunnableAction(name, title, icon, runnable);
     action.setEnableCheck(enableCheck);
 
-    final JToggleButton button = action.newToggleButton();
+    final ToggleButton button = action.newToggleButton();
     button.setBorderPainted(true);
     this.groups.addComponent(this, groupName, index, button);
     final ButtonGroup buttonGroup = getButtonGroup(groupName);
@@ -144,14 +144,14 @@ public class ToolBar extends JToolBar {
     return button;
   }
 
-  public JToggleButton addToggleButtonTitleIcon(final String groupName, final int index,
+  public ToggleButton addToggleButtonTitleIcon(final String groupName, final int index,
     final String title, final String iconName, final EnableCheck enableCheck,
     final Runnable runnable) {
     final Icon icon = Icons.getIcon(iconName);
     return addToggleButton(groupName, index, iconName, title, icon, enableCheck, runnable);
   }
 
-  public JToggleButton addToggleButtonTitleIcon(final String groupName, final int index,
+  public ToggleButton addToggleButtonTitleIcon(final String groupName, final int index,
     final String title, final String iconName, final Runnable runnable) {
     final Icon icon = Icons.getIcon(iconName);
     return addToggleButton(groupName, index, iconName, title, icon, null, runnable);

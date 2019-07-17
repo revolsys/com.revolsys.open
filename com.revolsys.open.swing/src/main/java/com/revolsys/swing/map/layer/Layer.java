@@ -6,13 +6,13 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.Icon;
 import javax.swing.SwingUtilities;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.Child;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
@@ -21,6 +21,8 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.ProjectFrame;
+import com.revolsys.swing.map.ProjectFramePanel;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
@@ -28,7 +30,7 @@ import com.revolsys.util.Booleans;
 
 public interface Layer extends GeometryFactoryProxy, PropertyChangeSupportProxy,
   ObjectWithProperties, PropertyChangeListener, Comparable<Layer>, MapSerializer, Child<LayerGroup>,
-  Cloneable, BoundingBoxProxy {
+  Cloneable, BoundingBoxProxy, ProjectFramePanel {
 
   default void addParent(final List<Layer> path) {
     final LayerGroup parent = getLayerGroup();
@@ -62,6 +64,7 @@ public interface Layer extends GeometryFactoryProxy, PropertyChangeSupportProxy,
 
   Collection<Class<?>> getChildClasses();
 
+  @Override
   Icon getIcon();
 
   long getId();
@@ -83,12 +86,14 @@ public interface Layer extends GeometryFactoryProxy, PropertyChangeSupportProxy,
 
   long getMinimumScale();
 
+  @Override
   String getName();
 
   /**
    * Get the path from the root project. The name of the layer group at the root is not included.
    * @return
    */
+  @Override
   String getPath();
 
   default List<Layer> getPathList() {
@@ -228,7 +233,14 @@ public interface Layer extends GeometryFactoryProxy, PropertyChangeSupportProxy,
     }
   }
 
-  void showTableView();
+  default void showTableView() {
+    showTableView(MapEx.EMPTY);
+  }
 
-  void showTableView(Map<String, Object> config);
+  default void showTableView(final MapEx config) {
+    final ProjectFrame projectFrame = ProjectFrame.get(this);
+    if (projectFrame != null) {
+      projectFrame.addBottomTab(this, config);
+    }
+  }
 }

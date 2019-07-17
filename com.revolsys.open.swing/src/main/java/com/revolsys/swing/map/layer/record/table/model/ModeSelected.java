@@ -1,9 +1,12 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
+import java.awt.Color;
 import java.util.List;
 
 import javax.swing.Icon;
 import javax.swing.ListSelectionModel;
+
+import org.jeometry.common.awt.WebColors;
 
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -45,6 +48,11 @@ public class ModeSelected extends ModeAbstractCached {
     super.deactivate();
     final AbstractRecordLayer layer = getLayer();
     layer.clearHighlightedRecords();
+  }
+
+  @Override
+  public Color getBorderColor() {
+    return WebColors.LimeGreen;
   }
 
   @Override

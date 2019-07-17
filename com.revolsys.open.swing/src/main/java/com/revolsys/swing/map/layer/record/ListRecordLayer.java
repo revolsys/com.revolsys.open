@@ -22,7 +22,7 @@ import com.revolsys.swing.map.layer.record.table.model.RecordLayerErrors;
 
 public class ListRecordLayer extends AbstractRecordLayer {
 
-  private List<LayerRecord> records = new ArrayList<>();
+  protected List<LayerRecord> records = new ArrayList<>();
 
   public ListRecordLayer(final RecordDefinition recordDefinition) {
     this("listRecordLayer");

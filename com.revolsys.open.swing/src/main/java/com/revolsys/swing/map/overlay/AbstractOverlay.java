@@ -351,14 +351,7 @@ public class AbstractOverlay extends JComponent implements MapOverlay, PropertyC
   }
 
   protected BoundingBox getHotspotBoundingBox() {
-    final Point point = MouseOverlay.getEventPoint();
-
-    final double x = point.getX();
-    final double y = point.getY();
-    final double maxDistance = this.viewport.getHotspotMapUnits();
-    final GeometryFactory geometryFactory = getViewportGeometryFactory2d();
-    return geometryFactory.newBoundingBox(x - maxDistance, y - maxDistance, x + maxDistance,
-      y + maxDistance);
+    return getMap().getHotspotBoundingBox();
   }
 
   public int getHotspotPixels() {

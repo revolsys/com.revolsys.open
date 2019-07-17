@@ -116,7 +116,7 @@ public class CsvRecordReader extends AbstractRecordReader {
     if (in == null) {
       throw new NoSuchElementException();
     } else {
-      StringBuilder sb = this.sb;
+      final StringBuilder sb = this.sb;
       sb.setLength(0);
       final List<String> values = new ArrayList<>();
       boolean inQuotes = false;
@@ -209,19 +209,5 @@ public class CsvRecordReader extends AbstractRecordReader {
         }
       }
     }
-  }
-
-  private List<String> returnEof(final List<String> values, final boolean hadQuotes) {
-    final StringBuilder sb = this.sb;
-    if (values.isEmpty()) {
-      if (sb.length() > 0) {
-        values.add(sb.toString());
-      } else {
-        throw new NoSuchElementException();
-      }
-    } else {
-      addValue(values, hadQuotes);
-    }
-    return values;
   }
 }

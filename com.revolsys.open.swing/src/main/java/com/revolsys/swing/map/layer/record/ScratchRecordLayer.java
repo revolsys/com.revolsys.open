@@ -11,7 +11,6 @@ import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 
 public class ScratchRecordLayer extends ListRecordLayer {
 
@@ -20,8 +19,12 @@ public class ScratchRecordLayer extends ListRecordLayer {
       menu.deleteMenuItem("edit", "Save Changes");
       menu.deleteMenuItem("edit", "Cancel Changes");
 
-      Menus.addMenuItem(menu, "edit", "Delete All Records", "table:delete",
-        ScratchRecordLayer::isCanDeleteRecords, ScratchRecordLayer::clearRecords, true);
+      menu.addMenuItem("edit", -1, "Delete All Records", "table:delete",
+        ScratchRecordLayer::isCanDeleteRecords, layer -> {
+          if (layer.confirmDeleteRecords(layer.records)) {
+            layer.clearRecords();
+          }
+        }, true);
     });
   }
 

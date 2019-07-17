@@ -6,7 +6,6 @@ import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.beans.PropertyChangeSupport;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -21,6 +20,7 @@ import javax.swing.UIManager;
 import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.logging.Logs;
 
+import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.parallel.Invoke;

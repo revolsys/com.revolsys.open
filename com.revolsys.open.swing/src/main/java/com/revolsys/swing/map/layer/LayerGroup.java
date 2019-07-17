@@ -58,7 +58,6 @@ import com.revolsys.swing.map.layer.record.ScratchRecordLayer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.swing.tree.node.layer.LayerGroupTreeNode;
@@ -72,7 +71,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   static {
     MenuFactory.addMenuInitializer(LayerGroup.class, menu -> {
       menu.addGroup(0, "group");
-      Menus.<LayerGroup> addMenuItem(menu, "group", "Add Group",
+      menu.<LayerGroup> addMenuItem("group", "Add Group",
         Icons.getIconWithBadge(PathTreeNode.getIconFolder(), "add"),
         LayerGroup::actionAddLayerGroup, false);
 
@@ -89,7 +88,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
         } else {
           iconName = "table_" + dataType.toString().toLowerCase();
         }
-        Menus.<LayerGroup> addMenuItem(scratchMenu, "layer", "Add " + dataType + " Layer", iconName,
+        scratchMenu.<LayerGroup> addMenuItem("layer", "Add " + dataType + " Layer", iconName,
           layerGroup -> {
             GeometryFactoryField.selectGeometryFactory("Select coordinate system for layer",
               layerGroup, geometryFactory -> {
@@ -101,10 +100,10 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       }
       menu.addComponentFactory("group", scratchMenu);
 
-      Menus.<LayerGroup> addMenuItem(menu, "group", "Open File Layer...", "page:add",
+      menu.<LayerGroup> addMenuItem("group", "Open File Layer...", "page:add",
         LayerGroup::actionOpenFileLayer, false);
 
-      Menus.<LayerGroup> addMenuItem(menu, "group", "Import Project...", "map:import",
+      menu.<LayerGroup> addMenuItem("group", "Import Project...", "map:import",
         LayerGroup::actionImportProject, false);
 
     });

@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.jeometry.common.data.type.DataType;
-
 import com.revolsys.collection.map.Maps;
 import com.revolsys.swing.field.Field;
 import com.revolsys.util.PreferenceKey;
@@ -15,15 +13,13 @@ import com.revolsys.util.PreferenceKey;
 public class PreferenceFields {
   private static final Map<String, List<Consumer<PreferencesDialog>>> fieldFactories = new LinkedHashMap<>();
 
-  public static void addField(final String title, final String applicationName,
-    final PreferenceKey preference, final DataType valueClass, final Object defaultValue) {
-    addField(title, applicationName, preference, valueClass, defaultValue, null);
+  public static void addField(final String applicationName, final PreferenceKey preference) {
+    addField(applicationName, preference, null);
   }
 
-  public static void addField(final String title, final String applicationName,
-    final PreferenceKey preference, final DataType valueClass, final Object defaultValue,
+  public static void addField(final String applicationName, final PreferenceKey preference,
     final Function<Preference, Field> fieldFactory) {
-
+    final String title = preference.getCategoryTitle();
     final Consumer<PreferencesDialog> factory = (Consumer<PreferencesDialog>)(dialog) -> {
       PreferencesPanel panel = dialog.getPanel(title);
       if (panel == null) {
@@ -32,8 +28,7 @@ public class PreferenceFields {
       }
       if (panel instanceof SimplePreferencesPanel) {
         final SimplePreferencesPanel simplePanel = (SimplePreferencesPanel)panel;
-        simplePanel.addPreference(applicationName, preference, valueClass, defaultValue,
-          fieldFactory);
+        simplePanel.addPreference(applicationName, preference, fieldFactory);
       }
     };
     Maps.addToList(fieldFactories, title, factory);

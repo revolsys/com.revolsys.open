@@ -2,14 +2,21 @@ package com.revolsys.swing.map.overlay.record;
 
 import java.awt.Color;
 
+import javax.measure.quantity.Length;
+
 import org.jeometry.common.awt.WebColors;
+import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Punctual;
+import com.revolsys.record.Record;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Property;
+
+import tec.uom.se.ComparableQuantity;
+import tec.uom.se.quantity.Quantities;
 
 public class SelectedRecordsRenderer {
   private final GeometryStyle highlightStyle = GeometryStyle
@@ -18,11 +25,14 @@ public class SelectedRecordsRenderer {
 
   private final GeometryStyle lineStyle = GeometryStyle.line(WebColors.Black);
 
-  private final int alpha;
+  private int alpha;
+
+  public SelectedRecordsRenderer() {
+  }
 
   public SelectedRecordsRenderer(final Color color, final int alpha) {
-    this.alpha = alpha;
-    setStyleColor(color);
+    setAlpha(alpha);
+    setHighlightColor(color);
   }
 
   public void paintSelected(final ViewRenderer view, final GeometryFactory viewportGeometryFactory,
@@ -36,10 +46,42 @@ public class SelectedRecordsRenderer {
     }
   }
 
-  public void setStyleColor(final Color lineColor) {
-    final Color fillColor = WebColors.newAlpha(lineColor, this.alpha);
-    this.highlightStyle.setLineColor(lineColor);
+  public void paintSelected(final ViewRenderer view, final Record record) {
+    if (record != null) {
+      final Geometry geometry = record.getGeometry();
+      final GeometryFactory geometryFactory = view.getGeometryFactory();
+      paintSelected(view, geometryFactory, geometry);
+    }
+  }
+
+  public SelectedRecordsRenderer setAlpha(final int alpha) {
+    this.alpha = alpha;
+    return this;
+  }
+
+  public SelectedRecordsRenderer setHighlightColor(final Color color) {
+    final Color fillColor = WebColors.newAlpha(color, this.alpha);
+    this.highlightStyle.setLineColor(color);
     this.highlightStyle.setPolygonFill(fillColor);
-    this.highlightStyle.setMarkerLineColor(lineColor);
+    this.highlightStyle.setMarkerLineColor(color);
+    return this;
+  }
+
+  public SelectedRecordsRenderer setHighlightLineWidth(final int width) {
+    final ComparableQuantity<Length> lineWidth = Quantities.getQuantity(width, CustomUnits.PIXEL);
+    this.highlightStyle.setLineWidth(lineWidth);
+    this.highlightStyle.setMarkerLineWidth(lineWidth);
+    return this;
+  }
+
+  public SelectedRecordsRenderer setLineColor(final Color color) {
+    this.lineStyle.setLineColor(color);
+    return this;
+  }
+
+  public SelectedRecordsRenderer setLineWidth(final int width) {
+    final ComparableQuantity<Length> lineWidth = Quantities.getQuantity(width, CustomUnits.PIXEL);
+    this.lineStyle.setLineWidth(lineWidth);
+    return this;
   }
 }

@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
+import java.awt.Color;
 import java.util.Collection;
 import java.util.function.Consumer;
 
@@ -20,6 +21,8 @@ public interface TableRecordsMode {
   void exportRecords(final Query query, final Collection<String> fieldNames, final Object target);
 
   void forEachRecord(Query query, final Consumer<? super LayerRecord> action);
+
+  Color getBorderColor();
 
   default EnableCheck getEnableCheck() {
     return EnableCheck.ENABLED;

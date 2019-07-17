@@ -53,7 +53,7 @@ public interface Property {
     public boolean equals(final Object other) {
       if (other instanceof NewValueListener) {
         final NewValueListener<?> listener = (NewValueListener<?>)other;
-        if (listener.consumer == consumer) {
+        if (listener.consumer == this.consumer) {
           return true;
         }
       }
@@ -62,7 +62,7 @@ public interface Property {
 
     @Override
     public int hashCode() {
-      return consumer.hashCode();
+      return this.consumer.hashCode();
     }
 
     @SuppressWarnings("unchecked")
@@ -72,7 +72,7 @@ public interface Property {
       if (this.source == null || this.source == source) {
         try {
           final V newValue = (V)event.getNewValue();
-          consumer.accept(newValue);
+          this.consumer.accept(newValue);
         } catch (final Throwable e) {
           Logs.error(this, "Error invoking listener", e);
         }
@@ -94,7 +94,7 @@ public interface Property {
     public boolean equals(final Object other) {
       if (other instanceof OldAndNewValueListener) {
         final OldAndNewValueListener<?, ?> listener = (OldAndNewValueListener<?, ?>)other;
-        if (listener.consumer == consumer) {
+        if (listener.consumer == this.consumer) {
           return true;
         }
       }
@@ -103,7 +103,7 @@ public interface Property {
 
     @Override
     public int hashCode() {
-      return consumer.hashCode();
+      return this.consumer.hashCode();
     }
 
     @SuppressWarnings("unchecked")
@@ -114,7 +114,7 @@ public interface Property {
         try {
           final V1 oldValue = (V1)event.getOldValue();
           final V2 newValue = (V2)event.getNewValue();
-          consumer.accept(oldValue, newValue);
+          this.consumer.accept(oldValue, newValue);
         } catch (final Throwable e) {
           Logs.error(this, "Error invoking listener", e);
         }
@@ -133,7 +133,7 @@ public interface Property {
     public boolean equals(final Object other) {
       if (other instanceof RunnableListener) {
         final RunnableListener listener = (RunnableListener)other;
-        if (listener.runnable == runnable) {
+        if (listener.runnable == this.runnable) {
           return true;
         }
       }
@@ -142,13 +142,13 @@ public interface Property {
 
     @Override
     public int hashCode() {
-      return runnable.hashCode();
+      return this.runnable.hashCode();
     }
 
     @Override
     public void propertyChange(final PropertyChangeEvent event) {
       try {
-        runnable.run();
+        this.runnable.run();
       } catch (final Throwable e) {
         Logs.error(this, "Error invoking listener", e);
       }
@@ -166,7 +166,7 @@ public interface Property {
     public boolean equals(final Object other) {
       if (other instanceof SourceListener) {
         final SourceListener<?> listener = (SourceListener<?>)other;
-        if (listener.consumer == consumer) {
+        if (listener.consumer == this.consumer) {
           return true;
         }
       }
@@ -175,7 +175,7 @@ public interface Property {
 
     @Override
     public int hashCode() {
-      return consumer.hashCode();
+      return this.consumer.hashCode();
     }
 
     @SuppressWarnings("unchecked")
@@ -183,7 +183,7 @@ public interface Property {
     public void propertyChange(final PropertyChangeEvent event) {
       try {
         final V source = (V)event.getSource();
-        consumer.accept(source);
+        this.consumer.accept(source);
       } catch (final Throwable e) {
         Logs.error(this, "Error invoking listener", e);
       }

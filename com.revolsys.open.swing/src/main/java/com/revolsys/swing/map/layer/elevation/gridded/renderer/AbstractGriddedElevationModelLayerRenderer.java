@@ -13,14 +13,13 @@ import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 
 public abstract class AbstractGriddedElevationModelLayerRenderer
   extends AbstractLayerRenderer<ElevationModelLayer> {
 
   static {
     MenuFactory.addMenuInitializer(AbstractGriddedElevationModelLayerRenderer.class, menu -> {
-      Menus.addMenuItem(menu, "layer", "View/Edit Style", "palette",
+      menu.addMenuItem("layer", -1, "View/Edit Style", "palette",
         ((Predicate<AbstractGriddedElevationModelLayerRenderer>)AbstractGriddedElevationModelLayerRenderer::isEditing)
           .negate(),
         AbstractGriddedElevationModelLayerRenderer::showProperties, false);

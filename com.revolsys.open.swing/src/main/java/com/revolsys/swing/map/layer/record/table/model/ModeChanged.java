@@ -1,8 +1,11 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
+import java.awt.Color;
 import java.util.List;
 
 import javax.swing.Icon;
+
+import org.jeometry.common.awt.WebColors;
 
 import com.revolsys.record.RecordState;
 import com.revolsys.swing.Icons;
@@ -33,6 +36,11 @@ public class ModeChanged extends ModeAbstractCached {
         this::addCachedRecord) //
     );
     super.activate();
+  }
+
+  @Override
+  public Color getBorderColor() {
+    return WebColors.Fuchsia;
   }
 
   @Override

@@ -114,6 +114,14 @@ public interface SwingUtil {
   }
 
   static JComponent addField(final Container panel, final String fieldName, final String label,
+    final DataType dataType, final Object fieldValue) {
+    addLabel(panel, label);
+    final JComponent field = SwingUtil.newField(dataType, fieldName, fieldValue);
+    panel.add(field);
+    return field;
+  }
+
+  static JComponent addField(final Container panel, final String fieldName, final String label,
     final Object fieldValue) {
     addLabel(panel, label);
     final JComponent field = SwingUtil.newField(fieldValue.getClass(), fieldName, fieldValue);
@@ -153,10 +161,21 @@ public interface SwingUtil {
     return addObjectField(container, object, fieldName, fieldName);
   }
 
+  static JComponent addObjectField(final Container container, final Object object,
+    final String fieldName, final DataType dataType) {
+    return addObjectField(container, object, fieldName, fieldName, dataType);
+  }
+
   static JComponent addObjectField(final Container panel, final Object object,
     final String fieldName, final String label) {
     final Object fieldValue = Property.get(object, fieldName);
     return addField(panel, fieldName, label, fieldValue);
+  }
+
+  static JComponent addObjectField(final Container panel, final Object object,
+    final String fieldName, final String label, final DataType dataType) {
+    final Object fieldValue = Property.get(object, fieldName);
+    return addField(panel, fieldName, label, dataType, fieldValue);
   }
 
   static void addReadOnlyTextField(final JPanel container, final String fieldName,

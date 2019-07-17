@@ -39,6 +39,7 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.BackgroundRefreshResource;
@@ -213,6 +214,21 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     }
   }
 
+  private boolean modePopupMenu(final MouseEvent event) {
+    if (event.isPopupTrigger()) {
+      final MapPanel map = getMap();
+      for (final CloseLocation location : map.getCloseSelectedLocations()) {
+        final LayerRecord record = location.getRecord();
+        if (record != null) {
+          final LayerRecordMenu menu = record.getMenu();
+          menu.showMenu(record, event);
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
   @Override
   public void mouseDragged(final MouseEvent event) {
     if (selectBoxDrag(event)) {
@@ -236,12 +252,14 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   @Override
   public void mousePressed(final MouseEvent event) {
     if (selectBoxStart(event)) {
+    } else if (modePopupMenu(event)) {
     }
   }
 
   @Override
   public void mouseReleased(final MouseEvent event) {
     if (selectBoxFinish(event)) {
+    } else if (modePopupMenu(event)) {
     }
   }
 
@@ -464,12 +482,12 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   public void setHighlightColors(final Color color) {
-    this.highlightRenderer.setStyleColor(color);
+    this.highlightRenderer.setHighlightColor(color);
     this.highlightVertexRenderer.setStyleColor(color);
   }
 
   public void setSelectColors(final Color color) {
-    this.selectRenderer.setStyleColor(color);
+    this.selectRenderer.setHighlightColor(color);
     this.selectVertexRenderer.setStyleColor(color);
   }
 

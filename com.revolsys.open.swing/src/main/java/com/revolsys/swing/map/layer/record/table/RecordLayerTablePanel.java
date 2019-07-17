@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.record.table;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.datatransfer.DataFlavor;
@@ -24,6 +25,7 @@ import javax.swing.JTable;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 import javax.swing.table.TableCellEditor;
 
 import org.jdesktop.swingx.VerticalLayout;
@@ -56,6 +58,7 @@ import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.model.TableRecordsMode;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.menu.ToggleButton;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.TableRowCount;
 import com.revolsys.swing.table.record.RecordRowTable;
@@ -377,17 +380,19 @@ public class RecordLayerTablePanel extends TablePanel
     // Filter buttons
 
     boolean first = true;
-    for (final TableRecordsMode fieldFilterMode : this.tableModel.getFieldFilterModes()) {
-      final String key = fieldFilterMode.getKey();
-      final String title = fieldFilterMode.getTitle();
-      final Icon icon = fieldFilterMode.getIcon();
-      final EnableCheck enableCheck = fieldFilterMode.getEnableCheck();
-      final JToggleButton button = toolBar.addToggleButton(FILTER_FIELD, -1, null, title, icon,
+    for (final TableRecordsMode tableRecordsMode : this.tableModel.getFieldFilterModes()) {
+      final String key = tableRecordsMode.getKey();
+      final String title = tableRecordsMode.getTitle();
+      final Icon icon = tableRecordsMode.getIcon();
+      final EnableCheck enableCheck = tableRecordsMode.getEnableCheck();
+      final ToggleButton button = toolBar.addToggleButton(FILTER_FIELD, -1, null, title, icon,
         enableCheck, () -> {
           if (this.tableModel != null) {
-            this.tableModel.setTableRecordsMode(fieldFilterMode);
+            this.tableModel.setTableRecordsMode(tableRecordsMode);
           }
         });
+      button.setInsideBorder(
+        BorderFactory.createMatteBorder(0, 0, 2, 0, tableRecordsMode.getBorderColor()));
       this.buttonByMode.put(FILTER_FIELD + "_" + key, button);
       if (first) {
         button.doClick();
@@ -455,6 +460,9 @@ public class RecordLayerTablePanel extends TablePanel
     if (!Property.hasValue(tableRecordsMode)) {
       tableRecordsMode = this.tableModel.getTableRecordsMode();
     }
+    final Color borderColor = tableRecordsMode.getBorderColor();
+    final Border border = BorderFactory.createMatteBorder(2, 0, 0, 0, borderColor);
+    this.scrollPane.setBorder(border);
     final JToggleButton button = this.buttonByMode
       .get(FILTER_FIELD + "_" + tableRecordsMode.getKey());
     if (button != null) {

@@ -71,11 +71,9 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.listener.BeanPropertyListener;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
-import com.revolsys.swing.map.ProjectFramePanel;
 import com.revolsys.swing.map.component.GeometryFactoryField;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.preferences.PreferenceFields;
 import com.revolsys.swing.table.NumberTableCellRenderer;
@@ -88,8 +86,8 @@ import com.revolsys.util.Property;
 import com.revolsys.util.ToolTipProxy;
 import com.revolsys.value.ThreadBooleanValue;
 
-public abstract class AbstractLayer extends BaseObjectWithProperties implements Layer,
-  PropertyChangeListener, PropertyChangeSupportProxy, ProjectFramePanel, ToolTipProxy {
+public abstract class AbstractLayer extends BaseObjectWithProperties
+  implements Layer, PropertyChangeListener, PropertyChangeSupportProxy, ToolTipProxy {
   private static final AtomicLong ID_GEN = new AtomicLong();
 
   public static final String PLUGIN_TABLE_VIEW = "tableView";
@@ -97,14 +95,16 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
   public static final String PREFERENCE_PATH = "/com/revolsys/gis/layer";
 
   public static final PreferenceKey PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW = new PreferenceKey(
-    PREFERENCE_PATH, "newLayersShowTableView");
+    PREFERENCE_PATH, "newLayersShowTableView", DataTypes.BOOLEAN, false)//
+      .setCategoryTitle("Layers");
 
   public static final PreferenceKey PREFERENCE_NEW_LAYERS_VISIBLE = new PreferenceKey(
-    PREFERENCE_PATH, "newLayersVisible");
+    PREFERENCE_PATH, "newLayersVisible", DataTypes.BOOLEAN, false)//
+      .setCategoryTitle("Layers");
 
   static {
     MenuFactory.addMenuInitializer(AbstractLayer.class, menu -> {
-      Menus.addMenuItem(menu, "zoom", "Zoom to Layer", "magnifier",
+      menu.addMenuItem("zoom", -1, "Zoom to Layer", "magnifier",
         AbstractLayer::isZoomToLayerEnabled, AbstractLayer::zoomToLayer, true);
 
       final Predicate<AbstractLayer> hasGeometry = AbstractLayer::isHasGeometry;
@@ -115,25 +115,22 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
       final Predicate<AbstractLayer> exists = AbstractLayer::isExists;
 
-      Menus.<AbstractLayer> addMenuItem(menu, "refresh", "Refresh", "arrow_refresh",
+      menu.<AbstractLayer> addMenuItem("refresh", "Refresh", "arrow_refresh",
         AbstractLayer::refreshAll, true);
 
-      Menus.<AbstractLayer> addMenuItem(menu, "layer", "Delete", "delete",
+      menu.<AbstractLayer> addMenuItem("layer", "Delete", "delete",
         AbstractLayer::deleteWithConfirm, false);
 
-      Menus.<AbstractLayer> addMenuItem(menu, "layer", "Layer Properties", "information", exists,
+      menu.<AbstractLayer> addMenuItem("layer", -1, "Layer Properties", "information", exists,
         AbstractLayer::showProperties, false);
 
-      PreferenceFields.addField("Layers", "com.revolsys.gis", PREFERENCE_NEW_LAYERS_VISIBLE,
-        DataTypes.BOOLEAN, false);
-      PreferenceFields.addField("Layers", "com.revolsys.gis", PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW,
-        DataTypes.BOOLEAN, false);
+      PreferenceFields.addField("com.revolsys.gis", PREFERENCE_NEW_LAYERS_VISIBLE);
+      PreferenceFields.addField("com.revolsys.gis", PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW);
     });
   }
 
   public static boolean isShowNewLayerTableView() {
-    return new Preferences("com.revolsys.gis").getBoolean(PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW,
-      false);
+    return Preferences.getValue("com.revolsys.gis", PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW);
   }
 
   public static void menuItemPathAddLayer(final String menuGroup, final String menuName,
@@ -154,7 +151,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   private boolean open = false;
 
-  private PropertyChangeListener beanPropertyListener = new BeanPropertyListener(this);
+  protected PropertyChangeListener beanPropertyListener = new BeanPropertyListener(this);
 
   private BoundingBox boundingBox = BoundingBox.empty();
 
@@ -202,8 +199,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
 
   private MenuFactory menu;
 
-  private boolean visible = new Preferences("com.revolsys.gis")
-    .getBoolean(PREFERENCE_NEW_LAYERS_VISIBLE, false);
+  private boolean visible = Preferences.getValue("com.revolsys.gis", PREFERENCE_NEW_LAYERS_VISIBLE);
 
   private GeometryFactory selectedGeometryFactory;
 
@@ -304,8 +300,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
   public void deleteWithConfirm() {
     final int confirm = JOptionPane.showConfirmDialog(getMapPanel(),
       "Delete the layer and any child layers? This action cannot be undone.", "Delete Layer",
-      JOptionPane.OK_CANCEL_OPTION, JOptionPane.ERROR_MESSAGE);
-    if (confirm == JOptionPane.OK_OPTION) {
+      JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+    if (confirm == JOptionPane.YES_OPTION) {
       delete();
     }
   }
@@ -1252,19 +1248,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties implements 
           removeProperty("INTERNAL_PROPERTIES_VISIBLE");
         }
       }
-    }
-  }
-
-  @Override
-  public void showTableView() {
-    showTableView(Collections.emptyMap());
-  }
-
-  @Override
-  public void showTableView(final Map<String, Object> config) {
-    final ProjectFrame projectFrame = ProjectFrame.get(this);
-    if (projectFrame != null) {
-      projectFrame.addBottomTab(this, config);
     }
   }
 

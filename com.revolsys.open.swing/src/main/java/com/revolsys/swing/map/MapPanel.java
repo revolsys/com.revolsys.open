@@ -198,7 +198,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private final GlobalBooleanValue updateZoomHistory = new GlobalBooleanValue(true);
 
-  private final ComponentViewport2D viewport;;
+  private final ComponentViewport2D viewport;
 
   private Component visibleOverlay;
 
@@ -684,7 +684,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   }
 
   public void mouseExitedCloseSelected(final MouseEvent event) {
-    this.closeSelectedRecords.clear();
+    clearCloseSelected();
   }
 
   public boolean mouseMovedCloseSelected(final MouseEvent event) {

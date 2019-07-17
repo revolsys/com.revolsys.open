@@ -1,11 +1,14 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
+import java.awt.Color;
 import java.util.Collection;
 import java.util.function.Consumer;
 
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.Icon;
 import javax.swing.ListSelectionModel;
+
+import org.jeometry.common.awt.WebColors;
 
 import com.revolsys.record.query.Query;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -18,6 +21,11 @@ public class ModeEmpty implements TableRecordsMode {
 
   @Override
   public void forEachRecord(final Query query, final Consumer<? super LayerRecord> action) {
+  }
+
+  @Override
+  public Color getBorderColor() {
+    return WebColors.Black;
   }
 
   @Override

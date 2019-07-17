@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.swing.ActionMap;
@@ -42,8 +41,10 @@ import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
 import javax.swing.tree.TreePath;
 
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.connection.file.FileConnectionManager;
 import com.revolsys.connection.file.FolderConnectionRegistry;
@@ -54,6 +55,7 @@ import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.filter.FileNameExtensionFilter;
+import com.revolsys.process.JavaProcess;
 import com.revolsys.raster.GeoreferencedImageWriterFactory;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
@@ -109,7 +111,7 @@ public class ProjectFrame extends BaseFrame {
     PREFERENCE_PROJECT, "recentProject");
 
   private static final PreferenceKey PREFERENCE_RECENT_PROJECTS = new PreferenceKey(
-    PREFERENCE_PROJECT, "recentProjects");
+    PREFERENCE_PROJECT, "recentProjects", DataTypes.LIST, new ArrayList<String>());
 
   private static final String BOTTOM_TAB = "INTERNAL_bottomTab";
 
@@ -312,13 +314,15 @@ public class ProjectFrame extends BaseFrame {
   }
 
   private void actionRunScript() {
-    ScriptRunner.runScriptProcess(this);
+    final File logDirectory = getLogDirectory();
+    final JavaProcess javaProcess = newJavaProcess();
+    ScriptRunner.runScriptProcess(this, logDirectory, javaProcess);
   }
 
-  public void addBottomTab(final ProjectFramePanel panel, final Map<String, Object> config) {
+  public void addBottomTab(final ProjectFramePanel panel, final MapEx config) {
     Invoke.later(() -> {
       final TabbedPane tabs = getBottomTabs();
-
+      final boolean selectTab = config.getBoolean("selectTab", true);
       final Object tableView = panel.getProperty(BOTTOM_TAB);
       Component component = null;
       if (tableView instanceof Component) {
@@ -347,7 +351,9 @@ public class ProjectFrame extends BaseFrame {
           final TabClosableTitle tab = tabs.addClosableTab(name, icon, panelComponent, closeAction);
           tab.setMenu(panel);
 
-          tabs.setSelectedIndex(tabIndex);
+          if (selectTab) {
+            tabs.setSelectedIndex(tabIndex);
+          }
 
           panel.setPropertyWeak(BOTTOM_TAB_LISTENER, Arrays.asList(//
             EventQueue.addPropertyChange(panel, "name", () -> {
@@ -368,7 +374,9 @@ public class ProjectFrame extends BaseFrame {
         }
       } else {
         panel.activatePanelComponent(component, config);
-        tabs.setSelectedComponent(component);
+        if (selectTab) {
+          tabs.setSelectedComponent(component);
+        }
       }
     });
   }
@@ -544,8 +552,7 @@ public class ProjectFrame extends BaseFrame {
   }
 
   private List<String> getRecentProjectPaths() {
-    final List<String> recentProjects = this.preferences.getValue(PREFERENCE_RECENT_PROJECTS,
-      new ArrayList<String>());
+    final List<String> recentProjects = this.preferences.getValue(PREFERENCE_RECENT_PROJECTS);
     for (int i = 0; i < recentProjects.size();) {
       final String filePath = recentProjects.get(i);
       final File file = FileUtil.getFile(filePath);
@@ -704,6 +711,10 @@ public class ProjectFrame extends BaseFrame {
 
   protected Project newEmptyProject() {
     return new Project();
+  }
+
+  public JavaProcess newJavaProcess() {
+    return new JavaProcess();
   }
 
   protected MapPanel newMapPanel() {

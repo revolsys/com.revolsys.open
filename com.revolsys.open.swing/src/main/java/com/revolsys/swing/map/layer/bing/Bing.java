@@ -7,7 +7,6 @@ import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.BaseMapLayerGroup;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 
 public interface Bing {
   static void actionAddLayer(final BaseMapLayerGroup parent) {
@@ -40,7 +39,7 @@ public interface Bing {
     });
 
     MenuFactory.addMenuInitializer(BaseMapLayerGroup.class, (menu) -> {
-      Menus.addMenuItem(menu, "group", "Add Bing Layer", "bing", Bing::actionAddLayer, false);
+      menu.addMenuItem("group", "Add Bing Layer", "bing", Bing::actionAddLayer, false);
     });
 
   }

@@ -24,7 +24,6 @@ import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.menu.Menus;
 import com.revolsys.util.Property;
 
 public class TriangulatedIrregularNetworkLayer extends AbstractLayer
@@ -35,7 +34,7 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer
     menu.addGroup(0, "table");
     menu.addGroup(2, "edit");
 
-    Menus.<TriangulatedIrregularNetworkLayer> addMenuItem(menu, "refresh", "Reload from File",
+    menu.<TriangulatedIrregularNetworkLayer> addMenuItem("refresh", "Reload from File",
       Icons.getIconWithBadge("page", "refresh"), TriangulatedIrregularNetworkLayer::revertDo, true);
     menu.deleteMenuItem("refresh", "Refresh");
   }

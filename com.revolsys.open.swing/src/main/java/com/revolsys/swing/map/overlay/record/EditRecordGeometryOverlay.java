@@ -1013,6 +1013,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           final LayerRecordMenu menu = record.getMenu();
           menu.showMenu(record, event);
         }
+        event.consume();
         return true;
       }
     }

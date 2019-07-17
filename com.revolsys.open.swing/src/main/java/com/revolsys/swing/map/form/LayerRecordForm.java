@@ -256,7 +256,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     }
     layer.saveChanges(record);
     layer.setSelectedRecords(record);
-    layer.showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED);
+    layer.showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED, true);
     closeWindow();
   }
 
@@ -619,7 +619,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     final LayerRecord record = getRecord();
     if (record != null) {
       final AbstractRecordLayer layer = getLayer();
-      layer.deleteRecord(record);
+      layer.deleteRecordWithConfirm(record);
     }
   }
 

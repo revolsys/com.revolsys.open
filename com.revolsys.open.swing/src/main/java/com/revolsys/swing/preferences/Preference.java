@@ -33,46 +33,19 @@ public class Preference implements PropertyChangeSupportProxy {
   private final Preferences preferences;
 
   public Preference(final String applicationName, final PreferenceKey preference,
-    final DataType dataType, final Object defaultValue) {
-    this(applicationName, preference, dataType, defaultValue, (JComponent)null);
-  }
-
-  public Preference(final String applicationName, final PreferenceKey preference,
-    final DataType dataType, final Object defaultValue, final Field field) {
-    this(applicationName, preference, dataType, defaultValue, (JComponent)field);
-  }
-
-  public Preference(final String applicationName, final PreferenceKey preference,
-    final DataType dataType, final Object defaultValue,
     final Function<Preference, Field> fieldFactory) {
     this.applicationName = applicationName;
     this.preferences = new Preferences(applicationName);
     this.preference = preference;
 
-    this.dataType = dataType;
-    this.savedValue = this.preferences.getValue(preference, defaultValue);
+    this.dataType = preference.getDataType();
+    final Object defaultValue = preference.getDefaultValue();
+    this.savedValue = this.preferences.getValue(preference);
     final String propertyName = preference.getName();
     if (fieldFactory == null) {
-      this.fieldComponent = SwingUtil.newField(dataType, propertyName, defaultValue);
+      this.fieldComponent = SwingUtil.newField(this.dataType, propertyName, defaultValue);
     } else {
       this.fieldComponent = (JComponent)fieldFactory.apply(this);
-    }
-    this.field = (Field)this.fieldComponent;
-    cancelChanges();
-  }
-
-  public Preference(final String applicationName, final PreferenceKey preference,
-    final DataType dataType, final Object defaultValue, final JComponent field) {
-    this.applicationName = applicationName;
-    this.preferences = new Preferences(applicationName);
-    this.preference = preference;
-    this.dataType = dataType;
-    final String propertyName = preference.getName();
-    this.savedValue = this.preferences.getValue(preference, defaultValue);
-    if (field == null) {
-      this.fieldComponent = SwingUtil.newField(dataType, propertyName, defaultValue);
-    } else {
-      this.fieldComponent = field;
     }
     this.field = (Field)this.fieldComponent;
     cancelChanges();
