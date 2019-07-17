@@ -16,7 +16,7 @@
     <dependency>
       <groupId>com.revolsys.open</groupId>
       <artifactId>com.revolsys.open.core</artifactId>
-      <version>TRUNK-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
