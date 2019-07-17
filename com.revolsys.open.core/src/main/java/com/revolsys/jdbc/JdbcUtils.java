@@ -31,6 +31,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.exception.JdbcExceptionTranslator;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.jdbc.field.JdbcFieldDefinitions;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
@@ -728,7 +729,7 @@ public final class JdbcUtils {
     final Query query) {
     int index = 1;
     for (final Object parameter : query.getParameters()) {
-      final JdbcFieldDefinition attribute = JdbcFieldDefinition.newFieldDefinition(parameter);
+      final JdbcFieldDefinition attribute = JdbcFieldDefinitions.newFieldDefinition(parameter);
       try {
         index = attribute.setPreparedStatementValue(statement, index, parameter);
       } catch (final SQLException e) {
@@ -743,7 +744,7 @@ public final class JdbcUtils {
 
   public static int setValue(final PreparedStatement statement, final int index, final Object value)
     throws SQLException {
-    final JdbcFieldDefinition fieldDefinition = JdbcFieldDefinition.newFieldDefinition(value);
+    final JdbcFieldDefinition fieldDefinition = JdbcFieldDefinitions.newFieldDefinition(value);
     return fieldDefinition.setPreparedStatementValue(statement, index, value);
   }
 

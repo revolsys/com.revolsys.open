@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.ctc.wstx.util.ExceptionUtil;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.jdbc.field.JdbcFieldDefinitions;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
@@ -72,7 +73,7 @@ public class CollectionValue extends AbstractMultiQueryValue {
         final Value valueWrapper = (Value)queryValue;
         final Object value = valueWrapper.getQueryValue();
         if (jdbcField == null) {
-          jdbcField = JdbcFieldDefinition.newFieldDefinition(value);
+          jdbcField = JdbcFieldDefinitions.newFieldDefinition(value);
         }
         try {
           index = jdbcField.setPreparedStatementValue(statement, index, value);

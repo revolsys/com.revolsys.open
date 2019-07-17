@@ -822,6 +822,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   @Override
   public void initializeDo() {
+    boolean exists = false;
     synchronized (this.apiSync) {
       Geodatabase geodatabase = null;
       try {
@@ -856,7 +857,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           final String domainName = domainNames.get(i);
           loadDomain(geodatabase, domainName);
         }
-        this.exists = true;
+        exists = true;
       } catch (final Throwable e) {
         try {
           closeDo();
@@ -869,6 +870,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         }
       }
     }
+    this.exists = exists;
   }
 
   @Override

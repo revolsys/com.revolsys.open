@@ -707,7 +707,7 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected MapPanel newMapPanel() {
-    final MapPanel mapPanel = new MapPanel(this.preferences, this.project);
+    final MapPanel mapPanel = new MapPanel(this, this.preferences, this.project);
     if (OS.isMac()) {
       // Make border on right/bottom to match the JTabbedPane UI on a mac
       mapPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 9, 9));

@@ -14,6 +14,7 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.date.Dates;
 
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.jdbc.field.JdbcFieldDefinitions;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.code.CodeTableProperty;
@@ -52,7 +53,7 @@ public class Value implements QueryValue {
   }
 
   public Value(final Object value) {
-    this(JdbcFieldDefinition.newFieldDefinition(value), value);
+    this(JdbcFieldDefinitions.newFieldDefinition(value), value);
   }
 
   @Override
@@ -157,7 +158,7 @@ public class Value implements QueryValue {
       if (field instanceof JdbcFieldDefinition) {
         this.jdbcField = (JdbcFieldDefinition)field;
       } else {
-        this.jdbcField = JdbcFieldDefinition.newFieldDefinition(this.queryValue);
+        this.jdbcField = JdbcFieldDefinitions.newFieldDefinition(this.queryValue);
       }
 
       CodeTable codeTable = null;
@@ -206,8 +207,8 @@ public class Value implements QueryValue {
 
   public void setValue(Object value) {
     value = getValue(value);
-    if (this.fieldDefinition.getName() == JdbcFieldDefinition.UNKNOWN) {
-      this.fieldDefinition = JdbcFieldDefinition.newFieldDefinition(value);
+    if (this.fieldDefinition.getName() == JdbcFieldDefinitions.UNKNOWN) {
+      this.fieldDefinition = JdbcFieldDefinitions.newFieldDefinition(value);
     }
     setQueryValue(value);
   }
