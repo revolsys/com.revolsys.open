@@ -84,6 +84,7 @@ import com.revolsys.swing.map.overlay.LayerRendererOverlay;
 import com.revolsys.swing.map.overlay.MapOverlay;
 import com.revolsys.swing.map.overlay.MeasureOverlay;
 import com.revolsys.swing.map.overlay.MouseOverlay;
+import com.revolsys.swing.map.overlay.ShortestRouteOverlay;
 import com.revolsys.swing.map.overlay.ToolTipOverlay;
 import com.revolsys.swing.map.overlay.ZoomOverlay;
 import com.revolsys.swing.map.overlay.record.EditRecordGeometryOverlay;
@@ -128,17 +129,25 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     });
   }
 
-  private final ProjectFrame projectFrame;
-
   private BaseComboBox<Layer> baseMapLayerField;
 
   private BaseMapLayerGroup baseMapLayers;
 
   private LayerMapOverlay baseMapOverlay;
 
+  private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(100, 100));
+
+  private List<CloseLocation> closeSelectedLocations = Collections.emptyList();
+
+  private List<LayerRecord> closeSelectedRecords = Collections.emptyList();
+
   private FileDropTargetListener fileDropListener;
 
+  private boolean initializing = true;
+
   private final JLayeredPane layeredPane;
+
+  private final BasePanel layeredPanel;
 
   private LayerMapOverlay layerOverlay;
 
@@ -159,15 +168,21 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private int overlayIndex = 1;
 
+  private final Preferences preferences;
+
   private SwingWorkerProgressBar progressBar;
 
   private final Project project;
+
+  private final ProjectFrame projectFrame;
 
   private BasePanel rightStatusBar = new BasePanel(new FlowLayout(FlowLayout.RIGHT, 2, 2));
 
   private double scale = 500000000;
 
   private SelectMapCoordinateSystem selectCoordinateSystem;
+
+  private RecordSpatialIndex<LayerRecord> selectedRecordsIndex;
 
   private final GlobalBooleanValue settingBoundingBox = new GlobalBooleanValue(false);
 
@@ -183,7 +198,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private final GlobalBooleanValue updateZoomHistory = new GlobalBooleanValue(true);
 
-  private final ComponentViewport2D viewport;
+  private final ComponentViewport2D viewport;;
 
   private Component visibleOverlay;
 
@@ -192,20 +207,6 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   private final LinkedList<BoundingBox> zoomHistory = new LinkedList<>();
 
   private int zoomHistoryIndex = -1;
-
-  private RecordSpatialIndex<LayerRecord> selectedRecordsIndex;
-
-  private List<LayerRecord> closeSelectedRecords = Collections.emptyList();
-
-  private List<CloseLocation> closeSelectedLocations;
-
-  private boolean initializing = true;
-
-  private final JXBusyLabel busyLabel = new JXBusyLabel(new Dimension(100, 100));
-
-  private final BasePanel layeredPanel;
-
-  private final Preferences preferences;
 
   public MapPanel(final ProjectFrame projectFrame, final Preferences preferences,
     final Project project) {
@@ -304,6 +305,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     this.mouseOverlay = new MouseOverlay(this, this.layeredPane);
     new EditGeoreferencedImageOverlay(this);
     new MeasureOverlay(this);
+    new ShortestRouteOverlay(this);
     this.toolTipOverlay = new ToolTipOverlay(this);
   }
 
@@ -398,6 +400,13 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     }
   }
 
+  public void clearOverlayActions() {
+    while (!this.overlayActionStack.isEmpty()) {
+      final String action = this.overlayActionStack.element();
+      clearOverlayAction(action);
+    }
+  }
+
   public void clearToolTipText() {
     this.toolTipOverlay.clearText();
   }
@@ -470,13 +479,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     final double y = point.getY();
     final double maxDistance = this.viewport.getHotspotMapUnits();
     final GeometryFactory geometryFactory = this.viewport.getGeometryFactory2dFloating();
-    return findCloseLocation(geometryFactory, layer, record, geometry, x, y, maxDistance);
-  }
-
-  public CloseLocation findCloseLocation(final GeometryFactory viewportGeometryFactory2d,
-    final AbstractRecordLayer layer, final LayerRecord record, final Geometry geometry,
-    final double x, final double y, final double maxDistance) {
-    final Geometry convertedGeometry = geometry.convertGeometry(viewportGeometryFactory2d);
+    final Geometry convertedGeometry = geometry.convertGeometry(geometryFactory);
     final Pair<GeometryComponent, Double> closestGeometryComponent = convertedGeometry
       .findClosestGeometryComponent(x, y, maxDistance);
 
@@ -533,6 +536,17 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.viewport.getGeometryFactory();
+  }
+
+  public BoundingBox getHotspotBoundingBox() {
+    final Point point = MouseOverlay.getEventPoint();
+    final double x = point.getX();
+    final double y = point.getY();
+    final ComponentViewport2D viewport = this.viewport;
+    final double maxDistance = viewport.getHotspotMapUnits();
+    final GeometryFactory geometryFactory = viewport.getGeometryFactory2dFloating();
+    return geometryFactory.newBoundingBox(x - maxDistance, y - maxDistance, x + maxDistance,
+      y + maxDistance);
   }
 
   public MapOverlay getLayerOverlay() {
@@ -680,22 +694,15 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       return false;
     } else {
       final double scale = getViewport().getScale();
-      final Point point = MouseOverlay.getEventPoint();
-      final double x = point.getX();
-      final double y = point.getY();
-      final double maxDistance = this.viewport.getHotspotMapUnits();
-      final GeometryFactory geometryFactory = this.viewport.getGeometryFactory2dFloating();
 
-      final BoundingBox boundingBox = point.bboxEditor() //
-        .expandDelta(maxDistance);
+      final BoundingBox boundingBox = getHotspotBoundingBox();
       final List<LayerRecord> closeRecords = new ArrayList<>();
       final List<CloseLocation> closeLocations = new ArrayList<>();
       for (final LayerRecord closeRecord : getSelectedRecords(boundingBox)) {
         final AbstractRecordLayer layer = closeRecord.getLayer();
         if (layer.isVisible(scale) && layer.isVisible(closeRecord)) {
           final Geometry geometry = closeRecord.getGeometry();
-          final CloseLocation closeLocation = findCloseLocation(geometryFactory, layer, closeRecord,
-            geometry, x, y, maxDistance);
+          final CloseLocation closeLocation = findCloseLocation(layer, closeRecord, geometry);
           if (closeLocation != null) {
             closeRecords.add(closeRecord);
             closeLocations.add(closeLocation);

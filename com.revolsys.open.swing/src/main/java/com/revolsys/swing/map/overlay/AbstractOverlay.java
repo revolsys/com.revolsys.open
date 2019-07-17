@@ -227,6 +227,12 @@ public class AbstractOverlay extends JComponent implements MapOverlay, PropertyC
     }
   }
 
+  public void clearOverlayActions() {
+    if (this.map != null) {
+      this.map.clearOverlayActions();
+    }
+  }
+
   protected void clearSnapLocations() {
     this.snapPointLocationMap = Collections.emptyMap();
     this.snapPoint = null;
@@ -485,13 +491,8 @@ public class AbstractOverlay extends JComponent implements MapOverlay, PropertyC
     this.snapEventX = MouseOverlay.getEventX();
     this.snapEventY = MouseOverlay.getEventY();
     this.snapCentre = MouseOverlay.getEventPoint();
-    final double snapCentreX = this.snapCentre.getX();
-    final double snapCentreY = this.snapCentre.getY();
-    final double maxDistance = this.viewport.getHotspotMapUnits();
-    final BoundingBox boundingBox = this.snapCentre.bboxEditor() //
-      .expandDelta(maxDistance);
+    final BoundingBox boundingBox = getHotspotBoundingBox();
 
-    final GeometryFactory geometryFactory = getViewportGeometryFactory2d();
     final Map<Point, Set<CloseLocation>> snapLocations = new HashMap<>();
     final List<AbstractRecordLayer> layers = getSnapLayers();
     for (final AbstractRecordLayer layer : layers) {
@@ -499,8 +500,8 @@ public class AbstractOverlay extends JComponent implements MapOverlay, PropertyC
       for (final LayerRecord record : records) {
         if (layer.isVisible(record)) {
           final Geometry recordGeometry = record.getGeometry();
-          final CloseLocation closeLocation = this.map.findCloseLocation(geometryFactory, layer,
-            record, recordGeometry, snapCentreX, snapCentreY, maxDistance);
+          final CloseLocation closeLocation = this.map.findCloseLocation(layer, record,
+            recordGeometry);
           if (closeLocation != null) {
             final Point closePoint = closeLocation.getViewportPoint();
             Maps.addToSet(snapLocations, closePoint, closeLocation);
