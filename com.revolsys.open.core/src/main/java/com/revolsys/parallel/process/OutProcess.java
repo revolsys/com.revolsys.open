@@ -6,14 +6,15 @@ public interface OutProcess<T> extends Process {
 
   Channel<T> getOut();
 
-  void setOut(Channel<T> out);
+  OutProcess<T> setOut(Channel<T> out);
 
-  default void setOut(final InProcess<T> process) {
+  default OutProcess<T> setOut(final InProcess<T> process) {
     if (process != null) {
       final Channel<T> channel = process.getIn();
       if (channel != null) {
         setOut(channel);
       }
     }
+    return this;
   }
 }

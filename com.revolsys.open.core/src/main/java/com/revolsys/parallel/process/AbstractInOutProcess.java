@@ -133,26 +133,30 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
    * @param in the in to set
    */
   @Override
-  public void setIn(final Channel<I> in) {
+  public AbstractInOutProcess<I, O> setIn(final Channel<I> in) {
     this.in = in;
     in.readConnect();
+    return this;
   }
 
-  public void setInBufferSize(final int inBufferSize) {
+  public AbstractInOutProcess<I, O> setInBufferSize(final int inBufferSize) {
     this.inBufferSize = inBufferSize;
+    return this;
   }
 
   /**
    * @param out the out to set
    */
   @Override
-  public void setOut(final Channel<O> out) {
+  public AbstractInOutProcess<I, O> setOut(final Channel<O> out) {
     this.out = out;
     out.writeConnect();
+    return this;
   }
 
-  public void setOutBufferSize(final int outBufferSize) {
+  public AbstractInOutProcess<I, O> setOutBufferSize(final int outBufferSize) {
     this.outBufferSize = outBufferSize;
+    return this;
   }
 
 }

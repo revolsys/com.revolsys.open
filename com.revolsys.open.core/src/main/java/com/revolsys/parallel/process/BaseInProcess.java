@@ -1,9 +1,12 @@
 package com.revolsys.parallel.process;
 
 import com.revolsys.parallel.channel.Channel;
+import com.revolsys.util.Cancellable;
 
-public class BaseInProcess<T> extends AbstractInProcess<T> {
+public class BaseInProcess<T> extends AbstractInProcess<T> implements Cancellable {
   private boolean running = false;
+
+  private Cancellable cancellable;
 
   public BaseInProcess() {
   }
@@ -18,6 +21,18 @@ public class BaseInProcess<T> extends AbstractInProcess<T> {
 
   public BaseInProcess(final String processName) {
     super(processName);
+  }
+
+  @Override
+  public boolean isCancelled() {
+    if (this.running) {
+      if (this.cancellable != null) {
+        return this.cancellable.isCancelled();
+      } else {
+        return false;
+      }
+    }
+    return true;
   }
 
   protected void postRun(final Channel<T> in) {
@@ -35,7 +50,7 @@ public class BaseInProcess<T> extends AbstractInProcess<T> {
     try {
       preRun(in);
       final Thread thread = Thread.currentThread();
-      while (this.running) {
+      while (!isCancelled()) {
         if (thread.isInterrupted()) {
           return;
         } else {
@@ -54,6 +69,11 @@ public class BaseInProcess<T> extends AbstractInProcess<T> {
         this.running = false;
       }
     }
+  }
+
+  public BaseInProcess<T> setCancellable(final Cancellable cancellable) {
+    this.cancellable = cancellable;
+    return this;
   }
 
 }

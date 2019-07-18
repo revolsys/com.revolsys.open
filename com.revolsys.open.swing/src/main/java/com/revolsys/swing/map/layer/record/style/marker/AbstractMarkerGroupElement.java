@@ -39,7 +39,6 @@ public abstract class AbstractMarkerGroupElement extends AbstractNameTitle
     return this.parent;
   }
 
-  @Override
   public abstract String getTypeName();
 
   public void setParent(final MarkerGroup parent) {

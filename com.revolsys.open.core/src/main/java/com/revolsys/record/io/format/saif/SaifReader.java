@@ -56,7 +56,6 @@ import com.revolsys.record.schema.RecordDefinitionFactory;
 import com.revolsys.record.schema.RecordDefinitionFactoryImpl;
 import com.revolsys.spring.resource.ClassPathResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.spring.resource.SpringUtil;
 
 /**
  * <p>
@@ -146,7 +145,7 @@ public class SaifReader extends AbstractReader<Record>
   }
 
   public SaifReader(final Resource resource) {
-    setFile(SpringUtil.getFileOrCreateTempFile(resource));
+    setFile(Resource.getFileOrCreateTempFile(resource));
   }
 
   /**

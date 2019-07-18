@@ -8,11 +8,16 @@ public abstract class AbstractProcess implements Process, BeanNameAware {
   private ProcessNetwork processNetwork;
 
   public AbstractProcess() {
-    this.beanName = getClass().getName();
+    this(null);
   }
 
   public AbstractProcess(final String beanName) {
-    this.beanName = beanName;
+    setProcessNetwork(ProcessNetwork.forThread());
+    if (beanName == null) {
+      this.beanName = getClass().getName();
+    } else {
+      this.beanName = beanName;
+    }
   }
 
   @Override

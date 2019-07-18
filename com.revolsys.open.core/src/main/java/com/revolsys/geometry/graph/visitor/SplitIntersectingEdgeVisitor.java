@@ -18,7 +18,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.util.GeometryProperties;
-import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 
 public class SplitIntersectingEdgeVisitor implements Consumer<Edge<Record>> {
@@ -41,7 +40,7 @@ public class SplitIntersectingEdgeVisitor implements Consumer<Edge<Record>> {
       .getEdges(edge.getGraph(), edge);
     if (!intersectEdges.isEmpty()) {
       final Predicate<Edge<Record>> edgeEqualFilter = new LineFilter<>(new EqualFilter<>(line));
-      Predicates.remove(intersectEdges, edgeEqualFilter);
+      intersectEdges.removeIf(edgeEqualFilter);
       for (final Edge<Record> edge2 : intersectEdges) {
         if (!edge2.isRemoved()) {
           final LineString line2 = edge2.getLine();
