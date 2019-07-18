@@ -66,10 +66,13 @@ public abstract class AbstractRunnable implements Runnable {
             component.setCursor(WAIT_CURSOR);
             runDo();
           } finally {
-            if (glassPane != null) {
-              glassPane.setVisible(false);
+            try {
+              if (glassPane != null) {
+                glassPane.setVisible(false);
+              }
+            } finally {
+              component.setCursor(cursor);
             }
-            component.setCursor(cursor);
           }
         }
       } else {

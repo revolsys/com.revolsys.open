@@ -73,6 +73,7 @@ import com.revolsys.geometry.operation.buffer.BufferParameters;
 import com.revolsys.geometry.operation.distance.DistanceOp;
 import com.revolsys.geometry.operation.overlay.OverlayOp;
 import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
+import com.revolsys.geometry.operation.predicate.RectangleContains;
 import com.revolsys.geometry.operation.predicate.RectangleIntersects;
 import com.revolsys.geometry.operation.relate.RelateOp;
 import com.revolsys.geometry.operation.union.UnaryUnionOp;
@@ -654,6 +655,11 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
   default boolean contains(final Geometry geometry) {
     if (bboxCovers(geometry)) {
+      // optimization for rectangle arguments
+      if (isRectangle()) {
+        return RectangleContains.contains((Polygon)this, geometry);
+      }
+      // general case
       return relate(geometry).isContains();
     } else {
       return false;

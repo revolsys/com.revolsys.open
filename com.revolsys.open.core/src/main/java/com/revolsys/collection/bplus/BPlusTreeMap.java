@@ -361,7 +361,6 @@ public class BPlusTreeMap<K, V> extends AbstractMap<K, V> {
           System.out.print(value);
         }
       }
-      System.out.println();
       page.setOffset(offset);
       for (final Integer childPageIndex : pageIndexes) {
         printPage(childPageIndex);

@@ -1760,26 +1760,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       menu.addMenuItem("record", "Revert Empty Fields", "field_empty_revert",
         hasModifiedEmptyFields, LayerRecord::revertEmptyFields);
 
-      final DataType geometryType = getGeometryType();
-      if (geometryType == GeometryDataTypes.LINE_STRING
-        || geometryType == GeometryDataTypes.MULTI_LINE_STRING
-        || geometryType == GeometryDataTypes.LINE_STRING
-        || geometryType == GeometryDataTypes.GEOMETRY_COLLECTION) {
-        final MapPanel map = getMapPanel();
-        final ShortestRouteOverlay shortestRouteOverlay = map
-          .getMapOverlay(ShortestRouteOverlay.class);
-
-        menu.addMenuItem("route", "Route From Record", "route_from", (final LayerRecord record) -> {
-          shortestRouteOverlay.setRecord1(record);
-        });
-
-        final Predicate<LayerRecord> routeMode = record -> shortestRouteOverlay.isHasRecord1();
-
-        menu.addMenuItem("route", "Route To Record", "route_to", routeMode,
-          (final LayerRecord record) -> {
-            shortestRouteOverlay.setRecord2(record);
-          });
-      }
+      ShortestRouteOverlay.initMenuItems(this, menu);
 
       menu.addMenuItem("dnd", "Copy Record", "page_copy", this::copyRecordToClipboard);
 

@@ -51,5 +51,9 @@ public interface PointOnGeometryLocator {
    * @param p the point to test
    * @return the location of the point in the geometry
    */
-  Location locate(Point p);
+  default Location locate(final Point p) {
+    final double x = p.getX();
+    final double y = p.getY();
+    return locate(x, y);
+  }
 }

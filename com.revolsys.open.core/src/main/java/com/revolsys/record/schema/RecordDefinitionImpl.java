@@ -769,7 +769,10 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   @Override
-  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+  public void setGeometryFactory(GeometryFactory geometryFactory) {
+    if (geometryFactory == null) {
+      geometryFactory = GeometryFactory.DEFAULT_2D;
+    }
     final FieldDefinition geometryFieldDefinition = getGeometryField();
     if (geometryFieldDefinition == null) {
       this.geometryFactory = geometryFactory;

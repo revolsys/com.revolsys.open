@@ -45,14 +45,8 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
           BaseCloseable lock = writeLock();
           final FileGdbEnumRowsIterator rows = search(typePath, "OBJECTID", whereClause, false)) {
           for (final Row row : rows) {
-            final boolean loadOnly = isLocked();
-            if (loadOnly) {
-              setLoadOnlyMode(false);
-            }
+            setLoadOnlyMode(false);
             table.deleteRow(row);
-            if (loadOnly) {
-              setLoadOnlyMode(true);
-            }
             record.setState(RecordState.DELETED);
             recordStore.addStatistic("Delete", record);
             return true;
@@ -242,14 +236,8 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
                   throw new ObjectPropertyException(record, name, e);
                 }
               }
-              final boolean loadOnly = isLocked();
-              if (loadOnly) {
-                setLoadOnlyMode(false);
-              }
+              table.setLoadOnlyMode(false);
               table.updateRow(row);
-              if (loadOnly) {
-                setLoadOnlyMode(true);
-              }
               record.setState(RecordState.PERSISTED);
               recordStore.addStatistic("Update", record);
             } catch (final ObjectException e) {

@@ -94,7 +94,8 @@ public class PointBuilder {
       if (n.isInResult()) {
         continue;
       }
-      // if an incident edge is in the result, then the node coordinate is
+      // if an incident edge is in the result, then the node
+      // coordinate is
       // included already
       if (n.isIncidentEdgeInResult()) {
         continue;

@@ -44,6 +44,8 @@ import org.jeometry.common.function.Function4Double;
 import com.revolsys.geometry.model.editor.AbstractGeometryEditor;
 import com.revolsys.geometry.model.editor.MultiPointEditor;
 import com.revolsys.geometry.model.editor.PunctualEditor;
+import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.util.Pair;
 
 /**
  * Identifies {@link Geometry} subclasses which
@@ -67,6 +69,36 @@ public interface Punctual extends Geometry {
       final String string = DataTypes.toString(value);
       final Geometry geometry = GeometryFactory.DEFAULT_3D.geometry(string, false);
       return (G)newPunctual(geometry);
+    }
+  }
+
+  @Override
+  default Pair<GeometryComponent, Double> findClosestGeometryComponent(final double x,
+    final double y, final double maxDistance) {
+    if (isEmpty()) {
+      return new Pair<>();
+    } else {
+      Vertex closestComponent = null;
+      double closestDistance = Double.POSITIVE_INFINITY;
+      for (final Vertex vertex : vertices()) {
+        if (vertex.equalsVertex(x, y)) {
+          return new Pair<>(vertex, 0.0);
+        } else {
+          final double fromDistance = vertex.distance(x, y);
+          if (fromDistance <= maxDistance) {
+            if (fromDistance < closestDistance) {
+              closestDistance = fromDistance;
+              closestComponent = vertex.clone();
+            }
+          }
+        }
+      }
+
+      if (Double.isFinite(closestDistance)) {
+        return new Pair<>(closestComponent, closestDistance);
+      } else {
+        return new Pair<>();
+      }
     }
   }
 

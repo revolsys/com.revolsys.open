@@ -626,6 +626,15 @@ public class AbstractOverlay extends JComponent implements MapOverlay, PropertyC
     }
   }
 
+  public boolean setOverlayActionClearOthers(final String overlayAction) {
+    if (this.map == null) {
+      return false;
+    } else {
+      final boolean set = this.map.setOverlayActionClearOthers(overlayAction);
+      return set;
+    }
+  }
+
   protected boolean setSnapLocations(final Map<Point, Set<CloseLocation>> snapLocations) {
     if (snapLocations.isEmpty()) {
       if (!this.snapPointLocationMap.isEmpty()) {

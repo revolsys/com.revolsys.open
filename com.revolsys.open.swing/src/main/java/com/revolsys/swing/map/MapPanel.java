@@ -129,6 +129,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     });
   }
 
+  private JLabel messageLabel;
+
   private BaseComboBox<Layer> baseMapLayerField;
 
   private BaseMapLayerGroup baseMapLayers;
@@ -207,6 +209,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   private final LinkedList<BoundingBox> zoomHistory = new LinkedList<>();
 
   private int zoomHistoryIndex = -1;
+
+  private final LinkedList<Pair<String, Color>> messageStack = new LinkedList<>();
 
   public MapPanel(final ProjectFrame projectFrame, final Preferences preferences,
     final Project project) {
@@ -377,20 +381,33 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     }
   }
 
+  public void clearMessage(final String overlayAction) {
+    this.messageLabel.setVisible(false);
+  }
+
   public boolean clearOverlayAction(final String overlayAction) {
     if (overlayAction == null) {
       return false;
     } else if (isOverlayAction(overlayAction)) {
+      this.messageLabel.setVisible(false);
       this.overlayActionCursorStack.pop();
       this.overlayActionStack.pop();
+      this.messageStack.pop();
       if (hasOverlayAction()) {
         final Cursor cursor = this.overlayActionCursorStack.peek();
         setViewportCursor(cursor);
         final String previousAction = this.overlayActionStack.peek();
         this.overlayActionLabel.setText(CaseConverter.toCapitalizedWords(previousAction));
+        final Pair<String, Color> message = this.messageStack.peek();
+        if (message != null) {
+          this.messageLabel.setText(message.getValue1());
+          this.messageLabel.setForeground(message.getValue2());
+          this.messageLabel.setVisible(true);
+        }
       } else {
         this.overlayActionLabel.setText("");
         this.overlayActionLabel.setVisible(false);
+        this.messageLabel.setVisible(false);
         setViewportCursor(AbstractOverlay.DEFAULT_CURSOR);
       }
       firePropertyChange("overlayAction", overlayAction, null);
@@ -754,6 +771,13 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     this.overlayActionLabel.setForeground(WebColors.Green);
     this.leftStatusBar.add(this.overlayActionLabel);
 
+    this.messageLabel = new JLabel();
+    this.messageLabel.setBorder(
+      BorderFactory.createCompoundBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED),
+        BorderFactory.createEmptyBorder(2, 3, 2, 3)));
+    this.messageLabel.setVisible(false);
+    this.leftStatusBar.add(this.messageLabel);
+
     this.progressBar = new SwingWorkerProgressBar();
     this.rightStatusBar.add(this.progressBar);
   }
@@ -1075,6 +1099,16 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     }
   }
 
+  public void setMessage(final String overlayAction, final String message, final Color color) {
+    if (isOverlayAction(overlayAction)) {
+      this.messageStack.pop();
+      this.messageStack.push(new Pair<>(message, color));
+      this.messageLabel.setForeground(color);
+      this.messageLabel.setText(message);
+      this.messageLabel.setVisible(true);
+    }
+  }
+
   public boolean setOverlayAction(final String overlayAction) {
     final String oldAction = getOverlayAction();
     if (overlayAction == null) {
@@ -1089,10 +1123,25 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       this.overlayActionStack.push(overlayAction);
       this.overlayActionLabel.setText(CaseConverter.toCapitalizedWords(overlayAction));
       this.overlayActionLabel.setVisible(true);
+      this.messageStack.push(null);
+      this.messageLabel.setVisible(false);
       firePropertyChange("overlayAction", oldAction, overlayAction);
       return true;
     } else {
       return false;
+    }
+  }
+
+  public boolean setOverlayActionClearOthers(final String overlayAction) {
+    final String oldAction = getOverlayAction();
+    if (overlayAction == null) {
+      firePropertyChange("overlayAction", oldAction, null);
+      return false;
+    } else if (DataType.equal(oldAction, overlayAction)) {
+      return true;
+    } else {
+      clearOverlayActions();
+      return setOverlayAction(overlayAction);
     }
   }
 

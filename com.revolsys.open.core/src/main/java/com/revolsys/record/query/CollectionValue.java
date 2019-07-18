@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.ctc.wstx.util.ExceptionUtil;
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.field.JdbcFieldDefinitions;
 import com.revolsys.record.Record;
@@ -78,7 +79,7 @@ public class CollectionValue extends AbstractMultiQueryValue {
         try {
           index = jdbcField.setPreparedStatementValue(statement, index, value);
         } catch (final SQLException e) {
-          ExceptionUtil.throwIfUnchecked(e);
+          throw Exceptions.wrap(e);
         }
       } else {
         index = queryValue.appendParameters(index, statement);
