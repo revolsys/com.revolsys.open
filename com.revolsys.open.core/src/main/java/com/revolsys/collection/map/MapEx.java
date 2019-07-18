@@ -50,7 +50,7 @@ public interface MapEx extends MapDefault<String, Object> {
     return getValue(name, DataTypes.BOOLEAN);
   }
 
-  default boolean getBoolean(final String name, final boolean defaultValue) {
+  default boolean getBoolean(final CharSequence name, final boolean defaultValue) {
     final Object value = getValue(name, DataTypes.BOOLEAN);
     if (value == null) {
       return defaultValue;
