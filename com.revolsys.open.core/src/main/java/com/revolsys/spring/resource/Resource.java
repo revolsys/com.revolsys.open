@@ -118,7 +118,7 @@ public interface Resource extends org.springframework.core.io.Resource, FileProx
       if (source instanceof org.springframework.core.io.ClassPathResource) {
         final org.springframework.core.io.ClassPathResource springResource = (org.springframework.core.io.ClassPathResource)source;
         return new ClassPathResource(springResource.getPath(), springResource.getClassLoader());
-      } else if (source instanceof org.springframework.core.io.PathResource) {
+      } else if (source instanceof org.springframework.core.io.FileSystemResource) {
         final org.springframework.core.io.FileSystemResource springResource = (org.springframework.core.io.FileSystemResource)source;
         return new PathResource(springResource.getFile());
       } else if (source instanceof org.springframework.core.io.PathResource) {
