@@ -10,8 +10,6 @@ import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.util.Property;
-
 public interface MapEx extends MapDefault<String, Object> {
   static final MapEx EMPTY = new MapEx() {
     @Override
@@ -91,10 +89,10 @@ public interface MapEx extends MapDefault<String, Object> {
 
   default <E extends Enum<E>> E getEnum(final Class<E> enumType, final CharSequence fieldName) {
     final String value = getString(fieldName);
-    if (Property.hasValue(value)) {
-      return Enum.valueOf(enumType, value);
-    } else {
+    if (value == null) {
       return null;
+    } else {
+      return Enum.valueOf(enumType, value);
     }
   }
 
@@ -175,10 +173,10 @@ public interface MapEx extends MapDefault<String, Object> {
 
   default String getString(final CharSequence name, final String defaultValue) {
     final String value = getString(name);
-    if (Property.hasValue(value)) {
-      return value;
-    } else {
+    if (value == null) {
       return defaultValue;
+    } else {
+      return value;
     }
   }
 

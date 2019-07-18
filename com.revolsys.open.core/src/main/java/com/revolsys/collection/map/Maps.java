@@ -65,6 +65,12 @@ public interface Maps {
     return values.add(value);
   }
 
+  static <K1, K2, C extends Collection<V>, V> boolean addToCollection(final Supplier<C> factory,
+    final Map<K1, Map<K2, C>> map, final K1 key1, final K2 key2, final V value) {
+    final C values = getCollection(factory, map, key1, key2);
+    return values.add(value);
+  }
+
   static <K1, V> boolean addToList(final Map<K1, List<V>> map, final K1 key1, final V value) {
     if (map != null && key1 != null) {
       final List<V> values = getList(map, key1);
@@ -119,6 +125,11 @@ public interface Maps {
   }
 
   static <K, V> MapBuilder<K, V> buildHash() {
+    final Map<K, V> map = newHash();
+    return new MapBuilder<>(map);
+  }
+
+  static <K, V> MapBuilder<K, V> buildHashEx() {
     final Map<K, V> map = newHash();
     return new MapBuilder<>(map);
   }
@@ -376,6 +387,23 @@ public interface Maps {
     }
   }
 
+  static <K, C extends Collection<V>, V> C getCollection(final Supplier<C> factory,
+    final Map<K, C> map, final K key) {
+    C collection = map.get(key);
+    if (collection == null && factory != null) {
+      collection = factory.get();
+      map.put(key, collection);
+    }
+    return collection;
+  }
+
+  static <K1, K2, C extends Collection<V>, V> C getCollection(final Supplier<C> factory,
+    final Map<K1, Map<K2, C>> map, final K1 key1, final K2 key2) {
+    final Map<K2, C> map2 = getMap(map, key1);
+    final C collecion = getCollection(factory, map2, key2);
+    return collecion;
+  }
+
   static <T> Integer getCount(final Map<T, Integer> counts, final T key) {
     final Integer count = counts.get(key);
     if (count == null) {
@@ -406,28 +434,7 @@ public interface Maps {
     }
   }
 
-  static Double getDouble(final Map<String, ? extends Object> map, final String name) {
-    final Object value = get(map, name);
-    if (value == null) {
-      return null;
-    } else if (value instanceof Number) {
-      final Number number = (Number)value;
-      return number.doubleValue();
-    } else {
-      final String stringValue = value.toString();
-      if (Property.hasValue(stringValue)) {
-        try {
-          return Double.valueOf(stringValue);
-        } catch (final NumberFormatException e) {
-          return null;
-        }
-      } else {
-        return null;
-      }
-    }
-  }
-
-  static double getDouble(final Map<String, ? extends Object> object, final String name,
+  static <K> double getDouble(final Map<K, ? extends Object> object, final K name,
     final double defaultValue) {
     final Double value = getDouble(object, name);
     if (value == null) {
@@ -444,6 +451,14 @@ public interface Maps {
     } else {
       return value.doubleValue();
     }
+  }
+
+  static <K> K getFirstKey(final Map<K, ?> map) {
+    return map.keySet().iterator().next();
+  }
+
+  static <V> V getFirstValue(final Map<?, V> map) {
+    return map.values().iterator().next();
   }
 
   static <K> Integer getInteger(final Map<K, ? extends Object> map, final K name) {
@@ -468,37 +483,6 @@ public interface Maps {
   }
 
   static <K> int getInteger(final Map<K, ? extends Object> object, final K name,
-    final int defaultValue) {
-    final Integer value = getInteger(object, name);
-    if (value == null) {
-      return defaultValue;
-    } else {
-      return value;
-    }
-  }
-
-  static Integer getInteger(final Map<String, ? extends Object> map, final String name) {
-    final Object value = get(map, name);
-    if (value == null) {
-      return null;
-    } else if (value instanceof Number) {
-      final Number number = (Number)value;
-      return number.intValue();
-    } else {
-      final String stringValue = value.toString();
-      if (Property.hasValue(stringValue)) {
-        try {
-          return Integer.valueOf(stringValue);
-        } catch (final NumberFormatException e) {
-          return null;
-        }
-      } else {
-        return null;
-      }
-    }
-  }
-
-  static int getInteger(final Map<String, ? extends Object> object, final String name,
     final int defaultValue) {
     final Integer value = getInteger(object, name);
     if (value == null) {
@@ -686,6 +670,11 @@ public interface Maps {
       }
       return value;
     }
+  }
+
+  static <K1, K2, V> V getValue(final Map<K1, Map<K2, V>> map, final K1 key1, final K2 key2) {
+    final Map<K2, V> map2 = getMap(map, key1);
+    return map2.get(key2);
   }
 
   static <K> boolean hasValue(final Map<K, ?> map, final K key) {
