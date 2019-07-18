@@ -16,7 +16,6 @@ import org.jeometry.common.compare.CompareUtil;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 
-import com.revolsys.beans.Classes;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.util.Emptyable;
@@ -129,7 +128,7 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
   }
 
   default String getName() {
-    return Classes.className(getClass());
+    return getClass().getSimpleName();
   }
 
   default JComponent getSwingEditor() {
