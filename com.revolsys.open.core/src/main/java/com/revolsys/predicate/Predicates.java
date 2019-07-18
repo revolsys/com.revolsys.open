@@ -12,6 +12,19 @@ import com.revolsys.util.Property;
 
 public interface Predicates {
 
+  static <T> boolean add(final Collection<T> collection, final T value,
+    final Predicate<? super T> filter) {
+    if (filter == null) {
+      return collection.add(value);
+    } else {
+      if (filter.test(value)) {
+        return collection.add(value);
+      } else {
+        return false;
+      }
+    }
+  }
+
   static <T> void addAll(final Collection<T> collection, final Iterable<T> values,
     final Predicate<? super T> filter) {
     if (filter == null) {

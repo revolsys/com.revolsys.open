@@ -36,7 +36,7 @@ package com.revolsys.geometry.algorithm.match;
 import com.revolsys.geometry.model.Geometry;
 
 /**
- * QuantityType the degree of similarity between two {@link Geometry}s
+ * Measures the degree of similarity between two {@link Geometry}s
  * using the area of intersection between the geometries.
  * The measure is normalized to lie in the range [0, 1].
  * Higher measures indicate a great degree of similarity.

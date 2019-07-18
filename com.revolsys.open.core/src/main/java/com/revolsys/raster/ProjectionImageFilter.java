@@ -35,8 +35,8 @@ public class ProjectionImageFilter extends WholeImageFilter {
     final Point p4 = sourceBoundingBox.getCornerPoint(3).convertPoint2d(destGeometryFactory);
 
     final double sourceWidth = sourceBoundingBox.getWidth() / sourcePixelSize;
-    final double distance1 = p1.distance(p2);
-    final double distance2 = p3.distance(p4);
+    final double distance1 = p1.distancePoint(p2);
+    final double distance2 = p3.distancePoint(p4);
     final double destPixelSize1 = distance1 / sourceWidth;
     final double destPixelSize2 = distance2 / sourceWidth;
     if (destPixelSize1 < destPixelSize2) {

@@ -236,9 +236,9 @@ public abstract class GeometryTransformer {
       }
     }
     if (updated) {
-      return lineal;
-    } else {
       return this.factory.lineal(newLines);
+    } else {
+      return lineal;
     }
   }
 
@@ -257,9 +257,9 @@ public abstract class GeometryTransformer {
       }
     }
     if (updated) {
-      return punctual;
-    } else {
       return this.factory.punctual(newPoints);
+    } else {
+      return punctual;
     }
   }
 
@@ -296,7 +296,6 @@ public abstract class GeometryTransformer {
       final Geometry newHole = transformLinearRing(hole, polygon);
       if (Property.hasValue(newHole)) {
         if (!(newHole instanceof LinearRing)) {
-        } else {
           isAllValidLinearRings = false;
         }
         components.add(newHole);

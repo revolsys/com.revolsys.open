@@ -32,7 +32,6 @@
  */
 package com.revolsys.core.test.geometry.test.function;
 
-import com.revolsys.beans.Classes;
 import com.revolsys.geometry.model.Geometry;
 
 /**
@@ -190,10 +189,10 @@ public abstract class BaseGeometryFunction implements GeometryFunction, Comparab
     paramTypes.append("Geometry");
     for (final Class parameterType : this.parameterTypes) {
       paramTypes.append(",");
-      paramTypes.append(Classes.className(parameterType));
+      paramTypes.append(((Class<?>)parameterType).getSimpleName());
     }
     final Class clz = this.returnType;
-    return this.name + "(" + paramTypes + ")" + " -> " + Classes.className(clz);
+    return this.name + "(" + paramTypes + ")" + " -> " + ((Class<?>)clz).getSimpleName();
   }
 
   @Override

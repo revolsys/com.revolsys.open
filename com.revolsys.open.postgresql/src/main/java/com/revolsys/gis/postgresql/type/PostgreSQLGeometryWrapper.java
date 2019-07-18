@@ -9,7 +9,6 @@ import org.jeometry.common.function.Consumer3;
 import org.jeometry.common.number.Doubles;
 import org.postgresql.util.PGobject;
 
-import com.revolsys.beans.Classes;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataTypes;
@@ -94,15 +93,15 @@ public class PostgreSQLGeometryWrapper extends PGobject {
           return (G)geometry;
         } else {
           throw new RuntimeException(geometry.getGeometryType() + " must contain a single "
-            + Classes.className(expectedClass) + " not a " + firstGeometry.getGeometryType());
+            + expectedClass.getSimpleName() + " not a " + firstGeometry.getGeometryType());
         }
       } else {
         throw new RuntimeException(geometry.getGeometryType() + " must only have one "
-          + Classes.className(expectedClass) + " not " + geometry.getGeometryCount());
+          + expectedClass.getSimpleName() + " not " + geometry.getGeometryCount());
       }
     } else {
       throw new RuntimeException(
-        "Expecting a " + Classes.className(expectedClass) + " not " + geometry.getGeometryType());
+        "Expecting a " + expectedClass.getSimpleName() + " not " + geometry.getGeometryType());
     }
   }
 
