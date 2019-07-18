@@ -32,12 +32,6 @@
  */
 package com.revolsys.geometry.model;
 
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.PathIterator;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -207,7 +201,7 @@ import com.revolsys.util.Property;
  *@version 1.7
  */
 public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object>, Emptyable,
-  GeometryFactoryProxy, Serializable, DataTypeProxy, Shape {
+  GeometryFactoryProxy, Serializable, DataTypeProxy {
   int M = 3;
 
   double NULL_ORDINATE = Double.NaN;
@@ -429,14 +423,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return as2d(geometryFactory);
   }
 
-  @Override
-  default boolean bboxIntersects(Point point) {
-    point = point.as2d(this);
-    final double x = point.getX();
-    final double y = point.getY();
-    return intersects(x, y);
-  }
-
   /**
    * Computes a buffer area around this geometry having the given width. The
    * buffer of a Geometry is the Minkowski sum or difference of the geometry
@@ -637,13 +623,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     }
   }
 
-  @Override
   default boolean contains(final double x, final double y) {
-    return false;
-  }
-
-  @Override
-  default boolean contains(final double x, final double y, final double w, final double h) {
     return false;
   }
 
@@ -686,16 +666,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     } else {
       return false;
     }
-  }
-
-  @Override
-  default boolean contains(final Point2D point) {
-    return false;
-  }
-
-  @Override
-  default boolean contains(final Rectangle2D rectangle) {
-    return false;
   }
 
   default boolean containsProperly(final Geometry geometry) {
@@ -976,7 +946,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    */
 
   default boolean disjoint(final Geometry g) {
-    return !bboxIntersects(g);
+    return !intersects(g);
   }
 
   /**
@@ -1525,30 +1495,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return newBoundingBox();
   }
 
-  @Override
-  default Rectangle getBounds() {
-    final Rectangle2D bounds2d = getBounds2D();
-    if (bounds2d == null) {
-      return null;
-    } else {
-      return bounds2d.getBounds();
-    }
-  }
-
-  @Override
-  default Rectangle2D getBounds2D() {
-    final BoundingBox boundingBox = getBoundingBox();
-    if (boundingBox.isEmpty()) {
-      return null;
-    } else {
-      final double x = boundingBox.getMinX();
-      final double y = boundingBox.getMinY();
-      final double width = boundingBox.getWidth();
-      final double height = boundingBox.getHeight();
-      return new Rectangle2D.Double(x, y, width, height);
-    }
-  }
-
   /**
    * Computes the centroid of this <code>Geometry</code>.
    * The centroid
@@ -1786,21 +1732,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     }
   }
 
-  @Override
-  default PathIterator getPathIterator(final AffineTransform transform) {
-    final Vertex vertex = vertices();
-    if (transform == null) {
-      return new VertexPathIterator(vertex);
-    } else {
-      return new VertexPathIteratorTransform(vertex, transform);
-    }
-  }
-
-  @Override
-  default PathIterator getPathIterator(final AffineTransform transform, final double flatness) {
-    return getPathIterator(transform);
-  }
-
   /**
    *  Returns a vertex of this <code>Geometry</code>
    *  (usually, but not necessarily, the first one).
@@ -1868,7 +1799,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * The intersection of two geometries of different dimension produces a result
    * geometry of dimension less than or equal to the minimum dimension of the input
    * geometries.
-   * the result geometry may be a {@link #isHeterogeneousGeometryCollection()}.
+   * The result geometry may be a {@link #isHeterogeneousGeometryCollection()}.
    * If the result is empty, it is an atomic geometry
    * with the dimension of the lowest input dimension.
    * <p>
@@ -1914,12 +1845,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
   default boolean intersects(final double x, final double y) {
     return locate(x, y) != Location.EXTERIOR;
-  }
-
-  @Override
-  default boolean intersects(final double x, final double y, final double width,
-    final double height) {
-    return bboxIntersects(x, y, x + width, y + height);
   }
 
   /**
@@ -1980,13 +1905,11 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return relate(geometry).isIntersects();
   }
 
-  @Override
-  default boolean intersects(final Rectangle2D rectangle) {
-    final double x = rectangle.getX();
-    final double y = rectangle.getY();
-    final double width = rectangle.getWidth();
-    final double height = rectangle.getHeight();
-    return intersects(x, y, width, height);
+  default boolean intersects(Point point) {
+    point = point.as2d(this);
+    final double x = point.getX();
+    final double y = point.getY();
+    return intersects(x, y);
   }
 
   boolean intersectsBbox(BoundingBox boundingBox);
@@ -2351,8 +2274,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
         return OverlayOp.newEmptyResult(OverlayOp.SYMDIFFERENCE, this, other, getGeometryFactory());
       }
 
-      // special case: if either input is empty ==> result = other
-      // arg
+      // special case: if either input is empty ==> result = other arg
       if (this.isEmpty()) {
         return other.clone();
       }
@@ -2456,7 +2378,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * {@link GeometryCollection}s
    * (which the other overlay operations currently do not).
    * <p>
-   * the result obeys the following contract:
+   * The result obeys the following contract:
    * <ul>
    * <li>Unioning a set of {@link LineString}s has the effect of fully noding
    * and dissolving the linework.
@@ -2483,7 +2405,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * The union of two geometries of different dimension produces a result
    * geometry of dimension equal to the maximum dimension of the input
    * geometries.
-   * the result geometry may be a heterogenous
+   * The result geometry may be a heterogenous
    * {@link GeometryCollection}.
    * If the result is empty, it is an atomic geometry
    * with the dimension of the highest input dimension.

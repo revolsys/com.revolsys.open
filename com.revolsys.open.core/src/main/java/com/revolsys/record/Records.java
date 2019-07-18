@@ -579,7 +579,7 @@ public interface Records {
             final Geometry convertedGeometry2 = geometry2.convertGeometry(geometryFactory);
             if (convertedGeometry2 != null) {
               try {
-                return geometry.bboxIntersects(convertedGeometry2);
+                return geometry.intersects(convertedGeometry2);
               } catch (final TopologyException e) {
                 return true;
               }

@@ -1,5 +1,6 @@
 package com.revolsys.record.code;
 
+import org.jeometry.common.data.identifier.Code;
 import org.jeometry.common.data.type.AbstractDataType;
 
 import com.revolsys.util.Strings;

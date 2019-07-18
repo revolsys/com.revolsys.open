@@ -245,7 +245,7 @@ public interface Point extends Punctual, Serializable, BoundingBox {
   }
 
   @Override
-  default boolean bboxIntersects(final Point point) {
+  default boolean intersects(final Point point) {
     if (isEmpty()) {
       return false;
     } else {

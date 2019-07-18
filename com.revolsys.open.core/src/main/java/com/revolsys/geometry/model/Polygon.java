@@ -161,7 +161,7 @@ public interface Polygon extends Polygonal {
       return Double.POSITIVE_INFINITY;
     } else {
       // TODO implement intersects for x,y
-      if (bboxIntersects(new PointDoubleXY(x, y))) {
+      if (intersects(new PointDoubleXY(x, y))) {
         return 0.0;
       } else {
         double minDistance = Double.MAX_VALUE;
