@@ -23,22 +23,41 @@ package com.revolsys.geometry.filter;
 import java.util.function.Predicate;
 
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.segment.Segment;
 
 public class SharesLineSegmentsFilter implements Predicate<LineString> {
-  private final LineString line;
-
   public SharesLineSegmentsFilter(final LineString line) {
-    this.line = line;
   }
 
   @Override
   public boolean test(final LineString line) {
-    for (final Segment segment1 : this.line.segments()) {
-      for (final Segment segment2 : line.segments()) {
-        if (segment1.equals(2, segment2)) {
-          return true;
+
+    final int vertexCount = line.getVertexCount();
+    if (vertexCount > 0) {
+      double line1x1 = line.getX(0);
+      double line1y1 = line.getY(0);
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double line1x2 = line.getX(vertexIndex);
+        final double line1y2 = line.getY(vertexIndex);
+
+        final int vertexCount2 = line.getVertexCount();
+        if (vertexCount2 > 0) {
+          double line2x1 = line.getX(0);
+          double line2y1 = line.getY(0);
+          for (final int vertexIndex2 = 1; vertexIndex < vertexCount2; vertexIndex++) {
+            final double line2x2 = line.getX(vertexIndex2);
+            final double line2y2 = line.getY(vertexIndex2);
+            if (line1x1 == line2x1 && line1y1 == line2y1) {
+              if (line1x2 == line2x2 && line1y2 == line2y2) {
+                return true;
+              }
+            }
+            line2x1 = line2x2;
+            line2y1 = line2y2;
+
+          }
         }
+        line1x1 = line1x2;
+        line1y1 = line1y2;
       }
     }
     return false;

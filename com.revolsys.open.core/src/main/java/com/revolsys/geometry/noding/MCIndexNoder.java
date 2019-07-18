@@ -71,7 +71,7 @@ public class MCIndexNoder extends SinglePassNoder {
 
   private int idCounter = 0;
 
-  private final SpatialIndex index = new StrTree();
+  private final MonotoneChainIndex index = new MonotoneChainIndex();
 
   private final List<MonotoneChain> monoChains = new ArrayList<>();
 
@@ -87,16 +87,13 @@ public class MCIndexNoder extends SinglePassNoder {
   private void add(final SegmentString segStr) {
     final List<MonotoneChain> segChains = MonotoneChainBuilder.getChains(segStr.getLineString(),
       segStr);
-    for (final MonotoneChain mc : segChains) {
-      mc.setId(this.idCounter++);
-      this.index.insertItem(mc.getEnvelope(), mc);
-      this.monoChains.add(mc);
+    for (final MonotoneChain chain : segChains) {
+      chain.setId(this.idCounter++);
+      this.index.insertItem(chain);
+      this.monoChains.add(chain);
     }
   }
 
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
   @Override
   public void computeNodes(final Collection<NodedSegmentString> segments) {
     this.nodedSegStrings = segments;
@@ -106,7 +103,7 @@ public class MCIndexNoder extends SinglePassNoder {
     intersectChains();
   }
 
-  public SpatialIndex getIndex() {
+  public MonotoneChainIndex getIndex() {
     return this.index;
   }
 
@@ -114,15 +111,11 @@ public class MCIndexNoder extends SinglePassNoder {
     return this.monoChains;
   }
 
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
   @Override
   public Collection<NodedSegmentString> getNodedSubstrings() {
     return NodedSegmentString.getNodedSubstrings(this.nodedSegStrings);
   }
 
-  @SuppressWarnings("unchecked")
   private void intersectChains() {
     final MonotoneChainOverlapAction overlapAction = new SegmentOverlapAction(this.segInt);
 

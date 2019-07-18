@@ -85,6 +85,30 @@ public enum Location {
     return this.index;
   }
 
+  public boolean isBoundary() {
+    return this == BOUNDARY;
+  }
+
+  public boolean isDisjoint() {
+    return isExterior() || isNone();
+  }
+
+  public boolean isExterior() {
+    return this == EXTERIOR;
+  }
+
+  public boolean isInterior() {
+    return this == INTERIOR;
+  }
+
+  public boolean isIntersects() {
+    return isInterior() || isBoundary();
+  }
+
+  public boolean isNone() {
+    return this == NONE;
+  }
+
   @Override
   public String toString() {
     switch (this) {

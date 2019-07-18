@@ -32,12 +32,11 @@
  */
 package com.revolsys.geometry.geomgraph;
 
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.geomgraph.index.MonotoneChainEdge;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.DelegatingLineString;
 import com.revolsys.geometry.model.IntersectionMatrix;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -46,11 +45,8 @@ import com.revolsys.geometry.model.impl.LineStringDouble;
 /**
  * @version 1.7
  */
-public class Edge extends GraphComponent implements LineString {
+public class Edge extends GraphComponent implements DelegatingLineString {
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   /**
@@ -72,8 +68,6 @@ public class Edge extends GraphComponent implements LineString {
   private int depthDelta = 0; // the change in area depth from the R to L side
 
   private final EdgeIntersectionList eiList = new EdgeIntersectionList(this);
-
-  private BoundingBox env;
 
   private boolean isIsolated = true;
 
@@ -105,10 +99,11 @@ public class Edge extends GraphComponent implements LineString {
     // normalize the intersection point location
     final int nextSegIndex = normalizedSegmentIndex + 1;
     if (nextSegIndex < getVertexCount()) {
-      final Point nextPt = getPoint(nextSegIndex);
+      final double nextX = getX(nextSegIndex);
+      final double nextY = getY(nextSegIndex);
       // Normalize segment index if intPt falls on vertex
       // The check for point equality is 2D only - Z values are ignored
-      if (intPt.equals(2, nextPt)) {
+      if (intPt.equalsVertex(nextX, nextY)) {
         normalizedSegmentIndex = nextSegIndex;
         dist = 0.0;
       }
@@ -116,7 +111,7 @@ public class Edge extends GraphComponent implements LineString {
     /**
      * Add the intersection point to edge intersection list.
      */
-    this.eiList.add(intPt, normalizedSegmentIndex, dist);
+    this.eiList.add(intPt.getX(), intPt.getY(), normalizedSegmentIndex, dist);
   }
 
   /**
@@ -125,19 +120,17 @@ public class Edge extends GraphComponent implements LineString {
    */
   public void addIntersections(final LineIntersector li, final int segmentIndex,
     final int geomIndex) {
-    for (int i = 0; i < li.getIntersectionNum(); i++) {
+    for (int i = 0; i < li.getIntersectionCount(); i++) {
       addIntersection(li, segmentIndex, geomIndex, i);
     }
   }
-
-  // of this edge
 
   @Override
   public Edge clone() {
     try {
       return (Edge)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -164,14 +157,15 @@ public class Edge extends GraphComponent implements LineString {
     }
     final Edge e = (Edge)o;
 
-    if (getVertexCount() != e.getVertexCount()) {
+    final int vertexCount = getVertexCount();
+    if (vertexCount != e.getVertexCount()) {
       return false;
     }
 
     boolean isEqualForward = true;
     boolean isEqualReverse = true;
-    int iRev = getVertexCount();
-    for (int i = 0; i < getVertexCount(); i++) {
+    int iRev = vertexCount;
+    for (int i = 0; i < vertexCount; i++) {
       if (!getPoint(i).equals(2, e.getPoint(i))) {
         isEqualForward = false;
       }
@@ -185,14 +179,6 @@ public class Edge extends GraphComponent implements LineString {
     return true;
   }
 
-  @Override
-  public BoundingBox getBoundingBox() {
-    if (this.env == null) {
-      this.env = this.line.getBoundingBox();
-    }
-    return this.env;
-  }
-
   public Edge getCollapsedEdge() {
     final LineString points = new LineStringDouble(getPoint(0), getPoint(1));
     final Label lineLabel = Label.toLineLabel(this.label);
@@ -200,19 +186,11 @@ public class Edge extends GraphComponent implements LineString {
     return edge;
   }
 
-  @Override
-  public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    return this.line.getCoordinate(vertexIndex, axisIndex);
-  }
-
-  @Override
-  public double[] getCoordinates() {
-    return this.line.getCoordinates();
-  }
-
   public Depth getDepth() {
     return this.depth;
   }
+
+  // of this edge
 
   /**
    * The depthDelta is the change in depth as an edge is crossed from R to L
@@ -227,11 +205,7 @@ public class Edge extends GraphComponent implements LineString {
   }
 
   @Override
-  public GeometryFactory getGeometryFactory() {
-    return this.line.getGeometryFactory();
-  }
-
-  public LineString getLine() {
+  public LineString getLineString() {
     return this.line;
   }
 
@@ -248,17 +222,18 @@ public class Edge extends GraphComponent implements LineString {
 
   @Override
   public Point getPoint() {
-    return this.line.getPoint();
+    final LineString line = getLineString();
+    return line.getPoint();
   }
 
   @Override
-  public Point getPoint(final int i) {
-    return this.line.getPoint(i);
+  public double getX(final int vertexIndex) {
+    return this.line.getX(vertexIndex);
   }
 
   @Override
-  public int getVertexCount() {
-    return this.line.getVertexCount();
+  public double getY(final int vertexIndex) {
+    return this.line.getY(vertexIndex);
   }
 
   /**
@@ -268,14 +243,19 @@ public class Edge extends GraphComponent implements LineString {
   public boolean isCollapsed() {
     if (!this.label.isArea()) {
       return false;
-    }
-    if (getVertexCount() != 3) {
+    } else if (getVertexCount() != 3) {
       return false;
+    } else {
+      final double x1 = getX(0);
+      final double x2 = getX(2);
+      if (x1 == x2) {
+        final double y1 = getY(0);
+        final double y2 = getY(2);
+        return y1 == y2;
+      } else {
+        return false;
+      }
     }
-    if (getPoint(0).equals(getPoint(2))) {
-      return true;
-    }
-    return false;
   }
 
   @Override
@@ -287,11 +267,12 @@ public class Edge extends GraphComponent implements LineString {
    * @return true if the coordinate sequences of the Edges are identical
    */
   public boolean isPointwiseEqual(final Edge e) {
-    if (getVertexCount() != e.getVertexCount()) {
+    final int vertexCount = getVertexCount();
+    if (vertexCount != e.getVertexCount()) {
       return false;
     }
 
-    for (int i = 0; i < getVertexCount(); i++) {
+    for (int i = 0; i < vertexCount; i++) {
       if (!getPoint(i).equals(2, e.getPoint(i))) {
         return false;
       }
@@ -315,7 +296,7 @@ public class Edge extends GraphComponent implements LineString {
   public String toString() {
     final StringBuilder buf = new StringBuilder();
     buf.append("edge " + this.name + ": ");
-    buf.append(this.line.toString());
+    buf.append(toWkt());
     buf.append("  " + this.label + " " + this.depthDelta);
     return buf.toString();
   }

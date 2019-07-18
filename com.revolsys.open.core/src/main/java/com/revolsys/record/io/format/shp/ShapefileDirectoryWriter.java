@@ -18,6 +18,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.util.Property;
 import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 
 public class ShapefileDirectoryWriter extends AbstractRecordWriter {
   private File directory;
@@ -26,7 +27,7 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
 
   private Map<String, RecordDefinition> recordDefinitionMap = new HashMap<>();
 
-  private LabelCountMap labelCountMap;
+  private LabelCounters labelCountMap;
 
   private boolean useNamespaceAsSubDirectory;
 
@@ -105,7 +106,7 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
     return this.recordDefinitionMap.get(path);
   }
 
-  public LabelCountMap getStatistics() {
+  public LabelCounters getStatistics() {
     return this.labelCountMap;
   }
 
@@ -154,7 +155,7 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
     this.nameSuffix = nameSuffix;
   }
 
-  public void setStatistics(final LabelCountMap labelCountMap) {
+  public void setStatistics(final LabelCounters labelCountMap) {
     if (this.labelCountMap != labelCountMap) {
       this.labelCountMap = labelCountMap;
       labelCountMap.connect();

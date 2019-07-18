@@ -33,13 +33,11 @@
 
 package com.revolsys.geometry.planargraph;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.Consumer3Double;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * A node in a {@link PlanarGraph}is a location where 0 or more {@link Edge}s
@@ -50,44 +48,24 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
  *
  * @version 1.7
  */
-public class Node extends GraphComponent {
-  /**
-   * Returns all Edges that connect the two nodes (which are assumed to be different).
-   */
-  public static Collection getEdgesBetween(final Node node0, final Node node1) {
-    final List edges0 = DirectedEdge.toEdges(node0.getOutEdges().getEdges());
-    final Set commonEdges = new HashSet(edges0);
-    final List edges1 = DirectedEdge.toEdges(node1.getOutEdges().getEdges());
-    commonEdges.retainAll(edges1);
-    return commonEdges;
-  }
+public class Node extends GraphComponent implements Point {
+  private static final long serialVersionUID = 1L;
 
   /** The collection of DirectedEdges that leave this Node */
-  protected DirectedEdgeStar deStar;
+  private final DirectedEdgeStar deStar;
 
   /** The location of this Node */
-  protected Point pt;
+  private double x;
+
+  private final double y;
 
   /**
    * Constructs a Node with the given location.
    */
   public Node(final double x, final double y) {
-    this(new PointDoubleXY(x, y), new DirectedEdgeStar());
-  }
-
-  /**
-  * Constructs a Node with the given location.
-  */
-  public Node(final Point pt) {
-    this(pt, new DirectedEdgeStar());
-  }
-
-  /**
-   * Constructs a Node with the given location and collection of outgoing DirectedEdges.
-   */
-  public Node(final Point pt, final DirectedEdgeStar deStar) {
-    this.pt = pt;
-    this.deStar = deStar;
+    this.x = x;
+    this.y = y;
+    this.deStar = new DirectedEdgeStar();
   }
 
   /**
@@ -97,11 +75,57 @@ public class Node extends GraphComponent {
     this.deStar.add(de);
   }
 
-  /**
-   * Returns the location of this Node.
-   */
-  public Point getCoordinate() {
-    return this.pt;
+  @Override
+  public Point clone() {
+    return this;
+  }
+
+  @Override
+  public void copyCoordinates(final double[] coordinates) {
+    coordinates[X] = this.x;
+    coordinates[Y] = this.y;
+    for (int i = 3; i < coordinates.length; i++) {
+      coordinates[i] = Double.NaN;
+    }
+  }
+
+  @Override
+  public boolean equals(final Object other) {
+    if (other instanceof Point) {
+      final Point point = (Point)other;
+      return equals(point);
+    } else if (other instanceof BoundingBox) {
+      final BoundingBox boundingBox = (BoundingBox)other;
+      return bboxEquals(boundingBox);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    action.accept(this.x, this.y);
+  }
+
+  @Override
+  public void forEachVertex(final Consumer3Double action) {
+    action.accept(this.x, this.y, Double.NaN);
+  }
+
+  @Override
+  public int getAxisCount() {
+    return 2;
+  }
+
+  @Override
+  public double getCoordinate(final int axisIndex) {
+    if (axisIndex == X) {
+      return this.x;
+    } else if (axisIndex == Y) {
+      return this.y;
+    } else {
+      return Double.NaN;
+    }
   }
 
   /**
@@ -126,6 +150,26 @@ public class Node extends GraphComponent {
     return this.deStar;
   }
 
+  @Override
+  public double getX() {
+    return this.x;
+  }
+
+  @Override
+  public double getY() {
+    return this.y;
+  }
+
+  @Override
+  public int hashCode() {
+    return Point.hashCode(this);
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return false;
+  }
+
   /**
    * Tests whether this node has been removed from its containing graph
    *
@@ -133,14 +177,14 @@ public class Node extends GraphComponent {
    */
   @Override
   public boolean isRemoved() {
-    return this.pt == null;
+    return Double.isNaN(this.x);
   }
 
   /**
    * Removes this node from its containing graph.
    */
   void remove() {
-    this.pt = null;
+    this.x = Double.NaN;
   }
 
   /**

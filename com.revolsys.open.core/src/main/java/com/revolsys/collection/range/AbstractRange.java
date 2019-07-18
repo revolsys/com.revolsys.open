@@ -4,7 +4,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.number.Numbers;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.util.Emptyable;
@@ -22,18 +21,20 @@ public abstract class AbstractRange<V>
     } else if (value2 == null) {
       return 1;
     } else {
-      final Long longValue1 = Numbers.toLong(value1);
-      final Long longValue2 = Numbers.toLong(value2);
-      if (longValue1 == null) {
-        if (longValue2 == null) {
-          return value1.toString().compareTo(value2.toString());
+      if (value1 instanceof Number) {
+        if (value2 instanceof Number) {
+          final Number number1 = (Number)value1;
+          final Number number2 = (Number)value2;
+          return Long.compare(number1.longValue(), number2.longValue());
         } else {
           return 1;
         }
-      } else if (longValue2 == null) {
-        return -1;
       } else {
-        return Long.compare(longValue1, longValue2);
+        if (value2 instanceof Number) {
+          return -1;
+        } else {
+          return value1.toString().compareTo(value2.toString());
+        }
       }
     }
   }
@@ -95,7 +96,7 @@ public abstract class AbstractRange<V>
   }
 
   /**
-   * Construct a newn expanded range if the this range and the other overlap or touch
+   * Construct a new expanded range if the this range and the other overlap or touch
    *
    * @param range
    * @return
@@ -151,24 +152,29 @@ public abstract class AbstractRange<V>
    * @return
    */
   public AbstractRange<?> expand(final Object value) {
-    if (value == null || contains(value)) {
-      return this;
+    if (value instanceof AbstractRange) {
+      final AbstractRange<?> range = (AbstractRange<?>)value;
+      return expand(range);
     } else {
-      final V from = getFrom();
-      final V to = getTo();
-      final V next = next(value);
-      if (next == null) {
-        return null;
-      } else if (compareFromValue(next) == 0) { // value == from -1
-        return newRange(value, to);
+      if (value == null || contains(value)) {
+        return this;
       } else {
-        final V previous = previous(value);
-        if (previous == null) {
+        final V from = getFrom();
+        final V to = getTo();
+        final V next = next(value);
+        if (next == null) {
           return null;
-        } else if (compareToValue(previous) == 0) { // value == to + 1
-          return newRange(from, value);
+        } else if (compareFromValue(next) == 0) { // value == from -1
+          return newRange(value, to);
         } else {
-          return null;
+          final V previous = previous(value);
+          if (previous == null) {
+            return null;
+          } else if (compareToValue(previous) == 0) { // value == to + 1
+            return newRange(from, value);
+          } else {
+            return null;
+          }
         }
       }
     }

@@ -33,9 +33,8 @@
 package com.revolsys.geometry.algorithm;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * Computes whether a rectangle intersects line segments.
@@ -71,7 +70,7 @@ public class RectangleLineIntersector {
    * specified as an {@link BoundingBox}.
    *
    *
-   * @param boundingBox the query rectangle, specified as an BoundingBoxDoubleGeometryFactory
+   * @param boundingBox the query rectangle, specified as an BoundingBox
    */
   public RectangleLineIntersector(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
@@ -81,14 +80,10 @@ public class RectangleLineIntersector {
      * relative to the Left side of the rectangle.
      * Index 0 is the left side, 1 is the right side.
      */
-    this.diagUp0 = new PointDouble(boundingBox.getMinX(), boundingBox.getMinY(),
-      Geometry.NULL_ORDINATE);
-    this.diagUp1 = new PointDouble(boundingBox.getMaxX(), boundingBox.getMaxY(),
-      Geometry.NULL_ORDINATE);
-    this.diagDown0 = new PointDouble(boundingBox.getMinX(), boundingBox.getMaxY(),
-      Geometry.NULL_ORDINATE);
-    this.diagDown1 = new PointDouble(boundingBox.getMaxX(), boundingBox.getMinY(),
-      Geometry.NULL_ORDINATE);
+    this.diagUp0 = new PointDoubleXY(boundingBox.getMinX(), boundingBox.getMinY());
+    this.diagUp1 = new PointDoubleXY(boundingBox.getMaxX(), boundingBox.getMaxY());
+    this.diagDown0 = new PointDoubleXY(boundingBox.getMinX(), boundingBox.getMaxY());
+    this.diagDown1 = new PointDoubleXY(boundingBox.getMaxX(), boundingBox.getMinY());
   }
 
   /**
@@ -114,6 +109,13 @@ public class RectangleLineIntersector {
     } else if (this.boundingBox.bboxIntersects(x2, y2)) {
       return true;
     } else if (this.boundingBox.bboxIntersects(x1, y1, x2, y2)) {
+      /**
+       * Compute angle of segment.
+       * Since the segment is normalized to run left to right,
+       * it is sufficient to simply test the Y ordinate.
+       * "Upwards" means relative to the left end of the segment.
+       */
+      boolean isSegUpwards;
 
       /**
        * Normalize segment.
@@ -125,16 +127,9 @@ public class RectangleLineIntersector {
         final Point tmp = p0;
         p0 = p1;
         p1 = tmp;
-      }
-      /**
-       * Compute angle of segment.
-       * Since the segment is normalized to run left to right,
-       * it is sufficient to simply test the Y ordinate.
-       * "Upwards" means relative to the left end of the segment.
-       */
-      boolean isSegUpwards = false;
-      if (p1.getY() > p0.getY()) {
-        isSegUpwards = true;
+        isSegUpwards = y1 > y2;
+      } else {
+        isSegUpwards = y2 > y1;
       }
 
       /**
@@ -166,6 +161,5 @@ public class RectangleLineIntersector {
       }
     }
     return false;
-
   }
 }

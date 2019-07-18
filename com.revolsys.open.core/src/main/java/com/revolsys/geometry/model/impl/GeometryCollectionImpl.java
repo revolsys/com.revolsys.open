@@ -82,8 +82,6 @@ public class GeometryCollectionImpl implements GeometryCollection {
    */
   private final GeometryFactory geometryFactory;
 
-  private Object userData;
-
   /**
    * @param geometries
    *            the <code>Geometry</code>s for this <code>GeometryCollection</code>,
@@ -293,11 +291,6 @@ public class GeometryCollectionImpl implements GeometryCollection {
     return segmentCount;
   }
 
-  @Override
-  public Object getUserDataOld() {
-    return this.userData;
-  }
-
   /**
    * Gets a hash code for the Geometry.
    *
@@ -353,11 +346,6 @@ public class GeometryCollectionImpl implements GeometryCollection {
   @Override
   public Geometry prepare() {
     return this;
-  }
-
-  @Override
-  public void setUserDataOld(final Object userData) {
-    this.userData = userData;
   }
 
   @Override

@@ -68,8 +68,6 @@ public class MultiPointImpl implements MultiPoint {
 
   private Point[] points;
 
-  private Object userData;
-
   public MultiPointImpl(final GeometryFactory geometryFactory, final Point... points) {
     this.geometryFactory = geometryFactory;
     if (points == null || points.length == 0) {
@@ -217,11 +215,6 @@ public class MultiPointImpl implements MultiPoint {
     return this.geometryFactory;
   }
 
-  @Override
-  public Object getUserDataOld() {
-    return this.userData;
-  }
-
   /**
    * Gets a hash code for the Geometry.
    *
@@ -236,11 +229,6 @@ public class MultiPointImpl implements MultiPoint {
   @Override
   public boolean isEmpty() {
     return false;
-  }
-
-  @Override
-  public void setUserDataOld(final Object userData) {
-    this.userData = userData;
   }
 
   @Override

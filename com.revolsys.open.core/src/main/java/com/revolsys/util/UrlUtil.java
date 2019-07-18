@@ -36,7 +36,6 @@ import java.util.regex.Pattern;
 
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
-import org.jeometry.common.exception.WrappedException;
 import org.jeometry.common.net.UrlProxy;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
@@ -417,8 +416,7 @@ public final class UrlUtil {
     if (parent == null) {
       return null;
     } else {
-      final URL parentUrl = parent.getUrl();
-      return getUrl(parentUrl, child);
+      return parent.getUrl(child);
     }
   }
 
@@ -491,7 +489,7 @@ public final class UrlUtil {
       final Path path = Paths.get(uri);
       return path.toFile();
     } catch (final URISyntaxException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -525,9 +523,9 @@ public final class UrlUtil {
       return null;
     } else if (value instanceof URL) {
       return (URL)value;
-    } else if (value instanceof Resource) {
-      final Resource resource = (Resource)value;
-      return resource.getURL();
+    } else if (value instanceof UrlProxy) {
+      final UrlProxy proxy = (UrlProxy)value;
+      return proxy.getUrl();
     } else if (value instanceof File) {
       final File file = (File)value;
       return FileUtil.toUrl(file);

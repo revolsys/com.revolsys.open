@@ -34,6 +34,7 @@
 package com.revolsys.geometry.operation.distance;
 
 import com.revolsys.geometry.index.strtree.StrTree;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -45,8 +46,8 @@ public class FacetSequenceTreeBuilder {
   // Seems to be better to use a minimum node capacity
   private static final int STR_TREE_NODE_CAPACITY = 4;
 
-  public static StrTree build(final Geometry g) {
-    final StrTree tree = new StrTree(STR_TREE_NODE_CAPACITY);
+  public static StrTree<FacetSequence> build(final Geometry g) {
+    final StrTree<FacetSequence> tree = new StrTree<>(STR_TREE_NODE_CAPACITY);
     for (final LineString line : g.getGeometryComponents(LineString.class)) {
       int i = 0;
       final int size = line.getVertexCount();
@@ -57,14 +58,15 @@ public class FacetSequenceTreeBuilder {
         if (end >= size - 1) {
           end = size;
         }
-        final FacetSequence facetSequence = new LineFacetSequence(line, i, end);
-        tree.insertItem(facetSequence.getEnvelope(), facetSequence);
+        final LineFacetSequence facetSequence = new LineFacetSequence(line, i, end);
+        final BoundingBox boundingBox = line.getBoundingBox();
+        tree.insertItem(boundingBox, facetSequence);
         i = i + FACET_SEQUENCE_SIZE;
       }
     }
     for (final Point point : g.getGeometries(Point.class)) {
       final PointFacetSequence facetSequence = new PointFacetSequence(point);
-      tree.insertItem(facetSequence.getEnvelope(), facetSequence);
+      tree.insertItem(point.getBoundingBox(), facetSequence);
     }
     tree.build();
     return tree;

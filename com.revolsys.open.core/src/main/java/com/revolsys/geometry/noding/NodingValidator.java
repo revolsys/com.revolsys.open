@@ -56,10 +56,11 @@ public class NodingValidator {
     this.segStrings = segStrings;
   }
 
-  private void checkCollapse(final Point p0, final Point p1, final Point p2) {
-    if (p0.equals(p2)) {
-      throw new RuntimeException(
-        "found non-noded collapse at " + GeometryFactory.DEFAULT_3D.lineString(p0, p1, p2));
+  private void checkCollapse(final double x1, final double y1, final double x2, final double y2,
+    final double x3, final double y3) {
+    if (x1 == x3 && y1 == y3) {
+      throw new RuntimeException("found non-noded collapse at "
+        + GeometryFactory.DEFAULT_2D.lineString(2, x1, y1, x2, y2, x3, y3));
     }
   }
 
@@ -75,7 +76,13 @@ public class NodingValidator {
   private void checkCollapses(final NodedSegmentString ss) {
     final LineString points = ss.getLineString();
     for (int i = 0; i < points.getVertexCount() - 2; i++) {
-      checkCollapse(points.getPoint(i), points.getPoint(i + 1), points.getPoint(i + 2));
+      final double x1 = points.getX(i);
+      final double y1 = points.getY(i);
+      final double x2 = points.getX(i + 1);
+      final double y2 = points.getY(i + 1);
+      final double x3 = points.getX(i + 2);
+      final double y3 = points.getY(i + 2);
+      checkCollapse(x1, y1, x2, y2, x3, y3);
     }
   }
 
@@ -85,19 +92,24 @@ public class NodingValidator {
    */
   private void checkEndPtVertexIntersections() {
     for (final NodedSegmentString ss : this.segStrings) {
-      checkEndPtVertexIntersections(ss.getPoint(0), this.segStrings);
-      checkEndPtVertexIntersections(ss.getPoint(ss.size() - 1), this.segStrings);
+      final double x1 = ss.getX(0);
+      final double y1 = ss.getX(0);
+      checkEndPtVertexIntersections(x1, y1, this.segStrings);
+      final int endIndex = ss.size() - 1;
+      final double x2 = ss.getX(endIndex);
+      final double y2 = ss.getY(endIndex);
+      checkEndPtVertexIntersections(x2, y2, this.segStrings);
     }
   }
 
-  private void checkEndPtVertexIntersections(final Point testPt,
+  private void checkEndPtVertexIntersections(final double x, final double y,
     final Collection<NodedSegmentString> segStrings) {
     for (final NodedSegmentString ss : segStrings) {
       final LineString pts = ss.getLineString();
       for (int j = 1; j < pts.getVertexCount() - 1; j++) {
-        if (pts.getPoint(j).equals(testPt)) {
+        if (pts.equalsVertex2d(j, x, y)) {
           throw new RuntimeException(
-            "found endpt/interior pt intersection at index " + j + " :pt " + testPt);
+            "found endpt/interior pt intersection at index " + j + " :pt " + x + "," + y);
         }
       }
     }
@@ -119,19 +131,24 @@ public class NodingValidator {
     if (e0 == e1 && segIndex0 == segIndex1) {
       return;
     }
-    // numTests++;
-    final Point p00 = e0.getPoint(segIndex0);
-    final Point p01 = e0.getPoint(segIndex0 + 1);
-    final Point p10 = e1.getPoint(segIndex1);
-    final Point p11 = e1.getPoint(segIndex1 + 1);
+    final double line1x1 = e0.getX(segIndex0);
+    final double line1y1 = e0.getY(segIndex0);
+    final double line1x2 = e0.getX(segIndex0 + 1);
+    final double line1y2 = e0.getY(segIndex0 + 1);
+    final double line2x1 = e1.getX(segIndex1);
+    final double line2y1 = e1.getY(segIndex1);
+    final double line2x2 = e1.getX(segIndex1 + 1);
+    final double line2y2 = e1.getY(segIndex1 + 1);
 
-    this.li.computeIntersectionPoints(p00, p01, p10, p11);
+    this.li.computeIntersection(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1, line2x2,
+      line2y2);
     if (this.li.hasIntersection()) {
 
-      if (this.li.isProper() || hasInteriorIntersection(this.li, p00, p01)
-        || hasInteriorIntersection(this.li, p10, p11)) {
+      if (this.li.isProper() || hasInteriorIntersection(this.li, line1x1, line1y1, line1x2, line1y2)
+        || hasInteriorIntersection(this.li, line2x1, line2y1, line2x2, line2y2)) {
         throw new RuntimeException(
-          "found non-noded intersection at " + p00 + "-" + p01 + " and " + p10 + "-" + p11);
+          "found non-noded intersection at " + line1x1 + "," + line1y1 + "-" + line1x2 + ","
+            + line1y2 + " and " + line2x1 + "," + line2y1 + "-" + line2x2 + "," + line2y2);
       }
     }
   }
@@ -155,11 +172,11 @@ public class NodingValidator {
   /**
    *@return true if there is an intersection point which is not an endpoint of the segment p0-p1
    */
-  private boolean hasInteriorIntersection(final LineIntersector li, final Point p0,
-    final Point p1) {
-    for (int i = 0; i < li.getIntersectionNum(); i++) {
+  private boolean hasInteriorIntersection(final LineIntersector li, final double x1,
+    final double y1, final double x2, final double y2) {
+    for (int i = 0; i < li.getIntersectionCount(); i++) {
       final Point intPt = li.getIntersection(i);
-      if (!(intPt.equals(p0) || intPt.equals(p1))) {
+      if (!(intPt.equalsVertex(x1, y1) || intPt.equalsVertex(x2, y2))) {
         return true;
       }
     }

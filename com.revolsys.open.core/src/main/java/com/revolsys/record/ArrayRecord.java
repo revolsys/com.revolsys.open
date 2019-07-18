@@ -34,9 +34,8 @@ public class ArrayRecord extends BaseRecord {
   private Object[] values;
 
   /**
-   * Construct a new ArrayRecord as a deep clone of the field values.
-   * Objects can only be cloned if they have a publicly accessible
-   * {@link #clone()} method.
+   * Construct a new ArrayRecord as a deep clone of the field values. Objects can
+   * only be cloned if they have a publicly accessible {@link #clone()} method.
    *
    * @param record The object to clone.
    */
@@ -162,7 +161,6 @@ public class ArrayRecord extends BaseRecord {
     if (!fieldDefinition.equals(oldValue, newValue)) {
       updated = true;
       updateState();
-      fieldDefinition.equals(oldValue, newValue);
     }
     this.values[index] = newValue;
     return updated;

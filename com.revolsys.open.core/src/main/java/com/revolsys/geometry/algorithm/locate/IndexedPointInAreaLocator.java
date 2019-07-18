@@ -32,20 +32,15 @@
  */
 package com.revolsys.geometry.algorithm.locate;
 
-import java.util.List;
-import java.util.function.Consumer;
-
+import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
-import com.revolsys.geometry.index.intervalrtree.SortedPackedIntervalRTree;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.segment.LineSegment;
-import com.revolsys.geometry.model.segment.Segment;
-import com.revolsys.geometry.util.GeometryProperties;
+import com.revolsys.util.Property;
 
 /**
  * Determines the {@link Location} of {@link Coordinates}s relative to
@@ -59,41 +54,24 @@ import com.revolsys.geometry.util.GeometryProperties;
  *
  */
 public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
-  public static class IntervalIndexedGeometry {
-    private final SortedPackedIntervalRTree<LineSegment> index = new SortedPackedIntervalRTree<>();
 
-    public IntervalIndexedGeometry(final Geometry geometry) {
-      final List<LineString> lines = geometry.getGeometryComponents(LineString.class);
-      for (final LineString line : lines) {
-        for (final Segment segment : line.segments()) {
-          final double y1 = segment.getY(0);
-          final double y2 = segment.getY(1);
-          final double min = Math.min(y1, y2);
-          final double max = Math.max(y1, y2);
-          this.index.insert(min, max, segment.clone());
-        }
-      }
-    }
-
-    public void query(final double min, final double max, final Consumer<LineSegment> visitor) {
-      this.index.query(min, max, visitor);
-    }
-  }
-
-  private static final String KEY = IndexedPointInAreaLocator.class.getName();
+  private static final WeakKeyValueMap<Geometry, IndexedPointInAreaLocator> CACHE = new WeakKeyValueMap<>();
 
   public static IndexedPointInAreaLocator get(final Geometry geometry) {
-    IndexedPointInAreaLocator locator = GeometryProperties.getGeometryProperty(geometry, KEY);
-    if (locator == null) {
-      locator = new IndexedPointInAreaLocator(geometry);
-      GeometryProperties.setGeometryProperty(geometry, KEY, locator);
+    if (Property.hasValue(geometry)) {
+      IndexedPointInAreaLocator locator = CACHE.get(geometry);
+      if (locator == null) {
+        locator = new IndexedPointInAreaLocator(geometry);
+        CACHE.put(geometry, locator);
+      }
+      return locator;
     }
-    return locator;
+    return null;
   }
 
   private final Geometry geometry;
 
-  private final IntervalIndexedGeometry index;
+  private final GeometrySegmentYIntervalIndex index;
 
   /**
    * Creates a new locator for a given {@link Geometry}
@@ -101,11 +79,11 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
    * @param geometry the Geometry to locate in
    */
   public IndexedPointInAreaLocator(final Geometry geometry) {
-    if (!(geometry instanceof Polygonal)) {
-      throw new IllegalArgumentException("Argument must be Polygonal");
+    if (!(geometry instanceof Polygonal || geometry instanceof LinearRing)) {
+      throw new IllegalArgumentException("Argument must be Polygonal or LinearRing");
     }
     this.geometry = geometry;
-    this.index = new IntervalIndexedGeometry(geometry);
+    this.index = new GeometrySegmentYIntervalIndex(geometry);
   }
 
   public Geometry getGeometry() {
@@ -116,7 +94,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
     return this.geometry.getGeometryFactory();
   }
 
-  public IntervalIndexedGeometry getIndex() {
+  public GeometrySegmentYIntervalIndex getIndex() {
     return this.index;
   }
 
@@ -128,7 +106,7 @@ public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
   @Override
   public Location locate(final double x, final double y) {
     final RayCrossingCounter visitor = new RayCrossingCounter(x, y);
-    this.index.query(y, y, visitor);
+    this.index.query(y, visitor);
 
     return visitor.getLocation();
   }

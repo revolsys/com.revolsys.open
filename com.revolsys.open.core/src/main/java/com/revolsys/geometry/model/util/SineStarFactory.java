@@ -37,9 +37,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
-import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.util.GeometricShapeFactory;
 
 /**
@@ -99,11 +97,11 @@ public class SineStarFactory extends GeometricShapeFactory {
     final double centreX = env.getMinX() + radius;
     final double centreY = env.getMinY() + radius;
 
-    final Point[] pts = new Point[this.nPts + 1];
-    int iPt = 0;
-    for (int i = 0; i < this.nPts; i++) {
+    final double[] coordinates = new double[(this.vertexCount + 1) * 2];
+    int coordinateIndex = 0;
+    for (int i = 0; i < this.vertexCount; i++) {
       // the fraction of the way thru the current arm - in [0,1]
-      final double ptArcFrac = i / (double)this.nPts * this.numArms;
+      final double ptArcFrac = i / (double)this.vertexCount * this.numArms;
       final double armAngFrac = ptArcFrac - Math.floor(ptArcFrac);
 
       // the angle for the current arm - in [0,2Pi]
@@ -116,14 +114,14 @@ public class SineStarFactory extends GeometricShapeFactory {
       final double curveRadius = insideRadius + armMaxLen * armLenFrac;
 
       // the current angle of the curve
-      final double ang = i * (2 * Math.PI / this.nPts);
+      final double ang = i * (2 * Math.PI / this.vertexCount);
       final double x = curveRadius * Math.cos(ang) + centreX;
       final double y = curveRadius * Math.sin(ang) + centreY;
-      pts[iPt++] = coord(x, y);
+      coordinates[coordinateIndex++] = this.geomFact.makeXyPrecise(x);
+      coordinates[coordinateIndex++] = this.geomFact.makeXyPrecise(y);
     }
-    pts[iPt] = new PointDouble(pts[0]);
 
-    final LinearRing ring = this.geomFact.linearRing(pts);
+    final LinearRing ring = this.geomFact.linearRing(2, coordinates);
     final Polygon poly = this.geomFact.polygon(ring);
     return poly;
   }

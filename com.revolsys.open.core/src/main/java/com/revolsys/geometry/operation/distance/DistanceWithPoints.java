@@ -43,6 +43,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.segment.Segment;
 
 /**
@@ -90,7 +91,7 @@ public class DistanceWithPoints {
   }
 
   /**
-   * Compute the the nearest points of two geometries.
+   * Compute the nearest points of two geometries.
    * The points are presented in the same order as the input Geometries.
    *
    * @param geometry1 a {@link Geometry}
@@ -169,9 +170,11 @@ public class DistanceWithPoints {
 
   private boolean computeContainmentDistance(final List<Point> locations,
     final List<Polygon> polygons) {
-    for (final Point insidePoint : locations) {
+    for (final Point point : locations) {
+      final double x = point.getX();
+      final double y = point.getY();
       for (final Polygon polygon : polygons) {
-        if (computeContainmentDistance(insidePoint, polygon)) {
+        if (computeContainmentDistance(polygon, x, y)) {
           return true;
         }
       }
@@ -179,12 +182,12 @@ public class DistanceWithPoints {
     return false;
   }
 
-  private boolean computeContainmentDistance(final Point point, final Polygon poly) {
+  private boolean computeContainmentDistance(final Polygon poly, final double x, final double y) {
     // if point is not in exterior, distance to geom is 0
-    if (Location.EXTERIOR != poly.locate(point)) {
+    if (Location.EXTERIOR != poly.locate(x, y)) {
       this.minDistance = 0.0;
-      this.minDistancePoint1 = point;
-      this.minDistancePoint2 = point;
+      this.minDistancePoint1 = new PointDoubleXY(x, y);
+      this.minDistancePoint2 = new PointDoubleXY(x, y);
       return true;
     } else {
       return false;
@@ -216,8 +219,7 @@ public class DistanceWithPoints {
   }
 
   private boolean computeLineLine(final LineString line1, final LineString line2) {
-    if (this.minDistance == Double.MAX_VALUE
-      || line1.getBoundingBox().bboxDistance(line2.getBoundingBox()) <= this.minDistance) {
+    if (this.minDistance == Double.MAX_VALUE || line1.bboxDistance(line2) <= this.minDistance) {
       for (final Segment segment1 : line1.segments()) {
         for (final Segment segment2 : line2.segments()) {
           final double dist = segment1.distance(segment2);
@@ -240,7 +242,7 @@ public class DistanceWithPoints {
     if (this.minDistance == Double.MAX_VALUE
       || line.getBoundingBox().bboxDistance(point) <= this.minDistance) {
       for (final Segment segment : line.segments()) {
-        final double distance = segment.distance(point);
+        final double distance = segment.distancePoint(point);
         if (distance < this.minDistance) {
           this.minDistance = distance;
           final Point closestPoint = segment.closestPoint(point);
@@ -282,7 +284,7 @@ public class DistanceWithPoints {
     if (this.minDistance == Double.MAX_VALUE
       || boundingBox.bboxDistance(point) <= this.minDistance) {
       for (final Segment segment : line.segments()) {
-        final double distance = segment.distance(point);
+        final double distance = segment.distancePoint(point);
         if (distance < this.minDistance) {
           this.minDistance = distance;
           final Point closestPoint = segment.closestPoint(point);

@@ -36,12 +36,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.geomgraph.DirectedEdge;
 import com.revolsys.geometry.geomgraph.EdgeRing;
 import com.revolsys.geometry.geomgraph.Node;
 import com.revolsys.geometry.geomgraph.PlanarGraph;
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
@@ -162,25 +160,20 @@ public class PolygonBuilder {
    */
   private EdgeRing findEdgeRingContaining(final EdgeRing testEr, final List<EdgeRing> shellList) {
     final LinearRing testRing = testEr.getLinearRing();
-    final BoundingBox testEnv = testRing.getBoundingBox();
-    final Point testPt = testRing.getPoint(0);
+    final double testX = testRing.getX(0);
+    final double testY = testRing.getY(0);
 
     EdgeRing minShell = null;
-    BoundingBox minEnv = null;
     for (final EdgeRing tryShell : shellList) {
       final LinearRing tryRing = tryShell.getLinearRing();
-      final BoundingBox tryEnv = tryRing.getBoundingBox();
-      if (minShell != null) {
-        minEnv = minShell.getLinearRing().getBoundingBox();
-      }
       boolean isContained = false;
-      if (tryEnv.bboxCovers(testEnv) && CGAlgorithms.isPointInRing(testPt, tryRing)) {
+      if (tryRing.bboxCovers(testRing) && tryRing.isPointInRing(testX, testY)) {
         isContained = true;
       }
       // check if this new containing ring is smaller than the current minimum
       // ring
       if (isContained) {
-        if (minShell == null || minEnv.bboxCovers(tryEnv)) {
+        if (minShell == null || minShell.bboxCovers(tryRing)) {
           minShell = tryShell;
         }
       }
@@ -239,10 +232,10 @@ public class PolygonBuilder {
       if (hole.getShell() == null) {
         final EdgeRing shell = findEdgeRingContaining(hole, shellList);
         if (shell == null) {
-          throw new TopologyException("unable to assign hole to a shell", hole.getCoordinate(0));
+          throw new TopologyException("unable to assign hole to a shell", hole.getFirstPoint());
+        } else {
+          hole.setShell(shell);
         }
-        // Assert.isTrue(shell != null, "unable to assign hole to a shell");
-        hole.setShell(shell);
       }
     }
   }

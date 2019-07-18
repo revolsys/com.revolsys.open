@@ -32,9 +32,7 @@
  */
 package com.revolsys.geometry.algorithm;
 
-import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
-import com.revolsys.geometry.model.impl.PointDouble;
+import org.jeometry.common.number.Doubles;
 
 /**
  * A non-robust version of {@link LineIntersector}.
@@ -63,100 +61,86 @@ public class NonRobustLineIntersector extends LineIntersector {
    * the same direction as p1-p2 DO_INTERSECT : the inputLines intersect in a
    * single point only, pa
    */
-  private int computeCollinearIntersection(final Point p1, final Point p2, final Point p3,
-    final Point p4) {
-    double r1;
-    double r2;
-    double r3;
-    double r4;
-    Point q3;
-    Point q4;
+  private int computeCollinearIntersection(final double line1x1, final double line1y1,
+    final double line1x2, final double line1y2, final double line2x1, final double line2y1,
+    final double line2x2, final double line2y2) {
+    final double r1 = 0;
+    final double r2 = 1;
+    final double r3 = rParameter(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1);
+    final double r4 = rParameter(line1x1, line1y1, line1x2, line1y2, line2x2, line2y2);
+    double q3x;
+    double q3y;
+    double q4x;
+    double q4y;
     double t3;
     double t4;
-    r1 = 0;
-    r2 = 1;
-    r3 = rParameter(p1, p2, p3);
-    r4 = rParameter(p1, p2, p4);
     // make sure p3-p4 is in same direction as p1-p2
     if (r3 < r4) {
-      q3 = p3;
+      q3x = line2x1;
+      q3y = line2y1;
+      q4x = line2x2;
+      q4y = line2y2;
       t3 = r3;
-      q4 = p4;
       t4 = r4;
     } else {
-      q3 = p4;
+      q3x = line2x2;
+      q3y = line2y2;
+      q4x = line2x1;
+      q4y = line2y1;
       t3 = r4;
-      q4 = p3;
       t4 = r3;
     }
-    // check for no intersection
     if (t3 > r2 || t4 < r1) {
+      // check for no intersection
       return NO_INTERSECTION;
-    }
-
-    // check for single point intersection
-    if (q4 == p1) {
-      this.pa = p1;
+    } else if (line1x1 == q4x && line1y1 == q4y) {
+      // check for single point intersection
+      this.pointAX = line1x1;
+      this.pointAY = line1y1;
       return POINT_INTERSECTION;
-    }
-    if (q3 == p2) {
-      this.pa = p2;
+    } else if (line1x2 == q3x && line1y2 == q3y) {
+      this.pointAX = line1x2;
+      this.pointAY = line1y2;
       return POINT_INTERSECTION;
-    }
+    } else {
 
-    // intersection MUST be a segment - compute endpoints
-    this.pa = p1;
-    if (t3 > r1) {
-      this.pa = q3;
+      // intersection MUST be a segment - compute endpoints
+      if (t3 > r1) {
+        this.pointAX = line2x1;
+        this.pointAY = line2y1;
+      } else {
+        this.pointAX = line1x1;
+        this.pointAY = line1y1;
+      }
+      if (t4 < r2) {
+        this.pointBX = line2x2;
+        this.pointBY = line2y2;
+      } else {
+        this.pointBX = line1x2;
+        this.pointBY = line1y2;
+      }
+      return COLLINEAR_INTERSECTION;
     }
-    this.pb = p2;
-    if (t4 < r2) {
-      this.pb = q4;
-    }
-    return COLLINEAR_INTERSECTION;
   }
 
-  @Override
-  protected int computeIntersect(final Point p1, final Point p2, final Point p3, final Point p4) {
-    double a1;
-    double b1;
-    double c1;
-    /*
-     * Coefficients of line eqns.
-     */
-    double a2;
-    /*
-     * Coefficients of line eqns.
-     */
-    double b2;
-    /*
-     * Coefficients of line eqns.
-     */
-    double c2;
-    double r1;
-    double r2;
-    double r3;
-    double r4;
-    /*
-     * 'Sign' values
-     */
-    // double denom, offset, num; /* Intermediate values */
-
+  private int computeIntersect(final double line1x1, final double line1y1, final double line1x2,
+    final double line1y2, final double line2x1, final double line2y1, final double line2x2,
+    final double line2y2) {
     this.isProper = false;
 
     /*
      * Compute a1, b1, c1, where line joining points 1 and 2 is
      * "a1 x  +  b1 y  +  c1  =  0".
      */
-    a1 = p2.getY() - p1.getY();
-    b1 = p1.getX() - p2.getX();
-    c1 = p2.getX() * p1.getY() - p1.getX() * p2.getY();
+    final double a1 = line1y2 - line1y1;
+    final double b1 = line1x1 - line1x2;
+    final double c1 = line1x2 * line1y1 - line1x1 * line1y2;
 
     /*
      * Compute r3 and r4.
      */
-    r3 = a1 * p3.getX() + b1 * p3.getY() + c1;
-    r4 = a1 * p4.getX() + b1 * p4.getY() + c1;
+    final double r3 = a1 * line2x1 + b1 * line2y1 + c1;
+    final double r4 = a1 * line2x2 + b1 * line2y2 + c1;
 
     /*
      * Check signs of r3 and r4. If both point 3 and point 4 lie on same side of
@@ -167,17 +151,17 @@ public class NonRobustLineIntersector extends LineIntersector {
     }
 
     /*
-     * Compute a2, b2, c2
+     * Coefficients of line eqns.
      */
-    a2 = p4.getY() - p3.getY();
-    b2 = p3.getX() - p4.getX();
-    c2 = p4.getX() * p3.getY() - p3.getX() * p4.getY();
+    final double a2 = line2y2 - line2y1;
+    final double b2 = line2x1 - line2x2;
+    final double c2 = line2x2 * line2y1 - line2x1 * line2y2;
 
     /*
      * Compute r1 and r2
      */
-    r1 = a2 * p1.getX() + b2 * p1.getY() + c2;
-    r2 = a2 * p2.getX() + b2 * p2.getY() + c2;
+    final double r1 = a2 * line1x1 + b2 * line1y1 + c2;
+    final double r2 = a2 * line1x2 + b2 * line1y2 + c2;
 
     /*
      * Check signs of r1 and r2. If both point 1 and point 2 lie on same side of
@@ -192,7 +176,8 @@ public class NonRobustLineIntersector extends LineIntersector {
      */
     final double denom = a1 * b2 - a2 * b1;
     if (denom == 0) {
-      return computeCollinearIntersection(p1, p2, p3, p4);
+      return computeCollinearIntersection(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
+        line2x2, line2y2);
     }
     final double numX = b1 * c2 - b2 * c1;
     /*
@@ -202,16 +187,21 @@ public class NonRobustLineIntersector extends LineIntersector {
      * " - int: " + valInt + ", floor: " + pa.x);
      */
     final double numY = a2 * c1 - a1 * c2;
-    this.pa = new PointDouble(numX / denom, numY / denom);
+    this.pointAX = numX / denom;
+    this.pointAY = numY / denom;
 
     // check if this is a proper intersection BEFORE truncating values,
     // to avoid spurious equality comparisons with endpoints
     this.isProper = true;
-    if (this.pa.equals(p1) || this.pa.equals(p2) || this.pa.equals(p3) || this.pa.equals(p4)) {
+    if (this.pointAX == line1x1 && this.pointAY == line1y1
+      || this.pointAX == line1x2 && this.pointAY == line1y2
+      || this.pointAX == line2x1 && this.pointAY == line2y1
+      || this.pointAX == line2x2 && this.pointAY == line2y2) {
       this.isProper = false;
     }
 
-    this.pa = CoordinatesUtil.getPrecise(getScale(), this.pa);
+    this.pointAX = Doubles.makePrecise(this.scale, this.pointAX);
+    this.pointAY = Doubles.makePrecise(this.scale, this.pointAY);
     return POINT_INTERSECTION;
   }
 
@@ -256,51 +246,20 @@ public class NonRobustLineIntersector extends LineIntersector {
   }
 
   @Override
-  public void computeIntersectionPoints(final Point p, final Point p1, final Point p2) {
-    double a1;
-    double b1;
-    double c1;
-    /*
-     * Coefficients of line eqns.
-     */
-    double r;
-    /*
-     * 'Sign' values
-     */
-    this.isProper = false;
-
-    /*
-     * Compute a1, b1, c1, where line joining points 1 and 2 is
-     * "a1 x  +  b1 y  +  c1  =  0".
-     */
-    a1 = p2.getY() - p1.getY();
-    b1 = p1.getX() - p2.getX();
-    c1 = p2.getX() * p1.getY() - p1.getX() * p2.getY();
-
-    /*
-     * Compute r3 and r4.
-     */
-    r = a1 * p.getX() + b1 * p.getY() + c1;
-
-    // if r != 0 the point does not lie on the line
-    if (r != 0) {
-      this.intersectionCount = NO_INTERSECTION;
-      return;
-    }
-
-    // Point lies on line - check to see whether it lies in line segment.
-
-    final double dist = rParameter(p1, p2, p);
-    if (dist < 0.0 || dist > 1.0) {
-      this.intersectionCount = NO_INTERSECTION;
-      return;
-    }
-
-    this.isProper = true;
-    if (p.equals(p1) || p.equals(p2)) {
-      this.isProper = false;
-    }
-    this.intersectionCount = POINT_INTERSECTION;
+  public boolean computeIntersection(final double line1x1, final double line1y1,
+    final double line1x2, final double line1y2, final double line2x1, final double line2y1,
+    final double line2x2, final double line2y2) {
+    this.line1x1 = line1x1;
+    this.line1y1 = line1y1;
+    this.line1x2 = line1x2;
+    this.line1y2 = line1y2;
+    this.line2x1 = line2x1;
+    this.line2y1 = line2y1;
+    this.line2x2 = line2x2;
+    this.line2y2 = line2y2;
+    this.intersectionCount = computeIntersect(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
+      line2x2, line2y2);
+    return hasIntersection();
   }
 
   /**
@@ -320,26 +279,6 @@ public class NonRobustLineIntersector extends LineIntersector {
       r = (x - x1) / (x2 - x1);
     } else {
       r = (y - y1) / (y2 - y1);
-    }
-    return r;
-  }
-
-  /**
-   *  RParameter computes the parameter for the point p
-   *  in the parameterized equation
-   *  of the line from p1 to p2.
-   *  This is equal to the 'distance' of p along p1-p2
-   */
-  private double rParameter(final Point p1, final Point p2, final Point p) {
-    double r;
-    // compute maximum delta, for numerical stability
-    // also handle case of p1-p2 being vertical or horizontal
-    final double dx = Math.abs(p2.getX() - p1.getX());
-    final double dy = Math.abs(p2.getY() - p1.getY());
-    if (dx > dy) {
-      r = (p.getX() - p1.getX()) / (p2.getX() - p1.getX());
-    } else {
-      r = (p.getY() - p1.getY()) / (p2.getY() - p1.getY());
     }
     return r;
   }

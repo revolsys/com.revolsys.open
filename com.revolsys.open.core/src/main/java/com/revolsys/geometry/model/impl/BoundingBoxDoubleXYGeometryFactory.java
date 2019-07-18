@@ -30,4 +30,8 @@ public class BoundingBoxDoubleXYGeometryFactory extends BoundingBoxDoubleXY {
     this.maxY = this.geometryFactory.makeYPreciseCeil(this.maxY);
   }
 
+  @Override
+  public RectangleXY toRectangle() {
+    return this.geometryFactory.newRectangleCorners(this.minX, this.minY, this.maxX, this.maxY);
+  }
 }

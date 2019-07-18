@@ -83,15 +83,17 @@ public abstract class AbstractInProcess<T> extends AbstractProcess implements In
    * @param in the in to set
    */
   @Override
-  public void setIn(final Channel<T> in) {
+  public AbstractInProcess<T> setIn(final Channel<T> in) {
     this.in = in;
     in.readConnect();
+    return this;
   }
 
   /**
    * @param bufferSize the bufferSize to set
    */
-  public void setInBufferSize(final int inBufferSize) {
+  public AbstractInProcess<T> setInBufferSize(final int inBufferSize) {
     this.inBufferSize = inBufferSize;
+    return this;
   }
 }

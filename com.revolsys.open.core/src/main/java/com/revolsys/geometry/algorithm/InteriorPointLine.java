@@ -35,7 +35,7 @@ package com.revolsys.geometry.algorithm;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.util.Points;
 
 /**
@@ -69,7 +69,7 @@ public class InteriorPointLine {
   private void add(final double x, final double y) {
     final double dist = Points.distance(this.centroid.getX(), this.centroid.getY(), x, y);
     if (dist < this.minDistance) {
-      this.interiorPoint = new PointDouble(x, y);
+      this.interiorPoint = new PointDoubleXY(x, y);
       this.minDistance = dist;
     }
   }
@@ -92,7 +92,8 @@ public class InteriorPointLine {
 
   private void addEndpoints(final LineString line) {
     add(line.getX(0), line.getY(0));
-    add(line.getX(-1), line.getY(-1));
+    final int lastIndex = line.getVertexCount() - 1;
+    add(line.getX(lastIndex), line.getY(lastIndex));
   }
 
   /**

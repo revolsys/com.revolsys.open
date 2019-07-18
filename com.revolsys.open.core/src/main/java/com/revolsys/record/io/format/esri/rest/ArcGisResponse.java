@@ -1,11 +1,14 @@
 package com.revolsys.record.io.format.esri.rest;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
@@ -201,6 +204,12 @@ public abstract class ArcGisResponse<V> extends AbstractWebService<V> implements
         BaseCloseable noCache = FileResponseCache.disable()) {
         refreshDo();
         this.hasError = false;
+      } catch (final WrappedException e) {
+        this.hasError = true;
+        final Throwable cause = Exceptions.unwrap(e);
+        if (cause instanceof UnknownHostException) {
+          Logs.error(this, "Cannot find host " + cause.getMessage());
+        }
       } catch (final Throwable e) {
         this.hasError = true;
         throw Exceptions.wrap("Unable to initialize: " + this, e);

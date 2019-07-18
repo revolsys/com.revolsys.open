@@ -32,14 +32,11 @@
  */
 package com.revolsys.geometry.operation.buffer;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.LineStringDouble;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.editor.LineStringEditor;
+import com.revolsys.geometry.util.Points;
 
 /**
  * A dynamic list of the vertices in a constructed offset curve.
@@ -49,64 +46,80 @@ import com.revolsys.geometry.model.impl.PointDouble;
  * @author Martin Davis
  *
  */
-class OffsetSegmentString {
+class OffsetSegmentString extends LineStringEditor {
+
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
   /**
    * The distance below which two adjacent points on the curve
    * are considered to be coincident.
    * This is chosen to be a small fraction of the offset distance.
    */
-  private double minimimVertexDistance = 0.0;
+  private final double minimimVertexDistance;
 
-  private final List<Point> points = new ArrayList<>();
-
-  private GeometryFactory precisionModel = null;
-
-  public void addPt(final double... coordinates) {
-    if (!this.precisionModel.isFloating()) {
-      coordinates[0] = this.precisionModel.makePrecise(0, coordinates[0]);
-      coordinates[1] = this.precisionModel.makePrecise(1, coordinates[1]);
-    }
-    final Point bufPt = new PointDouble(coordinates);
-    if (!isRedundant(bufPt)) {
-      this.points.add(bufPt);
+  public OffsetSegmentString(final GeometryFactory geometryFactory,
+    final double minimimVertexDistance) {
+    super(geometryFactory);
+    if (minimimVertexDistance < geometryFactory.getResolutionX()) {
+      this.minimimVertexDistance = 0;
+    } else {
+      this.minimimVertexDistance = minimimVertexDistance;
     }
   }
 
-  public void addPt(final Point point) {
-    addPt(point.getX(), point.getY());
+  public void addPoint(double x, double y) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    x = geometryFactory.makeXyPrecise(x);
+    y = geometryFactory.makeXyPrecise(y);
+    if (!isRedundant(x, y)) {
+      appendVertex(x, y);
+    }
   }
 
-  public void addPts(final LineString points, final boolean isForward) {
+  public void addPoint(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    addPoint(x, y);
+  }
+
+  public void addPoints(final LineString line, final boolean isForward) {
+    final int vertexCount = line.getVertexCount();
     if (isForward) {
-      for (int i = 0; i < points.getVertexCount(); i++) {
-        addPt(points.getPoint(i));
+      for (int i = 0; i < vertexCount; i++) {
+        final double x = line.getX(i);
+        final double y = line.getY(i);
+        addPoint(x, y);
       }
     } else {
-      for (int i = points.getVertexCount() - 1; i >= 0; i--) {
-        addPt(points.getPoint(i));
+      for (int i = vertexCount - 1; i >= 0; i--) {
+        final double x = line.getX(i);
+        final double y = line.getY(i);
+        addPoint(x, y);
       }
     }
   }
 
+  @Override
   public void closeRing() {
-    if (this.points.size() < 1) {
-      return;
+    final int vertexCount = getVertexCount();
+    if (vertexCount > 0) {
+      final double x1 = getX(0);
+      final double y1 = getY(0);
+      final int indexN = vertexCount - 1;
+      final double xn = getX(indexN);
+      final double yn = getY(indexN);
+
+      if (x1 != xn || y1 != yn) {
+        addPoint(x1, y1);
+      }
     }
-    final Point startPt = new PointDouble(this.points.get(0));
-    final Point lastPt = this.points.get(this.points.size() - 1);
-    Point last2Pt = null;
-    if (this.points.size() >= 2) {
-      last2Pt = this.points.get(this.points.size() - 2);
-    }
-    if (startPt.equals(lastPt)) {
-      return;
-    }
-    this.points.add(startPt);
   }
 
   public LineString getPoints() {
-    return new LineStringDouble(2, this.points);
+    return newLineString();
   }
 
   /**
@@ -117,39 +130,31 @@ class OffsetSegmentString {
    * @param pt
    * @return true if the point is redundant
    */
-  private boolean isRedundant(final Point pt) {
-    if (this.points.size() < 1) {
+  private boolean isRedundant(final double x, final double y) {
+    final int vertexCount = getVertexCount();
+    if (vertexCount == 0) {
       return false;
+    } else {
+      final int indexN = vertexCount - 1;
+      final double lastX = getX(indexN);
+      final double lastY = getY(indexN);
+      if (x == lastX && y == lastY) {
+        return true;
+      } else if (this.minimimVertexDistance == 0) {
+        return false;
+      } else {
+        final double distance = Points.distance(x, y, lastX, lastY);
+        if (distance < this.minimimVertexDistance) {
+          return true;
+        } else {
+          return false;
+        }
+      }
     }
-    // return points.get(points.size() - 1).equals(pt);
-    final Point lastPt = this.points.get(this.points.size() - 1);
-    final double ptDist = pt.distancePoint(lastPt);
-    if (ptDist < this.minimimVertexDistance) {
-      return true;
-    }
-    return false;
-  }
-
-  public void reverse() {
-
-  }
-
-  public void setMinimumVertexDistance(final double minimimVertexDistance) {
-    this.minimimVertexDistance = minimimVertexDistance;
-  }
-
-  public void setPrecisionModel(final GeometryFactory precisionModel) {
-    this.precisionModel = precisionModel;
   }
 
   @Override
   public String toString() {
-    final GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
-    if (this.points.size() == 1) {
-      return this.points.get(0).toString();
-    } else {
-      final LineString line = geometryFactory.lineString(this.points);
-      return line.toString();
-    }
+    return toString();
   }
 }

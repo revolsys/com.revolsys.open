@@ -42,8 +42,7 @@ public class ProcessQueueWorker extends Thread {
             if (e instanceof ThreadInterruptedException) {
               throw (ThreadInterruptedException)e;
             } else {
-              final Class<? extends Process> processClass = this.process.getClass();
-              Logs.error(processClass, e.getMessage(), e);
+              Logs.error(this.process, e.getMessage(), e);
             }
           }
         }

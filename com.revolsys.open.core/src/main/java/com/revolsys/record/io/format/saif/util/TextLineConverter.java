@@ -2,14 +2,13 @@ package com.revolsys.record.io.format.saif.util;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.record.io.format.saif.SaifConstants;
+import com.revolsys.record.io.format.saif.geometry.TextLinePoint;
+import com.revolsys.util.Property;
 
 public class TextLineConverter implements OsnConverter {
   private static final String TYPE = "type";
@@ -25,7 +24,7 @@ public class TextLineConverter implements OsnConverter {
   public Object read(final OsnIterator iterator) {
     final Map<String, Object> values = new TreeMap<>();
     values.put(TYPE, SaifConstants.TEXT_LINE);
-    Geometry geometry = null;
+    TextLinePoint geometry = null;
 
     String fieldName = iterator.nextFieldName();
     while (fieldName != null) {
@@ -35,15 +34,13 @@ public class TextLineConverter implements OsnConverter {
         if (osnConverter == null) {
           iterator.throwParseError("No Geometry Converter for " + objectName);
         }
-        geometry = (Geometry)osnConverter.read(iterator);
+        geometry = new TextLinePoint((Point)osnConverter.read(iterator));
       } else {
         readAttribute(iterator, fieldName, values);
       }
       fieldName = iterator.nextFieldName();
     }
-    if (!values.isEmpty()) {
-      geometry.setUserDataOld(values);
-    }
+    Property.set(geometry, values);
     return geometry;
   }
 
@@ -63,28 +60,12 @@ public class TextLineConverter implements OsnConverter {
       osnConverter.write(serializer, point);
       serializer.endAttribute();
 
-      final Map<String, Object> values = GeometryProperties.getGeometryProperties(point);
-      writeAttributes(serializer, values);
+      writeAttribute(serializer, point, "characterHeight");
+      writeAttribute(serializer, point, "fontName");
+      writeAttribute(serializer, point, "orientation");
+      writeAttribute(serializer, point, "other");
+      writeAttribute(serializer, point, "text");
       serializer.endObject();
-    }
-  }
-
-  protected void writeAttribute(final OsnSerializer serializer, final String name,
-    final Object value) throws IOException {
-    if (value != null) {
-      serializer.endLine();
-      serializer.attribute(name, value, false);
-    }
-
-  }
-
-  protected void writeAttributes(final OsnSerializer serializer, final Map<String, Object> values)
-    throws IOException {
-    for (final Entry<String, Object> entry : values.entrySet()) {
-      final String key = entry.getKey();
-      if (key != TYPE) {
-        writeAttribute(serializer, key, entry.getValue());
-      }
     }
   }
 

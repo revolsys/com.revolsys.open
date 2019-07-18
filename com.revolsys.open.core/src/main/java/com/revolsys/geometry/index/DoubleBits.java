@@ -16,9 +16,11 @@ public class DoubleBits {
 
   public static final int EXPONENT_BIAS = 1023;
 
-  public static int exponent(final double d) {
-    final DoubleBits db = new DoubleBits(d);
-    return db.getExponent();
+  public static int exponent(final double value) {
+    final long valueBits = Double.doubleToLongBits(value);
+    final int signExp = (int)(valueBits >> 52);
+    final int exp = signExp & 0x07ff;
+    return exp - EXPONENT_BIAS;
   }
 
   public static double maximumCommonMantissa(final double d1, final double d2) {

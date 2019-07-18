@@ -7,8 +7,9 @@ import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.properties.ObjectWithProperties;
 
-public class SupplierWithProperties<T> implements Supplier<T>, MapSerializer {
+public class SupplierWithProperties<T> implements ObjectWithProperties, Supplier<T>, MapSerializer {
   private final Supplier<T> supplier;
 
   private final MapEx properties = new LinkedHashMapEx();
@@ -23,6 +24,11 @@ public class SupplierWithProperties<T> implements Supplier<T>, MapSerializer {
   @Override
   public T get() {
     return this.supplier.get();
+  }
+
+  @Override
+  public MapEx getProperties() {
+    return this.properties;
   }
 
   @Override

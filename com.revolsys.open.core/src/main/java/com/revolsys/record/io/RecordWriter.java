@@ -11,6 +11,7 @@ import com.revolsys.io.Writer;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
@@ -28,25 +29,21 @@ public interface RecordWriter extends Writer<Record> {
     return IoFactory.isAvailable(RecordWriterFactory.class, fileNameExtension);
   }
 
-  static RecordWriter newRecordWriter(final Record record, final Object target) {
-    if (record != null) {
-      final RecordDefinition recordDefinition = record.getRecordDefinition();
-      return newRecordWriter(recordDefinition, target);
+  static RecordWriter newRecordWriter(final RecordDefinitionProxy recordDefinition,
+    final Object target) {
+    if (recordDefinition != null) {
+      final RecordDefinition definition = recordDefinition.getRecordDefinition();
+      if (definition != null) {
+        final Resource resource = Resource.getResource(target);
+        final RecordWriterFactory writerFactory = IoFactory.factory(RecordWriterFactory.class,
+          resource);
+        if (writerFactory != null) {
+          final RecordWriter writer = writerFactory.newRecordWriter(definition, resource);
+          return writer;
+        }
+      }
     }
     return null;
-  }
-
-  static RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
-    final Object target) {
-    final Resource resource = Resource.getResource(target);
-    final RecordWriterFactory writerFactory = IoFactory.factory(RecordWriterFactory.class,
-      resource);
-    if (writerFactory == null || recordDefinition == null) {
-      return null;
-    } else {
-      final RecordWriter writer = writerFactory.newRecordWriter(recordDefinition, resource);
-      return writer;
-    }
   }
 
   default ClockDirection getPolygonRingDirection() {

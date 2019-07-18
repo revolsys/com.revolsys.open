@@ -12,6 +12,11 @@
     <ignoreVersion type="regex">.*-MTEC.*</ignoreVersion>
   </ignoreVersions>
   <rules>
+    <rule groupId="org.jeometry" comparisonMethod="maven">
+      <ignoreVersions>
+        <ignoreVersion type="regex">.*</ignoreVersion>
+      </ignoreVersions>
+    </rule>
     <rule groupId="com.revolsys.open" comparisonMethod="maven">
       <ignoreVersions>
         <ignoreVersion type="regex">.*</ignoreVersion>
@@ -30,6 +35,11 @@
     <rule groupId="javax.measure" comparisonMethod="maven">
       <ignoreVersions>
         <ignoreVersion type="regex">.*-EDR</ignoreVersion>
+      </ignoreVersions>
+    </rule>
+    <rule groupId="org.docx4j" artifactId="docx4j-JAXB-MOXy" comparisonMethod="maven">
+      <ignoreVersions>
+        <ignoreVersion type="regex">11.*</ignoreVersion>
       </ignoreVersions>
     </rule>
   </rules>

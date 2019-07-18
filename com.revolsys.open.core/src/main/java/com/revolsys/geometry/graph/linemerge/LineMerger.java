@@ -3,7 +3,6 @@ package com.revolsys.geometry.graph.linemerge;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.Predicate;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.graph.Edge;
@@ -37,6 +36,8 @@ public class LineMerger {
   private final LineStringsGraph graph = new LineStringsGraph();
 
   private boolean merged = true;
+
+  private boolean allowLoops = false;
 
   /**
    * Creates a new line merger.
@@ -125,16 +126,6 @@ public class LineMerger {
     return Lists.toArray(edgeLines);
   }
 
-  public Lineal getMultiLineString() {
-    final GeometryFactory geometryFactory = this.graph.getGeometryFactory();
-    return getMultiLineString(geometryFactory);
-  }
-
-  public Lineal getMultiLineString(final GeometryFactory geometryFactory) {
-    final List<LineString> lines = getLineStrings();
-    return geometryFactory.lineal(lines);
-  }
-
   private void merge() {
     if (!this.merged) {
       mergeDegree2FromEnds();
@@ -143,10 +134,8 @@ public class LineMerger {
   }
 
   private void mergeDegree2FromEnds() {
-    final Predicate<Node<LineString>> filter = (node) -> {
-      return !node.isRemoved() && node.getDegree() != 2;
-    };
-    for (final Node<LineString> node : this.graph.getNodes(filter)) {
+    final List<Node<LineString>> endNodes = this.graph.getNodes(node -> node.getDegree() != 2);
+    for (final Node<LineString> node : endNodes) {
       if (!node.isRemoved()) {
         for (final Edge<LineString> edge : Lists.toArray(node.getEdges())) {
           if (!edge.isRemoved()) {
@@ -158,7 +147,7 @@ public class LineMerger {
             Node<LineString> currentNode = node;
             Edge<LineString> currentEdge = edge;
             do {
-              final LineString line = currentEdge.getLine();
+              final LineString line = currentEdge.getLineString();
               final double length = line.getLength();
               final boolean forwards = currentEdge.getEnd(currentNode).isFrom();
               if (forwards) {
@@ -195,6 +184,26 @@ public class LineMerger {
         }
       }
     }
+    if (this.allowLoops) {
+      final List<Node<LineString>> psudeoNodes = this.graph.getNodes(node -> node.getDegree() == 2);
+      for (final Node<LineString> node : psudeoNodes) {
+        if (!node.isRemoved()) {
+          final List<Edge<LineString>> edges = node.getEdges();
+          if (edges.size() == 2) {
+            final Edge<LineString> edge1 = edges.get(0);
+            final Edge<LineString> edge2 = edges.get(1);
+            if (edge1 != edge2) {
+              final LineString line1 = edge1.getLineString();
+              final LineString line2 = edge2.getLineString();
+              final LineString mergedLine = line1.merge(line2);
+              this.graph.addEdge(mergedLine);
+              this.graph.remove(edge1);
+              this.graph.remove(edge2);
+            }
+          }
+        }
+      }
+    }
   }
 
   public void remove(final LineString lineString) {
@@ -205,5 +214,9 @@ public class LineMerger {
   public void removeAll(final Iterable<LineString> lines) {
     this.merged = false;
     this.graph.removeEdges(lines);
+  }
+
+  public void setAllowLoops(final boolean allowLoops) {
+    this.allowLoops = allowLoops;
   }
 }

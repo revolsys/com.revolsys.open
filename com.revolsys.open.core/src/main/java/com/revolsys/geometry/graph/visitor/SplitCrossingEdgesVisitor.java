@@ -4,11 +4,11 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.geometry.algorithm.index.IdObjectIndex;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.graph.event.NodeEventListener;
+import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
@@ -32,13 +32,13 @@ public class SplitCrossingEdgesVisitor<T> extends AbstractEdgeListenerVisitor<T>
   @Override
   public void accept(final Edge<T> edge) {
     final IdObjectIndex<Edge<T>> edgeIndex = this.graph.getEdgeIndex();
-    final LineString line = edge.getLine();
+    final LineString line = edge.getLineString();
     final List<Edge<T>> crossings = queryCrosses(edgeIndex, line);
     crossings.remove(edge);
 
     for (final Edge<T> crossEdge : crossings) {
       if (!crossEdge.isRemoved()) {
-        final LineString crossLine = crossEdge.getLine();
+        final LineString crossLine = crossEdge.getLineString();
         final Point intersection = LineStringUtil.getCrossingIntersection(line, crossLine);
         if (intersection != null) {
           final Point point = this.graph.getPrecisionModel().getPreciseCoordinates(intersection);
@@ -69,7 +69,7 @@ public class SplitCrossingEdgesVisitor<T> extends AbstractEdgeListenerVisitor<T>
     // TODO change to use an visitor
     for (final Iterator<Edge<T>> iterator = edges.iterator(); iterator.hasNext();) {
       final Edge<T> edge = iterator.next();
-      final LineString matchLine = edge.getLine();
+      final LineString matchLine = edge.getLineString();
       if (!preparedLine.crosses(matchLine)) {
         iterator.remove();
       }

@@ -86,7 +86,7 @@ import com.revolsys.geometry.operation.overlay.PolygonBuilder;
  * operation of postive and negative buffering
  * is referred to as <i>erosion</i> and <i>dilation</i>
  * <p>
- * The buffer operation always returns a polygonal intersectionCount.
+ * The buffer operation always returns a polygonal result.
  * The negative or zero-distance buffer of lines and points is always an empty {@link Polygon}.
  * <p>
  * Since true buffer curves may contain circular arcs,
@@ -177,7 +177,7 @@ public class Buffer {
   private static Geometry bufferFixedPrecision(final GeometryFactory precisionModel,
     final Geometry geometry, final double distance, final BufferParameters parameters) {
     final MCIndexSnapRounder rounder = new MCIndexSnapRounder(1.0);
-    final double scale = precisionModel.getScale(0);
+    final double scale = precisionModel.getScaleXY();
     final Noder noder = new ScaledNoder(rounder, scale);
     return buffer(noder, precisionModel, geometry, distance, parameters);
   }
@@ -190,7 +190,7 @@ public class Buffer {
       try {
         final double sizeBasedScaleFactor = precisionScaleFactor(geometry, distance, precDigits);
         final GeometryFactory precisionModel = geometry.getGeometryFactory()
-          .convertScales(sizeBasedScaleFactor);
+          .convertScales(sizeBasedScaleFactor, sizeBasedScaleFactor);
         return bufferFixedPrecision(precisionModel, geometry, distance, parameters);
       } catch (final TopologyException e) {
 
@@ -231,8 +231,7 @@ public class Buffer {
     final Collection<NodedSegmentString> nodedSegments = noder.getNodedSubstrings();
     for (final SegmentString segment : nodedSegments) {
       final int vertexCount = segment.size();
-      if (vertexCount > 2
-        || vertexCount == 2 && !segment.getPoint(0).equals(2, segment.getPoint(1))) {
+      if (vertexCount > 2 || vertexCount == 2 && !segment.equalsVertex2d(0, 1)) {
         final Label oldLabel = (Label)segment.getData();
         final Label label = new Label(oldLabel);
         final LineString points = segment.getLineString();

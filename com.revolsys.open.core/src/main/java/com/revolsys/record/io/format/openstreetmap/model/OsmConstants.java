@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
+
 import com.revolsys.geometry.model.GeometryFactory;
 
 public interface OsmConstants {
@@ -22,7 +24,7 @@ public interface OsmConstants {
 
   QName WAY = new QName("way");
 
-  GeometryFactory WGS84_2D = GeometryFactory.floating(4326, 2);
+  GeometryFactory WGS84_2D = GeometryFactory.floating2d(EpsgId.WGS84);
 
   List<QName> NODE_XML_ELEMENTS = Arrays.asList(TAG);
 

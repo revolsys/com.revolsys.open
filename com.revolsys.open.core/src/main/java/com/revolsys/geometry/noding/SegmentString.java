@@ -33,7 +33,6 @@
 package com.revolsys.geometry.noding;
 
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.Point;
 
 /**
  * An interface for classes which represent a sequence of contiguous line segments.
@@ -42,19 +41,15 @@ import com.revolsys.geometry.model.Point;
  *
  * @version 1.7
  */
-public interface SegmentString {
+public interface SegmentString extends LineString {
   /**
-   * Gets the user-defined data for this segment string.
-   *
-   * @return the user-defined data
-   */
+  * Gets the user-defined data for this segment string.
+  *
+  * @return the user-defined data
+  */
   Object getData();
 
   LineString getLineString();
-
-  Point getPoint(int i);
-
-  boolean isClosed();
 
   /**
    * Sets the user-defined data for this segment string.

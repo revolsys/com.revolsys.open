@@ -1,6 +1,5 @@
 package com.revolsys.record.query;
 
-import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -12,18 +11,14 @@ import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
 
-public class In extends Condition {
-
-  private QueryValue left;
-
-  private CollectionValue values;
+public class In extends AbstractBinaryQueryValue implements Condition {
 
   public In(final FieldDefinition field, final Collection<? extends Object> values) {
     this(new Column(field), new CollectionValue(field, values));
   }
 
   public In(final QueryValue left, final CollectionValue values) {
-    this.left = left;
+    super(left, values);
     if (left instanceof Column) {
       final Column column = (Column)left;
       final FieldDefinition field = column.getFieldDefinition();
@@ -31,7 +26,6 @@ public class In extends Condition {
         values.setFieldDefinition(field);
       }
     }
-    this.values = values;
   }
 
   public In(final String name, final Collection<? extends Object> values) {
@@ -45,32 +39,14 @@ public class In extends Condition {
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
     final StringBuilder buffer) {
-    if (this.left == null) {
-      buffer.append("NULL");
-    } else {
-      this.left.appendSql(query, recordStore, buffer);
-    }
-    buffer.append(" ");
-    buffer.append(" IN ");
-    this.values.appendSql(query, recordStore, buffer);
-  }
-
-  @Override
-  public int appendParameters(int index, final PreparedStatement statement) {
-    if (this.left != null) {
-      index = this.left.appendParameters(index, statement);
-    }
-    if (this.values != null) {
-      index = this.values.appendParameters(index, statement);
-    }
-    return index;
+    super.appendLeft(buffer, query, recordStore);
+    buffer.append("IN");
+    super.appendRight(buffer, query, recordStore);
   }
 
   @Override
   public In clone() {
     final In clone = (In)super.clone();
-    clone.left = this.left.clone();
-    clone.values = this.values.clone();
     return clone;
   }
 
@@ -78,32 +54,18 @@ public class In extends Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof In) {
       final In in = (In)obj;
-      if (DataType.equal(in.getLeft(), this.getLeft())) {
-        if (DataType.equal(in.getValues(), this.getValues())) {
-          return true;
-        }
-      }
+      return super.equals(in);
     }
     return false;
   }
 
-  @SuppressWarnings("unchecked")
-  public <V extends QueryValue> V getLeft() {
-    return (V)this.left;
-  }
-
-  @Override
-  public List<QueryValue> getQueryValues() {
-    return Arrays.asList(this.left, this.values);
-  }
-
   public CollectionValue getValues() {
-    return this.values;
+    return (CollectionValue)getRight();
   }
 
   @Override
   public boolean isEmpty() {
-    return this.values.isEmpty();
+    return getValues().isEmpty();
   }
 
   @Override
@@ -124,8 +86,8 @@ public class In extends Condition {
 
   @Override
   public String toString() {
-    final Object value = this.left;
-    final Object value1 = this.values;
+    final Object value = getLeft();
+    final Object value1 = getRight();
     return DataTypes.toString(value) + " IN " + DataTypes.toString(value1);
   }
 }

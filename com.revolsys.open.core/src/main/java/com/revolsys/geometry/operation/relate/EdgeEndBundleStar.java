@@ -32,8 +32,6 @@
  */
 package com.revolsys.geometry.operation.relate;
 
-import java.util.Iterator;
-
 import com.revolsys.geometry.geomgraph.EdgeEnd;
 import com.revolsys.geometry.geomgraph.EdgeEndStar;
 import com.revolsys.geometry.model.IntersectionMatrix;
@@ -45,7 +43,7 @@ import com.revolsys.geometry.model.IntersectionMatrix;
  *
  * @version 1.7
  */
-public class EdgeEndBundleStar extends EdgeEndStar {
+public class EdgeEndBundleStar extends EdgeEndStar<EdgeEndBundle> {
   /**
    * Creates a new empty EdgeEndBundleStar
    */
@@ -61,7 +59,7 @@ public class EdgeEndBundleStar extends EdgeEndStar {
    */
   @Override
   public void insert(final EdgeEnd e) {
-    EdgeEndBundle eb = (EdgeEndBundle)this.edgeMap.get(e);
+    EdgeEndBundle eb = this.edgeMap.get(e);
     if (eb == null) {
       eb = new EdgeEndBundle(e);
       insertEdgeEnd(e, eb);
@@ -74,8 +72,7 @@ public class EdgeEndBundleStar extends EdgeEndStar {
    * Update the IM with the contribution for the EdgeStubs around the node.
    */
   void updateIM(final IntersectionMatrix im) {
-    for (final Iterator it = iterator(); it.hasNext();) {
-      final EdgeEndBundle esb = (EdgeEndBundle)it.next();
+    for (final EdgeEndBundle esb : this) {
       esb.updateIM(im);
     }
   }

@@ -43,7 +43,6 @@ import com.revolsys.geometry.geomgraph.Label;
 import com.revolsys.geometry.geomgraph.Node;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.util.Assert;
 
 /**
  * Forms JTS LineStrings out of a the graph of {@link DirectedEdge}s
@@ -79,7 +78,7 @@ public class LineBuilder {
 
   private void buildLines(final int opCode) {
     for (final Edge e : this.lineEdgesList) {
-      final LineString line = this.geometryFactory.lineString(e.getLine());
+      final LineString line = this.geometryFactory.lineString(e.getLineString());
       this.resultLineList.add(line);
       e.setInResult(true);
     }
@@ -113,7 +112,9 @@ public class LineBuilder {
     }
 
     // sanity check for labelling of result edgerings
-    Assert.isTrue(!(de.isInResult() || de.getSym().isInResult()) || !de.getEdge().isInResult());
+    if (!(!(de.isInResult() || de.getSym().isInResult()) || !de.getEdge().isInResult())) {
+      throw new IllegalStateException();
+    }
 
     // include the linework if it's in the result of the operation
     if (OverlayOp.isResultOfOp(label, opCode) && opCode == OverlayOp.INTERSECTION) {
@@ -178,7 +179,7 @@ public class LineBuilder {
       final DirectedEdge de = (DirectedEdge)element;
       final Edge e = de.getEdge();
       if (de.isLineEdge() && !e.isCoveredSet()) {
-        final boolean isCovered = this.op.isCoveredByA(de.getCoordinate());
+        final boolean isCovered = this.op.isCoveredByA(de.getX1(), de.getY1());
         e.setCovered(isCovered);
       }
     }

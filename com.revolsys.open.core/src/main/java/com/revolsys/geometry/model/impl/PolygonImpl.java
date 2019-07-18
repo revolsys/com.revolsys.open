@@ -88,8 +88,6 @@ public class PolygonImpl extends AbstractPolygon {
 
   private LinearRing[] rings;
 
-  private Object userData;
-
   public PolygonImpl(final GeometryFactory factory, final LinearRing ring) {
     this.geometryFactory = factory;
     if (ring == null || ring.isEmpty()) {
@@ -255,17 +253,7 @@ public class PolygonImpl extends AbstractPolygon {
   }
 
   @Override
-  public Object getUserDataOld() {
-    return this.userData;
-  }
-
-  @Override
   public boolean isEmpty() {
     return false;
-  }
-
-  @Override
-  public void setUserDataOld(final Object userData) {
-    this.userData = userData;
   }
 }

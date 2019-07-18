@@ -32,6 +32,10 @@
  */
 package com.revolsys.geometry.model.segment;
 
+import java.util.Arrays;
+
+import org.jeometry.common.function.BiConsumerDouble;
+
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -83,7 +87,7 @@ public class LineSegmentDouble extends AbstractLineSegment {
   }
 
   protected LineSegmentDouble(final GeometryFactory geometryFactory, final LineString line) {
-    this(geometryFactory, line.getVertex(0), line.getVertex(-1));
+    this(geometryFactory, line.getVertex(0), line.getVertex(line.getVertexCount() - 1));
   }
 
   protected LineSegmentDouble(final GeometryFactory geometryFactory, final Point point1,
@@ -92,6 +96,11 @@ public class LineSegmentDouble extends AbstractLineSegment {
     this.coordinates = new double[axisCount * 2];
     CoordinatesListUtil.setCoordinates(geometryFactory, this.coordinates, axisCount, 0, point1);
     CoordinatesListUtil.setCoordinates(geometryFactory, this.coordinates, axisCount, 1, point2);
+  }
+
+  public LineSegmentDouble(final int axisCount) {
+    this.coordinates = new double[axisCount * 2];
+    Arrays.fill(this.coordinates, Double.NaN);
   }
 
   public LineSegmentDouble(final int axisCount, final double... coordinates) {
@@ -106,7 +115,7 @@ public class LineSegmentDouble extends AbstractLineSegment {
   }
 
   public LineSegmentDouble(final LineString line) {
-    this(line.getVertex(0), line.getVertex(-1));
+    this(line.getVertex(0), line.getVertex(line.getVertexCount() - 1));
   }
 
   public LineSegmentDouble(final Point point1, final Point point2) {
@@ -126,8 +135,25 @@ public class LineSegmentDouble extends AbstractLineSegment {
   }
 
   @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    if (!isEmpty()) {
+      final int axisCount = getAxisCount();
+      final double x1 = this.coordinates[0];
+      final double y1 = this.coordinates[1];
+      action.accept(x1, y1);
+      final double x2 = this.coordinates[axisCount];
+      final double y2 = this.coordinates[axisCount + 1];
+      action.accept(x2, y2);
+    }
+  }
+
+  @Override
   public int getAxisCount() {
-    return this.coordinates.length / 2;
+    if (this.coordinates == null) {
+      return 2;
+    } else {
+      return this.coordinates.length / 2;
+    }
   }
 
   @Override

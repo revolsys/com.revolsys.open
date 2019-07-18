@@ -15,6 +15,7 @@ import org.jeometry.common.data.identifier.SingleIdentifier;
 import org.jeometry.common.date.Dates;
 import org.jeometry.common.io.PathName;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.io.Reader;
 import com.revolsys.record.Record;
 import com.revolsys.record.comparator.RecordFieldComparator;
@@ -26,11 +27,11 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
+import com.revolsys.util.count.CategoryLabelCountMap;
 
 public class CodeTableProperty extends AbstractCodeTable implements RecordDefinitionProperty {
 
-  private static final ArrayList<String> DEFAULT_FIELD_NAMES = new ArrayList<>(
-    Arrays.asList("VALUE"));
+  private static final List<String> DEFAULT_FIELD_NAMES = Lists.newArray("VALUE");
 
   public static final String PROPERTY_NAME = CodeTableProperty.class.getName();
 
@@ -231,6 +232,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     return this.createMissingCodes;
   }
 
+  @Override
   public boolean isLoadAll() {
     return this.loadAll;
   }
@@ -243,6 +245,11 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   @Override
   public boolean isLoading() {
     return this.loading;
+  }
+
+  @Override
+  public boolean isLoadMissingCodes() {
+    return this.loadMissingCodes;
   }
 
   public synchronized void loadAll() {
@@ -260,29 +267,32 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
         this.threadLoading.set(Boolean.TRUE);
         this.loading = true;
         try {
-          final RecordDefinition recordDefinition = this.recordStore
-            .getRecordDefinition(this.typePath);
-          final Query query = new Query(recordDefinition);
-          query.setFieldNames(recordDefinition.getFieldNames());
-          for (final String order : this.orderBy) {
-            query.addOrderBy(order);
+          if (this.recordStore != null) {
+            final RecordDefinition recordDefinition = this.recordStore
+              .getRecordDefinition(this.typePath);
+            final Query query = new Query(recordDefinition);
+            query.setFieldNames(recordDefinition.getFieldNames());
+            for (final String order : this.orderBy) {
+              query.addOrderBy(order);
+            }
+            try (
+              Reader<Record> reader = this.recordStore.getRecords(query)) {
+              final List<Record> codes = reader.toList();
+              final CategoryLabelCountMap statistics = this.recordStore.getStatistics();
+              if (statistics != null) {
+                statistics.getLabelCountMap("query").addCount(this.typePath, -codes.size());
+              }
+              Collections.sort(codes, new RecordFieldComparator(this.orderBy));
+              addValues(codes);
+            }
           }
-          try (
-            Reader<Record> reader = this.recordStore.getRecords(query)) {
-            final List<Record> codes = reader.toList();
-            this.recordStore.getStatistics()
-              .getLabelCountMap("query")
-              .addCount(this.typePath, -codes.size());
-            Collections.sort(codes, new RecordFieldComparator(this.orderBy));
-            addValues(codes);
-          }
-          Property.firePropertyChange(this, "valuesChanged", false, true);
         } finally {
           this.loading = false;
           this.loaded = true;
           this.threadLoading.set(null);
           this.notifyAll();
         }
+        Property.firePropertyChange(this, "valuesChanged", false, true);
       }
     }
     Dates.debugEllapsedTime(this, "Load All: " + getTypePath(), time);
@@ -318,9 +328,10 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
       try {
         final List<Record> codes = reader.toList();
         if (codes.size() > 0) {
-          this.recordStore.getStatistics()
-            .getLabelCountMap("query")
-            .addCount(this.typePath, -codes.size());
+          final CategoryLabelCountMap statistics = this.recordStore.getStatistics();
+          if (statistics != null) {
+            statistics.getLabelCountMap("query").addCount(this.typePath, -codes.size());
+          }
 
           addValues(codes);
         }
@@ -341,7 +352,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
   protected List<Object> loadValues(final Object id) {
     if (this.loadAll && !isLoaded()) {
       loadAll();
-    } else {
+    } else if (!this.loadAll || this.loadMissingCodes) {
       try {
         final Record code;
         if (id instanceof Identifier) {
@@ -407,6 +418,13 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     }
   }
 
+  @Override
+  public void refreshIfNeeded() {
+    if (this.loadAll) {
+      super.refreshIfNeeded();
+    }
+  }
+
   public void setAllowNullValues(final boolean allowNullValues) {
     this.allowNullValues = allowNullValues;
   }
@@ -417,6 +435,10 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
 
   public void setCreationTimestampFieldName(final String creationTimestampFieldName) {
     this.creationTimestampFieldName = creationTimestampFieldName;
+  }
+
+  public void setFieldAliases(final String... fieldNameAliases) {
+    setFieldNameAliases(Lists.newArray(fieldNameAliases));
   }
 
   public void setFieldNameAliases(final List<String> fieldNameAliases) {
@@ -441,6 +463,10 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
 
   public void setOrderBy(final List<String> orderBy) {
     this.orderBy = new ArrayList<>(orderBy);
+  }
+
+  public void setOrderByFieldName(final String orderBy) {
+    this.orderBy = Lists.newArray(orderBy);
   }
 
   @Override

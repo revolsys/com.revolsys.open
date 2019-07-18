@@ -2,7 +2,7 @@ package com.revolsys.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -36,11 +36,7 @@ public class Md5 {
   }
 
   public static byte[] md5(final String data) {
-    try {
-      return md5(data.getBytes("UTF-8"));
-    } catch (final UnsupportedEncodingException e) {
-      throw new RuntimeException("UTF-8 encoding not found", e);
-    }
+    return md5(data.getBytes(StandardCharsets.UTF_8));
   }
 
   public static String md5Hex(final byte[] data) {
@@ -56,5 +52,16 @@ public class Md5 {
   public static String md5Hex(final String data) {
     final byte[] md5 = md5(data);
     return Hex.toHex(md5);
+  }
+
+  public static void update(final MessageDigest digest, final double value) {
+    final long l = Double.doubleToLongBits(value);
+    final String data = Long.toString(l);
+    update(digest, data);
+  }
+
+  public static void update(final MessageDigest digest, final String data) {
+    final byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
+    digest.update(bytes);
   }
 }

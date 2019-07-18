@@ -32,16 +32,16 @@
  */
 package com.revolsys.geometry.geomgraph;
 
-import com.revolsys.geometry.model.Point;
-
 /**
  * @version 1.7
  */
 public class NodeFactory {
   /**
    * The basic node constructor does not allow for incident edges
+   * @param x TODO
+   * @param y TODO
    */
-  public Node newNode(final Point coord) {
-    return new Node(coord, null);
+  public Node newNode(final double x, final double y) {
+    return new Node(x, y, null);
   }
 }

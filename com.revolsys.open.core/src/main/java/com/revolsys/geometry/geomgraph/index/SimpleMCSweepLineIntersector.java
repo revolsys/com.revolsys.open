@@ -36,8 +36,6 @@ package com.revolsys.geometry.geomgraph.index;
  * @version 1.7
  */
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.geomgraph.Edge;
@@ -54,10 +52,9 @@ import com.revolsys.geometry.geomgraph.Edge;
  */
 public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
 
-  List events = new ArrayList();
+  private final List<SweepLineEvent<MonotoneChain>> events = new ArrayList<>();
 
-  // statistics information
-  int nOverlaps;
+  private boolean changed = true;
 
   /**
    * A SimpleMCSweepLineIntersector creates monotone chains from the edges
@@ -67,33 +64,42 @@ public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
   }
 
   private void add(final Edge edge, final Object edgeSet) {
-    final MonotoneChainEdge mce = edge.getMonotoneChainEdge();
-    final int[] startIndex = mce.getStartIndexes();
+    final List<SweepLineEvent<MonotoneChain>> events = this.events;
+    final MonotoneChainEdge chainEdge = edge.getMonotoneChainEdge();
+    final int[] startIndex = chainEdge.getStartIndexes();
     for (int i = 0; i < startIndex.length - 1; i++) {
-      final MonotoneChain mc = new MonotoneChain(mce, i);
-      final SweepLineEvent insertEvent = new SweepLineEvent(edgeSet, mce.getMinX(i), mc);
-      this.events.add(insertEvent);
-      this.events.add(new SweepLineEvent(mce.getMaxX(i), insertEvent));
+      final MonotoneChain chain = new MonotoneChain(chainEdge, i);
+
+      double minX = edge.getX(startIndex[i]);
+      double maxX = edge.getX(startIndex[i + 1]);
+      if (minX > maxX) {
+        final double t = minX;
+        minX = maxX;
+        maxX = t;
+      }
+      final SweepLineEvent<MonotoneChain> minEvent = new SweepLineEvent<>(edgeSet, minX, chain);
+      events.add(minEvent);
+      final SweepLineEvent<MonotoneChain> maxEvent = new SweepLineEvent<>(maxX, minEvent);
+      events.add(maxEvent);
     }
+    this.changed = true;
   }
 
-  private void add(final List edges) {
-    for (final Iterator i = edges.iterator(); i.hasNext();) {
-      final Edge edge = (Edge)i.next();
+  private void add(final List<Edge> edges) {
+    for (final Edge edge : edges) {
       // edge is its own group
       add(edge, edge);
     }
   }
 
-  private void add(final List edges, final Object edgeSet) {
-    for (final Iterator i = edges.iterator(); i.hasNext();) {
-      final Edge edge = (Edge)i.next();
+  private void add(final List<Edge> edges, final Object edgeSet) {
+    for (final Edge edge : edges) {
       add(edge, edgeSet);
     }
   }
 
   @Override
-  public void computeIntersections(final List edges0, final List edges1,
+  public void computeIntersections(final List<Edge> edges0, final List<Edge> edges1,
     final SegmentIntersector si) {
     add(edges0, edges0);
     add(edges1, edges1);
@@ -101,7 +107,7 @@ public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
   }
 
   @Override
-  public void computeIntersections(final List edges, final SegmentIntersector si,
+  public void computeIntersections(final List<Edge> edges, final SegmentIntersector si,
     final boolean testAllSegments) {
     if (testAllSegments) {
       add(edges, null);
@@ -112,14 +118,14 @@ public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
   }
 
   private void computeIntersections(final SegmentIntersector si) {
-    this.nOverlaps = 0;
     prepareEvents();
-
-    for (int i = 0; i < this.events.size(); i++) {
-      final SweepLineEvent ev = (SweepLineEvent)this.events.get(i);
-      if (ev.isInsert()) {
-        processOverlaps(i, ev.getDeleteEventIndex(), ev, si);
+    int i = 0;
+    for (final SweepLineEvent<MonotoneChain> event : this.events) {
+      if (event.isInsert()) {
+        final int deleteEventIndex = event.getDeleteEventIndex();
+        processOverlaps(i, deleteEventIndex, event, si);
       }
+      i++;
     }
   }
 
@@ -129,32 +135,42 @@ public class SimpleMCSweepLineIntersector extends EdgeSetIntersector {
    * compared to a given Insert event object.
    */
   private void prepareEvents() {
-    Collections.sort(this.events);
-    // set DELETE event indexes
-    for (int i = 0; i < this.events.size(); i++) {
-      final SweepLineEvent ev = (SweepLineEvent)this.events.get(i);
-      if (ev.isDelete()) {
-        ev.getInsertEvent().setDeleteEventIndex(i);
+    if (this.changed) {
+      this.changed = false;
+      final List<SweepLineEvent<MonotoneChain>> events = this.events;
+      events.sort(null);
+      // set DELETE event indexes
+      int i = 0;
+      for (final SweepLineEvent<MonotoneChain> event : events) {
+        if (event.isDelete()) {
+          final SweepLineEvent<MonotoneChain> insertEvent = event.getInsertEvent();
+          insertEvent.setDeleteEventIndex(i);
+        }
+        i++;
       }
     }
   }
 
-  private void processOverlaps(final int start, final int end, final SweepLineEvent ev0,
-    final SegmentIntersector si) {
-    final MonotoneChain mc0 = (MonotoneChain)ev0.getObject();
+  private void processOverlaps(final int start, final int end,
+    final SweepLineEvent<MonotoneChain> event1, final SegmentIntersector intersector) {
+    final MonotoneChain chain1 = event1.getObject();
+    final int chain1Index = chain1.getChainIndex();
+    final MonotoneChainEdge chain1Edge = chain1.getEdge();
+    final List<SweepLineEvent<MonotoneChain>> events = this.events;
     /**
-     * Since we might need to test for self-intersections,
-     * include current INSERT event object in list of event objects to test.
-     * Last index can be skipped, because it must be a Delete event.
-     */
+    * Since we might need to test for self-intersections,
+    * include current INSERT event object in list of event objects to test.
+    * Last index can be skipped, because it must be a Delete event.
+    */
     for (int i = start; i < end; i++) {
-      final SweepLineEvent ev1 = (SweepLineEvent)this.events.get(i);
-      if (ev1.isInsert()) {
-        final MonotoneChain mc1 = (MonotoneChain)ev1.getObject();
+      final SweepLineEvent<MonotoneChain> event = events.get(i);
+      if (event.isInsert()) {
+        final MonotoneChain chain2 = event.getObject();
         // don't compare edges in same group, if labels are present
-        if (!ev0.isSameLabel(ev1)) {
-          mc0.computeIntersections(mc1, si);
-          this.nOverlaps++;
+        if (!event1.isSameLabel(event)) {
+          final MonotoneChainEdge chain2Edge = chain2.getEdge();
+          final int chain2Index = chain2.getChainIndex();
+          chain1Edge.computeIntersectsForChain(chain1Index, chain2Edge, chain2Index, intersector);
         }
       }
     }

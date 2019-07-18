@@ -27,12 +27,13 @@ import com.revolsys.record.Record;
 import com.revolsys.record.filter.RecordGeometryFilter;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 import com.revolsys.visitor.AbstractVisitor;
 
 public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Record>>
   implements ObjectProcessor<RecordGraph> {
 
-  private LabelCountMap duplicateStatistics;
+  private LabelCounters duplicateStatistics;
 
   private Set<String> equalExcludeFieldNames = new HashSet<>(
     Arrays.asList(Record.EXCLUDE_ID, Record.EXCLUDE_GEOMETRY));
@@ -48,7 +49,7 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
     final String typePath = edge.getTypeName();
 
     final Graph<Record> graph = edge.getGraph();
-    final LineString line = edge.getLine();
+    final LineString line = edge.getLineString();
 
     Predicate<Edge<Record>> attributeAndGeometryFilter = new EdgeTypeNameFilter<>(typePath);
 
@@ -66,13 +67,13 @@ public class LinearIntersectionNotEqualLineEdgeCleanupVisitor extends AbstractVi
     attributeAndGeometryFilter = attributeAndGeometryFilter
       .and(new EdgeObjectFilter<>(notEqualLineFilter.and(linearIntersectionFilter)));
 
-    final List<Edge<Record>> intersectingEdges = graph.getEdges(attributeAndGeometryFilter, line);
+    final List<Edge<Record>> intersectingEdges = graph.getEdges(line, attributeAndGeometryFilter);
 
     if (!intersectingEdges.isEmpty()) {
       if (intersectingEdges.size() == 1 && line.getLength() > 10) {
         if (line.getVertexCount() > 2) {
           final Edge<Record> edge2 = intersectingEdges.get(0);
-          final LineString line2 = edge2.getLine();
+          final LineString line2 = edge2.getLineString();
 
           if (middleCoordinatesEqual(line, line2)) {
             final boolean firstEqual = line.equalsVertex(2, 0, line2, 0);

@@ -3,24 +3,36 @@ package com.revolsys.geometry.model.segment;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.vertex.Vertex;
 
-public class PolygonSegment extends AbstractSegment implements Iterator<Segment> {
-  /**
-   *
-   */
+public class PolygonSegment extends AbstractLineSegment implements Iterator<Segment>, Segment {
   private static final long serialVersionUID = 1L;
 
   private int ringIndex;
 
   private int segmentIndex;
 
-  public PolygonSegment(final Polygon polygon, final int... segmentId) {
-    super(polygon);
-    setSegmentId(segmentId);
+  protected final Polygon polygon;
+
+  public PolygonSegment(final Polygon polygon, final int ringIndex, final int segmentIndex) {
+    this.polygon = polygon;
+    this.ringIndex = ringIndex;
+    this.segmentIndex = segmentIndex;
+  }
+
+  @Override
+  public PolygonSegment clone() {
+    return (PolygonSegment)super.clone();
+  }
+
+  @Override
+  public int getAxisCount() {
+    return this.polygon.getAxisCount();
   }
 
   @Override
@@ -38,8 +50,31 @@ public class PolygonSegment extends AbstractSegment implements Iterator<Segment>
   }
 
   @Override
+  public double[] getCoordinates() {
+    final int axisCount = getAxisCount();
+    final double[] coordinates = new double[axisCount * 2];
+    for (int vertexIndex = 0; vertexIndex < 2; vertexIndex++) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        coordinates[vertexIndex * axisCount + axisIndex] = getCoordinate(vertexIndex, axisIndex);
+      }
+    }
+    return coordinates;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V extends Geometry> V getGeometry() {
+    return (V)this.polygon;
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.polygon.getGeometryFactory();
+  }
+
+  @Override
   public Vertex getGeometryVertex(final int index) {
-    final Polygon polygon = getPolygon();
+    final Polygon polygon = this.polygon;
     if (index == 0) {
       return polygon.getVertex(this.ringIndex, this.segmentIndex);
     } else if (index == 1) {
@@ -50,16 +85,12 @@ public class PolygonSegment extends AbstractSegment implements Iterator<Segment>
   }
 
   public Polygon getPolygon() {
-    return (Polygon)getGeometry();
+    return this.polygon;
   }
 
   public LinearRing getRing() {
-    final Polygon polygon = getPolygon();
-    if (polygon == null) {
-      return null;
-    } else {
-      return polygon.getRing(this.ringIndex);
-    }
+    final Polygon polygon = this.polygon;
+    return polygon.getRing(this.ringIndex);
   }
 
   @Override
@@ -80,11 +111,53 @@ public class PolygonSegment extends AbstractSegment implements Iterator<Segment>
   }
 
   @Override
+  public double getX(final int vertexIndex) {
+    if (vertexIndex < 0 || vertexIndex > 1) {
+      return Double.NaN;
+    } else {
+      final LinearRing ring = getRing();
+      if (ring == null) {
+        return Double.NaN;
+      } else {
+        return ring.getX(this.segmentIndex + vertexIndex);
+      }
+    }
+  }
+
+  @Override
+  public double getY(final int vertexIndex) {
+    if (vertexIndex < 0 || vertexIndex > 1) {
+      return Double.NaN;
+    } else {
+      final LinearRing ring = getRing();
+      if (ring == null) {
+        return Double.NaN;
+      } else {
+        return ring.getY(this.segmentIndex + vertexIndex);
+      }
+    }
+  }
+
+  @Override
+  public double getZ(final int vertexIndex) {
+    if (vertexIndex < 0 || vertexIndex > 1) {
+      return Double.NaN;
+    } else {
+      final LinearRing ring = getRing();
+      if (ring == null) {
+        return Double.NaN;
+      } else {
+        return ring.getZ(this.segmentIndex + vertexIndex);
+      }
+    }
+  }
+
+  @Override
   public boolean hasNext() {
     if (getGeometry().isEmpty()) {
       return false;
     } else {
-      final Polygon polygon = getPolygon();
+      final Polygon polygon = this.polygon;
       int ringIndex = this.ringIndex;
       int segmentIndex = this.segmentIndex;
       while (ringIndex < polygon.getRingCount()) {
@@ -118,7 +191,7 @@ public class PolygonSegment extends AbstractSegment implements Iterator<Segment>
 
   @Override
   public Segment next() {
-    final Polygon polygon = getPolygon();
+    final Polygon polygon = this.polygon;
     this.segmentIndex++;
     while (this.ringIndex < polygon.getRingCount()) {
       final LinearRing ring = polygon.getRing(this.ringIndex);

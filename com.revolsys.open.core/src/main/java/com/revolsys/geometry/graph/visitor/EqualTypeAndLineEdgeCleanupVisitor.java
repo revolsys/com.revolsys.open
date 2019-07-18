@@ -24,6 +24,7 @@ import com.revolsys.record.RecordLog;
 import com.revolsys.record.filter.RecordGeometryFilter;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 import com.revolsys.visitor.AbstractVisitor;
 
 public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Record>>
@@ -33,7 +34,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
   private static final String EDGE_PROCESSED = EqualTypeAndLineEdgeCleanupVisitor.class.getName()
     + ".processed";
 
-  private LabelCountMap duplicateStatistics;
+  private LabelCounters duplicateStatistics;
 
   private Set<String> equalExcludeFieldNames = new HashSet<>(
     Arrays.asList(Record.EXCLUDE_ID, Record.EXCLUDE_GEOMETRY));
@@ -43,7 +44,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
     if (edge.getProperty(EDGE_PROCESSED) == null) {
       final String typePath = edge.getTypeName();
       final Graph<Record> graph = edge.getGraph();
-      final LineString line = edge.getLine();
+      final LineString line = edge.getLineString();
 
       Predicate<Edge<Record>> attributeAndGeometryFilter = new EdgeTypeNameFilter<>(typePath);
 
@@ -59,9 +60,9 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
 
       final List<Edge<Record>> equalEdges;
       if (getComparator() == null) {
-        equalEdges = graph.getEdges(attributeAndGeometryFilter, line);
+        equalEdges = graph.getEdges(line, attributeAndGeometryFilter);
       } else {
-        equalEdges = graph.getEdges(attributeAndGeometryFilter, getComparator(), line);
+        equalEdges = graph.getEdges(line, attributeAndGeometryFilter, getComparator());
       }
       processEqualEdges(equalEdges);
     }
@@ -165,7 +166,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
     final boolean equalAttributes = record1.equalValuesExclude(record2,
       this.equalExcludeFieldNames);
 
-    final LineString line1 = edge1.getLine();
+    final LineString line1 = edge1.getLineString();
     int compare = 0;
     final Comparator<Edge<Record>> comparator = getComparator();
     if (comparator != null) {
@@ -179,7 +180,7 @@ public class EqualTypeAndLineEdgeCleanupVisitor extends AbstractVisitor<Edge<Rec
             equalExcludedAttributes = false;
           }
         }
-        final LineString line2 = edge2.getLine();
+        final LineString line2 = edge2.getLineString();
 
         final boolean equalZ = fixMissingZValues(line1, line2);
         if (equalExcludedAttributes) {

@@ -54,8 +54,6 @@ public class LineStringDouble extends AbstractLineString {
 
   protected double[] coordinates;
 
-  private Object userData;
-
   public LineStringDouble(final int axisCount) {
     this.axisCount = axisCount;
     this.vertexCount = 0;
@@ -373,11 +371,6 @@ public class LineStringDouble extends AbstractLineString {
   }
 
   @Override
-  public Object getUserDataOld() {
-    return this.userData;
-  }
-
-  @Override
   public int getVertexCount() {
     return this.vertexCount;
   }
@@ -405,10 +398,5 @@ public class LineStringDouble extends AbstractLineString {
   @Override
   public boolean isEmpty() {
     return this.vertexCount == 0;
-  }
-
-  @Override
-  public void setUserDataOld(final Object userData) {
-    this.userData = userData;
   }
 }

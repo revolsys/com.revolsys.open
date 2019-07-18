@@ -238,8 +238,6 @@ public class WKBWriter {
    * Creates a writer that writes {@link Geometry}s with
    * the given dimension (2 or 3) for output coordinates
    * and {@link ByteOrderValues#BIG_ENDIAN} byte order.
-   * If the input geometry has a small coordinate dimension,
-   * coordinates will be padded with {@link Point#Coordinate.NULL_ORDINATE}.
    *
    * @param outputDimension the coordinate dimension to output (2 or 3)
    */
@@ -253,8 +251,6 @@ public class WKBWriter {
    * and {@link ByteOrderValues#BIG_ENDIAN} byte order. This constructor also
    * takes a flag to control whether srid information will be
    * written.
-   * If the input geometry has a smaller coordinate dimension,
-   * coordinates will be padded with {@link Point#Coordinate.NULL_ORDINATE}.
    *
    * @param outputDimension the coordinate dimension to output (2 or 3)
    * @param includeSRID indicates whether SRID should be written
@@ -267,8 +263,6 @@ public class WKBWriter {
    * Creates a writer that writes {@link Geometry}s with
    * the given dimension (2 or 3) for output coordinates
    * and byte order
-   * If the input geometry has a small coordinate dimension,
-   * coordinates will be padded with {@link Point#Coordinate.NULL_ORDINATE}.
    *
    * @param outputDimension the coordinate dimension to output (2 or 3)
    * @param byteOrder the byte ordering to use
@@ -282,8 +276,6 @@ public class WKBWriter {
    * the given dimension (2 or 3) for output coordinates
    * and byte order. This constructor also takes a flag to
    * control whether srid information will be written.
-   * If the input geometry has a small coordinate dimension,
-   * coordinates will be padded with {@link Point#Coordinate.NULL_ORDINATE}.
    *
    * @param outputDimension the coordinate dimension to output (2 or 3)
    * @param byteOrder the byte ordering to use
@@ -362,11 +354,11 @@ public class WKBWriter {
     if (this.outputDimension >= 3) {
       // if 3rd dim is requested, only write it if the LineString provides
       // it
-      double ordVal = Geometry.NULL_ORDINATE;
+      double coordinate = Double.NaN;
       if (seq.getAxisCount() >= 3) {
-        ordVal = seq.getCoordinate(index, 2);
+        coordinate = seq.getCoordinate(index, 2);
       }
-      ByteOrderValues.putDouble(ordVal, this.buf, this.byteOrder);
+      ByteOrderValues.putDouble(coordinate, this.buf, this.byteOrder);
       os.write(this.buf, 8);
     }
   }
@@ -382,11 +374,11 @@ public class WKBWriter {
     if (this.outputDimension >= 3) {
       // if 3rd dim is requested, only write it if the LineString provides
       // it
-      double ordVal = Geometry.NULL_ORDINATE;
+      double coordinate = Double.NaN;
       if (seq.getAxisCount() >= 3) {
-        ordVal = seq.getCoordinate(2);
+        coordinate = seq.getCoordinate(2);
       }
-      ByteOrderValues.putDouble(ordVal, this.buf, this.byteOrder);
+      ByteOrderValues.putDouble(coordinate, this.buf, this.byteOrder);
       os.write(this.buf, 8);
     }
   }
@@ -424,7 +416,7 @@ public class WKBWriter {
     typeInt |= this.includeSRID ? 0x20000000 : 0;
     writeInt(typeInt, os);
     if (this.includeSRID) {
-      writeInt(g.getCoordinateSystemId(), os);
+      writeInt(g.getHorizontalCoordinateSystemId(), os);
     }
   }
 

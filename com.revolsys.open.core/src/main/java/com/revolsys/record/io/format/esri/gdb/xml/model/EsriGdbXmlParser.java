@@ -65,9 +65,9 @@ public class EsriGdbXmlParser extends XmlProcessor implements EsriGeodatabaseXml
     TAG_NAME_CLASS_MAP.put(PROPERTY_SET_PROPERTY.getLocalPart(), PropertySetProperty.class);
     TAG_NAME_CLASS_MAP.put(EXTENT.getLocalPart(), EnvelopeN.class);
     TAG_NAME_CLASS_MAP.put(GEOGRAPHIC_COORDINATE_SYSTEM.getLocalPart(),
-      GeographicCoordinateSystem.class);
+      EsriGdbGeographicCoordinateSystem.class);
     TAG_NAME_CLASS_MAP.put(PROJECTED_COORDINATE_SYSTEM.getLocalPart(),
-      ProjectedCoordinateSystem.class);
+      EsriGdbProjectedCoordinateSystem.class);
     TAG_NAME_CLASS_MAP.put(SUBTYPES.getLocalPart(), ArrayList.class);
     TAG_NAME_CLASS_MAP.put(SUBTYPES.getLocalPart(), ArrayList.class);
     TAG_NAME_CLASS_MAP.put(WORKSPACE_DATA.getLocalPart(), ArrayList.class);

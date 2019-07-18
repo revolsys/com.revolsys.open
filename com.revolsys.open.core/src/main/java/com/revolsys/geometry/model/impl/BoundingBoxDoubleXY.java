@@ -34,6 +34,7 @@ package com.revolsys.geometry.model.impl;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
+import com.revolsys.geometry.model.GeometryFactory;
 
 public class BoundingBoxDoubleXY extends BaseBoundingBox {
 
@@ -331,6 +332,12 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
 
   protected void setMinY(final double minY) {
     this.minY = minY;
+  }
+
+  @Override
+  public RectangleXY toRectangle() {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.newRectangleCorners(this.minX, this.minY, this.maxX, this.maxY);
   }
 
   @Override

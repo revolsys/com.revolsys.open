@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Map;
 
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
@@ -108,7 +108,7 @@ public class JsonMapWriter extends AbstractMapWriter {
       JsonWriterUtil.write(this.out, values, indentString, isWriteNulls());
       newLine();
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

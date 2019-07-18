@@ -41,6 +41,7 @@ import com.revolsys.geometry.geomgraph.DirectedEdge;
 import com.revolsys.geometry.geomgraph.Edge;
 import com.revolsys.geometry.geomgraph.EdgeRing;
 import com.revolsys.geometry.geomgraph.GeometryGraph;
+import com.revolsys.geometry.geomgraph.Label;
 import com.revolsys.geometry.geomgraph.PlanarGraph;
 import com.revolsys.geometry.geomgraph.Position;
 import com.revolsys.geometry.model.Geometry;
@@ -50,7 +51,7 @@ import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.operation.overlay.MaximalEdgeRing;
 import com.revolsys.geometry.operation.overlay.OverlayNodeFactory;
 import com.revolsys.geometry.util.Assert;
@@ -72,9 +73,12 @@ import com.revolsys.geometry.util.Assert;
 public class ConnectedInteriorTester {
 
   public static Point findDifferentPoint(final LineString line, final Point point) {
-    for (final Vertex vertex : line.vertices()) {
-      if (!vertex.equals(point)) {
-        return vertex;
+    final int vertexCount = line.getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = line.getX(vertexIndex);
+      final double y = line.getY(vertexIndex);
+      if (!point.equalsVertex(x, y)) {
+        return new PointDoubleXY(x, y);
       }
     }
     return null;
@@ -198,7 +202,7 @@ public class ConnectedInteriorTester {
   }
 
   private void visitInteriorRing(final LineString ring, final PlanarGraph graph) {
-    final Point pt0 = ring.getVertex(0);
+    final Point pt0 = ring.getVertex(0).newPoint2D();
     /**
      * Find first point in coord list different to initial point.
      * Need special check since the first point may be repeated.
@@ -206,15 +210,18 @@ public class ConnectedInteriorTester {
     final Point pt1 = findDifferentPoint(ring, pt0);
     final Edge e = graph.findEdgeInSameDirection(pt0, pt1);
     final DirectedEdge de = (DirectedEdge)graph.findEdgeEnd(e);
-    DirectedEdge intDe = null;
-    if (de.getLabel().getLocation(0, Position.RIGHT) == Location.INTERIOR) {
-      intDe = de;
-    } else if (de.getSym().getLabel().getLocation(0, Position.RIGHT) == Location.INTERIOR) {
-      intDe = de.getSym();
-    }
-    Assert.isTrue(intDe != null, "unable to find dirEdge with Interior on RHS");
+    if (de != null) {
+      DirectedEdge intDe = null;
+      final Label label = de.getLabel();
+      if (label.getLocation(0, Position.RIGHT) == Location.INTERIOR) {
+        intDe = de;
+      } else if (de.getSym().getLabel().getLocation(0, Position.RIGHT) == Location.INTERIOR) {
+        intDe = de.getSym();
+      }
+      Assert.isTrue(intDe != null, "unable to find dirEdge with Interior on RHS");
 
-    visitLinkedDirectedEdges(intDe);
+      visitLinkedDirectedEdges(intDe);
+    }
   }
 
   protected void visitLinkedDirectedEdges(final DirectedEdge start) {

@@ -17,7 +17,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
 public class RangeSet extends AbstractSet<Object>
-  implements Iterable<Object>, Emptyable, Cloneable {
+  implements Iterable<Object>, Emptyable, Cloneable, Comparable<RangeSet> {
 
   private static void addPart(final RangeSet set, final List<AbstractRange<?>> crossProductRanges,
     final String fromValue, final String rangeSpec, final int partStart, final int partEnd) {
@@ -28,6 +28,12 @@ public class RangeSet extends AbstractSet<Object>
     } else {
       crossProductRanges.add(partRange);
     }
+  }
+
+  public static RangeSet newRangeSet(final int value) {
+    final RangeSet range = new RangeSet();
+    range.add(value);
+    return range;
   }
 
   public static RangeSet newRangeSet(final int from, final int to) {
@@ -201,6 +207,11 @@ public class RangeSet extends AbstractSet<Object>
     return addRange(addRange);
   }
 
+  public boolean addRange(final double from, final double to) {
+    final DoubleRange addRange = new DoubleRange(from, to);
+    return addRange(addRange);
+  }
+
   public boolean addRange(final int from, final int to) {
     final IntRange addRange = new IntRange(from, to);
     return addRange(addRange);
@@ -241,6 +252,34 @@ public class RangeSet extends AbstractSet<Object>
   }
 
   @Override
+  public int compareTo(final RangeSet rangeSet) {
+    if (isEmpty()) {
+      if (rangeSet.isEmpty()) {
+        return 0;
+      } else {
+        return -1;
+      }
+    } else if (rangeSet.isEmpty()) {
+      return 1;
+    } else {
+      final Object from1 = getFrom();
+      final Object from2 = rangeSet.getFrom();
+      if (from1 instanceof Integer) {
+        if (from2 instanceof Integer) {
+          return ((Integer)from1).compareTo((Integer)from2);
+        } else {
+          return -1;
+        }
+
+      } else if (from2 instanceof Integer) {
+        return 1;
+      } else {
+        return from1.toString().compareTo(from2.toString());
+      }
+    }
+  }
+
+  @Override
   public boolean contains(final Object object) {
     if (object != null) {
       for (final ListIterator<AbstractRange<?>> iterator = this.ranges.listIterator(); iterator
@@ -260,6 +299,16 @@ public class RangeSet extends AbstractSet<Object>
     return DataType.equal(value1, value2);
   }
 
+  @Override
+  public boolean equals(final Object o) {
+    if (o instanceof RangeSet) {
+      final RangeSet range2 = (RangeSet)o;
+      return this.ranges.equals(range2.ranges);
+    } else {
+      return false;
+    }
+  }
+
   public Object getEndValue(final End end) {
     if (!isEmpty()) {
       if (End.isFrom(end)) {
@@ -273,8 +322,30 @@ public class RangeSet extends AbstractSet<Object>
     return null;
   }
 
+  @SuppressWarnings("unchecked")
+  public <V> V getFrom() {
+    if (size() == 0) {
+      return null;
+    } else {
+      final AbstractRange<?> range = this.ranges.get(0);
+      final Object value = range.getFrom();
+      return (V)value;
+    }
+  }
+
   public List<AbstractRange<?>> getRanges() {
     return new ArrayList<>(this.ranges);
+  }
+
+  @SuppressWarnings("unchecked")
+  public <V> V getTo() {
+    if (size() == 0) {
+      return null;
+    } else {
+      final AbstractRange<?> range = this.ranges.get(this.ranges.size() - 1);
+      final Object to = range.getTo();
+      return (V)to;
+    }
   }
 
   @Override

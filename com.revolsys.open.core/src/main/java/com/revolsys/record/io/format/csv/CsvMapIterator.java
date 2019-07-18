@@ -24,7 +24,6 @@ public class CsvMapIterator implements Iterator<MapEx> {
    * Constructs CSVReader with supplied separator and quote char.
    * @param fieldSeparator
    *
-   * @param reader
    * @throws IOException
    */
   public CsvMapIterator(final Resource resource, final char fieldSeparator) throws IOException {

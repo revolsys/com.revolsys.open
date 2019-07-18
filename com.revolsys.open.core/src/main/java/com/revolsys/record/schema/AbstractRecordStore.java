@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.annotation.PreDestroy;
-
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
@@ -59,11 +57,11 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   private final RecordStoreSchema rootSchema;
 
-  private final CategoryLabelCountMap statistics = new CategoryLabelCountMap();
+  private CategoryLabelCountMap statistics;
 
   private final Map<String, Map<String, Object>> typeRecordDefinitionProperties = new HashMap<>();
 
-  private boolean initialized;
+  private boolean initialized = false;
 
   protected AbstractRecordStore() {
     this(ArrayRecord.FACTORY);
@@ -91,6 +89,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     }
   }
 
+  @Override
   public void addCodeTable(final String fieldName, final CodeTable codeTable) {
     if (fieldName != null && !fieldName.equalsIgnoreCase("ID")) {
       this.codeTableByFieldName.put(fieldName.toUpperCase(), codeTable);
@@ -139,7 +138,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   @Override
-  @PreDestroy
   public void close() {
     this.closed = true;
     try {
@@ -157,7 +155,9 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
       this.recordStoreExtensions.clear();
       this.iteratorFactory = null;
       this.label = "deleted";
-      this.statistics.clear();
+      if (this.statistics != null) {
+        this.statistics.clear();
+      }
       this.typeRecordDefinitionProperties.clear();
     }
   }
@@ -287,6 +287,10 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     return this.closed;
   }
 
+  public boolean isInitialized() {
+    return this.initialized;
+  }
+
   @Override
   public boolean isLoadFullSchema() {
     return this.loadFullSchema;
@@ -341,12 +345,25 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @Override
   public void setLabel(final String label) {
     this.label = label;
-    getStatistics().setPrefix(label);
+    final CategoryLabelCountMap statistics = getStatistics();
+    if (statistics != null) {
+      statistics.setPrefix(label);
+    }
   }
 
   @Override
   public void setLoadFullSchema(final boolean loadFullSchema) {
     this.loadFullSchema = loadFullSchema;
+  }
+
+  public void setLogCounts(final boolean logCounts) {
+    if (logCounts) {
+      if (this.statistics == null) {
+        this.statistics = new CategoryLabelCountMap();
+      }
+    } else {
+      this.statistics = null;
+    }
   }
 
   @Override

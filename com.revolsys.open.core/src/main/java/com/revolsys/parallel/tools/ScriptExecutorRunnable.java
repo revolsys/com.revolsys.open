@@ -81,11 +81,25 @@ public class ScriptExecutorRunnable extends AbstractRunnable {
   public void runDo() {
     final long startTime = System.currentTimeMillis();
     try {
-
+      String logPath = null;
+      final String logFileName = (String)this.attributes.get("logFile");
+      if (logFileName != null && logFileName.trim().length() > 0) {
+        final File logFile = new File(logFileName);
+        final File parentFile = logFile.getParentFile();
+        if (parentFile != null) {
+          parentFile.mkdirs();
+        }
+        logPath = logFile.getAbsolutePath();
+      }
       if (this.logScriptInfo) {
         final StringBuilder message = new StringBuilder("Processing ");
         message.append(" -s ");
         message.append(this.script);
+        if (logPath != null) {
+          message.append(" -l ");
+          message.append(logPath);
+
+        }
         for (final Entry<String, Object> parameter : this.attributes.entrySet()) {
           message.append(" ");
           message.append(parameter.getKey());

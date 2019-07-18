@@ -162,6 +162,21 @@ public interface IoFactory extends Available {
     return fileName;
   }
 
+  static String fileNameExtension(final Class<? extends IoFactory> factoryClass,
+    final String fileName) {
+    String fullFileNameExtension = "";
+    for (final String fileNameExtension : FileUtil.getFileNameExtensions(fileName)) {
+      fullFileNameExtension = fileNameExtension + fullFileNameExtension;
+      final IoFactory factory = factoryByFileExtension(factoryClass, fullFileNameExtension);
+      if (factory != null) {
+        return fullFileNameExtension;
+      }
+      fullFileNameExtension = "." + fullFileNameExtension;
+    }
+
+    return null;
+  }
+
   static <C extends IoFactory> boolean hasFactory(final Class<C> factoryClass,
     final Object source) {
     final C factory = factory(factoryClass, source);
@@ -223,13 +238,6 @@ public interface IoFactory extends Available {
     }
   }
 
-  public static FileNameExtensionFilter newFileFilter(final IoFactory factory) {
-    final List<String> fileExtensions = factory.getFileExtensions();
-    String description = factory.getName();
-    description += " (" + Strings.toString(fileExtensions) + ")";
-    return newFileFilter(description, fileExtensions);
-  }
-
   public static FileNameExtensionFilter newFileFilter(final String description,
     final Collection<String> fileExtensions) {
     final String[] array = fileExtensions.toArray(new String[0]);
@@ -246,11 +254,12 @@ public interface IoFactory extends Available {
     final List<FileNameExtensionFilter> filters = new ArrayList<>();
     final List<? extends IoFactory> factories = IoFactory.factories(factoryClass);
     for (final IoFactory factory : factories) {
-      final List<String> fileExtensions = factory.getFileExtensions();
-      final FileNameExtensionFilter filter = newFileFilter(factory);
+      final FileNameExtensionFilter filter = factory.newFileFilterAllExtensions();
       filters.add(filter);
       if (allExtensions != null) {
-        allExtensions.addAll(fileExtensions);
+        for (final String fileNameExtension : filter.getExtensions()) {
+          allExtensions.add(fileNameExtension);
+        }
       }
     }
     sortFilters(filters);

@@ -29,10 +29,11 @@ import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Integers;
 import org.jeometry.common.number.Shorts;
 
-import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.ResourceEndianOutput;
@@ -47,7 +48,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
 
   private static final ShapefileGeometryUtil SHP_WRITER = ShapefileGeometryUtil.SHP_INSTANCE;
 
-  private BoundingBox envelope = BoundingBox.empty();
+  private final BoundingBoxEditor boundingBox = new BoundingBoxEditor();
 
   private DataType geometryDataType;
 
@@ -115,6 +116,11 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
   }
 
   @Override
+  public ClockDirection getPolygonRingDirection() {
+    return ClockDirection.CLOCKWISE;
+  }
+
+  @Override
   protected void init() throws IOException {
     super.init();
     final RecordDefinitionImpl recordDefinition = (RecordDefinitionImpl)getRecordDefinition();
@@ -179,14 +185,14 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
       out.writeInt(sizeInShorts);
       out.seek(32);
       out.writeLEInt(this.shapeType);
-      doubleNotNaN(out, this.envelope.getMinX());
-      doubleNotNaN(out, this.envelope.getMinY());
-      doubleNotNaN(out, this.envelope.getMaxX());
-      doubleNotNaN(out, this.envelope.getMaxY());
-      doubleNotNaN(out, this.envelope.getMin(2));
-      doubleNotNaN(out, this.envelope.getMax(2));
-      doubleNotNaN(out, this.envelope.getMin(3));
-      doubleNotNaN(out, this.envelope.getMax(3));
+      doubleNotNaN(out, this.boundingBox.getMinX());
+      doubleNotNaN(out, this.boundingBox.getMinY());
+      doubleNotNaN(out, this.boundingBox.getMaxX());
+      doubleNotNaN(out, this.boundingBox.getMaxY());
+      doubleNotNaN(out, this.boundingBox.getMin(2));
+      doubleNotNaN(out, this.boundingBox.getMax(2));
+      doubleNotNaN(out, this.boundingBox.getMin(3));
+      doubleNotNaN(out, this.boundingBox.getMax(3));
       out.close();
     }
   }
@@ -204,7 +210,7 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
       if (geometry == null || geometry.isEmpty()) {
         writeNull(this.out);
       } else {
-        this.envelope = this.envelope.expandToInclude(geometry.getBoundingBox());
+        this.boundingBox.addBbox(geometry);
         SHP_WRITER.write(this.geometryWriteMethod, this.out, geometry);
       }
       if (this.indexOut != null) {

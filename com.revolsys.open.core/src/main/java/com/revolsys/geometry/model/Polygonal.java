@@ -33,8 +33,6 @@
 
 package com.revolsys.geometry.model;
 
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -71,27 +69,6 @@ public interface Polygonal extends Geometry {
   @Override
   default boolean contains(final double x, final double y) {
     return locate(x, y) != Location.EXTERIOR;
-  }
-
-  @Override
-  default boolean contains(final double x, final double y, final double w, final double h) {
-    return false;
-  }
-
-  @Override
-  default boolean contains(final Point2D point) {
-    final double x = point.getX();
-    final double y = point.getY();
-    return contains(x, y);
-  }
-
-  @Override
-  default boolean contains(final Rectangle2D rectangle) {
-    final double x = rectangle.getX();
-    final double y = rectangle.getY();
-    final double width = rectangle.getWidth();
-    final double height = rectangle.getHeight();
-    return contains(x, y, width, height);
   }
 
   default Polygonal differencePolygonal(final Geometry geometry) {

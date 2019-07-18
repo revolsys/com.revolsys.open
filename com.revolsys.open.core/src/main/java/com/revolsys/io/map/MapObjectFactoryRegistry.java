@@ -35,6 +35,6 @@ public class MapObjectFactoryRegistry {
     final Function<Map<String, ? extends Object>, Object> function) {
     final FunctionMapObjectFactory factory = new FunctionMapObjectFactory(typeName, description,
       function);
-    addFactory(factory);
+    TYPE_NAME_TO_FACTORY.put(typeName, factory);
   }
 }

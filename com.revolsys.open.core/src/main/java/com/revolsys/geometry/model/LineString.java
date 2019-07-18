@@ -80,7 +80,6 @@ import com.revolsys.geometry.operation.BoundaryOp;
 import com.revolsys.geometry.operation.RectangleIntersection;
 import com.revolsys.geometry.operation.overlay.OverlayOp;
 import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
-import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.geometry.util.Points;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.Pair;
@@ -1872,7 +1871,6 @@ public interface LineString extends Lineal {
 
     }
     final LineString newLine = newLineString(newVertexCount, coordinates);
-    GeometryProperties.copyUserData(this, newLine);
     return newLine;
   }
 
@@ -1919,7 +1917,6 @@ public interface LineString extends Lineal {
         throw new IllegalArgumentException("lines don't touch\n" + this + "\n" + line2);
       }
       final LineString newLine = newLineString(newVertexCount, coordinates);
-      GeometryProperties.copyUserData(this, newLine);
       return newLine;
     }
   }
@@ -2137,7 +2134,6 @@ public interface LineString extends Lineal {
       }
     }
     final LineString reverseLine = newLineString(coordinates);
-    GeometryProperties.copyUserData(this, reverseLine);
     return reverseLine;
   }
 
@@ -2361,7 +2357,6 @@ public interface LineString extends Lineal {
         CoordinatesListUtil.setCoordinates(coordinates, axisCount, vertexIndex++, toPoint);
       }
       final LineString newLine = newLineString(coordinates);
-      GeometryProperties.copyUserData(this, newLine);
       return newLine;
     }
   }

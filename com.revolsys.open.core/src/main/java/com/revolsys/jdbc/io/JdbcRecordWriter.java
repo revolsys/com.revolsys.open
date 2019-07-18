@@ -469,14 +469,23 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
 
     GlobalIdProperty.setIdentifier(record);
 
-    final String idFieldName = recordDefinition.getIdFieldName();
     final boolean hasId = recordDefinition.hasIdField();
     if (this.recordStore.isIdFieldRowid(recordDefinition)) {
       insertRowId(record, recordDefinition);
-    } else if (!hasId || record.hasValue(idFieldName)) {
+    } else if (!hasId) {
       insert(record, recordDefinition);
     } else {
-      insertSequence(record, recordDefinition);
+      boolean hasIdValue = true;
+      for (final String idFieldName : recordDefinition.getIdFieldNames()) {
+        if (!record.hasValue(idFieldName)) {
+          hasIdValue = false;
+        }
+      }
+      if (hasIdValue) {
+        insert(record, recordDefinition);
+      } else {
+        insertSequence(record, recordDefinition);
+      }
     }
     record.setState(RecordState.PERSISTED);
     this.recordStore.addStatistic("Insert", record);

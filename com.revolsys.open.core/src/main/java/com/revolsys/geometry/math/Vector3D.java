@@ -34,7 +34,7 @@
 package com.revolsys.geometry.math;
 
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 
 /**
  * Represents a vector in 3-dimensional Cartesian space.
@@ -104,9 +104,9 @@ public class Vector3D {
     return new Vector3D(coord);
   }
 
-  public static Point normalize(final Point v) {
-    final double len = length(v);
-    return new PointDouble(v.getX() / len, v.getY() / len, v.getZ() / len);
+  public static Point normalize(final Point point) {
+    final double len = length(point);
+    return new PointDoubleXYZ(point.getX() / len, point.getY() / len, point.getZ() / len);
   }
 
   private final double x;

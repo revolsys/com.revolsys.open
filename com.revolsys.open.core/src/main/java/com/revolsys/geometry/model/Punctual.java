@@ -55,7 +55,6 @@ import com.revolsys.util.Pair;
  *
  */
 public interface Punctual extends Geometry {
-
   @SuppressWarnings("unchecked")
   static <G extends Geometry> G newPunctual(final Object value) {
     if (value == null) {

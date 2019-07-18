@@ -20,7 +20,7 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge
       .bboxEditor() //
       .expandDelta(maxDistance);
     graph.getEdgeIndex()
-      .forEach(new EdgeLessThanDistanceToNodeVisitor<>(node, maxDistance, results), env);
+      .forEach(env, new EdgeLessThanDistanceToNodeVisitor<>(node, maxDistance, results));
     return results.getList();
 
   }
@@ -44,8 +44,7 @@ public class EdgeLessThanDistanceToNodeVisitor<T> extends DelegatingVisitor<Edge
 
   @Override
   public void accept(final Edge<T> edge) {
-    final com.revolsys.geometry.model.BoundingBox envelope = edge.getBoundingBox();
-    if (this.boundingBox.bboxDistance(envelope) < this.maxDistance) {
+    if (this.boundingBox.bboxDistance(edge) < this.maxDistance) {
       if (!edge.hasNode(this.node)) {
         if (edge.isLessThanDistance(this.node, this.maxDistance)) {
           super.accept(edge);

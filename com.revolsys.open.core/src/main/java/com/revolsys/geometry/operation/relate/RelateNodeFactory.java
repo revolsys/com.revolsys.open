@@ -35,7 +35,6 @@ package com.revolsys.geometry.operation.relate;
 import com.revolsys.geometry.geomgraph.Node;
 import com.revolsys.geometry.geomgraph.NodeFactory;
 import com.revolsys.geometry.geomgraph.NodeMap;
-import com.revolsys.geometry.model.Point;
 
 /**
  * Used by the {@link NodeMap} in a {@link RelateNodeGraph} to create {@link RelateNode}s.
@@ -44,7 +43,7 @@ import com.revolsys.geometry.model.Point;
  */
 public class RelateNodeFactory extends NodeFactory {
   @Override
-  public Node newNode(final Point coord) {
-    return new RelateNode(coord, new EdgeEndBundleStar());
+  public Node newNode(final double x, final double y) {
+    return new RelateNode(x, y, new EdgeEndBundleStar());
   }
 }

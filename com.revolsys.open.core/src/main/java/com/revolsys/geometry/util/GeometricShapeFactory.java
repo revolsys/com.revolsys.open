@@ -40,7 +40,7 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.util.AffineTransformation;
 
 /**
@@ -54,7 +54,7 @@ import com.revolsys.geometry.model.util.AffineTransformation;
  *  GeometricShapeFactory gsf = new GeometricShapeFactory();
  *  gsf.setSize(100);
  *  gsf.setNumPoints(100);
- *  gsf.setBase(new PointDouble(100.0, 100.0));
+ *  gsf.setBase(new PointDoubleXY(100.0, 100.0));
  *  gsf.setRotation(0.5);
  *  Polygon rect = gsf.createRectangle();
  * </pre>
@@ -77,8 +77,8 @@ public class GeometricShapeFactory {
 
     public Point getCentre() {
       if (this.centre == null) {
-        this.centre = new PointDouble(this.base.getX() + this.width / 2,
-          this.base.getY() + this.height / 2, Geometry.NULL_ORDINATE);
+        this.centre = new PointDoubleXY(this.base.getX() + this.width / 2,
+          this.base.getY() + this.height / 2);
       }
       return this.centre;
     }
@@ -119,8 +119,8 @@ public class GeometricShapeFactory {
     public void setEnvelope(final BoundingBox env) {
       this.width = env.getWidth();
       this.height = env.getHeight();
-      this.base = new PointDouble(env.getMinX(), env.getMinY());
-      this.centre = env.getCentre();
+      this.base = new PointDoubleXY(env.getMinX(), env.getMinY());
+      this.centre = env.getCentre().newPoint2D();
     }
 
     public void setHeight(final double height) {
@@ -142,7 +142,7 @@ public class GeometricShapeFactory {
 
   protected GeometryFactory geomFact;
 
-  protected int nPts = 100;
+  protected int vertexCount = 100;
 
   /**
    * Default is no rotation.
@@ -167,14 +167,8 @@ public class GeometricShapeFactory {
     this.geomFact = geomFact;
   }
 
-  protected Point coord(final double x, final double y) {
-    final Point point = new PointDouble(this.geomFact.makePrecise(0, x),
-      this.geomFact.makePrecise(1, y));
-    return point;
-  }
-
   protected Point coordTrans(final double x, final double y, final Point trans) {
-    return coord(x + trans.getX(), y + trans.getY());
+    return newPoint(x + trans.getX(), y + trans.getY());
   }
 
   /**
@@ -199,15 +193,15 @@ public class GeometricShapeFactory {
     if (angSize <= 0.0 || angSize > 2 * Math.PI) {
       angSize = 2 * Math.PI;
     }
-    final double angInc = angSize / (this.nPts - 1);
+    final double angInc = angSize / (this.vertexCount - 1);
 
-    final Point[] pts = new Point[this.nPts];
+    final Point[] pts = new Point[this.vertexCount];
     int iPt = 0;
-    for (int i = 0; i < this.nPts; i++) {
+    for (int i = 0; i < this.vertexCount; i++) {
       final double ang = startAng + i * angInc;
       final double x = xRadius * Math.cos(ang) + centreX;
       final double y = yRadius * Math.sin(ang) + centreY;
-      pts[iPt++] = coord(x, y);
+      pts[iPt++] = newPoint(x, y);
     }
     final LineString line = this.geomFact.lineString(pts);
     return (LineString)rotate(line);
@@ -234,22 +228,22 @@ public class GeometricShapeFactory {
     if (angSize <= 0.0 || angSize > 2 * Math.PI) {
       angSize = 2 * Math.PI;
     }
-    final double angInc = angSize / (this.nPts - 1);
-    // double check = angInc * nPts;
+    final double angInc = angSize / (this.vertexCount - 1);
+    // double check = angInc * vertexCount;
     // double checkEndAng = startAng + check;
 
-    final Point[] pts = new Point[this.nPts + 2];
+    final Point[] pts = new Point[this.vertexCount + 2];
 
     int iPt = 0;
-    pts[iPt++] = coord(centreX, centreY);
-    for (int i = 0; i < this.nPts; i++) {
+    pts[iPt++] = newPoint(centreX, centreY);
+    for (int i = 0; i < this.vertexCount; i++) {
       final double ang = startAng + angInc * i;
 
       final double x = xRadius * Math.cos(ang) + centreX;
       final double y = yRadius * Math.sin(ang) + centreY;
-      pts[iPt++] = coord(x, y);
+      pts[iPt++] = newPoint(x, y);
     }
-    pts[iPt++] = coord(centreX, centreY);
+    pts[iPt++] = newPoint(centreX, centreY);
     final LinearRing ring = this.geomFact.linearRing(pts);
     final Polygon poly = this.geomFact.polygon(ring);
     return (Polygon)rotate(poly);
@@ -281,19 +275,24 @@ public class GeometricShapeFactory {
     final double centreX = env.getMinX() + xRadius;
     final double centreY = env.getMinY() + yRadius;
 
-    final Point[] pts = new Point[this.nPts + 1];
-    int iPt = 0;
-    for (int i = 0; i < this.nPts; i++) {
-      final double ang = i * (2 * Math.PI / this.nPts);
+    final double[] coordinates = new double[(this.vertexCount + 1) * 2];
+    int coordinateIndex = 0;
+    for (int i = 0; i < this.vertexCount; i++) {
+      final double ang = i * (2 * Math.PI / this.vertexCount);
       final double x = xRadius * Math.cos(ang) + centreX;
       final double y = yRadius * Math.sin(ang) + centreY;
-      pts[iPt++] = coord(x, y);
+      coordinates[coordinateIndex++] = x;
+      coordinates[coordinateIndex++] = y;
     }
-    pts[iPt] = pts[0];
+    coordinates[coordinateIndex++] = 0;
+    coordinates[coordinateIndex++] = 1;
 
-    final LinearRing ring = this.geomFact.linearRing(pts);
-    final Polygon poly = this.geomFact.polygon(ring);
+    final Polygon poly = this.geomFact.polygon(2, coordinates);
     return (Polygon)rotate(poly);
+  }
+
+  protected Point newPoint(final double x, final double y) {
+    return new PointDoubleXY(this.geomFact, x, y);
   }
 
   /**
@@ -305,7 +304,7 @@ public class GeometricShapeFactory {
   public Polygon newRectangle() {
     int i;
     int ipt = 0;
-    int nSide = this.nPts / 4;
+    int nSide = this.vertexCount / 4;
     if (nSide < 1) {
       nSide = 1;
     }
@@ -321,22 +320,22 @@ public class GeometricShapeFactory {
     for (i = 0; i < nSide; i++) {
       final double x = env.getMinX() + i * XsegLen;
       final double y = env.getMinY();
-      pts[ipt++] = coord(x, y);
+      pts[ipt++] = newPoint(x, y);
     }
     for (i = 0; i < nSide; i++) {
       final double x = env.getMaxX();
       final double y = env.getMinY() + i * YsegLen;
-      pts[ipt++] = coord(x, y);
+      pts[ipt++] = newPoint(x, y);
     }
     for (i = 0; i < nSide; i++) {
       final double x = env.getMaxX() - i * XsegLen;
       final double y = env.getMaxY();
-      pts[ipt++] = coord(x, y);
+      pts[ipt++] = newPoint(x, y);
     }
     for (i = 0; i < nSide; i++) {
       final double x = env.getMinX();
       final double y = env.getMaxY() - i * YsegLen;
-      pts[ipt++] = coord(x, y);
+      pts[ipt++] = newPoint(x, y);
     }
     pts[ipt++] = pts[0];
 
@@ -377,7 +376,7 @@ public class GeometricShapeFactory {
 
     final double xyInt = Math.pow(r4 / 2, recipPow);
 
-    final int nSegsInOct = this.nPts / 8;
+    final int nSegsInOct = this.vertexCount / 8;
     final int totPts = nSegsInOct * 8 + 1;
     final Point[] pts = new Point[totPts];
     final double xInc = xyInt / nSegsInOct;
@@ -458,7 +457,7 @@ public class GeometricShapeFactory {
    * unless more are needed to Construct a new valid geometry.
    */
   public void setNumPoints(final int nPts) {
-    this.nPts = nPts;
+    this.vertexCount = nPts;
   }
 
   /**

@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
@@ -45,25 +46,25 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   private double minExtent = 1.0;
 
-  private AbstractNode<T> root;
+  private AbstractQuadTreeNode<T> root;
 
   private int size = 0;
 
   private boolean useEquals = false;
 
   public QuadTree() {
-    this.root = new Node<>();
+    this.root = new QuadTreeNode<>();
   }
 
-  protected QuadTree(final AbstractNode<T> root) {
+  protected QuadTree(final AbstractQuadTreeNode<T> root) {
     this.root = root;
   }
 
   public QuadTree(final GeometryFactory geometryFactory) {
-    this(geometryFactory, new Node<>());
+    this(geometryFactory, new QuadTreeNode<>());
   }
 
-  protected QuadTree(final GeometryFactory geometryFactory, final AbstractNode<T> root) {
+  protected QuadTree(final GeometryFactory geometryFactory, final AbstractQuadTreeNode<T> root) {
     setGeometryFactory(geometryFactory);
     this.root = root;
   }
@@ -86,10 +87,10 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
-  protected double[] convert(BoundingBox boundingBox) {
+  protected double[] convert(final BoundingBoxProxy boundingBoxProxy) {
+    BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
     if (this.geometryFactory != null) {
-      final GeometryFactory geometryFactory1 = this.geometryFactory;
-      boundingBox = boundingBox.bboxToCs(geometryFactory1);
+      boundingBox = boundingBoxProxy.bboxToCs(this.geometryFactory);
     }
     return boundingBox.getMinMaxValues(2);
   }
@@ -108,7 +109,8 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
-  public boolean forEach(final BoundingBox boundingBox, final Consumer<? super T> action) {
+  @Override
+  public boolean forEach(final BoundingBoxProxy boundingBox, final Consumer<? super T> action) {
     try {
       final double[] bounds = convert(boundingBox);
       this.root.forEach(this, bounds, action);
@@ -137,12 +139,6 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   public boolean forEach(final double minX, final double minY, final double maxX, final double maxY,
     final Consumer<? super T> action) {
     return forEach(new BoundingBoxDoubleXY(minX, minY, maxX, maxY), action);
-  }
-
-  public List<T> getAll() {
-    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
-    forEach(visitor);
-    return visitor.getList();
   }
 
   @Override

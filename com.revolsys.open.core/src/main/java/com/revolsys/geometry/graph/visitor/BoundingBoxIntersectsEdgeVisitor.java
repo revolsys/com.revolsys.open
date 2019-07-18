@@ -3,9 +3,9 @@ package com.revolsys.geometry.graph.visitor;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.algorithm.index.IdObjectIndex;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
+import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.visitor.CreateListVisitor;
@@ -16,13 +16,14 @@ public class BoundingBoxIntersectsEdgeVisitor<T> extends DelegatingVisitor<Edge<
     final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
 
-    final LineString line = edge.getLine();
-    BoundingBox boundingBox = line.getBoundingBox();
-    boundingBox = boundingBox.expand(maxDistance);
+    final LineString line = edge.getLineString();
+    final BoundingBox boundingBox = line.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     final BoundingBoxIntersectsEdgeVisitor<T> visitor = new BoundingBoxIntersectsEdgeVisitor<>(
       boundingBox, results);
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
-    index.forEach(visitor, boundingBox);
+    index.forEach(boundingBox, visitor);
     final List<Edge<T>> list = results.getList();
     list.remove(edge);
     return list;

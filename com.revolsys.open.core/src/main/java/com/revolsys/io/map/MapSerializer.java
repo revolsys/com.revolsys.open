@@ -6,10 +6,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.json.Json;
@@ -58,6 +60,12 @@ public interface MapSerializer {
         map.remove(name);
       }
     }
+  }
+
+  default void addToMap(final Map<String, Object> map, final String name,
+    final Supplier<Object> supplier) {
+    final Object value = supplier.get();
+    addToMap(map, name, value);
   }
 
   default void addTypeToMap(final Map<String, Object> map, final String type) {
@@ -139,6 +147,8 @@ public interface MapSerializer {
         } else {
           return null;
         }
+      } else if (value.getClass().isArray()) {
+        return Lists.arrayToList(value);
       } else if (value instanceof Component) {
         return null;
       } else {

@@ -4,7 +4,6 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.properties.ObjectWithProperties;
 
 public interface Writer<T> extends ObjectWithProperties, BaseCloseable {
-
   @Override
   default void close() {
     ObjectWithProperties.super.close();

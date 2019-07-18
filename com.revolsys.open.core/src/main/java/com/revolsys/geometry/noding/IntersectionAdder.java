@@ -139,7 +139,7 @@ public class IntersectionAdder implements SegmentIntersector {
   private boolean isTrivialIntersection(final SegmentString e0, final int segIndex0,
     final SegmentString e1, final int segIndex1) {
     if (e0 == e1) {
-      if (this.li.getIntersectionNum() == 1) {
+      if (this.li.getIntersectionCount() == 1) {
         if (isAdjacentSegments(segIndex0, segIndex1)) {
           return true;
         }
@@ -170,12 +170,17 @@ public class IntersectionAdder implements SegmentIntersector {
       return;
     }
     this.numTests++;
-    final Point p00 = e0.getPoint(segIndex0);
-    final Point p01 = e0.getPoint(segIndex0 + 1);
-    final Point p10 = e1.getPoint(segIndex1);
-    final Point p11 = e1.getPoint(segIndex1 + 1);
+    final double line1x1 = e0.getX(segIndex0);
+    final double line1y1 = e0.getY(segIndex0);
+    final double line1x2 = e0.getX(segIndex0 + 1);
+    final double line1y2 = e0.getY(segIndex0 + 1);
+    final double line2x1 = e1.getX(segIndex1);
+    final double line2y1 = e1.getY(segIndex1);
+    final double line2x2 = e1.getX(segIndex1 + 1);
+    final double line2y2 = e1.getY(segIndex1 + 1);
 
-    this.li.computeIntersectionPoints(p00, p01, p10, p11);
+    this.li.computeIntersection(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1, line2x2,
+      line2y2);
     // if (li.hasIntersection() && li.isProper()) Debug.println(li);
     if (this.li.hasIntersection()) {
       // intersectionFound = true;

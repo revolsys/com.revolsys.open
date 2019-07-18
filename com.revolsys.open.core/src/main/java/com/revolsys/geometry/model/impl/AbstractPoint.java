@@ -88,4 +88,5 @@ public abstract class AbstractPoint implements Point {
   public String toString() {
     return toEwkt();
   }
+
 }

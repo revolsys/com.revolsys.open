@@ -34,53 +34,74 @@ package com.revolsys.geometry.algorithm.distance;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.segment.LineSegment;
-import com.revolsys.geometry.model.segment.Segment;
 
 /**
- * Computes the Euclidean distance (L2 metric) from a {@link Coordinates} to a {@link Geometry}.
+ * Computes the Euclidean distance (L2 metric) from a {@link Point} to a {@link Geometry}.
  * Also computes two points on the geometry which are separated by the distance found.
  */
 public class DistanceToPoint {
 
-  public static void computeDistance(final Geometry geom, final Point pt,
-    final PointPairDistance ptDist) {
+  public static void computeDistance(final Geometry geom, final Point point,
+    final PointPairDistance pointDistance) {
     if (geom instanceof LineString) {
       final LineString line = (LineString)geom;
-      computeDistance(line, pt, ptDist);
+      computeDistance(line, point, pointDistance);
     } else if (geom instanceof Polygon) {
       final Polygon polygon = (Polygon)geom;
-      computeDistance(polygon, pt, ptDist);
+      computeDistance(polygon, point, pointDistance);
     } else if (geom.isGeometryCollection()) {
       for (final Geometry part : geom.geometries()) {
-        computeDistance(part, pt, ptDist);
+        computeDistance(part, point, pointDistance);
       }
     } else { // assume geom is Point
-      ptDist.setMinimum(geom.getPoint(), pt);
+      pointDistance.setMinimum(geom.getPoint(), point);
     }
   }
 
   public static void computeDistance(final LineSegment segment, final Point pt,
-    final PointPairDistance ptDist) {
+    final PointPairDistance pointDistance) {
     final Point closestPt = segment.closestPoint(pt);
-    ptDist.setMinimum(closestPt, pt);
+    pointDistance.setMinimum(closestPt, pt);
   }
 
-  public static void computeDistance(final LineString line, final Point pt,
-    final PointPairDistance ptDist) {
-    for (final Segment segment : line.segments()) {
-      final Point closestPt = segment.closestPoint(pt);
-      ptDist.setMinimum(closestPt, pt);
+  public static void computeDistance(final LineString line, final double x, final double y,
+    final PointPairDistance pointDistance) {
+    final int vertexCount = line.getVertexCount();
+    if (vertexCount > 0) {
+      double x1 = line.getX(0);
+      double y1 = line.getY(0);
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x2 = line.getX(vertexIndex);
+        final double y2 = line.getY(vertexIndex);
+        final Point closestPoint = LineSegmentUtil.closestPoint(x1, y1, x2, y2, x, y);
+        final double closestX = closestPoint.getX();
+        final double closestY = closestPoint.getY();
+        pointDistance.setMinimum(closestX, closestY, x, y);
+        x1 = x2;
+        y1 = y2;
+      }
     }
   }
 
-  public static void computeDistance(final Polygon poly, final Point pt,
-    final PointPairDistance ptDist) {
-    computeDistance(poly.getShell(), pt, ptDist);
-    for (int i = 0; i < poly.getHoleCount(); i++) {
-      computeDistance(poly.getHole(i), pt, ptDist);
+  public static void computeDistance(final LineString line, final Point point,
+    final PointPairDistance pointDistance) {
+    final double x = point.getX();
+    final double y = point.getY();
+    computeDistance(line, x, y, pointDistance);
+  }
+
+  public static void computeDistance(final Polygon poly, final Point point,
+    final PointPairDistance pointDistance) {
+    final double x = point.getX();
+    final double y = point.getY();
+
+    for (final LinearRing ring : poly.rings()) {
+      computeDistance(ring, x, y, pointDistance);
     }
   }
 

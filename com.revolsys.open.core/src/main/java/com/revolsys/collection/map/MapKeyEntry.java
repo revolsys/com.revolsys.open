@@ -3,8 +3,6 @@ package com.revolsys.collection.map;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.revolsys.collection.bplus.BPlusTreeMap;
-
 public class MapKeyEntry<K, V> implements Entry<K, V> {
   private final K key;
 
@@ -16,7 +14,7 @@ public class MapKeyEntry<K, V> implements Entry<K, V> {
 
   @Override
   public boolean equals(final Object o) {
-    if (o instanceof BPlusTreeMap.Entry) {
+    if (o instanceof MapKeyEntry) {
       @SuppressWarnings("unchecked")
       final Entry<K, V> e = (Entry<K, V>)o;
       final K k1 = getKey();

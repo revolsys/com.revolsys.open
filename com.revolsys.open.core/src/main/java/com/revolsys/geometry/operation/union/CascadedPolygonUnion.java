@@ -33,6 +33,7 @@
 package com.revolsys.geometry.operation.union;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.collection.list.Lists;
@@ -137,6 +138,10 @@ public class CascadedPolygonUnion {
     return op.union();
   }
 
+  public static Polygonal union(final Polygonal... polygons) {
+    return union(Arrays.asList(polygons));
+  }
+
   private GeometryFactory geometryFactory;
 
   private List<Polygon> polygons = new ArrayList<>();
@@ -189,6 +194,7 @@ public class CascadedPolygonUnion {
       final Polygonal polygon2 = getPolygon(polygons, start + 1);
       return unionSafe(polygon1, polygon2);
     } else {
+
       // recurse on both halves of the list
       final int mid = (end + start) / 2;
       final Polygonal polygon1 = binaryUnion(polygons, start, mid);
@@ -267,7 +273,7 @@ public class CascadedPolygonUnion {
        * This makes unioning more efficient, since vertices are more likely
        * to be eliminated on each round.
        */
-      final StrTree index = new StrTree(STRTREE_NODE_CAPACITY);
+      final StrTree<Polygon> index = new StrTree<>(STRTREE_NODE_CAPACITY);
       for (final Polygon polygon : this.polygons) {
         final BoundingBox boundingBox = polygon.getBoundingBox();
         index.insertItem(boundingBox, polygon);
@@ -315,7 +321,7 @@ public class CascadedPolygonUnion {
     } else if (polygonal1.getGeometryCount() <= 1 && polygonal2.getGeometryCount() <= 1) {
       return unionActual(polygonal1, polygonal2);
     } else {
-      final BoundingBox boundingBoxIntersection = boundingBox1.intersection(boundingBox2);
+      final BoundingBox boundingBoxIntersection = boundingBox1.bboxIntersection(boundingBox2);
       return unionUsingEnvelopeIntersection(polygonal1, polygonal2, boundingBoxIntersection);
     }
   }
@@ -343,7 +349,7 @@ public class CascadedPolygonUnion {
 
   /**
    * Recursively unions all subtrees in the list into single geometries.
-   * the result is a list of Geometrys only
+   * The result is a list of Geometrys only
    */
   private Polygonal unionTree(final List<?> items) {
     final List<Polygonal> geoms = reduceToGeometries(items);

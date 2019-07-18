@@ -42,7 +42,7 @@ public class OgrVrtWriter {
           final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
           writer.element("GeometryType", "wkb" + fieldType);
           if (geometryFactory != null) {
-            writer.element("LayerSRS", "EPSG:" + geometryFactory.getCoordinateSystemId());
+            writer.element("LayerSRS", "EPSG:" + geometryFactory.getHorizontalCoordinateSystemId());
           }
           writer.startTag("GeometryField");
           writer.attribute("encoding", "WKT");
@@ -51,7 +51,7 @@ public class OgrVrtWriter {
           writer.attribute("reportSrcColumn", "FALSE");
           writer.element("GeometryType", "wkb" + fieldType);
           if (geometryFactory != null) {
-            writer.element("SRS", "EPSG:" + geometryFactory.getCoordinateSystemId());
+            writer.element("SRS", "EPSG:" + geometryFactory.getHorizontalCoordinateSystemId());
           }
           writer.endTag("GeometryField");
         } else {

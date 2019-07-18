@@ -13,7 +13,6 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -27,6 +26,8 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.exception.JdbcExceptionTranslator;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
@@ -35,6 +36,7 @@ import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.LockMode;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
@@ -208,7 +210,7 @@ public final class JdbcUtils {
     try {
       return executeUpdate(connection, sql, parameters);
     } catch (final SQLException e) {
-      throw getException(dataSource, connection, "Update", sql, e);
+      throw getException(dataSource, "Update", sql, e);
     } finally {
       release(connection, dataSource);
     }
@@ -237,7 +239,7 @@ public final class JdbcUtils {
     try {
       return DataSourceUtils.doGetConnection(dataSource);
     } catch (final SQLException e) {
-      throw getException(dataSource, null, "Get Connection", null, e);
+      throw getException(dataSource, "Get Connection", null, e);
     }
   }
 
@@ -253,8 +255,8 @@ public final class JdbcUtils {
     return sql.toString();
   }
 
-  public static DataAccessException getException(final DataSource dataSource,
-    final Connection connection, final String task, final String sql, final SQLException e) {
+  public static DataAccessException getException(final DataSource dataSource, final String task,
+    final String sql, final SQLException e) {
     SQLExceptionTranslator translator;
     if (dataSource == null) {
       translator = new SQLStateSQLExceptionTranslator();
@@ -331,9 +333,10 @@ public final class JdbcUtils {
         }
       }
       final String fromClause = query.getFromClause();
-      final boolean lockResults = query.isLockResults();
-      sql = newSelectSql(recordDefinition, "T", fromClause, lockResults, fieldNames, query,
-        orderBy);
+      final LockMode lockMode = query.getLockMode();
+      final boolean distinct = query.isDistinct();
+      sql = newSelectSql(recordDefinition, "T", distinct, fromClause, fieldNames, query, orderBy,
+        lockMode);
     } else {
       if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
         final StringBuilder newSql = new StringBuilder("SELECT ");
@@ -383,12 +386,15 @@ public final class JdbcUtils {
   }
 
   public static String newSelectSql(final RecordDefinition recordDefinition,
-    final String tablePrefix, final String fromClause, final boolean lockResults,
+    final String tablePrefix, final boolean distinct, final String fromClause,
     final List<String> fieldNames, final Query query,
-    final Map<? extends CharSequence, Boolean> orderBy) {
+    final Map<? extends CharSequence, Boolean> orderBy, final LockMode lockMode) {
     final String typePath = recordDefinition.getPath();
     final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");
+    if (distinct) {
+      sql.append("DISTINCT ");
+    }
     boolean hasColumns = false;
     if (fieldNames.isEmpty() || fieldNames.remove("*")) {
       addColumnNames(sql, recordDefinition, tablePrefix);
@@ -406,14 +412,12 @@ public final class JdbcUtils {
     }
     appendWhere(sql, query);
     addOrderBy(sql, orderBy);
-    if (lockResults) {
-      sql.append(" FOR UPDATE");
-    }
+    lockMode.append(sql);
     return sql.toString();
   }
 
-  public static Map<String, Object> readMap(final ResultSet rs) throws SQLException {
-    final Map<String, Object> values = new LinkedHashMap<>();
+  public static MapEx readMap(final ResultSet rs) throws SQLException {
+    final MapEx values = new LinkedHashMapEx();
     final ResultSetMetaData metaData = rs.getMetaData();
     for (int i = 1; i <= metaData.getColumnCount(); i++) {
       final String name = metaData.getColumnName(i);
@@ -497,7 +501,7 @@ public final class JdbcUtils {
         close(statement);
       }
     } catch (final SQLException e) {
-      throw getException(dataSource, connection, "selectInt", sql, e);
+      throw getException(dataSource, "selectInt", sql, e);
     } finally {
       if (dataSource != null) {
         release(connection, dataSource);
@@ -647,7 +651,7 @@ public final class JdbcUtils {
     }
   }
 
-  public static Map<String, Object> selectMap(final JdbcRecordStore recordStore, final String sql,
+  public static MapEx selectMap(final JdbcRecordStore recordStore, final String sql,
     final Object... parameters) {
     try (
       JdbcConnection connection = recordStore.getJdbcConnection()) {

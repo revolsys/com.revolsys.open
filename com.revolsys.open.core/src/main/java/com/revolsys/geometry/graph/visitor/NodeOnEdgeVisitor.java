@@ -4,10 +4,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.algorithm.index.IdObjectIndex;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
+import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -20,11 +20,13 @@ public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
     final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
     final Point point = node;
-    final BoundingBox boundingBox = point.bboxEdit(editor -> editor.expand(maxDistance));
+    final BoundingBox boundingBox = point.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     final IdObjectIndex<Edge<T>> index = graph.getEdgeIndex();
     final NodeOnEdgeVisitor<T> visitor = new NodeOnEdgeVisitor<>(node, boundingBox, maxDistance,
       results);
-    index.forEach(visitor, boundingBox);
+    index.forEach(boundingBox, visitor);
     final List<Edge<T>> edges = results.getList();
     Collections.sort(edges);
     return edges;
@@ -51,7 +53,7 @@ public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
   @Override
   public void accept(final Edge<T> edge) {
     if (!edge.hasNode(this.node)) {
-      final LineString line = edge.getLine();
+      final LineString line = edge.getLineString();
       if (line.getBoundingBox().bboxIntersects(this.boundingBox)) {
         if (LineStringUtil.isPointOnLine(line, this.point, this.maxDistance)) {
           super.accept(edge);

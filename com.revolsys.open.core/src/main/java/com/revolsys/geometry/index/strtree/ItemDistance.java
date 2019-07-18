@@ -35,13 +35,13 @@ package com.revolsys.geometry.index.strtree;
 
 /**
  * A function method which computes the distance
- * between two {@link ItemBoundable}s in an {@link StrTree}.
+ * between two {@link StrTreeLeaf}s in an {@link StrTree}.
  * Used for Nearest Neighbour searches.
  *
  * @author Martin Davis
  *
  */
-public interface ItemDistance {
+public interface ItemDistance<I> {
   /**
    * Computes the distance between two items.
    *
@@ -51,6 +51,6 @@ public interface ItemDistance {
    *
    * @throws IllegalArgumentException if the metric is not applicable to the arguments
    */
-  double distance(ItemBoundable item1, ItemBoundable item2);
+  double distance(StrTreeLeaf<I> item1, StrTreeLeaf<I> item2);
 
 }

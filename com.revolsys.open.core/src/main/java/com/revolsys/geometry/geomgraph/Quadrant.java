@@ -32,6 +32,7 @@
  */
 package com.revolsys.geometry.geomgraph;
 
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 
 /**
@@ -140,29 +141,44 @@ public class Quadrant {
     }
   }
 
+  public static int quadrant(final double x1, final double y1, final double x2, final double y2) {
+    if (x2 == x1 && y2 == y1) {
+      throw new IllegalArgumentException(
+        "Cannot compute the quadrant for two identical points POINT(" + x1 + " " + y1 + ")");
+    } else if (x2 >= x1) {
+      if (y2 >= y1) {
+        return NE;
+      } else {
+        return SE;
+      }
+    } else {
+      if (y2 >= y1) {
+        return NW;
+      } else {
+        return SW;
+      }
+    }
+  }
+
+  public static int quadrant(final LineString line, final int vertexIndex1,
+    final int vertexIndex2) {
+    final double x1 = line.getX(vertexIndex1);
+    final double y1 = line.getY(vertexIndex1);
+    final double x2 = line.getX(vertexIndex2);
+    final double y2 = line.getY(vertexIndex2);
+    return quadrant(x1, y1, x2, y2);
+  }
+
   /**
    * Returns the quadrant of a directed line segment from p0 to p1.
    *
    * @throws IllegalArgumentException if the points are equal
    */
   public static int quadrant(final Point p0, final Point p1) {
-    if (p1.getX() == p0.getX() && p1.getY() == p0.getY()) {
-      throw new IllegalArgumentException(
-        "Cannot compute the quadrant for two identical points " + p0);
-    }
-
-    if (p1.getX() >= p0.getX()) {
-      if (p1.getY() >= p0.getY()) {
-        return NE;
-      } else {
-        return SE;
-      }
-    } else {
-      if (p1.getY() >= p0.getY()) {
-        return NW;
-      } else {
-        return SW;
-      }
-    }
+    final double x1 = p0.getX();
+    final double y1 = p0.getY();
+    final double x2 = p1.getX();
+    final double y2 = p1.getY();
+    return quadrant(x1, y1, x2, y2);
   }
 }

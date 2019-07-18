@@ -29,7 +29,7 @@
     class="com.revolsys.gis.parallel.WriterProcess"
     p:writer-ref="kmlFileStatisticsWriter"
   />
- 
+  
   <bean
     id="kmlFileStatisticsWriterStats"
     factory-bean="kmlFileStatisticsWriter"

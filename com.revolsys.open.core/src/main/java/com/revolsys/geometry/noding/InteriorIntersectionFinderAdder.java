@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.geometry.algorithm.LineIntersector;
-import com.revolsys.geometry.model.Point;
 
 /**
  * Finds <b>interior</b> intersections between line segments in {@link NodedSegmentString}s,
@@ -94,16 +93,21 @@ public class InteriorIntersectionFinderAdder implements SegmentIntersector {
       return;
     }
 
-    final Point p00 = e0.getPoint(segIndex0);
-    final Point p01 = e0.getPoint(segIndex0 + 1);
-    final Point p10 = e1.getPoint(segIndex1);
-    final Point p11 = e1.getPoint(segIndex1 + 1);
+    final double line1x1 = e0.getX(segIndex0);
+    final double line1y1 = e0.getY(segIndex0);
+    final double line1x2 = e0.getX(segIndex0 + 1);
+    final double line1y2 = e0.getY(segIndex0 + 1);
+    final double line2x1 = e1.getX(segIndex1);
+    final double line2y1 = e1.getY(segIndex1);
+    final double line2x2 = e1.getX(segIndex1 + 1);
+    final double line2y2 = e1.getY(segIndex1 + 1);
 
-    this.li.computeIntersectionPoints(p00, p01, p10, p11);
+    this.li.computeIntersection(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1, line2x2,
+      line2y2);
 
     if (this.li.hasIntersection()) {
       if (this.li.isInteriorIntersection()) {
-        for (int intIndex = 0; intIndex < this.li.getIntersectionNum(); intIndex++) {
+        for (int intIndex = 0; intIndex < this.li.getIntersectionCount(); intIndex++) {
           this.interiorIntersections.add(this.li.getIntersection(intIndex));
         }
         ((NodedSegmentString)e0).addIntersections(this.li, segIndex0, 0);

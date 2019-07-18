@@ -126,11 +126,6 @@ public class DouglasPeuckerSimplifier {
       return newValidArea(rawGeom);
     }
 
-    @Override
-    protected Geometry transformPoint(final Point point, final Geometry parent) {
-      return point;
-    }
-
     /**
      * Simplifies a polygon, fixing it if required.
      */
@@ -183,7 +178,7 @@ public class DouglasPeuckerSimplifier {
    * @return the simplified geometry
    */
   public Geometry getResultGeometry() {
-    // empty input produces an empty intersectionCount
+    // empty input produces an empty result
     if (this.inputGeom.isEmpty()) {
       return this.inputGeom.clone();
     }

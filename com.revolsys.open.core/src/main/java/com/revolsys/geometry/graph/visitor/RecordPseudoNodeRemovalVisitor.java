@@ -18,6 +18,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.property.DirectionalFields;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 
 /**
  * Find and remove nodes that have exactly two edges for each feature type with
@@ -28,7 +29,7 @@ import com.revolsys.util.count.LabelCountMap;
 public class RecordPseudoNodeRemovalVisitor extends AbstractNodeListenerVisitor<Record>
   implements PredicateProxy<Node<Record>> {
 
-  private LabelCountMap mergedStatistics;
+  private LabelCounters mergedStatistics;
 
   private Predicate<Node<Record>> predicate;
 

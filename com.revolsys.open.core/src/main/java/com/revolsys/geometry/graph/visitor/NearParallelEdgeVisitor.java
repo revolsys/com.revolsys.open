@@ -22,7 +22,7 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
 
   @Override
   public void accept(final Edge<T> edge) {
-    final LineString matchLine = edge.getLine();
+    final LineString matchLine = edge.getLineString();
     if (isAlmostParallel(matchLine)) {
       super.accept(edge);
     }
@@ -30,13 +30,14 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
 
   @Override
   public BoundingBox getEnvelope() {
-    BoundingBox envelope = this.line.getBoundingBox();
-    envelope = envelope.expand(this.maxDistance);
+    final BoundingBox envelope = this.line.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(this.maxDistance);
     return envelope;
   }
 
   private boolean isAlmostParallel(final LineString matchLine) {
-    if (this.line.getBoundingBox().bboxDistance(matchLine.getBoundingBox()) > this.maxDistance) {
+    if (this.line.bboxDistance(matchLine) > this.maxDistance) {
       return false;
     }
     final LineString coords = this.line;

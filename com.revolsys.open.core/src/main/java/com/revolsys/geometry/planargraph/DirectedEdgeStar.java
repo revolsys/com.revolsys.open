@@ -38,8 +38,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import com.revolsys.geometry.model.Point;
-
 /**
  * A sorted collection of {@link DirectedEdge}s which leave a {@link Node}
  * in a {@link PlanarGraph}.
@@ -51,7 +49,7 @@ public class DirectedEdgeStar implements Iterable<DirectedEdge> {
   /**
    * The underlying list of outgoing DirectedEdges
    */
-  protected List<DirectedEdge> outEdges = new ArrayList<>();
+  private final List<DirectedEdge> outEdges = new ArrayList<>();
 
   private boolean sorted = false;
 
@@ -67,18 +65,6 @@ public class DirectedEdgeStar implements Iterable<DirectedEdge> {
   public void add(final DirectedEdge de) {
     this.outEdges.add(de);
     this.sorted = false;
-  }
-
-  /**
-   * Returns the coordinate for the node at wich this star is based
-   */
-  public Point getCoordinate() {
-    final Iterator<DirectedEdge> it = iterator();
-    if (!it.hasNext()) {
-      return null;
-    }
-    final DirectedEdge e = it.next();
-    return e.getCoordinate();
   }
 
   /**

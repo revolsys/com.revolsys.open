@@ -33,6 +33,8 @@
 
 package com.revolsys.geometry.operation.overlay.snap;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -40,9 +42,11 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.geometry.model.impl.LineStringDouble;
+import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
+import com.revolsys.geometry.model.editor.LineStringEditor;
 import com.revolsys.geometry.model.util.GeometryTransformer;
 import com.revolsys.geometry.model.vertex.Vertex;
 
@@ -88,7 +92,7 @@ public class GeometrySnapper {
      */
     final GeometryFactory geometryFactory = g.getGeometryFactory();
     if (!geometryFactory.isFloating()) {
-      final double fixedSnapTol = 1 / geometryFactory.getScale(0) * 2 / 1.415;
+      final double fixedSnapTol = 1 / geometryFactory.getScaleXY() * 2 / 1.415;
       if (fixedSnapTol > snapTolerance) {
         snapTolerance = fixedSnapTol;
       }
@@ -162,14 +166,14 @@ public class GeometrySnapper {
     this.srcGeom = srcGeom;
   }
 
-  private Point[] extractTargetCoordinates(final Geometry geometry) {
+  private Collection<Point> extractTargetCoordinates(final Geometry geometry) {
     // TODO: should do this more efficiently. Use CoordSeq filter to get points,
     // KDTree for uniqueness & queries
     final Set<Point> points = new TreeSet<>();
     for (final Vertex vertex : geometry.vertices()) {
-      points.add(vertex);
+      points.add(vertex.newPoint2D());
     }
-    return points.toArray(new Point[points.size()]);
+    return new ArrayList<>(points);
   }
 
   /**
@@ -181,10 +185,13 @@ public class GeometrySnapper {
    * @return a new snapped Geometry
    */
   public Geometry snapTo(final Geometry snapGeom, final double snapTolerance) {
-    final Point[] snapPts = extractTargetCoordinates(snapGeom);
-
-    final SnapTransformer snapTrans = new SnapTransformer(snapTolerance, snapPts);
-    return snapTrans.transform(this.srcGeom);
+    final Collection<Point> snapPoints = extractTargetCoordinates(snapGeom);
+    if (snapPoints.isEmpty()) {
+      return this.srcGeom;
+    } else {
+      final SnapTransformer snapTrans = new SnapTransformer(snapTolerance, snapPoints);
+      return snapTrans.transform(this.srcGeom);
+    }
   }
 
   /**
@@ -200,58 +207,255 @@ public class GeometrySnapper {
    * @return a new snapped Geometry
    */
   public Geometry snapToSelf(final double snapTolerance, final boolean cleanResult) {
-    final Point[] snapPts = extractTargetCoordinates(this.srcGeom);
-
-    final SnapTransformer snapTrans = new SnapTransformer(snapTolerance, snapPts, true);
-    final Geometry snappedGeom = snapTrans.transform(this.srcGeom);
-    Geometry result = snappedGeom;
-    if (cleanResult && result instanceof Polygonal) {
-      // TODO: use better cleaning approach
-      result = snappedGeom.buffer(0);
+    final Collection<Point> snapPoints = extractTargetCoordinates(this.srcGeom);
+    if (snapPoints.isEmpty()) {
+      return this.srcGeom;
+    } else {
+      final SnapTransformer snapTrans = new SnapTransformer(snapTolerance, snapPoints, true);
+      final Geometry snappedGeom = snapTrans.transform(this.srcGeom);
+      Geometry result = snappedGeom;
+      if (cleanResult && result instanceof Polygonal) {
+        // TODO: use better cleaning approach
+        result = snappedGeom.buffer(0);
+      }
+      return result;
     }
-    return result;
   }
-
 }
 
 class SnapTransformer extends GeometryTransformer {
-  private boolean isSelfSnap = false;
+  private final boolean isSelfSnap;
 
-  private final Point[] snapPts;
+  private final Collection<Point> snapPoints;
 
   private final double snapTolerance;
 
-  SnapTransformer(final double snapTolerance, final Point[] snapPts) {
-    this.snapTolerance = snapTolerance;
-    this.snapPts = snapPts;
+  SnapTransformer(final double snapTolerance, final Collection<Point> snapPoints) {
+    this(snapTolerance, snapPoints, false);
   }
 
-  SnapTransformer(final double snapTolerance, final Point[] snapPts, final boolean isSelfSnap) {
+  SnapTransformer(final double snapTolerance, final Collection<Point> snapPoints,
+    final boolean isSelfSnap) {
     this.snapTolerance = snapTolerance;
-    this.snapPts = snapPts;
+    this.snapPoints = snapPoints;
     this.isSelfSnap = isSelfSnap;
   }
 
-  private Point[] snapLine(final LineString srcPts, final Point[] snapPts) {
-    final LineStringSnapper snapper = new LineStringSnapper(srcPts, this.snapTolerance);
-    snapper.setAllowSnappingToSourceVertices(this.isSelfSnap);
-    return snapper.snapTo(snapPts);
+  /**
+   * Finds a src segment which snaps to (is close to) the given snap point.
+   * <p>
+   * Only a single segment is selected for snapping.
+   * This prevents multiple segments snapping to the same snap vertex,
+   * which would almost certainly cause invalid geometry
+   * to be created.
+   * (The heuristic approach to snapping used here
+   * is really only appropriate when
+   * snap pts snap to a unique spot on the src geometry.)
+   * <p>
+   * Also, if the snap vertex occurs as a vertex in the src coordinate list,
+   * no snapping is performed.
+   *
+   * @param snapPt the point to snap to
+   * @param line the source segment coordinates
+   * @param axisCount
+   * @return the index of the snapped segment
+   * or -1 if no segment snaps to the snap point
+   */
+  private int findSegmentIndexToSnap(final Point snapPt, final LineString line) {
+    double minDist = Double.MAX_VALUE;
+    int snapIndex = -1;
+    final double snapX = snapPt.getX();
+    final double snapY = snapPt.getY();
+    final int vertexCount = line.getVertexCount();
+    double x1 = line.getX(0);
+    double y1 = line.getY(0);
+    for (int i = 0; i < vertexCount - 1; i++) {
+      final double x2 = line.getX(i + 1);
+      final double y2 = line.getY(i + 1);
+
+      /**
+       * Check if the snap pt is equal to one of the segment endpoints.
+       *
+       * If the snap pt is already in the src list, don't snap at all.
+       */
+      if (snapPt.equalsVertex(x1, y1) || snapPt.equalsVertex(x2, y2)) {
+        if (this.isSelfSnap) {
+          continue;
+        } else {
+          return -1;
+        }
+      }
+
+      final double dist = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, snapX, snapY);
+      if (dist < this.snapTolerance && dist < minDist) {
+        minDist = dist;
+        snapIndex = i;
+      }
+      x1 = x2;
+      y1 = y2;
+    }
+    return snapIndex;
+  }
+
+  private Point findSnapForVertex(final double x, final double y) {
+    for (final Point snapPt : this.snapPoints) {
+      // if point is already equal to a src pt, don't snap
+      if (snapPt.equalsVertex(x, y)) {
+        return null;
+      } else if (snapPt.distance(x, y) < this.snapTolerance) {
+        return snapPt;
+      }
+    }
+    return null;
+  }
+
+  private LineString snapLine(final LineString line) {
+    final LineString newLine = snapVertices(line);
+    return snapSegments(newLine);
+  }
+
+  /**
+   * Snap segments of the source to nearby snap vertices.
+   * Source segments are "cracked" at a snap vertex.
+   * A single input segment may be snapped several times
+   * to different snap vertices.
+   * <p>
+   * For each distinct snap vertex, at most one source segment
+   * is snapped to.  This prevents "cracking" multiple segments
+   * at the same point, which would likely cause
+   * topology collapse when being used on polygonal linework.
+   *
+   * @param newCoordinates the coordinates of the source linestring to be snapped
+   * @param snapPoints the target snap vertices
+   */
+  private LineString snapSegments(LineString line) {
+    LineStringEditor newLine = null;
+    for (final Point snapPoint : this.snapPoints) {
+      final int index = findSegmentIndexToSnap(snapPoint, line);
+      /**
+       * If a segment to snap to was found, "crack" it at the snap pt.
+       * The new pt is inserted immediately into the src segment list,
+       * so that subsequent snapping will take place on the modified segments.
+       * Duplicate points are not added.
+       */
+      if (index >= 0) {
+        if (newLine == null) {
+          if (line instanceof LineStringEditor) {
+            newLine = (LineStringEditor)line;
+          } else {
+            newLine = LineStringEditor.newLineStringEditor(line);
+            line = newLine;
+          }
+        }
+        newLine.insertVertex(index + 1, snapPoint, false);
+      }
+    }
+    if (newLine == null) {
+      return line;
+    } else {
+      return newLine;
+    }
+  }
+
+  /**
+   * Snap source vertices to vertices in the target.
+   *
+   * @param newCoordinates the points to snap
+   * @param snapPoints the points to snap to
+   */
+  private LineString snapVertices(final LineString line) {
+    LineStringEditor newLine = null;
+    final int vertexCount = line.getVertexCount();
+    final boolean closed = line.isClosed();
+    // if src is a ring then don't snap final vertex
+    final int end = closed ? vertexCount - 1 : vertexCount;
+    for (int i = 0; i < end; i++) {
+      final double x = line.getX(i);
+      final double y = line.getY(i);
+      final Point snapVert = findSnapForVertex(x, y);
+      if (snapVert != null) {
+        if (newLine == null) {
+          newLine = LineStringEditor.newLineStringEditor(line);
+          if (i == 0 && closed) {
+            // keep final closing point in synch (rings only)
+            newLine.setVertex(vertexCount - 1, snapVert);
+          }
+        }
+        newLine.setVertex(i, snapVert);
+      }
+    }
+    if (newLine == null) {
+      return line;
+    } else {
+      return newLine;
+    }
   }
 
   @Override
-  protected LineString transformCoordinates(final LineString coords, final Geometry parent) {
-    final Point[] newPts = snapLine(coords, this.snapPts);
-    return new LineStringDouble(newPts);
+  protected LineString transformCoordinates(final LineString line, final Geometry parent) {
+    final LineString newLine = snapLine(line);
+    return newLine;
+  }
+
+  /**
+   * Transforms a LinearRing.
+   * The transformation of a LinearRing may result in a coordinate sequence
+   * which does not form a structurally valid ring (i.e. a degnerate ring of 3 or fewer points).
+   * In this case a LineString is returned.
+   * Subclasses may wish to override this method and check for this situation
+   * (e.g. a subclass may choose to eliminate degenerate linear rings)
+   *
+   * @param geom the ring to simplify
+   * @param parent the parent geometry
+   * @return a LinearRing if the transformation resulted in a structurally valid ring
+   * @return a LineString if the transformation caused the LinearRing to collapse to 3 or fewer points
+   */
+  @Override
+  protected Geometry transformLinearRing(final LinearRing geometry, final Geometry parent) {
+    if (geometry == null) {
+      return this.factory.linearRing();
+    } else {
+      final LineString newLine = transformCoordinates(geometry, geometry);
+      if (newLine == geometry) {
+        return geometry;
+      } else {
+        final int vertexCount = newLine.getVertexCount();
+        // ensure a valid LinearRing
+        if (vertexCount > 0 && vertexCount < 4 && !isPreserveType()) {
+          return newLine.newLineString();
+        } else {
+          return newLine.newLinearRing();
+        }
+      }
+    }
+  }
+
+  /**
+   * Transforms a {@link LineString} geometry.
+   *
+   * @param line
+   * @return
+   */
+  @Override
+  protected LineString transformLineString(final LineString line) {
+    final LineString newLine = transformCoordinates(line, line);
+    if (newLine == line) {
+      return line;
+    } else {
+      return newLine.newLineString();
+    }
   }
 
   @Override
-  protected Geometry transformPoint(final Point point, final Geometry parent) {
-    final Point snapVert = LineStringSnapper.findSnapForVertex(point, this.snapPts,
-      this.snapTolerance);
+  protected Point transformPoint(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    final Point snapVert = findSnapForVertex(x, y);
     if (snapVert == null) {
       return point;
     } else {
       return snapVert;
     }
   }
+
 }

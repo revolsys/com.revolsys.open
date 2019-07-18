@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataTypes;
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.io.AbstractMapWriter;
 import com.revolsys.io.FileUtil;
@@ -116,7 +116,7 @@ public class CsvMapWriter extends AbstractMapWriter {
       }
       this.out.write('\n');
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 }

@@ -9,7 +9,6 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.date.Dates;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Doubles;
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -96,8 +95,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
       }
     }
     if (this.recordDefinition.getField("OBJECTID") == null) {
-      final EsriGeodatabaseXmlFieldType fieldType = this.fieldTypes
-        .getFieldType(DataTypes.BIG_INTEGER);
+      final EsriGeodatabaseXmlFieldType fieldType = this.fieldTypes.getFieldType(DataTypes.INT);
       fieldType.writeValue(this.out, this.objectId++);
     }
 
@@ -229,8 +227,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
 
   public void writeExtent(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem != null) {
+      if (geometryFactory.isHasHorizontalCoordinateSystem()) {
         final BoundingBox boundingBox = geometryFactory.getAreaBoundingBox();
         this.out.startTag(EXTENT);
         this.out.attribute(XsiConstants.TYPE, ENVELOPE_N_TYPE);

@@ -104,7 +104,8 @@ class RightmostEdgeFinder {
      * If the rightmost point is a node, we need to identify which of
      * the incident edges is rightmost.
      */
-    Assert.isTrue(this.minIndex != 0 || this.minCoord.equals(this.minDe.getCoordinate()),
+    Assert.isTrue(
+      this.minIndex != 0 || this.minCoord.equalsVertex(this.minDe.getX1(), this.minDe.getY1()),
       "inconsistency in rightmost processing");
     if (this.minIndex == 0) {
       findRightmostEdgeAtNode();

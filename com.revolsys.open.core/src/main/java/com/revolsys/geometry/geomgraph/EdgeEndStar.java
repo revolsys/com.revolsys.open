@@ -41,6 +41,7 @@ import java.util.TreeMap;
 
 import com.revolsys.geometry.algorithm.BoundaryNodeRule;
 import com.revolsys.geometry.algorithm.locate.SimplePointInAreaLocator;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.TopologyException;
@@ -184,8 +185,10 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
           if (hasDimensionalCollapseEdge[geomi]) {
             loc = Location.EXTERIOR;
           } else {
-            final Point p = e.getCoordinate();
-            loc = getLocation(geomi, p, geomGraph);
+            final double x = e.getX1();
+            final double y = e.getY1();
+            final Point c = e.getCoordinate();
+            loc = getLocation(geomi, x, y, geomGraph);
           }
           label.setAllLocationsIfNull(geomi, loc);
         }
@@ -230,13 +233,16 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
     return this.edgeList;
   }
 
-  private Location getLocation(final int geomIndex, final Point p, final GeometryGraph[] geom) {
+  private Location getLocation(final int geomIndex, final double x, final double y,
+    final GeometryGraph[] geom) {
     // compute location only on demand
-    if (this.ptInAreaLocation[geomIndex] == Location.NONE) {
-      this.ptInAreaLocation[geomIndex] = SimplePointInAreaLocator
-        .locate(geom[geomIndex].getGeometry(), p.getX(), p.getY());
+    Location location = this.ptInAreaLocation[geomIndex];
+    if (location == Location.NONE) {
+      final Geometry geometry = geom[geomIndex].getGeometry();
+      location = SimplePointInAreaLocator.locate(geometry, x, y);
+      this.ptInAreaLocation[geomIndex] = location;
     }
-    return this.ptInAreaLocation[geomIndex];
+    return location;
   }
 
   public EdgeEnd getNextCW(final EdgeEnd ee) {
@@ -334,8 +340,9 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
            *  the other geometry (which is determined by the current location).
            *  Assign both sides to be the current location.
            */
-          Assert.isTrue(label.getLocation(geomIndex, Position.LEFT) == Location.NONE,
-            "found single null side");
+          if (label.getLocation(geomIndex, Position.LEFT) != Location.NONE) {
+            throw new IllegalStateException("found single null side");
+          }
           label.setLocation(geomIndex, Position.RIGHT, currLoc);
           label.setLocation(geomIndex, Position.LEFT, currLoc);
         }

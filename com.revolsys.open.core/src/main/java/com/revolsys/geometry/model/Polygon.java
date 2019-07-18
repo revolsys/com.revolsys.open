@@ -89,7 +89,6 @@ import com.revolsys.util.Property;
  *@version 1.7
  */
 public interface Polygon extends Polygonal {
-
   @SuppressWarnings("unchecked")
   static <G extends Geometry> G newPolygon(final Object value) {
     if (value == null) {
@@ -161,7 +160,7 @@ public interface Polygon extends Polygonal {
       return Double.POSITIVE_INFINITY;
     } else {
       // TODO implement intersects for x,y
-      if (bboxIntersects(new PointDoubleXY(x, y))) {
+      if (intersects(new PointDoubleXY(x, y))) {
         return 0.0;
       } else {
         double minDistance = Double.MAX_VALUE;
@@ -630,9 +629,9 @@ public interface Polygon extends Polygonal {
 
         final GeometryFactory geometryFactory = getGeometryFactory();
         if (boundingBox.isProjectionRequired(this)) {
-          return bboxIntersects(boundingBox.toPolygon(geometryFactory, 10));
+          return intersects(boundingBox.toPolygon(geometryFactory, 10));
         } else {
-          return bboxIntersects(boundingBox.toRectangle());
+          return intersects(boundingBox.toRectangle());
         }
       }
       // for (final LinearRing ring : rings()) {

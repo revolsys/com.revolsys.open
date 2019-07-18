@@ -5,7 +5,6 @@ import java.util.function.Predicate;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Point;
 
 public class NodeGeometryIntersectionFilter<T> implements Predicate<Node<T>> {
 
@@ -27,9 +26,7 @@ public class NodeGeometryIntersectionFilter<T> implements Predicate<Node<T>> {
 
   @Override
   public boolean test(final Node<T> node) {
-    final Point coordinates = node;
-    final Point point = this.geometryFactory.point(coordinates);
-    final boolean intersects = this.preparedGeometry.bboxIntersects(point);
+    final boolean intersects = this.preparedGeometry.intersects(node);
     return intersects;
   }
 }

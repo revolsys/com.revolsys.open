@@ -33,11 +33,14 @@
 
 package com.revolsys.geometry.operation.distance;
 
-import com.revolsys.geometry.model.BoundingBox;
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.Consumer3Double;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
+import com.revolsys.geometry.model.impl.AbstractPoint;
 
 /**
  * Represents a sequence of facets (points or line segments)
@@ -47,23 +50,28 @@ import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
  * @author Martin Davis
  *
  */
-public class PointFacetSequence implements FacetSequence {
+public class PointFacetSequence extends AbstractPoint implements FacetSequence {
+
+  private static final long serialVersionUID = 1L;
 
   public static double computePointLineDistance(final double x, final double y,
     final FacetSequence facetSeq) {
-    double minDistance = Double.MAX_VALUE;
+    double minDistance = java.lang.Double.MAX_VALUE;
 
-    for (int i = 0; i < facetSeq.getVertexCount() - 1; i++) {
-      final double x1 = facetSeq.getCoordinate(i, 0);
-      final double y1 = facetSeq.getCoordinate(i, 1);
-      final double x2 = facetSeq.getCoordinate(i + 1, 0);
-      final double y2 = facetSeq.getCoordinate(i + 1, 1);
+    double x1 = facetSeq.getX(0);
+    double y1 = facetSeq.getY(0);
+    final int vertexCount = facetSeq.getVertexCount();
+    for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+      final double x2 = facetSeq.getX(vertexIndex);
+      final double y2 = facetSeq.getY(vertexIndex);
       final double dist = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
       if (dist == 0.0) {
         return 0.0;
       } else if (dist < minDistance) {
         minDistance = dist;
       }
+      x1 = x2;
+      y1 = y2;
     }
     return minDistance;
   }
@@ -77,8 +85,8 @@ public class PointFacetSequence implements FacetSequence {
   @Override
   public double distance(final FacetSequence other) {
     final boolean isPointOther = other.isPoint();
-    final double x = getCoordinate(0, 0);
-    final double y = getCoordinate(0, 1);
+    final double x = getX(0);
+    final double y = getY(0);
     if (isPointOther) {
       return this.point.distance(x, y);
     } else {
@@ -87,8 +95,23 @@ public class PointFacetSequence implements FacetSequence {
   }
 
   @Override
-  public Point getCoordinate(final int vertexIndex) {
-    return this.point;
+  public void forEachVertex(final BiConsumerDouble action) {
+    this.point.forEachVertex(action);
+  }
+
+  @Override
+  public void forEachVertex(final Consumer3Double action) {
+    this.point.forEachVertex(action);
+  }
+
+  @Override
+  public int getAxisCount() {
+    return 2;
+  }
+
+  @Override
+  public double getCoordinate(final int axisIndex) {
+    return this.point.getCoordinate(axisIndex);
   }
 
   @Override
@@ -97,13 +120,38 @@ public class PointFacetSequence implements FacetSequence {
   }
 
   @Override
-  public BoundingBox getEnvelope() {
-    return this.point.getBoundingBox();
+  public Point getPoint(final int vertexIndex) {
+    return this.point;
   }
 
   @Override
   public int getVertexCount() {
     return 1;
+  }
+
+  @Override
+  public double getX() {
+    return this.point.getX();
+  }
+
+  @Override
+  public double getX(final int vertexIndex) {
+    return this.point.getX();
+  }
+
+  @Override
+  public double getY() {
+    return this.point.getY();
+  }
+
+  @Override
+  public double getY(final int vertexIndex) {
+    return this.point.getY();
+  }
+
+  @Override
+  public boolean isEmpty() {
+    return this.point.isEmpty();
   }
 
   @Override

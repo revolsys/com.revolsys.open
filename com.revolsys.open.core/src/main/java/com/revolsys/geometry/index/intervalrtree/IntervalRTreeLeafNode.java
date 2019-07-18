@@ -43,7 +43,8 @@ public class IntervalRTreeLeafNode<V> extends IntervalRTreeNode<V> {
   }
 
   @Override
-  public void query(final double queryMin, final double queryMax, final Consumer<V> action) {
+  public void query(final double queryMin, final double queryMax,
+    final Consumer<? super V> action) {
     if (intersects(queryMin, queryMax)) {
       action.accept(this.item);
     }

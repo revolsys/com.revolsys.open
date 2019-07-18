@@ -13,34 +13,26 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.graph.attribute.NodeProperties;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.properties.ObjectPropertyProxy;
 import com.revolsys.properties.ObjectWithProperties;
-import com.revolsys.record.Record;
 
 public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Externalizable {
+  private static final int[] EMPTY_IDS = new int[0];
+
   public static <V> Predicate<Node<V>> filterDegree(final int degree) {
     return (node) -> {
       return node.getDegree() == degree;
     };
-  }
-
-  public static List<Point> getCoordinates(final Collection<Node<Record>> nodes) {
-    final List<Point> points = new ArrayList<>(nodes.size());
-    for (final Node<Record> node : nodes) {
-      final Point point = node;
-      points.add(point);
-    }
-    return points;
   }
 
   public static <V> int getEdgeIndex(final List<Edge<V>> edges, final Edge<V> edge) {
@@ -120,15 +112,15 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
 
   private int id;
 
-  private int[] inEdgeIds = new int[0];
+  private int[] inEdgeIds = EMPTY_IDS;
 
-  private int[] outEdgeIds = new int[0];
+  private int[] outEdgeIds = EMPTY_IDS;
 
   public Node() {
   }
 
-  protected Node(final int nodeId, final Graph<T> graph, final Point point) {
-    super(point);
+  protected Node(final int nodeId, final Graph<T> graph, final double x, final double y) {
+    super(x, y);
     this.id = nodeId;
     this.graph = graph;
   }
@@ -183,6 +175,18 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     return false;
   }
 
+  @Override
+  public boolean equals(final Object other) {
+    if (other == this) {
+      return true;
+    } else if (other instanceof Node<?>) {
+      final Node<?> node = (Node<?>)other;
+      return node.id == this.id && node.graph == this.graph;
+    } else {
+      return super.equals(other);
+    }
+  }
+
   public boolean equalsCoordinate(final double x, final double y) {
     return this.getX() == x && this.getY() == y;
   }
@@ -195,6 +199,22 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     super.finalize();
   }
 
+  public void forEachInEdge(final Consumer<Edge<T>> action) {
+    final Graph<T> graph = this.graph;
+    for (final int edgeId : this.inEdgeIds) {
+      final Edge<T> edge = graph.getEdge(edgeId);
+      action.accept(edge);
+    }
+  }
+
+  public void forEachOutEdge(final Consumer<Edge<T>> action) {
+    final Graph<T> graph = this.graph;
+    for (final int edgeId : this.outEdgeIds) {
+      final Edge<T> edge = graph.getEdge(edgeId);
+      action.accept(edge);
+    }
+  }
+
   public Point get3dCoordinates(final String typePath) {
     if (!isRemoved()) {
 
@@ -202,7 +222,7 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
       if (!edges.isEmpty()) {
         Point coordinates = null;
         for (final Edge<T> edge : edges) {
-          final LineString line = edge.getLine();
+          final LineString line = edge.getLineString();
           final LineString points = line;
           Point point = null;
           if (edge.getFromNode() == this) {
@@ -212,7 +232,7 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
           }
           if (point != null) {
             final double z = point.getZ();
-            if (z == 0 || Double.isNaN(z)) {
+            if (z == 0 || java.lang.Double.isNaN(z)) {
               coordinates = point;
             } else {
               return point;
@@ -235,24 +255,12 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
         return this.getY();
 
       default:
-        return Double.NaN;
+        return java.lang.Double.NaN;
     }
   }
 
   public int getDegree() {
     return this.inEdgeIds.length + this.outEdgeIds.length;
-  }
-
-  /**
-   * Get the distance between this node and the geometry.
-   *
-   * @param geometry The geometry.
-   * @return The distance.
-   */
-  public double getDistance(final Geometry geometry) {
-    final GeometryFactory factory = geometry.getGeometryFactory();
-    final Point point = factory.point(this);
-    return point.distance(geometry);
   }
 
   public Edge<T> getEdge(final int i) {
@@ -343,6 +351,11 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     return edges;
   }
 
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.graph.getGeometryFactory();
+  }
+
   public Graph<T> getGraph() {
     return this.graph;
   }
@@ -356,6 +369,10 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     return this.graph.getEdge(edgeId);
   }
 
+  public int getInEdgeCount() {
+    return this.inEdgeIds.length;
+  }
+
   public int getInEdgeIndex(final Edge<T> edge) {
     return getInEdges().indexOf(edge);
   }
@@ -365,8 +382,13 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     return graph.getEdges(this.inEdgeIds);
   }
 
-  public int getIntEdgeCount() {
-    return this.inEdgeIds.length;
+  public <T2 extends T> List<T2> getInObjects() {
+    if (this.inEdgeIds.length == 0) {
+      return Collections.emptyList();
+    } else {
+      final Graph<T> graph = getGraph();
+      return graph.getEdgeObjects(this.inEdgeIds);
+    }
   }
 
   public Edge<T> getNextEdge(final Edge<T> edge) {
@@ -414,6 +436,15 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
       }
     }
     return edges;
+  }
+
+  public <T2 extends T> List<T2> getOutObjects() {
+    if (this.outEdgeIds.length == 0) {
+      return Collections.emptyList();
+    } else {
+      final Graph<T> graph = getGraph();
+      return graph.getEdgeObjects(this.outEdgeIds);
+    }
   }
 
   @Override
@@ -492,49 +523,15 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
 
   @Override
   public int hashCode() {
-    return this.id;
+    return Integer.hashCode(this.id);
   }
 
   public boolean isRemoved() {
     return this.graph == null;
   }
 
-  public boolean move(final Point newCoordinates) {
-    if (isRemoved()) {
-      return false;
-    } else {
-      final Node<T> newNode = this.graph.getNode(newCoordinates);
-      if (equals(newNode)) {
-        return false;
-      } else {
-        this.graph.nodeMoved(this, newNode);
-        final int numEdges = getDegree();
-        final Set<Edge<T>> edges = new HashSet<>(getInEdges());
-        edges.addAll(getOutEdges());
-        for (final Edge<T> edge : edges) {
-          if (!edge.isRemoved()) {
-            final LineString line = edge.getLine();
-            LineString newLine;
-            if (edge.getEnd(this).isFrom()) {
-              newLine = line.subLine(newNode, 1, line.getVertexCount() - 1, null);
-            } else {
-              newLine = line.subLine(null, 0, line.getVertexCount() - 1, newNode);
-            }
-            this.graph.replaceEdge(edge, newLine);
-            if (!edge.isRemoved()) {
-              throw new RuntimeException("Not node Removed");
-            }
-          }
-        }
-        if (!isRemoved()) {
-          throw new RuntimeException("Not node Removed");
-        }
-        if (newNode.getDegree() != numEdges) {
-          throw new RuntimeException("numEdges");
-        }
-        return true;
-      }
-    }
+  public void moveNode(final double x, final double y) {
+    moveNode(new PointDoubleXY(x, y));
   }
 
   public boolean moveNode(final Point point) {
@@ -578,8 +575,8 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     this.id = in.readInt();
     this.inEdgeIds = (int[])in.readObject();
     this.outEdgeIds = (int[])in.readObject();
-    setX(in.readDouble());
-    setY(in.readDouble());
+    this.x = in.readDouble();
+    this.y = in.readDouble();
   }
 
   void remove() {

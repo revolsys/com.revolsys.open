@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.jeometry.common.logging.Logs;
+
 /**
  * The ZipWriter is a wrapper for another writer which has been configured to
  * write files to the tempDirectory. When this writer closes it will output a
@@ -35,7 +37,9 @@ public class ZipWriter<T> extends DelegatingWriter<T> {
       } catch (final IOException e) {
         throw new RuntimeException("Unable to compress files", e);
       } finally {
-        FileUtil.deleteDirectory(this.tempDirectory);
+        if (!FileUtil.deleteDirectory(this.tempDirectory)) {
+          Logs.error(this, "Unable to delete:" + this.tempDirectory);
+        }
       }
     }
   }

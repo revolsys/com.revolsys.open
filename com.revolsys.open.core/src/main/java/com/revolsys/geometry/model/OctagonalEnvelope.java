@@ -32,7 +32,7 @@
  */
 package com.revolsys.geometry.model;
 
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * A Bounding Container which is in the shape of an octagon.
@@ -386,27 +386,27 @@ public class OctagonalEnvelope {
       return geometryFactory.point();
     }
 
-    final Point px00 = new PointDouble(geometryFactory.makePrecise(0, this.minX),
+    final Point px00 = new PointDoubleXY(geometryFactory.makePrecise(0, this.minX),
       geometryFactory.makePrecise(1, this.minA - this.minX));
-    final Point px01 = new PointDouble(geometryFactory.makePrecise(0, this.minX),
+    final Point px01 = new PointDoubleXY(geometryFactory.makePrecise(0, this.minX),
       geometryFactory.makePrecise(1, this.minX - this.minB));
 
-    final Point px10 = new PointDouble(geometryFactory.makePrecise(0, this.maxX),
+    final Point px10 = new PointDoubleXY(geometryFactory.makePrecise(0, this.maxX),
       geometryFactory.makePrecise(1, this.maxX - this.maxB));
-    final Point px11 = new PointDouble(geometryFactory.makePrecise(0, this.maxX),
+    final Point px11 = new PointDoubleXY(geometryFactory.makePrecise(0, this.maxX),
       geometryFactory.makePrecise(1, this.maxA - this.maxX));
 
-    final Point py00 = new PointDouble(geometryFactory.makePrecise(0, this.minA - this.minY),
+    final Point py00 = new PointDoubleXY(geometryFactory.makePrecise(0, this.minA - this.minY),
       geometryFactory.makePrecise(1, this.minY));
-    final Point py01 = new PointDouble(geometryFactory.makePrecise(0, this.minY + this.maxB),
+    final Point py01 = new PointDoubleXY(geometryFactory.makePrecise(0, this.minY + this.maxB),
       geometryFactory.makePrecise(1, this.minY));
 
-    final Point py10 = new PointDouble(geometryFactory.makePrecise(0, this.maxY + this.minB),
+    final Point py10 = new PointDoubleXY(geometryFactory.makePrecise(0, this.maxY + this.minB),
       geometryFactory.makePrecise(1, this.maxY));
-    final Point py11 = new PointDouble(geometryFactory.makePrecise(0, this.maxA - this.maxY),
+    final Point py11 = new PointDoubleXY(geometryFactory.makePrecise(0, this.maxA - this.maxY),
       geometryFactory.makePrecise(1, this.maxY));
 
-    final CoordinateList coordList = new CoordinateList();
+    final PointList coordList = new PointList();
     coordList.add(px00, false);
     coordList.add(px01, false);
     coordList.add(py10, false);

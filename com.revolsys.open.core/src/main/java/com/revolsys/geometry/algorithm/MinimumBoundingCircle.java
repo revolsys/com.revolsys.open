@@ -33,11 +33,10 @@
 
 package com.revolsys.geometry.algorithm;
 
-import com.revolsys.geometry.model.CoordinateArrays;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.util.Assert;
 import com.revolsys.geometry.util.Triangles;
 
@@ -78,6 +77,40 @@ public class MinimumBoundingCircle {
    * The algorithm used is based on the one by Jon Rokne in the article
    * "An Easy Bounding Circle" in <i>Graphic Gems II</i>.
    */
+
+  /**
+   * Creates a deep copy of the argument {@link Coordinates} array.
+   *
+   * @param points an array of Coordinates
+   * @return a deep copy of the input
+   */
+  public static Point[] copyDeep(final Point[] points) {
+    final Point[] copy = new Point[points.length];
+    int i = 0;
+    for (final Point point : points) {
+      copy[i++] = point.newPoint();
+    }
+    return copy;
+  }
+
+  /**
+   * Creates a deep copy of a given section of a source {@link Coordinates} array
+   * into a destination Point array.
+   * The destination array must be an appropriate size to receive
+   * the copied coordinates.
+   *
+   * @param src an array of Coordinates
+   * @param srcStart the index to start copying from
+   * @param dest the
+   * @param destStart the destination index to start copying to
+   * @param length the number of items to copy
+   */
+  public static void copyDeep(final Point[] src, final int srcStart, final Point[] dest,
+    final int destStart, final int length) {
+    for (int i = 0; i < length; i++) {
+      dest[destStart + i] = src[srcStart + i].newPoint();
+    }
+  }
 
   private static Point lowestPoint(final Point[] pts) {
     Point min = pts[0];
@@ -144,7 +177,7 @@ public class MinimumBoundingCircle {
 
   private Point[] extremalPts = null;
 
-  private final Geometry input;
+  private final Geometry geometry;
 
   private double radius = 0.0;
 
@@ -152,10 +185,10 @@ public class MinimumBoundingCircle {
    * Creates a new object for computing the minimum bounding circle for the
    * point set defined by the vertices of the given geometry.
    *
-   * @param geom the geometry to use to obtain the point set
+   * @param geometry the geometry to use to obtain the point set
    */
-  public MinimumBoundingCircle(final Geometry geom) {
-    this.input = geom;
+  public MinimumBoundingCircle(final Geometry geometry) {
+    this.geometry = geometry;
   }
 
   private void compute() {
@@ -179,9 +212,9 @@ public class MinimumBoundingCircle {
         this.centre = this.extremalPts[0];
       break;
       case 2:
-        this.centre = new PointDouble(
+        this.centre = new PointDoubleXY(
           (this.extremalPts[0].getX() + this.extremalPts[1].getX()) / 2.0,
-          (this.extremalPts[0].getY() + this.extremalPts[1].getY()) / 2.0, Geometry.NULL_ORDINATE);
+          (this.extremalPts[0].getY() + this.extremalPts[1].getY()) / 2.0);
       break;
       case 3:
         this.centre = Triangles.circumcentre(this.extremalPts[0], this.extremalPts[1],
@@ -192,13 +225,13 @@ public class MinimumBoundingCircle {
 
   private void computeCirclePoints() {
     // handle degenerate or trivial cases
-    if (this.input.isEmpty()) {
+    if (this.geometry.isEmpty()) {
       this.extremalPts = new Point[0];
       return;
     }
-    if (this.input.getVertexCount() == 1) {
+    if (this.geometry.getVertexCount() == 1) {
       this.extremalPts = new Point[] {
-        this.input.getPoint()
+        this.geometry.getPoint()
       };
       return;
     }
@@ -207,7 +240,7 @@ public class MinimumBoundingCircle {
      * The problem is simplified by reducing to the convex hull.
      * Computing the convex hull also has the useful effect of eliminating duplicate points
      */
-    final Geometry convexHull = this.input.convexHull();
+    final Geometry convexHull = this.geometry.convexHull();
 
     final Point[] hullPts = CoordinatesListUtil.getPointArray(convexHull);
 
@@ -215,14 +248,14 @@ public class MinimumBoundingCircle {
     Point[] pts = hullPts;
     if (hullPts[0].equals(2, hullPts[hullPts.length - 1])) {
       pts = new Point[hullPts.length - 1];
-      CoordinateArrays.copyDeep(hullPts, 0, pts, 0, hullPts.length - 1);
+      MinimumBoundingCircle.copyDeep(hullPts, 0, pts, 0, hullPts.length - 1);
     }
 
     /**
      * Optimization for the trivial case where the CH has fewer than 3 points
      */
     if (pts.length <= 2) {
-      this.extremalPts = CoordinateArrays.copyDeep(pts);
+      this.extremalPts = MinimumBoundingCircle.copyDeep(pts);
       return;
     }
 
@@ -238,34 +271,32 @@ public class MinimumBoundingCircle {
      * a pair or triplet of points which determine the minimal circle.
      * By the design of the algorithm,
      * at most <tt>pts.length</tt> iterations are required to terminate
-     * with a correct intersectionCount.
+     * with a correct result.
      */
-    for (final Point pt : pts) {
+    for (final Point point : pts) {
       final Point R = pointWithMinAngleWithSegment(pts, P, Q);
 
       // if PRQ is obtuse, then MBC is determined by P and Q
       if (Point.isObtuse(P, R, Q)) {
         this.extremalPts = new Point[] {
-          new PointDouble(P), new PointDouble(Q)
+          P, Q
         };
         return;
       }
-      // if RPQ is obtuse, update baseline and iterate
       if (Point.isObtuse(R, P, Q)) {
+        // if RPQ is obtuse, update baseline and iterate
         P = R;
-        continue;
-      }
-      // if RQP is obtuse, update baseline and iterate
-      if (Point.isObtuse(R, Q, P)) {
+      } else if (Point.isObtuse(R, Q, P)) {
+        // if RQP is obtuse, update baseline and iterate
         Q = R;
-        continue;
+      } else {
+        // otherwise all angles are acute, and the MBC is determined by the
+        // triangle PQR
+        this.extremalPts = new Point[] {
+          P, Q, R
+        };
+        return;
       }
-      // otherwise all angles are acute, and the MBC is determined by the
-      // triangle PQR
-      this.extremalPts = new Point[] {
-        new PointDouble(P), new PointDouble(Q), new PointDouble(R)
-      };
-      return;
     }
     Assert.shouldNeverReachHere("Logic failure in Minimum Bounding Circle algorithm!");
   }
@@ -299,13 +330,14 @@ public class MinimumBoundingCircle {
 
     compute();
     if (this.centre == null) {
-      return this.input.getGeometryFactory().polygon();
+      return this.geometry.getGeometryFactory().polygon();
+    } else {
+      final Point centrePoint = this.geometry.getGeometryFactory().point(this.centre);
+      if (this.radius == 0.0) {
+        return centrePoint;
+      }
+      return centrePoint.buffer(this.radius);
     }
-    final Point centrePoint = this.input.getGeometryFactory().point(this.centre);
-    if (this.radius == 0.0) {
-      return centrePoint;
-    }
-    return centrePoint.buffer(this.radius);
   }
 
   /**

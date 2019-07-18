@@ -28,7 +28,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.Value;
 import com.revolsys.record.schema.FieldDefinition;
@@ -479,8 +478,8 @@ public interface Record
   default <T> T getCodeValue(final CharSequence fieldName) {
     Object value = getValue(fieldName);
     if (Property.hasValue(value)) {
-      final RecordDefinition recordDefinition = getRecordDefinition();
-      final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
+      final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
+      final CodeTable codeTable = fieldDefinition.getCodeTable();
       if (codeTable != null) {
         value = codeTable.getValue(value);
       }
@@ -492,9 +491,8 @@ public interface Record
   default <T> T getCodeValue(final int fieldIndex) {
     Object value = getValue(fieldIndex);
     if (Property.hasValue(value)) {
-      final RecordDefinition recordDefinition = getRecordDefinition();
-      final String fieldName = getFieldName(fieldIndex);
-      final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
+      final FieldDefinition fieldDefinition = getFieldDefinition(fieldIndex);
+      final CodeTable codeTable = fieldDefinition.getCodeTable();
       if (codeTable != null) {
         value = codeTable.getValue(value);
       }
@@ -886,9 +884,6 @@ public interface Record
           } else {
             return null;
           }
-        } else if (propertyValue instanceof Geometry) {
-          final Geometry geometry = (Geometry)propertyValue;
-          propertyValue = GeometryProperties.getGeometryProperty(geometry, propertyName);
         } else if (propertyValue instanceof Map) {
           final Map<String, Object> map = (Map<String, Object>)propertyValue;
           propertyValue = map.get(propertyName);

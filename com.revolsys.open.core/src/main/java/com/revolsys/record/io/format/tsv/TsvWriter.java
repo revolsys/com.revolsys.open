@@ -5,7 +5,7 @@ import java.io.Writer;
 import java.util.Collection;
 
 import org.jeometry.common.data.type.DataTypes;
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
@@ -57,7 +57,7 @@ public class TsvWriter implements BaseCloseable {
       }
       this.out.write('\n');
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 }

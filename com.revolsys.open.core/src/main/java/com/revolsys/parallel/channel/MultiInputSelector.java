@@ -160,12 +160,10 @@ public class MultiInputSelector {
       synchronized (this.monitor) {
         if (!this.scheduled) {
           try {
-            synchronized (this.monitor) {
-              try {
-                this.monitor.wait(Math.min(msecs, this.maxWait), nsecs);
-              } catch (final InterruptedException e) {
-                throw new ThreadInterruptedException(e);
-              }
+            try {
+              this.monitor.wait(Math.min(msecs, this.maxWait), nsecs);
+            } catch (final InterruptedException e) {
+              throw new ThreadInterruptedException(e);
             }
           } catch (final ThreadInterruptedException e) {
             throw new ClosedException(e);
@@ -183,12 +181,10 @@ public class MultiInputSelector {
         synchronized (this.monitor) {
           try {
             if (!this.scheduled) {
-              synchronized (this.monitor) {
-                try {
-                  this.monitor.wait(Math.min(msecs, this.maxWait), nsecs);
-                } catch (final InterruptedException e) {
-                  throw new ThreadInterruptedException(e);
-                }
+              try {
+                this.monitor.wait(Math.min(msecs, this.maxWait), nsecs);
+              } catch (final InterruptedException e) {
+                throw new ThreadInterruptedException(e);
               }
             }
           } catch (final ThreadInterruptedException e) {

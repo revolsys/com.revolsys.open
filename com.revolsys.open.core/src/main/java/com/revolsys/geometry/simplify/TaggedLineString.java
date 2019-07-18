@@ -45,7 +45,7 @@ import com.revolsys.geometry.model.segment.Segment;
 /**
  * Represents a {@link LineString} which can be modified to a simplified shape.
  * This class provides an attribute which specifies the minimum allowable length
- * for the modified intersectionCount.
+ * for the modified result.
  *
  * @version 1.7
  */
@@ -119,7 +119,8 @@ class TaggedLineString {
   }
 
   private void init() {
-    this.segs = new TaggedLineSegment[this.parentLine.getVertexCount() - 1];
+    final int vertexCount = this.parentLine.getVertexCount();
+    this.segs = new TaggedLineSegment[vertexCount - 1];
     int i = 0;
     for (final Segment segment : this.parentLine.segments()) {
       final TaggedLineSegment seg = new TaggedLineSegment(segment.getPoint(0), segment.getPoint(1),

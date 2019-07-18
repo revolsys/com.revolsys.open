@@ -73,8 +73,6 @@ public class MultiPolygonImpl implements MultiPolygon {
 
   private Polygon[] polygons;
 
-  private Object userData;
-
   public MultiPolygonImpl(final GeometryFactory geometryFactory, final Polygon... polygons) {
     this.geometryFactory = geometryFactory;
     if (polygons == null || polygons.length == 0) {
@@ -257,11 +255,6 @@ public class MultiPolygonImpl implements MultiPolygon {
     return this.polygons.length;
   }
 
-  @Override
-  public Object getUserDataOld() {
-    return this.userData;
-  }
-
   /**
    * Gets a hash code for the Geometry.
    *
@@ -275,11 +268,6 @@ public class MultiPolygonImpl implements MultiPolygon {
   @Override
   public boolean isEmpty() {
     return false;
-  }
-
-  @Override
-  public void setUserDataOld(final Object userData) {
-    this.userData = userData;
   }
 
   @Override

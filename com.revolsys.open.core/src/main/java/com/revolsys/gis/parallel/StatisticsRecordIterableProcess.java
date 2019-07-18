@@ -2,11 +2,11 @@ package com.revolsys.gis.parallel;
 
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.record.Record;
-import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 
 public class StatisticsRecordIterableProcess extends IterableProcess<Record> {
 
-  private LabelCountMap labelCountMap;
+  private LabelCounters labelCountMap;
 
   public StatisticsRecordIterableProcess() {
   }
@@ -20,11 +20,11 @@ public class StatisticsRecordIterableProcess extends IterableProcess<Record> {
     }
   }
 
-  public LabelCountMap getStatistics() {
+  public LabelCounters getStatistics() {
     return this.labelCountMap;
   }
 
-  public void setStatistics(final LabelCountMap labelCountMap) {
+  public void setStatistics(final LabelCounters labelCountMap) {
     this.labelCountMap = labelCountMap;
     if (labelCountMap != null) {
       labelCountMap.connect();

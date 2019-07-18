@@ -25,7 +25,6 @@ import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
 
 public class RsCoreServiceInitializer implements ServiceInitializer {
-
   @Override
   public void initializeService() {
     DataTypes.registerDataTypes(RsCoreDataTypes.class);

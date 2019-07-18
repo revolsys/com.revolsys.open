@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.revolsys.geometry.algorithm.BoundaryNodeRule;
-import com.revolsys.geometry.model.CoordinateArrays;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -148,7 +147,7 @@ public class BoundaryOp {
       }
     }
 
-    return CoordinateArrays.toCoordinateArray(bdyPts);
+    return (Point[])bdyPts.toArray(new Point[0]);
   }
 
   public Geometry getBoundary() {

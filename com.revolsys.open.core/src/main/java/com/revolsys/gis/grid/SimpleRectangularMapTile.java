@@ -5,6 +5,7 @@ import org.jeometry.common.data.type.DataType;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
+import com.revolsys.record.RecordState;
 
 public class SimpleRectangularMapTile implements RectangularMapTile {
 
@@ -22,6 +23,15 @@ public class SimpleRectangularMapTile implements RectangularMapTile {
     this.name = name;
     this.formattedName = formattedName;
     this.boundingBox = boundingBox;
+  }
+
+  @Override
+  public SimpleRectangularMapTile clone() {
+    try {
+      return (SimpleRectangularMapTile)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return null;
+    }
   }
 
   @Override
@@ -54,6 +64,11 @@ public class SimpleRectangularMapTile implements RectangularMapTile {
   }
 
   @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.boundingBox.getGeometryFactory();
+  }
+
+  @Override
   public RectangularMapGrid getGrid() {
     return this.grid;
   }
@@ -76,19 +91,24 @@ public class SimpleRectangularMapTile implements RectangularMapTile {
 
   @Override
   public Polygon getPolygon(final int numPoints) {
-    final GeometryFactory factory = GeometryFactory.floating3d(4326);
+    final GeometryFactory factory = getGeometryFactory();
     return getPolygon(factory, numPoints);
   }
 
   @Override
   public Polygon getPolygon(final int numXPoints, final int numYPoints) {
-    final GeometryFactory factory = GeometryFactory.floating3d(4326);
+    final GeometryFactory factory = getGeometryFactory();
     return getPolygon(factory, numXPoints, numYPoints);
   }
 
   @Override
   public int hashCode() {
     return this.name.hashCode();
+  }
+
+  @Override
+  public boolean isState(final RecordState state) {
+    return RecordState.NEW == state;
   }
 
   @Override

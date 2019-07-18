@@ -229,7 +229,7 @@ public class OverlayOp extends GeometryGraphOperation {
 
   private final EdgeList edgeList = new EdgeList();
 
-  private final GeometryFactory geomFact;
+  private final GeometryFactory geomFactory;
 
   private final PlanarGraph graph;
 
@@ -258,7 +258,7 @@ public class OverlayOp extends GeometryGraphOperation {
      * Note that this does NOT handle mixed-precision arguments
      * where the second arg has greater precision than the first.
      */
-    this.geomFact = g0.getGeometryFactory();
+    this.geomFactory = g0.getGeometryFactory();
   }
 
   /**
@@ -287,10 +287,10 @@ public class OverlayOp extends GeometryGraphOperation {
 
     if (geometries.isEmpty()) {
       return newEmptyResult(opcode, this.arg[0].getGeometry(), this.arg[1].getGeometry(),
-        this.geomFact);
+        this.geomFactory);
       // */
     } else {
-      return this.geomFact.geometry(geometries);
+      return this.geomFactory.geometry(geometries);
     }
   }
 
@@ -423,14 +423,14 @@ public class OverlayOp extends GeometryGraphOperation {
     findResultAreaEdges(opCode);
     cancelDuplicateResultEdges();
 
-    final PolygonBuilder polyBuilder = new PolygonBuilder(this.geomFact);
+    final PolygonBuilder polyBuilder = new PolygonBuilder(this.geomFactory);
     polyBuilder.add(this.graph);
     this.resultPolyList = polyBuilder.getPolygons();
 
-    final LineBuilder lineBuilder = new LineBuilder(this, this.geomFact, this.ptLocator);
+    final LineBuilder lineBuilder = new LineBuilder(this, this.geomFactory, this.ptLocator);
     this.resultLineList = lineBuilder.build(opCode);
 
-    final PointBuilder pointBuilder = new PointBuilder(this, this.geomFact, this.ptLocator);
+    final PointBuilder pointBuilder = new PointBuilder(this, this.geomFactory, this.ptLocator);
     this.resultLineString = pointBuilder.build(opCode);
 
     // gather the results from all calculations into a single Geometry for the
@@ -451,7 +451,7 @@ public class OverlayOp extends GeometryGraphOperation {
   private void copyPoints(final int argIndex) {
     for (final Iterator<Node> i = this.arg[argIndex].getNodeIterator(); i.hasNext();) {
       final Node graphNode = i.next();
-      final Node newNode = this.graph.addNode(graphNode.getPoint());
+      final Node newNode = this.graph.addNode(graphNode);
       newNode.setLabel(argIndex, graphNode.getLabel().getLocation(argIndex));
     }
   }
@@ -549,6 +549,17 @@ public class OverlayOp extends GeometryGraphOperation {
     }
   }
 
+  private boolean isCovered(final double x, final double y,
+    final List<? extends Geometry> geometries) {
+    for (final Geometry geometry : geometries) {
+      final Location loc = this.ptLocator.locate(geometry, x, y);
+      if (loc != Location.EXTERIOR) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * @return true if the coord is located in the interior or boundary of
    * a geometry in the list.
@@ -569,8 +580,37 @@ public class OverlayOp extends GeometryGraphOperation {
    * @param coord the point coordinate
    * @return true if the coordinate point is covered by a result Area geometry
    */
+  public boolean isCoveredByA(final double x, final double y) {
+    if (isCovered(x, y, this.resultPolyList)) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Tests if an L edge should be included in the result or not.
+   *
+   * @param coord the point coordinate
+   * @return true if the coordinate point is covered by a result Area geometry
+   */
   public boolean isCoveredByA(final Point coord) {
     if (isCovered(coord, this.resultPolyList)) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Tests if a point node should be included in the result or not.
+   *
+   * @param coord the point coordinate
+   * @return true if the coordinate point is covered by a result Line or Area geometry
+   */
+  public boolean isCoveredByLA(final double x, final double y) {
+    if (isCovered(x, y, this.resultLineList)) {
+      return true;
+    }
+    if (isCovered(x, y, this.resultPolyList)) {
       return true;
     }
     return false;
@@ -595,12 +635,13 @@ public class OverlayOp extends GeometryGraphOperation {
   /**
    * Label an isolated node with its relationship to the target geometry.
    */
-  private void labelIncompleteNode(final Node n, final int targetIndex) {
-    final Location loc = this.ptLocator.locate(this.arg[targetIndex].getGeometry(), n.getPoint());
-
-    // MD - 2008-10-24 - experimental for now
-    // int loc = arg[targetIndex].locate(n.getCoordinate());
-    n.getLabel().setLocation(targetIndex, loc);
+  private void labelIncompleteNode(final Node node, final int targetIndex) {
+    final Geometry geometry = this.arg[targetIndex].getGeometry();
+    final double x = node.getX();
+    final double y = node.getY();
+    final Location location = this.ptLocator.locate(geometry, x, y);
+    final Label label = node.getLabel();
+    label.setLocation(targetIndex, location);
   }
 
   /**

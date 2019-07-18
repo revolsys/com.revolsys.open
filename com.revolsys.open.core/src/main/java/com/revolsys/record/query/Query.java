@@ -28,6 +28,7 @@ import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.LockMode;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.CancellableProxy;
@@ -44,22 +45,22 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
         if (fieldDefinition == null) {
           final Object value = entry.getValue();
           if (value == null) {
-            multipleCondition.add(Q.isNull(name));
+            multipleCondition.addCondition(Q.isNull(name));
           } else if (value instanceof Collection) {
             final Collection<?> values = (Collection<?>)value;
-            multipleCondition.add(new In(name, values));
+            multipleCondition.addCondition(new In(name, values));
           } else {
-            multipleCondition.add(Q.equal(name, value));
+            multipleCondition.addCondition(Q.equal(name, value));
           }
         } else {
           final Object value = entry.getValue();
           if (value == null) {
-            multipleCondition.add(Q.isNull(name));
+            multipleCondition.addCondition(Q.isNull(name));
           } else if (value instanceof Collection) {
             final Collection<?> values = (Collection<?>)value;
-            multipleCondition.add(new In(fieldDefinition, values));
+            multipleCondition.addCondition(new In(fieldDefinition, values));
           } else {
-            multipleCondition.add(Q.equal(fieldDefinition, value));
+            multipleCondition.addCondition(Q.equal(fieldDefinition, value));
           }
         }
       }
@@ -83,9 +84,9 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return query;
   }
 
-  public static Query equal(final RecordDefinition recordDefinition, final String name,
+  public static Query equal(final RecordDefinitionProxy recordDefinition, final String name,
     final Object value) {
-    final FieldDefinition fieldDefinition = recordDefinition.getField(name);
+    final FieldDefinition fieldDefinition = recordDefinition.getFieldDefinition(name);
     if (fieldDefinition == null) {
       return null;
     } else {
@@ -162,8 +163,6 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   private LockMode lockMode = LockMode.NONE;
 
-  private boolean lockResults = false;
-
   private int offset = 0;
 
   private Map<CharSequence, Boolean> orderBy = new LinkedHashMap<>();
@@ -194,13 +193,13 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     setWhereCondition(whereCondition);
   }
 
-  public Query(final RecordDefinition recordDefinition) {
+  public Query(final RecordDefinitionProxy recordDefinition) {
     this(recordDefinition, null);
   }
 
-  public Query(final RecordDefinition recordDefinition, final Condition whereCondition) {
-    this(recordDefinition.getPath());
-    this.recordDefinition = recordDefinition;
+  public Query(final RecordDefinitionProxy recordDefinition, final Condition whereCondition) {
+    this(recordDefinition == null ? null : recordDefinition.getPathName());
+    this.recordDefinition = recordDefinition.getRecordDefinition();
     setWhereCondition(whereCondition);
   }
 
@@ -409,10 +408,6 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this.distinct;
   }
 
-  public boolean isLockResults() {
-    return this.lockResults;
-  }
-
   public Query newQuery(final RecordDefinition recordDefinition) {
     final Query query = clone();
     query.setRecordDefinition(recordDefinition);
@@ -467,10 +462,6 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
   public Query setLockMode(final LockMode lockMode) {
     this.lockMode = lockMode;
     return this;
-  }
-
-  public void setLockResults(final boolean lockResults) {
-    this.lockResults = lockResults;
   }
 
   public Query setOffset(final int offset) {

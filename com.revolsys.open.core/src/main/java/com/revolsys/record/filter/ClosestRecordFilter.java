@@ -2,7 +2,7 @@ package com.revolsys.record.filter;
 
 import java.util.function.Predicate;
 
-import com.revolsys.geometry.index.quadtree.RecordQuadTree;
+import com.revolsys.geometry.index.RecordSpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
@@ -12,7 +12,7 @@ import com.revolsys.util.Property;
 
 public class ClosestRecordFilter implements Predicate<Record> {
 
-  public static ClosestRecordFilter query(final RecordQuadTree<Record> index,
+  public static ClosestRecordFilter query(final RecordSpatialIndex<Record> index,
     final Geometry geometry, final double maxDistance) {
     final ClosestRecordFilter closestFilter = new ClosestRecordFilter(geometry, maxDistance);
     final BoundingBox boundingBox = closestFilter.getFilterBoundingBox();
@@ -20,7 +20,7 @@ public class ClosestRecordFilter implements Predicate<Record> {
     return closestFilter;
   }
 
-  public static ClosestRecordFilter query(final RecordQuadTree<Record> index,
+  public static ClosestRecordFilter query(final RecordSpatialIndex<Record> index,
     final Geometry geometry, final double maxDistance, final Predicate<Record> filter) {
     final ClosestRecordFilter closestFilter = new ClosestRecordFilter(geometry, maxDistance,
       filter);

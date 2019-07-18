@@ -6,7 +6,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.IteratorMapReader;
@@ -43,8 +43,13 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
       final CsvMapIterator iterator = new CsvMapIterator(resource, FIELD_SEPARATOR);
       return new IteratorMapReader(iterator);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
+  }
+
+  public static RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
+    final Object target, final boolean useQuotes, final boolean ewkt) {
+    return new CsvRecordWriter(recordDefinition, target, Tsv.FIELD_SEPARATOR, useQuotes, ewkt);
   }
 
   public static RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
@@ -72,6 +77,11 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
+  public boolean isReadFromZipFileSupported() {
+    return true;
+  }
+
+  @Override
   public MapReader newMapReader(final Resource resource) {
     return mapReader(resource);
   }
@@ -84,11 +94,14 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
   @Override
   public RecordReader newRecordReader(final Resource resource,
     final RecordFactory<? extends Record> recordFactory, final MapEx properties) {
-    return new CsvRecordReader(resource, recordFactory, Tsv.FIELD_SEPARATOR);
+    final CsvRecordReader reader = new CsvRecordReader(resource, recordFactory,
+      Tsv.FIELD_SEPARATOR);
+    reader.setProperties(properties);
+    return reader;
   }
 
   @Override
-  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
+  public CsvRecordWriter newRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
     return new CsvRecordWriter(recordDefinition, resource, Tsv.FIELD_SEPARATOR, true, true);
   }

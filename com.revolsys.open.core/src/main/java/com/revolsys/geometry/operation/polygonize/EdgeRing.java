@@ -36,13 +36,13 @@ package com.revolsys.geometry.operation.polygonize;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.CoordinateList;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.coordinates.CoordinatesUtil;
 import com.revolsys.geometry.planargraph.DirectedEdge;
@@ -53,10 +53,10 @@ import com.revolsys.geometry.planargraph.DirectedEdge;
  *
  * @version 1.7
  */
-class EdgeRing {
+class EdgeRing implements BoundingBoxProxy {
 
   private static void addEdge(final LineString coords, final boolean isForward,
-    final CoordinateList coordList) {
+    final PointList coordList) {
     if (isForward) {
       for (int i = 0; i < coords.getVertexCount(); i++) {
         coordList.add(coords.getPoint(i), false);
@@ -85,38 +85,34 @@ class EdgeRing {
   public static EdgeRing findEdgeRingContaining(final EdgeRing testEr,
     final List<EdgeRing> shellList) {
     final LinearRing testRing = testEr.getRing();
-    final BoundingBox testEnv = testRing.getBoundingBox();
     Point testPt = testRing.getPoint(0);
     if (testPt == null) {
       return null;
     } else {
       EdgeRing minShell = null;
-      BoundingBox minShellEnv = null;
       for (final EdgeRing tryShell : shellList) {
         final LinearRing tryShellRing = tryShell.getRing();
-        final BoundingBox tryShellEnv = tryShellRing.getBoundingBox();
         // the hole envelope cannot equal the shell envelope
         // (also guards against testing rings against themselves)
-        if (tryShellEnv.equals(testEnv)) {
+        if (tryShell.bboxEquals(testRing)) {
           continue;
         }
         // hole must be contained in shell
-        if (!tryShellEnv.bboxCovers(testEnv)) {
+        if (!tryShell.bboxCovers(testRing)) {
           continue;
         }
 
-        testPt = CoordinatesUtil.pointNotInList(testRing.vertices(), tryShellRing.vertices());
+        testPt = CoordinatesUtil.pointNotInList(testRing, tryShellRing);
         boolean isContained = false;
-        if (CGAlgorithms.isPointInRing(testPt, tryShellRing)) {
+        if (tryShellRing.isPointInRing(testPt)) {
           isContained = true;
         }
 
         // check if this new containing ring is smaller than the current minimum
         // ring
         if (isContained) {
-          if (minShell == null || minShellEnv.bboxCovers(tryShellEnv)) {
+          if (minShell == null || minShell.bboxCovers(tryShellRing)) {
             minShell = tryShell;
-            minShellEnv = minShell.getRing().getBoundingBox();
           }
         }
       }
@@ -198,6 +194,11 @@ class EdgeRing {
     this.holes.add(hole);
   }
 
+  @Override
+  public BoundingBox getBoundingBox() {
+    return this.ring.getBoundingBox();
+  }
+
   /**
    * Computes the list of coordinates which are contained in this ring.
    * The coordinatea are computed once only and cached.
@@ -206,12 +207,12 @@ class EdgeRing {
    */
   private Point[] getCoordinates() {
     if (this.ringPts == null) {
-      final CoordinateList coordList = new CoordinateList();
+      final PointList coordList = new PointList();
       for (final DirectedEdge de : this.deList) {
         final PolygonizeEdge edge = (PolygonizeEdge)de.getEdge();
         addEdge(edge.getLine(), de.getEdgeDirection(), coordList);
       }
-      this.ringPts = coordList.toCoordinateArray();
+      this.ringPts = coordList.toPointArray();
     }
     return this.ringPts;
   }

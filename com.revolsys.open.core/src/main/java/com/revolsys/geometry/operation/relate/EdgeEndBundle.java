@@ -57,7 +57,7 @@ public class EdgeEndBundle extends EdgeEnd implements Iterable<EdgeEnd> {
   private final List<EdgeEnd> edgeEnds = new ArrayList<>();
 
   public EdgeEndBundle(final BoundaryNodeRule boundaryNodeRule, final EdgeEnd e) {
-    super(e.getEdge(), e.getCoordinate(), e.getDirectedCoordinate(), new Label(e.getLabel()));
+    super(e.getEdge(), e.getX1(), e.getY1(), e.getX2(), e.getY2(), new Label(e.getLabel()));
     insert(e);
     /*
      * if (boundaryNodeRule != null) this.boundaryNodeRule = boundaryNodeRule;

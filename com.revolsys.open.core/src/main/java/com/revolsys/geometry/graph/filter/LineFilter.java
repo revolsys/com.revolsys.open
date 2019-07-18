@@ -14,7 +14,7 @@ public class LineFilter<T> implements Predicate<Edge<T>> {
 
   @Override
   public boolean test(final Edge<T> edge) {
-    final LineString line = edge.getLine();
+    final LineString line = edge.getLineString();
     return this.filter.test(line);
   }
 

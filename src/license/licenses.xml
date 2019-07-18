@@ -195,17 +195,6 @@
     </dependency>
     <dependency>
       <groupId>log4j</groupId>
-      <artifactId>apache-log4j-extras</artifactId>
-      <licenses>
-        <license>
-          <name>apache_v2</name>
-          <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-          <distribution>repo</distribution>
-        </license>
-      </licenses>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <licenses>
         <license>

@@ -7,6 +7,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -15,17 +16,18 @@ import com.revolsys.spring.resource.Resource;
 
 public class KmzGeometryIterator extends AbstractIterator<Geometry> implements GeometryReader {
 
-  private KmlGeometryIterator kmlIterator;
+  private KmlGeometryReader kmlIterator;
 
   private ZipInputStream zipIn;
 
-  public KmzGeometryIterator(final Resource resource) {
+  public KmzGeometryIterator(final Resource resource, final MapEx properties) {
     try {
       final InputStream in = resource.getInputStream();
       this.zipIn = new ZipInputStream(in);
     } catch (final Throwable e) {
       throw new RuntimeException("Unable to reade KMZ file", e);
     }
+    setProperties(properties);
   }
 
   @Override
@@ -57,7 +59,7 @@ public class KmzGeometryIterator extends AbstractIterator<Geometry> implements G
         final String name = entry.getName();
         final String extension = FileUtil.getFileNameExtension(name);
         if ("kml".equals(extension)) {
-          this.kmlIterator = new KmlGeometryIterator(this.zipIn);
+          this.kmlIterator = new KmlGeometryReader(this.zipIn);
           return;
         }
       }

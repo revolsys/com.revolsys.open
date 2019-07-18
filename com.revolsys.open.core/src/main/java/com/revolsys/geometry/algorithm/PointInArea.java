@@ -13,7 +13,7 @@ public class PointInArea extends RayCrossingCounter implements Consumer<LineSegm
   public PointInArea(final GeometryFactory geometryFactory, final double x, final double y) {
     super(x, y);
     if (geometryFactory != null && !geometryFactory.isFloating()) {
-      this.minDistance = geometryFactory.getResolutionXy();
+      this.minDistance = geometryFactory.getResolutionX();
     } else {
       this.minDistance = Double.NaN;
     }

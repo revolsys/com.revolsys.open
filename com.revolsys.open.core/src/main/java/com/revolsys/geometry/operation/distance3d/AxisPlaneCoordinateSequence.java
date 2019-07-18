@@ -33,6 +33,9 @@
 
 package com.revolsys.geometry.operation.distance3d;
 
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Function4Double;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.impl.AbstractLineString;
@@ -50,9 +53,6 @@ import com.revolsys.geometry.model.impl.AbstractLineString;
  */
 public class AxisPlaneCoordinateSequence extends AbstractLineString {
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private static final int[] XY_INDEX = new int[] {
@@ -103,16 +103,48 @@ public class AxisPlaneCoordinateSequence extends AbstractLineString {
 
   private final int[] indexMap;
 
-  private final LineString seq;
+  private final LineString line;
 
   private AxisPlaneCoordinateSequence(final LineString seq, final int[] indexMap) {
-    this.seq = seq;
+    this.line = seq;
     this.indexMap = indexMap;
   }
 
   @Override
   public AxisPlaneCoordinateSequence clone() {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public <R> R findSegment(final Function4Double<R> action) {
+    final int vertexCount = getVertexCount();
+    double x1 = getX(0);
+    double y1 = getY(0);
+    for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+      final double x2 = getX(vertexIndex);
+      final double y2 = getY(vertexIndex);
+      final R result = action.accept(x1, y1, x2, y2);
+      if (result != null) {
+        return result;
+      }
+      x1 = x2;
+      y1 = y2;
+    }
+    return null;
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    final int vertexCount = getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = getX(vertexIndex);
+      final double y = getY(vertexIndex);
+      final R result = action.accept(x, y);
+      if (result != null) {
+        return result;
+      }
+    }
+    return null;
   }
 
   @Override
@@ -126,17 +158,17 @@ public class AxisPlaneCoordinateSequence extends AbstractLineString {
     if (ordinateIndex > 1) {
       return 0;
     }
-    return this.seq.getCoordinate(index, this.indexMap[ordinateIndex]);
+    return this.line.getCoordinate(index, this.indexMap[ordinateIndex]);
   }
 
   @Override
   public double[] getCoordinates() {
-    return this.seq.getCoordinates();
+    return this.line.getCoordinates();
   }
 
   @Override
   public int getVertexCount() {
-    return this.seq.getVertexCount();
+    return this.line.getVertexCount();
   }
 
   @Override
@@ -156,7 +188,7 @@ public class AxisPlaneCoordinateSequence extends AbstractLineString {
 
   @Override
   public boolean isEmpty() {
-    return this.seq.isEmpty();
+    return this.line.isEmpty();
   }
 
 }

@@ -5,7 +5,7 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.util.Cancellable;
 
-public class CancelIterable<T> extends AbstractIterator<T> {
+public class CancelIterable<T> implements Iterator<T>, Iterable<T> {
 
   public static <V> Iterable<V> i(final Cancellable cancellable, final Iterable<V> iterable) {
     if (cancellable == null) {
@@ -28,35 +28,42 @@ public class CancelIterable<T> extends AbstractIterator<T> {
     this.iterator = iterator;
   }
 
-  @Override
-  public void closeDo() {
-    try {
-      if (this.iterator instanceof AutoCloseable) {
-        final AutoCloseable closeable = (AutoCloseable)this.iterator;
-        try {
-          closeable.close();
-        } catch (final Exception e) {
-        }
+  private void close() {
+    if (this.iterator instanceof AutoCloseable) {
+      final AutoCloseable closeable = (AutoCloseable)this.iterator;
+      try {
+        closeable.close();
+      } catch (final Exception e) {
       }
-    } finally {
-      this.iterator = null;
     }
   }
 
   @Override
-  protected T getNext() throws NoSuchElementException {
+  public boolean hasNext() {
     if (this.cancellable.isCancelled()) {
-      throw new NoSuchElementException();
+      close();
+      return false;
     } else if (this.iterator.hasNext()) {
-      return this.iterator.next();
+      return true;
     } else {
-      throw new NoSuchElementException();
+      close();
+      return false;
     }
   }
 
   @Override
   public Iterator<T> iterator() {
     return this;
+  }
+
+  @Override
+  public T next() {
+    try {
+      return this.iterator.next();
+    } catch (final NoSuchElementException e) {
+      close();
+      throw e;
+    }
   }
 
   @Override

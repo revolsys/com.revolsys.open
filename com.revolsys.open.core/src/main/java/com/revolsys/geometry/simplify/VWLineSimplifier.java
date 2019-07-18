@@ -1,9 +1,8 @@
 package com.revolsys.geometry.simplify;
 
-import com.revolsys.geometry.model.CoordinateList;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.util.Triangles;
 
 /**
@@ -55,13 +54,13 @@ class VWLineSimplifier {
     }
 
     public Point[] getCoordinates() {
-      final CoordinateList coords = new CoordinateList();
+      final PointList coords = new PointList();
       VWLineSimplifier.VWVertex curr = this;
       do {
         coords.add(curr.pt, false);
         curr = curr.next;
       } while (curr != null);
-      return coords.toCoordinateArray();
+      return coords.toPointArray();
     }
 
     public boolean isLive() {
@@ -129,7 +128,7 @@ class VWLineSimplifier {
     // ensure computed value is a valid line
     if (simp.length < 2) {
       return new Point[] {
-        simp[0], new PointDouble(simp[0])
+        simp[0], simp[0]
       };
     }
     return simp;

@@ -8,17 +8,16 @@ import org.jeometry.coordinatesystem.model.CoordinateSystem;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
-import com.revolsys.geometry.io.GeometryReaderFactory;
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
+import com.revolsys.record.io.GeometryRecordReaderFactory;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
-public class Kmz extends AbstractIoFactoryWithCoordinateSystem
-  implements RecordWriterFactory, MapWriterFactory, GeometryReaderFactory {
+public class Kmz extends GeometryRecordReaderFactory
+  implements RecordWriterFactory, MapWriterFactory {
 
   public Kmz() {
     super(Kml22Constants.KMZ_FORMAT_DESCRIPTION);
@@ -37,8 +36,7 @@ public class Kmz extends AbstractIoFactoryWithCoordinateSystem
 
   @Override
   public GeometryReader newGeometryReader(final Resource resource, final MapEx properties) {
-    final KmzGeometryIterator iterator = new KmzGeometryIterator(resource);
-    return iterator;
+    return new KmzGeometryIterator(resource, properties);
   }
 
   @Override
