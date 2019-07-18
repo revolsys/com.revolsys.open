@@ -21,7 +21,7 @@
 
   <bean
     id="moepDirectoryStatisticsReader"
-    class="com.revolsys.gis.io.LabalCountIterable"
+    class="com.revolsys.gis.io.LabelCountIterable"
     p:iterable-ref="moepDirectoryReader"
 
     lazy-init="true"
