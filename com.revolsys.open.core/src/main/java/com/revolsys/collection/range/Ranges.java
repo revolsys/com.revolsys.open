@@ -2,7 +2,6 @@ package com.revolsys.collection.range;
 
 import org.jeometry.common.number.Numbers;
 
-import com.revolsys.beans.Classes;
 import com.revolsys.util.Property;
 
 public class Ranges {
@@ -117,7 +116,7 @@ public class Ranges {
         }
       } else {
         throw new RangeInvalidException("Cannot create range from " + fromValue + " (Long) and "
-          + toValue + " (" + Classes.className(toValue.getClass()) + ")");
+          + toValue + " (" + toValue.getClass().getSimpleName() + ")");
       }
     } else if (fromValue instanceof Integer) {
       final int fromInt = (Integer)fromValue;
@@ -139,7 +138,7 @@ public class Ranges {
         }
       } else {
         throw new RangeInvalidException("Cannot create range from " + fromValue + " (Long) and "
-          + toValue + " (" + Classes.className(toValue.getClass()) + ")");
+          + toValue + " (" + toValue.getClass().getSimpleName() + ")");
       }
     } else if (fromValue instanceof Character) {
       final char fromChar = (Character)fromValue;
@@ -148,11 +147,11 @@ public class Ranges {
         return newRange(fromChar, toChar);
       } else {
         throw new RangeInvalidException("Cannot create range from " + fromValue
-          + " (Character) and " + toValue + " (" + Classes.className(toValue.getClass()) + ")");
+          + " (Character) and " + toValue + " (" + toValue.getClass().getSimpleName() + ")");
       }
     } else {
       throw new RangeInvalidException("Cannot create range from " + fromValue + " (String) and "
-        + toValue + " (" + Classes.className(toValue.getClass()) + ")");
+        + toValue + " (" + toValue.getClass().getSimpleName() + ")");
     }
   }
 

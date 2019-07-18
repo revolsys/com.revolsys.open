@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
 
-import com.revolsys.beans.Classes;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -73,7 +72,7 @@ public class FileGdbTable {
         geometryType = 4;
       } else {
         throw new IllegalArgumentException(
-          "Geometry type not supported " + Classes.className(geometryClass));
+          "Geometry type not supported " + geometryClass.getSimpleName());
       }
     }
 

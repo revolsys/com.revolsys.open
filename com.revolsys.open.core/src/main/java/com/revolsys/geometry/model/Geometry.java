@@ -1905,6 +1905,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     return relate(geometry).isIntersects();
   }
 
+  @Override
   default boolean intersects(Point point) {
     point = point.as2d(this);
     final double x = point.getX();

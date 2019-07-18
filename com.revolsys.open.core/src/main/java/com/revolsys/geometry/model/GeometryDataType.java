@@ -5,7 +5,6 @@ import java.util.function.Function;
 
 import org.jeometry.common.data.type.AbstractDataType;
 
-import com.revolsys.beans.Classes;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 
 public class GeometryDataType<G extends Geometry, GE extends GeometryEditor<?>>
@@ -18,7 +17,7 @@ public class GeometryDataType<G extends Geometry, GE extends GeometryEditor<?>>
   public GeometryDataType(final Class<G> javaClass,
     final Function<Object, ? extends Geometry> toObjectFunction,
     final Function<GeometryFactory, GE> newGeometryEditorFunction) {
-    super(Classes.className(javaClass), javaClass, true);
+    super(javaClass.getSimpleName(), javaClass, true);
     this.toObjectFunction = toObjectFunction;
     this.newGeometryEditorFunction = newGeometryEditorFunction;
   }

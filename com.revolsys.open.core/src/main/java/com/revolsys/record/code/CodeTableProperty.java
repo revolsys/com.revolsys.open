@@ -231,6 +231,7 @@ public class CodeTableProperty extends AbstractCodeTable implements RecordDefini
     return this.createMissingCodes;
   }
 
+  @Override
   public boolean isLoadAll() {
     return this.loadAll;
   }

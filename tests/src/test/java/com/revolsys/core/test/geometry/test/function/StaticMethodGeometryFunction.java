@@ -37,7 +37,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import com.revolsys.beans.Classes;
 import com.revolsys.core.test.geometry.test.testrunner.StringUtil;
 import com.revolsys.geometry.model.Geometry;
 
@@ -194,7 +193,7 @@ public class StaticMethodGeometryFunction extends BaseGeometryFunction {
 
     final Class clz = method.getDeclaringClass();
 
-    final String category = extractCategory(Classes.className(clz));
+    final String category = extractCategory(((Class<?>)clz).getSimpleName());
     final String funcName = method.getName();
     final String description = extractDescription(method);
     final String[] paramNames = extractParamNames(method);

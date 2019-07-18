@@ -245,15 +245,6 @@ public interface Point extends Punctual, Serializable, BoundingBox {
   }
 
   @Override
-  default boolean intersects(final Point point) {
-    if (isEmpty()) {
-      return false;
-    } else {
-      return equals(point);
-    }
-  }
-
-  @Override
   Point clone();
 
   default int compareTo(final double x, final double y) {
@@ -924,6 +915,15 @@ public interface Point extends Punctual, Serializable, BoundingBox {
       return intersects(point);
     } else {
       return geometry.intersects(this);
+    }
+  }
+
+  @Override
+  default boolean intersects(final Point point) {
+    if (isEmpty()) {
+      return false;
+    } else {
+      return equals(point);
     }
   }
 
