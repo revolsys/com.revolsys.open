@@ -127,6 +127,7 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
 
   @Override
   public Identifier getIdentifier(final List<Object> values, final boolean loadMissing) {
+    refreshIfNeeded();
     if (values.size() == 1) {
       final Object id = values.get(0);
       if (id == null) {
@@ -153,7 +154,7 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
 
     processValues(values);
     Identifier id = getIdByValue(values);
-    if (id == null && loadMissing) {
+    if (id == null && loadMissing && isLoadMissingCodes() && !isLoading()) {
       synchronized (this) {
         id = loadId(values, true);
         if (id != null && !this.idValueCache.containsKey(id)) {
@@ -166,6 +167,7 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
 
   @Override
   public List<Identifier> getIdentifiers() {
+    refreshIfNeeded();
     return Collections.unmodifiableList(this.identifiers);
   }
 
@@ -246,7 +248,7 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
       if (values == null) {
         synchronized (this) {
           values = loadValues(id);
-          if (values != null) {
+          if (values != null && !isLoadAll()) {
             addValue(id, values);
           }
         }
@@ -271,6 +273,10 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
   @Override
   public boolean isEmpty() {
     return this.idIdCache.isEmpty();
+  }
+
+  protected boolean isLoadMissingCodes() {
+    return false;
   }
 
   protected Identifier loadId(final List<Object> values, final boolean createId) {

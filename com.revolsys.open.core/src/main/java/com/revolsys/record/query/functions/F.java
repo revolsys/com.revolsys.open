@@ -1,6 +1,7 @@
 package com.revolsys.record.query.functions;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.query.Column;
 import com.revolsys.record.query.QueryValue;
@@ -52,8 +53,8 @@ public class F {
   }
 
   public static EnvelopeIntersects envelopeIntersects(final String name,
-    final BoundingBox boundingBox) {
-    return new EnvelopeIntersects(new Column(name), new Value(boundingBox));
+    final BoundingBoxProxy boundingBox) {
+    return new EnvelopeIntersects(new Column(name), new Value(boundingBox.getBoundingBox()));
   }
 
   public static Lower lower(final QueryValue value) {

@@ -32,7 +32,7 @@ public class Or extends AbstractMultiCondition {
   @Override
   public Or or(final Condition condition) {
     if (!Property.isEmpty(condition)) {
-      add(condition);
+      addCondition(condition);
     }
     return this;
   }

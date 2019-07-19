@@ -19,7 +19,7 @@ public class And extends AbstractMultiCondition {
   @Override
   public And and(final Condition condition) {
     if (!Property.isEmpty(condition)) {
-      add(condition);
+      addCondition(condition);
     }
     return this;
   }
