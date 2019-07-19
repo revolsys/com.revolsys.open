@@ -416,8 +416,7 @@ public final class UrlUtil {
     if (parent == null) {
       return null;
     } else {
-      final URL parentUrl = parent.getUrl();
-      return getUrl(parentUrl, child);
+      return parent.getUrl(child);
     }
   }
 
@@ -524,9 +523,9 @@ public final class UrlUtil {
       return null;
     } else if (value instanceof URL) {
       return (URL)value;
-    } else if (value instanceof Resource) {
-      final Resource resource = (Resource)value;
-      return resource.getURL();
+    } else if (value instanceof UrlProxy) {
+      final UrlProxy proxy = (UrlProxy)value;
+      return proxy.getUrl();
     } else if (value instanceof File) {
       final File file = (File)value;
       return FileUtil.toUrl(file);

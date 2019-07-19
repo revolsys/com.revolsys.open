@@ -33,7 +33,6 @@ import java.util.Map.Entry;
 
 import org.apache.commons.beanutils.MethodUtils;
 import org.jeometry.common.exception.Exceptions;
-import org.jeometry.common.exception.WrappedException;
 import org.jeometry.common.logging.Logs;
 
 /**
@@ -294,7 +293,7 @@ public final class JavaBeanUtil {
       } else if (t instanceof Error) {
         throw (Error)t;
       } else {
-        throw new WrappedException(t);
+        throw Exceptions.wrap(t);
       }
     } catch (final Exception e) {
       throw Exceptions.wrap(e);

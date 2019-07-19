@@ -27,8 +27,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.springframework.util.Assert;
-
 /**
  * Represents a URI template. A URI template is a URI-like String that contains variables enclosed
  * by braces (<code>{</code>, <code>}</code>), which can be expanded to produce an actual URI.
@@ -52,7 +50,6 @@ public class UriTemplate implements Serializable {
     private final List<String> variableNames = new LinkedList<>();
 
     private Parser(final String uriTemplate) {
-      Assert.hasText(uriTemplate, "'uriTemplate' must not be null");
       final Matcher m = NAMES_PATTERN.matcher(uriTemplate);
       int end = 0;
       while (m.find()) {
@@ -144,7 +141,6 @@ public class UriTemplate implements Serializable {
    * or if it does not contain values for all the variable names
    */
   public URI expand(final Map<String, ?> uriVariables) {
-    Assert.notNull(uriVariables, "'uriVariables' must not be null");
     final Object[] values = new Object[this.variableNames.size()];
     for (int i = 0; i < this.variableNames.size(); i++) {
       final String name = this.variableNames.get(i);
@@ -171,7 +167,6 @@ public class UriTemplate implements Serializable {
    * or if it does not contain sufficient variables
    */
   public URI expand(final Object... uriVariableValues) {
-    Assert.notNull(uriVariableValues, "'uriVariableValues' must not be null");
     if (uriVariableValues.length != this.variableNames.size()) {
       throw new IllegalArgumentException(
         "Invalid amount of variables values in [" + this.uriTemplate + "]: expected "
@@ -191,7 +186,6 @@ public class UriTemplate implements Serializable {
   }
 
   public String expandString(final Map<String, ?> uriVariables) {
-    Assert.notNull(uriVariables, "'uriVariables' must not be null");
     final Object[] values = new Object[this.variableNames.size()];
     for (int i = 0; i < this.variableNames.size(); i++) {
       final String name = this.variableNames.get(i);
@@ -204,7 +198,6 @@ public class UriTemplate implements Serializable {
   }
 
   public String expandString(final Object... uriVariableValues) {
-    Assert.notNull(uriVariableValues, "'uriVariableValues' must not be null");
     if (uriVariableValues.length != this.variableNames.size()) {
       throw new IllegalArgumentException(
         "Invalid amount of variables values in [" + this.uriTemplate + "]: expected "
@@ -244,7 +237,6 @@ public class UriTemplate implements Serializable {
    * @return a map of variable values
    */
   public Map<String, String> match(final String uri) {
-    Assert.notNull(uri, "'uri' must not be null");
     final Map<String, String> result = new LinkedHashMap<>(this.variableNames.size());
     final Matcher matcher = this.matchPattern.matcher(uri);
     if (matcher.find()) {
