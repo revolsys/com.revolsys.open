@@ -12,7 +12,7 @@ import org.jeometry.common.exception.Exceptions;
 import com.revolsys.io.FileUtil;
 
 public class CsvIterator implements Iterator<List<String>>, Iterable<List<String>> {
-  private static final int BUFFER_SIZE = 8096;
+  private static final int BUFFER_SIZE = 8192;
 
   private final char fieldSeparator;
 

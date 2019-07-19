@@ -1,22 +1,17 @@
 package com.revolsys.record.io.format.csv;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.file.Path;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractRecordWriter;
-import com.revolsys.io.FileUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.wkt.EWktWriter;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 
 public class CsvRecordWriter extends AbstractRecordWriter {
@@ -29,26 +24,27 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   private final RecordDefinition recordDefinition;
 
-  private final boolean useQuotes;
+  private boolean useQuotes;
 
-  public CsvRecordWriter(final RecordDefinition recordDefinition, final Path path,
+  private boolean paused = false;
+
+  public CsvRecordWriter(final RecordDefinition recordDefinition, final Object target,
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
-    this(recordDefinition, new PathResource(path), fieldSeparator, useQuotes, ewkt);
+    this(recordDefinition, Resource.getResource(target), fieldSeparator, useQuotes, ewkt);
   }
 
   public CsvRecordWriter(final RecordDefinition recordDefinition, final Resource resource,
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
     this(recordDefinition, resource.newWriter(), fieldSeparator, useQuotes, ewkt);
     setResource(resource);
-    final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
-    geometryFactory.writePrjFile(resource);
+    recordDefinition.writePrjFile(resource);
   }
 
   public CsvRecordWriter(final RecordDefinition recordDefinition, final Writer out,
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
     try {
       this.recordDefinition = recordDefinition;
-      this.out = new BufferedWriter(out);
+      this.out = out;
       this.fieldSeparator = fieldSeparator;
       this.useQuotes = useQuotes;
       this.ewkt = ewkt;
@@ -70,8 +66,18 @@ public class CsvRecordWriter extends AbstractRecordWriter {
    */
   @Override
   public synchronized void close() {
-    FileUtil.closeSilent(this.out);
-    this.out = null;
+    final Writer out = this.out;
+    if (out != null) {
+      try {
+        out.flush();
+      } catch (final IOException e) {
+      }
+      try {
+        out.close();
+      } catch (final IOException e) {
+      }
+      this.out = null;
+    }
   }
 
   @Override
@@ -89,6 +95,33 @@ public class CsvRecordWriter extends AbstractRecordWriter {
   @Override
   public RecordDefinition getRecordDefinition() {
     return this.recordDefinition;
+  }
+
+  public void pause() {
+    final Resource resource = getResource();
+    if (resource == null) {
+      throw new IllegalStateException("Cannot pause without a resource");
+    }
+    if (!this.paused) {
+      final Writer out = this.out;
+      if (out != null) {
+        this.paused = true;
+        flush();
+        try {
+          out.flush();
+        } catch (final IOException e) {
+        }
+        try {
+          out.close();
+        } catch (final IOException e) {
+        }
+        this.out = null;
+      }
+    }
+  }
+
+  public void setUseQuotes(final boolean useQuotes) {
+    this.useQuotes = useQuotes;
   }
 
   private void string(final Object value) throws IOException {
@@ -113,7 +146,12 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   @Override
   public void write(final Record record) {
-    final Writer out = this.out;
+    Writer out = this.out;
+    if (this.paused) {
+      this.paused = false;
+      final Resource resource = getResource();
+      out = this.out = resource.newWriterAppend();
+    }
     if (out != null) {
       try {
         final RecordDefinition recordDefinition = this.recordDefinition;
@@ -134,12 +172,17 @@ public class CsvRecordWriter extends AbstractRecordWriter {
           }
           if (value instanceof Geometry) {
             final Geometry geometry = (Geometry)value;
-            final String text = EWktWriter.toString(geometry, this.ewkt);
-            string(text);
+            if (this.useQuotes) {
+              out.write('"');
+              EWktWriter.write(out, geometry, this.ewkt);
+              out.write('"');
+            } else {
+              EWktWriter.write(out, geometry, this.ewkt);
+            }
           } else if (value != null) {
             final DataType dataType = field.getDataType();
             final String stringValue = dataType.toString(value);
-            if (dataType.isRequiresQuotes()) {
+            if (this.useQuotes && dataType.isRequiresQuotes()) {
               string(stringValue);
             } else {
               out.write(stringValue, 0, stringValue.length());

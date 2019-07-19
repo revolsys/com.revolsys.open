@@ -1,7 +1,5 @@
 package com.revolsys.record.io.format.directory;
 
-import javax.annotation.PreDestroy;
-
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
@@ -23,11 +21,11 @@ public class DirectoryRecordStoreWriter extends AbstractRecordWriter {
     this.recordDefinition = recordDefinition;
   }
 
-  @PreDestroy
   @Override
   public void close() {
     super.close();
     this.recordStore = null;
+    this.recordDefinition = null;
   }
 
   @Override
