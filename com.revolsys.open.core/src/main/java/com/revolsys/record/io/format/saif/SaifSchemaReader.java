@@ -1,9 +1,4 @@
 /*
- * $URL:https://secure.revolsys.com/svn/open.revolsys.com/GIS/trunk/src/main/java/com/revolsys/gis/format/saif/io/SaifSchemaReader.java $
- * $Author:paul.austin@revolsys.com $
- * $Date:2007-06-09 09:28:28 -0700 (Sat, 09 Jun 2007) $
- * $Revision:265 $
-
  * Copyright 2004-2005 Revolution Systems Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -64,15 +59,15 @@ public class SaifSchemaReader {
   static {
     addType("/Boolean", DataTypes.BOOLEAN);
     addType("/Numeric", DataTypes.DECIMAL);
-    addType("/Integer", DataTypes.BIG_INTEGER);
+    addType("/Integer", DataTypes.INT);
     addType("/Integer8", DataTypes.BYTE);
     addType("/Integer16", DataTypes.SHORT);
     addType("/Integer32", DataTypes.INT);
     addType("/Integer64", DataTypes.LONG);
-    addType("/Integer8Unsigned", DataTypes.BIG_INTEGER);
-    addType("/Integer16Unsigned", DataTypes.BIG_INTEGER);
-    addType("/Integer32Unsigned", DataTypes.BIG_INTEGER);
-    addType("/Integer64Unsigned", DataTypes.BIG_INTEGER);
+    addType("/Integer8Unsigned", DataTypes.INT);
+    addType("/Integer16Unsigned", DataTypes.INT);
+    addType("/Integer32Unsigned", DataTypes.LONG);
+    addType("/Integer64Unsigned", DataTypes.LONG);
     addType("/Real", DataTypes.DECIMAL);
     addType("/Real32", DataTypes.FLOAT);
     addType("/Real64", DataTypes.DOUBLE);
@@ -103,7 +98,7 @@ public class SaifSchemaReader {
     this.schema.addRecordDefinition(exportedObjectHandle);
     exportedObjectHandle.addField("referenceID", DataTypes.STRING, true);
     exportedObjectHandle.addField("type", DataTypes.STRING, true);
-    exportedObjectHandle.addField("offset", DataTypes.BIG_INTEGER, true);
+    exportedObjectHandle.addField("offset", DataTypes.INT, true);
     exportedObjectHandle.addField("sharable", DataTypes.BOOLEAN, true);
   }
 

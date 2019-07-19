@@ -35,10 +35,15 @@ public class XBase extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
+  public boolean isReadFromZipFileSupported() {
+    return true;
+  }
+
+  @Override
   public RecordReader newRecordReader(final Resource resource,
     final RecordFactory<? extends Record> recordFactory, final MapEx properties) {
     try {
-      return new XbaseIterator(resource, recordFactory);
+      return new XbaseRecordReader(resource, recordFactory);
     } catch (final IOException e) {
       throw new RuntimeException("Unable to create reader for " + resource, e);
     }

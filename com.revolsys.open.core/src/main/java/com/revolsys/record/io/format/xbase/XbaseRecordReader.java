@@ -1,10 +1,10 @@
 package com.revolsys.record.io.format.xbase;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.channels.FileChannel.MapMode;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -19,18 +19,15 @@ import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.io.Buffers;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.endian.EndianInput;
-import com.revolsys.io.endian.EndianInputStream;
-import com.revolsys.io.endian.EndianMappedByteBuffer;
-import com.revolsys.io.endian.LittleEndianRandomAccessFile;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
 
-public class XbaseIterator extends AbstractIterator<Record> implements RecordReader {
+public class XbaseRecordReader extends AbstractIterator<Record> implements RecordReader {
   public static final char CHARACTER_TYPE = 'C';
 
   private static final Map<Character, DataType> DATA_TYPES = new HashMap<>();
@@ -66,19 +63,15 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
 
   private int deletedCount = 0;
 
-  private long firstIndex;
-
-  private EndianInput in;
+  private ReadableByteChannel in;
 
   private Runnable initCallback;
 
-  private boolean mappedFile;
-
-  private int numRecords;
+  private int recordCount;
 
   private int position = 0;
 
-  private byte[] recordBuffer;
+  private ByteBuffer recordBuffer;
 
   private RecordDefinitionImpl recordDefinition;
 
@@ -90,7 +83,11 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
 
   private PathName typeName;
 
-  public XbaseIterator(final Resource resource, final RecordFactory recordFactory)
+  private final ByteBuffer buffer1 = ByteBuffer.allocate(1);
+
+  private boolean exists = false;
+
+  public XbaseRecordReader(final Resource resource, final RecordFactory recordFactory)
     throws IOException {
     this.resource = resource;
     final String baseName = resource.getBaseName();
@@ -108,7 +105,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
     }
   }
 
-  public XbaseIterator(final Resource in, final RecordFactory recordFactory,
+  public XbaseRecordReader(final Resource in, final RecordFactory recordFactory,
     final Runnable initCallback) throws IOException {
     this(in, recordFactory);
     this.initCallback = initCallback;
@@ -131,8 +128,8 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
     this.resource = null;
   }
 
-  private Boolean getBoolean(final int startIndex) {
-    final char c = (char)this.recordBuffer[startIndex];
+  private Boolean getBoolean() {
+    final char c = (char)this.recordBuffer.get();
     switch (c) {
       case 't':
       case 'T':
@@ -150,8 +147,8 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
     }
   }
 
-  private Date getDate(final int startIndex, final int len) {
-    final String dateString = getString(startIndex, len);
+  private Date getDate(final int len) {
+    final String dateString = getString(len);
     if (dateString.trim().length() == 0 || dateString.equals("0")) {
       return null;
     } else {
@@ -163,7 +160,7 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
     return this.deletedCount;
   }
 
-  private Object getMemo(final int startIndex, final int len) throws IOException {
+  private Object getMemo(final int len) throws IOException {
     return null;
     /*
      * String memoIndexString = new String(record, startIndex, len).trim(); if
@@ -184,34 +181,44 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
   @Override
   protected Record getNext() {
     try {
-      Record object = null;
+      Record record = null;
       this.deletedCount = this.currentDeletedCount;
       this.currentDeletedCount = 0;
       int deleteFlag = ' ';
       do {
-        deleteFlag = this.in.read();
-        if (deleteFlag == -1) {
+        this.recordBuffer.clear();
+        final int readCount = Buffers.readAll(this.in, this.recordBuffer);
+        if (readCount == -1) {
           throw new NoSuchElementException();
-        } else if (deleteFlag == ' ') {
-          object = loadRecord();
-        } else if (deleteFlag != 0x1A) {
-          this.currentDeletedCount++;
-          this.in.read(this.recordBuffer);
-          this.position++;
+        } else if (readCount == 1) {
+          throw new NoSuchElementException();
+        } else if (readCount != this.recordSize) {
+          throw new IllegalStateException("Unexpected end of mappedFile");
+        } else {
+          deleteFlag = this.recordBuffer.get();
+          if (deleteFlag == -1) {
+            throw new NoSuchElementException();
+          } else if (deleteFlag == ' ') {
+            record = loadRecord();
+          } else if (deleteFlag != 0x1A) {
+            this.currentDeletedCount++;
+            this.position++;
+          }
         }
       } while (deleteFlag == '*');
-      if (object == null) {
+      if (record == null) {
         throw new NoSuchElementException();
       }
-      return object;
+      return record;
     } catch (final IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
 
-  private BigDecimal getNumber(final int startIndex, final int len) {
+  private BigDecimal getNumber(final int len) {
     BigDecimal number = null;
-    final String numberString = getString(startIndex, len).replaceAll("\\*", "");
+    final String string = getString(len);
+    final String numberString = string.replace('*', ' ');
     if (numberString.trim().length() != 0) {
       try {
         number = new BigDecimal(numberString.trim());
@@ -222,12 +229,12 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
     return number;
   }
 
-  public int getNumRecords() {
-    return this.numRecords;
-  }
-
   public int getPosition() {
     return this.position;
+  }
+
+  public int getRecordCount() {
+    return this.recordCount;
   }
 
   @Override
@@ -236,8 +243,10 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
     return this.recordDefinition;
   }
 
-  private String getString(final int startIndex, final int len) {
-    final String text = new String(this.recordBuffer, startIndex, len, this.charset);
+  private String getString(final int len) {
+    final byte[] bytes = new byte[len];
+    this.recordBuffer.get(bytes, 0, len);
+    final String text = new String(bytes, this.charset);
     return text.trim();
   }
 
@@ -247,31 +256,24 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
 
   @Override
   protected void initDo() {
-    if (this.in == null) {
-      try {
-        try {
-          final File file = this.resource.getFile();
-          final Boolean memoryMapped = getProperty("memoryMapped");
-          if (Boolean.TRUE == memoryMapped) {
-            this.in = new EndianMappedByteBuffer(file, MapMode.READ_ONLY);
-            this.mappedFile = true;
-          } else {
-            this.in = new LittleEndianRandomAccessFile(file, "r");
-          }
-        } catch (final IllegalArgumentException e) {
-          this.in = new EndianInputStream(this.resource.getInputStream());
-        } catch (final FileNotFoundException e) {
-          this.in = new EndianInputStream(this.resource.getInputStream());
-        }
+    try {
+      this.in = this.resource.newReadableByteChannel();
+      if (this.in == null) {
+        this.exists = false;
+        close();
+      } else {
+        this.exists = true;
         loadHeader();
-        readRecordDefinition();
-        this.recordBuffer = new byte[this.recordSize];
-        if (this.initCallback != null) {
-          this.initCallback.run();
-        }
-      } catch (final IOException e) {
-        throw new RuntimeException("Error initializing mappedFile ", e);
       }
+      readRecordDefinition();
+      if (this.initCallback != null) {
+        this.initCallback.run();
+      }
+      if (this.exists) {
+        this.recordBuffer = ByteBuffer.allocateDirect(this.recordSize);
+      }
+    } catch (final IOException e) {
+      throw new RuntimeException("Error initializing mappedFile ", e);
     }
   }
 
@@ -286,81 +288,93 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
    */
   @SuppressWarnings("unused")
   private void loadHeader() throws IOException {
-    final int version = this.in.read();
-    final int y = this.in.read();
-    final int m = this.in.read();
-    final int d = this.in.read();
-    // properties.put(new QName("date"), new Date(y, m - 1, d));
-    this.numRecords = this.in.readLEInt();
-    final short headerSize = this.in.readLEShort();
+    final ByteBuffer header = ByteBuffer.allocate(32);
+    header.order(ByteOrder.LITTLE_ENDIAN);
+    if (Buffers.readAll(this.in, header) == 32) {
+      final int version = header.get();
+      final int y = header.get();
+      final int m = header.get();
+      final int d = header.get();
+      // properties.put(new QName("date"), new Date(y, m - 1, d));
+      this.recordCount = header.getInt();
+      final short headerSize = header.getShort();
 
-    this.recordSize = (short)(this.in.readLEShort() - 1);
-    this.in.skipBytes(20);
+      this.recordSize = header.getShort();
+    } else {
+      throw new RuntimeException("Invalid file:" + this.resource);
+    }
   }
 
   protected Record loadRecord() throws IOException {
-    if (this.in.read(this.recordBuffer) != this.recordBuffer.length) {
-      throw new IllegalStateException("Unexpected end of mappedFile");
-    }
-    final Record object = this.recordFactory.newRecord(this.recordDefinition);
-    int startIndex = 0;
+    final Record record = this.recordFactory.newRecord(this.recordDefinition);
     for (int i = 0; i < this.recordDefinition.getFieldCount(); i++) {
-      int len = this.recordDefinition.getFieldLength(i);
+      int length = this.recordDefinition.getFieldLength(i);
       final DataType type = this.recordDefinition.getFieldType(i);
       Object value = null;
 
       if (type == DataTypes.STRING) {
-        if (len < 255) {
-          value = getString(startIndex, len);
+        if (length < 255) {
+          value = getString(length);
         } else {
-          value = getMemo(startIndex, len);
-          len = 10;
+          value = getMemo(length);
+          length = 10;
         }
       } else if (type == DataTypes.DECIMAL || type == DataTypes.FLOAT) {
-        value = getNumber(startIndex, len);
+        value = getNumber(length);
       } else if (type == DataTypes.BOOLEAN) {
-        value = getBoolean(startIndex);
+        value = getBoolean();
       } else if (type == DataTypes.DATE_TIME) {
-        value = getDate(startIndex, len);
+        value = getDate(length);
       }
-      startIndex += len;
-      object.setValue(i, value);
+      record.setValue(i, value);
     }
-    return object;
+    return record;
   }
 
   private void readRecordDefinition() throws IOException {
     this.recordDefinition = new RecordDefinitionImpl(this.typeName);
-    int b = this.in.read();
-    while (b != 0x0D) {
-      final StringBuilder fieldName = new StringBuilder();
-      boolean endOfName = false;
-      for (int i = 0; i < 11; i++) {
-        if (!endOfName && b != 0) {
-          fieldName.append((char)b);
-        } else {
+    if (this.exists) {
+      int readCount = Buffers.readAll(this.in, this.buffer1);
+      if (readCount == -1) {
+        throw new RuntimeException("Unexpected end of file: " + this.resource);
+      }
+      final ByteBuffer fieldHeaderBuffer = ByteBuffer.allocate(31);
+      int b = this.buffer1.get();
+      while (b != 0x0D) {
+        this.buffer1.clear();
+        readCount = Buffers.readAll(this.in, fieldHeaderBuffer);
+        if (readCount != 31) {
+          throw new RuntimeException("Unexpected end of file: " + this.resource);
+        }
+        final StringBuilder fieldName = new StringBuilder();
+        boolean endOfName = false;
+        for (int i = 0; i < 11; i++) {
+          if (!endOfName && b != 0) {
+            fieldName.append((char)b);
+          } else {
 
-          endOfName = true;
+            endOfName = true;
+          }
+          if (i != 10) {
+            b = fieldHeaderBuffer.get();
+          }
         }
-        if (i != 10) {
-          b = this.in.read();
+        final char fieldType = (char)fieldHeaderBuffer.get();
+        fieldHeaderBuffer.getInt();
+        int length = fieldHeaderBuffer.get() & 0xFF;
+        final int decimalCount = fieldHeaderBuffer.get();
+        fieldHeaderBuffer.clear();
+        readCount = Buffers.readAll(this.in, this.buffer1);
+        if (readCount == -1) {
+          throw new RuntimeException("Unexpected end of file: " + this.resource);
         }
+        b = this.buffer1.get();
+        final DataType dataType = DATA_TYPES.get(fieldType);
+        if (fieldType == MEMO_TYPE) {
+          length = Integer.MAX_VALUE;
+        }
+        this.recordDefinition.addField(fieldName.toString(), dataType, length, decimalCount, false);
       }
-      final char fieldType = (char)this.in.read();
-      this.in.skipBytes(4);
-      int length = this.in.read();
-      final int decimalCount = this.in.read();
-      this.in.skipBytes(14);
-      b = this.in.read();
-      final DataType dataType = DATA_TYPES.get(fieldType);
-      if (fieldType == MEMO_TYPE) {
-        length = Integer.MAX_VALUE;
-      }
-      this.recordDefinition.addField(fieldName.toString(), dataType, length, decimalCount, false);
-    }
-    if (this.mappedFile) {
-      final EndianMappedByteBuffer file = (EndianMappedByteBuffer)this.in;
-      this.firstIndex = file.getFilePointer();
     }
   }
 
@@ -371,23 +385,6 @@ public class XbaseIterator extends AbstractIterator<Record> implements RecordRea
 
   public void setCloseFile(final boolean closeFile) {
     this.closeFile = closeFile;
-  }
-
-  public void setPosition(final int position) {
-    if (this.mappedFile) {
-      final EndianMappedByteBuffer file = (EndianMappedByteBuffer)this.in;
-      this.position = position;
-      try {
-        final long offset = this.firstIndex + (long)(this.recordSize + 1) * position;
-        file.seek(offset);
-        setLoadNext(true);
-      } catch (final IOException e) {
-        throw new RuntimeException("Unable to seek to " + this.firstIndex, e);
-      }
-
-    } else {
-      throw new UnsupportedOperationException("The position can only be set on files");
-    }
   }
 
   public void setTypeName(final PathName typeName) {

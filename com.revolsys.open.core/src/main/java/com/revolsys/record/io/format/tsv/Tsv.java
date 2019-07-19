@@ -48,6 +48,11 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   public static RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
+    final Object target, final boolean useQuotes, final boolean ewkt) {
+    return new CsvRecordWriter(recordDefinition, target, Tsv.FIELD_SEPARATOR, useQuotes, ewkt);
+  }
+
+  public static RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
     final Writer writer, final boolean useQuotes, final boolean ewkt) {
     return new CsvRecordWriter(recordDefinition, writer, Tsv.FIELD_SEPARATOR, useQuotes, ewkt);
   }
@@ -72,6 +77,11 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
+  public boolean isReadFromZipFileSupported() {
+    return true;
+  }
+
+  @Override
   public MapReader newMapReader(final Resource resource) {
     return mapReader(resource);
   }
@@ -84,11 +94,14 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
   @Override
   public RecordReader newRecordReader(final Resource resource,
     final RecordFactory<? extends Record> recordFactory, final MapEx properties) {
-    return new CsvRecordReader(resource, recordFactory, Tsv.FIELD_SEPARATOR);
+    final CsvRecordReader reader = new CsvRecordReader(resource, recordFactory,
+      Tsv.FIELD_SEPARATOR);
+    reader.setProperties(properties);
+    return reader;
   }
 
   @Override
-  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
+  public CsvRecordWriter newRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
     return new CsvRecordWriter(recordDefinition, resource, Tsv.FIELD_SEPARATOR, true, true);
   }

@@ -5,6 +5,10 @@ import java.io.Writer;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.channels.SeekableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
@@ -23,14 +27,14 @@ import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Doubles;
 
 import com.revolsys.io.AbstractRecordWriter;
-import com.revolsys.io.endian.ResourceEndianOutput;
+import com.revolsys.io.Buffers;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
 /**
- * <p>Xbase attributes suffer a number of limitations:</p>
+ * <p>Xbase fields suffer a number of limitations:</p>
  *
  * <ul>
  *   <li>Field names can only be up to 10 characters long. If required names will be truncated to 10 character.
@@ -58,9 +62,11 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
 
   private boolean initialized;
 
-  private int numRecords = 0;
+  private WritableByteChannel out;
 
-  private ResourceEndianOutput out;
+  private ByteBuffer recordBuffer;
+
+  private int recordCount = 0;
 
   private final RecordDefinition recordDefinition;
 
@@ -159,14 +165,22 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
     try {
       if (this.out != null) {
         try {
-          this.out.write(0x1a);
-          this.out.seek(1);
-          final Date now = new Date();
-          this.out.write(now.getYear());
-          this.out.write(now.getMonth() + 1);
-          this.out.write(now.getDate());
+          this.recordBuffer.put((byte)0x1a);
+          Buffers.writeAll(this.out, this.recordBuffer);
 
-          this.out.writeLEInt(this.numRecords);
+          if (this.out instanceof SeekableByteChannel) {
+            final SeekableByteChannel out = (SeekableByteChannel)this.out;
+            out.position(1);
+            final ByteBuffer buffer = ByteBuffer.allocate(7);
+            buffer.order(ByteOrder.LITTLE_ENDIAN);
+            final Date now = new Date();
+            buffer.put((byte)now.getYear());
+            buffer.put((byte)(now.getMonth() + 1));
+            buffer.put((byte)now.getDate());
+
+            buffer.putInt(this.recordCount);
+            Buffers.writeAll(out, buffer);
+          }
         } finally {
           try {
             this.out.close();
@@ -178,11 +192,6 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
     } catch (final IOException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  @Override
-  public void flush() {
-    this.out.flush();
   }
 
   public Charset getCharset() {
@@ -215,7 +224,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
         if (shortNames != null) {
           this.shortNames = shortNames;
         }
-        this.out = new ResourceEndianOutput(resource);
+        this.out = resource.newWritableByteChannel();
         writeHeader();
       }
       final Resource codePageResource = resource.newResourceChangeExtension("cpg");
@@ -255,16 +264,17 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
         preFirstWrite(record);
       }
       if (this.out != null) {
-        this.out.write(' ');
-      }
-      for (final XBaseFieldDefinition field : this.fields) {
-        if (!writeField(record, field)) {
-          final String fieldName = field.getFullName();
-          Logs.warn(this, "Unable to write attribute '" + fieldName + "' with value "
-            + record.getValue(fieldName));
+        this.recordBuffer.put((byte)' ');
+        for (final XBaseFieldDefinition field : this.fields) {
+          if (!writeField(record, field)) {
+            final String fieldName = field.getFullName();
+            Logs.warn(this,
+              "Unable to write field '" + fieldName + "' with value " + record.getValue(fieldName));
+          }
         }
+        Buffers.writeAll(this.out, this.recordBuffer);
+        this.recordCount++;
       }
-      this.numRecords++;
     } catch (final IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
@@ -317,16 +327,17 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
               throw new IllegalArgumentException("Not a number " + fieldName + "=" + value);
             }
           }
-          final int numLength = numString.length();
+          final byte[] numberBytes = numString.getBytes();
+          final int numLength = numberBytes.length;
           if (numLength > fieldLength) {
             for (int i = 0; i < fieldLength; i++) {
-              this.out.write('9');
+              this.recordBuffer.put((byte)'9');
             }
           } else {
             for (int i = numLength; i < fieldLength; i++) {
-              this.out.write(' ');
+              this.recordBuffer.put((byte)' ');
             }
-            this.out.writeBytes(numString);
+            this.recordBuffer.put(numberBytes);
           }
           return true;
         case XBaseFieldDefinition.FLOAT_TYPE:
@@ -334,16 +345,17 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
           if (value != null) {
             floatString = value.toString();
           }
-          final int floatLength = floatString.length();
+          final byte[] floatBytes = floatString.getBytes();
+          final int floatLength = floatBytes.length;
           if (floatLength > fieldLength) {
             for (int i = 0; i < fieldLength; i++) {
-              this.out.write('9');
+              this.recordBuffer.put((byte)'9');
             }
           } else {
             for (int i = floatLength; i < fieldLength; i++) {
-              this.out.write(' ');
+              this.recordBuffer.put((byte)' ');
             }
-            this.out.writeBytes(floatString);
+            this.recordBuffer.put(floatBytes);
           }
           return true;
 
@@ -353,13 +365,13 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
             final Object value1 = value;
             string = DataTypes.toString(value1);
           }
-          final byte[] bytes = string.getBytes(this.charset);
-          if (bytes.length >= fieldLength) {
-            this.out.write(bytes, 0, fieldLength);
+          final byte[] stringBytes = string.getBytes(this.charset);
+          if (stringBytes.length >= fieldLength) {
+            this.recordBuffer.put(stringBytes, 0, fieldLength);
           } else {
-            this.out.write(bytes);
-            for (int i = bytes.length; i < fieldLength; i++) {
-              this.out.write(' ');
+            this.recordBuffer.put(stringBytes);
+            for (int i = stringBytes.length; i < fieldLength; i++) {
+              this.recordBuffer.put((byte)' ');
             }
           }
           return true;
@@ -368,12 +380,13 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
           if (value instanceof Date) {
             final Date date = (Date)value;
             final String dateString = Dates.format("yyyyMMdd", date);
-            this.out.writeBytes(dateString);
+            this.recordBuffer.put(dateString.getBytes());
 
           } else if (value == null) {
-            this.out.writeBytes("        ");
+            this.recordBuffer.put("        ".getBytes());
           } else {
-            this.out.writeBytes(value.toString().substring(0, 8));
+            final byte[] dateBytes = value.toString().getBytes();
+            this.recordBuffer.put(dateBytes, 0, 8);
           }
           return true;
 
@@ -386,9 +399,9 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
             logical = Boolean.valueOf(value.toString());
           }
           if (logical) {
-            this.out.write('T');
+            this.recordBuffer.put((byte)'T');
           } else {
-            this.out.write('F');
+            this.recordBuffer.put((byte)'F');
           }
           return true;
 
@@ -401,49 +414,55 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
   @SuppressWarnings("deprecation")
   private void writeHeader() throws IOException {
     if (this.out != null) {
+
+      final ByteBuffer headerBuffer = ByteBuffer.allocateDirect(32);
+      headerBuffer.order(ByteOrder.LITTLE_ENDIAN);
+
       int recordLength = 1;
 
       this.fields.clear();
-      int numFields = 0;
+      int fieldCount = 0;
       for (final String name : this.recordDefinition.getFieldNames()) {
         final int index = this.recordDefinition.getFieldIndex(name);
         final int length = this.recordDefinition.getFieldLength(index);
         final int scale = this.recordDefinition.getFieldScale(index);
-        final DataType attributeType = this.recordDefinition.getFieldType(index);
-        final Class<?> typeJavaClass = attributeType.getJavaClass();
-        final int fieldLength = addDbaseField(name, attributeType, typeJavaClass, length, scale);
+        final DataType fieldType = this.recordDefinition.getFieldType(index);
+        final Class<?> typeJavaClass = fieldType.getJavaClass();
+        final int fieldLength = addDbaseField(name, fieldType, typeJavaClass, length, scale);
         if (fieldLength > 0) {
           recordLength += fieldLength;
-          numFields++;
+          fieldCount++;
         }
       }
-      this.out.write(0x03);
-      final Date now = new Date();
-      this.out.write(now.getYear());
-      this.out.write(now.getMonth() + 1);
-      this.out.write(now.getDate());
-      // Write 0 as the number of records, come back and update this when closed
-      this.out.writeLEInt(0);
-      final short headerLength = (short)(33 + numFields * 32);
 
-      this.out.writeLEShort(headerLength);
-      this.out.writeLEShort((short)recordLength);
-      this.out.writeLEShort((short)0);
-      this.out.write(0);
-      this.out.write(0);
-      this.out.writeLEInt(0);
-      this.out.writeLEInt(0);
-      this.out.writeLEInt(0);
-      this.out.write(0);
-      this.out.write(1);
-      this.out.writeLEShort((short)0);
-      int offset = 1;
+      this.recordBuffer = ByteBuffer.allocateDirect(recordLength);
+
+      headerBuffer.put((byte)0x03);
+      final Date now = new Date();
+      headerBuffer.put((byte)now.getYear());
+      headerBuffer.put((byte)(now.getMonth() + 1));
+      headerBuffer.put((byte)now.getDate());
+      // Write 0 as the number of records, come back and update this when closed
+      headerBuffer.putInt(0);
+      final short headerLength = (short)(33 + fieldCount * 32);
+
+      headerBuffer.putShort(headerLength);
+      headerBuffer.putShort((short)recordLength);
+      headerBuffer.putShort((short)0);
+      headerBuffer.put((byte)0);
+      headerBuffer.put((byte)0);
+      headerBuffer.putInt(0);
+      headerBuffer.putInt(0);
+      headerBuffer.putInt(0);
+      headerBuffer.put((byte)0);
+      headerBuffer.put((byte)1);
+      headerBuffer.putShort((short)0);
+      Buffers.writeAll(this.out, headerBuffer);
+
       for (final XBaseFieldDefinition field : this.fields) {
         if (field.getDataType() != DataTypes.OBJECT) {
-          String name = field.getName();
-          if (name.length() > 10) {
-            name = name.substring(0, 10);
-          }
+          final String name = field.getName();
+          final byte[] nameBytes = name.getBytes();
           final int length = field.getLength();
           int decimalPlaces = field.getDecimalPlaces();
           if (decimalPlaces < 0) {
@@ -453,31 +472,33 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
           } else if (decimalPlaces > length) {
             decimalPlaces = Math.min(length, 15);
           }
-          this.out.writeBytes(name);
-          final int numPad = 11 - name.length();
+          headerBuffer.put(nameBytes, 0, Math.min(10, nameBytes.length));
+          final int numPad = 11 - nameBytes.length;
           for (int i = 0; i < numPad; i++) {
-            this.out.write(0);
+            headerBuffer.put((byte)0);
           }
-          this.out.write(field.getType());
-          this.out.writeLEInt(0);
-          this.out.write(length);
-          this.out.write(decimalPlaces);
-          this.out.writeLEShort((short)0);
-          this.out.write(0);
-          this.out.writeLEShort((short)0);
-          this.out.write(0);
-          this.out.write(0);
-          this.out.write(0);
-          this.out.write(0);
-          this.out.write(0);
-          this.out.write(0);
-          this.out.write(0);
-          this.out.write(0);
-          this.out.write(0);
-          offset += length;
+          headerBuffer.put((byte)field.getType());
+          headerBuffer.putInt(0);
+          headerBuffer.put((byte)length);
+          headerBuffer.put((byte)decimalPlaces);
+          headerBuffer.putShort((short)0);
+          headerBuffer.put((byte)0);
+          headerBuffer.putShort((short)0);
+          headerBuffer.put((byte)0);
+          headerBuffer.put((byte)0);
+          headerBuffer.put((byte)0);
+          headerBuffer.put((byte)0);
+          headerBuffer.put((byte)0);
+          headerBuffer.put((byte)0);
+          headerBuffer.put((byte)0);
+          headerBuffer.put((byte)0);
+          headerBuffer.put((byte)0);
+          Buffers.writeAll(this.out, headerBuffer);
         }
       }
-      this.out.write(0x0d);
+      headerBuffer.put((byte)0x0d);
+      Buffers.writeAll(this.out, headerBuffer);
+
     }
   }
 }

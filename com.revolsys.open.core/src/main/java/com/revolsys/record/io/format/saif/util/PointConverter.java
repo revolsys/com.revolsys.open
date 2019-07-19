@@ -7,9 +7,8 @@ import java.util.TreeMap;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.record.io.format.saif.SaifConstants;
+import com.revolsys.util.Property;
 
 public class PointConverter implements OsnConverter {
   private String geometryClass = SaifConstants.POINT;
@@ -25,16 +24,19 @@ public class PointConverter implements OsnConverter {
     this.geometryClass = geometryClass;
   }
 
+  public Point newPoint(final GeometryFactory geometryFactory, final double... coordinates) {
+    return geometryFactory.point(coordinates);
+  }
+
   @Override
   public Object read(final OsnIterator iterator) {
     final Map<String, Object> values = new TreeMap<>();
     values.put("type", this.geometryClass);
-    Geometry geometry = null;
+    Point point = null;
 
     String fieldName = iterator.nextFieldName();
     while (fieldName != null) {
       if (fieldName.equals("coords")) {
-        Point coordinate = null;
         final String coordTypeName = iterator.nextObjectName();
         if (coordTypeName.equals("/Coord3D")) {
           final double x = iterator.nextDoubleAttribute("c1");
@@ -43,25 +45,24 @@ public class PointConverter implements OsnConverter {
           if (z == 2147483648.0) {
             z = 0;
           }
-          coordinate = new PointDouble(x, y, z);
+          final GeometryFactory geometryFactory = this.geometryFactory.convertAxisCount(3);
+          point = newPoint(geometryFactory, x, y, z);
         } else if (coordTypeName.equals("/Coord2D")) {
           final double x = iterator.nextDoubleAttribute("c1");
           final double y = iterator.nextDoubleAttribute("c2");
-          coordinate = new PointDouble(x, y);
+          final GeometryFactory geometryFactory = this.geometryFactory.convertAxisCount(3);
+          point = newPoint(geometryFactory, x, y);
         } else {
           iterator.throwParseError("Expecting Coord2D or Coord3D");
         }
         iterator.nextEndObject();
-        geometry = this.geometryFactory.point(coordinate);
       } else {
         readAttribute(iterator, fieldName, values);
       }
       fieldName = iterator.nextFieldName();
     }
-    if (!values.isEmpty()) {
-      geometry.setUserDataOld(values);
-    }
-    return geometry;
+    Property.set(point, values);
+    return point;
   }
 
   protected void readAttribute(final OsnIterator iterator, final String fieldName,
@@ -97,34 +98,14 @@ public class PointConverter implements OsnConverter {
       serializer.endObject();
       serializer.endAttribute();
 
-      final Map<String, Object> values = GeometryProperties.getGeometryProperties(point);
-      writeAttributes(serializer, values);
+      writeAttributes(serializer, point);
       serializer.endObject();
     }
   }
 
-  protected void writeAttribute(final OsnSerializer serializer, final Map<String, Object> values,
-    final String name) throws IOException {
-    final Object value = values.get(name);
-    if (value != null) {
-      serializer.endLine();
-      serializer.attribute(name, value, false);
-    }
-
-  }
-
-  protected void writeAttributes(final OsnSerializer serializer, final Map<String, Object> values)
+  protected void writeAttributes(final OsnSerializer serializer, final Geometry geometry)
     throws IOException {
-    writeEnumAttribute(serializer, values, "qualifier");
-  }
-
-  protected void writeEnumAttribute(final OsnSerializer serializer,
-    final Map<String, Object> values, final String name) throws IOException {
-    final String value = (String)values.get(name);
-    if (value != null) {
-      serializer.endLine();
-      serializer.attributeEnum(name, value, false);
-    }
+    writeAttributeEnum(serializer, geometry, "qualifier");
   }
 
 }

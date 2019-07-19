@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class ObjectSetOutputStream extends OutputStream {
-
   private File file;
 
   private short index = 0;

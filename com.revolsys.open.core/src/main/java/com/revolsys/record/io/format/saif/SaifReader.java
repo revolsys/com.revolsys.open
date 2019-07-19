@@ -1,9 +1,4 @@
 /*
- * $URL:https://secure.revolsys.com/svn/open.revolsys.com/GIS/trunk/src/main/java/com/revolsys/gis/format/saif/io/SaifReader.java $
- * $Author:paul.austin@revolsys.com $
- * $Date:2007-06-09 09:28:28 -0700 (Sat, 09 Jun 2007) $
- * $Revision:265 $
-
  * Copyright 2004-2005 Revolution Systems Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,6 +34,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.jeometry.common.logging.Logs;
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractReader;
@@ -117,7 +113,7 @@ public class SaifReader extends AbstractReader<Record>
   /** The directory the SAIF archive is extracted to. */
   private File saifArchiveDirectory;
 
-  private int srid = 26910;
+  private int srid = EpsgId.nad83Utm(10);
 
   /** Mapping between type names and file names. */
   private final Map<String, String> typePathFileNameMap = new HashMap<>();
@@ -165,9 +161,18 @@ public class SaifReader extends AbstractReader<Record>
    */
   @Override
   public void close() {
+    if (Logs.isDebugEnabled(this)) {
+      Logs.debug(this, "Closing SAIF archive '" + this.file.getAbsolutePath() + "'");
+    }
     closeCurrentReader();
     if (!this.file.isDirectory() && this.saifArchiveDirectory != null) {
+      if (Logs.isDebugEnabled(this)) {
+        Logs.debug(this, "  Deleting temporary files");
+      }
       FileUtil.deleteDirectory(this.saifArchiveDirectory);
+    }
+    if (Logs.isDebugEnabled(this)) {
+      Logs.debug(this, "  Finished closing file");
     }
   }
 
@@ -176,11 +181,6 @@ public class SaifReader extends AbstractReader<Record>
       this.osnReader.close();
       this.osnReader = null;
     }
-  }
-
-  @Override
-  public int getCoordinateSystemId() {
-    return this.srid;
   }
 
   /**
@@ -230,6 +230,11 @@ public class SaifReader extends AbstractReader<Record>
       }
     }
     return this.globalMetadata;
+  }
+
+  @Override
+  public int getHorizontalCoordinateSystemId() {
+    return this.srid;
   }
 
   /**
@@ -523,7 +528,7 @@ public class SaifReader extends AbstractReader<Record>
         final Record coordinateSystem = spatialReferencing.getValue("coordSystem");
         if (coordinateSystem.getRecordDefinition().getPath().equals("/UTM")) {
           final Number srid = coordinateSystem.getValue("zone");
-          setSrid(26900 + srid.intValue());
+          setSrid(EpsgId.nad83Utm(srid.intValue()));
         }
       }
     } finally {
@@ -556,6 +561,9 @@ public class SaifReader extends AbstractReader<Record>
     if (!this.opened) {
       this.opened = true;
       try {
+        if (Logs.isDebugEnabled(this)) {
+          Logs.debug(this, "Opening SAIF archive '" + this.file.getCanonicalPath() + "'");
+        }
         if (this.file.isDirectory()) {
           this.saifArchiveDirectory = this.file;
         } else if (!this.file.exists()) {
@@ -563,11 +571,13 @@ public class SaifReader extends AbstractReader<Record>
         } else {
           this.zipFile = new ZipFile(this.file);
         }
+        if (Logs.isDebugEnabled(this)) {
+          Logs.debug(this, "  Finished opening archive");
+        }
         loadSchema();
         loadExportedObjects();
         loadSrid();
-        final int coordinateSystemId = this.srid;
-        final GeometryFactory geometryFactory = GeometryFactory.fixed3d(1.0, 1.0, 1.0);
+        final GeometryFactory geometryFactory = GeometryFactory.fixed3d(this.srid, 1.0, 1.0, 1.0);
 
         for (final RecordDefinition recordDefinition : ((RecordDefinitionFactoryImpl)this.recordDefinitionFactory)
           .getRecordDefinitions()) {

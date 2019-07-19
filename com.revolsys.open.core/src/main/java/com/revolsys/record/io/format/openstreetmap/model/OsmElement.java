@@ -13,7 +13,6 @@ import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.record.AbstractRecord;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.io.format.xml.StaxReader;
-import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.util.Property;
@@ -220,6 +219,11 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
     return this.tags != null && !this.tags.isEmpty();
   }
 
+  @Override
+  public boolean isState(final RecordState state) {
+    return state == RecordState.NEW;
+  }
+
   public boolean isTagged() {
     return this.tags != null && !this.tags.isEmpty();
   }
@@ -295,13 +299,6 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
 
   public void setUser(final String user) {
     this.user = user;
-  }
-
-  @Override
-  public boolean setValue(final FieldDefinition fieldDefinition, final Object value) {
-    final String propertyName = fieldDefinition.getName();
-    Property.setSimple(this, propertyName, value);
-    return true;
   }
 
   public void setVersion(final int version) {
