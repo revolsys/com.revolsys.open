@@ -40,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.util.Assert;
@@ -130,19 +129,19 @@ public class SegmentNodeList implements Iterable<SegmentNode> {
    *
    * @return the SegmentIntersection found or added
    */
-  public SegmentNode add(final Point point, final int segmentIndex) {
-    if (point.isEmpty()) {
+  public SegmentNode add(final double x, final double y, final int segmentIndex) {
+    if (!Double.isFinite(x) || !Double.isFinite(y)) {
       throw new IllegalArgumentException("Cannot add an empty point to a SegmentNodeList");
     } else {
       final int segmentOctant = this.edge.getSegmentOctant(segmentIndex);
-      final SegmentNode newNode = new SegmentNode(this.edge, point, segmentIndex, segmentOctant);
+      final SegmentNode newNode = new SegmentNode(this.edge, x, y, segmentIndex, segmentOctant);
       SegmentNode node = this.nodeMap.get(newNode);
       if (node == null) {
         node = newNode;
         this.nodeMap.put(node, node);
       } else {
         // debugging sanity check
-        final boolean equals = node.equals(2, point);
+        final boolean equals = node.equalsVertex(x, y);
         if (!equals) {
           Assert.isTrue(equals, "Found equal nodes with different coordinates");
         }
@@ -166,7 +165,9 @@ public class SegmentNodeList implements Iterable<SegmentNode> {
 
     // node the collapses
     for (final int vertexIndex : collapsedVertexIndexes) {
-      add(this.edge.getPoint(vertexIndex), vertexIndex);
+      final double x = this.edge.getX(vertexIndex);
+      final double y = this.edge.getY(vertexIndex);
+      add(x, y, vertexIndex);
     }
   }
 
@@ -175,11 +176,13 @@ public class SegmentNodeList implements Iterable<SegmentNode> {
    */
   private void addEndpoints() {
     final int maxSegIndex = this.edge.size() - 1;
-    final Point fromPoint = this.edge.getPoint(0);
-    add(fromPoint, 0);
+    final double fromPointX = this.edge.getX(0);
+    final double fromPointY = this.edge.getY(0);
+    add(fromPointX, fromPointY, 0);
 
-    final Point toPoint = this.edge.getPoint(maxSegIndex);
-    add(toPoint, maxSegIndex);
+    final double toPointX = this.edge.getX(maxSegIndex);
+    final double toPointY = this.edge.getY(maxSegIndex);
+    add(toPointX, toPointY, maxSegIndex);
   }
 
   /**
@@ -238,11 +241,9 @@ public class SegmentNodeList implements Iterable<SegmentNode> {
    */
   private void findCollapsesFromExistingVertices(final List<Integer> collapsedVertexIndexes) {
     for (int i = 0; i < this.edge.size() - 2; i++) {
-      final Point p0 = this.edge.getPoint(i);
-      final Point p2 = this.edge.getPoint(i + 2);
-      if (p0.equals(2, p2)) {
+      if (this.edge.equalsVertex2d(i, i + 2)) {
         // add base of collapse as node
-        collapsedVertexIndexes.add(new Integer(i + 1));
+        collapsedVertexIndexes.add(i + 1);
       }
     }
   }
@@ -292,13 +293,13 @@ public class SegmentNodeList implements Iterable<SegmentNode> {
     // Debug.println("\ncreateSplitEdge"); Debug.print(ei0); Debug.print(ei1);
     int npts = ei1.getSegmentIndex() - ei0.getSegmentIndex() + 2;
 
-    final Point lastSegStartPt = this.edge.getPoint(ei1.getSegmentIndex());
     // if the last intersection point is not equal to the its segment start pt,
     // add it to the points list as well.
     // (This check is needed because the distance metric is not totally
     // reliable!)
     // The check for point equality is 2D only - Z values are ignored
-    final boolean useIntPt1 = ei1.isInterior() || !ei1.equals(2, lastSegStartPt);
+    final boolean useIntPt1 = ei1.isInterior()
+      || !this.edge.equalsVertex(ei1.getSegmentIndex(), ei1.getX(), ei1.getY());
     if (!useIntPt1) {
       npts--;
     }
@@ -309,8 +310,7 @@ public class SegmentNodeList implements Iterable<SegmentNode> {
     int ipt = 0;
     CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, ei0);
     for (int i = ei0.getSegmentIndex() + 1; i <= ei1.getSegmentIndex(); i++) {
-      final Point point = this.edge.getPoint(i);
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, point);
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, this.edge, i);
     }
     if (useIntPt1) {
       CoordinatesListUtil.setCoordinates(coordinates, axisCount, ipt++, ei1);

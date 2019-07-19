@@ -33,6 +33,7 @@
 package com.revolsys.geometry.algorithm;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.function.Consumer;
 
 import com.revolsys.geometry.model.BoundingBox;
@@ -41,7 +42,6 @@ import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.segment.LineSegment;
-import com.revolsys.geometry.model.segment.Segment;
 
 /**
  * Counts the number of segments crossed by a horizontal ray extending to the right
@@ -75,19 +75,13 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
     final BoundingBox boundingBox = ring.getBoundingBox();
     if (boundingBox.bboxCovers(x, y)) {
       final RayCrossingCounter counter = new RayCrossingCounter(x, y);
-
-      double x0 = ring.getX(0);
-      double y0 = ring.getY(0);
-      for (int i = 1; i < ring.getVertexCount(); i++) {
-        final double x1 = ring.getX(i);
-        final double y1 = ring.getY(i);
-        counter.countSegment(x1, y1, x0, y0);
+      ring.findSegment((x1, y1, x2, y2) -> {
+        counter.countSegment(x2, y2, x1, y1);
         if (counter.isOnSegment()) {
           return counter.getLocation();
         }
-        x0 = x1;
-        y0 = y1;
-      }
+        return null;
+      });
       return counter.getLocation();
     } else {
       return Location.EXTERIOR;
@@ -129,17 +123,18 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
 
         final RayCrossingCounter counter = new RayCrossingCounter(point);
 
-        double x0 = ring.getX(0);
-        double y0 = ring.getY(0);
-        for (int i = 1; i < ring.getVertexCount(); i++) {
-          final double x1 = ring.getX(i);
-          final double y1 = ring.getY(i);
-          counter.countSegment(x1, y1, x0, y0);
+        double x1 = ring.getX(0);
+        double y1 = ring.getY(0);
+        final int vertexCount = ring.getVertexCount();
+        for (int i = 1; i < vertexCount; i++) {
+          final double x2 = ring.getX(i);
+          final double y2 = ring.getY(i);
+          counter.countSegment(x2, y2, x1, y1);
           if (counter.isOnSegment()) {
             return counter.getLocation();
           }
-          x0 = x1;
-          y0 = y1;
+          x1 = x2;
+          y1 = y2;
         }
         return counter.getLocation();
       } else {
@@ -175,9 +170,12 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
   // true if the test point lies on an input segment
   private boolean pointOnSegment = false;
 
-  private final double x;
+  private double x;
 
-  private final double y;
+  private double y;
+
+  public RayCrossingCounter() {
+  }
 
   public RayCrossingCounter(final double x, final double y) {
     this.x = x;
@@ -204,12 +202,14 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
   }
 
   public void countSegment(final double x1, final double y1, final double x2, final double y2) {
-    if (x1 < this.x && x2 < this.x) {
+    final double x = this.x;
+    final double y = this.y;
+    if (x1 < x && x2 < x) {
       // check if the segment is strictly to the left of the test point
-    } else if (this.x == x2 && this.y == y2) {
+    } else if (x == x2 && y == y2) {
       // check if the point is equal to the current ring vertex
       this.pointOnSegment = true;
-    } else if (y1 == this.y && y2 == this.y) {
+    } else if (y1 == y && y2 == y) {
       /**
        * For horizontal segments, check if the point is on the segment. Otherwise,
        * horizontal segments are not counted.
@@ -220,10 +220,10 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
         minX = x2;
         maxX = x1;
       }
-      if (this.x >= minX && this.x <= maxX) {
+      if (x >= minX && x <= maxX) {
         this.pointOnSegment = true;
       }
-    } else if (y1 > this.y && y2 <= this.y || y2 > this.y && y1 <= this.y) {
+    } else if (y1 > y && y2 <= y || y2 > y && y1 <= y) {
       /**
        * Evaluate all non-horizontal segments which cross a horizontal ray to the
        * right of the test pt. To avoid double-counting shared vertices, we use
@@ -236,37 +236,38 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
        * </ul>
        */
       // translate the segment so that the test point lies on the origin
-      final double deltaX1 = x1 - this.x;
-      final double deltaY1 = y1 - this.y;
-      final double deltaX2 = x2 - this.x;
-      final double deltaY2 = y2 - this.y;
+      final double deltaX1 = x1 - x;
+      final double deltaY1 = y1 - y;
+      final double deltaX2 = x2 - x;
+      final double deltaY2 = y2 - y;
 
       /**
        * The translated segment straddles the x-axis. Compute the sign of the
        * ordinate of intersection with the x-axis. (y2 != y1, so denominator
        * will never be 0.0)
        */
-      // double xIntSign = RobustDeterminant.signOfDet2x2(x1, y1, x2, y2) / (y2
-      // - y1);
-      // MD - faster & more robust computation?
       double xIntSign = RobustDeterminant.signOfDet2x2(deltaX1, deltaY1, deltaX2, deltaY2);
       if (xIntSign == 0.0) {
         this.pointOnSegment = true;
       } else {
         if (deltaY2 < deltaY1) {
           xIntSign = -xIntSign;
-          // xsave = xInt;
         }
 
-        // System.out.println("xIntSign(" + x1 + ", " + y1 + ", " + x2 + ", " +
-        // y2
-        // + " = " + xIntSign);
         // The segment crosses the ray if the sign is strictly positive.
         if (xIntSign > 0.0) {
           this.crossingCount++;
         }
       }
     }
+  }
+
+  public void countSegment(final LineSegment segment) {
+    final double x1 = segment.getX(0);
+    final double y1 = segment.getY(0);
+    final double x2 = segment.getX(1);
+    final double y2 = segment.getY(1);
+    countSegment(x1, y1, x2, y2);
   }
 
   /**
@@ -286,10 +287,6 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
     countSegment(x1, y1, x2, y2);
   }
 
-  public void countSegment(final Segment segment) {
-    countSegment(segment.getPoint(1), segment.getPoint(0));
-  }
-
   /**
    * Gets the {@link Location} of the point relative to
    * the ring, polygon
@@ -303,14 +300,14 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
   public Location getLocation() {
     if (this.pointOnSegment) {
       return Location.BOUNDARY;
-    }
-
-    // The point is in the interior of the ring if the number of X-crossings is
-    // odd.
-    if (this.crossingCount % 2 == 1) {
+    } else if (this.crossingCount % 2 == 1) {
+      // The point is in the interior of the ring if the number of X-crossings
+      // is
+      // odd.
       return Location.INTERIOR;
+    } else {
+      return Location.EXTERIOR;
     }
-    return Location.EXTERIOR;
   }
 
   public double getX() {
@@ -319,6 +316,40 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
 
   public double getY() {
     return this.y;
+  }
+
+  public boolean isDisjoint() {
+    if (this.pointOnSegment) {
+      return false;
+    } else if (this.crossingCount % 2 == 1) {
+      // The point is in the interior of the ring if the number of X-crossings
+      // is
+      // odd.
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  public boolean isIntersects() {
+    if (this.pointOnSegment) {
+      return true;
+    } else if (this.crossingCount % 2 == 1) {
+      // The point is in the interior of the ring if the number of X-crossings
+      // is
+      // odd.
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public boolean isIntersects(final double x, final double y, final List<LineSegment> segments) {
+    reset(x, y);
+    for (final LineSegment segment : segments) {
+      countSegment(segment);
+    }
+    return isIntersects();
   }
 
   /**
@@ -348,7 +379,36 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
     return getLocation() != Location.EXTERIOR;
   }
 
+  public void reset() {
+    this.crossingCount = 0;
+    this.pointOnSegment = false;
+  }
+
+  public void reset(final double x, final double y) {
+    this.crossingCount = 0;
+    this.pointOnSegment = false;
+    this.x = x;
+    this.y = y;
+  }
+
+  public void resetX(final double x) {
+    this.crossingCount = 0;
+    this.pointOnSegment = false;
+    this.x = x;
+  }
+
+  public void resetY(final double y) {
+    this.crossingCount = 0;
+    this.pointOnSegment = false;
+    this.y = y;
+  }
+
   public void setPointOnSegment(final boolean pointOnSegment) {
     this.pointOnSegment = pointOnSegment;
+  }
+
+  public void setXY(final double x, final double y) {
+    this.x = x;
+    this.y = y;
   }
 }

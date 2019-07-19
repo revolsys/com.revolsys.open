@@ -21,7 +21,7 @@ public class EdgeQuadTree<T> extends AbstractIdObjectQuadTree<Edge<T>> {
     if (edge == null) {
       return BoundingBox.empty();
     } else {
-      final LineString line = edge.getLine();
+      final LineString line = edge.getLineString();
       if (line == null) {
         return BoundingBox.empty();
       } else {

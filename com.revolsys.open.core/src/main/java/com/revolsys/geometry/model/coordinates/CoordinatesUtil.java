@@ -6,7 +6,6 @@ import org.jeometry.common.number.Doubles;
 import com.revolsys.geometry.algorithm.HCoordinate;
 import com.revolsys.geometry.algorithm.NotRepresentableException;
 import com.revolsys.geometry.algorithm.RobustDeterminant;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
@@ -147,15 +146,6 @@ public class CoordinatesUtil {
 
   public static boolean equals(final double x1, final double y1, final double x2, final double y2) {
     return x1 == x2 && y1 == y2;
-  }
-
-  public static Point get2d(final Geometry geometry) {
-    if (geometry.isEmpty()) {
-      return null;
-    } else {
-      final Point point = geometry.getPoint();
-      return new PointDouble(point, 2);
-    }
   }
 
   public static int getAxisCount(final Point... points) {

@@ -47,13 +47,17 @@ public class IntervalRTreeBranchNode<V> extends IntervalRTreeNode<V> {
   }
 
   @Override
-  public void query(final double queryMin, final double queryMax, final Consumer<V> action) {
-    if (intersects(queryMin, queryMax)) {
-      if (this.node1 != null) {
-        this.node1.query(queryMin, queryMax, action);
+  public void query(final double queryMin, final double queryMax,
+    final Consumer<? super V> action) {
+    final boolean intersects = !(this.min > queryMax || this.max < queryMin);
+    if (intersects) {
+      final IntervalRTreeNode<V> node1 = this.node1;
+      if (node1 != null) {
+        node1.query(queryMin, queryMax, action);
       }
-      if (this.node2 != null) {
-        this.node2.query(queryMin, queryMax, action);
+      final IntervalRTreeNode<V> node2 = this.node2;
+      if (node2 != null) {
+        node2.query(queryMin, queryMax, action);
       }
     }
   }

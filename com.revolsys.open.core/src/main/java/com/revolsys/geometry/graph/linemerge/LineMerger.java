@@ -158,7 +158,7 @@ public class LineMerger {
             Node<LineString> currentNode = node;
             Edge<LineString> currentEdge = edge;
             do {
-              final LineString line = currentEdge.getLine();
+              final LineString line = currentEdge.getLineString();
               final double length = line.getLength();
               final boolean forwards = currentEdge.getEnd(currentNode).isFrom();
               if (forwards) {

@@ -202,7 +202,7 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
       if (!edges.isEmpty()) {
         Point coordinates = null;
         for (final Edge<T> edge : edges) {
-          final LineString line = edge.getLine();
+          final LineString line = edge.getLineString();
           final LineString points = line;
           Point point = null;
           if (edge.getFromNode() == this) {
@@ -497,44 +497,6 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
 
   public boolean isRemoved() {
     return this.graph == null;
-  }
-
-  public boolean move(final Point newCoordinates) {
-    if (isRemoved()) {
-      return false;
-    } else {
-      final Node<T> newNode = this.graph.getNode(newCoordinates);
-      if (equals(newNode)) {
-        return false;
-      } else {
-        this.graph.nodeMoved(this, newNode);
-        final int numEdges = getDegree();
-        final Set<Edge<T>> edges = new HashSet<>(getInEdges());
-        edges.addAll(getOutEdges());
-        for (final Edge<T> edge : edges) {
-          if (!edge.isRemoved()) {
-            final LineString line = edge.getLine();
-            LineString newLine;
-            if (edge.getEnd(this).isFrom()) {
-              newLine = line.subLine(newNode, 1, line.getVertexCount() - 1, null);
-            } else {
-              newLine = line.subLine(null, 0, line.getVertexCount() - 1, newNode);
-            }
-            this.graph.replaceEdge(edge, newLine);
-            if (!edge.isRemoved()) {
-              throw new RuntimeException("Not node Removed");
-            }
-          }
-        }
-        if (!isRemoved()) {
-          throw new RuntimeException("Not node Removed");
-        }
-        if (newNode.getDegree() != numEdges) {
-          throw new RuntimeException("numEdges");
-        }
-        return true;
-      }
-    }
   }
 
   public boolean moveNode(final Point point) {

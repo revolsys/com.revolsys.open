@@ -34,7 +34,7 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
 
   public static <T> void addEdgeToEdgesByLine(final Map<LineString, Set<Edge<T>>> lineEdgeMap,
     final Edge<T> edge) {
-    final LineString line = edge.getLine();
+    final LineString line = edge.getLineString();
     for (final Entry<LineString, Set<Edge<T>>> entry : lineEdgeMap.entrySet()) {
       final LineString keyLine = entry.getKey();
       if (LineStringUtil.equalsIgnoreDirection2d(line, keyLine)) {
@@ -50,7 +50,7 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
 
   public static <T> void addEdgeToEdgesByLine(final Node<T> node,
     final Map<LineString, Set<Edge<T>>> lineEdgeMap, final Edge<T> edge) {
-    LineString line = edge.getLine();
+    LineString line = edge.getLineString();
     for (final Entry<LineString, Set<Edge<T>>> entry : lineEdgeMap.entrySet()) {
       final LineString keyLine = entry.getKey();
       if (LineStringUtil.equalsIgnoreDirection2d(line, keyLine)) {
@@ -70,7 +70,7 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
   public static <T> Set<Edge<T>> getEdges(final Collection<Edge<T>> edges, final LineString line) {
     final Set<Edge<T>> newEdges = new LinkedHashSet<>();
     for (final Edge<T> edge : edges) {
-      if (LineStringUtil.equalsIgnoreDirection2d(line, edge.getLine())) {
+      if (LineStringUtil.equalsIgnoreDirection2d(line, edge.getLineString())) {
         newEdges.add(edge);
       }
     }
@@ -274,7 +274,7 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
       }
     } else if (other instanceof LineString) {
       final LineString otherLine = (LineString)other;
-      final LineString line = getLine();
+      final LineString line = getLineString();
       return line.compareTo(otherLine);
     }
     return 1;
@@ -303,7 +303,7 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
 
   @Override
   public BoundingBox getBoundingBox() {
-    return getLine().getBoundingBox();
+    return getLineString().getBoundingBox();
   }
 
   public Collection<Node<T>> getCommonNodes(final Edge<T> edge) {
@@ -315,13 +315,13 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
 
   @Override
   public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    final LineString line = getLine();
+    final LineString line = getLineString();
     return line.getCoordinate(vertexIndex, axisIndex);
   }
 
   @Override
   public double[] getCoordinates() {
-    final LineString line = getLine();
+    final LineString line = getLineString();
     return line.getCoordinates();
   }
 
@@ -373,7 +373,7 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
   }
 
   public double getFromAngle() {
-    final LineString line = getLine();
+    final LineString line = getLineString();
     final LineString points = line;
     return CoordinatesListUtil.angleToNext(points, 0);
   }
@@ -392,12 +392,8 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
 
   @Override
   public double getLength() {
-    final LineString line = getLine();
+    final LineString line = getLineString();
     return line.getLength();
-  }
-
-  public LineString getLine() {
-    return this.graph.getEdgeLine(this.id);
   }
 
   public LineString getLineString() {
@@ -476,7 +472,7 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
   }
 
   public double getToAngle() {
-    final LineString line = getLine();
+    final LineString line = getLineString();
     if (line == null) {
       return Double.NaN;
     } else {
@@ -495,7 +491,7 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
 
   @Override
   public int getVertexCount() {
-    final LineString line = getLine();
+    final LineString line = getLineString();
     return line.getVertexCount();
   }
 

@@ -67,8 +67,6 @@ public class MultiLineStringImpl implements MultiLineString {
    */
   private BoundingBox boundingBox;
 
-  private Object userData;
-
   private final GeometryFactory geometryFactory;
 
   private LineString[] lines;
@@ -250,11 +248,6 @@ public class MultiLineStringImpl implements MultiLineString {
     return this.lines.length;
   }
 
-  @Override
-  public Object getUserDataOld() {
-    return this.userData;
-  }
-
   /**
    * Gets a hash code for the Geometry.
    *
@@ -269,11 +262,6 @@ public class MultiLineStringImpl implements MultiLineString {
   @Override
   public boolean isEmpty() {
     return false;
-  }
-
-  @Override
-  public void setUserDataOld(final Object userData) {
-    this.userData = userData;
   }
 
   @Override

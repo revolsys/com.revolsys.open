@@ -70,7 +70,7 @@ public class NodeProperties {
       final List<Edge<T>> edges = node.getEdges();
       final Map<LineString, Map<String, Set<Edge<T>>>> lineEdgeMap = new HashMap<>();
       for (final Edge<T> edge : new HashSet<>(edges)) {
-        LineString line = edge.getLine();
+        LineString line = edge.getLineString();
         Map<String, Set<Edge<T>>> edgesByType = edgesByTypeForLine(lineEdgeMap, line);
         if (edgesByType == null) {
           edgesByType = new HashMap<>();

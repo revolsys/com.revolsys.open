@@ -73,7 +73,7 @@ public class EdgeWithinDistance<T> extends DelegatingVisitor<Edge<T>>
 
   @Override
   public boolean test(final Edge<T> edge) {
-    final LineString line = edge.getLine();
+    final LineString line = edge.getLineString();
     final double distance = line.distance(this.geometry);
     if (distance <= this.maxDistance) {
       return true;

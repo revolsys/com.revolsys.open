@@ -29,13 +29,13 @@ public class EdgeEvent<T> extends EventObject {
 
   public EdgeEvent(final Edge<T> edge) {
     super(edge);
-    this.line = edge.getLine();
+    this.line = edge.getLineString();
     this.typePath = edge.getTypeName();
   }
 
   public EdgeEvent(final Edge<T> edge, final String ruleName, final String action) {
     super(edge);
-    this.line = edge.getLine();
+    this.line = edge.getLineString();
     this.typePath = edge.getTypeName();
     this.ruleName = ruleName;
     this.action = action;
@@ -44,7 +44,7 @@ public class EdgeEvent<T> extends EventObject {
   public EdgeEvent(final Edge<T> edge, final String ruleName, final String action,
     final String notes) {
     super(edge);
-    this.line = edge.getLine();
+    this.line = edge.getLineString();
     this.typePath = edge.getTypeName();
     this.ruleName = ruleName;
     this.action = action;

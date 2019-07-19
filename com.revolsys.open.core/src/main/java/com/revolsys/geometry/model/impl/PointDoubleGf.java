@@ -33,6 +33,7 @@
 package com.revolsys.geometry.model.impl;
 
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Point;
 
 /**
  * Represents a single point.
@@ -54,16 +55,6 @@ public class PointDoubleGf extends PointDouble {
   private final GeometryFactory geometryFactory;
 
   /**
-   * An object reference which can be used to carry ancillary data defined
-   * by the client.
-   */
-  private Object userData;
-
-  public PointDoubleGf(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
-  }
-
-  /**
    *@param  coordinates      contains the single coordinate on which to base this <code>Point</code>
    *      , or <code>null</code> to create the empty geometry.
    */
@@ -82,29 +73,9 @@ public class PointDoubleGf extends PointDouble {
     return this.geometryFactory;
   }
 
-  /**
-   * Gets the user data object for this geometry, if any.
-   *
-   * @return the user data object, or <code>null</code> if none set
-   */
   @Override
-  public Object getUserDataOld() {
-    return this.userData;
+  public Point newPoint(final double x, final double y) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return geometryFactory.point(x, y);
   }
-
-  /**
-   * A simple scheme for applications to add their own custom data to a Geometry.
-   * An example use might be to add an object representing a Point Reference System.
-   * <p>
-   * Note that user data objects are not present in geometries created by
-   * construction methods.
-   *
-   * @param userData an object, the semantics for which are defined by the
-   * application using this Geometry
-   */
-  @Override
-  public void setUserDataOld(final Object userData) {
-    this.userData = userData;
-  }
-
 }

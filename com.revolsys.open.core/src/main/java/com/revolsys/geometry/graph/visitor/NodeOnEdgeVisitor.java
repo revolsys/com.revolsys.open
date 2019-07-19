@@ -51,7 +51,7 @@ public class NodeOnEdgeVisitor<T> extends DelegatingVisitor<Edge<T>> {
   @Override
   public void accept(final Edge<T> edge) {
     if (!edge.hasNode(this.node)) {
-      final LineString line = edge.getLine();
+      final LineString line = edge.getLineString();
       if (line.getBoundingBox().bboxIntersects(this.boundingBox)) {
         if (LineStringUtil.isPointOnLine(line, this.point, this.maxDistance)) {
           super.accept(edge);

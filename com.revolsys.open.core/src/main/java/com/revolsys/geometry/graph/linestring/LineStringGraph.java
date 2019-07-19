@@ -264,7 +264,9 @@ public class LineStringGraph extends Graph<LineSegment> {
     if (scaleXY > 0) {
       maxDistance = 1 / scaleXY;
     }
-    envelope = envelope.expand(maxDistance);
+    envelope = envelope //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     if (envelope.bboxIntersects(this.envelope)) {
       final LineString points = line;
       final int numPoints = points.getVertexCount();
@@ -301,7 +303,7 @@ public class LineStringGraph extends Graph<LineSegment> {
             }
           }
           for (final Point point : line1.vertices()) {
-            if (line2.distance(point) < maxDistance) {
+            if (line2.distancePoint(point) < maxDistance) {
 
               if (point.equals(fromPoint) || point.equals(toPoint)) {
                 // Point intersection, make sure it's not at the start
@@ -364,7 +366,7 @@ public class LineStringGraph extends Graph<LineSegment> {
   @Override
   public void nodeMoved(final Node<LineSegment> node, final Node<LineSegment> newNode) {
     if (this.fromPoint.equals(2, node)) {
-      this.fromPoint = new PointDouble(newNode);
+      this.fromPoint = newNode.newPoint2D();
     }
   }
 
@@ -399,7 +401,7 @@ public class LineStringGraph extends Graph<LineSegment> {
 
       edge.setProperty(INDEX, Arrays.asList(index++));
     }
-    this.fromPoint = new PointDouble(lineString.getPoint(0));
+    this.fromPoint = lineString.getPoint(0).newPoint2D();
     this.envelope = lineString.getBoundingBox();
   }
 
@@ -417,7 +419,7 @@ public class LineStringGraph extends Graph<LineSegment> {
           final LineSegment line2 = edge2.getObject();
           final Geometry intersections = line1.getIntersection(line2);
           if (intersections instanceof Point) {
-            final Point intersection = new PointDouble((Point)intersections);
+            final Point intersection = (Point)intersections;
             points.add(intersection);
             edge2.split(intersection);
           }

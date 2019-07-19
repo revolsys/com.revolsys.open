@@ -209,13 +209,13 @@ public class RobustLineIntersector extends LineIntersector {
        * Now check to see if any endpoint lies on the interior of the other segment.
        */
       else if (Pq1 == 0) {
-        this.intPt[0] = new PointDouble(q1);
+        this.intPt[0] = q1;
       } else if (Pq2 == 0) {
-        this.intPt[0] = new PointDouble(q2);
+        this.intPt[0] = q2;
       } else if (Qp1 == 0) {
-        this.intPt[0] = new PointDouble(p1);
+        this.intPt[0] = p1;
       } else if (Qp2 == 0) {
-        this.intPt[0] = new PointDouble(p2);
+        this.intPt[0] = p2;
       }
     } else {
       this.isProper = true;
@@ -298,7 +298,7 @@ public class RobustLineIntersector extends LineIntersector {
 
       // compute a safer intersectionCount
       // copy the coordinate, since it may be rounded later
-      intPt = new PointDouble(nearestEndpoint(p1, p2, q1, q2));
+      intPt = nearestEndpoint(p1, p2, q1, q2);
       // intPt = CentralEndpointIntersector.getIntersection(p1, p2, q1, q2);
 
       // System.out.println("Segments: " + this);

@@ -22,7 +22,7 @@ public class NearParallelEdgeVisitor<T> extends EdgeVisitor<T> {
 
   @Override
   public void accept(final Edge<T> edge) {
-    final LineString matchLine = edge.getLine();
+    final LineString matchLine = edge.getLineString();
     if (isAlmostParallel(matchLine)) {
       super.accept(edge);
     }

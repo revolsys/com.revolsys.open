@@ -16,7 +16,7 @@ public class BoundingBoxIntersectsEdgeVisitor<T> extends DelegatingVisitor<Edge<
     final double maxDistance) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>();
 
-    final LineString line = edge.getLine();
+    final LineString line = edge.getLineString();
     BoundingBox boundingBox = line.getBoundingBox();
     boundingBox = boundingBox.expand(maxDistance);
     final BoundingBoxIntersectsEdgeVisitor<T> visitor = new BoundingBoxIntersectsEdgeVisitor<>(

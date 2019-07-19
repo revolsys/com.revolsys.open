@@ -50,7 +50,7 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Consumer<Edge<T>> {
   @Override
   public void accept(final Edge<T> edge) {
     final String typePath = edge.getTypeName();
-    final LineString line = edge.getLine();
+    final LineString line = edge.getLineString();
     final int vertexCount = line.getVertexCount();
     if (vertexCount > 2) {
       final GeometryFactory geometryFactory = line.getGeometryFactory();

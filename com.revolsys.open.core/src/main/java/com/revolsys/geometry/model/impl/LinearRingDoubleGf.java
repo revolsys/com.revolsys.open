@@ -133,7 +133,7 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
       }
     } else {
       final StringWriter out = new StringWriter();
-      EWktWriter.write(out, this);
+      EWktWriter.write(out, (LineString)this);
       throw new IllegalArgumentException(
         "Points of LinearRing do not form a closed linestring: " + out);
     }

@@ -28,7 +28,6 @@ import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.TopologyException;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
-import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.RecordReader;
@@ -174,7 +173,6 @@ public interface Records {
     final Geometry oldGeometry = record.getGeometry();
     final T newObject = (T)record.clone();
     newObject.setGeometryValue(geometry);
-    GeometryProperties.copyUserData(oldGeometry, geometry);
     return newObject;
   }
 
@@ -334,9 +332,6 @@ public interface Records {
           } else {
             return null;
           }
-        } else if (propertyValue instanceof Geometry) {
-          final Geometry geometry = (Geometry)propertyValue;
-          propertyValue = GeometryProperties.getGeometryProperty(geometry, propertyName);
         } else if (propertyValue instanceof Map) {
           final Map<String, Object> map = (Map<String, Object>)propertyValue;
           propertyValue = map.get(propertyName);

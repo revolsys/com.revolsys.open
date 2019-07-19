@@ -37,7 +37,6 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
  * Snaps the vertices and segments of a {@link LineString}
@@ -185,7 +184,7 @@ public class LineStringSnapper {
        * Duplicate points are not added.
        */
       if (index >= 0) {
-        srcCoords.add(index + 1, new PointDouble(snapPt), false);
+        srcCoords.add(index + 1, snapPt, false);
       }
     }
   }
@@ -222,10 +221,10 @@ public class LineStringSnapper {
       final Point snapVert = findSnapForVertex(srcPt, snapPts, this.snapTolerance);
       if (snapVert != null) {
         // update src with snap pt
-        srcCoords.set(i, new PointDouble(snapVert));
+        srcCoords.set(i, snapVert);
         // keep final closing point in synch (rings only)
         if (i == 0 && this.isClosed) {
-          srcCoords.set(srcCoords.size() - 1, new PointDouble(snapVert));
+          srcCoords.set(srcCoords.size() - 1, snapVert);
         }
       }
     }

@@ -3,6 +3,7 @@ package com.revolsys.geometry.algorithm.index;
 import java.util.Collection;
 import java.util.function.Consumer;
 
+import com.revolsys.geometry.index.quadtree.PointQuadTree;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 

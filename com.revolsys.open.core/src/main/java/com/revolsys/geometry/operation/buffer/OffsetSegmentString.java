@@ -93,7 +93,7 @@ class OffsetSegmentString {
     if (this.points.size() < 1) {
       return;
     }
-    final Point startPt = new PointDouble(this.points.get(0));
+    final Point startPt = this.points.get(0);
     final Point lastPt = this.points.get(this.points.size() - 1);
     Point last2Pt = null;
     if (this.points.size() >= 2) {

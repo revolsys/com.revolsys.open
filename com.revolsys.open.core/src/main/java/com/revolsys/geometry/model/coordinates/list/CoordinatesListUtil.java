@@ -31,15 +31,6 @@ public class CoordinatesListUtil {
 
   public static final String SEGMENT_INDEX = "segmentIndex";
 
-  public static double angle(final LineString points, final int i1, final int i2) {
-    final double x1 = points.getX(i1);
-    final double y1 = points.getY(i1);
-    final double x2 = points.getX(i2);
-    final double y2 = points.getY(i2);
-    final double angle = Angle.angle2d(x1, y1, x2, y2);
-    return angle;
-  }
-
   public static double angleToNext(final LineString points, final int i) {
     final double x1 = points.getX(i);
     final double y1 = points.getY(i);
@@ -207,15 +198,15 @@ public class CoordinatesListUtil {
   }
 
   public static Point[] getPointArray(final Geometry geometry, final int vertexCount) {
-    final List<Point> coordinates = new ArrayList<>();
-    final int i = 0;
+    final Point[] points = new Point[vertexCount];
+    int i = 0;
     for (final Vertex vertex : geometry.vertices()) {
       if (i > vertexCount) {
         break;
       }
-      coordinates.add(vertex);
+      points[i++] = vertex.newPoint();
     }
-    return coordinates.toArray(new Point[coordinates.size()]);
+    return points;
   }
 
   public static List<LineString> intersection(final GeometryFactory geometryFactory,
@@ -291,7 +282,7 @@ public class CoordinatesListUtil {
   public static <T> boolean movePointsWithinTolerance(final Map<Point, Point> movedNodes,
     final Graph<T> graph2, final double maxDistance, final Node<T> node1) {
     final Graph<T> graph1 = node1.getGraph();
-    final List<Node<T>> nodes2 = graph2.findNodes(node1, maxDistance);
+    final List<Node<T>> nodes2 = graph2.getNodes(node1, maxDistance);
     if (nodes2.size() == 1) {
       final Node<T> node2 = nodes2.get(0);
       if (graph1.findNode(node2) == null) {
@@ -299,15 +290,15 @@ public class CoordinatesListUtil {
         final Point midPoint = LineSegmentUtil.midPoint(precisionModel, node1, node2);
         if (!node1.equals(2, midPoint)) {
           if (movedNodes != null) {
-            movedNodes.put(node1, midPoint);
+            movedNodes.put(node1.newPoint2D(), midPoint);
           }
-          node1.move(midPoint);
+          node1.moveNode(midPoint);
         }
         if (!node2.equals(2, midPoint)) {
           if (movedNodes != null) {
-            movedNodes.put(node2, midPoint);
+            movedNodes.put(node2.newPoint2D(), midPoint);
           }
-          node2.move(midPoint);
+          node2.moveNode(midPoint);
         }
       }
     }
@@ -315,8 +306,8 @@ public class CoordinatesListUtil {
   }
 
   /**
-   * Returns the index of the direction of the point <code>q</code> relative to
-   * a vector specified by <code>p1-p2</code>.
+   * Returns the index of the direction of the point <code>x,y</code> relative to
+   * a vector specified by <code>(x1,y1)->(x2,y2)</code>.
    *
    * @param p1 the origin point of the vector
    * @param p2 the final point of the vector
@@ -400,9 +391,11 @@ public class CoordinatesListUtil {
 
   public static void setCoordinates(final double[] coordinates, final int axisCount, final int i,
     final Point point) {
-    for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
-      final double value = point.getCoordinate(axisIndex);
-      coordinates[i * axisCount + axisIndex] = value;
+    if (point != null && !point.isEmpty()) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        final double value = point.getCoordinate(axisIndex);
+        coordinates[i * axisCount + axisIndex] = value;
+      }
     }
   }
 

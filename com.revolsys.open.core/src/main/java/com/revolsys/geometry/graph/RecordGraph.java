@@ -135,7 +135,7 @@ public class RecordGraph extends Graph<Record> {
     if (fromNode != null && toNode != null) {
       final Collection<Edge<Record>> edges = Node.getEdgesBetween(fromNode, toNode);
       for (final Edge<Record> edge : edges) {
-        final LineString updateLine = edge.getLine();
+        final LineString updateLine = edge.getLineString();
         if (updateLine.equals(line)) {
           return true;
         }
@@ -159,7 +159,7 @@ public class RecordGraph extends Graph<Record> {
   public List<Edge<Record>> splitEdges(final Point point, final double distance) {
     final List<Edge<Record>> edges = new ArrayList<>();
     for (final Edge<Record> edge : findEdges(point, distance)) {
-      final LineString line = edge.getLine();
+      final LineString line = edge.getLineString();
       final List<Edge<Record>> splitEdges = edge.splitEdge(point);
       DirectionalFields.edgeSplitFieldValues(line, point, splitEdges);
       edges.addAll(splitEdges);

@@ -33,7 +33,7 @@
 package com.revolsys.geometry.noding;
 
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.impl.AbstractDelegatingLineString;
 
 /**
  * Represents a list of contiguous line segments,
@@ -47,20 +47,25 @@ import com.revolsys.geometry.model.Point;
  *
  * @version 1.7
  */
-public class BasicSegmentString implements SegmentString {
-  private Object data;
+public class BasicSegmentString extends AbstractDelegatingLineString implements SegmentString {
+  private static final long serialVersionUID = 1L;
 
-  private final LineString points;
+  private Object data;
 
   /**
    * Creates a new segment string from a list of vertices.
    *
-   * @param points the vertices of the segment string
+   * @param line the vertices of the segment string
    * @param data the user-defined data of this segment string (may be null)
    */
-  public BasicSegmentString(final LineString points, final Object data) {
-    this.points = points;
+  public BasicSegmentString(final LineString line, final Object data) {
+    super(line);
     this.data = data;
+  }
+
+  @Override
+  public SegmentString clone() {
+    return this;
   }
 
   /**
@@ -73,16 +78,6 @@ public class BasicSegmentString implements SegmentString {
     return this.data;
   }
 
-  @Override
-  public LineString getLineString() {
-    return this.points;
-  }
-
-  @Override
-  public Point getPoint(final int i) {
-    return this.points.getPoint(i);
-  }
-
   /**
    * Gets the octant of the segment starting at vertex <code>index</code>.
    *
@@ -91,15 +86,14 @@ public class BasicSegmentString implements SegmentString {
    * @return the octant of the segment at the vertex
    */
   public int getSegmentOctant(final int index) {
-    if (index == this.points.getVertexCount() - 1) {
+    if (index == getVertexCount() - 1) {
       return -1;
     }
-    return Octant.octant(getPoint(index), getPoint(index + 1));
-  }
-
-  @Override
-  public boolean isClosed() {
-    return this.points.getPoint(0).equals(this.points.getPoint(this.points.getVertexCount() - 1));
+    final double x1 = getX(index);
+    final double y1 = getY(index);
+    final double x2 = getX(index + 1);
+    final double y2 = getY(index + 1);
+    return Octant.octant(x1, y1, x2, y2);
   }
 
   /**
@@ -114,11 +108,11 @@ public class BasicSegmentString implements SegmentString {
 
   @Override
   public int size() {
-    return this.points.getVertexCount();
+    return getVertexCount();
   }
 
   @Override
   public String toString() {
-    return this.points.toString();
+    return toWkt();
   }
 }

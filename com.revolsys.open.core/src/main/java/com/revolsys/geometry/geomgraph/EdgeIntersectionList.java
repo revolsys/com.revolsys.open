@@ -40,7 +40,6 @@ import java.util.TreeMap;
 
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.LineStringDouble;
-import com.revolsys.geometry.model.impl.PointDouble;
 
 /**
  * A list of edge intersections along an {@link Edge}.
@@ -155,7 +154,7 @@ public class EdgeIntersectionList implements Iterable<EdgeIntersection> {
 
     final Point[] pts = new Point[npts];
     int ipt = 0;
-    pts[ipt++] = new PointDouble(ei0.coord);
+    pts[ipt++] = ei0.coord;
     for (int i = ei0.segmentIndex + 1; i <= ei1.segmentIndex; i++) {
       pts[ipt++] = this.edge.getPoint(i);
     }

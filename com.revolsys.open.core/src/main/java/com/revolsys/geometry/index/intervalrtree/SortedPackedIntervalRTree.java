@@ -34,6 +34,7 @@ package com.revolsys.geometry.index.intervalrtree;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -61,8 +62,14 @@ public class SortedPackedIntervalRTree<V> {
 
   private IntervalRTreeNode<V> root = null;
 
-  public SortedPackedIntervalRTree() {
+  private Comparator<IntervalRTreeNode<V>> comparator;
 
+  public SortedPackedIntervalRTree() {
+    this(new NodeComparator<>());
+  }
+
+  public SortedPackedIntervalRTree(final Comparator<IntervalRTreeNode<V>> comparator) {
+    this.comparator = comparator;
   }
 
   private void buildLevel(final List<IntervalRTreeNode<V>> src,
@@ -75,9 +82,7 @@ public class SortedPackedIntervalRTree<V> {
       if (n2 == null) {
         dest.add(n1);
       } else {
-        final IntervalRTreeNode<V> node = new IntervalRTreeBranchNode<>(src.get(i), src.get(i + 1));
-        // printNode(node);
-        // System.out.println(node);
+        final IntervalRTreeNode<V> node = new IntervalRTreeBranchNode<>(n1, src.get(i + 1));
         dest.add(node);
       }
     }
@@ -87,7 +92,7 @@ public class SortedPackedIntervalRTree<V> {
     if (this.root == null) {
       try {
         // sort the leaf nodes
-        Collections.sort(this.leaves, new NodeComparator<V>());
+        Collections.sort(this.leaves, this.comparator);
 
         // now group nodes into blocks of two and build tree up recursively
         List<IntervalRTreeNode<V>> src = this.leaves;
@@ -134,7 +139,7 @@ public class SortedPackedIntervalRTree<V> {
    * @param max the upper bound of the query interval
    * @param visitor the visitor to pass any matched items to
    */
-  public void query(final double min, final double max, final Consumer<V> visitor) {
+  public void query(final double min, final double max, final Consumer<? super V> visitor) {
     init();
     try {
       this.root.query(min, max, visitor);

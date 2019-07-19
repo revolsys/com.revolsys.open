@@ -28,7 +28,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.Value;
 import com.revolsys.record.schema.FieldDefinition;
@@ -885,9 +884,6 @@ public interface Record
           } else {
             return null;
           }
-        } else if (propertyValue instanceof Geometry) {
-          final Geometry geometry = (Geometry)propertyValue;
-          propertyValue = GeometryProperties.getGeometryProperty(geometry, propertyName);
         } else if (propertyValue instanceof Map) {
           final Map<String, Object> map = (Map<String, Object>)propertyValue;
           propertyValue = map.get(propertyName);

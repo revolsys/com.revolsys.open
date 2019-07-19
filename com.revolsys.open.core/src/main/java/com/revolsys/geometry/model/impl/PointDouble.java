@@ -1,20 +1,33 @@
 package com.revolsys.geometry.model.impl;
 
 import java.io.Serializable;
+import java.util.function.Consumer;
+
+import org.jeometry.common.function.BiConsumerDouble;
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
+import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Point;
 
 public class PointDouble extends AbstractPoint implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private double[] coordinates;
 
-  protected PointDouble() {
-  }
-
   public PointDouble(final double... coordinates) {
-    this(coordinates.length, coordinates);
+    final int axisCount = coordinates.length;
+    this.coordinates = new double[axisCount];
+    for (int i = 0; i < axisCount; i++) {
+      double value;
+      if (i < coordinates.length) {
+        value = coordinates[i];
+      } else {
+        value = java.lang.Double.NaN;
+      }
+      this.coordinates[i] = value;
+    }
   }
 
   protected PointDouble(final GeometryFactory geometryFactory, final double... coordinates) {
@@ -26,54 +39,10 @@ public class PointDouble extends AbstractPoint implements Serializable {
         if (i < coordinates.length) {
           value = geometryFactory.makePrecise(i, coordinates[i]);
         } else {
-          value = Double.NaN;
+          value = java.lang.Double.NaN;
         }
         this.coordinates[i] = value;
       }
-    }
-  }
-
-  public PointDouble(final int axisCount) {
-    if (axisCount > 1) {
-      this.coordinates = new double[axisCount];
-    } else {
-      this.coordinates = null;
-    }
-  }
-
-  public PointDouble(final int axisCount, final double... coordinates) {
-    this.coordinates = new double[axisCount];
-    for (int i = 0; i < axisCount; i++) {
-      double value;
-      if (i < coordinates.length) {
-        value = coordinates[i];
-      } else {
-        value = Double.NaN;
-      }
-      this.coordinates[i] = value;
-    }
-  }
-
-  public PointDouble(final Point coordinates) {
-    final int axisCount = coordinates.getAxisCount();
-    this.coordinates = new double[axisCount];
-    for (int i = 0; i < axisCount; i++) {
-      final double value = coordinates.getCoordinate(i);
-      this.coordinates[i] = value;
-    }
-  }
-
-  public PointDouble(final Point point, final int axisCount) {
-    this(axisCount);
-    final int pointAxisCount = point.getAxisCount();
-    for (int i = 0; i < axisCount; i++) {
-      final double value;
-      if (i < pointAxisCount) {
-        value = point.getCoordinate(i);
-      } else {
-        value = Double.NaN;
-      }
-      this.coordinates[i] = value;
     }
   }
 
@@ -84,6 +53,59 @@ public class PointDouble extends AbstractPoint implements Serializable {
       point.coordinates = this.coordinates.clone();
     }
     return point;
+  }
+
+  @Override
+  public <R> R findVertex(final BiFunctionDouble<R> action) {
+    if (isEmpty()) {
+      return null;
+    } else {
+      final double x = this.coordinates[0];
+      final double y = this.coordinates[1];
+      return action.accept(x, y);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final BiConsumerDouble action) {
+    final double x = this.coordinates[0];
+    final double y = this.coordinates[1];
+    action.accept(x, y);
+  }
+
+  @Override
+  public void forEachVertex(final Consumer3Double action) {
+    if (!isEmpty()) {
+      final double x = this.coordinates[0];
+      final double y = this.coordinates[1];
+      double z;
+      if (this.coordinates.length < 3) {
+        z = java.lang.Double.NaN;
+      } else {
+        z = this.coordinates[2];
+      }
+
+      action.accept(x, y, z);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperation coordinatesOperation,
+    final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
+    if (!isEmpty()) {
+      point.setPoint(this.coordinates);
+      coordinatesOperation.perform(point);
+      action.accept(point);
+    }
+  }
+
+  @Override
+  public void forEachVertex(final CoordinatesOperationPoint point,
+    final Consumer<CoordinatesOperationPoint> action) {
+    if (!isEmpty()) {
+      point.setPoint(this.coordinates);
+      action.accept(point);
+    }
   }
 
   @Override
@@ -98,13 +120,13 @@ public class PointDouble extends AbstractPoint implements Serializable {
   @Override
   public double getCoordinate(final int axisIndex) {
     if (isEmpty()) {
-      return Double.NaN;
+      return java.lang.Double.NaN;
     } else {
       final int axisCount = getAxisCount();
       if (axisIndex >= 0 && axisIndex < axisCount) {
         return this.coordinates[axisIndex];
       } else {
-        return Double.NaN;
+        return java.lang.Double.NaN;
       }
     }
   }
@@ -120,20 +142,12 @@ public class PointDouble extends AbstractPoint implements Serializable {
 
   @Override
   public double getX() {
-    if (this.coordinates == null) {
-      return Double.NaN;
-    } else {
-      return this.coordinates[0];
-    }
+    return this.coordinates[0];
   }
 
   @Override
   public double getY() {
-    if (this.coordinates == null) {
-      return Double.NaN;
-    } else {
-      return this.coordinates[1];
-    }
+    return this.coordinates[1];
   }
 
   @Override

@@ -41,7 +41,6 @@ import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.segment.LineSegmentDouble;
 import com.revolsys.geometry.operation.distance.FacetSequence;
@@ -205,7 +204,7 @@ public class MinimumClearance {
     private void updatePts(final Point p, final Point seg0, final Point seg1) {
       this.minPts[0] = p;
       final LineSegment seg = new LineSegmentDouble(seg0, seg1);
-      this.minPts[1] = new PointDouble(seg.closestPoint(p));
+      this.minPts[1] = seg.closestPoint(p);
     }
 
     private double vertexDistance(final FacetSequence fs1, final FacetSequence fs2) {
