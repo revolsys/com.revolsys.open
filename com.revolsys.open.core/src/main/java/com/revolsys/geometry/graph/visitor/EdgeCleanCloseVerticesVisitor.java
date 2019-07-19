@@ -121,12 +121,12 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Consumer<Edge<T>> {
     }
   }
 
-  public CoordinateEventListenerList getCoordinateListeners() {
-    return this.coordinateListeners;
-  }
-
   public EdgeEventListenerList<T> getEdgeListeners() {
     return this.edgeListeners;
+  }
+
+  public CoordinateEventListenerList getPointListeners() {
+    return this.coordinateListeners;
   }
 
 }

@@ -36,12 +36,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
+import com.revolsys.geometry.algorithm.PointLocator;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
@@ -55,7 +59,7 @@ import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
  * it is possible to take advantage of various optimizations to improve performance.
  *  {@link Geometry#isHeterogeneousGeometryCollection()}s are fully supported.
  * <p>
- * the result obeys the following contract:
+ * The result obeys the following contract:
  * <ul>
  * <li>Unioning a set of {@link Polygon}s has the effect of
  * merging the areas (i.e. the same effect as
@@ -159,10 +163,10 @@ public class UnaryUnionOp {
        * MultiPoint and MultiLineStrings.
        * This is not the case for polygons, so Cascaded Union is required.
        */
-      Geometry unionPoints = null;
+      Punctual unionPoints = null;
       if (points.size() > 0) {
-        final Geometry pointal = geometryFactory.geometry(points);
-        unionPoints = unionNoOpt(geometryFactory, pointal);
+        final Punctual punctual = geometryFactory.punctual(points);
+        unionPoints = punctual.union();
       }
 
       Geometry unionLines = null;
@@ -180,21 +184,51 @@ public class UnaryUnionOp {
        * Performing two unions is somewhat inefficient,
        * but is mitigated by unioning lines and points first
        */
-      final Geometry unionLA = unionWithNull(unionLines, unionPolygons);
       Geometry union = null;
-      if (unionPoints == null) {
-        union = unionLA;
-      } else if (unionLA == null) {
-        union = unionPoints;
+      if (unionLines == null) {
+        union = unionPolygons;
+      } else if (unionPolygons == null) {
+        union = unionLines;
       } else {
-        union = PointGeometryUnion.union((Punctual)unionPoints, unionLA);
+        union = unionPolygons.union(unionLines);
       }
-
+      if (unionPoints != null) {
+        if (union == null) {
+          union = unionPoints;
+        } else {
+          union = union(unionPoints, union);
+        }
+      }
       if (union == null) {
         return geometryFactory.geometryCollection();
+      } else {
+        return union;
       }
+    }
+  }
 
-      return union;
+  public static Geometry union(final Punctual punctual, final Geometry otherGeom) {
+    final PointLocator locater = new PointLocator();
+    Set<Geometry> exteriorGeometries = null;
+
+    for (final Point point : punctual.points()) {
+      final Location loc = locater.locate(otherGeom, point);
+      if (loc == Location.EXTERIOR) {
+        if (exteriorGeometries == null) {
+          exteriorGeometries = new TreeSet<>();
+        }
+        exteriorGeometries.add(point);
+      }
+    }
+
+    if (exteriorGeometries == null) {
+      return otherGeom;
+    } else {
+      for (final Geometry geometry : otherGeom.geometries()) {
+        exteriorGeometries.add(geometry);
+      }
+      final GeometryFactory geomFactory = otherGeom.getGeometryFactory();
+      return geomFactory.geometry(exteriorGeometries);
     }
   }
 
@@ -215,26 +249,4 @@ public class UnaryUnionOp {
     final Geometry empty = geometryFactory.point();
     return SnapIfNeededOverlayOp.overlayOp(geometry, empty, OverlayOp.UNION);
   }
-
-  /**
-   * Computes the union of two geometries,
-   * either of both of which may be null.
-   *
-   * @param geometry1 a Geometry
-   * @param g1 a Geometry
-   * @return the union of the input(s)
-   * or null if both inputs are null
-   */
-  private static Geometry unionWithNull(final Geometry geometry1, final Geometry g1) {
-    if (geometry1 == null && g1 == null) {
-      return null;
-    } else if (g1 == null) {
-      return geometry1;
-    } else if (geometry1 == null) {
-      return g1;
-    } else {
-      return geometry1.union(g1);
-    }
-  }
-
 }

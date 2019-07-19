@@ -9,7 +9,6 @@ import org.jeometry.common.number.Doubles;
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.RobustDeterminant;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -678,7 +677,7 @@ public class LineSegmentUtil {
     final double y2 = p1.getY();
     final double x = x1 + segmentLengthFraction * (x2 - x1);
     final double y = y1 + segmentLengthFraction * (y2 - y1);
-    final Point coord = new PointDouble(x, y, Geometry.NULL_ORDINATE);
+    final Point coord = new PointDoubleXY(x, y);
     return coord;
   }
 

@@ -32,9 +32,9 @@
  */
 package com.revolsys.geometry.algorithm;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * Represents a homogeneous coordinate in a 2-D coordinate space.
@@ -79,7 +79,7 @@ public class HCoordinate {
       throw new NotRepresentableException();
     }
 
-    return new PointDouble(xInt, yInt, Geometry.NULL_ORDINATE);
+    return new PointDoubleXY(xInt, yInt);
   }
 
   /*

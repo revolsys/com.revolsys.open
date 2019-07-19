@@ -33,6 +33,7 @@
 package com.revolsys.geometry.operation.union;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.collection.list.Lists;
@@ -135,6 +136,10 @@ public class CascadedPolygonUnion {
   public static Polygonal union(final Iterable<? extends Polygonal> polygons) {
     final CascadedPolygonUnion op = new CascadedPolygonUnion(polygons);
     return op.union();
+  }
+
+  public static Polygonal union(final Polygonal... polygons) {
+    return union(Arrays.asList(polygons));
   }
 
   private GeometryFactory geometryFactory;
@@ -315,7 +320,7 @@ public class CascadedPolygonUnion {
     } else if (polygonal1.getGeometryCount() <= 1 && polygonal2.getGeometryCount() <= 1) {
       return unionActual(polygonal1, polygonal2);
     } else {
-      final BoundingBox boundingBoxIntersection = boundingBox1.intersection(boundingBox2);
+      final BoundingBox boundingBoxIntersection = boundingBox1.bboxIntersection(boundingBox2);
       return unionUsingEnvelopeIntersection(polygonal1, polygonal2, boundingBoxIntersection);
     }
   }
@@ -343,7 +348,7 @@ public class CascadedPolygonUnion {
 
   /**
    * Recursively unions all subtrees in the list into single geometries.
-   * the result is a list of Geometrys only
+   * The result is a list of Geometrys only
    */
   private Polygonal unionTree(final List<?> items) {
     final List<Polygonal> geoms = reduceToGeometries(items);

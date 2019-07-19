@@ -36,9 +36,8 @@ import org.jeometry.common.math.Angle;
 import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.algorithm.RobustDeterminant;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.util.Assert;
 
 /**
@@ -320,7 +319,7 @@ public class Vector2D {
   }
 
   public Point toCoordinate() {
-    return new PointDouble(this.x, this.y, Geometry.NULL_ORDINATE);
+    return new PointDoubleXY(this.x, this.y);
   }
 
   /**
@@ -334,7 +333,7 @@ public class Vector2D {
   }
 
   public Point translate(final Point coord) {
-    return new PointDouble(this.x + coord.getX(), this.y + coord.getY(), Geometry.NULL_ORDINATE);
+    return new PointDoubleXY(this.x + coord.getX(), this.y + coord.getY());
   }
 
   /**

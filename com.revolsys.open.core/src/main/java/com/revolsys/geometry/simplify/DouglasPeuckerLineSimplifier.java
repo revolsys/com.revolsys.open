@@ -33,9 +33,9 @@
 
 package com.revolsys.geometry.simplify;
 
-import com.revolsys.geometry.model.CoordinateList;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 
 /**
@@ -78,13 +78,13 @@ class DouglasPeuckerLineSimplifier {
       this.usePt[i] = true;
     }
     simplifySection(0, this.pts.getVertexCount() - 1);
-    final CoordinateList coordList = new CoordinateList();
+    final PointList coordList = new PointList();
     for (int i = 0; i < this.pts.getVertexCount(); i++) {
       if (this.usePt[i]) {
         coordList.add(this.pts.getPoint(i));
       }
     }
-    return coordList.toCoordinateArray();
+    return coordList.toPointArray();
   }
 
   private void simplifySection(final int i, final int j) {

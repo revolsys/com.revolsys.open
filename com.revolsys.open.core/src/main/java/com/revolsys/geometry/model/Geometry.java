@@ -204,8 +204,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   GeometryFactoryProxy, Serializable, DataTypeProxy {
   int M = 3;
 
-  double NULL_ORDINATE = Double.NaN;
-
   List<String> SORTED_GEOMETRY_TYPES = Arrays.asList("Point", "MultiPoint", "LineString",
     "LinearRing", "MultiLineString", "Polygon", "MultiPolygon", "GeometryCollection");
 

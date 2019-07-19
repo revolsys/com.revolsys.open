@@ -42,6 +42,7 @@ import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * Models a polygon lying in a plane in 3-dimensional Cartesian space.
@@ -71,12 +72,12 @@ public class PlanarPolygon3D {
   private static Point project(final Point p, final int facingPlane) {
     switch (facingPlane) {
       case Plane3D.XY_PLANE:
-        return new PointDouble(p.getX(), p.getY(), Geometry.NULL_ORDINATE);
+        return new PointDoubleXY(p.getX(), p.getY());
       case Plane3D.XZ_PLANE:
-        return new PointDouble(p.getX(), p.getZ(), Geometry.NULL_ORDINATE);
+        return new PointDoubleXY(p.getX(), p.getZ());
       // Plane3D.YZ
       default:
-        return new PointDouble(p.getY(), p.getZ(), Geometry.NULL_ORDINATE);
+        return new PointDoubleXY(p.getY(), p.getZ());
     }
   }
 

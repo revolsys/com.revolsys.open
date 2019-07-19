@@ -69,10 +69,10 @@ public class GmlGeometryReader extends AbstractIterator<Geometry> implements Geo
       }
     }
 
-    return toCoordinateList(axisCount, listOfCoordinateArrays);
+    return toPointList(axisCount, listOfCoordinateArrays);
   }
 
-  public static LineString toCoordinateList(final int axisCount,
+  public static LineString toPointList(final int axisCount,
     final List<double[]> listOfCoordinateArrays) {
     final int vertexCount = listOfCoordinateArrays.size();
     final double[] coordinates = new double[vertexCount * axisCount];

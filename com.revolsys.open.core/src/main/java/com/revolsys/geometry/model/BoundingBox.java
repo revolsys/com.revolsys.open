@@ -915,17 +915,9 @@ public interface BoundingBox
 
   default Quantity<Length> getHeightLength() {
     final double height = getHeight();
-    final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
-    if (coordinateSystem == null) {
-      return Quantities.getQuantity(height, Units.METRE);
-    } else {
-      return Quantities.getQuantity(height, coordinateSystem.getLengthUnit());
-    }
-  }
-
-  @Override
-  default int getHorizontalCoordinateSystemId() {
-    return getCoordinateSystemId();
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final Unit<Length> unit = geometryFactory.getHorizontalLengthUnit();
+    return Quantities.getQuantity(height, unit);
   }
 
   default double getMax(final int i) {
@@ -1082,47 +1074,14 @@ public interface BoundingBox
 
   default Quantity<Length> getWidthLength() {
     final double width = getWidth();
-    final CoordinateSystem coordinateSystem = getHorizontalCoordinateSystem();
-    if (coordinateSystem == null) {
-      return Quantities.getQuantity(width, Units.METRE);
-    } else {
-      return Quantities.getQuantity(width, coordinateSystem.getLengthUnit());
-    }
-  }
-
-  /**
-   * Computes the intersection of two {@link BoundingBox}s.
-   *
-   * @param env the envelope to intersect with
-   * @return a new BoundingBox representing the intersection of the envelopes (this will be
-   * the null envelope if either argument is null, or they do not intersect
-   */
-  default BoundingBox intersection(final BoundingBox boundingBox) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    final BoundingBox convertedBoundingBox = boundingBox.bboxToCs(geometryFactory);
-    if (isEmpty() || convertedBoundingBox.isEmpty() || !bboxIntersects(convertedBoundingBox)) {
-      return geometryFactory.bboxEmpty();
-    } else {
-      final double intMinX = Math.max(getMinX(), convertedBoundingBox.getMinX());
-      final double intMinY = Math.max(getMinY(), convertedBoundingBox.getMinY());
-      final double intMaxX = Math.min(getMaxX(), convertedBoundingBox.getMaxX());
-      final double intMaxY = Math.min(getMaxY(), convertedBoundingBox.getMaxY());
-      return geometryFactory.newBoundingBox(intMinX, intMinY, intMaxX, intMaxY);
-    }
+    final Unit<Length> unit = geometryFactory.getHorizontalLengthUnit();
+    return Quantities.getQuantity(width, unit);
   }
 
   @Override
   default boolean isBboxEmpty() {
     return isEmpty();
-  }
-
-  default boolean isWithinDistance(final BoundingBox boundingBox, final double maxDistance) {
-    final double distance = boundingBox.bboxDistance(boundingBox);
-    if (distance < maxDistance) {
-      return true;
-    } else {
-      return false;
-    }
   }
 
   default OutCode outcode(final double x, final double y) {

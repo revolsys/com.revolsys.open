@@ -2193,7 +2193,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
   /**
    * <p>Construct a new new {@link Point} from the specified point coordinates.
    * If the point is null or has length < 2 an empty point will be returned.
-   * the result point will have the same  {@link #getAxisCount()} from this factory.
+   * The result point will have the same  {@link #getAxisCount()} from this factory.
    * Additional coordinates in the point will be ignored. If the point length is &lt;
    * {@link #getAxisCount()} then {@link Double#NaN} will be used for that axis.</p>
    *
@@ -2300,7 +2300,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
   /**
    * <p>Construct a new new {@link Point} from the specified point ({@link Coordinates}).
    * If the point is null or has {@link Coordinates#getAxisCount()} &lt; 2 an empty
-   * point will be returned. the result point will have the same  {@link #getAxisCount()} from this
+   * point will be returned. The result point will have the same  {@link #getAxisCount()} from this
    * factory. Additional axis in the point will be ignored. If the point has a smaller
    * {@link Point#getAxisCount()} then {@link Double#NaN} will be used for that axis.</p>
    *

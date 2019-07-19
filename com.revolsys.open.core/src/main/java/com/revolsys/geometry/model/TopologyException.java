@@ -32,7 +32,7 @@
  */
 package com.revolsys.geometry.model;
 
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 /**
  * Indicates an invalid or inconsistent topological situation encountered during processing
@@ -58,12 +58,12 @@ public class TopologyException extends RuntimeException {
     super(msg);
   }
 
-  public TopologyException(final String msg, final Point pt) {
-    super(msgWithCoord(msg, pt));
-    this.pt = new PointDouble(pt);
+  public TopologyException(final String msg, final Point point) {
+    super(msgWithCoord(msg, point));
+    this.pt = new PointDoubleXY(point);
   }
 
-  public Point getCoordinate() {
+  public Point getPoint() {
     return this.pt;
   }
 

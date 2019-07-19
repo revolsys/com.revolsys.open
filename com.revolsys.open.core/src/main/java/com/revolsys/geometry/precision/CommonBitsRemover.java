@@ -34,7 +34,7 @@ package com.revolsys.geometry.precision;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.vertex.Vertex;
 
 /**
@@ -106,8 +106,8 @@ public class CommonBitsRemover {
       this.commonBitsY.add(vertex.getY());
 
     }
-    this.commonCoord = new PointDouble(this.commonBitsX.getCommon(), this.commonBitsY.getCommon(),
-      Geometry.NULL_ORDINATE);
+    this.commonCoord = new PointDoubleXY(this.commonBitsX.getCommon(),
+      this.commonBitsY.getCommon());
   }
 
   /**

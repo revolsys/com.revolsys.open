@@ -33,9 +33,9 @@
 
 package com.revolsys.geometry.operation.overlay.snap;
 
-import com.revolsys.geometry.model.CoordinateList;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.PointList;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
 import com.revolsys.geometry.model.impl.PointDouble;
 
@@ -113,7 +113,7 @@ public class LineStringSnapper {
    * @return the index of the snapped segment
    * or -1 if no segment snaps to the snap point
    */
-  private int findSegmentIndexToSnap(final Point snapPt, final CoordinateList srcCoords) {
+  private int findSegmentIndexToSnap(final Point snapPt, final PointList srcCoords) {
     double minDist = Double.MAX_VALUE;
     int snapIndex = -1;
     for (int i = 0; i < srcCoords.size() - 1; i++) {
@@ -160,7 +160,7 @@ public class LineStringSnapper {
    * @param srcCoords the coordinates of the source linestring to be snapped
    * @param snapPts the target snap vertices
    */
-  private void snapSegments(final CoordinateList srcCoords, final Point[] snapPts) {
+  private void snapSegments(final PointList srcCoords, final Point[] snapPts) {
     // guard against empty input
     if (snapPts.length == 0) {
       return;
@@ -198,12 +198,12 @@ public class LineStringSnapper {
    * @return a list of the snapped points
    */
   public Point[] snapTo(final Point[] snapPts) {
-    final CoordinateList coordList = new CoordinateList(this.srcPts);
+    final PointList coordList = new PointList(this.srcPts);
 
     snapVertices(coordList, snapPts);
     snapSegments(coordList, snapPts);
 
-    final Point[] newPts = coordList.toCoordinateArray();
+    final Point[] newPts = coordList.toPointArray();
     return newPts;
   }
 
@@ -213,7 +213,7 @@ public class LineStringSnapper {
    * @param srcCoords the points to snap
    * @param snapPts the points to snap to
    */
-  private void snapVertices(final CoordinateList srcCoords, final Point[] snapPts) {
+  private void snapVertices(final PointList srcCoords, final Point[] snapPts) {
     // try snapping vertices
     // if src is a ring then don't snap final vertex
     final int end = this.isClosed ? srcCoords.size() - 1 : srcCoords.size();
