@@ -1,0 +1,35 @@
+<project
+  xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.revolsys.open</groupId>
+    <artifactId>com.revolsys.open.parent</artifactId>
+    <version>GBA-SNAPSHOT</version>
+  </parent>
+  <artifactId>com.revolsys.open.geopackage</artifactId>
+  <packaging>jar</packaging>
+  <name>RS Geopackage</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.revolsys.open</groupId>
+      <artifactId>com.revolsys.open.core</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xerial</groupId>
+      <artifactId>sqlite-jdbc</artifactId>
+      <version>3.25.2</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
+      <version>5.2.0</version>
+    </dependency>
+  </dependencies>
+</project>
+
