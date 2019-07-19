@@ -2,9 +2,7 @@ package com.revolsys.gis.grid;
 
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryDataTypes;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionBuilder;
@@ -14,14 +12,6 @@ public abstract class AbstractRectangularMapGrid extends BaseObjectWithPropertie
   private RecordDefinition recordDefinition;
 
   private String name;
-
-  @Override
-  public BoundingBox getBoundingBox(final String mapTileName, final int srid) {
-    final GeometryFactory geometryFactory = GeometryFactory.floating3d(srid);
-    final RectangularMapTile mapTile = getTileByName(mapTileName);
-    final BoundingBox boundingBox = mapTile.getBoundingBox();
-    return boundingBox.bboxToCs(geometryFactory);
-  }
 
   @Override
   public String getName() {

@@ -2,6 +2,8 @@ package com.revolsys.gis.grid.filter;
 
 import java.util.function.Predicate;
 
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -71,7 +73,7 @@ public class MapGridGeometrySheetFilter implements Predicate<Record> {
       final Geometry geometry = object.getGeometry();
       if (geometry != null) {
         final Geometry geographicsGeometry = geometry
-          .convertGeometry(GeometryFactory.floating3d(4326));
+          .convertGeometry(GeometryFactory.floating3d(EpsgId.WGS84));
         final Point centroid = geographicsGeometry.getCentroid().getPoint();
         final String geometrySheet = this.grid.getMapTileName(centroid.getX(), centroid.getY());
         if (geometrySheet != null) {

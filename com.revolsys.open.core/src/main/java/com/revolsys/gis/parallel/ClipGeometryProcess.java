@@ -3,7 +3,6 @@ package com.revolsys.gis.parallel;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.BaseInOutProcess;
@@ -31,7 +30,6 @@ public class ClipGeometryProcess extends BaseInOutProcess<Record, Record> {
           LineString lineString = (LineString)intersection;
           lineString = LineStringUtil.addElevation(original, lineString);
         }
-        GeometryProperties.copyUserData(geometry, intersection);
 
         object.setGeometryValue(intersection);
         out.write(object);

@@ -8,6 +8,7 @@ import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.process.MultipleFilterProcess;
 import com.revolsys.record.Record;
 import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 
 public class StatisticsMultipleFilterProcess extends MultipleFilterProcess<Record> {
 
@@ -20,7 +21,7 @@ public class StatisticsMultipleFilterProcess extends MultipleFilterProcess<Recor
   @Override
   protected void destroy() {
     super.destroy();
-    for (final LabelCountMap stats : this.statisticsMap.values()) {
+    for (final LabelCounters stats : this.statisticsMap.values()) {
       stats.disconnect();
     }
   }

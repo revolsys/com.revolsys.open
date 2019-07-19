@@ -3,6 +3,7 @@ package com.revolsys.gis.wms.capabilities;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
 import org.w3c.dom.Element;
 
 import com.revolsys.collection.Parent;
@@ -103,7 +104,7 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, WebServic
       final double maxX = XmlUtil.getAttributeDouble(boundingBoxElement, "maxx", 180);
       final double minY = XmlUtil.getAttributeDouble(boundingBoxElement, "miny", -90);
       final double maxY = XmlUtil.getAttributeDouble(boundingBoxElement, "maxy", 90);
-      final GeometryFactory geometryFactory = GeometryFactory.floating(4326, 2);
+      final GeometryFactory geometryFactory = GeometryFactory.floating2d(EpsgId.WGS84);
       this.latLonBoundingBox = geometryFactory.newBoundingBox(minX, minY, maxX, maxY);
     });
     XmlUtil.forFirstElement(layerElement, "EX_GeographicBoundingBox", (boundingBoxElement) -> {
@@ -115,7 +116,7 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, WebServic
         -90);
       final double maxY = XmlUtil.getFirstElementDouble(boundingBoxElement, "northBoundLatitude",
         90);
-      final GeometryFactory geometryFactory = GeometryFactory.floating(4326, 2);
+      final GeometryFactory geometryFactory = GeometryFactory.floating2d(EpsgId.WGS84);
       this.latLonBoundingBox = geometryFactory.newBoundingBox(minX, minY, maxX, maxY);
     });
 
@@ -208,7 +209,7 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, WebServic
         final WmsLayerDefinition parentLayer = (WmsLayerDefinition)this.parent;
         return parentLayer.getDefaultGeometryFactory();
       } else {
-        return GeometryFactory.floating(4326, 2);
+        return GeometryFactory.floating2d(EpsgId.WGS84);
       }
     } else {
       return WmsClient.getGeometryFactory(this.srs.get(0));
@@ -283,8 +284,8 @@ public class WmsLayerDefinition implements Parent<WmsLayerDefinition>, WebServic
 
   public GeoreferencedImage getMapImage(final BoundingBox boundingBox, final int imageWidth,
     final int imageHeight) {
-    final BoundingBox queryBoundingBox = boundingBox.intersection(getLatLonBoundingBox());
-    final String srs = "EPSG:" + queryBoundingBox.getCoordinateSystemId();
+    final BoundingBox queryBoundingBox = boundingBox.bboxIntersection(getLatLonBoundingBox());
+    final String srs = "EPSG:" + queryBoundingBox.getHorizontalCoordinateSystemId();
     final WmsClient wmsClient = getWmsClient();
     return wmsClient.getMapImage(this.name, getDefaultStyleName(), srs, queryBoundingBox,
       "image/png", imageWidth, imageHeight);

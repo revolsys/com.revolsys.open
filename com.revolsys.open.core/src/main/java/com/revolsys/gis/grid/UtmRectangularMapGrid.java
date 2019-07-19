@@ -6,6 +6,7 @@ import java.util.List;
 import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -14,9 +15,9 @@ import com.revolsys.geometry.model.GeometryFactory;
 public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
 
   private static final CoordinateSystem COORDINATE_SYSTEM = EpsgCoordinateSystems
-    .getCoordinateSystem(4326);
+    .getCoordinateSystem(EpsgId.WGS84);
 
-  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(4326);
+  private static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(EpsgId.WGS84);
 
   public static final UtmRectangularMapGrid INSTANCE = new UtmRectangularMapGrid();
 
@@ -35,11 +36,6 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
   }
 
   @Override
-  public CoordinateSystem getCoordinateSystem() {
-    return COORDINATE_SYSTEM;
-  }
-
-  @Override
   public String getFormattedMapTileName(final String name) {
     return name.toUpperCase();
   }
@@ -49,8 +45,14 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     return GEOMETRY_FACTORY;
   }
 
+  @Override
+  public <C extends CoordinateSystem> C getHorizontalCoordinateSystem() {
+    return (C)COORDINATE_SYSTEM;
+  }
+
   public int getHorizontalZone(final double lat, final double lon) {
-    return getHorizontalZone(getMapTileName(lon, lat));
+    final String mapTileName = getMapTileName(lon, lat);
+    return getHorizontalZone(mapTileName);
   }
 
   public int getHorizontalZone(final String sheet) {
@@ -144,7 +146,7 @@ public class UtmRectangularMapGrid extends AbstractRectangularMapGrid {
     final int horizontalZone = getHorizontalZone(sheet);
     final int verticalZone = getVerticalZone(sheet);
     if (horizontalZone < 24 && verticalZone >= 'n') {
-      return 26900 + horizontalZone;
+      return EpsgId.nad83Utm(horizontalZone);
     } else {
       throw new IllegalArgumentException("UTM Zone " + sheet + " is not in North America");
     }

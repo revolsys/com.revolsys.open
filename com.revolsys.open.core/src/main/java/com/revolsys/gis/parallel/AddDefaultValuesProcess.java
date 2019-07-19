@@ -1,9 +1,4 @@
 /*
- * $URL: https://secure.revolsys.com/svn/open.revolsys.com/GIS/trunk/src/java/com/revolsys/gis/processor/AddDefaultValuesProcess.java $
- * $Author: paul.austin@revolsys.com $
- * $Date: 2006-04-29 00:28:10Z $
- * $Revision: 112 $
-
  * Copyright 2004-2005 Revolution Systems Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,7 +32,6 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionFactory;
 
 public class AddDefaultValuesProcess extends AbstractInOutProcess<Record, Record> {
-
   private Set<String> excludedFieldNames = new HashSet<>();
 
   private RecordDefinitionFactory recordDefinitionFactory;
