@@ -12,7 +12,6 @@ import org.jeometry.common.data.type.FunctionDataType;
 import org.jeometry.common.io.FileProxy;
 
 import com.revolsys.io.FileUtil;
-import com.revolsys.record.code.CodeDataType;
 
 public class RsCoreDataTypes {
 
@@ -46,8 +45,6 @@ public class RsCoreDataTypes {
       }
     }
   });
-
-  public static final DataType CODE = new CodeDataType();
 
   public static final DataType MEASURE = new FunctionDataType("measure", Quantity.class,
     QuantityType::newQuantity, QuantityType::toString);

@@ -299,6 +299,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement
     this.initialized = true;
     final AbstractRecordStore recordStore = getRecordStore();
     if (recordStore != null) {
+      recordStore.initialize();
       final Collection<RecordStoreExtension> extensions = recordStore.getRecordStoreExtensions();
       for (final RecordStoreExtension extension : extensions) {
         try {

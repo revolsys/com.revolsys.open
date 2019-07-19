@@ -189,6 +189,8 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   void addCodeTable(CodeTable codeTable);
 
+  void addCodeTable(String fieldName, CodeTable codeTable);
+
   default void addCodeTables(final Collection<CodeTable> codeTables) {
     for (final CodeTable codeTable : codeTables) {
       addCodeTable(codeTable);

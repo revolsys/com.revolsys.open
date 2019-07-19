@@ -8,7 +8,7 @@ import com.revolsys.util.Property;
 public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithProperties
   implements RecordStoreSchemaElement, Comparable<RecordStoreSchemaElement> {
 
-  private final PathName pathName;
+  private PathName pathName;
 
   private RecordStoreSchema schema;
 
@@ -29,7 +29,7 @@ public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithPro
     if (!Property.hasValue(path)) {
       throw new IllegalArgumentException("Path is required");
     }
-    this.pathName = PathName.newPathName(path);
+    setPathName(path);
     this.schema = schema;
   }
 
@@ -109,6 +109,10 @@ public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithPro
     } else {
       return this.pathName.hashCode();
     }
+  }
+
+  protected void setPathName(final String path) {
+    this.pathName = PathName.newPathName(path);
   }
 
   @Override

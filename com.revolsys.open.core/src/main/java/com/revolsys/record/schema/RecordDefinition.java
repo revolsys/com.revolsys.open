@@ -15,7 +15,7 @@ import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.util.CaseConverter;
 
-public interface RecordDefinition extends GeometryFactoryProxy, RecordStoreSchemaElement,
+public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, RecordStoreSchemaElement,
   MapSerializer, RecordDefinitionProxy, RecordFactory<Record> {
 
   static RecordDefinition newRecordDefinition(final GeometryFactory geometryFactory,
@@ -26,6 +26,13 @@ public interface RecordDefinition extends GeometryFactoryProxy, RecordStoreSchem
       .setGeometryFactory(geometryFactory) //
       .getRecordDefinition() //
     ;
+  }
+
+  default void addCodeTable(final String fieldName, final CodeTable codeTable) {
+    final FieldDefinition field = getField(fieldName);
+    if (field != null) {
+      field.setCodeTable(codeTable);
+    }
   }
 
   void addDefaultValue(String fieldName, Object defaultValue);
@@ -63,8 +70,7 @@ public interface RecordDefinition extends GeometryFactoryProxy, RecordStoreSchem
    * @param name The field name.
    * @return The index.
    */
-  @Override
-  int getFieldIndex(CharSequence name);
+  int getFieldIndex(String name);
 
   /**
    * Get the maximum length of the field.
@@ -189,8 +195,6 @@ public interface RecordDefinition extends GeometryFactoryProxy, RecordStoreSchem
   List<String> getIdFieldNames();
 
   List<FieldDefinition> getIdFields();
-
-  int getInstanceId();
 
   ClockDirection getPolygonRingDirection();
 
