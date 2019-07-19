@@ -89,7 +89,6 @@ import com.revolsys.util.Property;
  *@version 1.7
  */
 public interface Polygon extends Polygonal {
-
   @SuppressWarnings("unchecked")
   static <G extends Geometry> G newPolygon(final Object value) {
     if (value == null) {

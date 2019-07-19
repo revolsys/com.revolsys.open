@@ -56,6 +56,15 @@ public class PointDouble extends AbstractPoint implements Serializable {
   }
 
   @Override
+  public void copyCoordinates(final double[] coordinates) {
+    int axisCount = this.coordinates.length;
+    if (coordinates.length < axisCount) {
+      axisCount = coordinates.length;
+    }
+    System.arraycopy(this.coordinates, 0, coordinates, 0, axisCount);
+  }
+
+  @Override
   public <R> R findVertex(final BiFunctionDouble<R> action) {
     if (isEmpty()) {
       return null;
