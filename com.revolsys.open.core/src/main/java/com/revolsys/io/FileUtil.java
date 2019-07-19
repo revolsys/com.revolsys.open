@@ -48,7 +48,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.logging.Logs;
 
@@ -99,13 +98,17 @@ public final class FileUtil {
    */
   public static void closeSilent(final AutoCloseable... closeables) {
     for (final AutoCloseable closeable : closeables) {
-      if (closeable != null) {
-        try {
-          closeable.close();
-        } catch (final IOException e) {
-        } catch (final Exception e) {
-          Logs.error(FileUtil.class, e.getMessage(), e);
-        }
+      closeSilent(closeable);
+    }
+  }
+
+  public static void closeSilent(final AutoCloseable closeable) {
+    if (closeable != null) {
+      try {
+        closeable.close();
+      } catch (final IOException e) {
+      } catch (final Exception e) {
+        Logs.error(FileUtil.class, e.getMessage(), e);
       }
     }
   }
@@ -118,14 +121,7 @@ public final class FileUtil {
    */
   public static void closeSilent(final Collection<? extends AutoCloseable> closeables) {
     for (final AutoCloseable closeable : closeables) {
-      if (closeable != null) {
-        try {
-          closeable.close();
-        } catch (final IOException e) {
-        } catch (final Exception e) {
-          Logs.error(FileUtil.class, e.getMessage(), e);
-        }
-      }
+      closeSilent(closeable);
     }
   }
 
@@ -808,11 +804,15 @@ public final class FileUtil {
   }
 
   public static String getFileNameExtension(final String fileName) {
-    final int dotIndex = fileName.lastIndexOf('.');
-    if (dotIndex != -1) {
-      return fileName.substring(dotIndex + 1);
-    } else {
+    if (fileName == null) {
       return "";
+    } else {
+      final int dotIndex = fileName.lastIndexOf('.');
+      if (dotIndex != -1) {
+        return fileName.substring(dotIndex + 1);
+      } else {
+        return "";
+      }
     }
   }
 
@@ -1091,9 +1091,10 @@ public final class FileUtil {
     } else if (value instanceof Resource) {
       return getFile((Resource)value);
     } else {
-      final String string = DataTypes.toString(value);
-      return getFile(string);
+      // final String string = DataTypes.toString(value);
+      // return getFile(string);
     }
+    return null;
   }
 
   public static OutputStream newOutputStream(final File file) {
@@ -1128,7 +1129,13 @@ public final class FileUtil {
     }
   }
 
-  public static File newTempFile(final String prefix, final String suffix) {
+  public static File newTempFile(String prefix, String suffix) {
+    if (prefix == null) {
+      prefix = "abc";
+    }
+    if (suffix == null) {
+      suffix = "def";
+    }
     try {
       final File file = File.createTempFile(prefix, suffix);
       return file;
@@ -1202,9 +1209,6 @@ public final class FileUtil {
     return toUrlString(file);
   }
 
-  /**
-   * Construct a new FileUtil.
-   */
   private FileUtil() {
   }
 

@@ -1,8 +1,6 @@
 package com.revolsys.io.map;
 
-import java.io.File;
 import java.lang.reflect.Constructor;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +14,6 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.io.format.json.Json;
-import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -177,26 +174,6 @@ public interface MapObjectFactory {
     } finally {
       Resource.setBaseResource(oldResource);
     }
-  }
-
-  static String toString(final MapSerializer serializer) {
-    final Map<String, Object> properties = serializer.toMap();
-    return Json.toString(properties);
-  }
-
-  static void write(final File file, final MapSerializer serializer) {
-    final Map<String, Object> properties = serializer.toMap();
-    Json.writeMap(properties, file, true);
-  }
-
-  static void write(final Path path, final MapSerializer serializer) {
-    final PathResource resource = new PathResource(path);
-    write(resource, serializer);
-  }
-
-  static void write(final Resource resource, final MapSerializer serializer) {
-    final Map<String, Object> properties = serializer.toMap();
-    Json.writeMap(properties, resource, true);
   }
 
   String getDescription();

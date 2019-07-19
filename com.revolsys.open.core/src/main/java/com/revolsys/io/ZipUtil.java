@@ -6,6 +6,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -130,21 +133,32 @@ public class ZipUtil {
     }
   }
 
-  public static List<String> unzipFile(final File file, final File outputDirectory)
-    throws IOException {
+  public static List<String> unzipFile(final File file, final File outputDirectory) {
     final List<String> entryNames = new ArrayList<>();
-    final ZipFile zipFile = new ZipFile(file);
-    for (final Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries
-      .hasMoreElements();) {
-      final ZipEntry entry = entries.nextElement();
-      final String entryName = entry.getName();
-      final File outputFile = new File(outputDirectory, entryName);
-      outputFile.getParentFile().mkdirs();
-      FileUtil.copy(zipFile.getInputStream(entry), outputFile, entry.getSize());
-      entryNames.add(entryName);
+    try (
+      final ZipFile zipFile = new ZipFile(file)) {
+      for (final Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries
+        .hasMoreElements();) {
+        final ZipEntry entry = entries.nextElement();
+        if (!entry.isDirectory()) {
+          final String entryName = entry.getName();
+          final File outputFile = new File(outputDirectory, entryName);
+          outputFile.getParentFile().mkdirs();
+          try (
+            InputStream entryIn = zipFile.getInputStream(entry)) {
+            FileUtil.copy(entryIn, outputFile, entry.getSize());
+          }
+          entryNames.add(entryName);
+        }
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap("Error extracting: " + file, e);
     }
-    zipFile.close();
     return entryNames;
+  }
+
+  public static List<String> unzipFile(final Path zip, final Path outputDirectory) {
+    return unzipFile(zip.toFile(), outputDirectory.toFile());
   }
 
   public static File unzipFile(final Resource resource) throws IOException {
@@ -153,6 +167,12 @@ public class ZipUtil {
       filename += "x";
     }
     final File directory = FileUtil.newTempDirectory(filename, ".zip");
+    unzipFile(resource, directory);
+    return directory;
+  }
+
+  public static boolean unzipFile(final Resource resource, final File directory)
+    throws IOException {
     final InputStream in = resource.getInputStream();
     final ZipInputStream zipIn = new ZipInputStream(in);
     try {
@@ -169,12 +189,52 @@ public class ZipUtil {
         zipIn.closeEntry();
       }
       FileUtil.closeSilent(zipIn);
-      return directory;
-
+      return true;
     } catch (final IOException e) {
       FileUtil.closeSilent(zipIn);
       FileUtil.deleteDirectory(directory);
       throw e;
+    }
+  }
+
+  public static boolean unzipFile(final Resource resource, final Path directory)
+    throws IOException {
+    final File file = directory.toFile();
+    return unzipFile(resource, file);
+  }
+
+  public static void unzipSingleFile(final Path zipPath, final Path targetFile,
+    final String fileExtension) {
+    boolean hasMatch = false;
+    try (
+      final ZipFile zipFile = new ZipFile(zipPath.toFile())) {
+      for (final Enumeration<? extends ZipEntry> entries = zipFile.entries(); entries
+        .hasMoreElements();) {
+        final ZipEntry entry = entries.nextElement();
+        if (!entry.isDirectory()) {
+          final String name = entry.getName();
+          if (name.endsWith("." + fileExtension)) {
+            if (hasMatch) {
+              throw new IllegalArgumentException(
+                "Zip file cannot have more than one *." + fileExtension + " files: " + zipPath);
+            } else {
+              hasMatch = true;
+              try (
+                InputStream in = zipFile.getInputStream(entry)) {
+                final Resource targetResource = Resource.getResource(targetFile);
+                final Resource tempResource = targetResource.newResourceAddExtension("copy");
+                tempResource.copyFrom(in);
+                Files.move(tempResource.getPath(), targetFile, StandardCopyOption.ATOMIC_MOVE);
+              } catch (final Exception e) {
+                throw Exceptions.wrap("Error copying " + zipPath + "!" + name + " to " + targetFile,
+                  e);
+              }
+            }
+          }
+        }
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap("Error extracting: " + zipPath, e);
     }
   }
 

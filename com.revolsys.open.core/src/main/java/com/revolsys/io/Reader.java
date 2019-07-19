@@ -1,9 +1,4 @@
 /*
- * $URL: https://secure.revolsys.com/svn/open.revolsys.com/com.revolsys/trunk/com.revolsys.gis/com.revolsys.gis.core/src/main/java/com/revolsys/gis/data/io/Reader.java $
- * $Author: paul.austin@revolsys.com $
- * $Date: 2010-11-04 20:52:56 -0700 (Thu, 04 Nov 2010) $
- * $Revision: 2602 $
-
  * Copyright 2004-2007 Revolution Systems Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

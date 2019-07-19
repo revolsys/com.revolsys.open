@@ -1,80 +1,121 @@
 package com.revolsys.record;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.nio.file.Path;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
-import org.jeometry.common.logging.Logs;
 
-import com.revolsys.collection.map.ThreadSharedProperties;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.PathUtil;
 import com.revolsys.io.Writer;
+import com.revolsys.io.file.AtomicPathUpdator;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
+import com.revolsys.record.schema.RecordDefinitionProxy;
+import com.revolsys.util.Counter;
+import com.revolsys.util.LongCounter;
 
 public class RecordLog implements BaseCloseable {
   private static final String LOG_MESSAGE = "LOG_MESSAGE";
 
-  private static final String LOG_LOCALITY = "LOG_LOCALITY";
-
-  private static final String KEY = RecordLog.class.getName();
+  public static final String LOG_LOCALITY = "LOG_LOCALITY";
 
   public static void error(final Class<?> logCategory, final String message, final Record record) {
-    final RecordLog recordLog = getForThread();
-    if (record == null) {
-      Logs.error(logCategory, message + "\tnull");
-    } else if (recordLog == null) {
-      final RecordDefinition recordDefinition = record.getRecordDefinition();
-      Logs.error(logCategory, message + "\t" + recordDefinition.getPath() + record.getIdentifier());
+    throw new UnsupportedOperationException();
+    // final RecordLog recordLog = getForThread();
+    // if (record == null) {
+    // Logs.error(logCategory, message + "\tnull");
+    // } else if (recordLog == null) {
+    // final RecordDefinition recordDefinition = record.getRecordDefinition();
+    // Logs.error(logCategory, message + "\t" + recordDefinition.getPath() +
+    // record.getIdentifier());
+    // } else {
+    // recordLog.error(message, record);
+    // }
+  }
+
+  public static RecordDefinition getLogRecordDefinition(
+    final RecordDefinitionProxy recordDefinition, final boolean usesLocality) {
+    if (usesLocality) {
+      return getLogRecordDefinition(recordDefinition, LOG_LOCALITY);
     } else {
-      recordLog.error(message, record);
+      return getLogRecordDefinition(recordDefinition);
     }
   }
 
-  public static RecordLog getForThread() {
-    final RecordLog recordLog = ThreadSharedProperties.getProperty(KEY);
-    return recordLog;
-  }
-
-  public static RecordLog recordLog() {
-    RecordLog recordLog = getForThread();
-    if (recordLog == null) {
-      recordLog = new RecordLog();
-      ThreadSharedProperties.setProperty(KEY, recordLog);
+  public static RecordDefinition getLogRecordDefinition(
+    final RecordDefinitionProxy recordDefinition, final String... prefixFieldNames) {
+    final RecordDefinition recordDefinition2 = recordDefinition.getRecordDefinition();
+    final String path = recordDefinition2.getPath();
+    final String parentPath = PathUtil.getPath(path);
+    final String tableName = PathUtil.getName(path);
+    final String logTableName;
+    if (tableName.toUpperCase().equals(tableName)) {
+      logTableName = tableName + "_LOG";
+    } else {
+      logTableName = tableName + "_log";
     }
-    return recordLog;
+    final PathName logTypeName = PathName.newPathName(PathUtil.toPath(parentPath, logTableName));
+    final RecordDefinitionImpl logRecordDefinition = new RecordDefinitionImpl(logTypeName);
+    for (final String fieldName : prefixFieldNames) {
+      logRecordDefinition.addField(fieldName, DataTypes.STRING, 255, false);
+    }
+    logRecordDefinition.addField(LOG_MESSAGE, DataTypes.STRING, 255, true);
+    for (final FieldDefinition fieldDefinition : recordDefinition2.getFields()) {
+      final FieldDefinition logFieldDefinition = new FieldDefinition(fieldDefinition);
+      final DataType dataType = logFieldDefinition.getDataType();
+      if (recordDefinition2.getGeometryField() == fieldDefinition) {
+        logRecordDefinition.addField("GEOMETRY", dataType);
+      } else {
+        logRecordDefinition.addField(new FieldDefinition(fieldDefinition));
+      }
+    }
+    logRecordDefinition.setGeometryFactory(recordDefinition2.getGeometryFactory());
+    return logRecordDefinition;
   }
 
-  private final Map<RecordDefinition, RecordDefinitionImpl> logRecordDefinitionMap = new HashMap<>();
+  private final Counter counter = new LongCounter("");
 
-  private Writer<Record> writer;
+  private final RecordWriter writer;
 
-  private boolean usesLocality;
+  private AtomicPathUpdator pathUpdator;
 
-  public RecordLog() {
+  public RecordLog(final AtomicPathUpdator pathUpdator, final RecordDefinitionProxy record) {
+    this(getLogRecordDefinition(record, true), pathUpdator.getPath());
+    this.pathUpdator = pathUpdator;
   }
 
-  public RecordLog(final boolean usesLocality) {
-    this.usesLocality = usesLocality;
+  public RecordLog(final AtomicPathUpdator pathUpdator, final RecordDefinitionProxy record,
+    final String... prefixFieldNames) {
+    this(getLogRecordDefinition(record, prefixFieldNames), pathUpdator.getPath());
+    this.pathUpdator = pathUpdator;
   }
 
-  public RecordLog(final Writer<Record> writer) {
-    this.writer = writer;
+  public RecordLog(final Path path, final RecordDefinition recordDefinition,
+    final boolean usesLocality) {
+    this(getLogRecordDefinition(recordDefinition, usesLocality), path);
+  }
+
+  private RecordLog(final RecordDefinition logRecordDefinition, final Object targetFile) {
+    this.writer = RecordWriter.newRecordWriter(logRecordDefinition, targetFile);
   }
 
   @Override
-  public void close() {
-    final Writer<Record> writer = this.writer;
-    if (writer != null) {
-      writer.flush();
-      writer.close();
+  public synchronized void close() {
+    this.writer.flush();
+    this.writer.close();
+    final AtomicPathUpdator pathUpdator = this.pathUpdator;
+    if (pathUpdator != null) {
+      if (this.counter.get() == 0) {
+        pathUpdator.deleteFiles();
+      } else {
+        pathUpdator.close();
+      }
     }
-    this.logRecordDefinitionMap.clear();
   }
 
   public synchronized void error(final Object message, final Record record) {
@@ -96,69 +137,46 @@ public class RecordLog implements BaseCloseable {
     log(localityName, message, record, geometry);
   }
 
-  public RecordDefinition getLogRecordDefinition(final Record record) {
-    final RecordDefinition recordDefinition = record.getRecordDefinition();
-    final RecordDefinition logRecordDefinition = getLogRecordDefinition(recordDefinition);
-    return logRecordDefinition;
-  }
-
-  public RecordDefinition getLogRecordDefinition(final RecordDefinition recordDefinition) {
-    RecordDefinitionImpl logRecordDefinition = this.logRecordDefinitionMap.get(recordDefinition);
-    if (logRecordDefinition == null) {
-      final String path = recordDefinition.getPath();
-      final String parentPath = PathUtil.getPath(path);
-      final String tableName = PathUtil.getName(path);
-      final String logTableName;
-      if (tableName.toUpperCase().equals(tableName)) {
-        logTableName = tableName + "_LOG";
-      } else {
-        logTableName = tableName + "_log";
-      }
-      final PathName logTypeName = PathName.newPathName(PathUtil.toPath(parentPath, logTableName));
-      logRecordDefinition = new RecordDefinitionImpl(logTypeName);
-      if (this.usesLocality) {
-        logRecordDefinition.addField(LOG_LOCALITY, DataTypes.STRING, 255, false);
-      }
-      logRecordDefinition.addField(LOG_MESSAGE, DataTypes.STRING, 255, true);
-      for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
-        final FieldDefinition logFieldDefinition = new FieldDefinition(fieldDefinition);
-        final DataType dataType = logFieldDefinition.getDataType();
-        if (recordDefinition.getGeometryField() == fieldDefinition) {
-          logRecordDefinition.addField("GEOMETRY", dataType);
-        } else {
-          logRecordDefinition.addField(new FieldDefinition(fieldDefinition));
-        }
-      }
-      logRecordDefinition.setGeometryFactory(recordDefinition.getGeometryFactory());
-      this.logRecordDefinitionMap.put(recordDefinition, logRecordDefinition);
-    }
-    return logRecordDefinition;
-  }
-
-  public Writer<Record> getWriter() {
-    return this.writer;
+  public Counter getCounter() {
+    return this.counter;
   }
 
   private void log(final Object localityName, final Object message, final Record record,
     Geometry geometry) {
     final Writer<Record> writer = this.writer;
-    if (writer != null) {
-      final RecordDefinition logRecordDefinition = getLogRecordDefinition(record);
-      final Record logRecord = new ArrayRecord(logRecordDefinition, record);
-      if (geometry == null) {
-        geometry = record.getGeometry();
-      }
-      logRecord.setGeometryValue(geometry);
-      logRecord.setValue(LOG_LOCALITY, localityName);
-      logRecord.setValue(LOG_MESSAGE, message);
-      synchronized (writer) {
-        writer.write(logRecord);
-      }
+    final Record logRecord = this.writer.newRecord();
+    logRecord.setValues(record);
+    if (geometry == null) {
+      geometry = record.getGeometry();
+    }
+    logRecord.setGeometryValue(geometry);
+    logRecord.setValue(LOG_LOCALITY, localityName);
+    logRecord.setValue(LOG_MESSAGE, message);
+    synchronized (writer) {
+      this.counter.add();
+      writer.write(logRecord);
     }
   }
 
-  public void setWriter(final Writer<Record> writer) {
-    this.writer = writer;
+  public void log(final Object message, final Record record, Geometry geometry,
+    final Object... extraValues) {
+    final Writer<Record> writer = this.writer;
+    final Record logRecord = this.writer.newRecord();
+    logRecord.setValues(record);
+    if (geometry == null) {
+      geometry = record.getGeometry();
+    }
+    logRecord.setGeometryValue(geometry);
+    logRecord.setValue(LOG_MESSAGE, message);
+    int i = 0;
+    for (final Object value : extraValues) {
+      logRecord.setValue(i, value);
+      i++;
+    }
+    synchronized (writer) {
+      this.counter.add();
+      writer.write(logRecord);
+    }
   }
 
   @Override
