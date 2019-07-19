@@ -1,9 +1,5 @@
 package com.revolsys.record.io.format.esri.gdb.xml.model;
 
-import org.jeometry.coordinatesystem.model.CoordinateSystem;
-import org.jeometry.coordinatesystem.model.systems.EsriCoordinateSystems;
-
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 
@@ -13,11 +9,10 @@ public class SpatialReference implements GeometryFactoryProxy {
 
   public static SpatialReference get(final GeometryFactory geometryFactory, final String wkt) {
     if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem instanceof org.jeometry.coordinatesystem.model.GeographicCoordinateSystem) {
-        return new GeographicCoordinateSystem(geometryFactory, wkt);
-      } else if (coordinateSystem instanceof org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem) {
-        return new ProjectedCoordinateSystem(geometryFactory, wkt);
+      if (geometryFactory.isGeographic()) {
+        return new EsriGdbGeographicCoordinateSystem(geometryFactory, wkt);
+      } else if (geometryFactory.isProjected()) {
+        return new EsriGdbProjectedCoordinateSystem(geometryFactory, wkt);
       }
     }
     return null;
@@ -61,36 +56,35 @@ public class SpatialReference implements GeometryFactoryProxy {
   protected SpatialReference(final GeometryFactory geometryFactory, final String wkt) {
     this.geometryFactory = geometryFactory;
     if (geometryFactory != null) {
-      final CoordinateSystem coordinateSystem = geometryFactory.getCoordinateSystem();
-      if (coordinateSystem != null) {
-        final CoordinateSystem esriCoordinateSystem = EsriCoordinateSystems
-          .getCoordinateSystem(coordinateSystem.getCoordinateSystemId());
-        if (esriCoordinateSystem != null) {
-          final BoundingBox areaBoundingBox = geometryFactory.getAreaBoundingBox();
-          this.wkt = wkt;
-          this.xOrigin = areaBoundingBox.getMinX();
-          this.yOrigin = areaBoundingBox.getMinY();
-          this.xYScale = geometryFactory.getScaleXY();
-          if (this.xYScale == 0) {
-            if (this instanceof ProjectedCoordinateSystem) {
-              this.xYScale = 1000;
-            } else {
-              this.xYScale = 10000000;
-            }
-          }
-          this.zOrigin = -100000;
-          this.zScale = geometryFactory.getScaleZ();
-          if (this.zScale == 0) {
-            this.zScale = 10000000;
-          }
-          this.mOrigin = -100000;
-          this.mScale = 10000000;
-          this.xYTolerance = 1.0 / this.xYScale;
-          this.zTolerance = 1.0 / this.zScale;
-          this.mTolerance = 1.0 / this.mScale;
-          this.highPrecision = true;
-          this.wkid = coordinateSystem.getCoordinateSystemId();
+      if (geometryFactory.isHasHorizontalCoordinateSystem()) {
+        this.wkt = wkt;
+        if (this instanceof EsriGdbGeographicCoordinateSystem) {
+          this.xOrigin = -180;
+          this.yOrigin = -90;
+        } else {
+          this.xOrigin = Integer.MIN_VALUE;
+          this.yOrigin = Integer.MIN_VALUE;
         }
+        this.xYScale = geometryFactory.getScaleXY();
+        if (this.xYScale == 0) {
+          if (this instanceof EsriGdbGeographicCoordinateSystem) {
+            this.xYScale = 10000000;
+          } else {
+            this.xYScale = 1000;
+          }
+        }
+        this.zOrigin = -100000;
+        this.zScale = geometryFactory.getScaleZ();
+        if (this.zScale == 0) {
+          this.zScale = 10000000;
+        }
+        this.mOrigin = -100000;
+        this.mScale = 10000000;
+        this.xYTolerance = 1.0 / this.xYScale;
+        this.zTolerance = 1.0 / this.zScale;
+        this.mTolerance = 1.0 / this.mScale;
+        this.highPrecision = true;
+        this.wkid = geometryFactory.getHorizontalCoordinateSystemId();
       }
     }
   }

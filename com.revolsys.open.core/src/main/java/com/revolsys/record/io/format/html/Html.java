@@ -29,6 +29,11 @@ public class Html extends AbstractIoFactoryWithCoordinateSystem
   }
 
   @Override
+  public boolean isReadFromZipFileSupported() {
+    return true;
+  }
+
+  @Override
   public MapWriter newMapWriter(final Writer out) {
     return new XhtmlMapWriter(out);
   }

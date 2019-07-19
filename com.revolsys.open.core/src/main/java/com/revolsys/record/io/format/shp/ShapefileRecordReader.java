@@ -358,7 +358,7 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
 
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
     this.returnRecordDefinition = recordDefinition;
-    ((RecordDefinitionImpl)recordDefinition).setPolygonOrientation(ClockDirection.CLOCKWISE);
+    ((RecordDefinitionImpl)recordDefinition).setPolygonRingDirection(ClockDirection.CLOCKWISE);
   }
 
   public void setTypeName(final PathName typeName) {
@@ -376,7 +376,7 @@ public class ShapefileRecordReader extends AbstractIterator<Record> implements R
     assert this.recordDefinition == null : "Cannot override recordDefinition when set";
     if (this.xbaseIterator != null) {
       final RecordDefinitionImpl recordDefinition = this.xbaseIterator.getRecordDefinition();
-      recordDefinition.setPolygonOrientation(ClockDirection.CLOCKWISE);
+      recordDefinition.setPolygonRingDirection(ClockDirection.CLOCKWISE);
       this.recordDefinition = recordDefinition;
       if (recordDefinition.getGeometryFieldIndex() == -1) {
         DataType geometryType = GeometryDataTypes.GEOMETRY;
