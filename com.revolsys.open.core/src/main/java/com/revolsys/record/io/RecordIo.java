@@ -5,6 +5,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
 
 public interface RecordIo {
+
   static void copyRecords(final Iterable<? extends Record> reader, final Writer<Record> writer) {
     if (reader != null && writer != null) {
       for (final Record record : reader) {

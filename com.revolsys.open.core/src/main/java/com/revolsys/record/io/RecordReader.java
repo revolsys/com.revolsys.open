@@ -1,12 +1,16 @@
 package com.revolsys.record.io;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.jeometry.common.data.identifier.Identifier;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.ClockDirection;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.Reader;
@@ -48,6 +52,15 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
     return newRecordReader(source, ArrayRecord.FACTORY);
   }
 
+  static RecordReader newRecordReader(final Object source, final GeometryFactory geometryFactory) {
+    final LinkedHashMapEx properties = new LinkedHashMapEx("geometryFactory", geometryFactory);
+    return newRecordReader(source, ArrayRecord.FACTORY, properties);
+  }
+
+  static RecordReader newRecordReader(final Object source, final MapEx properties) {
+    return newRecordReader(source, ArrayRecord.FACTORY, properties);
+  }
+
   /**
    * Construct a new {@link RecordReader} for the given source. The source can be one of the following
    * classes.
@@ -64,11 +77,18 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
    */
   static RecordReader newRecordReader(final Object source,
     final RecordFactory<? extends Record> recordFactory) {
+    return newRecordReader(source, recordFactory, MapEx.EMPTY);
+  }
+
+  static RecordReader newRecordReader(final Object source,
+    final RecordFactory<? extends Record> recordFactory, final MapEx properties) {
     final RecordReaderFactory readerFactory = IoFactory.factory(RecordReaderFactory.class, source);
     if (readerFactory == null) {
       return null;
     } else {
-      final RecordReader reader = readerFactory.newRecordReader(source, recordFactory);
+      final Resource resource = readerFactory.getZipResource(source);
+      final RecordReader reader = readerFactory.newRecordReader(resource, recordFactory,
+        properties);
       return reader;
     }
   }
