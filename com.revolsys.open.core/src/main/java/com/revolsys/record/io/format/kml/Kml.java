@@ -12,19 +12,18 @@ import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
-import com.revolsys.geometry.io.GeometryReaderFactory;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
+import com.revolsys.record.io.GeometryRecordReaderFactory;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
-public class Kml extends AbstractIoFactoryWithCoordinateSystem
-  implements RecordWriterFactory, MapWriterFactory, GeometryReaderFactory {
+public class Kml extends GeometryRecordReaderFactory
+  implements RecordWriterFactory, MapWriterFactory {
 
   public static final Set<CoordinateSystem> COORDINATE_SYSTEMS = Collections
     .singleton(EpsgCoordinateSystems.wgs84());
@@ -82,8 +81,7 @@ public class Kml extends AbstractIoFactoryWithCoordinateSystem
 
   @Override
   public GeometryReader newGeometryReader(final Resource resource, final MapEx properties) {
-    final KmlGeometryIterator iterator = new KmlGeometryIterator(resource);
-    return iterator;
+    return new KmlGeometryReader(resource, properties);
   }
 
   @Override

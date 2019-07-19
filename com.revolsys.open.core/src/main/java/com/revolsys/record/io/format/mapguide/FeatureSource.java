@@ -18,7 +18,6 @@ import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
 import com.revolsys.webservice.WebServiceResource;
 
@@ -40,9 +39,9 @@ public class FeatureSource extends ResourceDocument implements Parent<FeatureLay
 
   private final Map<String, Integer> coordinateSystemIdBySrsName = Maps
     .<String, Integer> buildHash()//
-    // .add("UTM83-09", 26909) //
-    // .add("UTM83-10", 26910) //
-    // .add("UTM83-11", 26911) //
+    // .add("UTM83-09", EpsgCoordinateSystems.nad83UtmId(9)) //
+    // .add("UTM83-10", EpsgCoordinateSystems.nad83UtmId(10)) //
+    // .add("UTM83-11", EpsgCoordinateSystems.nad83UtmId(11)) //
     // .add("UTM83-12", 26912) //
     // .add("WORLD-MERCATOR", 3857) //
     .getMap();
@@ -178,8 +177,6 @@ public class FeatureSource extends ResourceDocument implements Parent<FeatureLay
                 } else {
                   geometryFactory = GeometryFactory.floating(coordinateSystemId, axisCount);
                 }
-              } else {
-                Debug.noOp();
               }
             }
 
@@ -190,9 +187,7 @@ public class FeatureSource extends ResourceDocument implements Parent<FeatureLay
               dataType = DataTypes.getDataType(fieldBase.replace("xs:", ""));
             }
           }
-          if (dataType == null) {
-            Debug.noOp();
-          } else {
+          if (dataType != null) {
             recordDefinition.addField(fieldName, dataType, required);
           }
         }

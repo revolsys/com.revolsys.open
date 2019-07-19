@@ -1,5 +1,6 @@
 package com.revolsys.record.io.format.kml;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.NoSuchElementException;
 import javax.xml.stream.XMLStreamException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -21,26 +23,37 @@ import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
-public class KmlGeometryIterator extends AbstractIterator<Geometry>
+public class KmlGeometryReader extends AbstractIterator<Geometry>
   implements GeometryReader, Kml22Constants {
   private GeometryFactory geometryFactory = GeometryFactory.floating3d(COORDINATE_SYSTEM_ID);
 
-  private StaxReader in;
+  private StaxReader reader;
 
-  public KmlGeometryIterator(final InputStream in) {
-    this.in = StaxReader.newXmlReader(in);
+  private InputStream in;
+
+  public KmlGeometryReader(final InputStream in) {
+    this.in = in;
+    this.reader = StaxReader.newXmlReader(in);
   }
 
-  public KmlGeometryIterator(final Resource resource) {
-    this.in = StaxReader.newXmlReader(resource);
+  public KmlGeometryReader(final Resource resource, final MapEx properties) {
+    this(resource.newBufferedInputStream());
+    setProperties(properties);
   }
 
   @Override
   protected void closeDo() {
+    if (this.reader != null) {
+      this.reader.close();
+    }
     if (this.in != null) {
-      this.in.close();
+      try {
+        this.in.close();
+      } catch (final IOException e) {
+      }
     }
     this.geometryFactory = null;
+    this.reader = null;
     this.in = null;
   }
 
@@ -53,7 +66,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   protected Geometry getNext() {
     try {
       final int depth = 0;
-      if (this.in.skipToStartElements(depth, MULTI_GEOMETRY, POINT, LINE_STRING, POLYGON)) {
+      if (this.reader.skipToStartElements(depth, MULTI_GEOMETRY, POINT, LINE_STRING, POLYGON)) {
         final Geometry geometry = parseGeometry();
         if (geometry == null) {
           throw new NoSuchElementException();
@@ -70,12 +83,12 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
 
   @Override
   protected void initDo() {
-    this.in.skipToStartElement();
+    this.reader.skipToStartElement();
   }
 
   private LineString parseCoordinates() throws XMLStreamException {
-    this.in.requireLocalName(COORDINATES);
-    final String coordinatesListString = this.in.getElementText();
+    this.reader.requireLocalName(COORDINATES);
+    final String coordinatesListString = this.reader.getElementText();
     if (Property.hasValue(coordinatesListString)) {
       int axisCount = 2;
       final String[] coordinatesListArray = coordinatesListString.trim().split("\\s+");
@@ -90,7 +103,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
         axisCount = Math.max(axisCount, coordinates.length);
         points.add(new PointDouble(coordinates));
       }
-      this.in.skipToEndElement();
+      this.reader.skipToEndElement();
       return new LineStringDouble(axisCount, points);
     } else {
       return null;
@@ -98,13 +111,13 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private Geometry parseGeometry() throws XMLStreamException {
-    if (this.in.isStartElementLocalName(MULTI_GEOMETRY)) {
+    if (this.reader.isStartElementLocalName(MULTI_GEOMETRY)) {
       return parseMultiGeometry();
-    } else if (this.in.isStartElementLocalName(POINT)) {
+    } else if (this.reader.isStartElementLocalName(POINT)) {
       return parsePoint();
-    } else if (this.in.isStartElementLocalName(LINE_STRING)) {
+    } else if (this.reader.isStartElementLocalName(LINE_STRING)) {
       return parseLineString();
-    } else if (this.in.isStartElementLocalName(POLYGON)) {
+    } else if (this.reader.isStartElementLocalName(POLYGON)) {
       return parsePolygon();
     } else {
       return null;
@@ -112,13 +125,13 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private LinearRing parseLinearRing() throws XMLStreamException {
-    this.in.requireLocalName(LINEAR_RING);
+    this.reader.requireLocalName(LINEAR_RING);
     LineString points = null;
-    final int depth = this.in.getDepth();
-    while (this.in.skipToStartElements(depth, COORDINATES)) {
-      if (points == null && this.in.isStartElementLocalName(COORDINATES)) {
+    final int depth = this.reader.getDepth();
+    while (this.reader.skipToStartElements(depth, COORDINATES)) {
+      if (points == null && this.reader.isStartElementLocalName(COORDINATES)) {
         points = parseCoordinates();
-        this.in.skipToEndElement();
+        this.reader.skipToEndElement();
       }
     }
     if (points == null) {
@@ -131,11 +144,11 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private LineString parseLineString() throws XMLStreamException {
-    this.in.requireLocalName(LINE_STRING);
+    this.reader.requireLocalName(LINE_STRING);
     LineString points = null;
-    final int depth = this.in.getDepth();
-    while (this.in.skipToStartElements(depth, COORDINATES)) {
-      if (points == null && this.in.isStartElementLocalName(COORDINATES)) {
+    final int depth = this.reader.getDepth();
+    while (this.reader.skipToStartElements(depth, COORDINATES)) {
+      if (points == null && this.reader.isStartElementLocalName(COORDINATES)) {
         points = parseCoordinates();
       }
     }
@@ -151,7 +164,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   private Geometry parseMultiGeometry() throws XMLStreamException {
     int axisCount = 2;
     final List<Geometry> geometries = new ArrayList<>();
-    while (this.in.skipToChildStartElements(POINT, LINE_STRING, POLYGON)) {
+    while (this.reader.skipToChildStartElements(POINT, LINE_STRING, POLYGON)) {
       final Geometry geometry = parseGeometry();
       if (geometry != null) {
         axisCount = Math.max(axisCount, geometry.getAxisCount());
@@ -165,11 +178,11 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private Point parsePoint() throws XMLStreamException {
-    this.in.requireLocalName(POINT);
+    this.reader.requireLocalName(POINT);
     LineString points = null;
-    final int depth = this.in.getDepth();
-    while (this.in.skipToStartElements(depth, COORDINATES)) {
-      if (points == null && this.in.isStartElementLocalName(COORDINATES)) {
+    final int depth = this.reader.getDepth();
+    while (this.reader.skipToStartElements(depth, COORDINATES)) {
+      if (points == null && this.reader.isStartElementLocalName(COORDINATES)) {
         points = parseCoordinates();
       }
     }
@@ -183,11 +196,11 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private Polygon parsePolygon() throws XMLStreamException {
-    this.in.requireLocalName(POLYGON);
+    this.reader.requireLocalName(POLYGON);
     final List<LinearRing> rings = new ArrayList<>();
     int axisCount = 2;
-    final int depth = this.in.getDepth();
-    while (this.in.skipToStartElements(depth, OUTER_BOUNDARY_IS, INNER_BOUNDARY_IS)) {
+    final int depth = this.reader.getDepth();
+    while (this.reader.skipToStartElements(depth, OUTER_BOUNDARY_IS, INNER_BOUNDARY_IS)) {
       final LinearRing ring = parseRing();
       if (ring != null) {
         axisCount = Math.max(axisCount, ring.getAxisCount());
@@ -200,8 +213,8 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
   }
 
   private LinearRing parseRing() throws XMLStreamException {
-    final int depth = this.in.getDepth();
-    while (this.in.skipToStartElements(depth, LINEAR_RING)) {
+    final int depth = this.reader.getDepth();
+    while (this.reader.skipToStartElements(depth, LINEAR_RING)) {
       final LinearRing ring = parseLinearRing();
       return ring;
     }
@@ -215,7 +228,7 @@ public class KmlGeometryIterator extends AbstractIterator<Geometry>
 
   @Override
   public String toString() {
-    return this.in.toString();
+    return this.reader.toString();
   }
 
 }
