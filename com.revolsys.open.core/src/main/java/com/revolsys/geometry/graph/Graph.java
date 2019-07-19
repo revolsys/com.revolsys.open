@@ -49,6 +49,7 @@ import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
+import com.revolsys.geometry.model.coordinates.comparator.PointComparators;
 import com.revolsys.geometry.model.coordinates.comparator.PointDistanceComparator;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
@@ -117,7 +118,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
 
   private Map<Integer, Node<T>> nodesById = new IntHashMap<>();
 
-  private Map<Point, Integer> nodesIdsByCoordinates = new TreeMap<>();
+  private Map<Point, Integer> nodesIdsByPoint = new TreeMap<>(PointComparators.leftLowest());
 
   private GeometryFactory precisionModel = GeometryFactory.DEFAULT_3D;
 
@@ -164,7 +165,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
       // TODO nodeIndex
       this.nodePropertiesById = BPlusTreeMap.newIntSeralizableTempDisk(this.nodePropertiesById);
       this.nodesById = BPlusTreeMap.newIntSeralizableTempDisk(this.nodesById);
-      this.nodesIdsByCoordinates = BPlusTreeMap.newTempDisk(this.nodesIdsByCoordinates,
+      this.nodesIdsByPoint = BPlusTreeMap.newTempDisk(this.nodesIdsByPoint,
         new SerializablePageValueManager<Point>(), PageValueManager.INT);
       this.inMemory = false;
     }
@@ -217,7 +218,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     if (this.nodePropertiesById != null) {
       this.nodePropertiesById.clear();
     }
-    this.nodesIdsByCoordinates.clear();
+    this.nodesIdsByPoint.clear();
   }
 
   /**
@@ -273,8 +274,8 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     if (this.nodesById != null) {
       this.nodesById.clear();
     }
-    if (this.nodesIdsByCoordinates != null) {
-      this.nodesIdsByCoordinates.clear();
+    if (this.nodesIdsByPoint != null) {
+      this.nodesIdsByPoint.clear();
     }
   }
 
@@ -322,7 +323,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
    * @return The nod or null if not found.
    */
   public Node<T> findNode(final Point point) {
-    final Integer nodeId = this.nodesIdsByCoordinates.get(point);
+    final Integer nodeId = this.nodesIdsByPoint.get(point);
     if (nodeId == null) {
       return null;
     } else {
@@ -804,7 +805,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     if (node == null) {
       final int nodeId = ++this.nextNodeId;
       node = new Node<>(nodeId, this, point);
-      this.nodesIdsByCoordinates.put(new PointDouble(node, 2), nodeId);
+      this.nodesIdsByPoint.put(new PointDouble(node, 2), nodeId);
       this.nodesById.put(nodeId, node);
       if (this.nodeIndex != null) {
         this.nodeIndex.add(node);
@@ -834,7 +835,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
   }
 
   public List<Node<T>> getNodes() {
-    final List<Integer> nodeIds = new ArrayList<>(this.nodesIdsByCoordinates.values());
+    final List<Integer> nodeIds = new ArrayList<>(this.nodesIdsByPoint.values());
     return new NodeList<>(this, nodeIds);
   }
 
@@ -1213,7 +1214,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
       final int nodeId = node.getId();
       this.nodesById.remove(nodeId);
       this.nodePropertiesById.remove(nodeId);
-      this.nodesIdsByCoordinates.remove(node);
+      this.nodesIdsByPoint.remove(node);
       if (this.nodeIndex != null) {
         this.nodeIndex.remove(node);
       }
@@ -1360,7 +1361,9 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
         Set<Point> splitNodes = segmentSplitNodes.get(index);
         if (splitNodes == null) {
           final Point point = points.getPoint(index);
-          splitNodes = new TreeSet<>(new PointDistanceComparator(point));
+          final double x = points.getX(index);
+          final double y = points.getY(index);
+          splitNodes = new TreeSet<>(new PointDistanceComparator(x, y));
           segmentSplitNodes.put(index, splitNodes);
           splitIndexes.add(index);
         }

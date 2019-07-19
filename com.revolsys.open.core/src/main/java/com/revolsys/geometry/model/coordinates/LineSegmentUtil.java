@@ -432,7 +432,8 @@ public class LineSegmentUtil {
     line2Start = line2Start.convertGeometry(geometryFactory);
     line2End = line2End.convertGeometry(geometryFactory);
     if (RectangleUtil.intersects(line1Start, line1End, line2Start, line2End)) {
-      final Set<Point> intersections = new TreeSet<>(new PointDistanceComparator(line1Start));
+      final Set<Point> intersections = new TreeSet<>(
+        new PointDistanceComparator(line1Start.getX(), line1Start.getY()));
       if (LineSegmentUtil.isPointOnLine(geometryFactory, line2Start, line2End, line1Start)) {
         intersections.add(line1Start);
       }
