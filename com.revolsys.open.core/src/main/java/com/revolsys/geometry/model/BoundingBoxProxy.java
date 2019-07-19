@@ -90,6 +90,11 @@ public interface BoundingBoxProxy extends GeometryFactoryProxy {
     return boundingBox.bboxIntersects(x1, y1, x2, y2);
   }
 
+  default boolean bboxIntersects(final Point point) {
+    final BoundingBoxPointFunction<Boolean> action = BoundingBox::bboxIntersects;
+    return bboxWith(point, action, false);
+  }
+
   default BoundingBox bboxNewExpandDelta(final double distance) {
     final BoundingBox boundingBox = getBoundingBox();
     if (boundingBox.isEmpty() || distance == 0) {
@@ -167,11 +172,6 @@ public interface BoundingBoxProxy extends GeometryFactoryProxy {
     } else {
       return boundingBox.getGeometryFactory();
     }
-  }
-
-  default boolean intersects(final Point point) {
-    final BoundingBoxPointFunction<Boolean> action = BoundingBox::bboxIntersects;
-    return bboxWith(point, action, false);
   }
 
   default boolean isBboxEmpty() {
