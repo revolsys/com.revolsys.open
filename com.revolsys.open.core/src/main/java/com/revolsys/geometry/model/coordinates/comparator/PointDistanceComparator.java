@@ -4,17 +4,17 @@ import java.util.Comparator;
 
 import com.revolsys.geometry.model.Point;
 
-public class CoordinatesDistanceComparator implements Comparator<Point> {
+public class PointDistanceComparator implements Comparator<Point> {
   private final double x;
 
   private final double y;
 
-  public CoordinatesDistanceComparator(final double x, final double y) {
+  public PointDistanceComparator(final double x, final double y) {
     this.x = x;
     this.y = y;
   }
 
-  public CoordinatesDistanceComparator(final Point point) {
+  public PointDistanceComparator(final Point point) {
     this(point.getX(), point.getY());
   }
 

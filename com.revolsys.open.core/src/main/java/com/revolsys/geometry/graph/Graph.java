@@ -49,7 +49,7 @@ import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
+import com.revolsys.geometry.model.coordinates.comparator.PointDistanceComparator;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.io.page.PageValueManager;
@@ -1360,7 +1360,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
         Set<Point> splitNodes = segmentSplitNodes.get(index);
         if (splitNodes == null) {
           final Point point = points.getPoint(index);
-          splitNodes = new TreeSet<>(new CoordinatesDistanceComparator(point));
+          splitNodes = new TreeSet<>(new PointDistanceComparator(point));
           segmentSplitNodes.put(index, splitNodes);
           splitIndexes.add(index);
         }

@@ -1,10 +1,8 @@
 package com.revolsys.geometry.util;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.HCoordinate;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 public interface Triangles {
 
@@ -31,8 +29,7 @@ public interface Triangles {
     final double dx = c.getX() - a.getX();
     final double dy = c.getY() - a.getY();
 
-    final Point splitPt = new PointDouble(a.getX() + frac * dx, a.getY() + frac * dy,
-      Geometry.NULL_ORDINATE);
+    final Point splitPt = new PointDoubleXY(a.getX() + frac * dx, a.getY() + frac * dy);
     return splitPt;
   }
 
@@ -73,6 +70,15 @@ public interface Triangles {
     final double x3 = c.getX();
     final double y3 = c.getY();
     return area(x1, y1, x2, y2, x3, y3);
+  }
+
+  /**
+   * Returns twice the signed area of the triangle p1-p2-p3.
+   * The area is positive if the triangle is oriented CCW, and negative if CW.
+   */
+  static double area2(final double x1, final double y1, final double x2, final double y2,
+    final double x3, final double y3) {
+    return (x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1);
   }
 
   /**
@@ -149,7 +155,7 @@ public interface Triangles {
   static Point centroid(final Point a, final Point b, final Point c) {
     final double x = (a.getX() + b.getX() + c.getX()) / 3;
     final double y = (a.getY() + b.getY() + c.getY()) / 3;
-    return new PointDouble(x, y, Geometry.NULL_ORDINATE);
+    return new PointDoubleXY(x, y);
   }
 
   /**
@@ -189,7 +195,7 @@ public interface Triangles {
     final double ccx = cx - numx / denom;
     final double ccy = cy + numy / denom;
 
-    return new PointDouble(ccx, ccy, Geometry.NULL_ORDINATE);
+    return new PointDoubleXY(ccx, ccy);
   }
 
   /**
@@ -236,7 +242,7 @@ public interface Triangles {
 
     final double inCentreX = (len0 * a.getX() + len1 * b.getX() + len2 * c.getX()) / circum;
     final double inCentreY = (len0 * a.getY() + len1 * b.getY() + len2 * c.getY()) / circum;
-    return new PointDouble(inCentreX, inCentreY, Geometry.NULL_ORDINATE);
+    return new PointDoubleXY(inCentreX, inCentreY);
   }
 
   /**
@@ -303,6 +309,26 @@ public interface Triangles {
     return true;
   }
 
+  static boolean isInCircleNormalized(final double x1, final double y1, final double x2,
+    final double y2, final double x3, final double y3, final double x, final double y) {
+    final double adx = x1 - x;
+    final double ady = y1 - y;
+    final double bdx = x2 - x;
+    final double bdy = y2 - y;
+    final double cdx = x3 - x;
+    final double cdy = y3 - y;
+
+    final double abdet = adx * bdy - bdx * ady;
+    final double bcdet = bdx * cdy - cdx * bdy;
+    final double cadet = cdx * ady - adx * cdy;
+    final double alift = adx * adx + ady * ady;
+    final double blift = bdx * bdx + bdy * bdy;
+    final double clift = cdx * cdx + cdy * cdy;
+
+    final double disc = alift * bcdet + blift * cadet + clift * abdet;
+    return disc > 0;
+  }
+
   /**
    * Computes the length of the longest side of a triangle
    *
@@ -352,9 +378,7 @@ public interface Triangles {
    * the triangle is oriented CW, and negative if it is oriented CCW.
    * <p>
    * The signed area value can be used to determine point orientation, but the
-   * implementation in this method is susceptible to round-off errors. Use
-   * {@link CGAlgorithms#orientationIndex(Coordinate, Coordinate, Coordinate)}
-   * for robust orientation calculation.
+   * implementation in this method is susceptible to round-off errors.
    *
    * @param a
    *          a vertex of the triangle
@@ -363,8 +387,6 @@ public interface Triangles {
    * @param c
    *          a vertex of the triangle
    * @return the signed 2D area of the triangle
-   *
-   * @see CGAlgorithms#orientationIndex(Coordinate, Coordinate, Coordinate)
    */
   static double signedArea(final Point a, final Point b, final Point c) {
     /**

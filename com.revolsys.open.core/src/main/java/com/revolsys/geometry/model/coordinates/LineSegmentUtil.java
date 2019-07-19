@@ -13,7 +13,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.coordinates.comparator.CoordinatesDistanceComparator;
+import com.revolsys.geometry.model.coordinates.comparator.PointDistanceComparator;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
@@ -23,6 +23,20 @@ import com.revolsys.geometry.util.Points;
 import com.revolsys.geometry.util.RectangleUtil;
 
 public class LineSegmentUtil {
+
+  public static Point closestPoint(final double x1, final double y1, final double x2,
+    final double y2, final double x, final double y) {
+    final double factor = projectionFactor(x1, y1, x2, y2, x, y);
+    if (factor > 0 && factor < 1) {
+      return project(x1, y1, x2, y2, factor);
+    }
+    final double dist0 = Points.distance(x1, y1, x, y);
+    final double dist1 = Points.distance(x2, y2, x, y);
+    if (dist0 < dist1) {
+      return new PointDoubleXY(x1, y1);
+    }
+    return new PointDoubleXY(x2, y2);
+  }
 
   public static Point closestPoint(final Point lineStart, final Point lineEnd, final Point point) {
     final double factor = projectionFactor(lineStart, lineEnd, point);
@@ -172,6 +186,33 @@ public class LineSegmentUtil {
     }
   }
 
+  public static double distanceLinePoint(final int x1, final int y1, final int x2, final int y2,
+    final int x, final int y) {
+    if (x1 == x2 && y1 == y2) {
+      return Points.distanceInt(x, y, x1, y1);
+    } else {
+      final long dxx1 = x - x1;
+      final long dx2x1 = x2 - x1;
+      final long dyy1 = y - y1;
+      final long dy2y1 = y2 - y1;
+      final long d2x1sq = dx2x1 * dx2x1;
+      final long dy2y1sq = dy2y1 * dy2y1;
+      final double ratio = (dxx1 * dx2x1 + dyy1 * dy2y1) / (d2x1sq + dy2y1sq);
+
+      if (ratio <= 0.0) {
+        return Points.distanceInt(x, y, x1, y1);
+      } else if (ratio >= 1.0) {
+        return Points.distanceInt(x, y, x2, y2);
+      } else {
+        final long dy1y = y1 - y;
+        final int dx1x = x1 - x;
+        final double s = (dy1y * dx2x1 - dx1x * dy2y1) / (d2x1sq + dy2y1sq);
+
+        return Math.abs(s) * Math.sqrt(d2x1sq + dy2y1sq);
+      }
+    }
+  }
+
   /**
    * Calculate the distance between the line from lineStart to lineEnd and the
    * point.
@@ -191,6 +232,53 @@ public class LineSegmentUtil {
     final double x = point.getX();
     final double y = point.getY();
     return distanceLinePoint(x1, y1, x2, y2, x, y);
+  }
+
+  /**
+   * Computes the perpendicular distance from a point p to the (infinite) line
+   * containing the points AB
+   *
+   * @param x The x coordinate of the point p to compute the distance for
+   * @param Y The y coordinate of the point p to compute the distance for
+   * @param x1 The x coordinate of the one point A of the line
+   * @param y1 The y coordinate of the one point A of the line
+   * @param x2 The x coordinate of the another point B of the line (must be different to A)
+   * @param 72 The y coordinate of the another point B of the line (must be different to A)
+   * @return the distance from p to line AB
+   */
+  public static double distancePointLinePerpendicular(final double x, final double y,
+    final double x1, final double y1, final double x2, final double y2) {
+    // use comp.graphics.algorithms Frequently Asked Questions method
+    /*
+     * (2) s = (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) ----------------------------- L^2
+     * Then the distance from C to P = |s|*L.
+     */
+    final double len2 = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+    final double s = ((y1 - y) * (x2 - x1) - (x1 - x) * (y2 - y1)) / len2;
+
+    return Math.abs(s) * Math.sqrt(len2);
+  }
+
+  /**
+   * Computes the perpendicular distance from a point p to the (infinite) line
+   * containing the points AB
+   *
+   * @param p
+   *          the point to compute the distance for
+   * @param A
+   *          one point of the line
+   * @param B
+   *          another point of the line (must be different to A)
+   * @return the distance from p to line AB
+   */
+  public static double distancePointLinePerpendicular(final Point p, final Point A, final Point B) {
+    final double x = p.getX();
+    final double y = p.getY();
+    final double x1 = A.getX();
+    final double y1 = A.getY();
+    final double x2 = B.getX();
+    final double y2 = B.getY();
+    return distancePointLinePerpendicular(x, y, x1, y1, x2, y2);
   }
 
   /**
@@ -345,7 +433,7 @@ public class LineSegmentUtil {
     line2Start = line2Start.convertGeometry(geometryFactory);
     line2End = line2End.convertGeometry(geometryFactory);
     if (RectangleUtil.intersects(line1Start, line1End, line2Start, line2End)) {
-      final Set<Point> intersections = new TreeSet<>(new CoordinatesDistanceComparator(line1Start));
+      final Set<Point> intersections = new TreeSet<>(new PointDistanceComparator(line1Start));
       if (LineSegmentUtil.isPointOnLine(geometryFactory, line2Start, line2End, line1Start)) {
         intersections.add(line1Start);
       }
@@ -435,18 +523,42 @@ public class LineSegmentUtil {
     }
   }
 
+  public static boolean isPointOnLine(final GeometryFactory geometryFactory, final double x1,
+    final double y1, final double x2, final double y2, final double x, final double y) {
+    if (Doubles.equal(x, x1) && Doubles.equal(y, y1)) {
+      return true;
+    } else if (Doubles.equal(x, x2) && Doubles.equal(y, y2)) {
+      return true;
+    } else {
+      final double projectionFactor = projectionFactor(x1, y1, x2, y2, y, y);
+      if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
+        double newX = x1 + projectionFactor * (x2 - x1);
+        double newY = y1 + projectionFactor * (y2 - y1);
+
+        if (geometryFactory != null) {
+          newX = geometryFactory.makeXyPrecise(newX);
+          newY = geometryFactory.makeXyPrecise(newY);
+        }
+        if (x == newX && y == newY) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+
   /**
    * Check to see if the point is on the line between lineStart and lineEnd
    * using the precision model to see if a line split at the projection of the
    * point on the line would be the same point.
    *
-   * @param precisionModel The precision model.
+   * @param geometryFactory The precision model.
    * @param lineStart The point at the start of the line.
    * @param lineEnd The point at the end of the line.
    * @param point The point.
    * @return True if the point is on the line.
    */
-  public static boolean isPointOnLine(final GeometryFactory precisionModel, final Point lineStart,
+  public static boolean isPointOnLine(final GeometryFactory geometryFactory, final Point lineStart,
     final Point lineEnd, final Point point) {
     if (lineStart.equals(2, point)) {
       return true;
@@ -456,8 +568,8 @@ public class LineSegmentUtil {
       final double projectionFactor = projectionFactor(lineStart, lineEnd, point);
       if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
         Point projectedPoint = project(2, lineStart, lineEnd, projectionFactor);
-        if (precisionModel != null) {
-          projectedPoint = precisionModel.getPreciseCoordinates(projectedPoint);
+        if (geometryFactory != null) {
+          projectedPoint = geometryFactory.getPreciseCoordinates(projectedPoint);
         }
         if (projectedPoint.equals(2, point)) {
           return true;
@@ -485,7 +597,7 @@ public class LineSegmentUtil {
     }
   }
 
-  public static boolean isPointOnLineMiddle(final GeometryFactory precisionModel,
+  public static boolean isPointOnLineMiddle(final GeometryFactory geometryFactory,
     final Point lineStart, final Point lineEnd, final Point point) {
     if (point.equals(2, lineStart)) {
       return false;
@@ -495,7 +607,7 @@ public class LineSegmentUtil {
       final double projectionFactor = projectionFactor(lineStart, lineEnd, point);
       if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
         Point projectedPoint = project(2, lineStart, lineEnd, projectionFactor);
-        projectedPoint = precisionModel.getPreciseCoordinates(projectedPoint);
+        projectedPoint = geometryFactory.getPreciseCoordinates(projectedPoint);
         if (projectedPoint.equals(2, point)) {
           return true;
         }
@@ -504,9 +616,9 @@ public class LineSegmentUtil {
     }
   }
 
-  public static Point midPoint(final GeometryFactory precisionModel, final Point lineStart,
+  public static Point midPoint(final GeometryFactory geometryFactory, final Point lineStart,
     final Point lineEnd) {
-    return project(precisionModel, lineStart, lineEnd, 0.5);
+    return project(geometryFactory, lineStart, lineEnd, 0.5);
   }
 
   public static Point midPoint(final Point lineStart, final Point lineEnd) {
@@ -546,7 +658,7 @@ public class LineSegmentUtil {
     return Angle.angleBetweenOriented(angle1, angle2);
   }
 
-  public static Point pointAlong(final GeometryFactory precisionModel, final Point lineStart,
+  public static Point pointAlong(final GeometryFactory geometryFactory, final Point lineStart,
     final Point lineEnd, final Point point) {
     final double projectionFactor = projectionFactor(lineStart, lineEnd, point);
     if (projectionFactor < 0.0) {
@@ -554,7 +666,7 @@ public class LineSegmentUtil {
     } else if (projectionFactor > 1.0) {
       return lineEnd;
     } else {
-      return project(precisionModel, lineStart, lineEnd, projectionFactor);
+      return project(geometryFactory, lineStart, lineEnd, projectionFactor);
     }
   }
 
@@ -570,18 +682,39 @@ public class LineSegmentUtil {
     return coord;
   }
 
-  public static Point project(final GeometryFactory precisionModel, final Point lineStart,
+  public static Point pointAlongSegmentByFraction(final double x1, final double y1, final double x2,
+    final double y2, final double fraction) {
+    if (fraction <= 0.0) {
+      return new PointDoubleXY(x1, y1);
+    } else if (fraction >= 1.0) {
+      return new PointDoubleXY(x2, y2);
+    } else {
+      final double x = (x2 - x1) * fraction + x1;
+      final double y = (y2 - y1) * fraction + y1;
+      return new PointDoubleXY(x, y);
+    }
+  }
+
+  public static Point project(final double x1, final double y1, final double x2, final double y2,
+    final double r) {
+    final double x = x1 + r * (x2 - x1);
+    final double y = y1 + r * (y2 - y1);
+
+    return new PointDoubleXY(x, y);
+  }
+
+  public static Point project(final GeometryFactory geometryFactory, final Point lineStart,
     final Point lineEnd, final double r) {
     final int axisCount = CoordinatesUtil.getAxisCount(lineStart, lineEnd);
     final Point point = project(axisCount, lineStart, lineEnd, r);
-    if (precisionModel != null) {
-      return precisionModel.getPreciseCoordinates(point);
+    if (geometryFactory != null) {
+      return geometryFactory.getPreciseCoordinates(point);
     }
 
     return point;
   }
 
-  public static Point project(final GeometryFactory precisionModel, final Point lineStart,
+  public static Point project(final GeometryFactory geometryFactory, final Point lineStart,
     final Point lineEnd, final Point point) {
     if (point.equals(2, lineStart) || point.equals(2, lineEnd)) {
       return point;
@@ -589,8 +722,8 @@ public class LineSegmentUtil {
       final double r = projectionFactor(lineStart, lineEnd, point);
       final int axisCount = CoordinatesUtil.getAxisCount(point, lineStart, lineEnd);
       Point projectedCoordinate = project(axisCount, lineStart, lineEnd, r);
-      if (precisionModel != null) {
-        projectedCoordinate = precisionModel.getPreciseCoordinates(projectedCoordinate);
+      if (geometryFactory != null) {
+        projectedCoordinate = geometryFactory.getPreciseCoordinates(projectedCoordinate);
       }
       if (projectedCoordinate.equals(2, lineStart)) {
         return lineStart;

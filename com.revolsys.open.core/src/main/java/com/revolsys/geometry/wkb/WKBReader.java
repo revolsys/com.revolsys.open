@@ -45,8 +45,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.LineStringDouble;
 
 /**
  * Reads a {@link Geometry}from a byte stream in Well-Known Binary format.
@@ -70,53 +68,6 @@ import com.revolsys.geometry.model.impl.LineStringDouble;
  */
 public class WKBReader {
   private static final String INVALID_GEOM_TYPE_MSG = "Invalid geometry type encountered in ";
-
-  /**
-   * Ensures that a LineString forms a valid ring,
-   * returning a new closed sequence of the correct length if required.
-   * If the input sequence is already a valid ring, it is returned
-   * without modification.
-   * If the input sequence is too short or is not closed,
-   * it is extended with one or more copies of the start point.
-   * @param seq the sequence to test
-   * @param geometryFactory the CoordinateSequenceFactory to use to create the new sequence
-   *
-   * @return the original sequence, if it was a valid ring, or a new sequence which is valid.
-   */
-  public static LineString ensureValidRing(final LineString seq) {
-    final int n = seq.getVertexCount();
-    // empty sequence is valid
-    if (n == 0) {
-      return seq;
-    }
-    // too short - make a new one
-    if (n <= 3) {
-      return newClosedRing(seq, 4);
-    }
-
-    final boolean isClosed = seq.getCoordinate(0, Geometry.X) == seq.getCoordinate(n - 1,
-      Geometry.X) && seq.getCoordinate(0, Geometry.Y) == seq.getCoordinate(n - 1, Geometry.Y);
-    if (isClosed) {
-      return seq;
-    }
-    // make a new closed ring
-    return newClosedRing(seq, n + 1);
-  }
-
-  public static LineString extend(final LineString seq, final int size) {
-    final int axisCount = seq.getAxisCount();
-    final double[] coordinates = new double[size * axisCount];
-    final int n = seq.getVertexCount();
-    CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, seq, 0, n);
-
-    // fill remaining coordinates with end point, if it exists
-    if (n > 0) {
-      for (int i = n; i < size; i++) {
-        CoordinatesListUtil.setCoordinates(coordinates, axisCount, i, seq, n - 1, 1);
-      }
-    }
-    return new LineStringDouble(axisCount, coordinates);
-  }
 
   /**
    * Converts a hexadecimal string to a byte array.
@@ -151,103 +102,16 @@ public class WKBReader {
     return nib;
   }
 
-  /**
-   * Tests whether two {@link LineString}s are equal.
-   * To be equal, the sequences must be the same length.
-   * They do not need to be of the same dimension,
-   * but the ordinate values for the smallest dimension of the two
-   * must be equal.
-   * Two <code>NaN</code> ordinates values are considered to be equal.
-   *
-   * @param cs1 a LineString
-   * @param cs2 a LineString
-   * @return true if the sequences are equal in the common dimensions
-   */
-  public static boolean isEqual(final LineString cs1, final LineString cs2) {
-    final int cs1Size = cs1.getVertexCount();
-    final int cs2Size = cs2.getVertexCount();
-    if (cs1Size != cs2Size) {
-      return false;
-    }
-    final int dim = Math.min(cs1.getAxisCount(), cs2.getAxisCount());
-    for (int i = 0; i < cs1Size; i++) {
-      for (int d = 0; d < dim; d++) {
-        final double v1 = cs1.getCoordinate(i, d);
-        final double v2 = cs2.getCoordinate(i, d);
-        if (cs1.getCoordinate(i, d) == cs2.getCoordinate(i, d)) {
-          continue;
-        }
-        // special check for NaNs
-        if (Double.isNaN(v1) && Double.isNaN(v2)) {
-          continue;
-        }
-        return false;
-      }
-    }
-    return true;
-  }
-
-  /**
-   * Tests whether a {@link LineString} forms a valid {@link LinearRing},
-   * by checking the sequence length and closure
-   * (whether the first and last points are identical in 2D).
-   * Self-intersection is not checked.
-   *
-   * @param seq the sequence to test
-   * @return true if the sequence is a ring
-   * @see LinearRing
-   */
-  public static boolean isRing(final LineString seq) {
-    final int n = seq.getVertexCount();
-    if (n == 0) {
-      return true;
-    }
-    // too few points
-    if (n <= 3) {
-      return false;
-    }
-    // test if closed
-    return seq.getCoordinate(0, Geometry.X) == seq.getCoordinate(n - 1, Geometry.X)
-      && seq.getCoordinate(0, Geometry.Y) == seq.getCoordinate(n - 1, Geometry.Y);
-  }
-
-  public static LineString newClosedRing(final LineString seq, final int size) {
-    final int axisCount = seq.getAxisCount();
-    final double[] coordinates = new double[size * axisCount];
-    final int n = seq.getVertexCount();
-    CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, seq, 0, n);
-    // fill remaining coordinates with start point
-    for (int i = n; i < size; i++) {
-      CoordinatesListUtil.setCoordinates(coordinates, axisCount, i, seq, 0, 1);
-    }
-    return new LineStringDouble(axisCount, coordinates);
-  }
-
   private final ByteOrderDataInStream dis = new ByteOrderDataInStream();
 
-  // private final PrecisionModel precisionModel;
-
-  private final GeometryFactory factory;
-
-  private boolean hasSRID = false;
-
-  // default dimension - will be set on read
-  private int inputDimension = 2;
-
-  /**
-   * true if structurally invalid input should be reported rather than repaired.
-   * At some point this could be made client-controllable.
-   */
-  private final boolean isStrict = false;
-
-  private double[] ordValues;
+  private final GeometryFactory geometryFactory;
 
   public WKBReader() {
     this(GeometryFactory.DEFAULT_3D);
   }
 
   public WKBReader(final GeometryFactory geometryFactory) {
-    this.factory = geometryFactory;
+    this.geometryFactory = geometryFactory;
   }
 
   /**
@@ -277,61 +141,26 @@ public class WKBReader {
    */
   public Geometry read(final InStream is) throws IOException, ParseException {
     this.dis.setInStream(is);
-    final Geometry g = readGeometry();
-    return g;
+    final Geometry geometry = readGeometry(this.geometryFactory);
+    return geometry;
   }
 
-  /**
-   * Reads a coordinate value with the specified dimensionality.
-   * Makes the X and Y ordinates precise according to the precision model
-   * in use.
-   */
-  private void readCoordinate() throws IOException {
-    for (int i = 0; i < this.inputDimension; i++) {
-      this.ordValues[i] = this.factory.makePrecise(i, this.dis.readDouble());
-    }
-  }
+  private double[] readCoordinates(final int axisCount, final int vertexCount) throws IOException {
+    final double[] coordinates = new double[vertexCount * axisCount];
 
-  private double[] readCoordinates(final int size) throws IOException {
-    final double[] coordinates = new double[size * this.inputDimension];
-
-    for (int i = 0; i < size; i++) {
-      readCoordinate();
-      for (int j = 0; j < this.inputDimension; j++) {
-        coordinates[i * this.inputDimension + j] = this.ordValues[j];
+    int coordinateIndex = 0;
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+        final double coordinate = this.dis.readDouble();
+        final double coordinatePrecise = this.geometryFactory.makePrecise(axisIndex, coordinate);
+        coordinates[coordinateIndex++] = coordinatePrecise;
       }
     }
     return coordinates;
   }
 
-  private LineString readCoordinateSequence(final int size) throws IOException {
-    final double[] coordinates = readCoordinates(size);
-    return new LineStringDouble(this.inputDimension, coordinates);
-  }
-
-  private LineString readCoordinateSequenceLineString(final int size) throws IOException {
-    final LineString seq = readCoordinateSequence(size);
-    if (this.isStrict) {
-      return seq;
-    }
-    if (seq.getVertexCount() == 0 || seq.getVertexCount() >= 2) {
-      return seq;
-    }
-    return WKBReader.extend(seq, 2);
-  }
-
-  private LineString readCoordinateSequenceRing(final int size) throws IOException {
-    final LineString seq = readCoordinateSequence(size);
-    if (this.isStrict) {
-      return seq;
-    }
-    if (isRing(seq)) {
-      return seq;
-    }
-    return WKBReader.ensureValidRing(seq);
-  }
-
-  private Geometry readGeometry() throws IOException, ParseException {
+  private Geometry readGeometry(GeometryFactory geometryFactory)
+    throws IOException, ParseException {
 
     // determine byte order
     final byte byteOrderWKB = this.dis.readByte();
@@ -341,7 +170,7 @@ public class WKBReader {
       this.dis.setOrder(ByteOrderValues.LITTLE_ENDIAN);
     } else if (byteOrderWKB == WKBConstants.wkbXDR) {
       this.dis.setOrder(ByteOrderValues.BIG_ENDIAN);
-    } else if (this.isStrict) {
+    } else {
       throw new ParseException("Unknown geometry byte order (not NDR or XDR): " + byteOrderWKB);
     }
     // if not strict and not XDR or NDR, then we just use the dis default set at
@@ -356,138 +185,151 @@ public class WKBReader {
     final int geometryType = typeInt & 0xff;
     // determine if Z values are present
     final boolean hasZ = (typeInt & 0x80000000) != 0;
-    this.inputDimension = hasZ ? 3 : 2;
-    // determine if SRIDs are present
-    this.hasSRID = (typeInt & 0x20000000) != 0;
-
-    int SRID = 0;
-    if (this.hasSRID) {
-      SRID = this.dis.readInt();
+    if (hasZ) {
+      geometryFactory = geometryFactory.convertAxisCount(3);
+    } else {
+      geometryFactory = geometryFactory.convertAxisCount(2);
     }
 
-    // only allocate ordValues buffer if necessary
-    if (this.ordValues == null || this.ordValues.length < this.inputDimension) {
-      this.ordValues = new double[this.inputDimension];
+    // determine if SRIDs are present
+    final boolean hasSRID = (typeInt & 0x20000000) != 0;
+    int coordinateSystemId = 0;
+    if (hasSRID) {
+      coordinateSystemId = this.dis.readInt();
+      if (coordinateSystemId != geometryFactory.getHorizontalCoordinateSystemId()) {
+        geometryFactory = geometryFactory.convertSrid(coordinateSystemId);
+      }
     }
 
     Geometry geom = null;
     switch (geometryType) {
       case WKBConstants.wkbPoint:
-        geom = readPoint();
+        geom = readPoint(geometryFactory);
       break;
       case WKBConstants.wkbLineString:
-        geom = readLineString();
+        geom = readLineString(geometryFactory);
       break;
       case WKBConstants.wkbPolygon:
-        geom = readPolygon();
+        geom = readPolygon(geometryFactory);
       break;
       case WKBConstants.wkbMultiPoint:
-        geom = readMultiPoint();
+        geom = readMultiPoint(geometryFactory);
       break;
       case WKBConstants.wkbMultiLineString:
-        geom = readMultiLineString();
+        geom = readMultiLineString(geometryFactory);
       break;
       case WKBConstants.wkbMultiPolygon:
-        geom = readMultiPolygon();
+        geom = readMultiPolygon(geometryFactory);
       break;
       case WKBConstants.wkbGeometryCollection:
-        geom = readGeometryCollection();
+        geom = readGeometryCollection(geometryFactory);
       break;
       default:
         throw new ParseException("Unknown WKB type " + geometryType);
     }
-    setSRID(geom, SRID);
     return geom;
   }
 
-  private Geometry readGeometryCollection() throws IOException, ParseException {
-    final int numGeom = this.dis.readInt();
-    final List<Geometry> geoms = new ArrayList<>();
-    for (int i = 0; i < numGeom; i++) {
-      final Geometry geometry = readGeometry();
-      geoms.add(geometry);
+  private Geometry readGeometryCollection(final GeometryFactory geometryFactory)
+    throws IOException, ParseException {
+    final int geometryCount = this.dis.readInt();
+    final List<Geometry> geometries = new ArrayList<>(geometryCount);
+    for (int i = 0; i < geometryCount; i++) {
+      final Geometry geometry = readGeometry(geometryFactory);
+      geometries.add(geometry);
     }
-    return this.factory.geometry(geoms);
+    return geometryFactory.geometry(geometries);
   }
 
-  private LinearRing readLinearRing() throws IOException {
-    final int size = this.dis.readInt();
-    final LineString pts = readCoordinateSequenceRing(size);
-    return this.factory.linearRing(pts);
+  private LinearRing readLinearRing(final GeometryFactory geometryFactory) throws IOException {
+    final int vertexCount = this.dis.readInt();
+    final int axisCount = geometryFactory.getAxisCount();
+    if (vertexCount == 0) {
+      return geometryFactory.linearRing();
+    } else {
+      final double[] coordinates = readCoordinates(axisCount, vertexCount);
+      final int lastIndex = (vertexCount - 1) * axisCount;
+      if (coordinates[0] == coordinates[lastIndex]) {
+        if (coordinates[1] == coordinates[lastIndex + 1]) {
+          return geometryFactory.linearRing(axisCount, coordinates);
+        }
+      }
+      final double[] newCoordinates = new double[coordinates.length + axisCount];
+      System.arraycopy(coordinates, 0, newCoordinates, 0, coordinates.length);
+      System.arraycopy(coordinates, 0, newCoordinates, lastIndex, axisCount);
+      return geometryFactory.linearRing(axisCount, newCoordinates);
+    }
   }
 
-  private LineString readLineString() throws IOException {
-    final int size = this.dis.readInt();
-    final LineString pts = readCoordinateSequenceLineString(size);
-    return this.factory.lineString(pts);
+  private LineString readLineString(final GeometryFactory geometryFactory) throws IOException {
+    final int vertexCount = this.dis.readInt();
+    if (vertexCount == 0) {
+      return geometryFactory.lineString();
+    } else {
+      final int axisCount = geometryFactory.getAxisCount();
+      final double[] coordinates = readCoordinates(axisCount, vertexCount);
+      return geometryFactory.lineString(axisCount, coordinates);
+    }
   }
 
-  private Lineal readMultiLineString() throws IOException, ParseException {
-    final int numGeom = this.dis.readInt();
-    final LineString[] geoms = new LineString[numGeom];
-    for (int i = 0; i < numGeom; i++) {
-      final Geometry g = readGeometry();
-      if (!(g instanceof LineString)) {
+  private Lineal readMultiLineString(final GeometryFactory geometryFactory)
+    throws IOException, ParseException {
+    final int geometryCount = this.dis.readInt();
+    final LineString[] lines = new LineString[geometryCount];
+    for (int i = 0; i < geometryCount; i++) {
+      final Geometry geometry = readGeometry(geometryFactory);
+      if (!(geometry instanceof LineString)) {
         throw new ParseException(INVALID_GEOM_TYPE_MSG + "MultiLineString");
       }
-      geoms[i] = (LineString)g;
+      lines[i] = (LineString)geometry;
     }
-    return this.factory.lineal(geoms);
+    return geometryFactory.lineal(lines);
   }
 
-  private Punctual readMultiPoint() throws IOException, ParseException {
-    final int numGeom = this.dis.readInt();
-    final Point[] geoms = new Point[numGeom];
-    for (int i = 0; i < numGeom; i++) {
-      final Geometry g = readGeometry();
-      if (!(g instanceof Point)) {
+  private Punctual readMultiPoint(final GeometryFactory geometryFactory)
+    throws IOException, ParseException {
+    final int geometryCount = this.dis.readInt();
+    final Point[] points = new Point[geometryCount];
+    for (int i = 0; i < geometryCount; i++) {
+      final Geometry geometry = readGeometry(geometryFactory);
+      if (!(geometry instanceof Point)) {
         throw new ParseException(INVALID_GEOM_TYPE_MSG + "MultiPoint");
       }
-      geoms[i] = (Point)g;
+      points[i] = (Point)geometry;
     }
-    return this.factory.punctual(geoms);
+    return geometryFactory.punctual(points);
   }
 
-  private Polygonal readMultiPolygon() throws IOException, ParseException {
-    final int numGeom = this.dis.readInt();
-    final Polygon[] geoms = new Polygon[numGeom];
+  private Polygonal readMultiPolygon(final GeometryFactory geometryFactory)
+    throws IOException, ParseException {
+    final int geometryCount = this.dis.readInt();
+    final Polygon[] polygons = new Polygon[geometryCount];
 
-    for (int i = 0; i < numGeom; i++) {
-      final Geometry g = readGeometry();
+    for (int i = 0; i < geometryCount; i++) {
+      final Geometry g = readGeometry(geometryFactory);
       if (!(g instanceof Polygon)) {
         throw new ParseException(INVALID_GEOM_TYPE_MSG + "MultiPolygon");
       }
-      geoms[i] = (Polygon)g;
+      polygons[i] = (Polygon)g;
     }
-    return this.factory.polygonal(geoms);
+    return geometryFactory.polygonal(polygons);
   }
 
-  private Point readPoint() throws IOException {
-    final double[] coordinates = readCoordinates(1);
-    return this.factory.point(coordinates);
+  private Point readPoint(final GeometryFactory geometryFactory) throws IOException {
+    final int axisCount = geometryFactory.getAxisCount();
+    final double[] coordinates = readCoordinates(axisCount, 1);
+    return geometryFactory.point(coordinates);
   }
 
-  private Polygon readPolygon() throws IOException {
-    final int numRings = this.dis.readInt();
+  private Polygon readPolygon(final GeometryFactory geometryFactory) throws IOException {
+    final int ringCount = this.dis.readInt();
     final List<LinearRing> rings = new ArrayList<>();
 
-    for (int i = 0; i < numRings; i++) {
-      final LinearRing ring = readLinearRing();
+    for (int i = 0; i < ringCount; i++) {
+      final LinearRing ring = readLinearRing(geometryFactory);
       rings.add(ring);
     }
-    return this.factory.polygon(rings);
-  }
-
-  /**
-   * Sets the SRID, if it was specified in the WKB
-   *
-   * @param g the geometry to update
-   * @return the geometry with an updated SRID value, if required
-   */
-  private Geometry setSRID(final Geometry g, final int SRID) {
-    // if (SRID != 0)
-    // g.setSRID(SRID);
-    return g;
+    return geometryFactory.polygon(rings);
   }
 
 }
