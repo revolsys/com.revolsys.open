@@ -4,9 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.algorithm.index.IdObjectIndex;
 import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
+import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -20,11 +20,12 @@ public class OnLineNodeVisitor<T> implements Consumer<Node<T>> {
       return Collections.emptyList();
     } else {
       final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
-      BoundingBox env = line.getBoundingBox();
-      env = env.expand(maxDistance);
+      final BoundingBox env = line.getBoundingBox() //
+        .bboxEditor() //
+        .expandDelta(maxDistance);
       final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
       final OnLineNodeVisitor<T> visitor = new OnLineNodeVisitor<>(line, results);
-      index.forEach(visitor, env);
+      index.forEach(env, visitor);
       return results.getList();
     }
   }

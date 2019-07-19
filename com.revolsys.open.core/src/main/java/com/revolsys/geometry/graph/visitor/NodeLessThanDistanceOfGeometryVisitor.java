@@ -4,9 +4,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import com.revolsys.geometry.algorithm.index.IdObjectIndex;
 import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
+import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -20,12 +20,13 @@ public class NodeLessThanDistanceOfGeometryVisitor<T> implements Consumer<Node<T
       return Collections.emptyList();
     } else {
       final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
-      BoundingBox env = geometry.getBoundingBox();
-      env = env.expand(maxDistance);
+      final BoundingBox env = geometry.getBoundingBox() //
+        .bboxEditor() //
+        .expandDelta(maxDistance);
       final IdObjectIndex<Node<T>> index = graph.getNodeIndex();
       final NodeLessThanDistanceOfGeometryVisitor<T> visitor = new NodeLessThanDistanceOfGeometryVisitor<>(
         geometry, maxDistance, results);
-      index.forEach(visitor, env);
+      index.forEach(env, visitor);
       return results.getList();
     }
   }
@@ -48,9 +49,7 @@ public class NodeLessThanDistanceOfGeometryVisitor<T> implements Consumer<Node<T
 
   @Override
   public void accept(final Node<T> node) {
-    final Point coordinate = node;
-    final Point point = this.geometryFactory.point(coordinate);
-    final double distance = this.geometry.distance(point);
+    final double distance = this.geometry.distancePoint(node);
     if (distance < this.maxDistance) {
       this.matchVisitor.accept(node);
     }

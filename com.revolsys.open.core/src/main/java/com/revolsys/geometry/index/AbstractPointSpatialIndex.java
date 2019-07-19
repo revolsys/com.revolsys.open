@@ -1,12 +1,12 @@
-package com.revolsys.geometry.algorithm.index;
+package com.revolsys.geometry.index;
 
+import java.util.Iterator;
 import java.util.List;
-import java.util.function.Predicate;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.visitor.CreateListVisitor;
 
-public abstract class AbstractSpatialIndex<T> implements EnvelopeSpatialIndex<T> {
+public abstract class AbstractPointSpatialIndex<T> implements PointSpatialIndex<T> {
 
   @Override
   public List<T> find(final BoundingBox envelope) {
@@ -16,16 +16,15 @@ public abstract class AbstractSpatialIndex<T> implements EnvelopeSpatialIndex<T>
   }
 
   @Override
-  public List<T> find(final BoundingBox envelope, final Predicate<T> filter) {
-    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
-    forEach(envelope, filter, visitor);
-    return visitor.getList();
-  }
-
-  @Override
   public List<T> findAll() {
     final CreateListVisitor<T> visitor = new CreateListVisitor<>();
     forEach(visitor);
     return visitor.getList();
   }
+
+  @Override
+  public Iterator<T> iterator() {
+    return findAll().iterator();
+  }
+
 }

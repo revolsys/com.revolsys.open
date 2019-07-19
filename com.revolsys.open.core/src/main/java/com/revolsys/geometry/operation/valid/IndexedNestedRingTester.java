@@ -53,13 +53,11 @@ import com.revolsys.geometry.model.Point;
 public class IndexedNestedRingTester {
   private final GeometryGraph graph; // used to find non-node vertices
 
-  private SpatialIndex index;
+  private SpatialIndex<LinearRing> index;
 
   private Point nestedPt;
 
-  private final List rings = new ArrayList();
-
-  private final BoundingBox totalEnv = BoundingBox.empty();
+  private final List<LinearRing> rings = new ArrayList<>();
 
   public IndexedNestedRingTester(final GeometryGraph graph) {
     this.graph = graph;
@@ -67,14 +65,13 @@ public class IndexedNestedRingTester {
 
   public void add(final LinearRing ring) {
     this.rings.add(ring);
-    this.totalEnv.expandToInclude(ring.getBoundingBox());
   }
 
   private void buildIndex() {
     this.index = new StrTree();
 
     for (int i = 0; i < this.rings.size(); i++) {
-      final LinearRing ring = (LinearRing)this.rings.get(i);
+      final LinearRing ring = this.rings.get(i);
       final BoundingBox env = ring.getBoundingBox();
       this.index.insertItem(env, ring);
     }
@@ -88,7 +85,7 @@ public class IndexedNestedRingTester {
     buildIndex();
 
     for (int i = 0; i < this.rings.size(); i++) {
-      final LinearRing innerRing = (LinearRing)this.rings.get(i);
+      final LinearRing innerRing = this.rings.get(i);
 
       final List results = this.index.getItems(innerRing.getBoundingBox());
       // System.out.println(results.size());

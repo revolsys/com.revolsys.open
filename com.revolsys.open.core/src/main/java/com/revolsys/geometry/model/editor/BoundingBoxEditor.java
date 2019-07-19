@@ -249,7 +249,6 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
     return expandPercent(factor, factor);
   }
 
-  @Override
   public BoundingBoxEditor expandPercent(final double factorX, final double factorY) {
     if (!isEmpty()) {
       final double width = getWidth();

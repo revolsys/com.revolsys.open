@@ -80,14 +80,11 @@ public class HausdorffSimilarityMeasure implements SimilarityMeasure {
   public double measure(final Geometry g1, final Geometry g2) {
     final double distance = DiscreteHausdorffDistance.distance(g1, g2, DENSIFY_FRACTION);
 
-    BoundingBox env = g1.getBoundingBox();
-    env = env.expandToInclude(g2.getBoundingBox());
-    final double envSize = diagonalSize(env);
+    final BoundingBox boundingBox = BoundingBox.bboxNew(g1, g2);
+    final double envSize = diagonalSize(boundingBox);
     // normalize so that more similarity produces a measure closer to 1
     final double measure = 1 - distance / envSize;
 
-    // System.out.println("Hausdorff distance = " + distance + ", measure = " +
-    // measure);
     return measure;
   }
 }

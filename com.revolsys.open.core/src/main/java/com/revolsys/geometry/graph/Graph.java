@@ -27,7 +27,6 @@ import com.revolsys.collection.bplus.BPlusTreeMap;
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.comparator.ComparatorProxy;
-import com.revolsys.geometry.algorithm.index.IdObjectIndex;
 import com.revolsys.geometry.graph.attribute.NodeProperties;
 import com.revolsys.geometry.graph.comparator.NodeDistanceComparator;
 import com.revolsys.geometry.graph.event.EdgeEvent;
@@ -40,7 +39,7 @@ import com.revolsys.geometry.graph.filter.IsPointOnLineEdgeFilter;
 import com.revolsys.geometry.graph.visitor.EdgeWithinDistance;
 import com.revolsys.geometry.graph.visitor.NodeWithinBoundingBoxVisitor;
 import com.revolsys.geometry.graph.visitor.NodeWithinDistanceOfCoordinateVisitor;
-import com.revolsys.geometry.graph.visitor.NodeWithinDistanceOfGeometryVisitor;
+import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
@@ -53,6 +52,7 @@ import com.revolsys.geometry.model.coordinates.comparator.PointComparators;
 import com.revolsys.geometry.model.coordinates.comparator.PointDistanceComparator;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.page.PageValueManager;
 import com.revolsys.io.page.SerializablePageValueManager;
 import com.revolsys.predicate.PredicateProxy;
@@ -137,10 +137,58 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     this.nodeListeners.add(listener);
   }
 
+  protected Edge<T> addEdge(final T object, final double fromX, final double fromY,
+    final double toX, final double toY) {
+    return addEdge(object, null, fromX, fromY, toX, toY);
+  }
+
   public Edge<T> addEdge(final T object, final LineString line) {
     final Point from = line.getFromPoint();
     final Point to = line.getToPoint();
     return addEdge(object, line, from, to);
+  }
+
+  /**
+   * Actually add the edge.
+   *
+   * @param object
+   * @param line
+   * @param from
+   * @param to
+   * @return
+   */
+  protected Edge<T> addEdge(final T object, final LineString line, final double fromX,
+    final double fromY, final double toX, final double toY) {
+    if (this.inMemory && getEdgeCount() >= this.maxEdgesInMemory) {
+      this.edgePropertiesById = BPlusTreeMap.newIntSeralizableTempDisk(this.edgePropertiesById);
+      // TODO edgIds
+      // TODO edgeIndex
+      this.edgeLinesById = BPlusTreeMap.newIntSeralizableTempDisk(this.edgeLinesById);
+      this.edgeObjectsById = BPlusTreeMap.newIntSeralizableTempDisk(this.edgeObjectsById);
+      this.edgesById = BPlusTreeMap.newIntSeralizableTempDisk(this.edgesById);
+
+      // TODO nodeIndex
+      this.nodePropertiesById = BPlusTreeMap.newIntSeralizableTempDisk(this.nodePropertiesById);
+      this.nodesById = BPlusTreeMap.newIntSeralizableTempDisk(this.nodesById);
+      this.nodesIdsByPoint = BPlusTreeMap.newTempDisk(this.nodesIdsByPoint,
+        new SerializablePageValueManager<Point>(), PageValueManager.INT);
+      this.inMemory = false;
+    }
+    final Node<T> fromNode = getNode(fromX, fromY);
+    final Node<T> toNode = getNode(toX, toY);
+    final int edgeId = ++this.nextEdgeId;
+    final Edge<T> edge = new Edge<>(edgeId, this, fromNode, toNode);
+    if (this.edgeLinesById != null) {
+      this.edgeLinesById.put(edgeId, line);
+    }
+    this.edgeObjectsById.put(edgeId, object);
+    this.edgesById.put(edgeId, edge);
+    this.edgeIds.put(edge, edgeId);
+    if (this.edgeIndex != null) {
+      this.edgeIndex.add(edge);
+    }
+    this.edgeListeners.edgeEvent(edge, null, EdgeEvent.EDGE_ADDED, null);
+    return edge;
   }
 
   /**
@@ -357,29 +405,6 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
   }
 
   /**
-   * Find the nodes <= the distance of the specified geometry.
-   *
-   * @param geometry The geometry.
-   * @param distance The distance.
-   * @return The list of nodes.
-   */
-  public List<Node<T>> findNodes(final Geometry geometry, final double distance) {
-    if (geometry == null) {
-      return Collections.emptyList();
-    } else {
-      final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
-      final Consumer<Node<T>> visitor = new NodeWithinDistanceOfGeometryVisitor<>(geometry,
-        distance, results);
-      BoundingBox envelope = geometry.getBoundingBox();
-      envelope = envelope.expand(distance);
-      getNodeIndex().forEach(visitor, envelope);
-      final List<Node<T>> nodes = results.getList();
-      Collections.sort(nodes);
-      return nodes;
-    }
-  }
-
-  /**
    * Find all the nodes <= the distance of the node.
    *
    * @param node The node.
@@ -402,8 +427,8 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<>();
     final Consumer<Node<T>> visitor = new NodeWithinDistanceOfCoordinateVisitor<>(point, distance,
       results);
-    final BoundingBox envelope = point.bboxEdit(editor -> editor.expand(distance));
-    getNodeIndex().forEach(visitor, envelope);
+    final BoundingBox envelope = point.bboxEdit(editor -> editor.expandDelta(distance));
+    getNodeIndex().forEach(envelope, visitor);
     final List<Node<T>> nodes = results.getList();
     Collections.sort(nodes);
     return nodes;
@@ -425,6 +450,10 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     edgeIndex.forEach(boundingBox.getBoundingBox(), filter, visitor);
   }
 
+  public void forEachEdge(final Comparator<Edge<T>> comparator, final Consumer<Edge<T>> action) {
+    forEachEdge(action, null, comparator);
+  }
+
   @SuppressWarnings("unchecked")
   public void forEachEdge(final Consumer<Edge<T>> action) {
     Predicate<Edge<T>> filter = null;
@@ -440,11 +469,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
 
   public void forEachEdge(final Consumer<Edge<T>> visitor, final BoundingBox envelope) {
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
-    edgeIndex.forEach(visitor, envelope);
-  }
-
-  public void forEachEdge(final Consumer<Edge<T>> action, final Comparator<Edge<T>> comparator) {
-    forEachEdge(action, null, comparator);
+    edgeIndex.forEach(envelope, visitor);
   }
 
   public void forEachEdge(final Consumer<Edge<T>> action, final Predicate<Edge<T>> filter) {
@@ -694,8 +719,9 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     if (point == null) {
       return Collections.emptyList();
     } else {
-      BoundingBox boundingBox = point.getBoundingBox();
-      boundingBox = boundingBox.expand(maxDistance);
+      final BoundingBox boundingBox = point.getBoundingBox() //
+        .bboxEditor() //
+        .expandDelta(maxDistance);
       final double x = point.getX();
       final double y = point.getY();
       final Predicate<Edge<T>> filter = (edge) -> {
@@ -727,7 +753,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     final com.revolsys.geometry.model.BoundingBox envelope) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>(filter);
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
-    edgeIndex.forEach(results, envelope);
+    edgeIndex.forEach(envelope, results);
     final List<Edge<T>> edges = results.getList();
     Collections.sort(edges);
     return edges;
@@ -747,7 +773,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     final Comparator<Edge<T>> comparator, final com.revolsys.geometry.model.BoundingBox envelope) {
     final CreateListVisitor<Edge<T>> results = new CreateListVisitor<>(filter);
     final IdObjectIndex<Edge<T>> edgeIndex = getEdgeIndex();
-    edgeIndex.forEach(results, envelope);
+    edgeIndex.forEach(envelope, results);
     final List<Edge<T>> targetEdges = results.getList();
     if (comparator == null) {
       Collections.sort(targetEdges);
@@ -783,6 +809,28 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
 
   public int getNextNodeId() {
     return this.nextNodeId;
+  }
+
+  /**
+   * Get the node by point coordinates, creating one if it did not exist.
+   *
+   * @param point The point coordinates to get the node for.
+   * @return The node.
+   */
+  public Node<T> getNode(final double x, final double y) {
+    final PointDoubleXY point = new PointDoubleXY(x, y);
+    Node<T> node = findNode(point);
+    if (node == null) {
+      final int nodeId = ++this.nextNodeId;
+      node = new Node<>(nodeId, this, x, y);
+      this.nodesIdsByPoint.put(point, nodeId);
+      this.nodesById.put(nodeId, node);
+      if (this.nodeIndex != null) {
+        this.nodeIndex.add(node);
+      }
+      this.nodeListeners.nodeEvent(node, null, null, NodeEvent.NODE_ADDED, null);
+    }
+    return node;
   }
 
   public Node<T> getNode(final int nodeId) {
@@ -869,8 +917,9 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
    * @return The list of nodes.
    */
   public List<Node<T>> getNodes(final Geometry geometry, final double maxDistance) {
-    BoundingBox boundingBox = geometry.getBoundingBox();
-    boundingBox = boundingBox.expand(maxDistance);
+    final BoundingBox boundingBox = geometry.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     final IdObjectIndex<Node<T>> nodeIndex = getNodeIndex();
     final Predicate<? super Node<T>> filter = (node) -> {
       final double distance = geometry.distancePoint(node);
@@ -917,7 +966,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     final Comparator<Node<T>> comparator, final BoundingBox boundingBox) {
     final CreateListVisitor<Node<T>> results = new CreateListVisitor<>(filter);
     final IdObjectIndex<Node<T>> nodeIndex = getNodeIndex();
-    nodeIndex.forEach(results, boundingBox);
+    nodeIndex.forEach(boundingBox, results);
     final List<Node<T>> nodes = results.getList();
     if (comparator == null) {
       Collections.sort(nodes);
@@ -930,7 +979,9 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
 
   public List<Node<T>> getNodes(final Predicate<Node<T>> filter, final Geometry geometry,
     final double maxDistance) {
-    final BoundingBox boundingBox = geometry.getBoundingBox().expand(maxDistance);
+    final BoundingBox boundingBox = geometry.getBoundingBox() //
+      .bboxEditor() //
+      .expandDelta(maxDistance);
     final Predicate<Node<T>> distanceFilter = (node) -> {
       return filter.test(node) && node.distance(geometry) <= maxDistance;
     };
@@ -1169,7 +1220,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
   public void queryEdges(final EdgeVisitor<T> visitor) {
     final BoundingBox env = visitor.getEnvelope();
     final IdObjectIndex<Edge<T>> index = getEdgeIndex();
-    index.forEach(visitor, env);
+    index.forEach(env, visitor);
   }
 
   public void queryEdges(final EdgeVisitor<T> visitor, final Consumer<Edge<T>> matchVisitor) {

@@ -372,7 +372,7 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   private void removeDuplicateEdges() {
     final Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<>(INDEX);
-    forEachEdge((edge) -> {
+    forEachEdge(comparator, (edge) -> {
       final Node<LineSegment> fromNode = edge.getFromNode();
       final Node<LineSegment> toNode = edge.getToNode();
 
@@ -382,7 +382,7 @@ public class LineStringGraph extends Graph<LineSegment> {
         edges.remove(edge);
         Edge.remove(edges);
       }
-    }, comparator);
+    });
   }
 
   @Override
@@ -407,7 +407,7 @@ public class LineStringGraph extends Graph<LineSegment> {
 
   public void splitCrossingEdges() {
     final Comparator<Edge<LineSegment>> comparator = new EdgeAttributeValueComparator<>(INDEX);
-    forEachEdge((edge) -> {
+    forEachEdge(comparator, (edge) -> {
       final LineSegment line1 = edge.getObject();
       final Predicate<LineSegment> lineFilter = new CrossingLineSegmentFilter(line1);
       final Predicate<Edge<LineSegment>> filter = new EdgeObjectFilter<>(lineFilter);
@@ -428,7 +428,7 @@ public class LineStringGraph extends Graph<LineSegment> {
           edge.splitEdge(points);
         }
       }
-    }, comparator);
+    });
   }
 
   @Override
