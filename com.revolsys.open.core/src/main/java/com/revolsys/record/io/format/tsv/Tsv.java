@@ -6,7 +6,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.IteratorMapReader;
@@ -43,7 +43,7 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
       final CsvMapIterator iterator = new CsvMapIterator(resource, FIELD_SEPARATOR);
       return new IteratorMapReader(iterator);
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

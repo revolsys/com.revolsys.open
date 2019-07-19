@@ -479,8 +479,8 @@ public interface Record
   default <T> T getCodeValue(final CharSequence fieldName) {
     Object value = getValue(fieldName);
     if (Property.hasValue(value)) {
-      final RecordDefinition recordDefinition = getRecordDefinition();
-      final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
+      final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
+      final CodeTable codeTable = fieldDefinition.getCodeTable();
       if (codeTable != null) {
         value = codeTable.getValue(value);
       }
@@ -492,9 +492,8 @@ public interface Record
   default <T> T getCodeValue(final int fieldIndex) {
     Object value = getValue(fieldIndex);
     if (Property.hasValue(value)) {
-      final RecordDefinition recordDefinition = getRecordDefinition();
-      final String fieldName = getFieldName(fieldIndex);
-      final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
+      final FieldDefinition fieldDefinition = getFieldDefinition(fieldIndex);
+      final CodeTable codeTable = fieldDefinition.getCodeTable();
       if (codeTable != null) {
         value = codeTable.getValue(value);
       }

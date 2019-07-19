@@ -5,8 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
+
 import com.revolsys.collection.iterator.AbstractIterator;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -20,14 +24,15 @@ import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.io.format.json.JsonParser.EventType;
 import com.revolsys.spring.resource.Resource;
 
-public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implements GeometryReader {
+public class GeoJsonGeometryReader extends AbstractIterator<Geometry> implements GeometryReader {
 
   private GeometryFactory geometryFactory;
 
   private JsonParser in;
 
-  public GeoJsonGeometryIterator(final Resource resource) {
+  public GeoJsonGeometryReader(final Resource resource, final MapEx properties) {
     this.in = new JsonParser(resource);
+    setProperties(properties);
   }
 
   @Override
@@ -68,10 +73,15 @@ public class GeoJsonGeometryIterator extends AbstractIterator<Geometry> implemen
   }
 
   @Override
+  public ClockDirection getPolygonRingDirection() {
+    return ClockDirection.COUNTER_CLOCKWISE;
+  }
+
+  @Override
   protected void initDo() {
     this.geometryFactory = getProperty(IoConstants.GEOMETRY_FACTORY);
     if (this.geometryFactory == null) {
-      this.geometryFactory = GeometryFactory.floating3d(4326);
+      this.geometryFactory = GeometryFactory.floating3d(EpsgId.WGS84);
     }
     if (this.in.hasNext()) {
       this.in.next();

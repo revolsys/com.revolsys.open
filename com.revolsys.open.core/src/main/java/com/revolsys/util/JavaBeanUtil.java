@@ -297,7 +297,7 @@ public final class JavaBeanUtil {
         throw new WrappedException(t);
       }
     } catch (final Exception e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

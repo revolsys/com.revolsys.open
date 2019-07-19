@@ -4,7 +4,9 @@ import java.io.BufferedWriter;
 import java.io.Writer;
 
 import org.jeometry.common.math.Angle;
+import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -36,14 +38,20 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
 
   private int srid = -1;
 
-  public GeoJsonRecordWriter(final Writer out) {
-    this(out, false);
-  }
+  private RecordDefinition recordDefinition;
+
+  private boolean allowCustomCoordinateSystem = true;
 
   public GeoJsonRecordWriter(final Writer out, final boolean cogo) {
     this.out = new JsonWriter(new BufferedWriter(out));
     this.out.setIndent(true);
     this.cogo = cogo;
+  }
+
+  public GeoJsonRecordWriter(final Writer out, final RecordDefinition recordDefinition) {
+    this(out, false);
+    this.recordDefinition = recordDefinition;
+    setProperty(IoConstants.GEOMETRY_FACTORY, recordDefinition.getGeometryFactory());
   }
 
   /**
@@ -53,6 +61,9 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
   public void close() {
     if (this.out != null) {
       try {
+        if (!this.initialized) {
+          writeHeader();
+        }
         writeFooter();
       } finally {
         this.out.close();
@@ -175,6 +186,20 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     this.out.endList();
   }
 
+  @Override
+  public ClockDirection getPolygonRingDirection() {
+    return ClockDirection.COUNTER_CLOCKWISE;
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
+  }
+
+  public boolean isAllowCustomCoordinateSystem() {
+    return this.allowCustomCoordinateSystem;
+  }
+
   public boolean isCogo() {
     return this.cogo;
   }
@@ -292,18 +317,29 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     }
   }
 
+  public void setAllowCustomCoordinateSystem(final boolean allowCustomCoordinateSystem) {
+    this.allowCustomCoordinateSystem = allowCustomCoordinateSystem;
+  }
+
   private void srid(final int srid) {
-    final String urn = GeoJson.URN_OGC_DEF_CRS_EPSG + srid;
-    this.out.label(GeoJson.CRS);
-    this.out.startObject();
-    type(GeoJson.NAME);
-    this.out.endAttribute();
-    this.out.label(GeoJson.PROPERTIES);
-    this.out.startObject();
-    this.out.label(GeoJson.NAME);
-    this.out.value(urn);
-    this.out.endObject();
-    this.out.endObject();
+    if (isAllowCustomCoordinateSystem()) {
+      final String urn;
+      if (srid == EpsgId.WGS84) {
+        urn = "urn:ogc:def:crs:OGC::CRS84";
+      } else {
+        urn = GeoJson.URN_OGC_DEF_CRS_EPSG + srid;
+      }
+      this.out.label(GeoJson.CRS);
+      this.out.startObject();
+      type(GeoJson.NAME);
+      this.out.endAttribute();
+      this.out.label(GeoJson.PROPERTIES);
+      this.out.startObject();
+      this.out.label(GeoJson.NAME);
+      this.out.value(urn);
+      this.out.endObject();
+      this.out.endObject();
+    }
   }
 
   private void type(final String type) {
@@ -315,6 +351,9 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
   public void write(final Record record) {
     if (this.initialized) {
       this.out.endAttribute();
+      if (!isIndent()) {
+        this.out.newLineForce();
+      }
     } else {
       writeHeader();
       this.initialized = true;
@@ -342,15 +381,15 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     this.out.endAttribute();
     this.out.label(GeoJson.PROPERTIES);
     this.out.startObject();
-    final int numAttributes = recordDefinition.getFieldCount();
     boolean hasValue = false;
-    for (int i = 0; i < numAttributes; i++) {
-      if (i != geometryIndex) {
+    for (final FieldDefinition field : recordDefinition.getFields()) {
+      final int fieldIndex = field.getIndex();
+      if (fieldIndex != geometryIndex) {
         final Object value;
         if (isWriteCodeValues()) {
-          value = record.getValue(i);
+          value = record.getCodeValue(fieldIndex);
         } else {
-          value = record.getCodeValue(i);
+          value = record.getValue(fieldIndex);
         }
         if (isValueWritable(value)) {
           if (hasValue) {
@@ -358,11 +397,14 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
           } else {
             hasValue = true;
           }
-          final FieldDefinition attribute = recordDefinition.getField(i);
-          final String name = attribute.getName();
+          final String name = field.getName();
           this.out.label(name);
           if (value instanceof Geometry) {
-            final Geometry geometry = (Geometry)value;
+            Geometry geometry = (Geometry)value;
+            if (!this.allowCustomCoordinateSystem) {
+              final GeometryFactory wgs84 = geometryFactory.convertSrid(EpsgId.WGS84);
+              geometry = geometry.convertGeometry(wgs84);
+            }
             geometry(geometry);
           } else {
             this.out.value(value);
@@ -376,8 +418,12 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
 
   private void writeFooter() {
     if (!this.singleObject) {
+      if (!isIndent()) {
+        this.out.newLineForce();
+      }
       this.out.endList();
       this.out.endObject();
+      this.out.newLineForce();
     }
     final String callback = getProperty(IoConstants.JSONP_PROPERTY);
     if (callback != null) {
@@ -397,9 +443,12 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
       this.out.startObject();
       type(GeoJson.FEATURE_COLLECTION);
       this.srid = writeSrid();
-      this.out.endAttribute();
+      if (this.allowCustomCoordinateSystem) {
+        this.out.endAttribute();
+      }
       this.out.label(GeoJson.FEATURES);
       this.out.startList();
+      this.out.newLineForce();
     }
   }
 
@@ -411,13 +460,16 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
   private void writeSrid(final Geometry geometry) {
     if (geometry != null) {
       final GeometryFactory geometryFactory = geometry.getGeometryFactory();
-      writeSrid(geometryFactory);
+      if (this.recordDefinition == null
+        || !geometryFactory.isSameCoordinateSystem(this.recordDefinition.getGeometryFactory())) {
+        writeSrid(geometryFactory);
+      }
     }
   }
 
   protected int writeSrid(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
-      final int srid = geometryFactory.getCoordinateSystemId();
+      final int srid = geometryFactory.getHorizontalCoordinateSystemId();
       if (srid != 0 && srid != this.srid) {
         this.out.endAttribute();
         srid(srid);

@@ -6,7 +6,7 @@ import java.io.Writer;
 import java.nio.file.Path;
 
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -61,7 +61,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
       }
       this.out.write('\n');
     } catch (final IOException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -80,7 +80,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
       try {
         this.out.flush();
       } catch (final IOException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
 
@@ -148,7 +148,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
         }
         out.write('\n');
       } catch (final IOException e) {
-        throw new WrappedException(e);
+        throw Exceptions.wrap(e);
       }
     }
   }

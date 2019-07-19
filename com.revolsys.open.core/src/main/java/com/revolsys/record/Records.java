@@ -11,12 +11,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 import org.jeometry.common.compare.CompareUtil;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.io.PathName;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.comparator.StringNumberComparator;
@@ -25,21 +27,45 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.TopologyException;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.geometry.util.GeometryProperties;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
 public interface Records {
+  static BoundingBox bboxAddRecords(final BoundingBoxEditor boundingBox,
+    final Iterable<? extends Record> records) {
+    for (final Record record : records) {
+      final Geometry geometry = record.getGeometry();
+      boundingBox.addGeometry(geometry);
+    }
+    return boundingBox.newBoundingBox();
+  }
+
+  static BoundingBox boundingBox(final GeometryFactory geometryFactory,
+    final Iterable<? extends Record> records) {
+    final BoundingBoxEditor boundingBox = geometryFactory.bboxEditor();
+    for (final Record record : records) {
+      final Geometry geometry = record.getGeometry();
+      boundingBox.addGeometry(geometry);
+    }
+    return boundingBox.newBoundingBox();
+  }
+
   static BoundingBox boundingBox(final Iterable<? extends Record> records) {
     BoundingBox boundingBox = BoundingBox.empty();
     for (final Record record : records) {
-      boundingBox = boundingBox.expandToInclude(boundingBox(record));
+      boundingBox = boundingBox.bboxEdit(editor -> editor.addBbox(boundingBox(record)));
     }
     return boundingBox;
   }
@@ -150,6 +176,40 @@ public interface Records {
     newObject.setGeometryValue(geometry);
     GeometryProperties.copyUserData(oldGeometry, geometry);
     return newObject;
+  }
+
+  static void copyRecords(final RecordStore sourceRecordStore, final String sourceTableName,
+    final RecordStore targetRecordStore, final String targetTableName) {
+    final Query query = new Query(sourceTableName);
+    try (
+      RecordReader reader = sourceRecordStore.getRecords(query);
+      RecordWriter writer = targetRecordStore.newRecordWriter();) {
+      final RecordDefinition recordDefinition = targetRecordStore
+        .getRecordDefinition(targetTableName);
+      for (final Record record : reader) {
+        final Record newRecord = recordDefinition.newRecord();
+        newRecord.setValuesAll(record);
+        writer.write(newRecord);
+      }
+    }
+  }
+
+  static void copyRecords(final RecordStore sourceRecordStore, final String sourceTableName,
+    final RecordStore targetRecordStore, final String targetTableName,
+    final BiConsumer<Record, Record> recordEditor) {
+    final Query query = new Query(sourceTableName);
+    try (
+      RecordReader reader = sourceRecordStore.getRecords(query);
+      RecordWriter writer = targetRecordStore.newRecordWriter();) {
+      final RecordDefinition recordDefinition = targetRecordStore
+        .getRecordDefinition(targetTableName);
+      for (final Record record : reader) {
+        final Record newRecord = recordDefinition.newRecord();
+        newRecord.setValuesAll(record);
+        recordEditor.accept(record, newRecord);
+        writer.write(newRecord);
+      }
+    }
   }
 
   static double distance(final Record record1, final Record record2) {
@@ -529,7 +589,7 @@ public interface Records {
   }
 
   static <V extends Record> Predicate<V> newFilter(final BoundingBox boundingBox) {
-    return (record) -> {
+    return record -> {
       if (record != null) {
         try {
           final Geometry geometry = record.getGeometry();
@@ -537,6 +597,7 @@ public interface Records {
             return geometry.intersectsBbox(boundingBox);
           }
         } catch (final Throwable t) {
+          Logs.debug(Records.class, "Invalid Geometry", t);
         }
       }
       return false;
@@ -545,7 +606,7 @@ public interface Records {
 
   static <V extends Record> Predicate<V> newFilter(final Geometry geometry,
     final double maxDistance) {
-    return (record) -> {
+    return record -> {
       if (record != null) {
         final Geometry recordGeometry = record.getGeometry();
         if (recordGeometry != null) {
@@ -560,7 +621,7 @@ public interface Records {
   }
 
   static <V extends Record> Predicate<V> newFilter(final String fieldName, final Object value) {
-    return (record) -> {
+    return record -> {
       if (record != null) {
         final Object fieldValue = record.getValue(fieldName);
         return DataType.equal(fieldValue, value);
@@ -572,7 +633,7 @@ public interface Records {
   static <R extends Record> Predicate<R> newFilterGeometryIntersects(final Geometry geometry) {
     if (Property.hasValue(geometry)) {
       final GeometryFactory geometryFactory = geometry.getGeometryFactory();
-      return (record) -> {
+      return record -> {
         if (record != null) {
           try {
             final Geometry geometry2 = record.getGeometry();

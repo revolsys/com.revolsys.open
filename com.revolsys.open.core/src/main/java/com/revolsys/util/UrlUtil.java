@@ -36,7 +36,6 @@ import java.util.regex.Pattern;
 
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
-import org.jeometry.common.exception.WrappedException;
 import org.jeometry.common.net.UrlProxy;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
@@ -491,7 +490,7 @@ public final class UrlUtil {
       final Path path = Paths.get(uri);
       return path.toFile();
     } catch (final URISyntaxException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

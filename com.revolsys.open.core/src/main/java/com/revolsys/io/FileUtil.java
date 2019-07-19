@@ -50,7 +50,6 @@ import java.util.List;
 
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
-import org.jeometry.common.exception.WrappedException;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.connection.file.FileConnectionManager;
@@ -1101,7 +1100,7 @@ public final class FileUtil {
     try {
       return new FileOutputStream(file);
     } catch (final FileNotFoundException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 

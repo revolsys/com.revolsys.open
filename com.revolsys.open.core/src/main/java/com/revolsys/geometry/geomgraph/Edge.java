@@ -32,7 +32,7 @@
  */
 package com.revolsys.geometry.geomgraph;
 
-import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.geomgraph.index.MonotoneChainEdge;
@@ -137,7 +137,7 @@ public class Edge extends GraphComponent implements LineString {
     try {
       return (Edge)super.clone();
     } catch (final CloneNotSupportedException e) {
-      throw new WrappedException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
