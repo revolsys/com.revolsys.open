@@ -12,6 +12,25 @@ public interface Segment
   @Override
   Segment clone();
 
+  default int compareSegmentId(final Segment segment) {
+    if (segment == null) {
+      return 1;
+    } else {
+      final int[] segmentId1 = getSegmentId();
+      final int[] segmentId2 = segment.getSegmentId();
+      int compare = Integer.compare(segmentId1.length, segmentId2.length);
+      if (compare == 0) {
+        for (int i = 0; i < segmentId1.length; i++) {
+          compare = Integer.compare(segmentId1[i], segmentId2[i]);
+          if (compare != 0) {
+            return compare;
+          }
+        }
+      }
+      return compare;
+    }
+  }
+
   <V extends Geometry> V getGeometry();
 
   Vertex getGeometryVertex(int index);
@@ -27,8 +46,8 @@ public interface Segment
   int[] getSegmentId();
 
   default int getSegmentIndex() {
-    final int[] vertexId = getSegmentId();
-    return vertexId[vertexId.length - 1];
+    final int[] segmentId = getSegmentId();
+    return segmentId[segmentId.length - 1];
   }
 
   @Override
@@ -57,5 +76,5 @@ public interface Segment
     return this;
   }
 
-  void setSegmentId(int[] segmentId);
+  void setSegmentId(int... segmentId);
 }

@@ -1,5 +1,7 @@
 package com.revolsys.geometry.model.segment;
 
+import org.jeometry.common.function.BiFunctionDouble;
+import org.jeometry.common.function.Function4Double;
 import org.jeometry.common.math.Angle;
 import org.jeometry.common.number.Doubles;
 
@@ -9,6 +11,7 @@ import com.revolsys.geometry.algorithm.HCoordinate;
 import com.revolsys.geometry.algorithm.NotRepresentableException;
 import com.revolsys.geometry.algorithm.RobustLineIntersector;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -76,7 +79,7 @@ public interface LineSegment extends LineString {
     } else {
       final double distance = segment2.distance(x, y);
       final double maxDistance = segment1.getGeometryFactory().getResolution(0);
-      if (distance < maxDistance) {
+      if (distance == 0 || distance < maxDistance) {
         final double x1 = segment2.getX(0);
         final double y1 = segment2.getY(0);
         final double x2 = segment2.getX(1);
@@ -111,10 +114,27 @@ public interface LineSegment extends LineString {
    * @param point the point to find the closest point to
    * @return a Point which is the closest point on the line segment to the point p
    */
+  default Point closestPoint(final double x, final double y) {
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    return LineSegmentUtil.closestPoint(x1, y1, x2, y2, x, y);
+  }
+
+  /**
+   * Computes the closest point on this line segment to another point.
+   * @param point the point to find the closest point to
+   * @return a Point which is the closest point on the line segment to the point p
+   */
   default Point closestPoint(final Point point) {
-    final Point p0 = getP0();
-    final Point p1 = getP1();
-    return LineSegmentUtil.closestPoint(p0, p1, point);
+    final double x = point.getX();
+    final double y = point.getY();
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    return LineSegmentUtil.closestPoint(x1, y1, x2, y2, x, y);
   }
 
   /**
@@ -226,22 +246,29 @@ public interface LineSegment extends LineString {
     final double y1 = getY(0);
     final double x2 = getX(1);
     final double y2 = getY(1);
-    return LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
-  }
+    if (x1 == x2 && y1 == y2) {
+      return Points.distance(x, y, x1, y1);
+    } else {
+      final double dxx1 = x - x1;
+      final double dx2x1 = x2 - x1;
+      final double dyy1 = y - y1;
+      final double dy2y1 = y2 - y1;
+      final double d2x1sq = dx2x1 * dx2x1;
+      final double dy2y1sq = dy2y1 * dy2y1;
+      final double r = (dxx1 * dx2x1 + dyy1 * dy2y1) / (d2x1sq + dy2y1sq);
 
-  default double distance(final LineSegment line) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final LineString convertedLine = line.convertGeometry(geometryFactory, 2);
-    final double line1X1 = getX(0);
-    final double line1Y1 = getY(0);
-    final double line1X2 = getX(1);
-    final double line1Y2 = getY(1);
-    final double line2X1 = convertedLine.getX(0);
-    final double line2Y1 = convertedLine.getY(0);
-    final double line2X2 = convertedLine.getX(1);
-    final double line2Y2 = convertedLine.getY(1);
-    return LineSegmentUtil.distanceLineLine(line1X1, line1Y1, line1X2, line1Y2, line2X1, line2Y1,
-      line2X2, line2Y2);
+      if (r <= 0.0) {
+        return Points.distance(x, y, x1, y1);
+      } else if (r >= 1.0) {
+        return Points.distance(x, y, x2, y2);
+      } else {
+        final double dy1y = y1 - y;
+        final double dx1x = x1 - x;
+        final double s = (dy1y * dx2x1 - dx1x * dy2y1) / (d2x1sq + dy2y1sq);
+
+        return Math.abs(s) * Math.sqrt(d2x1sq + dy2y1sq);
+      }
+    }
   }
 
   /**
@@ -250,12 +277,32 @@ public interface LineSegment extends LineString {
    * @return the distance from this segment to the given point
    */
   @Override
-  default double distance(Point point, final double terminateDistance) {
+  default double distance(final double x, final double y, final double terminateDistance) {
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    return LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+  }
+
+  default double distance(final double x1, final double y1, final double x2, final double y2) {
+    final double line1x1 = getX(0);
+    final double line1y1 = getY(0);
+    final double line1x2 = getX(1);
+    final double line1y2 = getY(1);
+    return LineSegmentUtil.distanceLineLine(line1x1, line1y1, line1x2, line1y2, x1, y1, x2, y2);
+  }
+
+  default double distance(final LineSegment line) {
+    final double[] coordinates = new double[2];
     final GeometryFactory geometryFactory = getGeometryFactory();
-    point = point.convertGeometry(geometryFactory, 2);
-    final double x = point.getX();
-    final double y = point.getY();
-    return distance(x, y);
+    line.convertVertexCoordinates2d(0, geometryFactory, coordinates);
+    final double x1 = coordinates[X];
+    final double y1 = coordinates[Y];
+    line.convertVertexCoordinates2d(1, geometryFactory, coordinates);
+    final double x2 = coordinates[X];
+    final double y2 = coordinates[Y];
+    return distance(x1, y1, x2, y2);
   }
 
   default double distanceAlong(final double x, final double y) {
@@ -279,21 +326,13 @@ public interface LineSegment extends LineString {
    * @return the perpendicular distance between the defined line and the given point
    */
   default double distancePerpendicular(final Point p) {
-    return CGAlgorithms.distancePointLinePerpendicular(p, getP0(), getP1());
-  }
-
-  /**
-   * Computes the distance between this line segment and a given point.
-   *
-   * @return the distance from this segment to the given point
-   */
-  @Override
-  default double distancePoint(Point point) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    point = point.convertGeometry(geometryFactory, 2);
-    final double x = point.getX();
-    final double y = point.getY();
-    return distance(x, y);
+    final double x = p.getX();
+    final double y = p.getY();
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    return LineSegmentUtil.distancePointLinePerpendicular(x, y, x1, y1, x2, y2);
   }
 
   default boolean equals(final LineSegment segment) {
@@ -337,8 +376,45 @@ public interface LineSegment extends LineString {
   }
 
   @Override
+  default <R> R findSegment(final Function4Double<R> action) {
+    if (!isEmpty()) {
+      final double x1 = getX(0);
+      final double y1 = getY(0);
+      final double x2 = getX(1);
+      final double y2 = getY(1);
+      final R result = action.accept(x1, y1, x2, y2);
+      return result;
+    }
+    return null;
+  }
+
+  @Override
+  default <R> R findVertex(final BiFunctionDouble<R> action) {
+    if (!isEmpty()) {
+      for (int i = 0; i < 2; i++) {
+        final double x1 = getX(i);
+        final double y1 = getY(i);
+        final R result = action.accept(x1, y1);
+        if (result != null) {
+          return result;
+        }
+      }
+    }
+    return null;
+  }
+
+  @Override
   default int getAxisCount() {
     return 3;
+  }
+
+  default ClockDirection getClockDirection(final double x, final double y) {
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    final ClockDirection clockDirection = ClockDirection.directionLinePoint(x1, y1, x2, y2, x, y);
+    return clockDirection;
   }
 
   default Point getCrossing(final Point point1, final Point point2, final BoundingBox boundingBox) {
@@ -525,17 +601,12 @@ public interface LineSegment extends LineString {
   }
 
   @Override
-  default Side getSide(final Point point) {
-    final int orientationIndex = orientationIndex(point);
-    switch (orientationIndex) {
-      case 1:
-        return Side.LEFT;
-      case -1:
-        return Side.RIGHT;
-
-      default:
-        return null;
-    }
+  default Side getSide(final double x, final double y) {
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    return Side.getSide(x1, y1, x2, y2, x, y);
   }
 
   @Override
@@ -563,6 +634,42 @@ public interface LineSegment extends LineString {
       return null;
     } else {
       return intersection.getPoint();
+    }
+  }
+
+  @Override
+  default Geometry intersectionBbox(final BoundingBox boundingBox) {
+    notNullSameCs(boundingBox);
+    if (bboxCoveredBy(boundingBox)) {
+      return this;
+    } else {
+      // TODO optimize
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final double x1 = getX(0);
+      final double y1 = getY(0);
+      final double x2 = getX(1);
+      final double y2 = getY(1);
+      final Point lineStart = getPoint(0);
+      final Point lineEnd = getPoint(1);
+      final boolean contains1 = boundingBox.bboxIntersects(x1, y1);
+      final boolean contains2 = boundingBox.bboxIntersects(x2, y2);
+      if (contains1) {
+        if (contains2) {
+          return this;
+        } else {
+          final Point c2 = getCrossing(lineEnd, lineStart, boundingBox);
+          return new LineSegmentDoubleGF(geometryFactory, lineStart, c2);
+        }
+      } else {
+        if (contains2) {
+          final Point c1 = getCrossing(lineStart, lineEnd, boundingBox);
+          return new LineSegmentDoubleGF(geometryFactory, c1, lineEnd);
+        } else {
+          final Point c1 = getCrossing(lineStart, lineEnd, boundingBox);
+          final Point c2 = getCrossing(lineEnd, lineStart, boundingBox);
+          return new LineSegmentDoubleGF(geometryFactory, c1, c2);
+        }
+      }
     }
   }
 
@@ -603,6 +710,11 @@ public interface LineSegment extends LineString {
    */
   default boolean isHorizontal() {
     return getY(0) == getY(1);
+  }
+
+  default boolean isLeftOf(final double x, final double y) {
+    final ClockDirection clockDirection = getClockDirection(x, y);
+    return clockDirection.isCounterClockwise();
   }
 
   default boolean isPerpendicularTo(Point point) {
@@ -652,6 +764,11 @@ public interface LineSegment extends LineString {
     }
   }
 
+  default boolean isRightOf(final double x, final double y) {
+    final ClockDirection clockDirection = getClockDirection(x, y);
+    return clockDirection.isClockwise();
+  }
+
   /**
    * Tests whether the segment is vertical.
    *
@@ -662,11 +779,11 @@ public interface LineSegment extends LineString {
   }
 
   default boolean isWithinDistance(final Point point, final double distance) {
-    return distance(point) <= distance;
+    return distancePoint(point) <= distance;
   }
 
   default boolean isZeroLength() {
-    return equalsVertex(2, 0, 1);
+    return equalsVertex2d(0, 1);
   }
 
   /**
@@ -724,13 +841,23 @@ public interface LineSegment extends LineString {
    */
   @Override
   default LineSegment normalize() {
-    final Point p1 = getP1();
-    final Point p0 = getP0();
-    if (p1.compareTo(p0) < 0) {
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    if (CoordinatesUtil.compare(x1, y1, x2, y2) < 0) {
       return reverse();
     } else {
       return this;
     }
+  }
+
+  default int orientationIndex(final double x, final double y) {
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    return LineSegmentUtil.orientationIndex(x1, y1, x2, y2, x, y);
   }
 
   /**
@@ -789,11 +916,11 @@ public interface LineSegment extends LineString {
      * For instance, the following situation produces identical results in spite
      * of the inverse orientation of the line segment:
      *
-     * Point p0 = new PointDouble((double)219.3649559090992, 140.84159161824724);
-     * Point p1 = new PointDouble((double)168.9018919682399, -5.713787599646864);
+     * Point p0 = new PointDoubleXY(219.3649559090992, 140.84159161824724);
+     * Point p1 = new PointDoubleXY(168.9018919682399, -5.713787599646864);
      *
-     * Point p = new PointDouble((double)186.80814046338352, 46.28973405831556); int
-     * orient = orientationIndex(p0, p1, p); int orientInv =
+     * Point p = new PointDoubleXY(186.80814046338352, 46.28973405831556);
+     * int orient = orientationIndex(p0, p1, p); int orientInv =
      * orientationIndex(p1, p0, p);
      *
      * A way to force consistent results is to normalize the orientation of the
@@ -813,10 +940,10 @@ public interface LineSegment extends LineString {
    * If the fraction is < 0.0 or > 1.0 the point returned
    * will lie before the start or beyond the end of the segment.
    *
-   * @param segmentLengthFraction the fraction of the segment length along the line
+   * @param projectionFactor the fraction of the segment length along the line
    * @return the point at that distance
    */
-  default Point pointAlong(final double segmentLengthFraction) {
+  default Point pointAlong(final double projectionFactor) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final int axisCount = getAxisCount();
     final double[] coordinates = new double[axisCount];
@@ -824,7 +951,7 @@ public interface LineSegment extends LineString {
       final double value1 = getCoordinate(0, i);
       final double value2 = getCoordinate(1, i);
       final double delta = value2 - value1;
-      double newValue = value1 + delta * segmentLengthFraction;
+      double newValue = value1 + delta * projectionFactor;
       newValue = geometryFactory.makePrecise(i, newValue);
       coordinates[i] = newValue;
     }
@@ -899,33 +1026,48 @@ public interface LineSegment extends LineString {
    * @return the projected line segment, or <code>null</code> if there is no overlap
    */
   default LineSegment project(final LineSegment seg) {
-    final double pf0 = projectionFactor(seg.getP0());
-    final double pf1 = projectionFactor(seg.getP1());
+    final double x1 = seg.getX(0);
+    final double y1 = seg.getY(0);
+    final double x2 = seg.getX(1);
+    final double y2 = seg.getY(1);
+    final double pf0 = projectionFactor(x1, y1);
+    final double pf1 = projectionFactor(x2, y2);
     // check if segment projects at all
     if (pf0 >= 1.0 && pf1 >= 1.0) {
       return null;
-    }
-    if (pf0 <= 0.0 && pf1 <= 0.0) {
+    } else if (pf0 <= 0.0 && pf1 <= 0.0) {
       return null;
-    }
+    } else {
+      double newX1;
+      double newY1;
+      if (pf0 <= 0.0) {
+        newX1 = getX(0);
+        newY1 = getY(0);
+      } else if (pf0 >= 1.0) {
+        newX1 = getX(1);
+        newY1 = getY(1);
+      } else {
+        final Point newPoint = pointAlong(pf0);
+        newX1 = newPoint.getX();
+        newY1 = newPoint.getY();
+      }
 
-    Point newp0 = project(seg.getP0());
-    if (pf0 < 0.0) {
-      newp0 = getP0();
-    }
-    if (pf0 > 1.0) {
-      newp0 = getP1();
-    }
+      double newX2;
+      double newY2;
+      if (pf1 <= 0.0) {
+        newX2 = getX(0);
+        newY2 = getY(0);
+      } else if (pf1 > 1.0) {
+        newX2 = getX(1);
+        newY2 = getY(1);
+      } else {
+        final Point newPoint = pointAlong(pf1);
+        newX2 = newPoint.getX();
+        newY2 = newPoint.getY();
+      }
 
-    Point newp1 = project(seg.getP1());
-    if (pf1 < 0.0) {
-      newp1 = getP0();
+      return newLineSegment(2, newX1, newY1, newX2, newY2);
     }
-    if (pf1 > 1.0) {
-      newp1 = getP1();
-    }
-
-    return new LineSegmentDoubleGF(newp0, newp1);
   }
 
   /**
@@ -937,10 +1079,8 @@ public interface LineSegment extends LineString {
    * the projection factor will lie outside the range [0.0, 1.0].
    */
   default Point project(final Point point) {
-    final Point lineStart = getPoint(0);
-    final Point lineEnd = getPoint(1);
-    final Point newPoint = LineSegmentUtil.project(getGeometryFactory(), lineStart, lineEnd, point);
-    return newPoint;
+    final double projectionFactor = projectionFactor(point);
+    return pointAlong(projectionFactor);
   }
 
   default double projectCoordinate(final int axisIndex, final double projectionFactor) {
@@ -954,8 +1094,8 @@ public interface LineSegment extends LineString {
   }
 
   /**
-   * Computes the Projection Factor for the projection of the point p
-   * onto this LineSegmentDouble.  The Projection Factor is the constant r
+   * Computes the CoordinateOperationMethod Factor for the projection of the point p
+   * onto this LineSegmentDouble.  The CoordinateOperationMethod Factor is the constant r
    * by which the vector for this segment must be multiplied to
    * equal the vector for the projection of <tt>p<//t> on the line
    * defined by this segment.
@@ -976,8 +1116,8 @@ public interface LineSegment extends LineString {
   }
 
   /**
-   * Computes the Projection Factor for the projection of the point p
-   * onto this LineSegmentDouble.  The Projection Factor is the constant r
+   * Computes the CoordinateOperationMethod Factor for the projection of the point p
+   * onto this LineSegmentDouble.  The CoordinateOperationMethod Factor is the constant r
    * by which the vector for this segment must be multiplied to
    * equal the vector for the projection of <tt>p<//t> on the line
    * defined by this segment.
