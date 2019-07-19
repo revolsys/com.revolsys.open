@@ -351,8 +351,7 @@ public class GeometryGraph extends Graph<LineSegment> {
 
               if (point.equals(fromPoint) || point.equals(toPoint)) {
                 // Point intersection, make sure it's not at the start
-                final double maxDistance1 = maxDistance;
-                for (final Node<LineSegment> node : this.getNodes(point, maxDistance1)) {
+                for (final Node<LineSegment> node : this.getNodes(point, maxDistance)) {
                   final int degree = node.getDegree();
                   if (isStartPoint(node)) {
                     if (degree > 2) {
