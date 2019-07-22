@@ -168,42 +168,46 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
   }
 
   private int getSubnodeIndex(final double x, final double y) {
-    final double centreX = this.centreX;
-    final double centreY = this.centreY;
-    if (x >= centreX) {
-      if (y >= centreY) {
-        return 3;
-      } else if (y <= centreY) {
-        return 1;
+    int subnodeIndex = -1;
+    if (x >= this.centreX) {
+      if (y >= this.centreY) {
+        subnodeIndex = 3;
       }
-    } else if (x <= centreX) {
-      if (y >= centreY) {
-        return 2;
-      } else if (y <= centreY) {
-        return 0;
+      if (y <= this.centreY) {
+        subnodeIndex = 1;
       }
     }
-    return -1;
+    if (x <= this.centreX) {
+      if (y >= this.centreY) {
+        subnodeIndex = 2;
+      }
+      if (y <= this.centreY) {
+        subnodeIndex = 0;
+      }
+    }
+    return subnodeIndex;
   }
 
   private int getSubnodeIndex(final double minX, final double minY, final double maxX,
     final double maxY) {
-    final double centreX = this.centreX;
-    final double centreY = this.centreY;
-    if (minX >= centreX) {
-      if (minY >= centreY) {
-        return 3;
-      } else if (maxY <= centreY) {
-        return 1;
+    int subnodeIndex = -1;
+    if (minX >= this.centreX) {
+      if (minY >= this.centreY) {
+        subnodeIndex = 3;
       }
-    } else if (maxX <= centreX) {
-      if (minY >= centreY) {
-        return 2;
-      } else if (maxY <= centreY) {
-        return 0;
+      if (maxY <= this.centreY) {
+        subnodeIndex = 1;
       }
     }
-    return -1;
+    if (maxX <= this.centreX) {
+      if (minY >= this.centreY) {
+        subnodeIndex = 2;
+      }
+      if (maxY <= this.centreY) {
+        subnodeIndex = 0;
+      }
+    }
+    return subnodeIndex;
   }
 
   private boolean hasChildren() {
