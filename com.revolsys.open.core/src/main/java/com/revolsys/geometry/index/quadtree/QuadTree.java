@@ -142,12 +142,22 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
-  public final void insertItem(final double minX, final double minY, final double maxX,
-    final double maxY, final T item) {
-    final double delX = maxX - minX;
-    setMinExtent(delX);
-    final double delY = maxY - minY;
-    setMinExtent(delY);
+  public final void insertItem(double minX, double minY, double maxX, double maxY, final T item) {
+    final double deltaX = maxX - minX;
+    if (deltaX == 0) {
+      minX = minX - this.minExtent / 2.0;
+      maxX = minX + this.minExtent / 2.0;
+    } else if (deltaX < this.minExtent) {
+      this.minExtent = deltaX;
+    }
+
+    final double deltaY = maxY - minY;
+    if (deltaY == 0) {
+      minY = minY - this.minExtent / 2.0;
+      maxY = minY + this.minExtent / 2.0;
+    } else if (deltaY < this.minExtent) {
+      this.minExtent = deltaY;
+    }
 
     if (this.root.insertRoot(this, minX, minY, maxX, maxY, item)) {
       this.size++;
@@ -155,9 +165,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   }
 
   public final void insertItem(final double x, final double y, final T item) {
-    if (this.root.insertRoot(this, x, y, x, y, item)) {
-      this.size++;
-    }
+    insertItem(x, y, x, y, item);
   }
 
   @Override
@@ -202,17 +210,6 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     if (this.minExtent < this.absoluteMinExtent) {
       this.minExtent = this.absoluteMinExtent;
       this.minExtentTimes2 = this.minExtent * 2;
-    }
-  }
-
-  private void setMinExtent(double minExtent) {
-    if (minExtent > 0 && minExtent < this.minExtent) {
-      minExtent = this.geometryFactory.makeXPrecise(minExtent);
-      if (minExtent <= this.absoluteMinExtent) {
-        minExtent = this.absoluteMinExtent;
-      }
-      this.minExtent = minExtent;
-      this.minExtentTimes2 = minExtent * 2;
     }
   }
 
