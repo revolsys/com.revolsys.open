@@ -109,22 +109,25 @@ public class IdObjectNode<T> extends AbstractQuadTreeNode<T> {
   @Override
   protected boolean removeItem(final QuadTree<T> tree, final T item) {
     synchronized (this.nodes) {
+      boolean removed = false;
       final IdObjectQuadTree<T> idObjectTree = (IdObjectQuadTree<T>)tree;
       final Object id = idObjectTree.getId(item);
       int index = 0;
       for (final Object oldId : this.ids) {
-        if (id.equals(oldId)) {
+        if (index >= this.itemCount) {
+          break;
+        } else if (id.equals(oldId)) {
           if (index < this.itemCount - 1) {
             final int copyCount = this.itemCount - index - 1;
             System.arraycopy(this.ids, index + 1, this.ids, index, copyCount);
           }
           this.itemCount--;
           this.ids[this.itemCount] = null;
-          return true;
+          removed = true;
         }
         index++;
       }
-      return false;
+      return removed;
     }
   }
 }
