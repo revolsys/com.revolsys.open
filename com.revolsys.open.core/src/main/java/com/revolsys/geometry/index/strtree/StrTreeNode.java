@@ -1,6 +1,7 @@
 package com.revolsys.geometry.index.strtree;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 
 public final class StrTreeNode<I> extends AbstractNode {
   /**
@@ -14,6 +15,14 @@ public final class StrTreeNode<I> extends AbstractNode {
 
   @Override
   protected Object computeBounds() {
-    return BoundingBox.bboxNew(getChildBoundables());
+    final BoundingBoxEditor bounds = new BoundingBoxEditor();
+    for (final Boundable childBoundable : getChildBoundables()) {
+      bounds.addBbox((BoundingBox)childBoundable.getBounds());
+    }
+    if (bounds.isEmpty()) {
+      return null;
+    } else {
+      return bounds.getBoundingBox();
+    }
   }
 }

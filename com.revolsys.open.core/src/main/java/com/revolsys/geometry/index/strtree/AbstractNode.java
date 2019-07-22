@@ -58,7 +58,7 @@ public abstract class AbstractNode implements Emptyable, Boundable, Serializable
 
   private Object bounds = null;
 
-  private final ArrayList childBoundables = new ArrayList();
+  private final List<Boundable> childBoundables = new ArrayList<>();
 
   private int level;
 
@@ -115,7 +115,7 @@ public abstract class AbstractNode implements Emptyable, Boundable, Serializable
    * Returns either child {@link AbstractNode}s, or if this is a leaf node, real data (wrapped
    * in {@link ItemBoundable}s).
    */
-  public List getChildBoundables() {
+  public List<Boundable> getChildBoundables() {
     return this.childBoundables;
   }
 

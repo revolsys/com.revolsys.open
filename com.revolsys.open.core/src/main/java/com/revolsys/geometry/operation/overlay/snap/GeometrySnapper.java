@@ -245,7 +245,7 @@ class SnapTransformer extends GeometryTransformer {
   }
 
   @Override
-  protected Geometry transformPoint(final Point point, final Geometry parent) {
+  protected Point transformPoint(final Point point) {
     final Point snapVert = LineStringSnapper.findSnapForVertex(point, this.snapPts,
       this.snapTolerance);
     if (snapVert == null) {
