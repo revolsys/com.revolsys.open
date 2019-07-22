@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 import com.revolsys.geometry.index.DoubleBits;
 import com.revolsys.geometry.index.IntervalSize;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.Emptyable;
 
@@ -130,25 +129,26 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
 
   public abstract int getItemCount();
 
-  private AbstractQuadTreeNode<T> getNode(final QuadTree<T> tree, final double minX,
-    final double minY, final double maxX, final double maxY) {
+  private AbstractQuadTreeNode<T> getNode(final double minX, final double minY, final double maxX,
+    final double maxY) {
     final int subnodeIndex = getSubnodeIndex(minX, minY, maxX, maxY);
     if (subnodeIndex == -1) {
       return this;
     } else {
-      final GeometryFactory geometryFactory = tree.getGeometryFactory();
-      if (geometryFactory.makeXPreciseFloor((this.maxX - this.minX) / 2) <= geometryFactory
-        .getResolutionX()) {
-        return this;
-      } else {
-        AbstractQuadTreeNode<T> node = this.nodes[subnodeIndex];
-        if (node == null) {
-          node = newSubnode(subnodeIndex);
-          this.nodes[subnodeIndex] = node;
-        }
-        return node.getNode(tree, minX, minY, maxX, maxY);
-      }
+      final AbstractQuadTreeNode<T> node = getSubnode(subnodeIndex);
+      return node.getNode(minX, minY, maxX, maxY);
     }
+  }
+
+  private AbstractQuadTreeNode<T> getSubnode(final int index) {
+    final AbstractQuadTreeNode<T>[] nodes = this.nodes;
+    final AbstractQuadTreeNode<T> node = nodes[index];
+    if (node == null) {
+      final AbstractQuadTreeNode<T> newNode = newSubnode(index);
+      nodes[index] = newNode;
+      return newNode;
+    }
+    return node;
   }
 
   private int getSubnodeIndex(final double minX, final double minY, final double maxX,
@@ -194,7 +194,7 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
     if (isZeroX || isZeroY) {
       node = find(minX, minY, maxX, maxY);
     } else {
-      node = getNode(tree, minX, minY, maxX, maxY);
+      node = getNode(minX, minY, maxX, maxY);
     }
     return node.add(tree, minX, minY, maxX, maxY, item);
   }
