@@ -20,21 +20,19 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
 
   private final double centreY;
 
-  private double maxX;
+  private final double maxX;
 
-  private double maxY;
+  private final double maxY;
 
-  private double minX;
+  private final double minX;
 
-  private double minY;
+  private final double minY;
 
   @SuppressWarnings("unchecked")
   protected final AbstractQuadTreeNode<T>[] nodes = new AbstractQuadTreeNode[4];
 
   protected AbstractQuadTreeNode() {
-    this.level = Integer.MIN_VALUE;
-    this.centreX = 0;
-    this.centreY = 0;
+    this(Integer.MIN_VALUE, 0, 0, 0, 0);
   }
 
   public AbstractQuadTreeNode(final int level, final double minX, final double minY,
