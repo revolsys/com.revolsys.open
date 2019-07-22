@@ -56,6 +56,10 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   public void clear() {
     this.root.clear();
+    this.minExtent = 1.0;
+    if (this.minExtent < this.absoluteMinExtent) {
+      this.minExtent = this.absoluteMinExtent;
+    }
     this.size = 0;
   }
 
