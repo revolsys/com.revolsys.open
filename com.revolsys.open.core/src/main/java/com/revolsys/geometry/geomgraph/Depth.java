@@ -32,6 +32,8 @@
  */
 package com.revolsys.geometry.geomgraph;
 
+import java.util.Arrays;
+
 import com.revolsys.geometry.model.Location;
 
 /**
@@ -57,10 +59,8 @@ public class Depth {
 
   public Depth() {
     // initialize depth array to a sentinel value
-    for (int i = 0; i < 2; i++) {
-      for (int j = 0; j < 3; j++) {
-        this.depth[i][j] = NULL_VALUE;
-      }
+    for (final int[] depths : this.depth) {
+      Arrays.fill(depths, NULL_VALUE);
     }
   }
 
@@ -71,18 +71,20 @@ public class Depth {
   }
 
   public void add(final Label lbl) {
-    for (int i = 0; i < 2; i++) {
+    int i = 0;
+    for (final int[] depths : this.depth) {
       for (int j = 1; j < 3; j++) {
         final Location loc = lbl.getLocation(i, j);
         if (loc == Location.EXTERIOR || loc == Location.INTERIOR) {
           // initialize depth if it is null, otherwise add this location value
           if (isNull(i, j)) {
-            this.depth[i][j] = depthAtLocation(loc);
+            depths[j] = depthAtLocation(loc);
           } else {
-            this.depth[i][j] += depthAtLocation(loc);
+            depths[j] += depthAtLocation(loc);
           }
         }
       }
+      i++;
     }
   }
 
@@ -105,9 +107,9 @@ public class Depth {
    * A Depth object is null (has never been initialized) if all depths are null.
    */
   public boolean isNull() {
-    for (int i = 0; i < 2; i++) {
-      for (int j = 0; j < 3; j++) {
-        if (this.depth[i][j] != NULL_VALUE) {
+    for (final int[] depths : this.depth) {
+      for (final int depth : depths) {
+        if (depth != NULL_VALUE) {
           return false;
         }
       }
@@ -132,11 +134,11 @@ public class Depth {
    * one of them is 0.  If the remaining value is > 0, it is set to 1.
    */
   public void normalize() {
-    for (int i = 0; i < 2; i++) {
-      if (!isNull(i)) {
-        int minDepth = this.depth[i][1];
-        if (this.depth[i][2] < minDepth) {
-          minDepth = this.depth[i][2];
+    for (final int[] depths : this.depth) {
+      int minDepth = depths[1];
+      if (!(minDepth == NULL_VALUE)) {
+        if (depths[2] < minDepth) {
+          minDepth = depths[2];
         }
 
         if (minDepth < 0) {
@@ -144,10 +146,10 @@ public class Depth {
         }
         for (int j = 1; j < 3; j++) {
           int newValue = 0;
-          if (this.depth[i][j] > minDepth) {
+          if (depths[j] > minDepth) {
             newValue = 1;
           }
-          this.depth[i][j] = newValue;
+          depths[j] = newValue;
         }
       }
     }

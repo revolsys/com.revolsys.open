@@ -79,7 +79,7 @@ public class TopologyLocation {
   }
 
   public TopologyLocation(final Location[] location) {
-    init(location.length);
+    this.location = location;
   }
 
   public TopologyLocation(final TopologyLocation gl) {

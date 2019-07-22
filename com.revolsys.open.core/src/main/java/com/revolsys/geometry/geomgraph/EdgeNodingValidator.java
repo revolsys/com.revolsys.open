@@ -64,7 +64,7 @@ public class EdgeNodingValidator {
     // convert Edges to SegmentStrings
     final Collection<BasicSegmentString> segStrings = new ArrayList<>();
     for (final Edge e : edges) {
-      segStrings.add(new BasicSegmentString(e.getLine(), e));
+      segStrings.add(new BasicSegmentString(e.getLineString(), e));
     }
     return segStrings;
   }

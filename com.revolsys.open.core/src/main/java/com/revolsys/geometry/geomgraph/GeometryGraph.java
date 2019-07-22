@@ -39,13 +39,11 @@ import java.util.Map;
 
 import com.revolsys.geometry.algorithm.BoundaryNodeRule;
 import com.revolsys.geometry.algorithm.LineIntersector;
-import com.revolsys.geometry.algorithm.PointLocator;
-import com.revolsys.geometry.algorithm.locate.IndexedPointInAreaLocator;
-import com.revolsys.geometry.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.geometry.geomgraph.index.EdgeSetIntersector;
 import com.revolsys.geometry.geomgraph.index.SegmentIntersector;
 import com.revolsys.geometry.geomgraph.index.SimpleMCSweepLineIntersector;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
@@ -70,29 +68,18 @@ public class GeometryGraph extends PlanarGraph {
    * the "At Most One Rule":
    *    isInBoundary = (componentCount == 1)
    */
-  /*
-   * public static boolean isInBoundary(int boundaryCount) { // the "Mod-2 Rule"
-   * return boundaryCount % 2 == 1; } public static int determineBoundary(int
-   * boundaryCount) { return isInBoundary(boundaryCount) ? Location.BOUNDARY :
-   * Location.INTERIOR; }
-   */
-
   public static Location determineBoundary(final BoundaryNodeRule boundaryNodeRule,
     final int boundaryCount) {
     return boundaryNodeRule.isInBoundary(boundaryCount) ? Location.BOUNDARY : Location.INTERIOR;
   }
 
-  private PointOnGeometryLocator areaPtLocator = null;
-
-  private final int argIndex; // the index of this geometry as an argument to a
+  private final int argIndex;
 
   private BoundaryNodeRule boundaryNodeRule = null;
 
   private Collection<Node> boundaryNodes;
 
   private final Geometry geometry;
-
-  // spatial function (used for labelling)
 
   private boolean hasTooFewPoints = false;
 
@@ -104,9 +91,6 @@ public class GeometryGraph extends PlanarGraph {
    * This is used to efficiently perform findEdge queries
    */
   private final Map<LineString, Edge> lineEdgeMap = new HashMap<>();
-
-  // for use if geometry is not Polygonal
-  private final PointLocator ptLocator = new PointLocator();
 
   /**
    * If this flag is true, the Boundary Determination Rule will used when deciding
@@ -168,7 +152,8 @@ public class GeometryGraph extends PlanarGraph {
   private void addLineString(final LineString line) {
     final LineString cleanLine = line.removeDuplicatePoints();
 
-    if (cleanLine.getVertexCount() < 2 || cleanLine.isEmpty()) {
+    final int cleanVertexCount = cleanLine.getVertexCount();
+    if (cleanVertexCount < 2 || cleanLine.isEmpty()) {
       this.hasTooFewPoints = true;
       this.invalidPoint = cleanLine.getPoint(0);
       return;
@@ -184,7 +169,7 @@ public class GeometryGraph extends PlanarGraph {
        * This allows for the case that the node already exists and is a boundary point.
        */
       insertBoundaryPoint(this.argIndex, cleanLine.getPoint(0));
-      insertBoundaryPoint(this.argIndex, cleanLine.getPoint(cleanLine.getVertexCount() - 1));
+      insertBoundaryPoint(this.argIndex, cleanLine.getPoint(cleanVertexCount - 1));
     }
   }
 
@@ -219,31 +204,41 @@ public class GeometryGraph extends PlanarGraph {
    */
   private void addPolygonRing(final LinearRing ring, final Location cwLeft,
     final Location cwRight) {
-    // don't bother adding empty holes
-    if (ring.isEmpty()) {
-      return;
-    }
-    final LineString coordinatesList = ring.removeDuplicatePoints();
+    if (!ring.isEmpty()) {
+      final LineString simplifiedRing;
+      try {
+        simplifiedRing = ring.removeDuplicatePoints();
+        final int vertexCount = simplifiedRing.getVertexCount();
+        if (vertexCount > 3) {
+          Location left;
+          Location right;
+          if (ring.isCounterClockwise()) {
+            left = cwRight;
+            right = cwLeft;
+          } else {
+            left = cwLeft;
+            right = cwRight;
+          }
+          final Label label = new Label(this.argIndex, Location.BOUNDARY, left, right);
+          final Edge e = new Edge(simplifiedRing, label);
+          this.lineEdgeMap.put(ring, e);
 
-    if (coordinatesList.getVertexCount() < 4) {
-      this.hasTooFewPoints = true;
-      this.invalidPoint = coordinatesList.getPoint(0);
-      return;
-    }
+          insertEdge(e);
+          // insert the endpoint as a node, to mark that it is on the boundary
+          insertPoint(this.argIndex, simplifiedRing.getPoint2D(0), Location.BOUNDARY);
 
-    Location left = cwLeft;
-    Location right = cwRight;
-    if (ring.isCounterClockwise()) {
-      left = cwRight;
-      right = cwLeft;
+        } else if (vertexCount == 0) {
+          this.hasTooFewPoints = true;
+          this.invalidPoint = GeometryFactory.DEFAULT_2D.point();
+        } else {
+          this.hasTooFewPoints = true;
+          this.invalidPoint = simplifiedRing.getPoint2D(0);
+        }
+      } catch (final IllegalArgumentException e) {
+        this.hasTooFewPoints = true;
+        this.invalidPoint = ring.getPoint2D(0);
+      }
     }
-    final Edge e = new Edge(coordinatesList,
-      new Label(this.argIndex, Location.BOUNDARY, left, right));
-    this.lineEdgeMap.put(ring, e);
-
-    insertEdge(e);
-    // insert the endpoint as a node, to mark that it is on the boundary
-    insertPoint(this.argIndex, coordinatesList.getPoint(0), Location.BOUNDARY);
   }
 
   /**
@@ -252,15 +247,15 @@ public class GeometryGraph extends PlanarGraph {
    * is a boundary) then insert it as a potential boundary node.
    * Otherwise, just add it as a regular node.
    */
-  private void addSelfIntersectionNode(final int argIndex, final Point coord, final Location loc) {
+  private void addSelfIntersectionNode(final int argIndex, final Point point, final Location loc) {
     // if this node is already a boundary node, don't change it
-    if (isBoundaryNode(argIndex, coord)) {
+    if (isBoundaryNode(argIndex, point)) {
       return;
     }
     if (loc == Location.BOUNDARY && this.useBoundaryDeterminationRule) {
-      insertBoundaryPoint(argIndex, coord);
+      insertBoundaryPoint(argIndex, point);
     } else {
-      insertPoint(argIndex, coord, loc);
+      insertPoint(argIndex, point, loc);
     }
   }
 
@@ -268,7 +263,7 @@ public class GeometryGraph extends PlanarGraph {
     for (final Edge e : this.edges) {
       final Location eLoc = e.getLabel().getLocation(argIndex);
       for (final EdgeIntersection ei : e.getEdgeIntersectionList()) {
-        addSelfIntersectionNode(argIndex, ei.coord, eLoc);
+        addSelfIntersectionNode(argIndex, ei.newPoint2D(), eLoc);
       }
     }
   }
@@ -276,7 +271,7 @@ public class GeometryGraph extends PlanarGraph {
   public SegmentIntersector computeEdgeIntersections(final GeometryGraph g,
     final LineIntersector li, final boolean includeProper) {
     final SegmentIntersector si = new SegmentIntersector(li, includeProper, true);
-    si.setBoundaryNodes(this.getBoundaryNodes(), g.getBoundaryNodes());
+    si.setBoundaryNodes(getBoundaryNodes(), g.getBoundaryNodes());
 
     final EdgeSetIntersector esi = newEdgeSetIntersector();
     esi.computeIntersections(this.edges, g.edges, si);
@@ -334,16 +329,6 @@ public class GeometryGraph extends PlanarGraph {
     return this.boundaryNodes;
   }
 
-  public Point[] getBoundaryPoints() {
-    final Collection<Node> nodes = getBoundaryNodes();
-    final Point[] points = new Point[nodes.size()];
-    int i = 0;
-    for (final Node node : nodes) {
-      points[i++] = node.getPoint();
-    }
-    return points;
-  }
-
   public Geometry getGeometry() {
     return this.geometry;
   }
@@ -351,22 +336,6 @@ public class GeometryGraph extends PlanarGraph {
   public Point getInvalidPoint() {
     return this.invalidPoint;
   }
-
-  /**
-   * This constructor is used by clients that wish to add Edges explicitly,
-   * rather than adding a Geometry.  (An example is Buffer).
-   */
-  // no longer used
-  // public GeometryGraph(int argIndex, PrecisionModel precisionModel, int SRID)
-  // {
-  // this(argIndex, null);
-  // this.precisionModel = precisionModel;
-  // this.SRID = SRID;
-  // }
-  // public PrecisionModel getPrecisionModel()
-  // {
-  // return precisionModel;
-  // }
 
   public boolean hasTooFewPoints() {
     return this.hasTooFewPoints;
@@ -377,9 +346,9 @@ public class GeometryGraph extends PlanarGraph {
    * This is used to add the boundary
    * points of dim-1 geometries (Curves/MultiCurves).
    */
-  private void insertBoundaryPoint(final int argIndex, final Point coord) {
+  private void insertBoundaryPoint(final int argIndex, final Point point) {
     final NodeMap nodes = getNodeMap();
-    final Node n = nodes.addNode(coord);
+    final Node n = nodes.addNode(point);
     // nodes always have labels
     final Label lbl = n.getLabel();
     // the new point to insert is on a boundary
@@ -397,9 +366,9 @@ public class GeometryGraph extends PlanarGraph {
     lbl.setLocation(argIndex, newLoc);
   }
 
-  private void insertPoint(final int argIndex, final Point coord, final Location onLocation) {
+  private void insertPoint(final int argIndex, final Point point, final Location onLocation) {
     final NodeMap nodes = getNodeMap();
-    final Node n = nodes.addNode(coord);
+    final Node n = nodes.addNode(point);
     final Label lbl = n.getLabel();
     if (lbl == null) {
       n.label = new Label(argIndex, onLocation);
@@ -408,35 +377,7 @@ public class GeometryGraph extends PlanarGraph {
     }
   }
 
-  // MD - experimental for now
-  /**
-   * Determines the {@link Location} of the given {@link Coordinates}
-   * in this geometry.
-   *
-   * @param p the point to test
-   * @return the location of the point in the geometry
-   */
-  public Location locate(final Point pt) {
-    if (this.geometry instanceof Polygonal && this.geometry.getGeometryCount() > 50) {
-      // lazily init point locator
-      if (this.areaPtLocator == null) {
-        this.areaPtLocator = new IndexedPointInAreaLocator(this.geometry);
-      }
-      return this.areaPtLocator.locate(pt);
-    }
-    return this.ptLocator.locate(this.geometry, pt);
-  }
-
   private EdgeSetIntersector newEdgeSetIntersector() {
-    // various options for computing intersections, from slowest to fastest
-
-    // private EdgeSetIntersector esi = new SimpleEdgeSetIntersector();
-    // private EdgeSetIntersector esi = new MonotoneChainIntersector();
-    // private EdgeSetIntersector esi = new NonReversingChainIntersector();
-    // private EdgeSetIntersector esi = new SimpleSweepLineIntersector();
-    // private EdgeSetIntersector esi = new MCSweepLineIntersector();
-
-    // return new SimpleEdgeSetIntersector();
     return new SimpleMCSweepLineIntersector();
   }
 }

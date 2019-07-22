@@ -152,7 +152,7 @@ public class ConsistentAreaTester {
     for (final Iterator nodeIt = this.nodeGraph.getNodeIterator(); nodeIt.hasNext();) {
       final RelateNode node = (RelateNode)nodeIt.next();
       if (!node.getEdges().isAreaLabelsConsistent(this.geomGraph)) {
-        this.invalidPoint = node.getPoint().newPoint();
+        this.invalidPoint = node.newPoint();
         return false;
       }
     }

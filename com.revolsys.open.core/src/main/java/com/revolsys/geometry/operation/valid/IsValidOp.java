@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.algorithm.MCPointInRing;
 import com.revolsys.geometry.algorithm.PointInRing;
@@ -54,7 +53,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.geometry.model.segment.Segment;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.Assert;
 import com.revolsys.util.Strings;
@@ -73,17 +72,20 @@ public class IsValidOp {
    *
    * @return the point found, or <code>null</code> if none found
    */
-  public static Point findPtNotNode(final Iterable<? extends Point> testPoints,
-    final LinearRing searchRing, final GeometryGraph graph) {
+  public static Point findPtNotNode(final LineString testLine, final LinearRing searchRing,
+    final GeometryGraph graph) {
     // find edge corresponding to searchRing.
     final Edge searchEdge = graph.findEdge(searchRing);
     // find a point in the testCoords which is not a node of the searchRing
     final EdgeIntersectionList eiList = searchEdge.getEdgeIntersectionList();
     // somewhat inefficient - is there a better way? (Use a node map, for
     // instance?)
-    for (final Point testPoint : testPoints) {
-      if (!eiList.isIntersection(testPoint)) {
-        return testPoint;
+    final int vertexCount = testLine.getVertexCount();
+    for (int vertexIndex = 0; vertexIndex < vertexCount; vertexIndex++) {
+      final double x = testLine.getX(vertexIndex);
+      final double y = testLine.getY(vertexIndex);
+      if (!eiList.isIntersection(x, y)) {
+        return new PointDoubleXY(x, y);
       }
     }
     return null;
@@ -125,7 +127,9 @@ public class IsValidOp {
   }
 
   private boolean checkClosedRing(final LinearRing ring) {
-    if (ring.isClosed()) {
+    if (ring == null) {
+      return false;
+    } else if (ring.isClosed()) {
       return true;
     } else {
       Point point = null;
@@ -195,17 +199,16 @@ public class IsValidOp {
    * Given this, a simple point-in-polygon test of a single point in the hole can be used,
    * provided the point is chosen such that it does not lie on the shell.
    *
-   * @param p the polygon to be tested for hole inclusion
+   * @param polygon the polygon to be tested for hole inclusion
    * @param graph a GeometryGraph incorporating the polygon
    */
-  private boolean checkHolesInShell(final Polygon p, final GeometryGraph graph) {
+  private boolean checkHolesInShell(final Polygon polygon, final GeometryGraph graph) {
     boolean valid = true;
-    final LinearRing shell = p.getShell();
+    final LinearRing shell = polygon.getShell();
 
     final PointInRing pir = new MCPointInRing(shell);
-    for (int i = 0; i < p.getHoleCount(); i++) {
-      final LinearRing hole = p.getHole(i);
-      final Point holePt = findPtNotNode(hole.vertices(), shell, graph);
+    for (final LinearRing hole : polygon.holes()) {
+      final Point holePt = findPtNotNode(hole, shell, graph);
       /**
        * If no non-node hole vertex can be found, the hole must
        * split the polygon into disconnected interiors.
@@ -291,15 +294,15 @@ public class IsValidOp {
     for (final EdgeIntersection ei : eiList) {
       if (isFirst) {
         isFirst = false;
-      } else if (nodeSet.contains(ei.coord)) {
+      } else if (nodeSet.contains(ei)) {
         valid = false;
-        addError(
-          new TopologyValidationError(TopologyValidationError.RING_SELF_INTERSECTION, ei.coord));
+        addError(new TopologyValidationError(TopologyValidationError.RING_SELF_INTERSECTION,
+          ei.newPoint2D()));
         if (isErrorReturn()) {
           return false;
         }
       } else {
-        nodeSet.add(ei.coord);
+        nodeSet.add(ei.newPoint2D());
       }
     }
     return valid;
@@ -336,20 +339,20 @@ public class IsValidOp {
   private Point checkShellInsideHole(final LinearRing shell, final LinearRing hole,
     final GeometryGraph graph) {
     // TODO: improve performance of this - by sorting LineStrings for instance?
-    final Point shellPt = findPtNotNode(shell.vertices(), hole, graph);
+    final Point shellPt = findPtNotNode(shell, hole, graph);
     // if point is on shell but not hole, check that the shell is inside the
     // hole
     if (shellPt != null) {
-      final boolean insideHole = CGAlgorithms.isPointInRing(shellPt, hole);
+      final boolean insideHole = hole.isPointInRing(shellPt);
       if (!insideHole) {
         return shellPt;
       }
     }
-    final Point holePt = findPtNotNode(hole.vertices(), shell, graph);
+    final Point holePt = findPtNotNode(hole, shell, graph);
     // if point is on hole but not shell, check that the hole is outside the
     // shell
     if (holePt != null) {
-      final boolean insideShell = CGAlgorithms.isPointInRing(holePt, shell);
+      final boolean insideShell = shell.isPointInRing(holePt);
       if (insideShell) {
         return holePt;
       }
@@ -372,13 +375,13 @@ public class IsValidOp {
     final GeometryGraph graph) {
     // test if shell is inside polygon shell
     final LinearRing polyShell = polygon.getShell();
-    final Point shellPt = findPtNotNode(shell.vertices(), polyShell, graph);
+    final Point shellPt = findPtNotNode(shell, polyShell, graph);
     // if no point could be found, we can assume that the shell is outside the
     // polygon
     if (shellPt == null) {
       return true;
     } else {
-      final boolean insidePolyShell = CGAlgorithms.isPointInRing(shellPt, polyShell);
+      final boolean insidePolyShell = polyShell.isPointInRing(shellPt);
       if (!insidePolyShell) {
         return true;
       }
@@ -452,11 +455,22 @@ public class IsValidOp {
 
   private boolean checkTooFewVertices(final LineString line, final int minVertexCount) {
     int edgeCount = 0;
-    for (final Segment segment : line.segments()) {
-      if (!segment.isZeroLength()) {
-        edgeCount++;
+
+    final int vertexCount = line.getVertexCount();
+    if (vertexCount > 0) {
+      double x1 = line.getX(0);
+      double y1 = line.getY(0);
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x2 = line.getX(vertexIndex);
+        final double y2 = line.getY(vertexIndex);
+        if (x1 != x2 || y1 != y2) {
+          edgeCount++;
+        }
+        x1 = x2;
+        y1 = y2;
       }
     }
+
     if (edgeCount < minVertexCount - 1) {
       addError(
         new TopologyValidationError(TopologyValidationError.TOO_FEW_POINTS, line.getPoint(0)));
@@ -608,34 +622,38 @@ public class IsValidOp {
       return false;
     }
 
-    final GeometryGraph graph = new GeometryGraph(0, g);
+    try {
+      final GeometryGraph graph = new GeometryGraph(0, g);
 
-    valid &= checkTooFewPoints(graph);
-    if (isErrorReturn()) {
-      return false;
-    }
-    valid &= checkConsistentArea(graph);
-    if (isErrorReturn()) {
-      return false;
-    }
-
-    if (!this.isSelfTouchingRingFormingHoleValid) {
-      valid &= checkNoSelfIntersectingRings(graph);
+      valid &= checkTooFewPoints(graph);
       if (isErrorReturn()) {
         return false;
       }
-    }
-    valid &= checkHolesInShell(g, graph);
-    if (isErrorReturn()) {
+      valid &= checkConsistentArea(graph);
+      if (isErrorReturn()) {
+        return false;
+      }
+
+      if (!this.isSelfTouchingRingFormingHoleValid) {
+        valid &= checkNoSelfIntersectingRings(graph);
+        if (isErrorReturn()) {
+          return false;
+        }
+      }
+      valid &= checkHolesInShell(g, graph);
+      if (isErrorReturn()) {
+        return false;
+      }
+      // SLOWcheckHolesNotNested(g);
+      valid &= checkHolesNotNested(g, graph);
+      if (isErrorReturn()) {
+        return false;
+      }
+      valid &= checkConnectedInteriors(graph);
+      return valid;
+    } catch (final IllegalArgumentException e) {
       return false;
     }
-    // SLOWcheckHolesNotNested(g);
-    valid &= checkHolesNotNested(g, graph);
-    if (isErrorReturn()) {
-      return false;
-    }
-    valid &= checkConnectedInteriors(graph);
-    return valid;
   }
 
   public List<GeometryValidationError> getErrors() {

@@ -171,7 +171,7 @@ class OffsetSegmentGenerator {
      * but the situation of exact collinearity should be fairly rare.
      */
     this.li.computeIntersectionPoints(this.s0, this.s1, this.s1, this.s2);
-    final int numInt = this.li.getIntersectionNum();
+    final int numInt = this.li.getIntersectionCount();
     /**
      * if numInt is < 2, the lines are parallel and in the same direction. In
      * this case the point can be ignored, since the offset lines will also be

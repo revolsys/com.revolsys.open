@@ -35,20 +35,21 @@ package com.revolsys.geometry.geomgraph;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.TopologyException;
-import com.revolsys.geometry.util.Assert;
+import com.revolsys.geometry.model.editor.LineStringEditor;
 
 /**
  * @version 1.7
  */
-public abstract class EdgeRing {
+public abstract class EdgeRing implements BoundingBoxProxy {
 
   private final List<DirectedEdge> edges = new ArrayList<>(); // the
 
@@ -74,8 +75,6 @@ public abstract class EdgeRing {
 
   private int maxNodeDegree = -1;
 
-  private final List<Point> pts = new ArrayList<>();
-
   private LinearRing ring; // the ring created for this EdgeRing
 
   // is its containing shell
@@ -92,22 +91,25 @@ public abstract class EdgeRing {
   public EdgeRing(final DirectedEdge start, final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
     computePoints(start);
-    computeRing();
   }
 
   public void addHole(final EdgeRing ring) {
     this.holes.add(ring);
   }
 
-  protected void addPoints(final Edge edge, final boolean isForward, final boolean isFirstEdge) {
-    final int numPoints = edge.getVertexCount();
+  private void addPoints(final LineStringEditor points, final Edge edge, final boolean isForward,
+    final boolean isFirstEdge) {
+    final LineString line = edge.getLineString();
+    final int numPoints = line.getVertexCount();
     if (isForward) {
       int startIndex = 1;
       if (isFirstEdge) {
         startIndex = 0;
       }
       for (int i = startIndex; i < numPoints; i++) {
-        this.pts.add(edge.getPoint(i));
+        final double x = line.getX(i);
+        final double y = line.getY(i);
+        points.appendVertex(x, y);
       }
     } else { // is backward
       int startIndex = numPoints - 2;
@@ -115,7 +117,9 @@ public abstract class EdgeRing {
         startIndex = numPoints - 1;
       }
       for (int i = startIndex; i >= 0; i--) {
-        this.pts.add(edge.getPoint(i));
+        final double x = line.getX(i);
+        final double y = line.getY(i);
+        points.appendVertex(x, y);
       }
     }
   }
@@ -137,7 +141,8 @@ public abstract class EdgeRing {
   /**
    * Collect all the points from the DirectedEdges of this ring into a contiguous list
    */
-  protected void computePoints(final DirectedEdge start) {
+  private void computePoints(final DirectedEdge start) {
+    final LineStringEditor points = new LineStringEditor(2, 10);
     this.startDe = start;
     DirectedEdge de = start;
     boolean isFirstEdge = true;
@@ -153,25 +158,17 @@ public abstract class EdgeRing {
 
       this.edges.add(de);
       final Label label = de.getLabel();
-      Assert.isTrue(label.isArea());
+      if (!label.isArea()) {
+        throw new IllegalStateException("Label is not an area");
+      }
       mergeLabel(label);
-      addPoints(de.getEdge(), de.isForward(), isFirstEdge);
+      addPoints(points, de.getEdge(), de.isForward(), isFirstEdge);
       isFirstEdge = false;
       setEdgeRing(de, this);
       de = getNext(de);
     } while (de != this.startDe);
-  }
-
-  /**
-   * Compute a LinearRing from the point list previously collected.
-   * Test if the ring is a hole (i.e. if it is CCW) and set the hole flag
-   * accordingly.
-   */
-  public void computeRing() {
-    if (this.ring == null) {
-      this.ring = this.geometryFactory.linearRing(this.pts);
-      this.isHole = this.ring.isCounterClockwise();
-    }
+    this.ring = points.newLinearRing();
+    this.isHole = this.ring.isCounterClockwise();
   }
 
   /**
@@ -184,7 +181,7 @@ public abstract class EdgeRing {
     if (!env.bboxCovers(p)) {
       return false;
     }
-    if (!CGAlgorithms.isPointInRing(p, shell)) {
+    if (!shell.isPointInRing(p)) {
       return false;
     }
 
@@ -196,8 +193,9 @@ public abstract class EdgeRing {
     return true;
   }
 
-  public Point getCoordinate(final int i) {
-    return this.pts.get(i);
+  @Override
+  public BoundingBox getBoundingBox() {
+    return this.ring.getBoundingBox();
   }
 
   /**
@@ -205,6 +203,10 @@ public abstract class EdgeRing {
    */
   public List<DirectedEdge> getEdges() {
     return this.edges;
+  }
+
+  public Point getFirstPoint() {
+    return this.ring.getPoint(0);
   }
 
   public Label getLabel() {
@@ -296,11 +298,7 @@ public abstract class EdgeRing {
 
   @Override
   public String toString() {
-    if (this.ring == null) {
-      return this.pts.toString();
-    } else {
-      return this.ring.toString();
-    }
+    return this.ring.toString();
   }
 
 }

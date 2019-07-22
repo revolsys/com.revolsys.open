@@ -157,7 +157,7 @@ public class NodingValidator {
    */
   private boolean hasInteriorIntersection(final LineIntersector li, final Point p0,
     final Point p1) {
-    for (int i = 0; i < li.getIntersectionNum(); i++) {
+    for (int i = 0; i < li.getIntersectionCount(); i++) {
       final Point intPt = li.getIntersection(i);
       if (!(intPt.equals(p0) || intPt.equals(p1))) {
         return true;

@@ -79,7 +79,7 @@ public class LineBuilder {
 
   private void buildLines(final int opCode) {
     for (final Edge e : this.lineEdgesList) {
-      final LineString line = this.geometryFactory.lineString(e.getLine());
+      final LineString line = this.geometryFactory.lineString(e.getLineString());
       this.resultLineList.add(line);
       e.setInResult(true);
     }

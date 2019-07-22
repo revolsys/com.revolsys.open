@@ -171,8 +171,7 @@ public class SegmentIntersector {
   private boolean isBoundaryPoint(final LineIntersector li, final Collection bdyNodes) {
     for (final Iterator i = bdyNodes.iterator(); i.hasNext();) {
       final Node node = (Node)i.next();
-      final Point pt = node.getPoint();
-      if (li.isIntersection(pt)) {
+      if (li.isIntersection(node)) {
         return true;
       }
     }
@@ -201,7 +200,7 @@ public class SegmentIntersector {
   private boolean isTrivialIntersection(final Edge e0, final int segIndex0, final Edge e1,
     final int segIndex1) {
     if (e0 == e1) {
-      if (this.li.getIntersectionNum() == 1) {
+      if (this.li.getIntersectionCount() == 1) {
         if (isAdjacentSegments(segIndex0, segIndex1)) {
           return true;
         }

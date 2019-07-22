@@ -307,15 +307,6 @@ public abstract class LineIntersector {
   }
   // public int numIntersects = 0;
 
-  /**
-   * Returns the number of intersection points found.  This will be either 0, 1 or 2.
-   *
-   * @return the number of intersection points found (0, 1, or 2)
-   */
-  public int getIntersectionNum() {
-    return this.intersectionCount;
-  }
-
   public double getScale() {
     return this.scale;
   }

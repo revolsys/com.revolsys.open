@@ -64,26 +64,26 @@ public class EdgeEndBuilder {
    * Creates stub edges for all the intersections in this
    * Edge (if any) and inserts them into the graph.
    */
-  public void computeEdgeEnds(final Edge edge, final List l) {
+  public void computeEdgeEnds(final Edge edge, final List<EdgeEnd> l) {
     final EdgeIntersectionList eiList = edge.getEdgeIntersectionList();
     // Debug.print(eiList);
     // ensure that the list has entries for the first and last point of the edge
     eiList.addEndpoints();
 
-    final Iterator it = eiList.iterator();
+    final Iterator<EdgeIntersection> it = eiList.iterator();
     EdgeIntersection eiPrev = null;
     EdgeIntersection eiCurr = null;
     // no intersections, so there is nothing to do
     if (!it.hasNext()) {
       return;
     }
-    EdgeIntersection eiNext = (EdgeIntersection)it.next();
+    EdgeIntersection eiNext = it.next();
     do {
       eiPrev = eiCurr;
       eiCurr = eiNext;
       eiNext = null;
       if (it.hasNext()) {
-        eiNext = (EdgeIntersection)it.next();
+        eiNext = it.next();
       }
 
       if (eiCurr != null) {
@@ -95,13 +95,12 @@ public class EdgeEndBuilder {
 
   }
 
-  public List computeEdgeEnds(final Iterator edges) {
-    final List l = new ArrayList();
-    for (final Iterator i = edges; i.hasNext();) {
-      final Edge e = (Edge)i.next();
-      computeEdgeEnds(e, l);
+  public List<EdgeEnd> computeEdgeEnds(final Iterable<Edge> edges) {
+    final List<EdgeEnd> edgeEnds = new ArrayList<>();
+    for (final Edge edge : edges) {
+      computeEdgeEnds(edge, edgeEnds);
     }
-    return l;
+    return edgeEnds;
   }
 
   /**
@@ -112,7 +111,7 @@ public class EdgeEndBuilder {
    * <br>
    * eiCurr will always be an EdgeIntersection, but eiNext may be null.
    */
-  void newEdgeEndForNext(final Edge edge, final List l, final EdgeIntersection eiCurr,
+  void newEdgeEndForNext(final Edge edge, final List<EdgeEnd> l, final EdgeIntersection eiCurr,
     final EdgeIntersection eiNext) {
 
     final int iNext = eiCurr.segmentIndex + 1;
@@ -126,10 +125,11 @@ public class EdgeEndBuilder {
     // if the next intersection is in the same segment as the current, use it as
     // the endpoint
     if (eiNext != null && eiNext.segmentIndex == eiCurr.segmentIndex) {
-      pNext = eiNext.coord;
+      pNext = eiNext.newPoint2D();
     }
 
-    final EdgeEnd e = new EdgeEnd(edge, eiCurr.coord, pNext, new Label(edge.getLabel()));
+    final EdgeEnd e = new EdgeEnd(edge, eiCurr.getX(), eiCurr.getY(), pNext.getX(), pNext.getY(),
+      new Label(edge.getLabel()));
     // Debug.println(e);
     l.add(e);
   }
@@ -142,7 +142,7 @@ public class EdgeEndBuilder {
    * <br>
    * eiCurr will always be an EdgeIntersection, but eiPrev may be null.
    */
-  void newEdgeEndForPrev(final Edge edge, final List l, final EdgeIntersection eiCurr,
+  void newEdgeEndForPrev(final Edge edge, final List<EdgeEnd> l, final EdgeIntersection eiCurr,
     final EdgeIntersection eiPrev) {
 
     int iPrev = eiCurr.segmentIndex;
@@ -153,17 +153,19 @@ public class EdgeEndBuilder {
       }
       iPrev--;
     }
+
     Point pPrev = edge.getPoint(iPrev);
     // if prev intersection is past the previous vertex, use it instead
     if (eiPrev != null && eiPrev.segmentIndex >= iPrev) {
-      pPrev = eiPrev.coord;
+      pPrev = eiPrev.newPoint2D();
     }
 
     final Label label = new Label(edge.getLabel());
     // since edgeStub is oriented opposite to it's parent edge, have to flip
     // sides for edge label
     label.flip();
-    final EdgeEnd e = new EdgeEnd(edge, eiCurr.coord, pPrev, label);
+    final EdgeEnd e = new EdgeEnd(edge, eiCurr.getX(), eiCurr.getY(), pPrev.getX(), pPrev.getY(),
+      label);
     // e.print(System.out); System.out.println();
     l.add(e);
   }
