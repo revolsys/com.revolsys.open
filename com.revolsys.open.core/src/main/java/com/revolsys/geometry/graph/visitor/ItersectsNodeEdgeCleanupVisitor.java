@@ -17,6 +17,7 @@ import com.revolsys.geometry.graph.attribute.NodeProperties;
 import com.revolsys.record.Record;
 import com.revolsys.util.ObjectProcessor;
 import com.revolsys.util.count.LabelCountMap;
+import com.revolsys.util.count.LabelCounters;
 import com.revolsys.visitor.AbstractVisitor;
 
 public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record>>
@@ -24,7 +25,7 @@ public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record
   private final Set<String> equalExcludeFieldNames = new HashSet<>(
     Arrays.asList(Record.EXCLUDE_ID, Record.EXCLUDE_GEOMETRY));
 
-  private LabelCountMap splitStatistics;
+  private LabelCounters splitStatistics;
 
   @Override
   public void accept(final Edge<Record> edge) {
@@ -33,7 +34,7 @@ public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record
     final Node<Record> toNode = edge.getToNode();
 
     final Graph<Record> graph = edge.getGraph();
-    final List<Node<Record>> nodes = graph.findNodes(edge, 2);
+    final List<Node<Record>> nodes = graph.getNodes(edge, 2);
     for (final Iterator<Node<Record>> nodeIter = nodes.iterator(); nodeIter.hasNext();) {
       final Node<Record> node = nodeIter.next();
       final List<Edge<Record>> edges = NodeProperties.getEdgesByType(node, typePath);
@@ -48,7 +49,7 @@ public class ItersectsNodeEdgeCleanupVisitor extends AbstractVisitor<Edge<Record
           for (int j = i + 1; j < nodes.size(); j++) {
             final Node<Record> node2 = nodes.get(j);
             if (node1.distancePoint(node2) < 2) {
-              if (edge.distance(node1) <= edge.distance(node2)) {
+              if (edge.distancePoint(node1) <= edge.distancePoint(node2)) {
                 nodes.remove(j);
               } else {
                 nodes.remove(i);

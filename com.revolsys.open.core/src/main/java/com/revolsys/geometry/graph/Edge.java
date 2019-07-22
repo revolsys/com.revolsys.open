@@ -19,8 +19,7 @@ import java.util.function.Predicate;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.BoundingBoxProxy;
+import com.revolsys.geometry.model.DelegatingLineString;
 import com.revolsys.geometry.model.Direction;
 import com.revolsys.geometry.model.End;
 import com.revolsys.geometry.model.LineString;
@@ -30,7 +29,7 @@ import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.util.Property;
 
-public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperties, Externalizable {
+public class Edge<T> implements DelegatingLineString, ObjectWithProperties, Externalizable {
 
   public static <T> void addEdgeToEdgesByLine(final Map<LineString, Set<Edge<T>>> lineEdgeMap,
     final Edge<T> edge) {
@@ -245,11 +244,11 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
       } else {
         final Node<?> otherFromNode = edge.getFromNode();
         final Node<?> fromNode = getFromNode();
-        final int fromCompare = fromNode.compareTo(otherFromNode);
+        final int fromCompare = fromNode.compareTo(otherFromNode.getX(), otherFromNode.getY());
         if (fromCompare == 0) {
           final Node<?> otherToNode = edge.getToNode();
           final Node<T> toNode = getToNode();
-          final int toCompare = toNode.compareTo(otherToNode);
+          final int toCompare = toNode.compareTo(otherToNode.getX(), otherToNode.getY());
           if (toCompare == 0) {
             final double otherLength = edge.getLength();
             final double length = getLength();
@@ -280,6 +279,27 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
     return 1;
   }
 
+  public boolean equalId(final Edge<T> edge) {
+    if (edge != null) {
+      if (this.graph == edge.getGraph()) {
+        return this.id == edge.getId();
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if (obj == this) {
+      return true;
+    } else if (obj instanceof Edge<?>) {
+      final Edge<?> edge = (Edge<?>)obj;
+      return edge.id == this.id && edge.graph == this.graph;
+    } else {
+      return false;
+    }
+  }
+
   @Override
   protected void finalize() throws Throwable {
     if (this.graph != null) {
@@ -302,8 +322,8 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
   }
 
   @Override
-  public BoundingBox getBoundingBox() {
-    return getLineString().getBoundingBox();
+  public int getAxisCount() {
+    return this.graph.getAxisCount();
   }
 
   public Collection<Node<T>> getCommonNodes(final Edge<T> edge) {
@@ -311,18 +331,6 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
     final Collection<Node<T>> nodes2 = edge.getNodes();
     nodes1.retainAll(nodes2);
     return nodes1;
-  }
-
-  @Override
-  public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    final LineString line = getLineString();
-    return line.getCoordinate(vertexIndex, axisIndex);
-  }
-
-  @Override
-  public double[] getCoordinates() {
-    final LineString line = getLineString();
-    return line.getCoordinates();
   }
 
   public Direction getDirection(final Point point) {
@@ -333,6 +341,11 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
     } else {
       return Direction.NONE;
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T2 extends T> T2 getEdgeObject() {
+    return (T2)this.graph.getEdgeObject(this.id);
   }
 
   public List<Edge<T>> getEdgesToNextJunctionNode(final Node<T> node) {
@@ -391,11 +404,6 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
   }
 
   @Override
-  public double getLength() {
-    final LineString line = getLineString();
-    return line.getLength();
-  }
-
   public LineString getLineString() {
     return this.graph.getEdgeLine(this.id);
   }
@@ -490,14 +498,8 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
   }
 
   @Override
-  public int getVertexCount() {
-    final LineString line = getLineString();
-    return line.getVertexCount();
-  }
-
-  @Override
   public int hashCode() {
-    return this.id;
+    return Integer.hashCode(this.id);
   }
 
   public boolean hasNode(final Node<T> node) {
@@ -510,7 +512,19 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
       }
     }
     return false;
+  }
 
+  public boolean hasNode(final Point point) {
+    final Node<T> node = this.graph.findNode(point);
+    if (node == null) {
+      return false;
+    } else {
+      return hasNode(node);
+    }
+  }
+
+  public boolean isLoop() {
+    return this.fromNodeId == this.toNodeId;
   }
 
   public boolean isRemoved() {
@@ -557,6 +571,10 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
     }
   }
 
+  public void setObject(final T object) {
+    this.graph.setEdgeObject(this.id, object);
+  }
+
   public <V extends Point> List<Edge<T>> splitEdge(final Collection<V> splitPoints) {
     return this.graph.splitEdge(this, splitPoints);
   }
@@ -567,13 +585,15 @@ public class Edge<T> implements BoundingBoxProxy, LineString, ObjectWithProperti
   }
 
   public List<Edge<T>> splitEdge(final List<Point> points) {
-    final Graph<T> graph = getGraph();
-    return graph.splitEdge(this, points);
-
+    return this.graph.splitEdge(this, points);
   }
 
   public List<Edge<T>> splitEdge(final Point... points) {
     return splitEdge(Arrays.asList(points));
+  }
+
+  public List<Edge<T>> splitEdge(final Point point) {
+    return this.graph.splitEdge(this, point);
   }
 
   @Override

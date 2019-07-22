@@ -30,7 +30,7 @@ public class NodeQuadTree<T> extends AbstractIdObjectPointQuadTree<Node<T>> {
     } else {
       final double x = node.getX();
       final double y = node.getY();
-      final BoundingBox envelope = BoundingBoxDoubleXY.newBoundingBoxDoubleXY(x, y, x, y);
+      final BoundingBox envelope = new BoundingBoxDoubleXY(x, y, x, y);
       return envelope;
     }
   }

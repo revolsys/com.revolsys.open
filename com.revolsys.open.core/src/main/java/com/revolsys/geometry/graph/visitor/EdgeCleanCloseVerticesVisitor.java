@@ -13,7 +13,7 @@ import com.revolsys.geometry.graph.event.EdgeEventListenerList;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.util.Points;
 
 public class EdgeCleanCloseVerticesVisitor<T> implements Consumer<Edge<T>> {
@@ -77,11 +77,11 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Consumer<Edge<T>> {
 
           }
           if (fixed) {
-            this.coordinateListeners.coordinateEvent(new PointDouble(x2, y2), typePath,
+            this.coordinateListeners.coordinateEvent(new PointDoubleXY(x2, y2), typePath,
               "Short Segment", "Fixed", distance + " " + Math.toDegrees(previousAngle) + " "
                 + Math.toDegrees(angle) + " " + Math.toDegrees(nextAngle));
           } else {
-            this.coordinateListeners.coordinateEvent(new PointDouble(x2, y2), typePath,
+            this.coordinateListeners.coordinateEvent(new PointDoubleXY(x2, y2), typePath,
               "Short Segment", "Review", distance + " " + Math.toDegrees(previousAngle) + " "
                 + Math.toDegrees(angle) + " " + Math.toDegrees(nextAngle));
           }
@@ -117,16 +117,16 @@ public class EdgeCleanCloseVerticesVisitor<T> implements Consumer<Edge<T>> {
       final double y2 = line.getCoordinate(index, 1);
       final double x3 = line.getCoordinate(index + 1, 0);
       final double y3 = line.getCoordinate(index + 1, 1);
-      return Angle.angle(x1, y1, x2, y2, x3, y3);
+      return Angle.angleBetween(x1, y1, x2, y2, x3, y3);
     }
+  }
+
+  public CoordinateEventListenerList getCoordinateListeners() {
+    return this.coordinateListeners;
   }
 
   public EdgeEventListenerList<T> getEdgeListeners() {
     return this.edgeListeners;
-  }
-
-  public CoordinateEventListenerList getPointListeners() {
-    return this.coordinateListeners;
   }
 
 }

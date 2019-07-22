@@ -139,12 +139,6 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     return forEach(new BoundingBoxDoubleXY(minX, minY, maxX, maxY), action);
   }
 
-  public List<T> getAll() {
-    final CreateListVisitor<T> visitor = new CreateListVisitor<>();
-    forEach(visitor);
-    return visitor.getList();
-  }
-
   @Override
   public T getFirst(final BoundingBox boundingBox, final Predicate<T> filter) {
     final SingleObjectVisitor<T> visitor = new SingleObjectVisitor<>(filter);

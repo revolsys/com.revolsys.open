@@ -213,10 +213,10 @@ public class LineStringRelate {
     } else if (point.distancePoint(toPoint) < maxDistance) {
       return false;
     } else {
-      if (!graph.findNodes(point, maxDistance).isEmpty()) {
+      if (!graph.getNodes(point, maxDistance).isEmpty()) {
         return true;
       }
-      final List<Edge<LineSegment>> edges = graph.findEdges(point, maxDistance);
+      final List<Edge<LineSegment>> edges = graph.getEdges(point, maxDistance);
       for (final Edge<LineSegment> edge : edges) {
         final LineSegment line = edge.getObject();
         if (line.intersects(point, maxDistance)) {

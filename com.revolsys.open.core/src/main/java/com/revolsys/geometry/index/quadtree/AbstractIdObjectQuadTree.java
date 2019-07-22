@@ -9,11 +9,16 @@ import java.util.function.Predicate;
 import com.revolsys.geometry.index.IdObjectIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.visitor.CreateListVisitor;
 
 public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
 
-  private final QuadTree<Integer> index = new QuadTree<>();
+  private final QuadTree<Integer> index;
+
+  public AbstractIdObjectQuadTree(final GeometryFactory geometryFactory) {
+    this.index = new QuadTree<>(geometryFactory);
+  }
 
   public void add(final Collection<Integer> ids) {
     for (final Integer id : ids) {
@@ -73,7 +78,7 @@ public abstract class AbstractIdObjectQuadTree<T> implements IdObjectIndex<T> {
   }
 
   public List<T> queryAll() {
-    final List<Integer> ids = this.index.getAll();
+    final List<Integer> ids = this.index.getItems();
     return getObjects(ids);
   }
 
