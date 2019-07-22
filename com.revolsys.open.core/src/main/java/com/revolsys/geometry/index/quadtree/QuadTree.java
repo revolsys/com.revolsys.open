@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
@@ -86,10 +87,10 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
-  protected double[] convert(BoundingBox boundingBox) {
+  protected double[] convert(final BoundingBoxProxy boundingBoxProxy) {
+    BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
     if (this.geometryFactory != null) {
-      final GeometryFactory geometryFactory1 = this.geometryFactory;
-      boundingBox = boundingBox.bboxToCs(geometryFactory1);
+      boundingBox = boundingBoxProxy.bboxToCs(this.geometryFactory);
     }
     return boundingBox.getMinMaxValues(2);
   }
@@ -108,7 +109,8 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
-  public boolean forEach(final BoundingBox boundingBox, final Consumer<? super T> action) {
+  @Override
+  public boolean forEach(final BoundingBoxProxy boundingBox, final Consumer<? super T> action) {
     try {
       final double[] bounds = convert(boundingBox);
       this.root.forEach(this, bounds, action);
