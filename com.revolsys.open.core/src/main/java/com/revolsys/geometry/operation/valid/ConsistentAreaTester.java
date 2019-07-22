@@ -110,8 +110,8 @@ public class ConsistentAreaTester {
   public boolean hasDuplicateRings() {
     for (final Iterator nodeIt = this.nodeGraph.getNodeIterator(); nodeIt.hasNext();) {
       final RelateNode node = (RelateNode)nodeIt.next();
-      for (final Iterator i = node.getEdges().iterator(); i.hasNext();) {
-        final EdgeEndBundle eeb = (EdgeEndBundle)i.next();
+      for (final Object element : node.getEdges()) {
+        final EdgeEndBundle eeb = (EdgeEndBundle)element;
         if (eeb.getEdgeEnds().size() > 1) {
           this.invalidPoint = eeb.getEdge().getPoint(0);
           return true;

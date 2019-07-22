@@ -30,7 +30,6 @@ public abstract class AbstractIdObjectPointQuadTree<T> extends AbstractPointSpat
     return object;
   }
 
-
   @Override
   public void forEach(final BoundingBoxProxy boundingBoxProxy, final Consumer<? super T> action) {
     final BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();

@@ -33,6 +33,11 @@
 package com.revolsys.geometry.index.strtree;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.function.Consumer;
+
+import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 
 /**
  * Boundable wrapper for a non-Boundable spatial object. Used internally by
@@ -40,27 +45,33 @@ import java.io.Serializable;
  *
  * @version 1.7
  */
-public class ItemBoundable implements Boundable, Serializable {
-  /**
-   *
-   */
+public class StrTreeLeaf<I> extends BoundingBoxDoubleXY implements Boundable<I>, Serializable {
   private static final long serialVersionUID = 1L;
 
-  private final Object bounds;
+  private final I item;
 
-  private final Object item;
-
-  public ItemBoundable(final Object bounds, final Object item) {
-    this.bounds = bounds;
+  public StrTreeLeaf(final BoundingBox bounds, final I item) {
+    super(bounds);
     this.item = item;
   }
 
   @Override
-  public Object getBounds() {
-    return this.bounds;
+  public void boundablesAtLevel(final int level, final Collection<Boundable<I>> boundables) {
+    if (level == -1) {
+      boundables.add(this);
+    }
   }
 
-  public Object getItem() {
+  @Override
+  public I getItem() {
     return this.item;
+  }
+
+  @Override
+  public void query(final double minX, final double minY, final double maxX, final double maxY,
+    final Consumer<? super I> action) {
+    if (bboxIntersects(minX, minY, maxX, maxY)) {
+      action.accept(this.item);
+    }
   }
 }

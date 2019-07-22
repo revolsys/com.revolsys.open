@@ -66,6 +66,21 @@ public class CentralEndpointIntersector {
     return sum / vertexCount;
   }
 
+  private static Point average(final Point[] pts) {
+    double averageX = 0;
+    double averageY = 0;
+    final int n = pts.length;
+    for (final Point pt : pts) {
+      averageX += pt.getX();
+      averageY += pt.getY();
+    }
+    if (n > 0) {
+      averageX /= n;
+      averageX /= n;
+    }
+    return new PointDouble(averageX, averageY);
+  }
+
   public static Point getIntersection(final double... coordinates) {
     final double averageX = average(0, coordinates);
     final double averageY = average(1, coordinates);
@@ -86,21 +101,6 @@ public class CentralEndpointIntersector {
       }
     }
     return new PointDoubleXY(intersectionX, intersectionY);
-  }
-
-  private static Point average(final Point[] pts) {
-    double averageX = 0;
-    double averageY = 0;
-    final int n = pts.length;
-    for (final Point pt : pts) {
-      averageX += pt.getX();
-      averageY += pt.getY();
-    }
-    if (n > 0) {
-      averageX /= n;
-      averageX /= n;
-    }
-    return new PointDouble(averageX, averageY);
   }
 
   public static Point getIntersection(final Point p00, final Point p01, final Point p10,

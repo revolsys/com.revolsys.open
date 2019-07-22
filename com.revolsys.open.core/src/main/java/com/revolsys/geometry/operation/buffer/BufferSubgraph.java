@@ -223,7 +223,8 @@ class BufferSubgraph extends BoundingBoxDoubleXY implements Comparable {
 
     // only compute string append if assertion would fail
     if (startEdge == null) {
-      throw new TopologyException("unable to find edge to compute depths at " + n);
+      throw new TopologyException(
+        "unable to find edge to compute depths at POINT(" + n.getX() + " " + n.getY() + ")");
     }
 
     ((DirectedEdgeStar)n.getEdges()).computeDepths(startEdge);

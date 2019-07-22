@@ -32,19 +32,42 @@
  */
 package com.revolsys.geometry.index.strtree;
 
+import java.util.Collection;
+import java.util.function.Consumer;
+
+import com.revolsys.geometry.model.BoundingBox;
+
 /**
  * A spatial object in an AbstractSTRtree.
  *
  * @version 1.7
  */
-public interface Boundable {
-  /**
-   * Returns a representation of space that encloses this Boundable, preferably
-   * not much bigger than this Boundable's boundary yet fast to test for intersection
-   * with the bounds of other Boundables. The class of object returned depends
-   * on the subclass of AbstractSTRtree.
-   * @return an BoundingBoxDoubleGeometryFactory (for STRtrees), an Interval (for SIRtrees), or other object
-   * (for other subclasses of AbstractSTRtree)
-   */
-  Object getBounds();
+public interface Boundable<I> extends BoundingBox {
+  void boundablesAtLevel(int level, Collection<Boundable<I>> boundables);
+
+  default int getChildCount() {
+    return 0;
+  }
+
+  default Boundable<I>[] getChildren() {
+    return null;
+  }
+
+  default int getDepth() {
+    return 0;
+  }
+
+  default I getItem() {
+    return null;
+  }
+
+  default int getItemCount() {
+    return 1;
+  }
+
+  default boolean isNode() {
+    return false;
+  }
+
+  void query(double minX, double minY, double maxX, double maxY, Consumer<? super I> action);
 }
