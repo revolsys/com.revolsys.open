@@ -45,25 +45,25 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   private double minExtent = 1.0;
 
-  private AbstractNode<T> root;
+  private AbstractQuadTreeNode<T> root;
 
   private int size = 0;
 
   private boolean useEquals = false;
 
   public QuadTree() {
-    this.root = new Node<>();
+    this.root = new QuadTreeNode<>();
   }
 
-  protected QuadTree(final AbstractNode<T> root) {
+  protected QuadTree(final AbstractQuadTreeNode<T> root) {
     this.root = root;
   }
 
   public QuadTree(final GeometryFactory geometryFactory) {
-    this(geometryFactory, new Node<>());
+    this(geometryFactory, new QuadTreeNode<>());
   }
 
-  protected QuadTree(final GeometryFactory geometryFactory, final AbstractNode<T> root) {
+  protected QuadTree(final GeometryFactory geometryFactory, final AbstractQuadTreeNode<T> root) {
     setGeometryFactory(geometryFactory);
     this.root = root;
   }

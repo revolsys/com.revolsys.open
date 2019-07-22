@@ -2,7 +2,7 @@ package com.revolsys.geometry.index.quadtree;
 
 import java.util.function.Consumer;
 
-public class IdObjectNode<T> extends AbstractNode<T> {
+public class IdObjectNode<T> extends AbstractQuadTreeNode<T> {
   private static final long serialVersionUID = 1L;
 
   private Object[] ids = new Object[0];
@@ -87,7 +87,7 @@ public class IdObjectNode<T> extends AbstractNode<T> {
   }
 
   @Override
-  protected final AbstractNode<T> newNode(final int level, final double... newBounds) {
+  protected final AbstractQuadTreeNode<T> newNode(final int level, final double... newBounds) {
     return new IdObjectNode<>(level, newBounds);
   }
 

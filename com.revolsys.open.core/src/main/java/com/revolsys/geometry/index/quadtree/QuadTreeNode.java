@@ -7,17 +7,17 @@ import java.util.function.Consumer;
 
 import com.revolsys.geometry.util.RectangleUtil;
 
-public class Node<T> extends AbstractNode<T> {
+public class QuadTreeNode<T> extends AbstractQuadTreeNode<T> {
   private static final long serialVersionUID = 1L;
 
   private final List<double[]> boundingBoxes = new ArrayList<>();
 
   private final List<T> items = new ArrayList<>();
 
-  public Node() {
+  public QuadTreeNode() {
   }
 
-  public Node(final int level, final double... bounds) {
+  public QuadTreeNode(final int level, final double... bounds) {
     super(level, bounds);
   }
 
@@ -83,8 +83,8 @@ public class Node<T> extends AbstractNode<T> {
   }
 
   @Override
-  protected AbstractNode<T> newNode(final int level, final double... newBounds) {
-    return new Node<>(level, newBounds);
+  protected AbstractQuadTreeNode<T> newNode(final int level, final double... newBounds) {
+    return new QuadTreeNode<>(level, newBounds);
   }
 
   @Override
