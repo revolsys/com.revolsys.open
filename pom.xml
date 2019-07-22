@@ -41,12 +41,11 @@
     <url>http://www.revolsys.com/</url>
   </organization>
 
-
-
   <issueManagement>
     <system>GitHub</system>
     <url>https://github.com/revolsys/com.revolsys.open/issues</url>
   </issueManagement>
+
   <modules>
     <module>com.revolsys.open.core</module>
     <module>com.revolsys.open.testapi</module>
