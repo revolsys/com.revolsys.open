@@ -90,7 +90,7 @@ public class Distance3DOp {
   }
 
   /**
-   * Compute the the nearest points of two geometries. The points are
+   * Compute the nearest points of two geometries. The points are
    * presented in the same order as the input Geometries.
    *
    * @param g0
@@ -261,8 +261,8 @@ public class Distance3DOp {
           this.minDistance = distance;
           // TODO: compute closest pts in 3D
           final Point[] closestPt = segment1.closestPoints(segment2);
-          updateDistance(distance, new GeometryLocation(line0, i, closestPt[0]),
-            new GeometryLocation(line1, j, closestPt[1]), flip);
+          updateDistance(distance, new GeometryLocation(line0, i, closestPt[0].newPoint2D()),
+            new GeometryLocation(line1, j, closestPt[1].newPoint2D()), flip);
         }
         if (this.isDone) {
           return;
@@ -283,7 +283,7 @@ public class Distance3DOp {
         segment.getPoint(1));
       if (dist < this.minDistance) {
         final Point segClosestPoint = segment.closestPoint(coord);
-        updateDistance(dist, new GeometryLocation(line, i, segClosestPoint),
+        updateDistance(dist, new GeometryLocation(line, i, segClosestPoint.newPoint2D()),
           new GeometryLocation(point, 0, coord), flip);
       }
       if (this.isDone) {

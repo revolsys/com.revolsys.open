@@ -33,7 +33,6 @@
 
 package com.revolsys.geometry.operation.distance;
 
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -49,11 +48,11 @@ import com.revolsys.geometry.util.Points;
  *
  */
 public class LineFacetSequence implements FacetSequence {
-  private final int end;
-
   private final LineString line;
 
   private final int start;
+
+  private final int vertexCount;
 
   /**
    * Creates a new sequence for a single point from a LineString.
@@ -62,9 +61,7 @@ public class LineFacetSequence implements FacetSequence {
    * @param start the index of the point
    */
   public LineFacetSequence(final LineString line, final int start) {
-    this.line = line;
-    this.start = start;
-    this.end = start + 1;
+    this(line, start, start + 1);
   }
 
   /**
@@ -77,26 +74,28 @@ public class LineFacetSequence implements FacetSequence {
   public LineFacetSequence(final LineString line, final int start, final int end) {
     this.line = line;
     this.start = start;
-    this.end = end;
+    this.vertexCount = end - start;
   }
 
   private double computeLineLineDistance(final FacetSequence facetSeq) {
     // both linear - compute minimum segment-segment distance
     double minDistance = Double.MAX_VALUE;
 
-    for (int i = 0; i < getVertexCount() - 1; i++) {
-      final double line1X1 = getCoordinate(i, 0);
-      final double line1Y1 = getCoordinate(i, 1);
-      final double line1X2 = getCoordinate(i + 1, 0);
-      final double line1Y2 = getCoordinate(i + 1, 1);
-      for (int j = 0; j < facetSeq.getVertexCount() - 1; j++) {
-        final double line2X1 = facetSeq.getCoordinate(i, 0);
-        final double line2Y1 = facetSeq.getCoordinate(i, 1);
-        final double line2X2 = facetSeq.getCoordinate(i + 1, 0);
-        final double line2Y2 = facetSeq.getCoordinate(i + 1, 1);
+    final int lastVertexIndex1 = getVertexCount() - 1;
+    for (int vertexIndex1 = 0; vertexIndex1 < lastVertexIndex1; vertexIndex1++) {
+      final double line1x1 = getX(vertexIndex1);
+      final double line1y1 = getY(vertexIndex1);
+      final double line1x2 = getX(vertexIndex1 + 1);
+      final double line1y2 = getY(vertexIndex1 + 1);
+      final int lastVertexIndex2 = facetSeq.getVertexCount() - 1;
+      for (int vertexIndex2 = 0; vertexIndex2 < lastVertexIndex2; vertexIndex2++) {
+        final double line2x1 = facetSeq.getX(vertexIndex1);
+        final double line2y1 = facetSeq.getY(vertexIndex1);
+        final double line2x2 = facetSeq.getX(vertexIndex1 + 1);
+        final double line2y2 = facetSeq.getY(vertexIndex1 + 1);
 
-        final double dist = LineSegmentUtil.distanceLineLine(line1X1, line1Y1, line1X2, line1Y2,
-          line2X1, line2Y1, line2X2, line2Y2);
+        final double dist = LineSegmentUtil.distanceLineLine(line1x1, line1y1, line1x2, line1y2,
+          line2x1, line2y1, line2x2, line2y2);
         if (dist == 0.0) {
           return 0.0;
         } else if (dist < minDistance) {
@@ -113,19 +112,19 @@ public class LineFacetSequence implements FacetSequence {
     final boolean isPointOther = facetSeq.isPoint();
 
     if (isPoint) {
-      final double x = getCoordinate(0, 0);
-      final double y = getCoordinate(0, 1);
+      final double x = getX(0);
+      final double y = getY(0);
       if (isPointOther) {
-        final double x2 = facetSeq.getCoordinate(0, 0);
-        final double y2 = facetSeq.getCoordinate(0, 1);
+        final double x2 = facetSeq.getX(0);
+        final double y2 = facetSeq.getY(0);
 
         return Points.distance(x, x, x2, y2);
       } else {
         return PointFacetSequence.computePointLineDistance(x, y, facetSeq);
       }
     } else if (isPointOther) {
-      final double x = facetSeq.getCoordinate(0, 0);
-      final double y = facetSeq.getCoordinate(0, 1);
+      final double x = facetSeq.getX(0);
+      final double y = facetSeq.getY(0);
       return PointFacetSequence.computePointLineDistance(x, y, this);
     } else {
       return computeLineLineDistance(facetSeq);
@@ -134,41 +133,33 @@ public class LineFacetSequence implements FacetSequence {
   }
 
   @Override
-  public Point getCoordinate(final int index) {
+  public double getCoordinate(final int vertexIndex, final int axisIndex) {
+    return this.line.getCoordinateFast(this.start + vertexIndex, axisIndex);
+  }
+
+  @Override
+  public Point getPoint(final int index) {
     return this.line.getPoint(this.start + index);
   }
 
   @Override
-  public double getCoordinate(final int vertexIndex, final int axisIndex) {
-    return this.line.getCoordinate(this.start + vertexIndex, axisIndex);
-  }
-
-  @Override
-  public BoundingBox getEnvelope() {
-    return this.line.getBoundingBox();
-  }
-
-  @Override
   public int getVertexCount() {
-    return this.end - this.start;
+    return this.vertexCount;
+  }
+
+  @Override
+  public double getX(final int vertexIndex) {
+    return this.line.getX(this.start + vertexIndex);
+  }
+
+  @Override
+  public double getY(final int vertexIndex) {
+    return this.line.getY(this.start + vertexIndex);
   }
 
   @Override
   public boolean isPoint() {
-    return this.end - this.start == 1;
+    return this.vertexCount == 1;
   }
 
-  @Override
-  public String toString() {
-    final StringBuilder buf = new StringBuilder();
-    buf.append("LINESTRING ( ");
-    for (int i = 0; i < getVertexCount(); i++) {
-      if (i > 0) {
-        buf.append(", ");
-      }
-      buf.append(getCoordinate(i, 0) + " " + getCoordinate(i, 0));
-    }
-    buf.append(" )");
-    return buf.toString();
-  }
 }

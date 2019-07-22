@@ -134,7 +134,7 @@ public class Vector2D {
   }
 
   public double angle(final Vector2D v) {
-    return Angle.angleDiff(v.angle(), angle());
+    return Angle.angleDiff(v.angle(), angle(), false);
   }
 
   public double angleTo(final Vector2D v) {
@@ -332,8 +332,8 @@ public class Vector2D {
     return "[" + this.x + ", " + this.y + "]";
   }
 
-  public Point translate(final Point coord) {
-    return new PointDoubleXY(this.x + coord.getX(), this.y + coord.getY());
+  public Point translate(final Point point) {
+    return new PointDoubleXY(this.x + point.getX(), this.y + point.getY());
   }
 
   /**

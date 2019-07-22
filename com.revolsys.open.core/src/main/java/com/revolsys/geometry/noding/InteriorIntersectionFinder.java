@@ -51,7 +51,7 @@ public class InteriorIntersectionFinder implements SegmentIntersector {
 
   private final List intersections = new ArrayList();
 
-  private Point[] intSegments = null;
+  private double[] intSegments = null;
 
   private boolean isCheckEndSegmentsOnly = false;
 
@@ -87,7 +87,7 @@ public class InteriorIntersectionFinder implements SegmentIntersector {
    *
    * @return an array of the segment endpoints (p00, p01, p10, p11)
    */
-  public Point[] getIntersectionSegments() {
+  public double[] getIntersectionSegments() {
     return this.intSegments;
   }
 
@@ -158,20 +158,22 @@ public class InteriorIntersectionFinder implements SegmentIntersector {
       }
     }
 
-    final Point p00 = e0.getPoint(segIndex0);
-    final Point p01 = e0.getPoint(segIndex0 + 1);
-    final Point p10 = e1.getPoint(segIndex1);
-    final Point p11 = e1.getPoint(segIndex1 + 1);
+    final double x1 = e0.getX(segIndex0);
+    final double y1 = e0.getY(segIndex0);
+    final double x2 = e0.getX(segIndex0 + 1);
+    final double y2 = e0.getY(segIndex0 + 1);
+    final double x3 = e1.getX(segIndex1);
+    final double y3 = e1.getY(segIndex1);
+    final double x4 = e1.getX(segIndex1 + 1);
+    final double y4 = e1.getY(segIndex1 + 1);
 
-    this.li.computeIntersectionPoints(p00, p01, p10, p11);
+    this.li.computeIntersection(x1, y1, x2, y2, x3, y3, x4, y4);
 
     if (this.li.hasIntersection()) {
       if (this.li.isInteriorIntersection()) {
-        this.intSegments = new Point[4];
-        this.intSegments[0] = p00;
-        this.intSegments[1] = p01;
-        this.intSegments[2] = p10;
-        this.intSegments[3] = p11;
+        this.intSegments = new double[] {
+          x1, y1, x2, y2, x3, y3, x4, y4
+        };
 
         this.interiorIntersection = this.li.getIntersection(0);
         this.intersections.add(this.interiorIntersection);

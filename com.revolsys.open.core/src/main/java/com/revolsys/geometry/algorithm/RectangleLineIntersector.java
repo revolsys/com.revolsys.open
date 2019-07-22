@@ -70,7 +70,7 @@ public class RectangleLineIntersector {
    * specified as an {@link BoundingBox}.
    *
    *
-   * @param boundingBox the query rectangle, specified as an BoundingBoxDoubleGeometryFactory
+   * @param boundingBox the query rectangle, specified as an BoundingBox
    */
   public RectangleLineIntersector(final BoundingBox boundingBox) {
     this.boundingBox = boundingBox;
@@ -109,6 +109,13 @@ public class RectangleLineIntersector {
     } else if (this.boundingBox.bboxIntersects(x2, y2)) {
       return true;
     } else if (this.boundingBox.bboxIntersects(x1, y1, x2, y2)) {
+      /**
+       * Compute angle of segment.
+       * Since the segment is normalized to run left to right,
+       * it is sufficient to simply test the Y ordinate.
+       * "Upwards" means relative to the left end of the segment.
+       */
+      boolean isSegUpwards;
 
       /**
        * Normalize segment.
@@ -120,16 +127,9 @@ public class RectangleLineIntersector {
         final Point tmp = p0;
         p0 = p1;
         p1 = tmp;
-      }
-      /**
-       * Compute angle of segment.
-       * Since the segment is normalized to run left to right,
-       * it is sufficient to simply test the Y ordinate.
-       * "Upwards" means relative to the left end of the segment.
-       */
-      boolean isSegUpwards = false;
-      if (p1.getY() > p0.getY()) {
-        isSegUpwards = true;
+        isSegUpwards = y1 > y2;
+      } else {
+        isSegUpwards = y2 > y1;
       }
 
       /**
@@ -161,6 +161,5 @@ public class RectangleLineIntersector {
       }
     }
     return false;
-
   }
 }

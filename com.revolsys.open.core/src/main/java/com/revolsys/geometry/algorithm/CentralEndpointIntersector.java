@@ -33,7 +33,6 @@
 package com.revolsys.geometry.algorithm;
 
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.util.Points;
 
@@ -66,21 +65,6 @@ public class CentralEndpointIntersector {
     return sum / vertexCount;
   }
 
-  private static Point average(final Point[] pts) {
-    double averageX = 0;
-    double averageY = 0;
-    final int n = pts.length;
-    for (final Point pt : pts) {
-      averageX += pt.getX();
-      averageY += pt.getY();
-    }
-    if (n > 0) {
-      averageX /= n;
-      averageX /= n;
-    }
-    return new PointDouble(averageX, averageY);
-  }
-
   public static Point getIntersection(final double... coordinates) {
     final double averageX = average(0, coordinates);
     final double averageY = average(1, coordinates);
@@ -102,55 +86,4 @@ public class CentralEndpointIntersector {
     }
     return new PointDoubleXY(intersectionX, intersectionY);
   }
-
-  public static Point getIntersection(final Point p00, final Point p01, final Point p10,
-    final Point p11) {
-    final CentralEndpointIntersector intor = new CentralEndpointIntersector(p00, p01, p10, p11);
-    return intor.getIntersection();
-  }
-
-  private Point intPt = null;
-
-  private final Point[] pts;
-
-  public CentralEndpointIntersector(final Point p00, final Point p01, final Point p10,
-    final Point p11) {
-    this.pts = new Point[] {
-      p00, p01, p10, p11
-    };
-    compute();
-  }
-
-  private void compute() {
-    final Point centroid = average(this.pts);
-    this.intPt = findNearestPoint(centroid, this.pts);
-  }
-
-  /**
-   * Determines a point closest to the given point.
-   *
-   * @param p the point to compare against
-   * @param p1 a potential result point
-   * @param p2 a potential result point
-   * @param q1 a potential result point
-   * @param q2 a potential result point
-   * @return the point closest to the input point p
-   */
-  private Point findNearestPoint(final Point p, final Point[] pts) {
-    double minDist = Double.MAX_VALUE;
-    Point result = null;
-    for (final Point pt : pts) {
-      final double dist = p.distancePoint(pt);
-      if (dist < minDist) {
-        minDist = dist;
-        result = pt;
-      }
-    }
-    return result;
-  }
-
-  public Point getIntersection() {
-    return this.intPt;
-  }
-
 }

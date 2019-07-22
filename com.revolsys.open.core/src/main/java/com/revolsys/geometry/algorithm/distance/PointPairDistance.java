@@ -33,9 +33,11 @@
 
 package com.revolsys.geometry.algorithm.distance;
 
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.record.io.format.wkt.EWktWriter;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
+import com.revolsys.geometry.model.segment.Segment;
+import com.revolsys.geometry.util.Points;
 
 /**
  * Contains a pair of points and the distance between them.
@@ -43,36 +45,48 @@ import com.revolsys.record.io.format.wkt.EWktWriter;
  * either maximum or minimum distance.
  */
 public class PointPairDistance {
-
-  private double distance = Double.NaN;
+  private double distance = Double.POSITIVE_INFINITY;
 
   private boolean isNull = true;
 
-  private final Point[] pt = {
-    new PointDouble(), new PointDouble()
-  };
+  private double x1 = Double.NaN;
+
+  private double y1 = Double.NaN;
+
+  private double x2 = Double.NaN;
+
+  private double y2 = Double.NaN;
 
   public PointPairDistance() {
-  }
-
-  public Point getCoordinate(final int i) {
-    return this.pt[i];
-  }
-
-  public Point[] getCoordinates() {
-    return this.pt;
   }
 
   public double getDistance() {
     return this.distance;
   }
 
-  public void initialize() {
-    this.isNull = true;
+  public Point getPoint(final int i) {
+    if (i == 0) {
+      return new PointDoubleXY(this.x1, this.y1);
+    } else if (i == 1) {
+      return new PointDoubleXY(this.x2, this.y2);
+    } else {
+      throw new ArrayIndexOutOfBoundsException(i);
+    }
   }
 
-  public void initialize(final Point p0, final Point p1) {
-    initialize(p0, p1, p0.distancePoint(p1));
+  public Point[] getPoints() {
+    return new Point[] {
+      new PointDoubleXY(this.x1, this.y1), new PointDoubleXY(this.x2, this.y2)
+    };
+  }
+
+  public void initialize() {
+    this.distance = Double.POSITIVE_INFINITY;
+    this.isNull = true;
+    this.x1 = Double.NaN;
+    this.y1 = Double.NaN;
+    this.x2 = Double.NaN;
+    this.y2 = Double.NaN;
   }
 
   /**
@@ -81,45 +95,88 @@ public class PointPairDistance {
    * @param p1
    * @param distance the distance between p0 and p1
    */
-  private void initialize(final Point p0, final Point p1, final double distance) {
-    this.pt[0] = p0;
-    this.pt[1] = p1;
+  private void initialize(final double x1, final double y1, final double x2, final double y2,
+    final double distance) {
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
     this.distance = distance;
     this.isNull = false;
   }
 
-  public void setMaximum(final Point p0, final Point p1) {
-    if (this.isNull) {
-      initialize(p0, p1);
-      return;
-    }
-    final double dist = p0.distancePoint(p1);
-    if (dist > this.distance) {
-      initialize(p0, p1, dist);
+  public void setMaximum(final double x1, final double y1, final double x2, final double y2) {
+    final double distance = Points.distance(x1, y1, x2, y2);
+    if (this.isNull || distance > this.distance) {
+      initialize(x1, y1, x2, y2, distance);
     }
   }
 
-  public void setMaximum(final PointPairDistance ptDist) {
-    setMaximum(ptDist.pt[0], ptDist.pt[1]);
+  public void setMaximum(final Point p0, final Point p1) {
+    final double x1 = p0.getX();
+    final double y1 = p0.getY();
+    final double x2 = p1.getX();
+    final double y2 = p1.getY();
+    setMaximum(x1, y1, x2, y2);
+  }
+
+  public void setMaximum(final PointPairDistance pointPairDistance) {
+    if (!pointPairDistance.isNull) {
+      final double x1 = pointPairDistance.x1;
+      final double y1 = pointPairDistance.y1;
+      final double x2 = pointPairDistance.x2;
+      final double y2 = pointPairDistance.y2;
+      setMaximum(x1, y1, x2, y2);
+    }
+  }
+
+  public void setMinimum(final double x1, final double y1, final double x2, final double y2) {
+    final double distance = Points.distance(x1, y1, x2, y2);
+    if (distance < this.distance) {
+      initialize(x1, y1, x2, y2, distance);
+    }
+  }
+
+  public void setMinimum(final Geometry geometry, final double x, final double y) {
+    if (geometry.isGeometryCollection()) {
+      for (final Geometry part : geometry.geometries()) {
+        setMinimum(part, x, y);
+      }
+    } else if (geometry instanceof Point) {
+      final Point point = (Point)geometry;
+      final double closestX = point.getX();
+      final double closestY = point.getY();
+      setMinimum(closestX, closestY, x, y);
+    } else {
+      for (final Segment segment : geometry.segments()) {
+        final Point closestPoint = segment.closestPoint(x, y);
+        final double closestX = closestPoint.getX();
+        final double closestY = closestPoint.getY();
+        setMinimum(closestX, closestY, x, y);
+      }
+    }
   }
 
   public void setMinimum(final Point p0, final Point p1) {
-    if (this.isNull) {
-      initialize(p0, p1);
-      return;
-    }
-    final double dist = p0.distancePoint(p1);
-    if (dist < this.distance) {
-      initialize(p0, p1, dist);
-    }
+    final double x1 = p0.getX();
+    final double y1 = p0.getY();
+    final double x2 = p1.getX();
+    final double y2 = p1.getY();
+    setMinimum(x1, y1, x2, y2);
   }
 
-  public void setMinimum(final PointPairDistance ptDist) {
-    setMinimum(ptDist.pt[0], ptDist.pt[1]);
+  public void setMinimum(final PointPairDistance pointPairDistance) {
+    if (!pointPairDistance.isNull) {
+      final double x1 = pointPairDistance.x1;
+      final double y1 = pointPairDistance.y1;
+      final double x2 = pointPairDistance.x2;
+      final double y2 = pointPairDistance.y2;
+      setMinimum(x1, y1, x2, y2);
+    }
   }
 
   @Override
   public String toString() {
-    return EWktWriter.lineString(this.pt[0], this.pt[1]);
+    return "LINESTRING(" + this.x1 + ' ' + this.y1 + ',' + this.x2 + ' ' + this.y2 + ')';
   }
 }

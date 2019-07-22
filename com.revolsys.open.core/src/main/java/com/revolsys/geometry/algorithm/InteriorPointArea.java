@@ -172,9 +172,7 @@ public class InteriorPointArea {
     if (geometry instanceof Polygon) {
       addPolygon(geometry);
     } else if (geometry.isGeometryCollection()) {
-      for (final Geometry part : geometry.geometries()) {
-        add(part);
-      }
+      geometry.forEachGeometry(this::add);
     }
   }
 
@@ -226,9 +224,7 @@ public class InteriorPointArea {
     // double avgY = avg(envelope.getMinY(), envelope.getMaxY());
 
     final double bisectY = SafeBisectorFinder.getBisectorY((Polygon)geometry);
-    return this.factory.lineString(new Point[] {
-      new PointDoubleXY(envelope.getMinX(), bisectY), new PointDoubleXY(envelope.getMaxX(), bisectY)
-    });
+    return this.factory.lineString(2, envelope.getMinX(), bisectY, envelope.getMaxX(), bisectY);
   }
 
   // @return if geometry is a collection, the widest sub-geometry; otherwise,

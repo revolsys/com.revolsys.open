@@ -74,6 +74,7 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
   public static Location locatePointInRing(final LineString ring, final double x, final double y) {
     final BoundingBox boundingBox = ring.getBoundingBox();
     if (boundingBox.bboxCovers(x, y)) {
+
       final RayCrossingCounter counter = new RayCrossingCounter(x, y);
       ring.findSegment((x1, y1, x2, y2) -> {
         counter.countSegment(x2, y2, x1, y1);
@@ -194,11 +195,6 @@ public class RayCrossingCounter implements Consumer<LineSegment> {
     final double y2 = segment.getY(1);
 
     countSegment(x1, y1, x2, y2);
-  }
-
-  public void clear() {
-    this.crossingCount = 0;
-    this.pointOnSegment = false;
   }
 
   public void countSegment(final double x1, final double y1, final double x2, final double y2) {

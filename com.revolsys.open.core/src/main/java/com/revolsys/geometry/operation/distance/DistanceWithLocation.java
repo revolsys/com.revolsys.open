@@ -90,7 +90,7 @@ public class DistanceWithLocation {
   }
 
   /**
-   * Compute the the nearest points of two geometries.
+   * Compute the nearest points of two geometries.
    * The points are presented in the same order as the input Geometries.
    *
    * @param geometry1 a {@link Geometry}
@@ -158,8 +158,10 @@ public class DistanceWithLocation {
   private void computeContainmentDistance(final GeometryLocation ptLoc, final Polygon poly,
     final GeometryLocation[] locPtPoly) {
     final Point pt = ptLoc.getPoint();
+    final double x = pt.getX();
+    final double y = pt.getY();
     // if pt is not in exterior, distance to geom is 0
-    if (Location.EXTERIOR != poly.locate(pt)) {
+    if (Location.EXTERIOR != poly.locate(x, y)) {
       this.minDistance = 0.0;
       locPtPoly[0] = ptLoc;
       locPtPoly[1] = new GeometryLocation(poly, pt);
@@ -229,8 +231,7 @@ public class DistanceWithLocation {
   }
 
   private boolean computeLineLine(final LineString line1, final LineString line2) {
-    if (this.minDistance == Double.MAX_VALUE
-      || line1.getBoundingBox().bboxDistance(line2.getBoundingBox()) <= this.minDistance) {
+    if (this.minDistance == Double.MAX_VALUE || line1.bboxDistance(line2) <= this.minDistance) {
       for (final Segment segment1 : line1.segments()) {
         for (final Segment segment2 : line2.segments()) {
           final double dist = segment1.distance(segment2);
@@ -255,7 +256,7 @@ public class DistanceWithLocation {
     if (this.minDistance == Double.MAX_VALUE
       || line.getBoundingBox().bboxDistance(point) <= this.minDistance) {
       for (final Segment segment : line.segments()) {
-        final double distance = segment.distance(point);
+        final double distance = segment.distancePoint(point);
         if (distance < this.minDistance) {
           this.minDistance = distance;
           final Point closestPoint = segment.closestPoint(point);
@@ -298,7 +299,7 @@ public class DistanceWithLocation {
     if (this.minDistance == Double.MAX_VALUE
       || boundingBox.bboxDistance(point) <= this.minDistance) {
       for (final Segment segment : line.segments()) {
-        final double distance = segment.distance(point);
+        final double distance = segment.distancePoint(point);
         if (distance < this.minDistance) {
           this.minDistance = distance;
           final Point closestPoint = segment.closestPoint(point);

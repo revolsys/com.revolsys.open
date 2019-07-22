@@ -114,8 +114,10 @@ public class DistanceOp {
   private boolean computeContainmentDistance(final List<Point> points,
     final List<Polygon> polygons) {
     for (final Point point : points) {
+      final double x = point.getX();
+      final double y = point.getY();
       for (final Polygon polygon : polygons) {
-        if (computeContainmentDistance(point, polygon)) {
+        if (computeContainmentDistance(polygon, x, y)) {
           return true;
         }
       }
@@ -123,9 +125,10 @@ public class DistanceOp {
     return false;
   }
 
-  private boolean computeContainmentDistance(final Point point, final Polygon poly) {
+  private boolean computeContainmentDistance(final Polygon polygon, final double x,
+    final double y) {
     // if pt is not in exterior, distance to geom is 0
-    if (Location.EXTERIOR != poly.locate(point)) {
+    if (Location.EXTERIOR != polygon.locate(x, y)) {
       this.minDistance = 0.0;
       return true;
     } else {
@@ -158,8 +161,7 @@ public class DistanceOp {
   }
 
   private boolean computeLineLine(final LineString line1, final LineString line2) {
-    if (this.minDistance == Double.MAX_VALUE
-      || line1.getBoundingBox().bboxDistance(line2.getBoundingBox()) <= this.minDistance) {
+    if (this.minDistance == Double.MAX_VALUE || line1.bboxDistance(line2) <= this.minDistance) {
       final double distance = line1.distance(line2);
       if (distance < this.minDistance) {
         this.minDistance = distance;

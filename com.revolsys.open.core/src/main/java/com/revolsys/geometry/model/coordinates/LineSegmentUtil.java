@@ -68,14 +68,14 @@ public class LineSegmentUtil {
    * @param D
    *          another point of the line (must be different to A)
    */
-  public static double distanceLineLine(final double line1X1, final double line1Y1,
-    final double line1X2, final double line1Y2, final double line2X1, final double line2Y1,
-    final double line2X2, final double line2Y2) {
+  public static double distanceLineLine(final double line1x1, final double line1y1,
+    final double line1x2, final double line1y2, final double line2x1, final double line2y1,
+    final double line2x2, final double line2y2) {
     // check for zero-length segments
-    if (line1X1 == line1X2 && line1Y1 == line1Y2) {
-      return distanceLinePoint(line2X1, line2Y1, line2X2, line2Y2, line1X1, line1Y1);
-    } else if (line2X1 == line2X2 && line2Y1 == line2Y2) {
-      return distanceLinePoint(line1X1, line1Y1, line1X2, line1Y2, line2X1, line2Y1);
+    if (line1x1 == line1x2 && line1y1 == line1y2) {
+      return distanceLinePoint(line2x1, line2y1, line2x2, line2y2, line1x1, line1y1);
+    } else if (line2x1 == line2x2 && line2y1 == line2y2) {
+      return distanceLinePoint(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1);
     } else {
       // AB and CD are line segments
       /*
@@ -92,20 +92,20 @@ public class LineSegmentUtil {
        */
 
       boolean noIntersection = false;
-      if (!RectangleUtil.intersectsMinMax(line1X1, line1Y1, line1X2, line1Y2, line2X1, line2Y1,
-        line2X2, line2Y2)) {
+      if (!RectangleUtil.intersectsMinMax(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
+        line2x2, line2y2)) {
         noIntersection = true;
       } else {
-        final double denom = (line1X2 - line1X1) * (line2Y2 - line2Y1)
-          - (line1Y2 - line1Y1) * (line2X2 - line2X1);
+        final double denom = (line1x2 - line1x1) * (line2y2 - line2y1)
+          - (line1y2 - line1y1) * (line2x2 - line2x1);
 
         if (denom == 0) {
           noIntersection = true;
         } else {
-          final double r_num = (line1Y1 - line2Y1) * (line2X2 - line2X1)
-            - (line1X1 - line2X1) * (line2Y2 - line2Y1);
-          final double s_num = (line1Y1 - line2Y1) * (line1X2 - line1X1)
-            - (line1X1 - line2X1) * (line1Y2 - line1Y1);
+          final double r_num = (line1y1 - line2y1) * (line2x2 - line2x1)
+            - (line1x1 - line2x1) * (line2y2 - line2y1);
+          final double s_num = (line1y1 - line2y1) * (line1x2 - line1x1)
+            - (line1x1 - line2x1) * (line1y2 - line1y1);
 
           final double s = s_num / denom;
           final double r = r_num / denom;
@@ -116,14 +116,14 @@ public class LineSegmentUtil {
         }
       }
       if (noIntersection) {
-        final double distance1 = distanceLinePoint(line2X1, line2Y1, line2X2, line2Y2, line1X1,
-          line1Y1);
-        final double distance2 = distanceLinePoint(line2X1, line2Y1, line2X2, line2Y2, line1X2,
-          line1Y2);
-        final double distance3 = distanceLinePoint(line1X1, line1Y1, line1X2, line1Y2, line2X1,
-          line2Y1);
-        final double distance4 = distanceLinePoint(line1X1, line1Y1, line1X2, line1Y2, line2X2,
-          line2Y2);
+        final double distance1 = distanceLinePoint(line2x1, line2y1, line2x2, line2y2, line1x1,
+          line1y1);
+        final double distance2 = distanceLinePoint(line2x1, line2y1, line2x2, line2y2, line1x2,
+          line1y2);
+        final double distance3 = distanceLinePoint(line1x1, line1y1, line1x2, line1y2, line2x1,
+          line2y1);
+        final double distance4 = distanceLinePoint(line1x1, line1y1, line1x2, line1y2, line2x2,
+          line2y2);
         return Doubles.min(distance1, distance2, distance3, distance4);
       } else {
         // segments intersect
@@ -134,18 +134,18 @@ public class LineSegmentUtil {
 
   public static double distanceLineLine(final Point line1From, final Point line1To,
     final Point line2From, final Point line2To) {
-    final double line1X1 = line1From.getX();
-    final double line1Y1 = line1From.getY();
+    final double line1x1 = line1From.getX();
+    final double line1y1 = line1From.getY();
 
-    final double line1X2 = line1To.getX();
-    final double line1Y2 = line1To.getY();
+    final double line1x2 = line1To.getX();
+    final double line1y2 = line1To.getY();
 
-    final double line2X1 = line2From.getX();
-    final double line2Y1 = line2From.getY();
+    final double line2x1 = line2From.getX();
+    final double line2y1 = line2From.getY();
 
-    final double line2X2 = line2To.getX();
-    final double line2Y2 = line2To.getY();
-    return distanceLineLine(line1X1, line1Y1, line1X2, line1Y2, line2X1, line2Y1, line2X2, line2Y2);
+    final double line2x2 = line2To.getX();
+    final double line2y2 = line2To.getY();
+    return distanceLineLine(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1, line2x2, line2y2);
   }
 
   /**
@@ -162,25 +162,30 @@ public class LineSegmentUtil {
    */
   public static double distanceLinePoint(final double x1, final double y1, final double x2,
     final double y2, final double x, final double y) {
+    final double deltaX1X = x1 - x;
+    final double deltaY1Y = y1 - y;
     if (x1 == x2 && y1 == y2) {
-      return Points.distance(x, y, x1, y1);
+      return Math.sqrt(deltaX1X * deltaX1X + deltaY1Y * deltaY1Y);
     } else {
-      final double dxx1 = x - x1;
-      final double dx2x1 = x2 - x1;
-      final double dyy1 = y - y1;
-      final double dy2y1 = y2 - y1;
-      final double r = (dxx1 * dx2x1 + dyy1 * dy2y1) / (dx2x1 * dx2x1 + dy2y1 * dy2y1);
+      final double deltaXX1 = -deltaX1X;
+      final double deltaYY1 = -deltaY1Y;
+      final double deltaX2X1 = x2 - x1;
+      final double deltaY2Y1 = y2 - y1;
+      final double deltaX2X1Sq = deltaX2X1 * deltaX2X1;
+      final double deltaY2Y1Sq = deltaY2Y1 * deltaY2Y1;
+      final double deltaX2X1SqPlusDeltaY2Y1Sq = deltaX2X1Sq + deltaY2Y1Sq;
+      final double r = (deltaXX1 * deltaX2X1 + deltaYY1 * deltaY2Y1) / deltaX2X1SqPlusDeltaY2Y1Sq;
 
       if (r <= 0.0) {
-        return Points.distance(x, y, x1, y1);
+        return Math.sqrt(deltaX1X * deltaX1X + deltaY1Y * deltaY1Y);
       } else if (r >= 1.0) {
-        return Points.distance(x, y, x2, y2);
+        final double deltaX2X = x2 - x;
+        final double deltaY2Y = y2 - y;
+        return Math.sqrt(deltaX2X * deltaX2X + deltaY2Y * deltaY2Y);
       } else {
-        final double dy1y = y1 - y;
-        final double dx1x = x1 - x;
-        final double s = (dy1y * dx2x1 - dx1x * dy2y1) / (dx2x1 * dx2x1 + dy2y1 * dy2y1);
+        final double s = (deltaY1Y * deltaX2X1 - deltaX1X * deltaY2Y1) / deltaX2X1SqPlusDeltaY2Y1Sq;
 
-        return Math.abs(s) * Math.sqrt(dx2x1 * dx2x1 + dy2y1 * dy2y1);
+        return Math.abs(s) * Math.sqrt(deltaX2X1SqPlusDeltaY2Y1Sq);
       }
     }
   }
@@ -345,29 +350,29 @@ public class LineSegmentUtil {
    */
   public static boolean envelopeIntersects(final Point line1Start, final Point line1End,
     final Point line2Start, final Point line2End) {
-    final double line1X1 = line1Start.getX();
-    final double line1X2 = line1End.getX();
+    final double line1x1 = line1Start.getX();
+    final double line1x2 = line1End.getX();
 
-    final double line2X1 = line2Start.getX();
-    final double line2X2 = line2End.getX();
+    final double line2x1 = line2Start.getX();
+    final double line2x2 = line2End.getX();
 
-    final double max1X = Math.max(line1X1, line1X2);
-    final double min2X = Math.min(line2X1, line2X2);
+    final double max1X = Math.max(line1x1, line1x2);
+    final double min2X = Math.min(line2x1, line2x2);
     if (min2X <= max1X) {
-      final double min1X = Math.min(line1X1, line1X2);
-      final double max2X = Math.max(line2X1, line2X2);
+      final double min1X = Math.min(line1x1, line1x2);
+      final double max2X = Math.max(line2x1, line2x2);
       if (min1X <= max2X) {
-        final double line1Y1 = line1Start.getY();
-        final double line1Y2 = line1End.getY();
+        final double line1y1 = line1Start.getY();
+        final double line1y2 = line1End.getY();
 
-        final double line2Y1 = line2Start.getY();
-        final double line2Y2 = line2End.getY();
+        final double line2y1 = line2Start.getY();
+        final double line2y2 = line2End.getY();
 
-        final double max1Y = Math.max(line1Y1, line1Y2);
-        final double min2Y = Math.min(line2Y1, line2Y2);
+        final double max1Y = Math.max(line1y1, line1y2);
+        final double min2Y = Math.min(line2y1, line2y2);
         if (min2Y <= max1Y) {
-          final double min1Y = Math.min(line1Y1, line1Y2);
-          final double max2Y = Math.max(line2Y1, line2Y2);
+          final double min1Y = Math.min(line1y1, line1y2);
+          final double max2Y = Math.max(line2y1, line2y2);
           if (min1Y <= max2Y) {
             return true;
           }
@@ -523,7 +528,7 @@ public class LineSegmentUtil {
     }
   }
 
-  public static boolean isPointOnLine(final GeometryFactory geometryFactory, final double x1,
+  public static boolean isPointOnLine(final GeometryFactory precisionModel, final double x1,
     final double y1, final double x2, final double y2, final double x, final double y) {
     if (Doubles.equal(x, x1) && Doubles.equal(y, y1)) {
       return true;
@@ -535,9 +540,9 @@ public class LineSegmentUtil {
         double newX = x1 + projectionFactor * (x2 - x1);
         double newY = y1 + projectionFactor * (y2 - y1);
 
-        if (geometryFactory != null) {
-          newX = geometryFactory.makeXyPrecise(newX);
-          newY = geometryFactory.makeXyPrecise(newY);
+        if (precisionModel != null) {
+          newX = precisionModel.makeXyPrecise(newX);
+          newY = precisionModel.makeXyPrecise(newY);
         }
         if (x == newX && y == newY) {
           return true;
@@ -552,13 +557,13 @@ public class LineSegmentUtil {
    * using the precision model to see if a line split at the projection of the
    * point on the line would be the same point.
    *
-   * @param geometryFactory The precision model.
+   * @param precisionModel The precision model.
    * @param lineStart The point at the start of the line.
    * @param lineEnd The point at the end of the line.
    * @param point The point.
    * @return True if the point is on the line.
    */
-  public static boolean isPointOnLine(final GeometryFactory geometryFactory, final Point lineStart,
+  public static boolean isPointOnLine(final GeometryFactory precisionModel, final Point lineStart,
     final Point lineEnd, final Point point) {
     if (lineStart.equals(2, point)) {
       return true;
@@ -568,8 +573,8 @@ public class LineSegmentUtil {
       final double projectionFactor = projectionFactor(lineStart, lineEnd, point);
       if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
         Point projectedPoint = project(2, lineStart, lineEnd, projectionFactor);
-        if (geometryFactory != null) {
-          projectedPoint = geometryFactory.getPreciseCoordinates(projectedPoint);
+        if (precisionModel != null) {
+          projectedPoint = precisionModel.getPreciseCoordinates(projectedPoint);
         }
         if (projectedPoint.equals(2, point)) {
           return true;
@@ -597,7 +602,7 @@ public class LineSegmentUtil {
     }
   }
 
-  public static boolean isPointOnLineMiddle(final GeometryFactory geometryFactory,
+  public static boolean isPointOnLineMiddle(final GeometryFactory precisionModel,
     final Point lineStart, final Point lineEnd, final Point point) {
     if (point.equals(2, lineStart)) {
       return false;
@@ -607,7 +612,7 @@ public class LineSegmentUtil {
       final double projectionFactor = projectionFactor(lineStart, lineEnd, point);
       if (projectionFactor >= 0.0 && projectionFactor <= 1.0) {
         Point projectedPoint = project(2, lineStart, lineEnd, projectionFactor);
-        projectedPoint = geometryFactory.getPreciseCoordinates(projectedPoint);
+        projectedPoint = precisionModel.getPreciseCoordinates(projectedPoint);
         if (projectedPoint.equals(2, point)) {
           return true;
         }
@@ -616,9 +621,9 @@ public class LineSegmentUtil {
     }
   }
 
-  public static Point midPoint(final GeometryFactory geometryFactory, final Point lineStart,
+  public static Point midPoint(final GeometryFactory precisionModel, final Point lineStart,
     final Point lineEnd) {
-    return project(geometryFactory, lineStart, lineEnd, 0.5);
+    return project(precisionModel, lineStart, lineEnd, 0.5);
   }
 
   public static Point midPoint(final Point lineStart, final Point lineEnd) {
@@ -636,11 +641,13 @@ public class LineSegmentUtil {
 
   public static int orientationIndex(final Point lineStart, final Point lineEnd,
     final Point point) {
-    final double lineDx = lineEnd.getX() - lineStart.getX();
-    final double lineDy = lineEnd.getY() - lineStart.getY();
-    final double dx2 = point.getX() - lineEnd.getX();
-    final double dy2 = point.getY() - lineEnd.getY();
-    return RobustDeterminant.signOfDet2x2(lineDx, lineDy, dx2, dy2);
+    final double x1 = lineStart.getX();
+    final double y1 = lineStart.getY();
+    final double x2 = lineEnd.getX();
+    final double y2 = lineEnd.getY();
+    final double x = point.getX();
+    final double y = point.getY();
+    return orientationIndex(x1, y1, x2, y2, x, y);
   }
 
   /**
@@ -658,7 +665,7 @@ public class LineSegmentUtil {
     return Angle.angleBetweenOriented(angle1, angle2);
   }
 
-  public static Point pointAlong(final GeometryFactory geometryFactory, final Point lineStart,
+  public static Point pointAlong(final GeometryFactory precisionModel, final Point lineStart,
     final Point lineEnd, final Point point) {
     final double projectionFactor = projectionFactor(lineStart, lineEnd, point);
     if (projectionFactor < 0.0) {
@@ -666,7 +673,7 @@ public class LineSegmentUtil {
     } else if (projectionFactor > 1.0) {
       return lineEnd;
     } else {
-      return project(geometryFactory, lineStart, lineEnd, projectionFactor);
+      return project(precisionModel, lineStart, lineEnd, projectionFactor);
     }
   }
 
@@ -678,8 +685,7 @@ public class LineSegmentUtil {
     final double y2 = p1.getY();
     final double x = x1 + segmentLengthFraction * (x2 - x1);
     final double y = y1 + segmentLengthFraction * (y2 - y1);
-    final Point coord = new PointDoubleXY(x, y);
-    return coord;
+    return new PointDoubleXY(x, y);
   }
 
   public static Point pointAlongSegmentByFraction(final double x1, final double y1, final double x2,
@@ -721,25 +727,31 @@ public class LineSegmentUtil {
     } else {
       final double r = projectionFactor(lineStart, lineEnd, point);
       final int axisCount = CoordinatesUtil.getAxisCount(point, lineStart, lineEnd);
-      Point projectedCoordinate = project(axisCount, lineStart, lineEnd, r);
+      Point projectedPoint = project(axisCount, lineStart, lineEnd, r);
       if (geometryFactory != null) {
-        projectedCoordinate = geometryFactory.getPreciseCoordinates(projectedCoordinate);
+        projectedPoint = geometryFactory.getPreciseCoordinates(projectedPoint);
       }
-      if (projectedCoordinate.equals(2, lineStart)) {
+      if (projectedPoint.equals(2, lineStart)) {
         return lineStart;
-      } else if (projectedCoordinate.equals(2, lineEnd)) {
+      } else if (projectedPoint.equals(2, lineEnd)) {
         return lineEnd;
       } else {
         if (axisCount > 2) {
-          final double z = projectedCoordinate.getZ();
+          final double z = projectedPoint.getZ();
           if (!Double.isFinite(z) || z == 0) {
-            final double[] coordinates = projectedCoordinate.getCoordinates();
-            coordinates[2] = point.getZ();
-            return new PointDouble(coordinates);
+            final double[] coordinates = projectedPoint.getCoordinates(axisCount);
+            for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+              coordinates[axisIndex] = point.getCoordinate(axisIndex);
+            }
+            if (geometryFactory == null) {
+              return new PointDouble(coordinates);
+            } else {
+              return geometryFactory.point(coordinates);
+            }
           }
         }
 
-        return projectedCoordinate;
+        return projectedPoint;
       }
     }
   }
@@ -758,7 +770,7 @@ public class LineSegmentUtil {
     final double y = y1 + r * (y2 - y1);
 
     if (axisCount == 2) {
-      return new PointDouble(x, y);
+      return new PointDoubleXY(x, y);
     } else {
       double z;
       if (Double.isFinite(z1) && Double.isFinite(z2)) {

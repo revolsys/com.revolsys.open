@@ -1,19 +1,20 @@
 package com.revolsys.geometry.operation.distance;
 
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 
 public interface FacetSequence {
 
   double distance(final FacetSequence sequence);
 
-  Point getCoordinate(int vertexIndex);
-
   double getCoordinate(int vertexIndex, int axisIndex);
 
-  BoundingBox getEnvelope();
+  Point getPoint(int vertexIndex);
 
   int getVertexCount();
+
+  double getX(int vertexIndex);
+
+  double getY(int vertexIndex);
 
   boolean isPoint();
 }

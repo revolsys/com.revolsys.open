@@ -143,7 +143,7 @@ public class CommonBitsRemover {
     // return geom;
     // } else {
     // final Point invCoord = new PointDouble(-x, -y,
-    // Point.NULL_ORDINATE);
+    // );
     // final Translater trans = new Translater(invCoord);
     // geom.apply(trans);
     // geom.geometryChanged();

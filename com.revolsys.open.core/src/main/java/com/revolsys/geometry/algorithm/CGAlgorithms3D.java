@@ -35,7 +35,7 @@ package com.revolsys.geometry.algorithm;
 
 import com.revolsys.geometry.math.Vector3D;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 
 /**
  * Basic computational geometry algorithms
@@ -175,7 +175,7 @@ public class CGAlgorithms3D {
     final double z2 = C.getZ() + t * (D.getZ() - C.getZ());
 
     // length (p1-p2)
-    return distance(new PointDouble(x1, y1, z1), new PointDouble(x2, y2, z2));
+    return distance(new PointDoubleXYZ(x1, y1, z1), new PointDoubleXYZ(x2, y2, z2));
   }
 
 }

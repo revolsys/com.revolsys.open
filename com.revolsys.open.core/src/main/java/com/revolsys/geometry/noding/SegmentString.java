@@ -43,10 +43,10 @@ import com.revolsys.geometry.model.LineString;
  */
 public interface SegmentString extends LineString {
   /**
-   * Gets the user-defined data for this segment string.
-   *
-   * @return the user-defined data
-   */
+  * Gets the user-defined data for this segment string.
+  *
+  * @return the user-defined data
+  */
   Object getData();
 
   LineString getLineString();

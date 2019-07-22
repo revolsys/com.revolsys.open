@@ -32,6 +32,7 @@
 
 package com.revolsys.geometry.algorithm;
 
+import com.revolsys.geometry.algorithm.distance.PointPairDistance;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.segment.LineSegment;
@@ -51,67 +52,64 @@ import com.revolsys.geometry.model.vertex.Vertex;
  */
 public class VertexHausdorffDistance {
 
-  public static double distance(final Geometry g0, final Geometry g1) {
-    final VertexHausdorffDistance vhd = new VertexHausdorffDistance(g0, g1);
+  public static double distance(final Geometry geometry1, final Geometry geometry2) {
+    final VertexHausdorffDistance vhd = new VertexHausdorffDistance(geometry1, geometry2);
     return vhd.distance();
   }
 
-  private final PointPairDistance ptDist = new PointPairDistance();
+  private final PointPairDistance pointDistance = new PointPairDistance();
 
-  public VertexHausdorffDistance(final Geometry g0, final Geometry g1) {
-    compute(g0, g1);
+  public VertexHausdorffDistance(final Geometry geometry1, final Geometry geometry2) {
+    computeMaxPointDistance(geometry1, geometry2, this.pointDistance);
+    computeMaxPointDistance(geometry2, geometry1, this.pointDistance);
   }
 
-  public VertexHausdorffDistance(final LineSegment seg0, final LineSegment seg1) {
-    compute(seg0, seg1);
+  public VertexHausdorffDistance(final LineSegment line1, final LineSegment line2) {
+    computeMaxPointDistance(line1, line2, this.pointDistance);
+    computeMaxPointDistance(line2, line1, this.pointDistance);
   }
 
-  private void compute(final Geometry g0, final Geometry g1) {
-    computeMaxPointDistance(g0, g1, this.ptDist);
-    computeMaxPointDistance(g1, g0, this.ptDist);
-  }
-
-  private void compute(final LineSegment seg0, final LineSegment seg1) {
-    computeMaxPointDistance(seg0, seg1, this.ptDist);
-    computeMaxPointDistance(seg1, seg0, this.ptDist);
-  }
-
-  private void computeMaxPointDistance(final Geometry pointGeom, final Geometry geom,
-    final PointPairDistance ptDist) {
-    ptDist.setMaximum(ptDist);
-    final EuclideanDistanceToPoint euclideanDist = new EuclideanDistanceToPoint();
-    final PointPairDistance maxPtDist = new PointPairDistance();
-    final PointPairDistance minPtDist = new PointPairDistance();
-    for (final Vertex vertex : pointGeom.vertices()) {
-      minPtDist.initialize();
-      euclideanDist.computeDistance(geom, vertex, minPtDist);
-      maxPtDist.setMaximum(minPtDist);
+  private void computeMaxPointDistance(final Geometry pointGeometry, final Geometry geometry,
+    final PointPairDistance pointDistance) {
+    pointDistance.setMaximum(pointDistance);
+    final PointPairDistance maxPointDist = new PointPairDistance();
+    final PointPairDistance minPointDist = new PointPairDistance();
+    for (final Vertex vertex : pointGeometry.vertices()) {
+      minPointDist.initialize();
+      final double x = vertex.getX();
+      final double y = vertex.getY();
+      minPointDist.setMinimum(geometry, x, y);
+      maxPointDist.setMaximum(minPointDist);
     }
-    ptDist.setMaximum(maxPtDist);
+    pointDistance.setMaximum(maxPointDist);
   }
 
   /**
    * Computes the maximum oriented distance between two line segments, as well
    * as the point pair separated by that distance.
    *
-   * @param seg0 the line segment containing the furthest point
-   * @param seg1 the line segment containing the closest point
-   * @param ptDist the point pair and distance to be updated
+   * @param line1 the line segment containing the furthest point
+   * @param line2 the line segment containing the closest point
+   * @param pointDistance the point pair and distance to be updated
    */
-  private void computeMaxPointDistance(final LineSegment seg0, final LineSegment seg1,
-    final PointPairDistance ptDist) {
-    final Point closestPt0 = seg0.closestPoint(seg1.getP0());
-    ptDist.setMaximum(closestPt0, seg1.getP0());
-    final Point closestPt1 = seg0.closestPoint(seg1.getP1());
-    ptDist.setMaximum(closestPt1, seg1.getP1());
+  private void computeMaxPointDistance(final LineSegment line1, final LineSegment line2,
+    final PointPairDistance pointDistance) {
+    for (int i = 0; i < 2; i++) {
+      final double line2x = line2.getX(i);
+      final double line2y = line2.getY(i);
+      final Point closestPoint = line1.closestPoint(line2x, line2y);
+      final double closestX = closestPoint.getX();
+      final double closestY = closestPoint.getY();
+      pointDistance.setMaximum(closestX, closestY, line2x, line2y);
+    }
   }
 
   public double distance() {
-    return this.ptDist.getDistance();
+    return this.pointDistance.getDistance();
   }
 
   public Point[] getCoordinates() {
-    return this.ptDist.getCoordinates();
+    return this.pointDistance.getPoints();
   }
 
 }

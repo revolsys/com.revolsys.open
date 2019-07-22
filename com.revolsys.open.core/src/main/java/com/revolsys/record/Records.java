@@ -170,7 +170,6 @@ public interface Records {
    */
   @SuppressWarnings("unchecked")
   static <T extends Record> T copy(final T record, final Geometry geometry) {
-    final Geometry oldGeometry = record.getGeometry();
     final T newObject = (T)record.clone();
     newObject.setGeometryValue(geometry);
     return newObject;

@@ -37,7 +37,6 @@ import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.model.impl.PointDouble;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.util.Assert;
@@ -53,32 +52,25 @@ import com.revolsys.geometry.util.Assert;
  *
  * @version 1.7
  */
-public class HotPixel {
-  // testing only
-  // public static int nTests = 0;
+public class HotPixel extends PointDoubleXY {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
   private static final double SAFE_ENV_EXPANSION_FACTOR = 0.75;
 
-  /**
-   * The corners of the hot pixel, in the order:
-   *  10
-   *  23
-   */
-  private final Point[] corner = new Point[4];
-
   private final LineIntersector li;
 
-  private double maxx;
+  private final double maxx;
 
-  private double maxy;
+  private final double maxy;
 
-  private double minx;
+  private final double minx;
 
-  private double miny;
+  private final double miny;
 
   private final Point originalPt;
-
-  private Point pt;
 
   private BoundingBox safeEnv = null;
 
@@ -88,24 +80,30 @@ public class HotPixel {
    * Creates a new hot pixel, using a given scale factor.
    * The scale factor must be strictly positive (non-zero).
    *
-   * @param pt the coordinate at the centre of the pixel
+   * @param point the coordinate at the centre of the pixel
    * @param scaleFactor the scaleFactor determining the pixel size.  Must be > 0
    * @param li the intersector to use for testing intersection with line segments
    *
    */
-  public HotPixel(final Point pt, final double scaleFactor, final LineIntersector li) {
-    this.originalPt = pt;
-    this.pt = pt;
+  public HotPixel(final Point point, final double scaleFactor, final LineIntersector li) {
+    this.originalPt = point;
+    this.x = point.getX();
+    this.y = point.getY();
     this.scaleFactor = scaleFactor;
     this.li = li;
     // tolerance = 0.5;
     if (scaleFactor <= 0) {
-      throw new IllegalArgumentException("Scale factor must be non-zero");
+      throw new IllegalArgumentException("Scale factor must be > 0");
     }
-    if (scaleFactor != 1.0) {
-      this.pt = new PointDoubleXY(scale(pt.getX()), scale(pt.getY()));
+    if (scaleFactor == 1.0) {
+    } else {
+      this.x = scale(point.getX());
+      this.y = scale(point.getY());
     }
-    initCorners(this.pt);
+    this.minx = this.x - 0.5;
+    this.maxx = this.x + 0.5;
+    this.miny = this.y - 0.5;
+    this.maxy = this.y + 0.5;
   }
 
   /**
@@ -117,17 +115,23 @@ public class HotPixel {
    * @return true if a node was added to the segment
    */
   public boolean addSnappedNode(final NodedSegmentString segStr, final int segIndex) {
-    final Point p0 = segStr.getPoint(segIndex);
-    final Point p1 = segStr.getPoint(segIndex + 1);
+    double x1 = segStr.getX(segIndex);
+    double y1 = segStr.getY(segIndex);
+    double x2 = segStr.getX(segIndex + 1);
+    double y2 = segStr.getY(segIndex + 1);
 
-    if (intersects(p0, p1)) {
-      // System.out.println("snapped: " + snapPt);
-      // System.out.println("POINT (" + snapPt.x + " " + snapPt.y + ")");
-      segStr.addIntersection(getCoordinate(), segIndex);
-
-      return true;
+    if (this.scaleFactor != 1.0) {
+      x1 = scale(x1);
+      y1 = scale(y1);
+      x2 = scale(x2);
+      y2 = scale(y2);
     }
-    return false;
+    if (intersectsScaled(x1, y1, x2, y2)) {
+      segStr.addIntersection(this, segIndex);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /**
@@ -149,58 +153,26 @@ public class HotPixel {
   public BoundingBox getSafeEnvelope() {
     if (this.safeEnv == null) {
       final double safeTolerance = SAFE_ENV_EXPANSION_FACTOR / this.scaleFactor;
-      this.safeEnv = BoundingBoxDoubleXY.newBoundingBoxDoubleXY(
-        this.originalPt.getX() - safeTolerance, this.originalPt.getY() - safeTolerance,
-        this.originalPt.getX() + safeTolerance, this.originalPt.getY() + safeTolerance);
+      this.safeEnv = new BoundingBoxDoubleXY(this.originalPt.getX() - safeTolerance,
+        this.originalPt.getY() - safeTolerance, this.originalPt.getX() + safeTolerance,
+        this.originalPt.getY() + safeTolerance);
     }
     return this.safeEnv;
   }
 
-  private Point getScaled(final Point p) {
-    return new PointDouble(scale(p.getX()), scale(p.getY()));
-  }
-
-  private void initCorners(final Point pt) {
-    final double tolerance = 0.5;
-    this.minx = pt.getX() - tolerance;
-    this.maxx = pt.getX() + tolerance;
-    this.miny = pt.getY() - tolerance;
-    this.maxy = pt.getY() + tolerance;
-
-    this.corner[0] = new PointDoubleXY(this.maxx, this.maxy);
-    this.corner[1] = new PointDoubleXY(this.minx, this.maxy);
-    this.corner[2] = new PointDoubleXY(this.minx, this.miny);
-    this.corner[3] = new PointDoubleXY(this.maxx, this.miny);
-  }
-
-  /**
-   * Tests whether the line segment (p0-p1)
-   * intersects this hot pixel.
-   *
-   * @param p0 the first coordinate of the line segment to test
-   * @param p1 the second coordinate of the line segment to test
-   * @return true if the line segment intersects this hot pixel
-   */
-  public boolean intersects(final Point p0, final Point p1) {
-    if (this.scaleFactor == 1.0) {
-      return intersectsScaled(p0, p1);
-    }
-
-    return intersectsScaled(getScaled(p0), getScaled(p1));
-  }
-
-  private boolean intersectsScaled(final Point p0, final Point p1) {
-    final double segMinx = Math.min(p0.getX(), p1.getX());
-    final double segMaxx = Math.max(p0.getX(), p1.getX());
-    final double segMiny = Math.min(p0.getY(), p1.getY());
-    final double segMaxy = Math.max(p0.getY(), p1.getY());
+  private boolean intersectsScaled(final double x1, final double y1, final double x2,
+    final double y2) {
+    final double segMinx = Math.min(x1, x2);
+    final double segMaxx = Math.max(x1, x2);
+    final double segMiny = Math.min(y1, y2);
+    final double segMaxy = Math.max(y1, y2);
 
     final boolean isOutsidePixelEnv = this.maxx < segMinx || this.minx > segMaxx
       || this.maxy < segMiny || this.miny > segMaxy;
     if (isOutsidePixelEnv) {
       return false;
     }
-    final boolean intersects = intersectsToleranceSquare(p0, p1);
+    final boolean intersects = intersectsToleranceSquare(x1, y1, x2, y2);
 
     Assert.isTrue(!(isOutsidePixelEnv && intersects), "Found bad envelope test");
 
@@ -226,16 +198,17 @@ public class HotPixel {
    * @param p1
    * @return
    */
-  private boolean intersectsToleranceSquare(final Point p0, final Point p1) {
+  private boolean intersectsToleranceSquare(final double x1, final double y1, final double x2,
+    final double y2) {
     boolean intersectsLeft = false;
     boolean intersectsBottom = false;
 
-    this.li.computeIntersectionPoints(p0, p1, this.corner[0], this.corner[1]);
+    this.li.computeIntersection(x1, y1, x2, y2, this.maxx, this.maxy, this.minx, this.maxy);
     if (this.li.isProper()) {
       return true;
     }
 
-    this.li.computeIntersectionPoints(p0, p1, this.corner[1], this.corner[2]);
+    this.li.computeIntersection(x1, y1, x2, y2, this.minx, this.maxy, this.minx, this.miny);
     if (this.li.isProper()) {
       return true;
     }
@@ -243,7 +216,7 @@ public class HotPixel {
       intersectsLeft = true;
     }
 
-    this.li.computeIntersectionPoints(p0, p1, this.corner[2], this.corner[3]);
+    this.li.computeIntersection(x1, y1, x2, y2, this.minx, this.miny, this.maxx, this.miny);
     if (this.li.isProper()) {
       return true;
     }
@@ -251,7 +224,7 @@ public class HotPixel {
       intersectsBottom = true;
     }
 
-    this.li.computeIntersectionPoints(p0, p1, this.corner[3], this.corner[0]);
+    this.li.computeIntersection(x1, y1, x2, y2, this.maxx, this.miny, this.maxx, this.maxy);
     if (this.li.isProper()) {
       return true;
     }
@@ -260,10 +233,10 @@ public class HotPixel {
       return true;
     }
 
-    if (p0.equals(this.pt)) {
+    if (equals(x1, y1)) {
       return true;
     }
-    if (p1.equals(this.pt)) {
+    if (equals(x2, y2)) {
       return true;
     }
 

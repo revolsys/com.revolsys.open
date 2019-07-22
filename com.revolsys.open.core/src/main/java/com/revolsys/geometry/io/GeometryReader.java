@@ -1,5 +1,7 @@
 package com.revolsys.geometry.io;
 
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataTypes;
@@ -8,11 +10,13 @@ import com.revolsys.io.IoFactory;
 import com.revolsys.io.Reader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionBuilder;
+import com.revolsys.spring.resource.Resource;
 
 public interface GeometryReader extends Reader<Geometry> {
   static boolean isReadable(final Object source) {
-    final GeometryReaderFactory factory = IoFactory.factory(GeometryReaderFactory.class, source);
-    if (factory == null || !factory.isGeometrySupported()) {
+    final GeometryReaderFactory readerFactory = IoFactory.factory(GeometryReaderFactory.class,
+      source);
+    if (readerFactory == null || !readerFactory.isGeometrySupported()) {
       return false;
     } else {
       return true;
@@ -20,11 +24,23 @@ public interface GeometryReader extends Reader<Geometry> {
   }
 
   static GeometryReader newGeometryReader(final Object source) {
-    final GeometryReaderFactory factory = IoFactory.factory(GeometryReaderFactory.class, source);
-    if (factory == null || !factory.isGeometrySupported()) {
+    return newGeometryReader(source, MapEx.EMPTY);
+  }
+
+  static GeometryReader newGeometryReader(final Object source,
+    final GeometryFactory geometryFactory) {
+    final MapEx properties = new LinkedHashMapEx("geometryFactory", geometryFactory);
+    return newGeometryReader(source, properties);
+  }
+
+  static GeometryReader newGeometryReader(final Object source, final MapEx properties) {
+    final GeometryReaderFactory readerFactory = IoFactory.factory(GeometryReaderFactory.class,
+      source);
+    if (readerFactory == null || !readerFactory.isGeometrySupported()) {
       return null;
     } else {
-      return factory.newGeometryReader(source);
+      final Resource resource = readerFactory.getZipResource(source);
+      return readerFactory.newGeometryReader(resource, properties);
     }
   }
 
