@@ -222,7 +222,7 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
         this.nodes[index] = newNode;
         node = newNode;
       } else if (!node.coversBoundingBox(minX, minY, maxX, maxY)) {
-        final AbstractQuadTreeNode<T> newNode = node.newNodeExpanded(tree, minX, minY, maxX, maxY);
+        final AbstractQuadTreeNode<T> newNode = node.newNodeExpanded(minX, minY, maxX, maxY);
         this.nodes[index] = newNode;
         node = newNode;
       }
@@ -296,8 +296,8 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
   protected abstract AbstractQuadTreeNode<T> newNode(int level, double minX, final double minY,
     double maxX, final double maxY);
 
-  private AbstractQuadTreeNode<T> newNodeExpanded(final QuadTree<T> tree, double minX, double minY,
-    double maxX, double maxY) {
+  private AbstractQuadTreeNode<T> newNodeExpanded(double minX, double minY, double maxX,
+    double maxY) {
     if (this.minX < minX) {
       minX = this.minX;
     }
