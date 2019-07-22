@@ -33,11 +33,11 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
+  private double absoluteMinExtent;
+
   private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   private double minExtent = 1;
-
-  private double absoluteMinExtent;
 
   private double minExtentTimes2 = 2;
 
