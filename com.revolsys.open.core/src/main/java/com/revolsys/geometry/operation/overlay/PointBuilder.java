@@ -126,9 +126,10 @@ public class PointBuilder {
    * @param n the node to test
    */
   private void filterCoveredNodeToPoint(final Node n) {
-    final Point coord = n;
-    if (!this.op.isCoveredByLA(coord)) {
-      final Point pt = this.geometryFactory.point(coord);
+    final double x = n.getX();
+    final double y = n.getY();
+    if (!this.op.isCoveredByLA(x, y)) {
+      final Point pt = this.geometryFactory.point(x, y);
       this.resultLineString.add(pt);
     }
   }
