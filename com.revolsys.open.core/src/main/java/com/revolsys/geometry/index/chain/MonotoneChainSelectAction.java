@@ -32,7 +32,6 @@
  */
 package com.revolsys.geometry.index.chain;
 
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.segment.LineSegment;
 
 /**
@@ -42,8 +41,6 @@ import com.revolsys.geometry.model.segment.LineSegment;
  * @version 1.7
  */
 public class MonotoneChainSelectAction {
-  // these envelopes are used during the MonotoneChain search process
-  BoundingBox tempEnv1 = BoundingBox.empty();
 
   /**
    * This is a convenience method which can be overridden to obtain the actual
