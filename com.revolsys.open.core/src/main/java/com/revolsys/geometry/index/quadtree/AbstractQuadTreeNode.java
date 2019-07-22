@@ -6,105 +6,58 @@ import java.util.function.Consumer;
 
 import com.revolsys.geometry.index.DoubleBits;
 import com.revolsys.geometry.index.IntervalSize;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.Emptyable;
 
 public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
-
-  private static int computeQuadLevel(final double... bounds) {
-    final double dx = bounds[2] - bounds[0];
-    final double dy = bounds[3] - bounds[1];
-    final double dMax = dx > dy ? dx : dy;
-    final int level = DoubleBits.exponent(dMax) + 1;
-    return level;
-  }
-
-  private static int getSubnodeIndex(final double centreX, final double centreY,
-    final double... bounds) {
-    final double minX = bounds[0];
-    final double minY = bounds[1];
-    final double maxX = bounds[2];
-    final double maxY = bounds[3];
-    int subnodeIndex = -1;
-
-    if (minX >= centreX) {
-      if (minY >= centreY) {
-        subnodeIndex = 3;
-      }
-      if (maxY <= centreY) {
-        subnodeIndex = 1;
-      }
-    }
-    if (maxX <= centreX) {
-      if (minY >= centreY) {
-        subnodeIndex = 2;
-      }
-      if (maxY <= centreY) {
-        subnodeIndex = 0;
-      }
-    }
-    return subnodeIndex;
-  }
-
-  private static void setBounds(final double minX, final double minY, final double[] newBounds,
-    final int level) {
-    final double quadSize = DoubleBits.powerOf2(level);
-    final double x1 = Math.floor(minX / quadSize) * quadSize;
-    final double y1 = Math.floor(minY / quadSize) * quadSize;
-    final double x2 = x1 + quadSize;
-    final double y2 = y1 + quadSize;
-    newBounds[0] = x1;
-    newBounds[1] = y1;
-    newBounds[2] = x2;
-    newBounds[3] = y2;
-  }
 
   private final int level;
 
-  private double maxX;
+  private final double centreX;
 
-  private double maxY;
+  private final double centreY;
 
-  private double minX;
+  private final double maxX;
 
-  private double minY;
+  private final double maxY;
+
+  private final double minX;
+
+  private final double minY;
 
   @SuppressWarnings("unchecked")
   protected final AbstractQuadTreeNode<T>[] nodes = new AbstractQuadTreeNode[4];
 
   protected AbstractQuadTreeNode() {
-    this.level = Integer.MIN_VALUE;
+    this(Integer.MIN_VALUE, 0, 0, 0, 0);
   }
 
-  public AbstractQuadTreeNode(final int level, final double... bounds) {
+  public AbstractQuadTreeNode(final int level, final double minX, final double minY,
+    final double maxX, final double maxY) {
     this.level = level;
-    this.minX = bounds[0];
-    this.minY = bounds[1];
-    this.maxX = bounds[2];
-    this.maxY = bounds[3];
+    this.minX = minX;
+    this.minY = minY;
+    this.maxX = maxX;
+    this.maxY = maxY;
+    this.centreX = (this.minX + this.maxX) / 2;
+    this.centreY = (this.minY + this.maxY) / 2;
   }
 
-  public void add(final QuadTree<T> tree, final double[] bounds, final T item) {
-    if (!changeItem(tree, bounds, item)) {
-      addDo(tree, bounds, item);
-    }
-  }
-
-  protected abstract void addDo(QuadTree<T> tree, double[] bounds, T item);
-
-  protected abstract boolean changeItem(final QuadTree<T> tree, final double[] bounds,
-    final T item);
+  protected abstract boolean add(final QuadTree<T> tree, final double minX, final double minY,
+    final double maxX, final double maxY, final T item);
 
   public void clear() {
     Arrays.fill(this.nodes, null);
   }
 
-  public int depth() {
+  private boolean coversBoundingBox(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    return this.minX <= minX && maxX <= this.maxX && this.minY <= minY && maxY <= this.maxY;
+  }
 
+  public int depth() {
     int depth = 0;
     for (final AbstractQuadTreeNode<T> node : this.nodes) {
       if (node != null) {
@@ -117,19 +70,20 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
     return depth + 1;
   }
 
-  public AbstractQuadTreeNode<T> find(final double[] bounds) {
-    final int subnodeIndex = getSubnodeIndex(getCentreX(), getCentreY(), bounds);
+  protected AbstractQuadTreeNode<T> find(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    final int subnodeIndex = getSubnodeIndex(minX, minY, maxX, maxY);
     if (subnodeIndex == -1) {
       return this;
     }
     final AbstractQuadTreeNode<T> node = this.nodes[subnodeIndex];
     if (node != null) {
-      return node.find(bounds);
+      return node.find(minX, minY, maxX, maxY);
     }
     return this;
   }
 
-  public void forEach(final QuadTree<T> tree, final Consumer<? super T> action) {
+  protected void forEach(final QuadTree<T> tree, final Consumer<? super T> action) {
     forEachItem(tree, action);
 
     for (final AbstractQuadTreeNode<T> node : this.nodes) {
@@ -139,60 +93,51 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
     }
   }
 
-  public void forEach(final QuadTree<T> tree, final double[] bounds,
+  protected void forEach(final QuadTree<T> tree, final double x, final double y,
     final Consumer<? super T> action) {
-    if (isSearchMatch(bounds)) {
-      forEachItem(tree, bounds, action);
-
+    if (isSearchMatch(x, y)) {
+      forEachItem(tree, x, y, action);
       for (final AbstractQuadTreeNode<T> node : this.nodes) {
         if (node != null) {
-          node.forEach(tree, bounds, action);
+          node.forEach(tree, x, y, action);
         }
       }
     }
   }
 
-  protected abstract void forEachItem(QuadTree<T> tree, Consumer<? super T> action);
-
-  protected abstract void forEachItem(final QuadTree<T> tree, final double[] bounds,
-    final Consumer<? super T> action);
-
-  private double getCentreX() {
-    if (isRoot()) {
-      return 0;
-    } else {
-      return (this.minX + this.maxX) / 2;
+  protected void forEach(final QuadTree<T> tree, final double minX, final double minY,
+    final double maxX, final double maxY, final Consumer<? super T> action) {
+    if (isSearchMatch(minX, minY, maxX, maxY)) {
+      forEachItem(tree, minX, minY, maxX, maxY, action);
+      for (final AbstractQuadTreeNode<T> node : this.nodes) {
+        if (node != null) {
+          node.forEach(tree, minX, minY, maxX, maxY, action);
+        }
+      }
     }
   }
 
-  private double getCentreY() {
-    if (isRoot()) {
-      return 0;
-    } else {
-      return (this.minY + this.maxY) / 2;
-    }
+  protected abstract void forEachItem(final QuadTree<T> tree, final Consumer<? super T> action);
+
+  protected void forEachItem(final QuadTree<T> tree, final double x, final double y,
+    final Consumer<? super T> action) {
+    forEachItem(tree, x, y, x, y, action);
   }
+
+  protected abstract void forEachItem(final QuadTree<T> tree, final double minX, double minY,
+    double maxX, double maxY, final Consumer<? super T> action);
 
   public abstract int getItemCount();
 
-  public AbstractQuadTreeNode<T> getNode(final double[] bounds) {
-    final int subnodeIndex = getSubnodeIndex(getCentreX(), getCentreY(), bounds);
-    if (subnodeIndex != -1) {
-      final AbstractQuadTreeNode<T> node = getSubnode(subnodeIndex);
-      return node.getNode(bounds);
-    } else {
+  private AbstractQuadTreeNode<T> getNode(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    final int subnodeIndex = getSubnodeIndex(minX, minY, maxX, maxY);
+    if (subnodeIndex == -1) {
       return this;
+    } else {
+      final AbstractQuadTreeNode<T> node = getSubnode(subnodeIndex);
+      return node.getNode(minX, minY, maxX, maxY);
     }
-  }
-
-  protected int getNodeCount() {
-    int nodeCount = 0;
-    for (final AbstractQuadTreeNode<T> node : this.nodes) {
-      if (node != null) {
-        nodeCount += node.size();
-      }
-    }
-    return nodeCount + 1;
   }
 
   private AbstractQuadTreeNode<T> getSubnode(final int index) {
@@ -206,7 +151,29 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
     return node;
   }
 
-  public boolean hasChildren() {
+  private int getSubnodeIndex(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    int subnodeIndex = -1;
+    if (minX >= this.centreX) {
+      if (minY >= this.centreY) {
+        subnodeIndex = 3;
+      }
+      if (maxY <= this.centreY) {
+        subnodeIndex = 1;
+      }
+    }
+    if (maxX <= this.centreX) {
+      if (minY >= this.centreY) {
+        subnodeIndex = 2;
+      }
+      if (maxY <= this.centreY) {
+        subnodeIndex = 0;
+      }
+    }
+    return subnodeIndex;
+  }
+
+  private boolean hasChildren() {
     for (final AbstractQuadTreeNode<T> node : this.nodes) {
       if (node != null) {
         return true;
@@ -215,25 +182,25 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
     return false;
   }
 
-  protected abstract boolean hasItems();
-
-  private void insertContained(final QuadTree<T> tree, final AbstractQuadTreeNode<T> root,
-    final double[] bounds, final T item) {
-    final boolean isZeroX = IntervalSize.isZeroWidth(bounds[2], bounds[0]);
-    final boolean isZeroY = IntervalSize.isZeroWidth(bounds[3], bounds[1]);
-    AbstractQuadTreeNode<T> node;
-    if (isZeroX || isZeroY) {
-      node = root.find(bounds);
-    } else {
-      node = root.getNode(bounds);
-    }
-    node.add(tree, bounds, item);
+  private boolean hasItems() {
+    return getItemCount() > 0;
   }
 
-  void insertNode(final AbstractQuadTreeNode<T> node) {
-    final double centreX = getCentreX();
-    final double centreY = getCentreY();
-    final int index = getSubnodeIndex(centreX, centreY, node.minX, node.minY, node.maxX, node.maxY);
+  private boolean insertContained(final QuadTree<T> tree, final double minX, final double minY,
+    final double maxX, final double maxY, final T item) {
+    final boolean isZeroX = IntervalSize.isZeroWidth(maxX, minX);
+    final boolean isZeroY = IntervalSize.isZeroWidth(maxY, minY);
+    AbstractQuadTreeNode<T> node;
+    if (isZeroX || isZeroY) {
+      node = find(minX, minY, maxX, maxY);
+    } else {
+      node = getNode(minX, minY, maxX, maxY);
+    }
+    return node.add(tree, minX, minY, maxX, maxY, item);
+  }
+
+  private void insertNode(final AbstractQuadTreeNode<T> node) {
+    final int index = getSubnodeIndex(node.minX, node.minY, node.maxX, node.maxY);
     if (node.level == this.level - 1) {
       this.nodes[index] = node;
     } else {
@@ -243,23 +210,23 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
     }
   }
 
-  protected void insertRoot(final QuadTree<T> tree, final double[] bounds, final T item) {
-    final int index = getSubnodeIndex(0, 0, bounds);
+  protected boolean insertRoot(final QuadTree<T> tree, final double minX, final double minY,
+    final double maxX, final double maxY, final T item) {
+    final int index = getSubnodeIndex(minX, minY, maxX, maxY);
     if (index == -1) {
-      add(tree, bounds, item);
+      return add(tree, minX, minY, maxX, maxY, item);
     } else {
-      final double minX2 = bounds[0];
-      final double minY2 = bounds[1];
-      final double maxX2 = bounds[2];
-      final double maxY2 = bounds[3];
-      final AbstractQuadTreeNode<T>[] nodes = this.nodes;
-      AbstractQuadTreeNode<T> node = nodes[index];
-      if (node == null || !RectangleUtil.covers(node.minX, node.minY, node.maxX, node.maxY, minX2,
-        minY2, maxX2, maxY2)) {
-        node = newNodeExpanded(node, bounds);
-        nodes[index] = node;
+      AbstractQuadTreeNode<T> node = this.nodes[index];
+      if (node == null) {
+        final AbstractQuadTreeNode<T> newNode = newNode(minX, minY, maxX, maxY);
+        this.nodes[index] = newNode;
+        node = newNode;
+      } else if (!node.coversBoundingBox(minX, minY, maxX, maxY)) {
+        final AbstractQuadTreeNode<T> newNode = node.newNodeExpanded(minX, minY, maxX, maxY);
+        this.nodes[index] = newNode;
+        node = newNode;
       }
-      insertContained(tree, node, bounds, item);
+      return node.insertContained(tree, minX, minY, maxX, maxY, item);
     }
   }
 
@@ -276,61 +243,76 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
     return isEmpty;
   }
 
-  public boolean isPrunable() {
+  private boolean isPrunable() {
     return !(hasChildren() || hasItems());
   }
 
-  public boolean isRoot() {
+  private boolean isRoot() {
     return this.level == Integer.MIN_VALUE;
   }
 
-  protected boolean isSearchMatch(final double[] bounds) {
+  private boolean isSearchMatch(final double x, final double y) {
     if (isRoot()) {
       return true;
-    } else if (bounds == null) {
-      return false;
     } else {
-      final double minX2 = bounds[0];
-      final double minY2 = bounds[1];
-      final double maxX2 = bounds[2];
-      final double maxY2 = bounds[3];
-      return !(minX2 > this.maxX || maxX2 < this.minX || minY2 > this.maxY || maxY2 < this.minY);
+      return this.minX <= x && x <= this.maxX && this.minY <= y && y <= this.maxY;
     }
   }
 
-  protected AbstractQuadTreeNode<T> newNode(final double[] bounds) {
-    final double[] newBounds = new double[4];
-    final double minX = bounds[0];
-    final double minY = bounds[1];
-    final double maxX = bounds[2];
-    final double maxY = bounds[3];
-    int level = computeQuadLevel(bounds);
-    setBounds(minX, minY, newBounds, level);
-    while (!RectangleUtil.covers(newBounds[0], newBounds[1], newBounds[2], newBounds[3], minX, minY,
-      maxX, maxY)) {
+  private boolean isSearchMatch(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    if (isRoot()) {
+      return true;
+    } else {
+      return !(minX > this.maxX || maxX < this.minX || minY > this.maxY || maxY < this.minY);
+    }
+  }
+
+  private AbstractQuadTreeNode<T> newNode(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    final double dx = maxX - minX;
+    final double dy = maxY - minY;
+    final double dMax = dx > dy ? dx : dy;
+    int level = DoubleBits.exponent(dMax) + 1;
+
+    double quadSize = DoubleBits.powerOf2(level);
+    double newMinX = Math.floor(minX / quadSize) * quadSize;
+    double newMinY = Math.floor(minY / quadSize) * quadSize;
+    double newMaxX = newMinX + quadSize;
+    double newMaxY = newMinY + quadSize;
+
+    while (!RectangleUtil.covers(newMinX, newMinY, newMaxX, newMaxY, minX, minY, maxX, maxY)) {
       level++;
-      setBounds(minX, minY, newBounds, level);
+      quadSize = DoubleBits.powerOf2(level);
+      newMinX = Math.floor(minX / quadSize) * quadSize;
+      newMinY = Math.floor(minY / quadSize) * quadSize;
+      newMaxX = newMinX + quadSize;
+      newMaxY = newMinY + quadSize;
     }
 
-    return newNode(level, newBounds);
+    return newNode(level, newMinX, newMinY, newMaxX, newMaxY);
   }
 
-  protected abstract AbstractQuadTreeNode<T> newNode(int level, double... newBounds);
+  protected abstract AbstractQuadTreeNode<T> newNode(int level, double minX, final double minY,
+    double maxX, final double maxY);
 
-  public AbstractQuadTreeNode<T> newNodeExpanded(final AbstractQuadTreeNode<T> node, double[] bounds) {
-    bounds = bounds.clone();
-    if (node != null) {
-      RectangleUtil.expand(bounds, 2, 0, node.minX);
-      RectangleUtil.expand(bounds, 2, 0, node.maxX);
-      RectangleUtil.expand(bounds, 2, 1, node.minY);
-      RectangleUtil.expand(bounds, 2, 1, node.maxY);
+  private AbstractQuadTreeNode<T> newNodeExpanded(double minX, double minY, double maxX,
+    double maxY) {
+    if (this.minX < minX) {
+      minX = this.minX;
     }
-
-    final AbstractQuadTreeNode<T> largerNode = newNode(bounds);
-    if (node != null) {
-      largerNode.insertNode(node);
+    if (this.maxX > maxX) {
+      maxX = this.maxX;
     }
-    return largerNode;
+    if (this.minY < minY) {
+      minY = this.minY;
+    }
+    if (this.maxY > maxY) {
+      maxY = this.maxY;
+    }
+    final AbstractQuadTreeNode<T> newNode = newNode(minX, minY, maxX, maxY);
+    newNode.insertNode(this);
+    return newNode;
   }
 
   private AbstractQuadTreeNode<T> newSubnode(final int index) {
@@ -341,8 +323,8 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
     double minY = 0.0;
     double maxY = 0.0;
 
-    final double centreX = getCentreX();
-    final double centreY = getCentreY();
+    final double centreX = this.centreX;
+    final double centreY = this.centreY;
     switch (index) {
       case 0:
         minX = this.minX;
@@ -373,42 +355,33 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
     return node;
   }
 
-  public boolean removeItem(final QuadTree<T> tree, final double[] bounds, final T item) {
+  protected boolean removeItem(final QuadTree<T> tree, final double minX, final double minY,
+    final double maxX, final double maxY, final T item) {
     boolean removed = false;
-    if (isSearchMatch(bounds)) {
-      int nodeIndex = 0;
+    if (isSearchMatch(minX, minY, maxX, maxY)) {
       final AbstractQuadTreeNode<T>[] nodes = this.nodes;
-      for (final AbstractQuadTreeNode<T> node : nodes) {
+      final int nodeCount = nodes.length;
+      for (int i = 0; i < nodeCount; i++) {
+        final AbstractQuadTreeNode<T> node = nodes[i];
         if (node != null) {
-          if (node.removeItem(tree, bounds, item)) {
+          if (node.removeItem(tree, minX, minY, maxX, maxY, item)) {
             if (node.isPrunable()) {
-              nodes[nodeIndex] = null;
+              nodes[i] = null;
             }
             removed = true;
           }
         }
-        nodeIndex++;
       }
       removed |= removeItem(tree, item);
     }
     return removed;
-
   }
 
   protected abstract boolean removeItem(final QuadTree<T> tree, final T item);
 
-  protected int size() {
-    int subSize = 0;
-    for (final AbstractQuadTreeNode<T> node : this.nodes) {
-      if (node != null) {
-        subSize += node.size();
-      }
-    }
-    return subSize + getItemCount();
-  }
-
   @Override
   public String toString() {
-    return Arrays.toString(this.nodes) + "=" + getItemCount();
+    return this.level + " " + BoundingBox.bboxToWkt(this.minX, this.minY, this.maxX, this.maxY)
+      + " " + getItemCount();
   }
 }

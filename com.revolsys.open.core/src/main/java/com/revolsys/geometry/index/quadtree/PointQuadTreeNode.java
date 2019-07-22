@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDouble;
+import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.util.Points;
 
 public class PointQuadTreeNode<T> {
@@ -33,7 +33,7 @@ public class PointQuadTreeNode<T> {
   }
 
   public boolean contains(final Point point) {
-    if (point.equals(this.x, this.y)) {
+    if (point.equalsVertex(this.x, this.y)) {
       return true;
     }
     final boolean xLess = isLessThanX(point.getX());
@@ -67,8 +67,8 @@ public class PointQuadTreeNode<T> {
     final double minY = envelope.getMinY();
     final double maxY = envelope.getMaxY();
     if (envelope.bboxCovers(this.x, this.y)) {
-      final PointDouble coordinates = new PointDouble(this.x, this.y);
-      results.add(new SimpleImmutableEntry<Point, T>(coordinates, this.value));
+      final Point point = new PointDoubleXY(this.x, this.y);
+      results.add(new SimpleImmutableEntry<>(point, this.value));
     }
     final boolean minXLess = isLessThanX(minX);
     final boolean maxXLess = isLessThanX(maxX);
@@ -115,11 +115,11 @@ public class PointQuadTreeNode<T> {
   }
 
   public void findWithin(final List<T> results, final double x, final double y,
-    final double maxDistance, final BoundingBox envelope) {
-    final double minX = envelope.getMinX();
-    final double maxX = envelope.getMaxX();
-    final double minY = envelope.getMinY();
-    final double maxY = envelope.getMaxY();
+    final double maxDistance, final BoundingBox boundingBox) {
+    final double minX = boundingBox.getMinX();
+    final double maxX = boundingBox.getMaxX();
+    final double minY = boundingBox.getMinY();
+    final double maxY = boundingBox.getMaxY();
     final double distance = Points.distance(x, y, this.x, this.y);
     if (distance < maxDistance) {
       results.add(this.value);
@@ -129,16 +129,16 @@ public class PointQuadTreeNode<T> {
     final boolean minYLess = isLessThanY(minY);
     final boolean maxYLess = isLessThanY(maxY);
     if (this.southWest != null && minXLess && minYLess) {
-      this.southWest.findWithin(results, x, y, maxDistance, envelope);
+      this.southWest.findWithin(results, x, y, maxDistance, boundingBox);
     }
     if (this.northWest != null && minXLess && !maxYLess) {
-      this.northWest.findWithin(results, x, y, maxDistance, envelope);
+      this.northWest.findWithin(results, x, y, maxDistance, boundingBox);
     }
     if (this.southEast != null && !maxXLess && minYLess) {
-      this.southEast.findWithin(results, x, y, maxDistance, envelope);
+      this.southEast.findWithin(results, x, y, maxDistance, boundingBox);
     }
     if (this.northEast != null && !maxXLess && !maxYLess) {
-      this.northEast.findWithin(results, x, y, maxDistance, envelope);
+      this.northEast.findWithin(results, x, y, maxDistance, boundingBox);
     }
   }
 

@@ -1,21 +1,12 @@
 package com.revolsys.geometry.index.quadtree;
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.BoundingBoxProxy;
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.util.ExitLoopException;
-import com.revolsys.visitor.CreateListVisitor;
-import com.revolsys.visitor.SingleObjectVisitor;
 
 public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   private static final long serialVersionUID = 1L;
@@ -42,23 +33,17 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
+  private double absoluteMinExtent;
+
   private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
-  private double minExtent = 1.0;
+  private double minExtent = 1;
 
-  private AbstractQuadTreeNode<T> root;
+  private final AbstractQuadTreeNode<T> root;
 
   private int size = 0;
 
   private boolean useEquals = false;
-
-  public QuadTree() {
-    this.root = new QuadTreeNode<>();
-  }
-
-  protected QuadTree(final AbstractQuadTreeNode<T> root) {
-    this.root = root;
-  }
 
   public QuadTree(final GeometryFactory geometryFactory) {
     this(geometryFactory, new QuadTreeNode<>());
@@ -72,27 +57,10 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   public void clear() {
     this.root.clear();
     this.minExtent = 1.0;
+    if (this.minExtent < this.absoluteMinExtent) {
+      this.minExtent = this.absoluteMinExtent;
+    }
     this.size = 0;
-  }
-
-  private void collectStats(final BoundingBox envelope) {
-    final double delX = envelope.getWidth();
-    if (delX < this.minExtent && delX > 0.0) {
-      this.minExtent = delX;
-    }
-
-    final double delY = envelope.getHeight();
-    if (delY < this.minExtent && delY > 0.0) {
-      this.minExtent = delY;
-    }
-  }
-
-  protected double[] convert(final BoundingBoxProxy boundingBoxProxy) {
-    BoundingBox boundingBox = boundingBoxProxy.getBoundingBox();
-    if (this.geometryFactory != null) {
-      boundingBox = boundingBoxProxy.bboxToCs(this.geometryFactory);
-    }
-    return boundingBox.getMinMaxValues(2);
   }
 
   public int depth() {
@@ -110,17 +78,6 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   }
 
   @Override
-  public boolean forEach(final BoundingBoxProxy boundingBox, final Consumer<? super T> action) {
-    try {
-      final double[] bounds = convert(boundingBox);
-      this.root.forEach(this, bounds, action);
-      return true;
-    } catch (final ExitLoopException e) {
-      return false;
-    }
-  }
-
-  @Override
   public boolean forEach(final Consumer<? super T> action) {
     try {
       this.root.forEach(this, action);
@@ -130,31 +87,26 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
   }
 
+  // TODO forEach and remove in one call
+
   @Override
   public boolean forEach(final double x, final double y, final Consumer<? super T> action) {
-    return forEach(new PointDoubleXY(x, y), action);
+    try {
+      this.root.forEach(this, x, y, action);
+      return true;
+    } catch (final ExitLoopException e) {
+      return false;
+    }
   }
 
   @Override
   public boolean forEach(final double minX, final double minY, final double maxX, final double maxY,
     final Consumer<? super T> action) {
-    return forEach(new BoundingBoxDoubleXY(minX, minY, maxX, maxY), action);
-  }
-
-  @Override
-  public T getFirst(final BoundingBox boundingBox, final Predicate<T> filter) {
-    final SingleObjectVisitor<T> visitor = new SingleObjectVisitor<>(filter);
-    forEach(boundingBox, visitor);
-    return visitor.getObject();
-  }
-
-  @Override
-  public T getFirstBoundingBox(final Geometry geometry, final Predicate<T> filter) {
-    if (geometry == null) {
-      return null;
-    } else {
-      final BoundingBox boundingBox = geometry.getBoundingBox();
-      return getFirst(boundingBox, filter);
+    try {
+      this.root.forEach(this, minX, minY, maxX, maxY, action);
+      return true;
+    } catch (final ExitLoopException e) {
+      return false;
     }
   }
 
@@ -170,61 +122,88 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   @Override
   public void insertItem(final BoundingBox boundingBox, final T item) {
-    if (boundingBox == null) {
-      throw new IllegalArgumentException("Item envelope must not be null");
+    final BoundingBox convertedBoundingBox = convertBoundingBox(boundingBox);
+    if (convertedBoundingBox == null || convertedBoundingBox.isEmpty()) {
+      throw new IllegalArgumentException("Item bounding box " + boundingBox
+        + " must not be null or empty in coordinate system: " + getHorizontalCoordinateSystemId());
     } else {
-      double[] bounds = convert(boundingBox);
-      if (bounds != null) {
-        this.size++;
-        collectStats(boundingBox);
-        bounds = ensureExtent(bounds, this.minExtent);
-        this.root.insertRoot(this, bounds, item);
-      }
+      final double minX = convertedBoundingBox.getMinX();
+      final double minY = convertedBoundingBox.getMinY();
+      final double maxX = convertedBoundingBox.getMaxX();
+      final double maxY = convertedBoundingBox.getMaxY();
+
+      insertItem(minX, minY, maxX, maxY, item);
     }
   }
 
-  public final void insertItem(final double minX, final double minY, final double maxX,
-    final double maxY, final T item) {
-    insertItem(BoundingBoxDoubleXY.newBoundingBoxDoubleXY(minX, minY, maxX, maxY), item);
+  public final void insertItem(double minX, double minY, double maxX, double maxY, final T item) {
+    final double deltaX = maxX - minX;
+    if (deltaX == 0) {
+      minX = minX - this.minExtent / 2.0;
+      maxX = minX + this.minExtent / 2.0;
+    } else if (deltaX < this.minExtent) {
+      this.minExtent = deltaX;
+    }
+
+    final double deltaY = maxY - minY;
+    if (deltaY == 0) {
+      minY = minY - this.minExtent / 2.0;
+      maxY = minY + this.minExtent / 2.0;
+    } else if (deltaY < this.minExtent) {
+      this.minExtent = deltaY;
+    }
+
+    if (this.root.insertRoot(this, minX, minY, maxX, maxY, item)) {
+      this.size++;
+    }
   }
 
   public final void insertItem(final double x, final double y, final T item) {
-    insertItem(BoundingBoxDoubleXY.newBoundingBoxDoubleXY(x, y, x, y), item);
-  }
-
-  public List<T> query(final BoundingBox boundingBox, final Predicate<T> filter) {
-    final CreateListVisitor<T> visitor = new CreateListVisitor<>(filter);
-    forEach(boundingBox, visitor);
-    return visitor.getList();
-  }
-
-  public List<T> queryBoundingBox(final Geometry geometry) {
-    if (geometry == null) {
-      return Collections.emptyList();
-    } else {
-      final BoundingBox boundingBox = geometry.getBoundingBox();
-      return getItems(boundingBox);
-    }
+    insertItem(x, y, x, y, item);
   }
 
   @Override
-  public boolean removeItem(final BoundingBox boundingBox, final T item) {
-    double[] bounds = convert(boundingBox);
-    if (bounds != null) {
-      bounds = ensureExtent(bounds, this.minExtent);
-      final boolean removed = this.root.removeItem(this, bounds, item);
-      if (removed) {
-        this.size--;
-      }
-      return removed;
+  public boolean removeItem(BoundingBox boundingBox, final T item) {
+    boundingBox = convertBoundingBox(boundingBox);
+    if (boundingBox != null && !boundingBox.isEmpty()) {
+      final double minX = boundingBox.getMinX();
+      final double minY = boundingBox.getMinY();
+      final double maxX = boundingBox.getMaxX();
+      final double maxY = boundingBox.getMaxY();
+
+      return removeItem(minX, minY, maxX, maxY, item);
     } else {
       return false;
     }
   }
 
+  public boolean removeItem(final double minX, final double minY, final double maxX,
+    final double maxY, final T item) {
+    final boolean removed = this.root.removeItem(this, minX, minY, maxX, maxY, item);
+    if (removed) {
+      this.size--;
+    }
+    return removed;
+  }
+
   @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
-    this.geometryFactory = geometryFactory;
+    if (geometryFactory == null) {
+      this.geometryFactory = GeometryFactory.DEFAULT_2D;
+    } else {
+      this.geometryFactory = geometryFactory;
+    }
+    if (this.geometryFactory.isFloating()) {
+      this.absoluteMinExtent = 0.00000001;
+    } else {
+      this.absoluteMinExtent = this.geometryFactory.getResolutionX();
+      if (this.absoluteMinExtent < 0) {
+        this.absoluteMinExtent = 0.00000001;
+      }
+    }
+    if (this.minExtent < this.absoluteMinExtent) {
+      this.minExtent = this.absoluteMinExtent;
+    }
   }
 
   public void setUseEquals(final boolean useEquals) {
