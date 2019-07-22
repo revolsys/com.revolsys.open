@@ -218,7 +218,7 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
     } else {
       AbstractQuadTreeNode<T> node = this.nodes[index];
       if (node == null) {
-        final AbstractQuadTreeNode<T> newNode = newNode(tree, minX, minY, maxX, maxY);
+        final AbstractQuadTreeNode<T> newNode = newNode(minX, minY, maxX, maxY);
         this.nodes[index] = newNode;
         node = newNode;
       } else if (!node.coversBoundingBox(minX, minY, maxX, maxY)) {
@@ -268,45 +268,33 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
     }
   }
 
-  protected abstract AbstractQuadTreeNode<T> newNode(int level, double minX, final double minY,
-    double maxX, final double maxY);
+  private AbstractQuadTreeNode<T> newNode(final double minX, final double minY, final double maxX,
+    final double maxY) {
+    final double dx = maxX - minX;
+    final double dy = maxY - minY;
+    final double dMax = dx > dy ? dx : dy;
+    int level = DoubleBits.exponent(dMax) + 1;
 
-  private AbstractQuadTreeNode<T> newNode(final QuadTree<T> tree, double minX, double minY,
-    final double maxX, final double maxY) {
-
-    double deltaX = maxX - minX;
-    if (deltaX == 0) {
-      deltaX = tree.getMinExtentTimes2();
-      minX -= tree.getMinExtent();
-    }
-    double deltaY = maxY - minY;
-    if (deltaY == 0) {
-      deltaY = tree.getMinExtentTimes2();
-      minY -= tree.getMinExtent();
-    }
-    int level;
-    if (deltaX > deltaY) {
-      level = DoubleBits.exponent(deltaX);
-    } else {
-      level = DoubleBits.exponent(deltaY);
-    }
     double quadSize = DoubleBits.powerOf2(level);
+    double newMinX = Math.floor(minX / quadSize) * quadSize;
+    double newMinY = Math.floor(minY / quadSize) * quadSize;
+    double newMaxX = newMinX + quadSize;
+    double newMaxY = newMinY + quadSize;
 
-    double newMinX;
-    double newMinY;
-    double newMaxX;
-    double newMaxY;
-    do {
+    while (!RectangleUtil.covers(newMinX, newMinY, newMaxX, newMaxY, minX, minY, maxX, maxY)) {
       level++;
-      quadSize *= 2;
+      quadSize = DoubleBits.powerOf2(level);
       newMinX = Math.floor(minX / quadSize) * quadSize;
       newMinY = Math.floor(minY / quadSize) * quadSize;
       newMaxX = newMinX + quadSize;
       newMaxY = newMinY + quadSize;
-    } while (!RectangleUtil.covers(newMinX, newMinY, newMaxX, newMaxY, minX, minY, maxX, maxY));
+    }
 
     return newNode(level, newMinX, newMinY, newMaxX, newMaxY);
   }
+
+  protected abstract AbstractQuadTreeNode<T> newNode(int level, double minX, final double minY,
+    double maxX, final double maxY);
 
   private AbstractQuadTreeNode<T> newNodeExpanded(final QuadTree<T> tree, double minX, double minY,
     double maxX, double maxY) {
@@ -322,7 +310,7 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
     if (this.maxY > maxY) {
       maxY = this.maxY;
     }
-    final AbstractQuadTreeNode<T> newNode = newNode(tree, minX, minY, maxX, maxY);
+    final AbstractQuadTreeNode<T> newNode = newNode(minX, minY, maxX, maxY);
     newNode.insertNode(this);
     return newNode;
   }

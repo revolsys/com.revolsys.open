@@ -41,7 +41,7 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   private double minExtentTimes2 = 2;
 
-  private AbstractQuadTreeNode<T> root;
+  private final AbstractQuadTreeNode<T> root;
 
   private int size = 0;
 
