@@ -46,6 +46,31 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
  */
 public class HCoordinate {
 
+  public static Point intersection(final double line1x1, final double line1y1, final double line1x2,
+    final double line1y2, final double line2x1, final double line2y1, final double line2x2,
+    final double line2y2) {
+    final double px = line1y1 - line1y2;
+    final double py = line1x2 - line1x1;
+    final double pw = line1x1 * line1y2 - line1x2 * line1y1;
+
+    final double qx = line2y1 - line2y2;
+    final double qy = line2x2 - line2x1;
+    final double qw = line2x1 * line2y2 - line2x2 * line2y1;
+
+    final double x = py * qw - qy * pw;
+    final double y = qx * pw - px * qw;
+    final double w = px * qy - qx * py;
+
+    final double xInt = x / w;
+    final double yInt = y / w;
+
+    if (Double.isFinite(xInt) && Double.isFinite(yInt)) {
+      return new PointDoubleXY(xInt, yInt);
+    } else {
+      throw new NotRepresentableException();
+    }
+  }
+
   /**
    * Computes the (approximate) intersection point between two line segments
    * using homogeneous coordinates.

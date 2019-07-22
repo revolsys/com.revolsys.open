@@ -35,7 +35,6 @@ package com.revolsys.geometry.algorithm;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.segment.Segment;
 
 /**
  * Specifies and implements various fundamental Computational Geometric
@@ -187,26 +186,6 @@ public class CGAlgorithms {
       counterClockwise = disc > 0;
     }
     return counterClockwise;
-  }
-
-  /**
-   * Tests whether a point lies on the line segments defined by a list of
-   * coordinates.
-   *
-   * @return true if the point is a vertex of the line or lies in the interior
-   *         of a line segment in the linestring
-   */
-  public static boolean isOnLine(final Point p, final LineString line) {
-    final LineIntersector lineIntersector = new RobustLineIntersector();
-    for (final Segment segment : line.segments()) {
-      final Point p0 = segment.getPoint(0);
-      final Point p1 = segment.getPoint(1);
-      lineIntersector.computeIntersectionPoints(p, p0, p1);
-      if (lineIntersector.hasIntersection()) {
-        return true;
-      }
-    }
-    return false;
   }
 
   public static boolean isPointInRing(final LineString ring, final double x, final double y) {

@@ -78,11 +78,14 @@ public class MonotoneChainIndexer {
    */
   private int findChainEnd(final Edge edge, final int start) {
     // determine quadrant for chain
-    final int chainQuad = Quadrant.quadrant(edge.getPoint(start), edge.getPoint(start + 1));
+    final int chainQuad = Quadrant.quadrant(edge.getX(start), edge.getY(start),
+      edge.getX(start + 1), edge.getY(start + 1));
     int last = start + 1;
-    while (last < edge.getVertexCount()) {
+    final int vertexCount = edge.getVertexCount();
+    while (last < vertexCount) {
       // compute quadrant for next possible segment in chain
-      final int quad = Quadrant.quadrant(edge.getPoint(last - 1), edge.getPoint(last));
+      final int quad = Quadrant.quadrant(edge.getX(last - 1), edge.getY(last - 1), edge.getX(last),
+        edge.getY(last));
       if (quad != chainQuad) {
         break;
       }
@@ -96,12 +99,12 @@ public class MonotoneChainIndexer {
     int start = 0;
     final List<Integer> startIndexList = new ArrayList<>();
     startIndexList.add(start);
-    final int numPoints = edge.getVertexCount();
+    final int vertexCount = edge.getVertexCount();
     do {
       final int last = findChainEnd(edge, start);
       startIndexList.add(last);
       start = last;
-    } while (start < numPoints - 1);
+    } while (start < vertexCount - 1);
     // copy list to an array of ints, for efficiency
     final int[] startIndex = toIntArray(startIndexList);
     return startIndex;
