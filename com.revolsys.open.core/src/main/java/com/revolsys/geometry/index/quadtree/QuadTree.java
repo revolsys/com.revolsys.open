@@ -39,8 +39,6 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
 
   private double minExtent = 1;
 
-  private double minExtentTimes2 = 2;
-
   private final AbstractQuadTreeNode<T> root;
 
   private int size = 0;
@@ -111,14 +109,6 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
-  }
-
-  public double getMinExtent() {
-    return this.minExtent;
-  }
-
-  public double getMinExtentTimes2() {
-    return this.minExtentTimes2;
   }
 
   @Override
@@ -209,7 +199,6 @@ public class QuadTree<T> implements SpatialIndex<T>, Serializable {
     }
     if (this.minExtent < this.absoluteMinExtent) {
       this.minExtent = this.absoluteMinExtent;
-      this.minExtentTimes2 = this.minExtent * 2;
     }
   }
 
