@@ -7,7 +7,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
   KdTreeTest.class, //
-  QuadtreeTest.class
+  QuadtreeTest.class, //
+  STRtreeTest.class
 })
 public class TreeTestSuite {
 
