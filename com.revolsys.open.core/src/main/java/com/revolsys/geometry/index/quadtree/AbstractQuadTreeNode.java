@@ -453,7 +453,7 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
 
   protected boolean removeItem(final QuadTree<T> tree, final double minX, final double minY,
     final double maxX, final double maxY, final T item) {
-    final boolean removed = false;
+    boolean removed = false;
     if (isSearchMatch(minX, minY, maxX, maxY)) {
       final AbstractQuadTreeNode<T>[] nodes = this.nodes;
       final int nodeCount = nodes.length;
@@ -464,13 +464,11 @@ public abstract class AbstractQuadTreeNode<T> implements Emptyable, Serializable
             if (node.isPrunable()) {
               nodes[i] = null;
             }
-            return true;
+            removed = true;
           }
         }
       }
-      if (removeItem(tree, item)) {
-        return true;
-      }
+      removed |= removeItem(tree, item);
     }
     return removed;
   }
