@@ -255,16 +255,37 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
   @Override
   @PreDestroy
   public void close() {
-    this.edgePropertiesById.clear();
-    this.edgeIds.clear();
-    // TODO edgeIndex
-    this.edgeLinesById.clear();
-    this.edgeObjectsById.clear();
-    this.edgesById.clear();
+    if (this.edgeIds != null) {
+      this.edgeIds.clear();
+    }
+    if (this.edgeIndex != null) {
+      this.edgeIndex.clear();
+    }
+    if (this.edgeLinesById != null) {
+      this.edgeLinesById.clear();
+    }
+    if (this.edgeObjectsById != null) {
+      this.edgeObjectsById.clear();
+    }
+    if (this.edgePropertiesById != null) {
+      this.edgePropertiesById.clear();
+    }
+    if (this.edgesById != null) {
+      this.edgesById.clear();
+    }
 
-    // TODO nodeIndex.clear();
-    this.nodePropertiesById.clear();
-    this.nodesIdsByPoint.clear();
+    if (this.nodeIndex != null) {
+      this.nodeIndex.clear();
+    }
+    if (this.nodePropertiesById != null) {
+      this.nodePropertiesById.clear();
+    }
+    if (this.nodesById != null) {
+      this.nodesById.clear();
+    }
+    if (this.nodesIdsByPoint != null) {
+      this.nodesIdsByPoint.clear();
+    }
   }
 
   public boolean contains(final Edge<T> edge) {
