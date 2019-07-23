@@ -15,7 +15,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.util.Debug;
 
 public class ImageProjector {
 
@@ -145,14 +144,12 @@ public class ImageProjector {
   }
 
   private static double[] solve(final double[][] matrix, final double[] b) {
-    // final int[] indices not required as triangle normalized
     final double[] x = new double[3];
     for (int k = 0; k < 2; k++) {
       final int indexK = k;
       for (int i = k + 1; i < 3; i++) {
         final int indexI = i;
         b[indexI] -= matrix[indexI][k] * b[indexK];
-        // matrix[indices[i]][k] * b[indices[k]];
       }
     }
     final int indexLast = 2;
@@ -163,11 +160,9 @@ public class ImageProjector {
       double sum = b[index];
       for (int j = i + 1; j < 3; j++) {
         sum = sum - matrix[index][j] * x[j];
-        // sum -matrix[indices[i]][j] * x[j];
       }
       x[i] = sum / matrix[index][i];
 
-      // matrix[indices[i]][i];
     }
     return x;
   }
@@ -177,8 +172,6 @@ public class ImageProjector {
   private final BufferedImage sourceBufferdImage;
 
   private BufferedGeoreferencedImage targetImage;
-
-  private final ImageProjectorTriangle sourceTriangle = new ImageProjectorTriangle();
 
   private final ImageProjectorTriangle targetTriangle = new ImageProjectorTriangle();
 
@@ -206,6 +199,8 @@ public class ImageProjector {
 
   private final BoundingBox sourceBoundingBox;
 
+  private final int step = 50;
+
   private final BoundingBox targetBoundingBox;
 
   private int targetImageWidth;
@@ -229,8 +224,8 @@ public class ImageProjector {
 
     final int imageWidth = this.sourceImage.getImageWidth();
     final int imageHeight = this.sourceImage.getImageHeight();
-    this.gridWidth = 10;// (int)Math.ceil(imageWidth / (double)this.step);
-    this.gridHeight = 10;// (int)Math.ceil(imageHeight / (double)this.step);
+    this.gridWidth = (int)Math.ceil(imageWidth / (double)this.step);
+    this.gridHeight = (int)Math.ceil(imageHeight / (double)this.step);
 
     this.sourceXGrid = new SourceXGrid();
     this.sourceYGrid = new SourceYGrid();
@@ -259,14 +254,10 @@ public class ImageProjector {
         operation.perform(point);
         final double targetPercentX = (point.x - targetMinX) / targetWidth;
         final double targetPercentY = (targetMaxY - point.y) / targetHeight;
-        if (targetPercentX > 1) {
-          Debug.noOp();
-        }
         this.targetXGrid.setValue(gridX, gridY, targetPercentX);
         this.targetYGrid.setValue(gridX, gridY, targetPercentY);
       }
     }
-    Debug.noOp();
   }
 
   public void drawImage(final Graphics2D graphics) {
@@ -292,48 +283,6 @@ public class ImageProjector {
         drawTriangle(imageX2, imageY, imageX, imageY2, imageX2, imageY2);
       }
     }
-    graphics.setClip(clip);
-
-    // this.g2.setColor(WebColors.Blue);
-    // this.g2.drawRect(0, 0, this.targetImageWidth - 1, this.targetImageHeight
-    // - 1);
-
-    final int gridWidth = this.gridWidth;
-    final int gridHeight = this.gridHeight;
-
-    // final GeneralPath path = new GeneralPath();
-    //
-    // final double x1 = this.targetXGrid.getValue(0, 0) *
-    // this.targetImageWidth;
-    // final double y1 = this.targetYGrid.getValue(0, 0) *
-    // this.targetImageHeight;
-    //
-    // path.moveTo(x1, y1);
-    // for (int i = 1; i <= gridWidth; i++) {
-    // lineTo(path, i, 0);
-    // }
-    // for (int i = 1; i <= gridHeight; i++) {
-    // lineTo(path, 10, i);
-    // }
-    // for (int i = gridWidth - 1; i >= 0; i--) {
-    // lineTo(path, i, 10);
-    // }
-    // for (int i = gridHeight - 1; i >= 0; i--) {
-    // lineTo(path, 0, i);
-    // }
-    //
-    // this.g2.setColor(WebColors.Red);
-    // this.g2.draw(path);
-
-    // gridWidth = 1;
-    // gridHeight = 1;
-    // for (int gridY = 0; gridY < gridHeight; gridY++) {
-    // for (int gridX = 0; gridX < gridWidth; gridX++) {
-    // drawTriangle2(gridX + 1, gridY, gridX, gridY + 1, gridX, gridY);
-    // drawTriangle2(gridX + 1, gridY, gridX, gridY + 1, gridX + 1, gridY + 1);
-    // }
-    // }
-
     graphics.setClip(clip);
   }
 
