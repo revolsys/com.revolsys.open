@@ -6,6 +6,7 @@ import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
@@ -17,10 +18,92 @@ import com.revolsys.geometry.model.Point;
 
 public class ImageProjector {
 
-  private static int[] gauss(final double[][] matrix) {
-    final int[] indeces = {
-      0, 1, 2
-    };
+  private static interface Grid {
+    double getValue(int x, int y);
+  }
+
+  private class SourceXGrid implements Grid {
+    private final double[] percents = new double[ImageProjector.this.gridWidth + 1];
+
+    private SourceXGrid() {
+      final double max = ImageProjector.this.gridWidth;
+      for (int i = 0; i < this.percents.length; i++) {
+        this.percents[i] = i / max;
+      }
+    }
+
+    private double getValue(final int x) {
+      return this.percents[x];
+    }
+
+    @Override
+    public double getValue(final int x, final int y) {
+      return this.percents[x];
+    }
+
+    @Override
+    public String toString() {
+      return Arrays.toString(this.percents);
+    }
+  }
+
+  private class SourceYGrid implements Grid {
+    private final double[] percents = new double[ImageProjector.this.gridHeight + 1];
+
+    private SourceYGrid() {
+      final double max = ImageProjector.this.gridHeight;
+      for (int i = 0; i < this.percents.length; i++) {
+        this.percents[i] = i / max;
+      }
+    }
+
+    private double getValue(final int y) {
+      return this.percents[y];
+    }
+
+    @Override
+    public double getValue(final int x, final int y) {
+      return this.percents[y];
+    }
+
+    @Override
+    public String toString() {
+      return Arrays.toString(this.percents);
+    }
+  }
+
+  private class TargetGrid implements Grid {
+    private final double[][] percentRows;
+
+    private TargetGrid() {
+      final double[][] grid = new double[ImageProjector.this.gridHeight + 1][];
+      for (int i = 0; i < grid.length; i++) {
+        grid[i] = new double[ImageProjector.this.gridWidth + 1];
+      }
+      this.percentRows = grid;
+    }
+
+    @Override
+    public double getValue(final int x, final int y) {
+      return this.percentRows[y][x];
+    }
+
+    private void setValue(final int x, final int y, final double value) {
+      this.percentRows[y][x] = value;
+    }
+
+    @Override
+    public String toString() {
+      final StringBuilder string = new StringBuilder();
+      for (final double[] percents : this.percentRows) {
+        string.append(Arrays.toString(percents));
+        string.append("\n");
+      }
+      return string.toString();
+    }
+  }
+
+  private static void gauss(final double[][] matrix) {
     final double[] scalingFactor = new double[3];
     for (int i = 0; i < 3; i++) {
       scalingFactor[i] = maxAbs(matrix[i]);
@@ -31,21 +114,15 @@ public class ImageProjector {
       --j;
       double maxR = 0;
       for (int i = k; i < 3; i++) {
-        final int indexI = indeces[i];
-        final double r = Math.abs(matrix[indexI][k] / scalingFactor[indexI]);
+        final double r = Math.abs(matrix[i][k] / scalingFactor[i]);
         if (r > maxR) {
           maxR = r;
           j = i;
         }
       }
-      final int temp = indeces[j];
-      indeces[j] = indeces[k];
-      indeces[k] = temp;
-      final int indexK = indeces[k];
-      final double[] rowK = matrix[indexK];
+      final double[] rowK = matrix[k];
       for (int i = k + 1; i < 3; i++) {
-        final int indexI = indeces[i];
-        final double[] rowI = matrix[indexI];
+        final double[] rowI = matrix[i];
         final double xmult = rowI[k] / rowK[k];
         rowI[k] = xmult;
         for (j = k + 1; j < 3; j++) {
@@ -53,7 +130,6 @@ public class ImageProjector {
         }
       }
     }
-    return indeces;
   }
 
   private static double maxAbs(final double[] values) {
@@ -67,25 +143,26 @@ public class ImageProjector {
     return max;
   }
 
-  private static double[] solve(final double[][] matrix, final int[] indices, final double[] b) {
+  private static double[] solve(final double[][] matrix, final double[] b) {
     final double[] x = new double[3];
     for (int k = 0; k < 2; k++) {
-      final int indexK = indices[k];
+      final int indexK = k;
       for (int i = k + 1; i < 3; i++) {
-        final int indexI = indices[i];
+        final int indexI = i;
         b[indexI] -= matrix[indexI][k] * b[indexK];
       }
     }
-    final int indexLast = indices[2];
+    final int indexLast = 2;
     x[2] = b[indexLast] / matrix[indexLast][2];
 
     for (int i = 1; i >= 0; --i) {
-      final int index = indices[i];
+      final int index = i;
       double sum = b[index];
       for (int j = i + 1; j < 3; j++) {
         sum = sum - matrix[index][j] * x[j];
       }
       x[i] = sum / matrix[index][i];
+
     }
     return x;
   }
@@ -96,13 +173,11 @@ public class ImageProjector {
 
   private BufferedGeoreferencedImage targetImage;
 
-  private final ImageProjectorTriangle sourceTriangle = new ImageProjectorTriangle();
-
   private final ImageProjectorTriangle targetTriangle = new ImageProjectorTriangle();
 
   private final CoordinatesOperationPoint point = new CoordinatesOperationPoint();
 
-  private CoordinatesOperation operation;
+  private final CoordinatesOperation operation;
 
   private Graphics2D g2;
 
@@ -110,69 +185,135 @@ public class ImageProjector {
 
   private final AffineTransform transform = new AffineTransform();
 
+  private final SourceXGrid sourceXGrid;
+
+  private final SourceYGrid sourceYGrid;
+
+  private final TargetGrid targetXGrid;
+
+  private final TargetGrid targetYGrid;
+
+  private final int gridWidth;
+
+  private final int gridHeight;
+
+  private final BoundingBox sourceBoundingBox;
+
   private final int step = 50;
+
+  private final BoundingBox targetBoundingBox;
+
+  private int targetImageWidth;
+
+  private int targetImageHeight;
 
   public ImageProjector(final GeoreferencedImage sourceImage,
     final GeometryFactoryProxy targetGeometryFactory) {
     this.sourceImage = sourceImage;
+    this.sourceBoundingBox = sourceImage.getBoundingBox();
     this.sourceBufferdImage = sourceImage.getBufferedImage();
-    setTargetGeometryFactory(targetGeometryFactory);
+
+    if (targetGeometryFactory == null) {
+      this.targetGeometryFactory = GeometryFactory.DEFAULT_2D;
+    } else {
+      this.targetGeometryFactory = targetGeometryFactory.getGeometryFactory();
+    }
+
+    this.operation = this.sourceImage.getCoordinatesOperation(targetGeometryFactory);
+    this.targetBoundingBox = this.sourceBoundingBox.bboxToCs(this.targetGeometryFactory);
+
+    final int imageWidth = this.sourceImage.getImageWidth();
+    final int imageHeight = this.sourceImage.getImageHeight();
+    this.gridWidth = (int)Math.ceil(imageWidth / (double)this.step);
+    this.gridHeight = (int)Math.ceil(imageHeight / (double)this.step);
+
+    this.sourceXGrid = new SourceXGrid();
+    this.sourceYGrid = new SourceYGrid();
+    this.targetXGrid = new TargetGrid();
+    this.targetYGrid = new TargetGrid();
+
+    final CoordinatesOperationPoint point = this.point;
+    final double sourceMinX = this.sourceBoundingBox.getMinX();
+    final double sourceMaxY = this.sourceBoundingBox.getMaxY();
+    final double sourceWidth = this.sourceBoundingBox.getWidth();
+    final double sourceHeight = this.sourceBoundingBox.getHeight();
+
+    final double targetMinX = this.targetBoundingBox.getMinX();
+    final double targetMaxY = this.targetBoundingBox.getMaxY();
+    final double targetWidth = this.targetBoundingBox.getWidth();
+    final double targetHeight = this.targetBoundingBox.getHeight();
+
+    final CoordinatesOperation operation = this.operation;
+    for (int gridY = 0; gridY <= this.gridHeight; gridY++) {
+      final double yPercent = this.sourceYGrid.getValue(gridY);
+      final double sourceY = sourceMaxY - yPercent * sourceHeight;
+      for (int gridX = 0; gridX <= this.gridWidth; gridX++) {
+        final double xPercent = this.sourceXGrid.getValue(gridX);
+        final double sourceX = sourceMinX + xPercent * sourceWidth;
+        point.setPoint(sourceX, sourceY);
+        operation.perform(point);
+        final double targetPercentX = (point.x - targetMinX) / targetWidth;
+        final double targetPercentY = (targetMaxY - point.y) / targetHeight;
+        this.targetXGrid.setValue(gridX, gridY, targetPercentX);
+        this.targetYGrid.setValue(gridX, gridY, targetPercentY);
+      }
+    }
   }
 
   public void drawImage(final Graphics2D graphics) {
     this.g2 = graphics;
 
     graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
-      RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+      RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+
     final Shape clip = graphics.getClip();
 
     final int imageWidth = this.sourceImage.getImageWidth();
     final int imageHeight = this.sourceImage.getImageHeight();
 
-    final int step = this.step;
-    for (int imageY = 0; imageY < imageHeight; imageY += step) {
-      final int imageY2 = Math.min(imageHeight - 1, imageY + step);
-      for (int imageX = 0; imageX < imageWidth; imageX += step) {
-        final int imageX2 = Math.min(imageWidth - 1, imageX + step);
-        drawTriangle(imageX, imageY, imageX2, imageY, imageX, imageY2);
-        drawTriangle(imageX, imageY2, imageX2, imageY, imageX2, imageY2);
+    final double gridCellWidth = imageWidth / 10.0;
+    final double gridCellHeight = imageHeight / 10.0;
+    for (int gridY = 0; gridY < 10; gridY++) {
+      final double imageY = gridY * gridCellHeight;
+      final double imageY2 = imageY + gridCellHeight;
+      for (int gridX = 0; gridX < 10; gridX++) {
+        final double imageX = gridX * gridCellWidth;
+        final double imageX2 = imageX + gridCellWidth;
+        drawTriangle(imageX2, imageY, imageX, imageY2, imageX, imageY);
+        drawTriangle(imageX2, imageY, imageX, imageY2, imageX2, imageY2);
       }
     }
     graphics.setClip(clip);
   }
 
-  private void drawTriangle(final int x1, final int y1, final int x2, final int y2, final int x3,
-    final int y3) {
-    final ImageProjectorTriangle sourceTriangle = this.sourceTriangle;
-    sourceTriangle.setCorners(x1, y1, x2, y2, x3, y3);
+  private void drawTriangle(final double x1, final double y1, final double x2, final double y2,
+    final double x3, final double y3) {
     final GeoreferencedImage sourceImage = this.sourceImage;
     final ImageProjectorTriangle targetTriangle = this.targetTriangle;
-    for (int i = 0; i < 3; i++) {
-      final double imageX = sourceTriangle.getX(i);
-      final double imageY = sourceTriangle.getY(i);
-      final CoordinatesOperationPoint point = this.point;
-      sourceImage.copyModelPoint(point, imageX, imageY);
-      this.operation.perform(point);
-      this.targetImage.toImagePoint(point);
-      final double targetImageX = point.x;
-      final double targetImageY = point.y;
-      targetTriangle.setPoint(i, targetImageX, targetImageY);
-    }
+    final CoordinatesOperationPoint point = this.point;
+    final CoordinatesOperation operation = this.operation;
+    final BufferedGeoreferencedImage targetImage = this.targetImage;
+    targetTriangle.setCorner(0, sourceImage, x1, y1, point, operation, targetImage);
+    targetTriangle.setCorner(1, sourceImage, x2, y2, point, operation, targetImage);
+    targetTriangle.setCorner(2, sourceImage, x3, y3, point, operation, targetImage);
 
-    final double[][] a = new double[3][3];
-    for (int i = 0; i < 3; ++i) {
-      a[i][0] = sourceTriangle.getX(i);
-      a[i][1] = sourceTriangle.getY(i);
-      a[i][2] = 1.0;
-    }
+    final double[][] a = new double[][] {
+      {
+        x1, y1, 1
+      }, {
+        x2, y2, 1
+      }, {
+        x3, y3, 1
+      }
+    };
 
-    final int l[] = gauss(a);
+    gauss(a);
 
     final double[] bx = targetTriangle.xCoordinates.clone();
-    final double[] x = solve(a, l, bx);
+    final double[] x = solve(a, bx);
 
     final double[] by = targetTriangle.yCoordinates.clone();
-    final double[] y = solve(a, l, by);
+    final double[] y = solve(a, by);
 
     this.transform.setTransform(x[0], y[0], x[1], y[1], x[2], y[2]);
     final Graphics2D g2 = this.g2;
@@ -194,9 +335,7 @@ public class ImageProjector {
   }
 
   public GeoreferencedImage newImage() {
-    final BoundingBox sourceBoundingBox = this.sourceImage.getBoundingBox();
-
-    final BoundingBox targetBoundingBox = sourceBoundingBox.bboxToCs(this.targetGeometryFactory);
+    final BoundingBox sourceBoundingBox = this.sourceBoundingBox;
     final Point p1 = sourceBoundingBox.getCornerPoint(0).convertPoint2d(this.targetGeometryFactory);
     final Point p2 = sourceBoundingBox.getCornerPoint(1).convertPoint2d(this.targetGeometryFactory);
     final Point p3 = sourceBoundingBox.getCornerPoint(2).convertPoint2d(this.targetGeometryFactory);
@@ -214,13 +353,15 @@ public class ImageProjector {
     final double height2 = p2.distancePoint(p3);
     final double targetResolutionY = getResolution(sourceHeight, height1, height2);
 
+    final BoundingBox targetBoundingBox = this.targetBoundingBox;
     final double width = targetBoundingBox.getWidth();
     final double height = targetBoundingBox.getHeight();
-    final int targetImageWidth = (int)(width / targetResolutionX);
+    this.targetImageWidth = (int)(width / targetResolutionX);
 
-    final int targetImageHeight = (int)(height / targetResolutionY);
-    this.targetImage = BufferedGeoreferencedImage.newImage(targetBoundingBox, targetImageWidth,
-      targetImageHeight);
+    this.targetImageHeight = (int)(height / targetResolutionY);
+
+    this.targetImage = BufferedGeoreferencedImage.newImage(targetBoundingBox, this.targetImageWidth,
+      this.targetImageHeight);
     final Graphics2D graphics = this.targetImage.getBufferedImage().createGraphics();
     try {
       drawImage(graphics);
@@ -230,14 +371,16 @@ public class ImageProjector {
     return this.targetImage;
   }
 
-  public void setTargetGeometryFactory(final GeometryFactoryProxy targetGeometryFactory) {
-    if (targetGeometryFactory == null) {
-      this.targetGeometryFactory = GeometryFactory.DEFAULT_2D;
-    } else {
-      this.targetGeometryFactory = targetGeometryFactory.getGeometryFactory();
-    }
-
-    this.operation = this.sourceImage.getCoordinatesOperation(targetGeometryFactory);
+  public void setCorner(final ImageProjectorTriangle targetTriangle, final int i,
+    final GeoreferencedImage sourceImage, final double imageX, final double imageY,
+    final CoordinatesOperationPoint point, final CoordinatesOperation operation,
+    final BufferedGeoreferencedImage targetImage) {
+    sourceImage.copyModelPoint(point, imageX, imageY);
+    operation.perform(point);
+    targetImage.toImagePoint(point);
+    final double targetImageX = point.x;
+    final double targetImageY = point.y;
+    targetTriangle.setPoint(i, targetImageX, targetImageY);
   }
 
 }
