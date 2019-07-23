@@ -163,7 +163,7 @@
       <artifactId>commons-collections4</artifactId>
       <version>4.2</version>
     </dependency>
-     <dependency>
+    <dependency>
       <groupId>org.docx4j</groupId>
       <artifactId>docx4j-JAXB-MOXy</artifactId>
       <scope>provided</scope>
