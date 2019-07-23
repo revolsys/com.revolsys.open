@@ -314,15 +314,11 @@ public class ImageProjector {
 
     final double[] by = targetTriangle.yCoordinates.clone();
     final double[] y = solve(a, by);
-    // System.out.println(Arrays.toString(x));
-    // System.out.println(Arrays.toString(y));
 
     this.transform.setTransform(x[0], y[0], x[1], y[1], x[2], y[2]);
     final Graphics2D g2 = this.g2;
     g2.setClip(targetTriangle);
     g2.drawImage(this.sourceBufferdImage, this.transform, null);
-    // g2.setColor(WebColors.Black);
-    // g2.draw(targetTriangle);
   }
 
   private double getResolution(final double originalDistance, final double distance1,
@@ -347,14 +343,14 @@ public class ImageProjector {
 
     final double sourceResolutionX = this.sourceImage.getResolutionX();
     final double sourceWidth = sourceBoundingBox.getWidth() / sourceResolutionX;
-    final double width1 = p1.distance(p2);
-    final double width2 = p3.distance(p4);
+    final double width1 = p1.distancePoint(p2);
+    final double width2 = p3.distancePoint(p4);
     final double targetResolutionX = getResolution(sourceWidth, width1, width2);
 
     final double sourceResolutionY = this.sourceImage.getResolutionY();
     final double sourceHeight = sourceBoundingBox.getHeight() / sourceResolutionY;
-    final double height1 = p1.distance(p4);
-    final double height2 = p2.distance(p3);
+    final double height1 = p1.distancePoint(p4);
+    final double height2 = p2.distancePoint(p3);
     final double targetResolutionY = getResolution(sourceHeight, height1, height2);
 
     final BoundingBox targetBoundingBox = this.targetBoundingBox;
