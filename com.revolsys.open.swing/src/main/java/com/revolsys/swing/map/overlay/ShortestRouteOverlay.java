@@ -68,21 +68,29 @@ public class ShortestRouteOverlay extends AbstractOverlay {
   private static final MarkerStyle STYLE_VERTICES = MarkerStyle.marker("circle", 8,
     WebColors.DarkMagenta, 1, WebColors.Pink);
 
+  private static ShortestRouteOverlay getOverlay(final AbstractRecordLayer layer) {
+    final MapPanel map = layer.getMapPanel();
+    final ShortestRouteOverlay shortestRouteOverlay = map.getMapOverlay(ShortestRouteOverlay.class);
+    return shortestRouteOverlay;
+  }
+
   public static void initMenuItems(final AbstractRecordLayer layer, final LayerRecordMenu menu) {
     if (isLayerApplicable(layer)) {
-      final MapPanel map = layer.getMapPanel();
-      final ShortestRouteOverlay shortestRouteOverlay = map
-        .getMapOverlay(ShortestRouteOverlay.class);
 
       menu.addMenuItem("route", "Route From Record", "route_from", (final LayerRecord record) -> {
+        final ShortestRouteOverlay shortestRouteOverlay = getOverlay(layer);
         final int updateIndex = shortestRouteOverlay.setRecord1Index.incrementAndGet();
         shortestRouteOverlay.setRecord1(record, updateIndex);
       });
 
-      final Predicate<LayerRecord> routeMode = record -> shortestRouteOverlay.isHasRecord1();
+      final Predicate<LayerRecord> routeMode = record -> {
+        final ShortestRouteOverlay shortestRouteOverlay = getOverlay(layer);
+        return shortestRouteOverlay.isHasRecord1();
+      };
 
       menu.addMenuItem("route", "Route To Record", "route_to", routeMode,
         (final LayerRecord record) -> {
+          final ShortestRouteOverlay shortestRouteOverlay = getOverlay(layer);
           final int updateIndex = shortestRouteOverlay.setRecord2Index.incrementAndGet();
           shortestRouteOverlay.setRecord2(record, updateIndex);
         });
