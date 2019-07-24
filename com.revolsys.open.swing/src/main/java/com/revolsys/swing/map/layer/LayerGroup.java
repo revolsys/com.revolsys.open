@@ -650,7 +650,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     importProjectLayers(importProject, false);
   }
 
-  protected boolean importProject(final Project rootProject, final Resource resource,
+  public boolean importProject(final Project rootProject, final Resource resource,
     final boolean resetProject) {
     if (resetProject) {
       reset();
