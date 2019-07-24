@@ -839,8 +839,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   }
 
   protected void modeEditGeometryVerticesClear() {
-    clearOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES);
-    clearMouseOverLocations();
+    if (clearOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES)) {
+      clearMouseOverLocations();
+    }
     this.editGeometryVerticesStart = false;
   }
 
@@ -933,11 +934,13 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   }
 
   protected void modeMoveGeometryClear() {
-    clearOverlayAction(ACTION_MOVE_GEOMETRY);
+    final boolean cleared = clearOverlayAction(ACTION_MOVE_GEOMETRY);
     this.moveGeometryStart = null;
     this.moveGeometryEnd = null;
     this.moveGeometryLocations = null;
-    clearMouseOverLocations();
+    if (cleared) {
+      clearMouseOverLocations();
+    }
   }
 
   protected boolean modeMoveGeometryDrag(final MouseEvent event) {

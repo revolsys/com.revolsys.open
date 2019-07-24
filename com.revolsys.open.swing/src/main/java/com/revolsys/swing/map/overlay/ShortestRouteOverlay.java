@@ -356,7 +356,7 @@ public class ShortestRouteOverlay extends AbstractOverlay {
   }
 
   public void setRecord2(final LayerRecord record2, final int updateIndex) {
-    if (this.record2 == null) {
+    if (record2 == null) {
       Toolkit.getDefaultToolkit().beep();
     } else if (updateIndex == this.setRecord2Index.get()) {
       final Geometry geometry2 = record2.getGeometry();
