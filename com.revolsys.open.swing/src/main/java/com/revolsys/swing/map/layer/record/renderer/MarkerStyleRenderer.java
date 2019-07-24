@@ -95,7 +95,8 @@ public class MarkerStyleRenderer extends AbstractGeometryRecordLayerRenderer {
         for (final LayerRecord record : view.cancellable(records)) {
           if (isVisible(record)) {
             final Geometry geometry = record.getGeometry();
-            renderer.renderMarkerGeometry(geometry);
+            final Geometry viewGeometry = view.convertGeometry(geometry, 2);
+            renderer.renderMarkerGeometry(viewGeometry);
           }
         }
       }
