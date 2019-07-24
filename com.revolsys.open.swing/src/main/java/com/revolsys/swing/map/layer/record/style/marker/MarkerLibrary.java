@@ -88,7 +88,7 @@ public class MarkerLibrary extends MarkerGroup {
         // ShapeMarker.init();
         GeometryMarker.init();
         try {
-          final ClassLoader classLoader = MapObjectFactoryRegistry.class.getClassLoader();
+          final ClassLoader classLoader = MarkerLibrary.class.getClassLoader();
           final String resourceName = "META-INF/" + MarkerLibrary.class.getName() + ".json";
           final Enumeration<URL> resources = classLoader.getResources(resourceName);
           while (resources.hasMoreElements()) {
@@ -97,11 +97,11 @@ public class MarkerLibrary extends MarkerGroup {
               final MarkerLibrary library = MapObjectFactory.toObject(url);
               addLibrary(library);
             } catch (final Throwable e) {
-              Logs.error(MapObjectFactoryRegistry.class, "Unable to read resource" + url, e);
+              Logs.error(MarkerLibrary.class, "Unable to read resource" + url, e);
             }
           }
         } catch (final Throwable e) {
-          Logs.error(MapObjectFactoryRegistry.class, "Unable to read resources", e);
+          Logs.error(MarkerLibrary.class, "Unable to read resources", e);
         }
       }
     }
