@@ -68,6 +68,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.swing.Panels;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.TabbedPane;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
@@ -190,7 +191,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
 
   private final Map<Integer, Set<String>> tabInvalidFieldMap = new TreeMap<>();
 
-  private JTabbedPane tabs = new JTabbedPane();
+  private TabbedPane tabs = new TabbedPane();
 
   private ToolBar toolBar;
 
@@ -788,12 +789,17 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     return this.fieldErrors;
   }
 
-  public String getFieldName(Component field) {
+  public String getFieldName(Component component) {
     String fieldName = null;
     do {
-      fieldName = this.fieldToNameMap.get(field);
-      field = field.getParent();
-    } while (fieldName == null && field != null);
+      if (component instanceof Field) {
+        final Field field = (Field)component;
+        fieldName = this.fieldToNameMap.get(field);
+        component = component.getParent();
+      } else {
+        return fieldName;
+      }
+    } while (fieldName == null && component != null);
     return fieldName;
   }
 
@@ -1434,6 +1440,13 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     }
   }
 
+  public final void setTabColor(final String tabTitle, final Color foregroundColor) {
+    Invoke.later(() -> {
+      final int index = this.tabs.getTabIndexByTitle(tabTitle);
+      setTabColor(index, foregroundColor);
+    });
+  }
+
   public final void setValues(final Map<String, Object> values) {
     if (values != null) {
       Invoke.later(() -> {
@@ -1559,7 +1572,6 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
       if (requiredFieldNames.contains(fieldName)) {
         boolean run = true;
         if (this.record.getState() == RecordState.NEW) {
-          final RecordDefinition recordDefinition2 = getRecordDefinition();
           if (this.recordDefinition.isIdField(fieldName)) {
             run = false;
           }

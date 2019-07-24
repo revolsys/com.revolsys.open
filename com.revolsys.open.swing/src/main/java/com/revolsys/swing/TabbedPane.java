@@ -57,4 +57,15 @@ public class TabbedPane extends JTabbedPane {
     final Icon icon = Icons.getIcon(iconName);
     return addTab(icon, toolTipText, component, useScrollPane);
   }
+
+  public int getTabIndexByTitle(final String title) {
+    final int tabCount = getTabCount();
+    for (int i = 0; i < tabCount; i++) {
+      final String tabTitle = getTitleAt(i);
+      if (tabTitle.equals(title)) {
+        return i;
+      }
+    }
+    return -1;
+  }
 }
