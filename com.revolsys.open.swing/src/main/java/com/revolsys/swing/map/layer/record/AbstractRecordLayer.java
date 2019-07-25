@@ -153,6 +153,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     PREFERENCE_PATH, "confirmDeleteRecords", DataTypes.BOOLEAN, false)//
       .setCategoryTitle("Layers");
 
+  public static final PreferenceKey PREFERENCE_SHOW_ALL_RECORDS_ON_FILTER = new PreferenceKey(
+    PREFERENCE_PATH, "showAllRecordViewOnFilter", DataTypes.BOOLEAN, true)//
+      .setCategoryTitle("Layers");
+
   public static final String RECORD_CACHE_MODIFIED = "recordCacheModified";
 
   public static final String RECORD_DELETED_PERSISTED = "recordDeletedPersisted";
@@ -228,6 +232,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       menu.addMenuItem("layer", 0, "Layer Style", "palette", AbstractRecordLayer::isHasGeometry,
         (final AbstractRecordLayer layer) -> layer.showProperties("Style"), false);
 
+      PreferenceFields.addField("com.revolsys.gis", PREFERENCE_SHOW_ALL_RECORDS_ON_FILTER);
       PreferenceFields.addField("com.revolsys.gis", PREFERENCE_CONFIRM_DELETE_RECORDS);
     });
   }
@@ -2060,6 +2065,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public boolean isSelected(final LayerRecord record) {
     return isRecordCached(this.cacheIdSelected, record);
+  }
+
+  public boolean isShowAllRecordsOnFilter() {
+    return Preferences.getValue("com.revolsys.gis", PREFERENCE_SHOW_ALL_RECORDS_ON_FILTER);
   }
 
   public boolean isSnapToAllLayers() {
