@@ -9,20 +9,15 @@ import org.jeometry.common.awt.WebColors;
 
 import com.revolsys.record.RecordState;
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.action.enablecheck.EnableCheck;
-import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
 public class ModeChanged extends ModeAbstractCached {
-  private final EnableCheck enableCheck;
 
   public ModeChanged(final RecordLayerTableModel model) {
     super(RecordLayerTableModel.MODE_RECORDS_CHANGED, model);
-    final AbstractRecordLayer layer = getLayer();
-    this.enableCheck = new ObjectPropertyEnableCheck(layer, "hasChangedRecords");
   }
 
   @Override
@@ -41,11 +36,6 @@ public class ModeChanged extends ModeAbstractCached {
   @Override
   public Color getBorderColor() {
     return WebColors.Fuchsia;
-  }
-
-  @Override
-  public EnableCheck getEnableCheck() {
-    return this.enableCheck;
   }
 
   @Override

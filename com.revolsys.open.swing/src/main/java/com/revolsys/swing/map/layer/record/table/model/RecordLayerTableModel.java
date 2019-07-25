@@ -334,7 +334,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   public TableRecordsMode getTableRecordsMode() {
-    if (this.tableRecordsMode == null || !this.tableRecordsMode.isEnabled()) {
+    if (this.tableRecordsMode == null) {
       setTableRecordsMode(CollectionUtil.get(this.tableRecordsModeByKey.values(), 0));
     }
     return this.tableRecordsMode;

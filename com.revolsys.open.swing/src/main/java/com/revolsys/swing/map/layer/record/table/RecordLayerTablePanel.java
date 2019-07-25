@@ -384,9 +384,8 @@ public class RecordLayerTablePanel extends TablePanel
       final String key = tableRecordsMode.getKey();
       final String title = tableRecordsMode.getTitle();
       final Icon icon = tableRecordsMode.getIcon();
-      final EnableCheck enableCheck = tableRecordsMode.getEnableCheck();
-      final ToggleButton button = toolBar.addToggleButton(FILTER_FIELD, -1, null, title, icon,
-        enableCheck, () -> {
+      final ToggleButton button = toolBar.addToggleButton(FILTER_FIELD, -1, null, title, icon, null,
+        () -> {
           if (this.tableModel != null) {
             this.tableModel.setTableRecordsMode(tableRecordsMode);
           }

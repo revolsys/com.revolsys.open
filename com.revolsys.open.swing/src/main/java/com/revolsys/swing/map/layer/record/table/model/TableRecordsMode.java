@@ -8,7 +8,6 @@ import javax.swing.Icon;
 import javax.swing.ListSelectionModel;
 
 import com.revolsys.record.query.Query;
-import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 
 public interface TableRecordsMode {
@@ -24,10 +23,6 @@ public interface TableRecordsMode {
 
   Color getBorderColor();
 
-  default EnableCheck getEnableCheck() {
-    return EnableCheck.ENABLED;
-  }
-
   Icon getIcon();
 
   String getKey();
@@ -39,10 +34,6 @@ public interface TableRecordsMode {
   ListSelectionModel getSelectionModel();
 
   String getTitle();
-
-  default boolean isEnabled() {
-    return getEnableCheck().isEnabled();
-  }
 
   default boolean isFilterByBoundingBoxSupported() {
     return false;
