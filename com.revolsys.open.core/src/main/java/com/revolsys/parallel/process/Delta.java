@@ -3,10 +3,12 @@ package com.revolsys.parallel.process;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.parallel.channel.Channel;
 import com.revolsys.parallel.channel.ChannelOutput;
+import com.revolsys.parallel.channel.ClosedException;
 
 public final class Delta<T> extends AbstractInProcess<T> {
 
@@ -97,9 +99,18 @@ public final class Delta<T> extends AbstractInProcess<T> {
       while (this.running) {
         final T record = in.read();
         if (record != null) {
-          for (final ChannelOutput<T> out : this.out) {
+          for (final Iterator<ChannelOutput<T>> iterator = this.out.iterator(); iterator
+            .hasNext();) {
+            final ChannelOutput<T> out = iterator.next();
             final T clonedObject = clone(record);
-            out.write(clonedObject);
+            try {
+              out.write(clonedObject);
+            } catch (final ClosedException e) {
+              iterator.remove();
+              if (this.out.isEmpty()) {
+                this.running = false;
+              }
+            }
           }
         }
       }
