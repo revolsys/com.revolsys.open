@@ -115,10 +115,7 @@ public final class Delta<T> extends AbstractInProcess<T> {
         }
       }
     } finally {
-      try {
-      } finally {
-        this.running = false;
-      }
+      this.running = false;
     }
 
   }
