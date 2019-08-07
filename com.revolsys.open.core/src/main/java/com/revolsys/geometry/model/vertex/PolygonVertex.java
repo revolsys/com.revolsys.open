@@ -39,7 +39,15 @@ public class PolygonVertex extends AbstractVertex {
     } else {
       final int vertexIndex = getVertexIndex();
       final LinearRing line = getRing();
-      return line.getCoordinate(vertexIndex + vertexOffset, axisIndex);
+      int newIndex = vertexIndex + vertexOffset;
+      if (newIndex < 0) {
+        final int vertexCount = line.getVertexCount();
+        newIndex = vertexCount - 1 + newIndex;
+        if (newIndex < 0) {
+          return java.lang.Double.NaN;
+        }
+      }
+      return line.getCoordinate(newIndex, axisIndex);
     }
   }
 

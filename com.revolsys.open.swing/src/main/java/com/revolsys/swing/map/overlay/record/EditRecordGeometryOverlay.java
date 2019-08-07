@@ -121,6 +121,10 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   /** Index to the part of the addGeometry that new points should be added too. */
   private int[] addGeometryPartIndex = {};
 
+  private int addGeometryAddVertexPressCount;
+
+  private boolean addGeometryAddVertexActive;
+
   private AbstractRecordLayer addLayer;
 
   private boolean dragged = false;
@@ -128,6 +132,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   private boolean editGeometryVerticesStart;
 
   private boolean addGeometryEditVerticesStart;
+
+  private Point2D addGeometryEditVerticesScreenPoint;
 
   private List<CloseLocation> mouseOverLocations = Collections.emptyList();
 
@@ -613,6 +619,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       this.addGeometryEditVerticesStart = false;
       this.addGeometryPartDataType = null;
       this.addGeometryPartIndex = null;
+      this.addGeometryAddVertexPressCount = 0;
+      this.addGeometryAddVertexActive = true;
       this.addLayer = null;
       setGeometryFactory(null);
       clearMouseOverLocations();
@@ -625,39 +633,11 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     final int modifiers = event.getModifiersEx();
     if (modifiers == 0 && event.getButton() == MouseEvent.BUTTON1) {
       final int clickCount = event.getClickCount();
-      if (clickCount == 1) {
-        if (isOverlayAction(ACTION_ADD_GEOMETRY) && !hasMouseOverLocation()) {
-          Point point = getSnapPoint();
-          if (point == null) {
-            point = getPoint(event);
-          }
-          final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
-          point = point.newGeometry(geometryFactory);
-          addUndo(new MultipleUndo( //
-            new AppendVertexUndoEdit(this.addGeometryEditor, this.addGeometryPartIndex,
-              this.addGeometryPartDataType, point), //
-            new ClearXorUndoEdit() //
-          ));
-
-          event.consume();
-          if (GeometryDataTypes.POINT.equals(this.addGeometryEditor.getDataType())) {
-            if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
-              modeAddGeometryCompleted();
-            }
-          }
-          return true;
-        }
-      } else if (clickCount == 2) {
+      if (clickCount == 2) {
         if (isOverlayAction(ACTION_ADD_GEOMETRY)
           || isOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {
           setXorGeometry(null);
           event.consume();
-          Point point = getSnapPoint();
-          if (point == null) {
-            point = getPoint(event);
-          }
-          addUndo(new AppendVertexUndoEdit(this.addGeometryEditor, this.addGeometryPartIndex,
-            this.addGeometryPartDataType, point));
           modeAddGeometryCompleted();
           return true;
         }
@@ -709,7 +689,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         return true;
       }
     } else if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
-      modeAddGeometryUpdateXorGeometry();
+      if (this.addGeometryAddVertexActive) {
+        modeAddGeometryUpdateXorGeometry();
+      }
     }
     return false;
   }
@@ -721,23 +703,69 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   }
 
   protected boolean modeAddGeometryFinish(final MouseEvent event) {
+    final int button = event.getButton();
     if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
+      if (button == MouseEvent.BUTTON3) {
+        this.addGeometryAddVertexActive = false;
+        clearXor();
+      } else if (button == MouseEvent.BUTTON1) {
+        this.addGeometryAddVertexPressCount--;
+        if (this.addGeometryAddVertexPressCount <= 0) {
+          this.addGeometryAddVertexPressCount = 0;
+          if (this.addGeometryAddVertexActive) {
+            Point point = getSnapPoint();
+            if (point == null) {
+              point = getPoint(event);
+            }
+            final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
+            point = point.newGeometry(geometryFactory);
+            addUndo(new MultipleUndo( //
+              new AppendVertexUndoEdit(this.addGeometryEditor, this.addGeometryPartIndex,
+                this.addGeometryPartDataType, point), //
+              new ClearXorUndoEdit() //
+            ));
+
+            event.consume();
+            if (GeometryDataTypes.POINT.equals(this.addGeometryEditor.getDataType())) {
+              if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
+                modeAddGeometryCompleted();
+              }
+            }
+          }
+          this.addGeometryAddVertexActive = true;
+          modeAddGeometryUpdateXorGeometry();
+          return true;
+        }
+      }
     } else if (isOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {
       if (this.addGeometryEditVerticesStart && hasMouseOverLocation()) {
-        if (event.getButton() == MouseEvent.BUTTON1) {
+        if (button == MouseEvent.BUTTON1) {
           this.addGeometryEditVerticesStart = false;
           final MultipleUndo edit = new MultipleUndo();
-          for (final CloseLocation location : getMouseOverLocations()) {
-            final Point newPoint = getSnapOrEventPointWithElevation(event, location);
-            int[] vertexId = location.getVertexId();
-            AbstractUndoableEdit locationEdit;
-            if (vertexId == null) {
-              vertexId = location.getSegmentIdNext();
-              locationEdit = new InsertVertexUndoEdit(this.addGeometryEditor, vertexId, newPoint);
-            } else {
-              locationEdit = new SetVertexUndoEdit(this.addGeometryEditor, vertexId, newPoint);
+          final List<CloseLocation> locations = getMouseOverLocations();
+          if (this.addGeometryPartDataType == GeometryDataTypes.LINE_STRING && !this.dragged
+            && locations.size() == 1 && locations.get(0).isFromVertex()) {
+            final CloseLocation location = locations.get(0);
+            edit.addEdit(new AppendVertexUndoEdit(this.addGeometryEditor, this.addGeometryPartIndex,
+              this.addGeometryPartDataType, location.getVertex()));
+          } else {
+            for (final CloseLocation location : locations) {
+              Point newPoint;
+              if (this.dragged) {
+                newPoint = getSnapOrEventPointWithElevation(event, location);
+              } else {
+                newPoint = location.getViewportPoint();
+              }
+              int[] vertexId = location.getVertexId();
+              AbstractUndoableEdit locationEdit;
+              if (vertexId == null) {
+                vertexId = location.getSegmentIdNext();
+                locationEdit = new InsertVertexUndoEdit(this.addGeometryEditor, vertexId, newPoint);
+              } else {
+                locationEdit = new SetVertexUndoEdit(this.addGeometryEditor, vertexId, newPoint);
+              }
+              edit.addEdit(locationEdit);
             }
-            edit.addEdit(locationEdit);
           }
           if (!edit.isEmpty()) {
             edit.addEdit(new ClearXorUndoEdit());
@@ -780,6 +808,10 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           // TODO make work with multi-part
           if (hasMouseOver) {
             setOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES);
+            if (this.addGeometryPartDataType == GeometryDataTypes.LINE_STRING && location != null
+              && location.isFromVertex()) {
+              modeAddGeometryUpdateXorGeometry();
+            }
           } else {
             clearOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES);
             modeAddGeometryUpdateXorGeometry();
@@ -794,48 +826,60 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   protected boolean modeAddGeometryStart(final MouseEvent event) {
     final int modifiers = event.getModifiersEx();
-    if (modifiers == InputEvent.BUTTON1_DOWN_MASK) {
+    if (modifiers == InputEvent.BUTTON1_DOWN_MASK && event.getClickCount() == 1) {
       if (isOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {
         if (hasMouseOverLocation()) {
           this.addGeometryEditVerticesStart = true;
+          this.addGeometryEditVerticesScreenPoint = event.getPoint();
           repaint();
           return true;
         }
+      }
+    }
+    if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
+      if (event.getButton() == 1) {
+        this.addGeometryAddVertexPressCount++;
+        event.consume();
+        return true;
       }
     }
     return false;
   }
 
   protected void modeAddGeometryUpdateXorGeometry() {
-    final Point point = getOverlayPoint();
-    if (!hasSnapPoint()) {
-      setMapCursor(CURSOR_NODE_ADD);
-    }
-    final int[] firstVertexId = Geometry.newVertexId(this.addGeometryPartIndex, 0);
-    Geometry xorGeometry = null;
-
-    if (GeometryDataTypes.POINT.equals(this.addGeometryPartDataType)) {
+    if (this.addGeometryPartIndex == null) {
+      setXorGeometry(null);
     } else {
-      final Vertex firstVertex = this.addGeometryEditor.getVertex(firstVertexId);
-      final Vertex toVertex = this.addGeometryEditor.getToVertex(firstVertexId);
+      final Point point = getOverlayPoint();
+      if (!hasSnapPoint()) {
+        setMapCursor(CURSOR_NODE_ADD);
+      }
+      final int[] firstVertexId = Geometry.newVertexId(this.addGeometryPartIndex, 0);
+      Geometry xorGeometry = null;
 
-      final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
-      if (toVertex != null && !toVertex.isEmpty()) {
-        if (GeometryDataTypes.LINE_STRING.equals(this.addGeometryPartDataType)) {
-          xorGeometry = newXorLine(geometryFactory, toVertex, point);
-        } else if (GeometryDataTypes.POLYGON.equals(this.addGeometryPartDataType)) {
-          if (toVertex.equals(firstVertex)) {
+      if (GeometryDataTypes.POINT.equals(this.addGeometryPartDataType)) {
+      } else {
+        final Vertex firstVertex = this.addGeometryEditor.getVertex(firstVertexId);
+        final Vertex toVertex = this.addGeometryEditor.getToVertex(firstVertexId);
+
+        final GeometryFactory geometryFactory = this.addLayer.getGeometryFactory();
+        if (toVertex != null && !toVertex.isEmpty()) {
+          if (GeometryDataTypes.LINE_STRING.equals(this.addGeometryPartDataType)) {
             xorGeometry = newXorLine(geometryFactory, toVertex, point);
-          } else {
-            final Point p1 = geometryFactory.point(toVertex);
-            final Point p3 = geometryFactory.point(firstVertex);
-            final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory2d();
-            xorGeometry = viewportGeometryFactory.lineString(p1, point, p3);
+          } else if (GeometryDataTypes.POLYGON.equals(this.addGeometryPartDataType)) {
+            if (toVertex.equals(firstVertex)) {
+              xorGeometry = newXorLine(geometryFactory, toVertex, point);
+            } else {
+              final Point p1 = geometryFactory.point(toVertex);
+              final Point p3 = geometryFactory.point(firstVertex);
+              final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory2d();
+              xorGeometry = viewportGeometryFactory.lineString(p1, point, p3);
+            }
           }
         }
       }
+      setXorGeometry(xorGeometry);
     }
-    setXorGeometry(xorGeometry);
   }
 
   protected void modeEditGeometryVerticesClear() {

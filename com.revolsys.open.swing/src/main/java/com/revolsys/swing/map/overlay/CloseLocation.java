@@ -202,6 +202,14 @@ public class CloseLocation implements Comparable<CloseLocation> {
     return this.viewportPoint.hashCode();
   }
 
+  public boolean isFromVertex() {
+    if (this.vertex == null) {
+      return false;
+    } else {
+      return this.vertex.isFrom();
+    }
+  }
+
   @Override
   public String toString() {
     final StringBuilder string = new StringBuilder();

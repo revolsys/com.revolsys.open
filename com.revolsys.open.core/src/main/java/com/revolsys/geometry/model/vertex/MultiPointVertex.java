@@ -37,7 +37,7 @@ public class MultiPointVertex extends AbstractVertex {
   @Override
   public int[] getVertexId() {
     return new int[] {
-      this.partIndex, 0
+      this.partIndex
     };
   }
 
