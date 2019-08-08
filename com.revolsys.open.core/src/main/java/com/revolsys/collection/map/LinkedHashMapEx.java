@@ -25,4 +25,9 @@ public class LinkedHashMapEx extends LinkedHashMap<String, Object> implements Ma
   public LinkedHashMapEx(final String key, final Object value) {
     add(key, value);
   }
+
+  @Override
+  public MapEx clone() {
+    return (MapEx)super.clone();
+  }
 }

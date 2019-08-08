@@ -14,6 +14,7 @@ import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.model.Ellipsoid;
 
 import com.revolsys.beans.PropertyChangeSupport;
@@ -503,8 +504,23 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
           }
           unitsPerPixel = width / viewWidthPixels;
           if (!this.unitsPerPixelList.isEmpty() && viewHeightPixels > 0) {
-            if (this.zoomByUnitsPerPixel) {
-              unitsPerPixel = getClosestUnitsPerPixel(unitsPerPixel);
+            final double magnitudePower = Doubles.makePreciseFloor(1, Math.log10(unitsPerPixel));
+            double newUnitsPerPixel;
+            if (geometryFactory.isProjected() && magnitudePower < 0
+              || geometryFactory.isGeographic() && magnitudePower < -5) {
+              newUnitsPerPixel = getClosestUnitsPerPixel(unitsPerPixel);
+            } else {
+              final double resolution = Math.pow(10, magnitudePower - 1);
+              final double scaleFactor = 1 / resolution;
+              newUnitsPerPixel = Doubles.makePreciseCeil(scaleFactor, unitsPerPixel);
+              if (newUnitsPerPixel < this.minUnitsPerPixel) {
+                newUnitsPerPixel = this.minUnitsPerPixel;
+              } else if (newUnitsPerPixel > this.maxUnitsPerPixel) {
+                newUnitsPerPixel = this.maxUnitsPerPixel;
+              }
+            }
+            if (unitsPerPixel != newUnitsPerPixel) {
+              unitsPerPixel = newUnitsPerPixel;
               final double centreX = Math.floor(newBoundingBox.getCentreX() / unitsPerPixel)
                 * unitsPerPixel;
               final double centreY = Math.floor(newBoundingBox.getCentreY() / unitsPerPixel)
@@ -514,11 +530,31 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
               final double maxX = minX + viewWidthPixels * unitsPerPixel;
               final double maxY = minY + viewHeightPixels * unitsPerPixel;
               newBoundingBox = geometryFactory.newBoundingBox(minX, minY, maxX, maxY);
-            } else if (unitsPerPixel < this.minUnitsPerPixel) {
-              unitsPerPixel = this.minUnitsPerPixel;
-            } else if (unitsPerPixel > this.maxUnitsPerPixel) {
-              unitsPerPixel = this.maxUnitsPerPixel;
             }
+
+            // if (this.zoomByUnitsPerPixel) {
+            // System.out.println(unitsPerPixel + "\t" + resolution + "\t" +
+            // newUnitPerPixel);
+            // unitsPerPixel = getClosestUnitsPerPixel(unitsPerPixel);
+            // final double centreX = Math.floor(newBoundingBox.getCentreX() /
+            // unitsPerPixel)
+            // * unitsPerPixel;
+            // final double centreY = Math.floor(newBoundingBox.getCentreY() /
+            // unitsPerPixel)
+            // * unitsPerPixel;
+            // final double minX = centreX - Math.floor(viewWidthPixels / 2) *
+            // unitsPerPixel;
+            // final double minY = centreY - Math.floor(viewHeightPixels / 2) *
+            // unitsPerPixel;
+            // final double maxX = minX + viewWidthPixels * unitsPerPixel;
+            // final double maxY = minY + viewHeightPixels * unitsPerPixel;
+            // newBoundingBox = geometryFactory.newBoundingBox(minX, minY, maxX,
+            // maxY);
+            // } else if (unitsPerPixel < this.minUnitsPerPixel) {
+            // unitsPerPixel = this.minUnitsPerPixel;
+            // } else if (unitsPerPixel > this.maxUnitsPerPixel) {
+            // unitsPerPixel = this.maxUnitsPerPixel;
+            // }
           }
         } else {
           unitsPerPixel = Double.NaN;

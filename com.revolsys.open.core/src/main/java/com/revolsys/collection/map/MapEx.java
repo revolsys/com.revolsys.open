@@ -10,8 +10,13 @@ import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
-public interface MapEx extends MapDefault<String, Object> {
+public interface MapEx extends MapDefault<String, Object>, Cloneable {
   static final MapEx EMPTY = new MapEx() {
+    @Override
+    public MapEx clone() {
+      return this;
+    }
+
     @Override
     public Set<Entry<String, Object>> entrySet() {
       final Map<String, Object> emptyMap = Collections.emptyMap();
@@ -45,6 +50,8 @@ public interface MapEx extends MapDefault<String, Object> {
     }
     return this;
   }
+
+  MapEx clone();
 
   default Boolean getBoolean(final CharSequence name) {
     return getValue(name, DataTypes.BOOLEAN);

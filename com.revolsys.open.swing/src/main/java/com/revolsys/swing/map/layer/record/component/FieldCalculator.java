@@ -230,7 +230,7 @@ public class FieldCalculator extends AbstractUpdateField implements DocumentList
   }
 
   @Override
-  protected void updateRecord(final LayerRecord record) {
+  public void updateRecord(final LayerRecord record) {
     final Bindings bindings = newBindings();
     bindings.putAll(record);
     bindings.put("record", new ArrayRecord(record));

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
@@ -59,6 +61,15 @@ class ImgEntry implements MapEx, MapSerializer {
     this.name = reader.readString0(64);
     this.typeName = reader.readString0(32);
     this.type = reader.findType(this.typeName);
+  }
+
+  @Override
+  public MapEx clone() {
+    try {
+      return (MapEx)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   @Override

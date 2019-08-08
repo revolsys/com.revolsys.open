@@ -32,6 +32,8 @@
  */
 package com.revolsys.geometry.algorithm;
 
+import java.util.List;
+
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -82,6 +84,10 @@ public class Centroid {
     return cent.getCentroid();
   }
 
+  public static Point getCentroid(final List<? extends Point> points) {
+    return new Centroid(points).getCentroid();
+  }
+
   private double areaBasePtX = Double.NaN;
 
   private double areaBasePtY = Double.NaN;
@@ -116,6 +122,17 @@ public class Centroid {
     add(geometry);
   }
 
+  public Centroid(final List<? extends Point> points) {
+    if (points.isEmpty()) {
+      this.geometryFactory = GeometryFactory.DEFAULT_2D;
+    } else {
+      this.geometryFactory = points.get(0).getGeometryFactory();
+      for (final Point point : points) {
+        addPoint(point);
+      }
+    }
+  }
+
   /**
    * Adds a Geometry to the centroid total.
    *
@@ -126,9 +143,7 @@ public class Centroid {
       return;
     } else if (geometry instanceof Point) {
       final Point point = (Point)geometry;
-      final double x = point.getX();
-      final double y = point.getY();
-      addPoint(x, y);
+      addPoint(point);
     } else if (geometry instanceof LineString) {
       addLine((LineString)geometry);
     } else if (geometry instanceof Polygon) {
@@ -225,6 +240,12 @@ public class Centroid {
     this.pointCount += 1;
     this.pointSumX += x;
     this.pointSumY += y;
+  }
+
+  private void addPoint(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    addPoint(x, y);
   }
 
   private void addShell(final LineString line) {

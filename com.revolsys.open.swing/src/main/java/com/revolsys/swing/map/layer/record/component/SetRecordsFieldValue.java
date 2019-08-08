@@ -67,7 +67,7 @@ public class SetRecordsFieldValue extends AbstractUpdateField {
   }
 
   @Override
-  protected void updateRecord(final LayerRecord record) {
+  public void updateRecord(final LayerRecord record) {
     final String fieldName = this.getFieldDefinition().getName();
     final Object value = this.editField.getFieldValue();
     record.setValue(fieldName, value);

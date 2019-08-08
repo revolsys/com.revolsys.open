@@ -37,7 +37,7 @@ public class ProgressMonitor extends JDialog implements Cancellable, WindowListe
       Invoke.background(title, () -> {
         try {
           task.accept(progressMonitor);
-        } catch (final Exception e) {
+        } catch (final Throwable e) {
           Logs.error(ProgressMonitor.class, e);
         }
         return null;

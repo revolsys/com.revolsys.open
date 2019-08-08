@@ -3367,7 +3367,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     unSelectRecords(Arrays.asList(records));
   }
 
-  protected void updateRecordState(final LayerRecord record) {
+  public void updateRecordState(final LayerRecord record) {
     final RecordState state = record.getState();
     if (state == RecordState.MODIFIED) {
       addModifiedRecord(record);
