@@ -18,6 +18,7 @@ import com.revolsys.raster.AbstractGeoreferencedImage;
 import com.revolsys.raster.BufferedGeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Cancellable;
 
 public class GdalImage extends AbstractGeoreferencedImage {
 
@@ -45,7 +46,8 @@ public class GdalImage extends AbstractGeoreferencedImage {
   }
 
   @Override
-  public void drawImage(final Consumer3<RenderedImage, BoundingBox, AffineTransform> renderer,
+  public void drawImage(final Cancellable cancellable,
+    final Consumer3<RenderedImage, BoundingBox, AffineTransform> renderer,
     final BoundingBox viewBoundingBox, final int viewWidth, final int viewHeight,
     final boolean useTransform) {
     try {
@@ -109,7 +111,8 @@ public class GdalImage extends AbstractGeoreferencedImage {
           newMaxX, newMaxY);
         final GeoreferencedImage newImage = new BufferedGeoreferencedImage(newBoundingBox,
           bufferedImage);
-        newImage.drawImage(renderer, viewBoundingBox, viewWidth, viewHeight, useTransform);
+        newImage.drawImage(cancellable, renderer, viewBoundingBox, viewWidth, viewHeight,
+          useTransform);
       }
 
     } catch (final Throwable e) {

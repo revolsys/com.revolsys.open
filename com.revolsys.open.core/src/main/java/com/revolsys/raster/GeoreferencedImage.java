@@ -25,6 +25,7 @@ import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.math.matrix.Matrix;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.Cancellable;
 
 public interface GeoreferencedImage
   extends BoundingBoxProxy, MapSerializer, PropertyChangeListener {
@@ -140,7 +141,8 @@ public interface GeoreferencedImage
 
   void deleteTiePoint(MappedLocation tiePoint);
 
-  default void drawImage(final Consumer3<RenderedImage, BoundingBox, AffineTransform> renderer,
+  default void drawImage(final Cancellable cancellable,
+    final Consumer3<RenderedImage, BoundingBox, AffineTransform> renderer,
     final BoundingBox viewBoundingBox, final int viewWidth, final int viewHeight,
     final boolean useTransform) {
     if (viewBoundingBox.bboxIntersects(this) && viewWidth > 0 && viewHeight > 0) {
@@ -151,7 +153,8 @@ public interface GeoreferencedImage
       } else {
         final GeoreferencedImage image = imageToCs(viewBoundingBox);
         if (image != null) {
-          image.drawImage(renderer, viewBoundingBox, viewWidth, viewHeight, useTransform);
+          image.drawImage(cancellable, renderer, viewBoundingBox, viewWidth, viewHeight,
+            useTransform);
         }
       }
     }
@@ -309,6 +312,15 @@ public interface GeoreferencedImage
 
   default boolean hasGeometryFactory() {
     return getGeometryFactory().getHorizontalCoordinateSystemId() > 0;
+  }
+
+  default GeoreferencedImage imageToCs(final Cancellable cancellable,
+    final GeometryFactoryProxy geometryFactory) {
+    if (isSameCoordinateSystem(geometryFactory)) {
+      return this;
+    } else {
+      return new ImageProjector(this, geometryFactory).setCancellable(cancellable).newImage();
+    }
   }
 
   default GeoreferencedImage imageToCs(final GeometryFactoryProxy geometryFactory) {

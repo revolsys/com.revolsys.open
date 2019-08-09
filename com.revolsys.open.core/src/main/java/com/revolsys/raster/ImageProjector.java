@@ -15,6 +15,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.util.Cancellable;
 
 public class ImageProjector {
 
@@ -207,6 +208,8 @@ public class ImageProjector {
 
   private int targetImageHeight;
 
+  private Cancellable cancellable = Cancellable.FALSE;
+
   public ImageProjector(final GeoreferencedImage sourceImage,
     final GeometryFactoryProxy targetGeometryFactory) {
     this.sourceImage = sourceImage;
@@ -273,10 +276,10 @@ public class ImageProjector {
 
     final double gridCellWidth = imageWidth / 10.0;
     final double gridCellHeight = imageHeight / 10.0;
-    for (int gridY = 0; gridY < 10; gridY++) {
+    for (int gridY = 0; gridY < 10 && !isCancelled(); gridY++) {
       final double imageY = gridY * gridCellHeight;
       final double imageY2 = imageY + gridCellHeight;
-      for (int gridX = 0; gridX < 10; gridX++) {
+      for (int gridX = 0; gridX < 10 && !isCancelled(); gridX++) {
         final double imageX = gridX * gridCellWidth;
         final double imageX2 = imageX + gridCellWidth;
         drawTriangle(imageX2, imageY, imageX, imageY2, imageX, imageY);
@@ -334,6 +337,10 @@ public class ImageProjector {
     return targetPixelSize;
   }
 
+  public boolean isCancelled() {
+    return this.cancellable.isCancelled();
+  }
+
   public GeoreferencedImage newImage() {
     final BoundingBox sourceBoundingBox = this.sourceBoundingBox;
     final Point p1 = sourceBoundingBox.getCornerPoint(0).convertPoint2d(this.targetGeometryFactory);
@@ -369,6 +376,11 @@ public class ImageProjector {
       graphics.dispose();
     }
     return this.targetImage;
+  }
+
+  public ImageProjector setCancellable(final Cancellable cancellable) {
+    this.cancellable = cancellable;
+    return this;
   }
 
   public void setCorner(final ImageProjectorTriangle targetTriangle, final int i,

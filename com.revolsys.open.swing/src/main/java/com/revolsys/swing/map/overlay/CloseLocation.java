@@ -210,6 +210,14 @@ public class CloseLocation implements Comparable<CloseLocation> {
     }
   }
 
+  public boolean isSegment() {
+    return this.segment != null;
+  }
+
+  public boolean isVertex() {
+    return this.vertex != null;
+  }
+
   @Override
   public String toString() {
     final StringBuilder string = new StringBuilder();

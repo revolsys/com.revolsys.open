@@ -443,7 +443,7 @@ public class Graphics2DViewRenderer extends ViewRenderer {
         if (interpolationMethod != null) {
           this.graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, interpolationMethod);
         }
-        image.drawImage((renderedImage, imageBoundingBox, geoTransform) -> {
+        image.drawImage(this, (renderedImage, imageBoundingBox, geoTransform) -> {
           if (renderedImage != null) {
             final int imageWidth = renderedImage.getWidth();
             final int imageHeight = renderedImage.getHeight();

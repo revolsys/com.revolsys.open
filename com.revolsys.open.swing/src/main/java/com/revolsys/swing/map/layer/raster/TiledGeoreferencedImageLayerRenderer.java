@@ -51,8 +51,11 @@ public class TiledGeoreferencedImageLayerRenderer<T extends GeoreferencedImageMa
           final Graphics2DViewRenderer imageView = imageViewport.newViewRenderer();
           super.renderTiles(imageView, cancellable, mapTiles);
           final GeoreferencedImage mergedImage = imageViewport.getGeoreferencedImage();
-          final GeoreferencedImage projectedImage = mergedImage.imageToCs(view);
-          view.drawImage(projectedImage, false);
+          final GeoreferencedImage projectedImage = mergedImage.imageToCs(view, view);
+          if (!view.isCancelled()) {
+            view.drawImage(projectedImage, false);
+          }
+        } catch (final OutOfMemoryError e) {
         }
       }
     } else {

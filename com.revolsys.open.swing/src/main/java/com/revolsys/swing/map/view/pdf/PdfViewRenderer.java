@@ -495,7 +495,7 @@ public class PdfViewRenderer extends ViewRenderer {
         final BoundingBox viewBoundingBox = getBoundingBox();
         final int viewWidth = (int)Math.ceil(getViewWidthPixels());
         final int viewHeight = (int)Math.ceil(getViewHeightPixels());
-        image.drawImage((renderedImage, imageBoundingBox, geoTransform) -> {
+        image.drawImage(this, (renderedImage, imageBoundingBox, geoTransform) -> {
           try {
             final int imageWidth = renderedImage.getWidth();
             final int imageHeight = renderedImage.getHeight();

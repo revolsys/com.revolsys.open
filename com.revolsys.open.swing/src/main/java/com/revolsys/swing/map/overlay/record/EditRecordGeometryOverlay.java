@@ -133,8 +133,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   private boolean addGeometryEditVerticesStart;
 
-  private Point2D addGeometryEditVerticesScreenPoint;
-
   private List<CloseLocation> mouseOverLocations = Collections.emptyList();
 
   private Point moveGeometryEnd;
@@ -304,9 +302,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     }
   }
 
-  private GeometryEditor<?> geometryEdit(final MouseEvent event, final CloseLocation location) {
+  private GeometryEditor<?> geometryEdit(final CloseLocation location, final Point newPoint) {
     final Geometry geometry = location.getGeometry();
-    final Point newPoint = getSnapOrEventPointWithElevation(event, location);
     int[] vertexId = location.getVertexId();
     final GeometryEditor<?> geometryEditor = geometry.newGeometryEditor();
     if (vertexId == null) {
@@ -830,7 +827,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       if (isOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {
         if (hasMouseOverLocation()) {
           this.addGeometryEditVerticesStart = true;
-          this.addGeometryEditVerticesScreenPoint = event.getPoint();
           repaint();
           return true;
         }
@@ -915,23 +911,27 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   protected boolean modeEditGeometryVerticesFinish(final MouseEvent event) {
     if (this.editGeometryVerticesStart && clearOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES)) {
-      if (this.dragged && event.getButton() == MouseEvent.BUTTON1) {
-        try {
-          final MultipleUndo edit = new MultipleUndo();
-          final List<CloseLocation> locations = getMouseOverLocations();
-          for (final CloseLocation location : locations) {
-            final GeometryEditor<?> geometryEditor = geometryEdit(event, location);
-            if (geometryEditor.isModified()) {
-              final Geometry newGeometry = geometryEditor.newGeometry();
-              final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
-              edit.addEdit(geometryEdit);
+      if (event.getButton() == MouseEvent.BUTTON1) {
+        if (this.dragged) {
+          try {
+            final MultipleUndo edit = new MultipleUndo();
+            final List<CloseLocation> locations = getMouseOverLocations();
+            for (final CloseLocation location : locations) {
+              final Point newPoint = getSnapOrEventPointWithElevation(event, location);
+              final GeometryEditor<?> geometryEditor = geometryEdit(location, newPoint);
+              if (geometryEditor.isModified()) {
+                final Geometry newGeometry = geometryEditor.newGeometry();
+                final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
+                edit.addEdit(geometryEdit);
+              }
             }
+            if (!edit.isEmpty()) {
+              addUndo(edit);
+            }
+          } finally {
+            clearMouseOverLocations();
+            modeEditGeometryVerticesClear();
           }
-          if (!edit.isEmpty()) {
-            addUndo(edit);
-          }
-        } finally {
-          modeEditGeometryVerticesClear();
         }
         return true;
       }
