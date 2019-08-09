@@ -513,9 +513,9 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
               final double resolution = Math.pow(10, magnitudePower - 1);
               final double scaleFactor = 1 / resolution;
               newUnitsPerPixel = Doubles.makePreciseCeil(scaleFactor, unitsPerPixel);
-              if (newUnitsPerPixel < this.minUnitsPerPixel) {
+              if (this.minUnitsPerPixel > 0 && newUnitsPerPixel < this.minUnitsPerPixel) {
                 newUnitsPerPixel = this.minUnitsPerPixel;
-              } else if (newUnitsPerPixel > this.maxUnitsPerPixel) {
+              } else if (this.maxUnitsPerPixel > 0 && newUnitsPerPixel > this.maxUnitsPerPixel) {
                 newUnitsPerPixel = this.maxUnitsPerPixel;
               }
             }

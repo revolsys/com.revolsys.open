@@ -28,9 +28,12 @@ public class ArcGisRestTileCacheLayerRenderer
       if (mapService.isExportTilesAllowed() && restLayer.isUseServerExport()) {
         try {
           final BoundingBox boundingBox = view.getBoundingBox();
-          final int width = (int)view.getViewWidthPixels();
-          final int height = (int)view.getViewHeightPixels();
-          final BufferedImage image = mapService.getExportImage(boundingBox, width, height);
+          final double resolution = restLayer.getResolution(view);
+          final double width = boundingBox.getWidth();
+          final double height = boundingBox.getHeight();
+          final int viewWidth = (int)(width / resolution);
+          final int viewHeight = (int)(height / resolution);
+          final BufferedImage image = mapService.getExportImage(boundingBox, viewWidth, viewHeight);
           final BufferedGeoreferencedImage georeferencedImage = new BufferedGeoreferencedImage(
             boundingBox, image);
           view.drawImage(georeferencedImage, false);
