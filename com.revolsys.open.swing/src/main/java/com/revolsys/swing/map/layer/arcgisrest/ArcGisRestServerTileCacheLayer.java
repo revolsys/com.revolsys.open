@@ -48,7 +48,7 @@ public class ArcGisRestServerTileCacheLayer
     });
   }
 
-  private boolean useServerExport = true;
+  private boolean useServerExport = false;
 
   private String username;
 
