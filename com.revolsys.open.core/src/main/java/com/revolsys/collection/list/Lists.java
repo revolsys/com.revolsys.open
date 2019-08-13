@@ -337,6 +337,30 @@ public interface Lists {
     return list;
   }
 
+  static List<Double> newArrayDouble(final double... values) {
+    if (values == null) {
+      return Collections.emptyList();
+    } else {
+      final List<Double> list = new ArrayList<>();
+      for (final double value : values) {
+        list.add(value);
+      }
+      return list;
+    }
+  }
+
+  static List<Integer> newArrayInt(final int... values) {
+    if (values == null) {
+      return Collections.emptyList();
+    } else {
+      final List<Integer> list = new ArrayList<>();
+      for (final int value : values) {
+        list.add(value);
+      }
+      return list;
+    }
+  }
+
   public static <V> List<V> newArraySorted(
     final BiConsumer<Consumer<V>, Predicate<V>> forEachFunction, final Predicate<V> filter,
     final Comparator<V> comparator) {
