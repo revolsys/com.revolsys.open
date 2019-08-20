@@ -25,6 +25,7 @@ import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.EndOfFileException;
+import com.revolsys.io.SeekableByteChannelInputStream;
 import com.revolsys.spring.resource.Resource;
 
 public class ChannelReader implements BaseCloseable {
@@ -138,6 +139,31 @@ public class ChannelReader implements BaseCloseable {
     return getBytes(bytes);
   }
 
+  public byte[] getBytes(final long offset, final int byteCount) {
+    if (this.channel instanceof SeekableByteChannel) {
+      final byte[] bytes = new byte[byteCount];
+      try {
+        final SeekableByteChannel seekChannel = (SeekableByteChannel)this.channel;
+        seekChannel.position(offset);
+        final ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        final int count = seekChannel.read(buffer);
+        if (count == -1) {
+          throw new EndOfFileException();
+        } else if (count == byteCount) {
+          return bytes;
+        } else {
+          final byte[] subBytes = new byte[count];
+          System.arraycopy(bytes, 0, subBytes, 0, count);
+          return subBytes;
+        }
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    } else {
+      throw new IllegalArgumentException("Not supported");
+    }
+  }
+
   public ReadableByteChannel getChannel() {
     return this.channel;
   }
@@ -159,6 +185,15 @@ public class ChannelReader implements BaseCloseable {
     } else {
       this.available -= 4;
       return this.buffer.getFloat();
+    }
+  }
+
+  public InputStream getInputStream(final long offset, final int size) {
+    if (this.channel instanceof SeekableByteChannel) {
+      final SeekableByteChannel seekableChannel = (SeekableByteChannel)this.channel;
+      return new SeekableByteChannelInputStream(seekableChannel, offset, size);
+    } else {
+      throw new IllegalArgumentException("Channel not seekable");
     }
   }
 
@@ -300,7 +335,7 @@ public class ChannelReader implements BaseCloseable {
     }
   }
 
-  public ByteBuffer readByteByteBuffer(final long offset, final Integer size) {
+  public ByteBuffer readByteByteBuffer(final long offset, final int size) {
     final long position = position();
     final ByteBuffer buffer = ByteBuffer.allocateDirect(size);
     seek(offset);
@@ -313,7 +348,7 @@ public class ChannelReader implements BaseCloseable {
     } while (buffer.hasRemaining());
     seek(position);
     buffer.flip();
-    return null;
+    return buffer;
   }
 
   private ByteBuffer readTempBytes(final int count) {
@@ -338,10 +373,13 @@ public class ChannelReader implements BaseCloseable {
   public void seek(final long position) {
     try {
       if (this.channel instanceof SeekableByteChannel) {
-        final SeekableByteChannel channel = (SeekableByteChannel)this.channel;
-        channel.position(position);
-        this.available = 0;
-        this.buffer.clear();
+        final long currentPosition = position();
+        if (position != currentPosition) {
+          final SeekableByteChannel channel = (SeekableByteChannel)this.channel;
+          channel.position(position);
+          this.available = 0;
+          this.buffer.clear();
+        }
       } else {
         throw new IllegalArgumentException("Not supported");
       }

@@ -43,7 +43,7 @@ import com.revolsys.util.Property;
 public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeSupportProxy
   implements GeoreferencedImage {
 
-  public static int[] getResolution(final ImageReader r) throws IOException {
+  public static double[] getResolution(final ImageReader r) throws IOException {
     int hdpi = 96, vdpi = 96;
     final double mm2inch = 25.4;
 
@@ -59,14 +59,14 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
       vdpi = (int)(mm2inch / Float.parseFloat(((Element)lst.item(0)).getAttribute("value")));
     }
 
-    return new int[] {
+    return new double[] {
       hdpi, vdpi
     };
   }
 
   private BoundingBox boundingBox = BoundingBox.empty();
 
-  private int[] dpi;
+  private double[] dpi;
 
   private File file;
 
@@ -162,9 +162,9 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
   }
 
   @Override
-  public int[] getDpi() {
+  public double[] getDpi() {
     if (this.dpi == null) {
-      int[] dpi = new int[] {
+      double[] dpi = new double[] {
         96, 96
       };
       try {
@@ -280,7 +280,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     final Resource auxFile = resource.newResourceChangeExtension(extension + ".aux.xml");
     if (auxFile != null && auxFile.exists() && auxFile.getLastModified() > modifiedTime) {
       loadWorldFileX();
-      final int[] dpi = getDpi();
+      final double[] dpi = getDpi();
 
       try {
         int srid = 0;
@@ -501,7 +501,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
   }
 
   @Override
-  public void setDpi(final int... dpi) {
+  public void setDpi(final double... dpi) {
     this.dpi = dpi;
   }
 

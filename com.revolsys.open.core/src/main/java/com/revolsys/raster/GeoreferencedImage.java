@@ -260,7 +260,7 @@ public interface GeoreferencedImage
     }
   }
 
-  int[] getDpi();
+  double[] getDpi();
 
   default GeoreferencedImage getImage(final GeometryFactoryProxy geometryFactory,
     final double resolution) {
@@ -359,7 +359,7 @@ public interface GeoreferencedImage
     setBoundingBox(boundingBox);
   }
 
-  void setDpi(final int... dpi);
+  void setDpi(final double... dpi);
 
   void setRenderedImage(final RenderedImage image);
 

@@ -22,7 +22,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.EndianOutputStream;
 import com.revolsys.raster.io.format.tiff.GeoTiffConstants;
-import com.revolsys.raster.io.format.tiff.TiffImage;
+import com.revolsys.raster.io.format.tiff.TiffImageFactory;
 import com.revolsys.raster.io.format.tiff.TiffProjectionParameterName;
 import com.revolsys.util.Pair;
 
@@ -89,13 +89,13 @@ public class LasProjection {
           final GeographicCoordinateSystem geographicCoordinateSystem = EpsgCoordinateSystems
             .getCoordinateSystem(geoSrid);
           final String name = "unknown";
-          final CoordinateOperationMethod coordinateOperationMethod = TiffImage
+          final CoordinateOperationMethod coordinateOperationMethod = TiffImageFactory
             .getProjection(properties);
 
           final Map<ParameterName, ParameterValue> parameters = TiffProjectionParameterName
             .getProjectionParameters(properties);
 
-          final LinearUnit linearUnit = TiffImage.getLinearUnit(properties);
+          final LinearUnit linearUnit = TiffImageFactory.getLinearUnit(properties);
           final ProjectedCoordinateSystem projectedCoordinateSystem = new ProjectedCoordinateSystem(
             coordinateSystemId, name, geographicCoordinateSystem, coordinateOperationMethod,
             parameters, linearUnit);

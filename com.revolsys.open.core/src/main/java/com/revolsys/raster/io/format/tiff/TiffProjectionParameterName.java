@@ -57,7 +57,7 @@ public enum TiffProjectionParameterName {
     for (final TiffProjectionParameterName tiffParam : values()) {
       final int code = tiffParam.getCode();
       final ParameterName parameterName = tiffParam.getParameterName();
-      TiffImage.addDoubleParameter(parameters, parameterName, geoKeys, code);
+      TiffImageFactory.addDoubleParameter(parameters, parameterName, geoKeys, code);
     }
     return parameters;
   }
