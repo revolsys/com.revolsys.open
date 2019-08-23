@@ -142,6 +142,12 @@ public class RoutingOverlay extends AbstractOverlay {
     cancel();
   }
 
+  public void actionZoomToRecords() {
+    final BoundingBox boundingBox = BoundingBox.bboxNew(this.records);
+    final MapPanel map = getMap();
+    map.zoomToBoundingBox(boundingBox);
+  }
+
   private void addGeometry(final List<LineString> lines, final Set<Point> points,
     final Geometry geometry) {
     if (geometry instanceof Lineal) {
@@ -260,11 +266,13 @@ public class RoutingOverlay extends AbstractOverlay {
         Invoke.background("Set Record 2", this::getCloseRecord,
           record -> setRecord2(record, updateIndex));
       }
-    } else if (!this.records.isEmpty()) {
-      if (keyCode == KeyEvent.VK_A && event.isAltDown()) {
+    } else if (!this.records.isEmpty() && event.isAltDown()) {
+      if (keyCode == KeyEvent.VK_A) {
         actionAddToSelectRecords();
-      } else if (keyCode == KeyEvent.VK_S && event.isAltDown()) {
+      } else if (keyCode == KeyEvent.VK_S) {
         actionSelectRecords();
+      } else if (keyCode == KeyEvent.VK_Z) {
+        actionZoomToRecords();
       }
     }
   }
