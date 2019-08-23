@@ -127,7 +127,7 @@ import com.revolsys.swing.map.layer.record.table.model.RecordValidationDialog;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
 import com.revolsys.swing.map.overlay.CloseLocation;
-import com.revolsys.swing.map.overlay.ShortestRouteOverlay;
+import com.revolsys.swing.map.overlay.RoutingOverlay;
 import com.revolsys.swing.map.overlay.record.EditRecordGeometryOverlay;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.WrappedMenuFactory;
@@ -1765,7 +1765,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       menu.addMenuItem("record", "Revert Empty Fields", "field_empty_revert",
         hasModifiedEmptyFields, LayerRecord::revertEmptyFields);
 
-      ShortestRouteOverlay.initMenuItems(this, menu);
+      RoutingOverlay.initMenuItems(this, menu);
 
       menu.addMenuItem("dnd", "Copy Record", "page_copy", this::copyRecordToClipboard);
 

@@ -43,10 +43,11 @@ import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.marker.MarkerRenderer;
+import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.swing.parallel.Invoke;
 
-public class ShortestRouteOverlay extends AbstractOverlay {
+public class RoutingOverlay extends AbstractOverlay {
 
   private static final Cursor CURSOR = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
 
@@ -68,31 +69,31 @@ public class ShortestRouteOverlay extends AbstractOverlay {
   private static final MarkerStyle STYLE_VERTICES = MarkerStyle.marker("circle", 8,
     WebColors.DarkMagenta, 1, WebColors.Pink);
 
-  private static ShortestRouteOverlay getOverlay(final AbstractRecordLayer layer) {
+  private static RoutingOverlay getOverlay(final AbstractRecordLayer layer) {
     final MapPanel map = layer.getMapPanel();
-    final ShortestRouteOverlay shortestRouteOverlay = map.getMapOverlay(ShortestRouteOverlay.class);
-    return shortestRouteOverlay;
+    final RoutingOverlay routingOverlay = map.getMapOverlay(RoutingOverlay.class);
+    return routingOverlay;
   }
 
   public static void initMenuItems(final AbstractRecordLayer layer, final LayerRecordMenu menu) {
     if (isLayerApplicable(layer)) {
 
       menu.addMenuItem("route", "Route From Record", "route_from", (final LayerRecord record) -> {
-        final ShortestRouteOverlay shortestRouteOverlay = getOverlay(layer);
-        final int updateIndex = shortestRouteOverlay.setRecord1Index.incrementAndGet();
-        shortestRouteOverlay.setRecord1(record, updateIndex);
+        final RoutingOverlay routingOverlay = getOverlay(layer);
+        final int updateIndex = routingOverlay.setRecord1Index.incrementAndGet();
+        routingOverlay.setRecord1(record, updateIndex);
       });
 
       final Predicate<LayerRecord> routeMode = record -> {
-        final ShortestRouteOverlay shortestRouteOverlay = getOverlay(layer);
-        return shortestRouteOverlay.isHasRecord1();
+        final RoutingOverlay routingOverlay = getOverlay(layer);
+        return routingOverlay.isHasRecord1();
       };
 
       menu.addMenuItem("route", "Route To Record", "route_to", routeMode,
         (final LayerRecord record) -> {
-          final ShortestRouteOverlay shortestRouteOverlay = getOverlay(layer);
-          final int updateIndex = shortestRouteOverlay.setRecord2Index.incrementAndGet();
-          shortestRouteOverlay.setRecord2(record, updateIndex);
+          final RoutingOverlay routingOverlay = getOverlay(layer);
+          final int updateIndex = routingOverlay.setRecord2Index.incrementAndGet();
+          routingOverlay.setRecord2(record, updateIndex);
         });
     }
   }
@@ -119,7 +120,7 @@ public class ShortestRouteOverlay extends AbstractOverlay {
 
   private final AtomicInteger setRecord2Index = new AtomicInteger();
 
-  public ShortestRouteOverlay(final MapPanel map) {
+  public RoutingOverlay(final MapPanel map) {
     super(map);
     addOverlayAction( //
       SHORTEST_ROUTE, //
@@ -128,6 +129,17 @@ public class ShortestRouteOverlay extends AbstractOverlay {
       ZoomOverlay.ACTION_ZOOM, //
       ZoomOverlay.ACTION_ZOOM_BOX //
     );
+  }
+
+  public void actionAddToSelectRecords() {
+    this.layer.addSelectedRecords(this.records);
+    cancel();
+  }
+
+  public void actionSelectRecords() {
+    this.layer.setSelectedRecords(this.records);
+    this.layer.showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED, true);
+    cancel();
   }
 
   private void addGeometry(final List<LineString> lines, final Set<Point> points,
@@ -150,7 +162,7 @@ public class ShortestRouteOverlay extends AbstractOverlay {
     }
   }
 
-  private void cancel() {
+  public void cancel() {
     modeClear();
   }
 
@@ -235,18 +247,24 @@ public class ShortestRouteOverlay extends AbstractOverlay {
         cancel();
       }
 
-    } else if (keyCode == KeyEvent.VK_1 && event.isControlDown()) {
+    } else if (keyCode == KeyEvent.VK_1 && (event.isControlDown() || event.isAltDown())) {
       final int updateIndex = this.setRecord1Index.incrementAndGet();
       Invoke.background("Set Record 1", this::getCloseRecord,
         record -> setRecord1(record, updateIndex));
 
-    } else if (keyCode == KeyEvent.VK_2 && event.isControlDown()) {
+    } else if (keyCode == KeyEvent.VK_2 && (event.isControlDown() || event.isAltDown())) {
       if (this.layer == null) {
         Toolkit.getDefaultToolkit().beep();
       } else {
         final int updateIndex = this.setRecord2Index.incrementAndGet();
         Invoke.background("Set Record 2", this::getCloseRecord,
           record -> setRecord2(record, updateIndex));
+      }
+    } else if (!this.records.isEmpty()) {
+      if (keyCode == KeyEvent.VK_A && event.isAltDown()) {
+        actionAddToSelectRecords();
+      } else if (keyCode == KeyEvent.VK_S && event.isAltDown()) {
+        actionSelectRecords();
       }
     }
   }

@@ -18,6 +18,8 @@ public class SeekableByteChannelInputStream extends InputStream {
 
   private int count;
 
+  private int mark = -1;
+
   public SeekableByteChannelInputStream(final SeekableByteChannel in, final long position,
     final int size) {
     super();
@@ -57,12 +59,17 @@ public class SeekableByteChannelInputStream extends InputStream {
   }
 
   @Override
+  public synchronized void mark(final int readlimit) {
+    this.mark = this.count;
+  }
+
+  @Override
   public int read() throws IOException {
     final ByteBuffer buffer = ensureBuffer();
     if (buffer == null) {
       return -1;
     } else {
-      return buffer.get();
+      return Byte.toUnsignedInt(buffer.get());
     }
   }
 
@@ -80,6 +87,15 @@ public class SeekableByteChannelInputStream extends InputStream {
       }
     }
     return totalCount;
+  }
+
+  @Override
+  public synchronized void reset() throws IOException {
+    if (this.mark != -1) {
+      this.count = this.mark;
+      this.buffer.clear();
+      this.mark = -1;
+    }
   }
 
 }
