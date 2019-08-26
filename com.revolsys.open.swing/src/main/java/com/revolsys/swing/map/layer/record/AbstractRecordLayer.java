@@ -1840,11 +1840,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   protected boolean internalSaveChanges(final RecordLayerErrors errors, final LayerRecord record) {
     final RecordState originalState = record.getState();
     final LayerRecord layerRecord = getProxiedRecord(record);
-    final boolean saved = saveChangesDo(errors, layerRecord);
-    if (saved) {
-      postSaveChanges(originalState, layerRecord);
+    if (layerRecord == null) {
+      return true;
+    } else {
+      final boolean saved = saveChangesDo(errors, layerRecord);
+      if (saved) {
+        postSaveChanges(originalState, layerRecord);
+      }
+      return saved;
     }
-    return saved;
   }
 
   public boolean isCanAddRecords() {
@@ -2925,7 +2929,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
         cleanCachedRecords();
         final List<LayerRecord> newRecords = getRecordsNew();
-        index.addRecords(newRecords);
+        for (final LayerRecord newRecord : newRecords) {
+          if (newRecord.getState().isNew() && newRecord.hasGeometry()) {
+            addRecordToCache(cacheIdIndex, newRecord);
+            index.addRecord(newRecord.newRecordProxy());
+          }
+        }
         this.index = index;
       }
     }
