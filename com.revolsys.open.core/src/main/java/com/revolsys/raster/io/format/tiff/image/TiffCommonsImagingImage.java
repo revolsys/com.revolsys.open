@@ -1,4 +1,4 @@
-package com.revolsys.raster.io.format.tiff;
+package com.revolsys.raster.io.format.tiff.image;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -22,15 +22,19 @@ import org.jeometry.common.logging.Logs;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.raster.AbstractGeoreferencedImage;
+import com.revolsys.raster.io.format.tiff.GeoTiffConstants;
+import com.revolsys.raster.io.format.tiff.TiffImageFactory;
+import com.revolsys.raster.io.format.tiff.code.GeoTiffKey;
+import com.revolsys.raster.io.format.tiff.code.GeoTiffKeys;
 import com.revolsys.spring.resource.Resource;
 
-public class TiffImage extends AbstractGeoreferencedImage implements GeoTiffConstants {
+public class TiffCommonsImagingImage extends AbstractGeoreferencedImage implements GeoTiffConstants {
 
   public static final int TAG_X_RESOLUTION = 282;
 
   public static final int TAG_Y_RESOLUTION = 283;
 
-  public TiffImage(final Resource imageResource) {
+  public TiffCommonsImagingImage(final Resource imageResource) {
     super("tfw");
     setImageResource(imageResource);
 
@@ -58,9 +62,9 @@ public class TiffImage extends AbstractGeoreferencedImage implements GeoTiffCons
     }
   }
 
-  private Map<Integer, Object> getGeoKeys(final TiffImageMetadata metaData)
+  private Map<GeoTiffKey, Object> getGeoKeys(final TiffImageMetadata metaData)
     throws ImageReadException {
-    final Map<Integer, Object> geoKeys = new LinkedHashMap<>();
+    final Map<GeoTiffKey, Object> geoKeys = new LinkedHashMap<>();
 
     final TiffField keysField = metaData
       .findField(GeoTiffTagConstants.EXIF_TAG_GEO_KEY_DIRECTORY_TAG);
@@ -85,7 +89,7 @@ public class TiffImage extends AbstractGeoreferencedImage implements GeoTiffCons
     if (keysField != null) {
       final int[] keys = keysField.getIntArrayValue();
       for (int i = 4; i < keys.length; i += 4) {
-        final int keyId = keys[i];
+        final GeoTiffKey keyId = GeoTiffKeys.getById(keys[i]);
         final int tiffTag = keys[i + 1];
         final int valueCount = keys[i + 2];
         final int valueOrOffset = keys[i + 3];
@@ -137,7 +141,7 @@ public class TiffImage extends AbstractGeoreferencedImage implements GeoTiffCons
     } catch (final Throwable e) {
       Logs.error(this, e);
     }
-    final Map<Integer, Object> geoKeys = getGeoKeys(metaData);
+    final Map<GeoTiffKey, Object> geoKeys = getGeoKeys(metaData);
     final GeometryFactory geometryFactory = TiffImageFactory.getGeometryFactory(geoKeys);
     if (geometryFactory != null) {
       setGeometryFactory(geometryFactory);

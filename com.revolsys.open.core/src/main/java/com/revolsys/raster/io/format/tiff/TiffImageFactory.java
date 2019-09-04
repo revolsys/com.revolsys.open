@@ -2,6 +2,7 @@ package com.revolsys.raster.io.format.tiff;
 
 import java.util.Map;
 
+import org.jeometry.common.logging.Logs;
 import org.jeometry.coordinatesystem.model.CoordinateOperationMethod;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
@@ -19,26 +20,32 @@ import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.raster.GeoreferencedImageWriter;
 import com.revolsys.raster.GeoreferencedImageWriterFactory;
+import com.revolsys.raster.io.format.tiff.code.GeoTiffCoordinateTransformationCode;
+import com.revolsys.raster.io.format.tiff.code.GeoTiffKey;
+import com.revolsys.raster.io.format.tiff.code.GeoTiffKeyProjectionParameterName;
+import com.revolsys.raster.io.format.tiff.code.GeoTiffKeys;
+import com.revolsys.raster.io.format.tiff.image.TiffCommonsImagingImage;
+import com.revolsys.raster.io.format.tiff.image.TiffImage;
 import com.revolsys.spring.resource.Resource;
 
 public class TiffImageFactory extends AbstractIoFactory
   implements GeoreferencedImageReadFactory, GeoreferencedImageWriterFactory {
 
   public static void addDoubleParameter(final Map<ParameterName, ParameterValue> parameters,
-    final ParameterName name, final Map<Integer, Object> geoKeys, final int key) {
+    final ParameterName name, final Map<GeoTiffKey, Object> geoKeys, final GeoTiffKey key) {
     final Double value = Maps.getDouble(geoKeys, key);
     if (value != null) {
       parameters.put(name, new ParameterValueNumber(value));
     }
   }
 
-  public static GeometryFactory getGeometryFactory(final Map<Integer, Object> geoKeys) {
-    final int projectedCoordinateSystemId = Maps.getInteger(geoKeys,
-      GeoTiffConstants.ProjectedCSTypeGeoKey, 0);
-    final int geographicCoordinateSystemId = Maps.getInteger(geoKeys,
-      GeoTiffConstants.GeographicTypeGeoKey, 0);
+  public static GeometryFactory getGeometryFactory(final Map<GeoTiffKey, Object> geoKeys) {
+    final int projectedCoordinateSystemId = GeoTiffKeys.ProjectedCSTypeGeoKey.getInteger(geoKeys,
+      0);
+    final int geographicCoordinateSystemId = GeoTiffKeys.GeographicTypeGeoKey.getInteger(geoKeys,
+      0);
 
-    switch (Maps.getInteger(geoKeys, GeoTiffConstants.GTModelTypeGeoKey, 0)) {
+    switch (GeoTiffKeys.GTModelTypeGeoKey.getInteger(geoKeys, 0)) {
       case 1: // Projected
         if (projectedCoordinateSystemId <= 0) {
           return null;
@@ -48,7 +55,7 @@ public class TiffImageFactory extends AbstractIoFactory
           final String name = "unknown";
           final CoordinateOperationMethod coordinateOperationMethod = getProjection(geoKeys);
 
-          final Map<ParameterName, ParameterValue> parameters = TiffProjectionParameterName
+          final Map<ParameterName, ParameterValue> parameters = GeoTiffKeyProjectionParameterName
             .getProjectionParameters(geoKeys);
 
           final LinearUnit linearUnit = getLinearUnit(geoKeys);
@@ -80,14 +87,14 @@ public class TiffImageFactory extends AbstractIoFactory
 
   }
 
-  public static LinearUnit getLinearUnit(final Map<Integer, Object> geoKeys) {
-    final int linearUnitId = Maps.getInteger(geoKeys, GeoTiffConstants.ProjLinearUnitsGeoKey, 0);
+  public static LinearUnit getLinearUnit(final Map<GeoTiffKey, Object> geoKeys) {
+    final int linearUnitId = GeoTiffKeys.ProjLinearUnitsGeoKey.getInteger(geoKeys, 0);
     return EpsgCoordinateSystems.getUnit(linearUnitId);
   }
 
-  public static CoordinateOperationMethod getProjection(final Map<Integer, Object> geoKeys) {
-    final int projectionId = Maps.getInteger(geoKeys, GeoTiffConstants.ProjCoordTransGeoKey, 0);
-    return TiffCoordinateTransformationCode.getCoordinateOperationMethod(projectionId);
+  public static CoordinateOperationMethod getProjection(final Map<GeoTiffKey, Object> geoKeys) {
+    final int projectionId = GeoTiffKeys.ProjCoordTransGeoKey.getInteger(geoKeys, 0);
+    return GeoTiffCoordinateTransformationCode.getCoordinateOperationMethod(projectionId);
   }
 
   public TiffImageFactory() {
@@ -103,7 +110,18 @@ public class TiffImageFactory extends AbstractIoFactory
 
   @Override
   public GeoreferencedImage readGeoreferencedImage(final Resource resource) {
-    return new TiffImage(resource);
+    try (
+      TiffDirectoryIterator iterator = new TiffDirectoryIterator(resource)) {
+      for (final TiffDirectory directory : iterator) {
+        final TiffImage image = directory.getImage();
+        image.getRenderedImage();
+        return image;
+      }
+    } catch (final Exception e) {
+      Logs.error(TiffImageFactory.class,
+        "Cannot read TIFF, falling back to commons-imaging library: " + resource);
+    }
+    return new TiffCommonsImagingImage(resource);
   }
 
 }

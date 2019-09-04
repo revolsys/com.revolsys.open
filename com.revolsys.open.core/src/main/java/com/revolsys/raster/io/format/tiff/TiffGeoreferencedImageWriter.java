@@ -30,6 +30,10 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageWriter;
+import com.revolsys.raster.io.format.tiff.code.GeoTiffCoordinateTransformationCode;
+import com.revolsys.raster.io.format.tiff.code.GeoTiffKey;
+import com.revolsys.raster.io.format.tiff.code.GeoTiffKeyProjectionParameterName;
+import com.revolsys.raster.io.format.tiff.code.GeoTiffKeys;
 import com.revolsys.spring.resource.Resource;
 
 public class TiffGeoreferencedImageWriter extends AbstractWriter<GeoreferencedImage>
@@ -61,50 +65,56 @@ public class TiffGeoreferencedImageWriter extends AbstractWriter<GeoreferencedIm
 
           private void addGeographicCoordinateSystem(
             final GeographicCoordinateSystem coordinateSystem) {
-            if (!addGeoKeyAuthority(GeographicTypeGeoKey, coordinateSystem.getAuthority())) {
+            if (!addGeoKeyAuthority(GeoTiffKeys.GeographicTypeGeoKey,
+              coordinateSystem.getAuthority())) {
               final AngularUnit angularUnit = coordinateSystem.getAngularUnit();
               final AngularUnit unit = angularUnit;
               final Authority authority = unit.getAuthority();
-              if (!addGeoKeyAuthority(GeogAngularUnitsGeoKey, authority)) {
-                addGeoKeyDouble(GeogAngularUnitSizeGeoKey, unit.toDegrees(1));
+              if (!addGeoKeyAuthority(GeoTiffKeys.GeogAngularUnitsGeoKey, authority)) {
+                addGeoKeyDouble(GeoTiffKeys.GeogAngularUnitSizeGeoKey, unit.toDegrees(1));
               }
               final GeodeticDatum datum = coordinateSystem.getGeodeticDatum();
-              if (!addGeoKeyAuthority(GeogGeodeticDatumGeoKey, datum.getAuthority())) {
+              if (!addGeoKeyAuthority(GeoTiffKeys.GeogGeodeticDatumGeoKey, datum.getAuthority())) {
                 final Ellipsoid ellipsoid = datum.getEllipsoid();
-                if (!addGeoKeyAuthority(GeogEllipsoidGeoKey, ellipsoid.getAuthority())) {
-                  addGeoKeyDouble(GeogSemiMajorAxisGeoKey, ellipsoid.getSemiMajorAxis());
-                  addGeoKeyDouble(GeogSemiMinorAxisGeoKey, ellipsoid.getSemiMinorAxis());
+                if (!addGeoKeyAuthority(GeoTiffKeys.GeogEllipsoidGeoKey,
+                  ellipsoid.getAuthority())) {
+                  addGeoKeyDouble(GeoTiffKeys.GeogSemiMajorAxisGeoKey,
+                    ellipsoid.getSemiMajorAxis());
+                  addGeoKeyDouble(GeoTiffKeys.GeogSemiMinorAxisGeoKey,
+                    ellipsoid.getSemiMinorAxis());
                 }
               }
               final PrimeMeridian primeMeridian = coordinateSystem.getPrimeMeridian();
-              if (!addGeoKeyAuthority(GeogPrimeMeridianGeoKey, primeMeridian.getAuthority())) {
-                addGeoKeyShort(GeogPrimeMeridianGeoKey, 32767);
-                addGeoKeyDouble(GeogPrimeMeridianLongGeoKey, primeMeridian.getLongitude());
+              if (!addGeoKeyAuthority(GeoTiffKeys.GeogPrimeMeridianGeoKey,
+                primeMeridian.getAuthority())) {
+                addGeoKeyShort(GeoTiffKeys.GeogPrimeMeridianGeoKey, 32767);
+                addGeoKeyDouble(GeoTiffKeys.GeogPrimeMeridianLongGeoKey,
+                  primeMeridian.getLongitude());
               }
             }
           }
 
           private void addGeographicCoordinateSystem(final GeometryFactory geometryFactory) {
-            addGeoKeyShort(GTModelTypeGeoKey, ModelTypeGeographic);
+            addGeoKeyShort(GeoTiffKeys.GTModelTypeGeoKey, ModelTypeGeographic);
 
             final GeographicCoordinateSystem coordinateSystem = geometryFactory
               .getHorizontalCoordinateSystem();
             final String coordinateSystemName = coordinateSystem.getCoordinateSystemName();
-            addGeoKeyString(GTCitationGeoKey, coordinateSystemName);
-            addGeoKeyString(GeogCitationGeoKey, coordinateSystemName);
+            addGeoKeyString(GeoTiffKeys.GTCitationGeoKey, coordinateSystemName);
+            addGeoKeyString(GeoTiffKeys.GeogCitationGeoKey, coordinateSystemName);
 
             addGeographicCoordinateSystem(coordinateSystem);
           }
 
-          private void addGeoKey(final int keyId, final int tiffTag, final int valueCount,
+          private void addGeoKey(final GeoTiffKey keyId, final int tiffTag, final int valueCount,
             final int valueOrOffset) {
-            this.geoKeys.add((short)keyId);
+            this.geoKeys.add((short)keyId.getId());
             this.geoKeys.add((short)tiffTag);
             this.geoKeys.add((short)valueCount);
             this.geoKeys.add((short)valueOrOffset);
           }
 
-          private boolean addGeoKeyAuthority(final int keyId, final Authority authority) {
+          private boolean addGeoKeyAuthority(final GeoTiffKeys keyId, final Authority authority) {
             final int id = authority.getId();
             if (id > 0 && id <= 65535 && id != CUSTOM) {
               addGeoKeyShort(keyId, id);
@@ -115,16 +125,16 @@ public class TiffGeoreferencedImageWriter extends AbstractWriter<GeoreferencedIm
             }
           }
 
-          private void addGeoKeyDouble(final int keyId, final double value) {
+          private void addGeoKeyDouble(final GeoTiffKey keyId, final double value) {
             addGeoKey(keyId, 34736, 1, this.geoDoubleParams.size());
             this.geoDoubleParams.add(value);
           }
 
-          private void addGeoKeyShort(final int keyId, final int value) {
+          private void addGeoKeyShort(final GeoTiffKey keyId, final int value) {
             addGeoKey(keyId, 0, 1, value);
           }
 
-          private void addGeoKeyString(final int keyId, final String value) {
+          private void addGeoKeyString(final GeoTiffKey keyId, final String value) {
             if (value != null && value.length() > 0) {
               final int offset = this.geoAsciiParams.length();
               final int stringLength = value.length() + 1;
@@ -146,24 +156,24 @@ public class TiffGeoreferencedImageWriter extends AbstractWriter<GeoreferencedIm
 
             final LinearUnit linearUnit = projectedCoordinateSystem.getLinearUnit();
 
-            addGeoKeyShort(GTModelTypeGeoKey, ModelTypeProjected);
-            addGeoKeyString(GTCitationGeoKey, coordinateSystemName);
-            addGeoKeyString(PCSCitationGeoKey, coordinateSystemName);
-            addGeoKeyString(GeogCitationGeoKey, geographicCSName);
+            addGeoKeyShort(GeoTiffKeys.GTModelTypeGeoKey, ModelTypeProjected);
+            addGeoKeyString(GeoTiffKeys.GTCitationGeoKey, coordinateSystemName);
+            addGeoKeyString(GeoTiffKeys.PCSCitationGeoKey, coordinateSystemName);
+            addGeoKeyString(GeoTiffKeys.GeogCitationGeoKey, geographicCSName);
 
-            if (!addGeoKeyAuthority(ProjectedCSTypeGeoKey,
+            if (!addGeoKeyAuthority(GeoTiffKeys.ProjectedCSTypeGeoKey,
               projectedCoordinateSystem.getAuthority())) {
               addGeographicCoordinateSystem(geographicCoordinateSystem);
 
-              addGeoKeyShort(ProjectedCSTypeGeoKey, coordinateSystemId);
+              addGeoKeyShort(GeoTiffKeys.ProjectedCSTypeGeoKey, coordinateSystemId);
 
-              final int projectionCode = TiffCoordinateTransformationCode
+              final int projectionCode = GeoTiffCoordinateTransformationCode
                 .getCode(projectedCoordinateSystem);
-              addGeoKeyShort(ProjCoordTransGeoKey, projectionCode);
+              addGeoKeyShort(GeoTiffKeys.ProjCoordTransGeoKey, projectionCode);
 
               final Authority authority = linearUnit.getAuthority();
-              if (!addGeoKeyAuthority(ProjLinearUnitsGeoKey, authority)) {
-                addGeoKeyDouble(ProjLinearUnitSizeGeoKey, linearUnit.toMetres(1));
+              if (!addGeoKeyAuthority(GeoTiffKeys.ProjLinearUnitsGeoKey, authority)) {
+                addGeoKeyDouble(GeoTiffKeys.ProjLinearUnitSizeGeoKey, linearUnit.toMetres(1));
               }
               for (final Entry<ParameterName, ParameterValue> entry : projectedCoordinateSystem
                 .getParameterValues()
@@ -171,9 +181,9 @@ public class TiffGeoreferencedImageWriter extends AbstractWriter<GeoreferencedIm
                 final ParameterName parameterName = entry.getKey();
                 final ParameterValue value = entry.getValue();
 
-                final int keyId = TiffProjectionParameterName.getCode(parameterName).getCode();
+                final GeoTiffKey key = GeoTiffKeyProjectionParameterName.getById(parameterName);
                 final double valueDouble = ((Number)value.getValue()).doubleValue();
-                addGeoKeyDouble(keyId, valueDouble);
+                addGeoKeyDouble(key, valueDouble);
               }
             }
           }
@@ -207,7 +217,7 @@ public class TiffGeoreferencedImageWriter extends AbstractWriter<GeoreferencedIm
             } else if (geometryFactory.isGeographic()) {
               addGeographicCoordinateSystem(geometryFactory);
             }
-            addGeoKeyShort(GTRasterTypeGeoKey, RasterPixelIsArea);
+            addGeoKeyShort(GeoTiffKeys.GTRasterTypeGeoKey, RasterPixelIsArea);
             if (!this.geoKeys.isEmpty()) {
               final short[] geoKeysArray = new short[this.geoKeys.size() + 4];
               geoKeysArray[0] = 1;

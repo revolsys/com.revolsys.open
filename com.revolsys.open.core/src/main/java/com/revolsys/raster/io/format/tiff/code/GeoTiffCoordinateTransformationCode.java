@@ -1,4 +1,4 @@
-package com.revolsys.raster.io.format.tiff;
+package com.revolsys.raster.io.format.tiff.code;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,7 +8,7 @@ import org.jeometry.coordinatesystem.model.ProjectedCoordinateSystem;
 
 import com.revolsys.collection.map.IntHashMap;
 
-public enum TiffCoordinateTransformationCode {
+public enum GeoTiffCoordinateTransformationCode {
   undefined(0), //
   CT_TransverseMercator(1, CoordinateOperationMethod.TRANSVERSE_MERCATOR), //
   CT_TransvMercator_Modified_Alaska(2), //
@@ -38,12 +38,12 @@ public enum TiffCoordinateTransformationCode {
   CT_NewZealandMapGrid(26), //
   CT_TransvMercator_SouthOriented(27);
 
-  private static IntHashMap<TiffCoordinateTransformationCode> valueByCode = new IntHashMap<>();
+  private static IntHashMap<GeoTiffCoordinateTransformationCode> valueByCode = new IntHashMap<>();
 
-  private static Map<String, TiffCoordinateTransformationCode> valueByName = new HashMap<>();
+  private static Map<String, GeoTiffCoordinateTransformationCode> valueByName = new HashMap<>();
 
   static {
-    for (final TiffCoordinateTransformationCode value : TiffCoordinateTransformationCode.values()) {
+    for (final GeoTiffCoordinateTransformationCode value : GeoTiffCoordinateTransformationCode.values()) {
       final int code = value.getCode();
       valueByCode.put(code, value);
       final String projectionName = value.getProjectionName();
@@ -53,7 +53,7 @@ public enum TiffCoordinateTransformationCode {
     }
   }
 
-  public static TiffCoordinateTransformationCode getCode(final int code) {
+  public static GeoTiffCoordinateTransformationCode getById(final int code) {
     return valueByCode.getOrDefault(code, undefined);
   }
 
@@ -65,7 +65,7 @@ public enum TiffCoordinateTransformationCode {
   }
 
   public static CoordinateOperationMethod getCoordinateOperationMethod(final int code) {
-    return getCode(code).getCoordinateOperationMethod();
+    return getById(code).getCoordinateOperationMethod();
   }
 
   private int code;
@@ -74,11 +74,11 @@ public enum TiffCoordinateTransformationCode {
 
   private String projectionName;
 
-  private TiffCoordinateTransformationCode(final int code) {
+  private GeoTiffCoordinateTransformationCode(final int code) {
     this.code = code;
   }
 
-  private TiffCoordinateTransformationCode(final int code, final String projectionName) {
+  private GeoTiffCoordinateTransformationCode(final int code, final String projectionName) {
     this.code = code;
     this.projectionName = projectionName;
     this.coordinateOperationMethod = new CoordinateOperationMethod(projectionName);

@@ -21,19 +21,22 @@ import com.revolsys.elevation.cloud.las.pointformat.LasPointFormat;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.endian.EndianOutput;
 import com.revolsys.io.endian.EndianOutputStream;
-import com.revolsys.raster.io.format.tiff.GeoTiffConstants;
 import com.revolsys.raster.io.format.tiff.TiffImageFactory;
-import com.revolsys.raster.io.format.tiff.TiffProjectionParameterName;
+import com.revolsys.raster.io.format.tiff.code.GeoTiffKey;
+import com.revolsys.raster.io.format.tiff.code.GeoTiffKeyProjectionParameterName;
+import com.revolsys.raster.io.format.tiff.code.GeoTiffKeys;
+import com.revolsys.raster.io.format.tiff.code.TiffPrivateTag;
 import com.revolsys.util.Pair;
 
 public class LasProjection {
   private static final String LASF_PROJECTION = "LASF_Projection";
 
-  private static final int ID_TIFF_GEO_KEY_DIRECTORY_TAG = 34735;
+  private static final int ID_TIFF_GEO_KEY_DIRECTORY_TAG = TiffPrivateTag.GeoKeyDirectoryTag
+    .getId();
 
-  private static final int ID_TIFF_GEO_DOUBLE_PARAMS = 34736;
+  private static final int ID_TIFF_GEO_DOUBLE_PARAMS = TiffPrivateTag.GeoDoubleParamsTag.getId();
 
-  private static final int ID_TIFF_GEO_ASCII_PARAMS = 34737;
+  private static final int ID_TIFF_GEO_ASCII_PARAMS = TiffPrivateTag.GeoAsciiParamsTag.getId();
 
   private static final Pair<String, Integer> KEY_TIFF_GEO_ASCII_PARAMS = new Pair<>(LASF_PROJECTION,
     ID_TIFF_GEO_ASCII_PARAMS);
@@ -52,7 +55,7 @@ public class LasProjection {
     final byte[] asciiParamsBytes = header.getLasPropertyValue(KEY_TIFF_GEO_ASCII_PARAMS,
       new byte[0]);
 
-    final Map<Integer, Object> properties = new LinkedHashMap<>();
+    final Map<GeoTiffKey, Object> properties = new LinkedHashMap<>();
     final int[] geoKeys = LasVariableLengthRecordConverter.getUnsignedShortArray(bytes);
 
     int i = 0;
@@ -61,29 +64,29 @@ public class LasProjection {
     final int minorRevision = geoKeys[i++];
     final int keyCount = geoKeys[i++];
     for (int keyIndex = 0; keyIndex < keyCount; keyIndex++) {
-      final int keyId = geoKeys[i++];
-      final int tagLocation = geoKeys[i++];
+      final GeoTiffKey keyId = GeoTiffKeys.getById(geoKeys[i++]);
+      final int tagId = geoKeys[i++];
       final int count = geoKeys[i++];
       final int offset = geoKeys[i++];
-      if (tagLocation == 0) {
+      if (tagId == 0) {
         properties.put(keyId, offset);
-      } else if (tagLocation == ID_TIFF_GEO_DOUBLE_PARAMS) {
+      } else if (TiffPrivateTag.GeoDoubleParamsTag.equalsId(tagId)) {
         final double value = doubleParams[offset];
         properties.put(keyId, value);
-      } else if (tagLocation == ID_TIFF_GEO_ASCII_PARAMS) {
+      } else if (TiffPrivateTag.GeoAsciiParamsTag.equalsId(tagId)) {
         final String value = new String(asciiParamsBytes, offset, count, StandardCharsets.US_ASCII);
         properties.put(keyId, value);
       }
     }
     CoordinateSystem coordinateSystem = null;
-    int coordinateSystemId = Maps.getInteger(properties, GeoTiffConstants.ProjectedCSTypeGeoKey, 0);
+    int coordinateSystemId = Maps.getInteger(properties, GeoTiffKeys.ProjectedCSTypeGeoKey, 0);
     if (coordinateSystemId == 0) {
-      coordinateSystemId = Maps.getInteger(properties, GeoTiffConstants.GeographicTypeGeoKey, 0);
+      coordinateSystemId = Maps.getInteger(properties, GeoTiffKeys.GeographicTypeGeoKey, 0);
       if (coordinateSystemId != 0) {
         coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(coordinateSystemId);
       }
     } else if (coordinateSystemId <= 0 || coordinateSystemId == 32767) {
-      final int geoSrid = Maps.getInteger(properties, GeoTiffConstants.GeographicTypeGeoKey, 0);
+      final int geoSrid = Maps.getInteger(properties, GeoTiffKeys.GeographicTypeGeoKey, 0);
       if (geoSrid != 0) {
         if (geoSrid > 0 && geoSrid < 32767) {
           final GeographicCoordinateSystem geographicCoordinateSystem = EpsgCoordinateSystems
@@ -92,7 +95,7 @@ public class LasProjection {
           final CoordinateOperationMethod coordinateOperationMethod = TiffImageFactory
             .getProjection(properties);
 
-          final Map<ParameterName, ParameterValue> parameters = TiffProjectionParameterName
+          final Map<ParameterName, ParameterValue> parameters = GeoTiffKeyProjectionParameterName
             .getProjectionParameters(properties);
 
           final LinearUnit linearUnit = TiffImageFactory.getLinearUnit(properties);
@@ -159,11 +162,11 @@ public class LasProjection {
       final LasPointFormat pointFormat = header.getPointFormat();
       if (pointFormat.getId() <= 5) {
         final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
-        int keyId;
+        GeoTiffKey keyId;
         if (geometryFactory.isProjected()) {
-          keyId = GeoTiffConstants.ProjectedCSTypeGeoKey;
+          keyId = GeoTiffKeys.ProjectedCSTypeGeoKey;
         } else {
-          keyId = GeoTiffConstants.GeographicTypeGeoKey;
+          keyId = GeoTiffKeys.GeographicTypeGeoKey;
         }
 
         final ByteArrayOutputStream byteOut = new ByteArrayOutputStream(1024);
@@ -174,7 +177,7 @@ public class LasProjection {
           out.writeLEUnsignedShort(0);
           out.writeLEUnsignedShort(1);
           {
-            out.writeLEUnsignedShort(keyId);
+            out.writeLEUnsignedShort(keyId.getId());
             out.writeLEUnsignedShort(0);
             out.writeLEUnsignedShort(1);
             out.writeLEUnsignedShort(coordinateSystemId);
