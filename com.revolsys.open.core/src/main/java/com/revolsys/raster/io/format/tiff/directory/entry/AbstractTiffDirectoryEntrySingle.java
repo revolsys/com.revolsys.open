@@ -8,10 +8,9 @@ import com.revolsys.raster.io.format.tiff.code.TiffTag;
 public abstract class AbstractTiffDirectoryEntrySingle extends AbstractTiffDirectoryEntry {
 
   public AbstractTiffDirectoryEntrySingle(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory) {
+    final TiffDirectory directory, final ChannelReader in) {
     super(type, tag);
     final long count;
-    final ChannelReader in = directory.getIn();
     if (directory.isBigTiff()) {
       count = in.getLong();
     } else {

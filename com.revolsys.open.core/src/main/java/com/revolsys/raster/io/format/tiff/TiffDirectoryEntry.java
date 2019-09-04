@@ -4,6 +4,7 @@ import java.io.PrintStream;
 
 import org.jeometry.common.data.type.DataTypes;
 
+import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
 import com.revolsys.raster.io.format.tiff.code.TiffPrivateTag;
 import com.revolsys.raster.io.format.tiff.code.TiffTag;
@@ -209,6 +210,6 @@ public interface TiffDirectoryEntry {
     return true;
   }
 
-  default void loadValue() {
+  default void loadValue(final ChannelReader in) {
   }
 }

@@ -10,9 +10,8 @@ public class TiffDirectoryEntryUnsignedByte extends AbstractTiffDirectoryEntrySi
   private final byte value;
 
   public TiffDirectoryEntryUnsignedByte(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory) {
-    super(type, tag, directory);
-    final ChannelReader in = directory.getIn();
+    final TiffDirectory directory, final ChannelReader in) {
+    super(type, tag, directory, in);
     this.value = in.getByte();
     if (directory.isBigTiff()) {
       in.skipBytes(7);

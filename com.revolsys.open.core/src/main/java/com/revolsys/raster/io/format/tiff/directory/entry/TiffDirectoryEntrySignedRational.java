@@ -10,13 +10,12 @@ public class TiffDirectoryEntrySignedRational extends AbstractTiffDirectoryEntry
   private double value = Double.NaN;
 
   public TiffDirectoryEntrySignedRational(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory) {
-    super(type, tag, directory);
+    final TiffDirectory directory, final ChannelReader in) {
+    super(type, tag, directory, in);
   }
 
   @Override
   public double getDouble() {
-    loadValue();
     return this.value;
   }
 

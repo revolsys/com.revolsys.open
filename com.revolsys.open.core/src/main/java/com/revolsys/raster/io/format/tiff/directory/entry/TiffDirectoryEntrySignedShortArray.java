@@ -10,9 +10,8 @@ import com.revolsys.raster.io.format.tiff.code.TiffTag;
 public class TiffDirectoryEntrySignedShortArray extends AbstractTiffDirectoryEntryArray<short[]> {
 
   public static TiffDirectoryEntrySignedShortArray newEntry(final TiffFieldType type,
-    final TiffTag tag, final TiffDirectory directory) {
-    final ChannelReader in = directory.getIn();
-    final long count = directory.readOffsetOrCount();
+    final TiffTag tag, final TiffDirectory directory, final ChannelReader in) {
+    final long count = directory.readOffsetOrCount(in);
     final int maxInlineCount = directory.getMaxInlineCount(2);
     if (count <= maxInlineCount) {
       final short[] value = new short[(int)count];
@@ -23,7 +22,7 @@ public class TiffDirectoryEntrySignedShortArray extends AbstractTiffDirectoryEnt
       return new TiffDirectoryEntrySignedShortArray(type, tag, count, value);
 
     } else {
-      return new TiffDirectoryEntrySignedShortArray(type, tag, directory, count);
+      return new TiffDirectoryEntrySignedShortArray(type, tag, directory, in, count);
     }
   }
 
@@ -33,25 +32,22 @@ public class TiffDirectoryEntrySignedShortArray extends AbstractTiffDirectoryEnt
   }
 
   private TiffDirectoryEntrySignedShortArray(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory, final long count) {
-    super(type, tag, directory, count);
+    final TiffDirectory directory, final ChannelReader in, final long count) {
+    super(type, tag, directory, in, count);
   }
 
   @Override
   public Number getNumber(final int index) {
-    loadValue();
     return this.value[index];
   }
 
   @Override
   public short getShort(final int index) {
-    loadValue();
     return this.value[index];
   }
 
   @Override
   public String getString() {
-    loadValue();
     return Arrays.toString(this.value);
   }
 

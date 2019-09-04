@@ -10,13 +10,12 @@ public class TiffDirectoryEntryAscii extends AbstractTiffDirectoryEntryCountOffs
   private String value;
 
   public TiffDirectoryEntryAscii(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory) {
-    super(type, tag, directory);
+    final TiffDirectory directory, final ChannelReader in) {
+    super(type, tag, directory, in);
   }
 
   @Override
   public String getString() {
-    loadValue();
     return this.value;
   }
 

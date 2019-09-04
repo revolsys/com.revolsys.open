@@ -11,30 +11,27 @@ public class TiffDirectoryEntrySignedRationalArray
   extends AbstractTiffDirectoryEntryArray<double[]> {
 
   public TiffDirectoryEntrySignedRationalArray(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory) {
-    super(type, tag, directory);
+    final TiffDirectory directory, final ChannelReader in) {
+    super(type, tag, directory, in);
   }
 
   public TiffDirectoryEntrySignedRationalArray(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory, final long count) {
-    super(type, tag, directory, count);
+    final TiffDirectory directory, final ChannelReader in, final long count) {
+    super(type, tag, directory, in, count);
   }
 
   @Override
   public double getDouble(final int index) {
-    loadValue();
     return this.value[index];
   }
 
   @Override
   public Number getNumber(final int index) {
-    loadValue();
     return this.value[index];
   }
 
   @Override
   public String getString() {
-    loadValue();
     return Arrays.toString(this.value);
   }
 

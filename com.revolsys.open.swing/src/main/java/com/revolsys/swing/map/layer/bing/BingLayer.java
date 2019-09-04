@@ -12,11 +12,11 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.parallel.ExecutorServiceFactory;
-import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
+import com.revolsys.swing.map.layer.raster.AbstractTiledGeoreferencedImageLayer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.CaseConverter;
 
-public class BingLayer extends AbstractTiledImageLayer<BingMapTile> {
+public class BingLayer extends AbstractTiledGeoreferencedImageLayer<BingMapTile> {
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(EpsgId.WGS84);
 
   private static final BoundingBox MAX_BOUNDING_BOX = GEOMETRY_FACTORY.newBoundingBox(-180, -85,

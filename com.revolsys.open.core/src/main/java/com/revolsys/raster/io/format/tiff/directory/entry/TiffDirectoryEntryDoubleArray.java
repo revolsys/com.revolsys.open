@@ -10,9 +10,8 @@ import com.revolsys.raster.io.format.tiff.code.TiffTag;
 public class TiffDirectoryEntryDoubleArray extends AbstractTiffDirectoryEntryArray<double[]> {
 
   public static TiffDirectoryEntryDoubleArray newEntry(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory) {
-    final ChannelReader in = directory.getIn();
-    final long count = directory.readOffsetOrCount();
+    final TiffDirectory directory, final ChannelReader in) {
+    final long count = directory.readOffsetOrCount(in);
     final boolean bigTiff = directory.isBigTiff();
     if (count == 1 && bigTiff) {
       final double[] value = new double[(int)count];
@@ -20,7 +19,7 @@ public class TiffDirectoryEntryDoubleArray extends AbstractTiffDirectoryEntryArr
       return new TiffDirectoryEntryDoubleArray(type, tag, count, value);
 
     } else {
-      return new TiffDirectoryEntryDoubleArray(type, tag, directory, count);
+      return new TiffDirectoryEntryDoubleArray(type, tag, directory, in, count);
     }
   }
 
@@ -30,13 +29,12 @@ public class TiffDirectoryEntryDoubleArray extends AbstractTiffDirectoryEntryArr
   }
 
   public TiffDirectoryEntryDoubleArray(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory, final long count) {
-    super(type, tag, directory, count);
+    final TiffDirectory directory, final ChannelReader in, final long count) {
+    super(type, tag, directory, in, count);
   }
 
   @Override
   public double getDouble(final int index) {
-    loadValue();
     return this.value[index];
   }
 
@@ -47,13 +45,11 @@ public class TiffDirectoryEntryDoubleArray extends AbstractTiffDirectoryEntryArr
 
   @Override
   public Number getNumber(final int index) {
-    loadValue();
     return this.value[index];
   }
 
   @Override
   public String getString() {
-    loadValue();
     return Arrays.toString(this.value);
   }
 

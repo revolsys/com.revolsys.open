@@ -11,40 +11,30 @@ public abstract class AbstractTiffDirectoryEntryCountOffset extends AbstractTiff
 
   protected long offset;
 
-  private final ChannelReader in;
-
   public AbstractTiffDirectoryEntryCountOffset(final TiffFieldType type, final TiffTag tag,
-    final ChannelReader in, final long count, final long offset) {
+    final long count, final long offset) {
     super(type, tag);
-    this.in = in;
     this.count = count;
     this.offset = offset;
   }
 
   public AbstractTiffDirectoryEntryCountOffset(final TiffFieldType type, final TiffTag tag,
     final long count) {
-    this(type, tag, null, count, -1);
+    this(type, tag, count, -1);
   }
 
   public AbstractTiffDirectoryEntryCountOffset(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory) {
+    final TiffDirectory directory, final ChannelReader in) {
     super(type, tag);
-    this.in = directory.getIn();
-    if (directory.isBigTiff()) {
-      this.count = this.in.getLong();
-      this.offset = this.in.getLong();
-    } else {
-      this.count = this.in.getUnsignedInt();
-      this.offset = this.in.getUnsignedInt();
-    }
+    this.count = directory.readOffsetOrCount(in);
+    this.offset = directory.readOffsetOrCount(in);
   }
 
   public AbstractTiffDirectoryEntryCountOffset(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory, final long count) {
+    final TiffDirectory directory, final ChannelReader in, final long count) {
     super(type, tag);
-    this.in = directory.getIn();
     this.count = count;
-    this.offset = directory.readOffsetOrCount();
+    this.offset = directory.readOffsetOrCount(in);
   }
 
   @Override
@@ -58,10 +48,10 @@ public abstract class AbstractTiffDirectoryEntryCountOffset extends AbstractTiff
   }
 
   @Override
-  public void loadValue() {
+  public void loadValue(final ChannelReader in) {
     if (!isLoaded()) {
-      this.in.seek(this.offset);
-      loadValueDo(this.in, (int)this.count);
+      in.seek(this.offset);
+      loadValueDo(in, (int)this.count);
       this.offset = -1;
     }
   }

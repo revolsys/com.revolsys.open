@@ -7,6 +7,7 @@ import java.util.Arrays;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.number.Integers;
 
+import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.raster.io.format.tiff.TiffDirectory;
 import com.revolsys.raster.io.format.tiff.code.TiffBaselineTag;
 import com.revolsys.raster.io.format.tiff.code.TiffExtensionTag;
@@ -70,14 +71,14 @@ public class TiffRgbFullColorImage extends AbstractTiffImage {
   }
 
   @Override
-  protected void readImagePart(final BufferedImage bufferedImage, final long[] offsets,
-    final long[] counts, final int partIndex, final int imageX, final int imageY,
-    final int dataWidth, final int height, final int width) {
+  protected void readImagePart(final ChannelReader in, final BufferedImage bufferedImage,
+    final long[] offsets, final long[] counts, final int partIndex, final int imageX,
+    final int imageY, final int dataWidth, final int height, final int width) {
     if (this.planarConfiguration == 2) {
-      readImagePartPlanar(bufferedImage, partIndex, offsets, counts, imageX, imageY, dataWidth,
+      readImagePartPlanar(in, bufferedImage, partIndex, offsets, counts, imageX, imageY, dataWidth,
         height, width);
     } else {
-      super.readImagePart(bufferedImage, offsets, counts, partIndex, imageX, imageY, dataWidth,
+      super.readImagePart(in, bufferedImage, offsets, counts, partIndex, imageX, imageY, dataWidth,
         height, width);
     }
   }
@@ -116,17 +117,18 @@ public class TiffRgbFullColorImage extends AbstractTiffImage {
     }
   }
 
-  private void readImagePartPlanar(final BufferedImage bufferedImage, final int partIndex,
-    final long[] offsets, final long[] counts, final int imageX, final int imageY,
-    final int dataWidth, final int dataHeight, final int cropWidth) {
+  private void readImagePartPlanar(final ChannelReader in, final BufferedImage bufferedImage,
+    final int partIndex, final long[] offsets, final long[] counts, final int imageX,
+    final int imageY, final int dataWidth, final int dataHeight, final int cropWidth) {
     try (
-      final TiffDecompressor decompressorRed = newPlanarDecompressor(offsets, counts, partIndex, 0);
-      final TiffDecompressor decompressorGreen = newPlanarDecompressor(offsets, counts, partIndex,
-        1);
-      final TiffDecompressor decompressorBlue = newPlanarDecompressor(offsets, counts, partIndex,
-        2);
-      final TiffDecompressor decompressorAlpha = newPlanarDecompressor(offsets, counts, partIndex,
-        this.alphaByteIndex);) {
+      final TiffDecompressor decompressorRed = newPlanarDecompressor(in, offsets, counts, partIndex,
+        0);
+      final TiffDecompressor decompressorGreen = newPlanarDecompressor(in, offsets, counts,
+        partIndex, 1);
+      final TiffDecompressor decompressorBlue = newPlanarDecompressor(in, offsets, counts,
+        partIndex, 2);
+      final TiffDecompressor decompressorAlpha = newPlanarDecompressor(in, offsets, counts,
+        partIndex, this.alphaByteIndex);) {
       final ReadSampleInt sampleReaderRed = newSampleReader(decompressorRed,
         this.bitCountPerSample);
       final ReadSampleInt sampleReaderGreen = newSampleReader(decompressorGreen,

@@ -7,6 +7,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.raster.GeoreferencedImage;
+import com.revolsys.raster.GeoreferencedImageMapTile;
 import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayer;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
@@ -18,7 +19,7 @@ import com.revolsys.util.Cancellable;
 public class TiledGeoreferencedImageLayerRenderer<T extends GeoreferencedImageMapTile>
   extends AbstractTiledLayerRenderer<GeoreferencedImage, T> implements PropertyChangeListener {
 
-  public TiledGeoreferencedImageLayerRenderer(final AbstractTiledImageLayer<T> layer) {
+  public TiledGeoreferencedImageLayerRenderer(final AbstractTiledGeoreferencedImageLayer<T> layer) {
     super("tiledImage", layer);
   }
 

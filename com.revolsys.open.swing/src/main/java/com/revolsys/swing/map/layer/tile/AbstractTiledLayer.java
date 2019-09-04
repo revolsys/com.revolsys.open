@@ -9,6 +9,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.BaseMapLayer;
 import com.revolsys.swing.map.view.ViewRenderer;
+import com.revolsys.util.AbstractMapTile;
 
 public abstract class AbstractTiledLayer<D, T extends AbstractMapTile<D>> extends AbstractLayer
   implements BaseMapLayer {

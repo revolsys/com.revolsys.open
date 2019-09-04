@@ -1,11 +1,9 @@
-package com.revolsys.swing.map.layer.raster;
+package com.revolsys.raster;
 
 import java.awt.image.BufferedImage;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.raster.BufferedGeoreferencedImage;
-import com.revolsys.raster.GeoreferencedImage;
-import com.revolsys.swing.map.layer.tile.AbstractMapTile;
+import com.revolsys.util.AbstractMapTile;
 
 public abstract class GeoreferencedImageMapTile extends AbstractMapTile<GeoreferencedImage> {
 

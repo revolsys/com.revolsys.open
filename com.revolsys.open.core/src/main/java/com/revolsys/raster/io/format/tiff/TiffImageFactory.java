@@ -113,9 +113,7 @@ public class TiffImageFactory extends AbstractIoFactory
     try (
       TiffDirectoryIterator iterator = new TiffDirectoryIterator(resource)) {
       for (final TiffDirectory directory : iterator) {
-        final TiffImage image = directory.getImage();
-        image.getRenderedImage();
-        return image;
+        return directory.getImage();
       }
     } catch (final Exception e) {
       Logs.error(TiffImageFactory.class,

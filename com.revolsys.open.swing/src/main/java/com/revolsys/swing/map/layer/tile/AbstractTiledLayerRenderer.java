@@ -14,6 +14,7 @@ import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.parallel.RunnableSwingWorkerManager;
+import com.revolsys.util.AbstractMapTile;
 import com.revolsys.util.BooleanCancellable;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.Property;

@@ -10,9 +10,8 @@ import com.revolsys.raster.io.format.tiff.code.TiffTag;
 public class TiffDirectoryEntrySignedByteArray extends AbstractTiffDirectoryEntryArray<byte[]> {
 
   public static TiffDirectoryEntrySignedByteArray newEntry(final TiffFieldType type,
-    final TiffTag tag, final TiffDirectory directory) {
-    final ChannelReader in = directory.getIn();
-    final long count = directory.readOffsetOrCount();
+    final TiffTag tag, final TiffDirectory directory, final ChannelReader in) {
+    final long count = directory.readOffsetOrCount(in);
     final int maxInlineCount = directory.getMaxInlineCount(1);
     if (count <= maxInlineCount) {
       final byte[] value = new byte[(int)count];
@@ -22,7 +21,7 @@ public class TiffDirectoryEntrySignedByteArray extends AbstractTiffDirectoryEntr
       in.skipBytes((int)(maxInlineCount - count));
       return new TiffDirectoryEntrySignedByteArray(type, tag, count, value);
     } else {
-      return new TiffDirectoryEntrySignedByteArray(type, tag, directory, count);
+      return new TiffDirectoryEntrySignedByteArray(type, tag, directory, in, count);
     }
   }
 
@@ -32,13 +31,12 @@ public class TiffDirectoryEntrySignedByteArray extends AbstractTiffDirectoryEntr
   }
 
   public TiffDirectoryEntrySignedByteArray(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory, final long count) {
-    super(type, tag, directory, count);
+    final TiffDirectory directory, final ChannelReader in, final long count) {
+    super(type, tag, directory, in, count);
   }
 
   @Override
   public byte getByte(final int index) {
-    loadValue();
     return this.value[index];
   }
 
@@ -49,13 +47,11 @@ public class TiffDirectoryEntrySignedByteArray extends AbstractTiffDirectoryEntr
 
   @Override
   public Number getNumber(final int index) {
-    loadValue();
     return this.value[index];
   }
 
   @Override
   public String getString() {
-    loadValue();
     return Arrays.toString(this.value);
   }
 

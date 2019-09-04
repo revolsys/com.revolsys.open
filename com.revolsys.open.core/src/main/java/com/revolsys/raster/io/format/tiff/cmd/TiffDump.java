@@ -10,7 +10,6 @@ public class TiffDump {
     try (
       TiffDirectoryIterator directoryIterator = TiffDirectoryIterator.newIterator(source)) {
       for (final TiffDirectory directory : directoryIterator) {
-        directory.loadValues();
         directory.dump(out);
         out.println();
       }

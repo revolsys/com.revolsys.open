@@ -10,9 +10,8 @@ import com.revolsys.raster.io.format.tiff.code.TiffTag;
 public class TiffDirectoryEntryFloatArray extends AbstractTiffDirectoryEntryArray<float[]> {
 
   public static TiffDirectoryEntryFloatArray newEntry(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory) {
-    final ChannelReader in = directory.getIn();
-    final long count = directory.readOffsetOrCount();
+    final TiffDirectory directory, final ChannelReader in) {
+    final long count = directory.readOffsetOrCount(in);
     final int maxInlineCount = directory.getMaxInlineCount(4);
     if (count <= maxInlineCount) {
       final float[] value = new float[(int)count];
@@ -23,7 +22,7 @@ public class TiffDirectoryEntryFloatArray extends AbstractTiffDirectoryEntryArra
       return new TiffDirectoryEntryFloatArray(type, tag, count, value);
 
     } else {
-      return new TiffDirectoryEntryFloatArray(type, tag, directory, count);
+      return new TiffDirectoryEntryFloatArray(type, tag, directory, in, count);
     }
   }
 
@@ -33,25 +32,22 @@ public class TiffDirectoryEntryFloatArray extends AbstractTiffDirectoryEntryArra
   }
 
   private TiffDirectoryEntryFloatArray(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory, final long count) {
-    super(type, tag, directory, count);
+    final TiffDirectory directory, final ChannelReader in, final long count) {
+    super(type, tag, directory, in, count);
   }
 
   @Override
   public float getFloat(final int index) {
-    loadValue();
     return this.value[index];
   }
 
   @Override
   public Number getNumber(final int index) {
-    loadValue();
     return this.value[index];
   }
 
   @Override
   public String getString() {
-    loadValue();
     return Arrays.toString(this.value);
   }
 

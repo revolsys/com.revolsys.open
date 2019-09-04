@@ -2,7 +2,7 @@ package com.revolsys.swing.map.layer.webmercatortilecache;
 
 import java.awt.image.BufferedImage;
 
-import com.revolsys.swing.map.layer.raster.GeoreferencedImageMapTile;
+import com.revolsys.raster.GeoreferencedImageMapTile;
 
 public class WebMercatorTileCacheMapTile extends GeoreferencedImageMapTile {
   private final WebMercatorTileCacheLayer layer;

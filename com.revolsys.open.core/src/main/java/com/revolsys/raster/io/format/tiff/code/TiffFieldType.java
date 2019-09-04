@@ -3,8 +3,9 @@ package com.revolsys.raster.io.format.tiff.code;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jeometry.common.function.Function3;
+import org.jeometry.common.function.Function4;
 
+import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.raster.io.format.tiff.TiffDirectory;
 import com.revolsys.raster.io.format.tiff.TiffDirectoryEntry;
 import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryAscii;
@@ -138,18 +139,18 @@ public enum TiffFieldType {
 
   private final int type;
 
-  private final Function3<TiffFieldType, TiffTag, TiffDirectory, TiffDirectoryEntry> newDirectoryEntryFunction;
+  private final Function4<TiffFieldType, TiffTag, TiffDirectory, ChannelReader, TiffDirectoryEntry> newDirectoryEntryFunction;
 
-  private final Function3<TiffFieldType, TiffTag, TiffDirectory, TiffDirectoryEntry> newDirectoryEntryArrayFunction;
+  private final Function4<TiffFieldType, TiffTag, TiffDirectory, ChannelReader, TiffDirectoryEntry> newDirectoryEntryArrayFunction;
 
   private TiffFieldType(final int type,
-    final Function3<TiffFieldType, TiffTag, TiffDirectory, TiffDirectoryEntry> newDirectoryEntryFunction) {
+    final Function4<TiffFieldType, TiffTag, TiffDirectory, ChannelReader, TiffDirectoryEntry> newDirectoryEntryFunction) {
     this(type, newDirectoryEntryFunction, null);
   }
 
   private TiffFieldType(final int type,
-    final Function3<TiffFieldType, TiffTag, TiffDirectory, TiffDirectoryEntry> newDirectoryEntryFunction,
-    final Function3<TiffFieldType, TiffTag, TiffDirectory, TiffDirectoryEntry> newDirectoryEntryArrayFunction) {
+    final Function4<TiffFieldType, TiffTag, TiffDirectory, ChannelReader, TiffDirectoryEntry> newDirectoryEntryFunction,
+    final Function4<TiffFieldType, TiffTag, TiffDirectory, ChannelReader, TiffDirectoryEntry> newDirectoryEntryArrayFunction) {
     this.type = type;
     this.newDirectoryEntryFunction = newDirectoryEntryFunction;
     this.newDirectoryEntryArrayFunction = newDirectoryEntryArrayFunction;
@@ -159,16 +160,17 @@ public enum TiffFieldType {
     return this.type;
   }
 
-  public TiffDirectoryEntry newDirectoryEntry(final TiffTag tag, final TiffDirectory directory) {
-    return this.newDirectoryEntryFunction.apply(this, tag, directory);
+  public TiffDirectoryEntry newDirectoryEntry(final TiffTag tag, final TiffDirectory directory,
+    final ChannelReader in) {
+    return this.newDirectoryEntryFunction.apply(this, tag, directory, in);
   }
 
-  public TiffDirectoryEntry newDirectoryEntryArray(final TiffTag tag,
-    final TiffDirectory directory) {
+  public TiffDirectoryEntry newDirectoryEntryArray(final TiffTag tag, final TiffDirectory directory,
+    final ChannelReader in) {
     if (this.newDirectoryEntryArrayFunction == null) {
       throw new IllegalArgumentException("Array of " + this + " not supported");
     } else {
-      return this.newDirectoryEntryArrayFunction.apply(this, tag, directory);
+      return this.newDirectoryEntryArrayFunction.apply(this, tag, directory, in);
     }
   }
 }

@@ -10,9 +10,8 @@ public class TiffDirectoryEntrySignedShort extends AbstractTiffDirectoryEntrySin
   private final short value;
 
   public TiffDirectoryEntrySignedShort(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory) {
-    super(type, tag, directory);
-    final ChannelReader in = directory.getIn();
+    final TiffDirectory directory, final ChannelReader in) {
+    super(type, tag, directory, in);
     this.value = in.getShort();
     if (directory.isBigTiff()) {
       in.skipBytes(6);

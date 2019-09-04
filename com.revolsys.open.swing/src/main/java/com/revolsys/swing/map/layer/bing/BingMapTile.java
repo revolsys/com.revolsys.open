@@ -3,7 +3,7 @@ package com.revolsys.swing.map.layer.bing;
 import java.awt.image.BufferedImage;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.swing.map.layer.raster.GeoreferencedImageMapTile;
+import com.revolsys.raster.GeoreferencedImageMapTile;
 
 public class BingMapTile extends GeoreferencedImageMapTile {
 

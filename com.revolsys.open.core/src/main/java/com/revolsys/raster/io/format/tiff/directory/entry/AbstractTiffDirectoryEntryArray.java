@@ -12,7 +12,7 @@ public abstract class AbstractTiffDirectoryEntryArray<A>
 
   public AbstractTiffDirectoryEntryArray(final TiffFieldType type, final TiffTag tag,
     final ChannelReader in, final long count, final long offset) {
-    super(type, tag, in, count, offset);
+    super(type, tag, count, offset);
   }
 
   public AbstractTiffDirectoryEntryArray(final TiffFieldType type, final TiffTag tag,
@@ -22,13 +22,13 @@ public abstract class AbstractTiffDirectoryEntryArray<A>
   }
 
   public AbstractTiffDirectoryEntryArray(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory) {
-    super(type, tag, directory);
+    final TiffDirectory directory, final ChannelReader in) {
+    super(type, tag, directory, in);
   }
 
   public AbstractTiffDirectoryEntryArray(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory, final long count) {
-    super(type, tag, directory, count);
+    final TiffDirectory directory, final ChannelReader in, final long count) {
+    super(type, tag, directory, in, count);
   }
 
   @Override
@@ -64,7 +64,6 @@ public abstract class AbstractTiffDirectoryEntryArray<A>
   @SuppressWarnings("unchecked")
   @Override
   public final <V> V getValue() {
-    loadValue();
     return (V)this.value;
   }
 

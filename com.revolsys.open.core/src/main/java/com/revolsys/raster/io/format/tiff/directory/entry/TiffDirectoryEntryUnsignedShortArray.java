@@ -10,9 +10,8 @@ import com.revolsys.raster.io.format.tiff.code.TiffTag;
 public class TiffDirectoryEntryUnsignedShortArray extends AbstractTiffDirectoryEntryArray<int[]> {
 
   public static TiffDirectoryEntryUnsignedShortArray newEntry(final TiffFieldType type,
-    final TiffTag tag, final TiffDirectory directory) {
-    final ChannelReader in = directory.getIn();
-    final long count = directory.readOffsetOrCount();
+    final TiffTag tag, final TiffDirectory directory, final ChannelReader in) {
+    final long count = directory.readOffsetOrCount(in);
     final int maxInlineCount = directory.getMaxInlineCount(2);
     if (count <= maxInlineCount) {
       final int[] value = new int[(int)count];
@@ -23,7 +22,7 @@ public class TiffDirectoryEntryUnsignedShortArray extends AbstractTiffDirectoryE
       return new TiffDirectoryEntryUnsignedShortArray(type, tag, count, value);
 
     } else {
-      return new TiffDirectoryEntryUnsignedShortArray(type, tag, directory, count);
+      return new TiffDirectoryEntryUnsignedShortArray(type, tag, directory, in, count);
     }
   }
 
@@ -33,13 +32,12 @@ public class TiffDirectoryEntryUnsignedShortArray extends AbstractTiffDirectoryE
   }
 
   private TiffDirectoryEntryUnsignedShortArray(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory, final long count) {
-    super(type, tag, directory, count);
+    final TiffDirectory directory, final ChannelReader in, final long count) {
+    super(type, tag, directory, in, count);
   }
 
   @Override
   public int getInt(final int index) {
-    loadValue();
     return this.value[index];
   }
 
@@ -50,13 +48,11 @@ public class TiffDirectoryEntryUnsignedShortArray extends AbstractTiffDirectoryE
 
   @Override
   public Number getNumber(final int index) {
-    loadValue();
     return this.value[index];
   }
 
   @Override
   public String getString() {
-    loadValue();
     return Arrays.toString(this.value);
   }
 

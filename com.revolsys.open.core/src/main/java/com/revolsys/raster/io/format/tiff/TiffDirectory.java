@@ -34,11 +34,11 @@ public class TiffDirectory {
 
   private final long nextOffset;
 
-  private final ChannelReader in;
-
   private WeakReference<TiffImage> imageReference = new WeakReference<TiffImage>(null);
 
   private final Resource resource;
+
+  private final ByteOrder byteOrder;
 
   private final boolean bigTiff;
 
@@ -46,7 +46,7 @@ public class TiffDirectory {
     final int index, final long offset) {
     this.resource = resource;
     this.bigTiff = bigTiff;
-    this.in = in;
+    this.byteOrder = in.getByteOrder();
     this.index = index;
     this.offset = offset;
     in.seek(offset);
@@ -63,9 +63,9 @@ public class TiffDirectory {
           final TiffTag tiffTag = TiffTags.getTag(tag);
           final TiffDirectoryEntry entry;
           if (tiffTag.isArray()) {
-            entry = fieldType.newDirectoryEntryArray(tiffTag, this);
+            entry = fieldType.newDirectoryEntryArray(tiffTag, this, in);
           } else {
-            entry = fieldType.newDirectoryEntry(tiffTag, this);
+            entry = fieldType.newDirectoryEntry(tiffTag, this, in);
           }
 
           this.entryByTag.put(tiffTag, entry);
@@ -85,15 +85,18 @@ public class TiffDirectory {
           final TiffTag tiffTag = TiffTags.getTag(tag);
           final TiffDirectoryEntry entry;
           if (tiffTag.isArray()) {
-            entry = fieldType.newDirectoryEntryArray(tiffTag, this);
+            entry = fieldType.newDirectoryEntryArray(tiffTag, this, in);
           } else {
-            entry = fieldType.newDirectoryEntry(tiffTag, this);
+            entry = fieldType.newDirectoryEntry(tiffTag, this, in);
           }
 
           this.entryByTag.put(tiffTag, entry);
         }
       }
       this.nextOffset = in.getUnsignedInt();
+    }
+    for (final TiffDirectoryEntry entry : this.entryByTag.values()) {
+      entry.loadValue(in);
     }
   }
 
@@ -147,7 +150,7 @@ public class TiffDirectory {
   }
 
   public ByteOrder getByteOrder() {
-    return this.in.getByteOrder();
+    return this.byteOrder;
   }
 
   private TiffCompression getCompression() {
@@ -211,10 +214,6 @@ public class TiffDirectory {
       this.imageReference = new WeakReference<>(image);
     }
     return image;
-  }
-
-  public ChannelReader getIn() {
-    return this.in;
   }
 
   public int getIndex() {
@@ -324,14 +323,11 @@ public class TiffDirectory {
     return this.bigTiff;
   }
 
-  public void loadValues() {
-    for (final TiffDirectoryEntry entry : this.entryByTag.values()) {
-      entry.loadValue();
-    }
+  public ChannelReader newChannelReader() {
+    return this.resource.newChannelReader();
   }
 
   public TiffImage newImage() {
-
     final TiffPhotogrametricInterpretation photometricInterpretation = getPhotogrametricInterpretation();
     final TiffCompression compression = getCompression();
     if (compression == TiffCompression.JPEG) {
@@ -363,11 +359,11 @@ public class TiffDirectory {
     }
   }
 
-  public long readOffsetOrCount() {
+  public long readOffsetOrCount(final ChannelReader in) {
     if (this.bigTiff) {
-      return this.in.getUnsignedLong();
+      return in.getUnsignedLong();
     } else {
-      return this.in.getUnsignedInt();
+      return in.getUnsignedInt();
     }
   }
 

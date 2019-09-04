@@ -15,13 +15,13 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
-import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
+import com.revolsys.swing.map.layer.raster.AbstractTiledGeoreferencedImageLayer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
 
 public class WebMercatorTileCacheLayer
-  extends AbstractTiledImageLayer<WebMercatorTileCacheMapTile> {
+  extends AbstractTiledGeoreferencedImageLayer<WebMercatorTileCacheMapTile> {
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(EpsgId.WGS84);
 
   private static final BoundingBox MAX_BOUNDING_BOX = GEOMETRY_FACTORY.newBoundingBox(-180, -85,

@@ -10,9 +10,8 @@ public class TiffDirectoryEntryFloat extends AbstractTiffDirectoryEntrySingle {
   private final float value;
 
   public TiffDirectoryEntryFloat(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory) {
-    super(type, tag, directory);
-    final ChannelReader in = directory.getIn();
+    final TiffDirectory directory, final ChannelReader in) {
+    super(type, tag, directory, in);
     this.value = in.getFloat();
     if (directory.isBigTiff()) {
       in.skipBytes(4);

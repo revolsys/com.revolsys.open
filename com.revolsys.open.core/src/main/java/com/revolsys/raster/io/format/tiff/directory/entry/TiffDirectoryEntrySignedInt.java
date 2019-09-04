@@ -10,9 +10,8 @@ public class TiffDirectoryEntrySignedInt extends AbstractTiffDirectoryEntrySingl
   private final long offset;
 
   public TiffDirectoryEntrySignedInt(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory) {
-    super(type, tag, directory);
-    final ChannelReader in = directory.getIn();
+    final TiffDirectory directory, final ChannelReader in) {
+    super(type, tag, directory, in);
     this.offset = in.getUnsignedInt();
     if (directory.isBigTiff()) {
       in.skipBytes(4);

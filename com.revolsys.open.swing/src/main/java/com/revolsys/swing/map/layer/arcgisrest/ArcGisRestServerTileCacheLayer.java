@@ -22,7 +22,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
-import com.revolsys.swing.map.layer.raster.AbstractTiledImageLayer;
+import com.revolsys.swing.map.layer.raster.AbstractTiledGeoreferencedImageLayer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.CaseConverter;
@@ -33,7 +33,7 @@ import com.revolsys.webservice.WebServiceConnectionManager;
 import com.revolsys.webservice.WebServiceResource;
 
 public class ArcGisRestServerTileCacheLayer
-  extends AbstractTiledImageLayer<ArcGisRestServerTileCacheMapTile> {
+  extends AbstractTiledGeoreferencedImageLayer<ArcGisRestServerTileCacheMapTile> {
 
   static {
     MenuFactory.addMenuInitializer(ArcGisRestServerTileCacheLayer.class, menu -> {

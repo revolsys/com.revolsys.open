@@ -1,4 +1,4 @@
-package com.revolsys.swing.map.layer.tile;
+package com.revolsys.util;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
@@ -58,7 +58,7 @@ public abstract class AbstractMapTile<D> implements BoundingBoxProxy {
     return this.width;
   }
 
-  protected final D loadData() {
+  public final D loadData() {
     final D data = loadDataDo();
     this.data = data;
     return data;

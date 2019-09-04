@@ -205,8 +205,8 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
     }
   }
 
-  private InputStream getInputStream(final long[] offsets, final long[] counts, final int index) {
-    final ChannelReader in = this.directory.getIn();
+  private InputStream getInputStream(final ChannelReader in, final long[] offsets,
+    final long[] counts, final int index) {
     final long offset = offsets[index];
     final int byteCount = (int)counts[index];
     return in.getInputStream(offset, byteCount);
@@ -221,12 +221,15 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
     RenderedImage image = super.getRenderedImage();
     if (image == null) {
       BufferedImage bufferedImage;
-      if (this.tileWidth > 0 && this.tileHeight > 0) {
-        bufferedImage = newBufferedImageTiles();
-      } else if (this.stripOffsets.length > 0) {
-        bufferedImage = newBufferedImageStrips();
-      } else {
-        throw new IllegalArgumentException("Data must be in strips or tiles: " + this.directory);
+      try (
+        ChannelReader in = this.directory.newChannelReader()) {
+        if (this.tileWidth > 0 && this.tileHeight > 0) {
+          bufferedImage = newBufferedImageTiles(in);
+        } else if (this.stripOffsets.length > 0) {
+          bufferedImage = newBufferedImageStrips(in);
+        } else {
+          throw new IllegalArgumentException("Data must be in strips or tiles: " + this.directory);
+        }
       }
       image = bufferedImage;
       setRenderedImage(image);
@@ -263,7 +266,7 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
 
   protected abstract BufferedImage newBufferedImage(int imageWidth, int imageHeight);
 
-  private BufferedImage newBufferedImageStrips() {
+  private BufferedImage newBufferedImageStrips(final ChannelReader in) {
     BufferedImage bufferedImage;
     bufferedImage = newBufferedImage();
     final int imageWidth = getImageWidth();
@@ -275,13 +278,13 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
       if (stripIndex == this.stripCount - 1) {
         stripHeight = imageHeight - imageY;
       }
-      readImagePart(bufferedImage, this.stripOffsets, this.stripByteCounts, index, 0, imageY,
+      readImagePart(in, bufferedImage, this.stripOffsets, this.stripByteCounts, index, 0, imageY,
         imageWidth, stripHeight, imageWidth);
     }
     return bufferedImage;
   }
 
-  private BufferedImage newBufferedImageTiles() {
+  private BufferedImage newBufferedImageTiles(final ChannelReader in) {
     BufferedImage bufferedImage;
     bufferedImage = newBufferedImage();
     final int imageWidth = getImageWidth();
@@ -309,7 +312,7 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
           actualTileWidth = lastTileWidth;
         }
 
-        readImagePart(bufferedImage, this.tileOffsets, this.tileByteCounts, tileIndex, imageX,
+        readImagePart(in, bufferedImage, this.tileOffsets, this.tileByteCounts, tileIndex, imageX,
           imageY, this.tileWidth, actualTileHeight, actualTileWidth);
 
         tileIndex++;
@@ -318,13 +321,13 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
     return bufferedImage;
   }
 
-  protected TiffDecompressor newPlanarDecompressor(final long[] offsets, final long[] counts,
-    final int partIndex, final int sampleIndex) {
+  protected TiffDecompressor newPlanarDecompressor(final ChannelReader in, final long[] offsets,
+    final long[] counts, final int partIndex, final int sampleIndex) {
     if (sampleIndex < 0) {
       return null;
     } else {
       final int stripOrTileCount = getStripOrTileCount();
-      final TiffDecompressor decompressor = newTiffDecompressor(offsets, counts,
+      final TiffDecompressor decompressor = newTiffDecompressor(in, offsets, counts,
         stripOrTileCount * sampleIndex + partIndex);
       return decompressor;
     }
@@ -365,6 +368,12 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
     } else {
       return newSampleReader(decompressor, bitsPerSample);
     }
+  }
+
+  protected TiffDecompressor newTiffDecompressor(final ChannelReader in, final long[] offsets,
+    final long[] counts, final int partIndex) {
+    final InputStream inputStream = getInputStream(in, offsets, counts, partIndex);
+    return newTiffDecompressor(inputStream);
   }
 
   protected TiffDecompressor newTiffDecompressor(final InputStream in) {
@@ -412,17 +421,12 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
     }
   }
 
-  protected TiffDecompressor newTiffDecompressor(final long[] offsets, final long[] counts,
-    final int partIndex) {
-    final InputStream inputStream = getInputStream(offsets, counts, partIndex);
-    return newTiffDecompressor(inputStream);
-  }
-
-  protected void readImagePart(final BufferedImage bufferedImage, final long[] offsets,
-    final long[] counts, final int partIndex, final int imageX, final int imageY,
-    final int dataWidth, final int dataHeight, final int cropWidth) {
+  protected void readImagePart(final ChannelReader in, final BufferedImage bufferedImage,
+    final long[] offsets, final long[] counts, final int partIndex, final int imageX,
+    final int imageY, final int dataWidth, final int dataHeight, final int cropWidth) {
     try (
-      final TiffDecompressor stripDecompressor = newTiffDecompressor(offsets, counts, partIndex)) {
+      final TiffDecompressor stripDecompressor = newTiffDecompressor(in, offsets, counts,
+        partIndex)) {
       readImagePartDo(bufferedImage, stripDecompressor, imageX, imageY, dataWidth, dataHeight,
         cropWidth);
     }
@@ -431,6 +435,32 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
   protected void readImagePartDo(final BufferedImage bufferedImage,
     final TiffDecompressor decompressor, final int imageX, final int imageY, final int dataWidth,
     final int dataHeight, final int cropWidth) {
+  }
+
+  protected void readImagePartDoDataBuffer(final BufferedImage bufferedImage,
+    final TiffDecompressor decompressor, final int imageX, final int imageY, final int dataWidth,
+    final int dataHeight, final int cropWidth, final ReadSampleInt readSampleInt) {
+    final int imageWidth = bufferedImage.getWidth();
+    final WritableRaster raster = bufferedImage.getRaster();
+    final DataBuffer dataBuffer = raster.getDataBuffer();
+    try {
+      int y = imageY;
+      for (int yIndex = 0; yIndex < dataHeight; yIndex++) {
+        int x = imageX;
+        for (int xIndex = 0; xIndex < dataWidth; xIndex++) {
+          final int colorIndex = readSampleInt.getValue();
+          if (xIndex < cropWidth) {
+            final int pixelIndex = y * imageWidth + x;
+            dataBuffer.setElem(pixelIndex, colorIndex);
+            x++;
+          }
+        }
+        decompressor.endRow();
+        y++;
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   protected void readImagePartPixelValueFloat(final BufferedImage bufferedImage,
@@ -466,30 +496,5 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
     return this.photometricInterpretation + " " + this.directory.getIndex() + ": "
       + this.directory.getResource();
   }
-
-  protected void readImagePartDoDataBuffer(final BufferedImage bufferedImage, final TiffDecompressor decompressor, final int imageX, final int imageY,
-    final int dataWidth, final int dataHeight, final int cropWidth, final ReadSampleInt readSampleInt) {
-      final int imageWidth = bufferedImage.getWidth();
-      final WritableRaster raster = bufferedImage.getRaster();
-      final DataBuffer dataBuffer = raster.getDataBuffer();
-      try {
-        int y = imageY;
-        for (int yIndex = 0; yIndex < dataHeight; yIndex++) {
-          int x = imageX;
-          for (int xIndex = 0; xIndex < dataWidth; xIndex++) {
-            final int colorIndex = readSampleInt.getValue();
-            if (xIndex < cropWidth) {
-              final int pixelIndex = y * imageWidth + x;
-              dataBuffer.setElem(pixelIndex, colorIndex);
-              x++;
-            }
-          }
-          decompressor.endRow();
-          y++;
-        }
-      } catch (final IOException e) {
-        throw Exceptions.wrap(e);
-      }
-    }
 
 }
