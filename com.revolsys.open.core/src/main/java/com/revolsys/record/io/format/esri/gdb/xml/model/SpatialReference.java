@@ -1,5 +1,6 @@
 package com.revolsys.record.io.format.esri.gdb.xml.model;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 
@@ -62,8 +63,11 @@ public class SpatialReference implements GeometryFactoryProxy {
           this.xOrigin = -180;
           this.yOrigin = -90;
         } else {
-          this.xOrigin = Integer.MIN_VALUE;
-          this.yOrigin = Integer.MIN_VALUE;
+          final BoundingBox areaBoundingBox = geometryFactory.getAreaBoundingBox();
+          final double minX = areaBoundingBox.getMinX();
+          final double minY = areaBoundingBox.getMinY();
+          this.xOrigin = minX;
+          this.yOrigin = minY;
         }
         this.xYScale = geometryFactory.getScaleXY();
         if (this.xYScale == 0) {

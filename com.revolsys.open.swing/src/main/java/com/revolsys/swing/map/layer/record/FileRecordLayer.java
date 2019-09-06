@@ -106,11 +106,15 @@ public class FileRecordLayer extends ListRecordLayer {
               return false;
             } else {
               final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
-              GeometryFactory setGeometryFactory = setGeometryFactoryPrompt(geometryFactory);
-              if (setGeometryFactory != geometryFactory) {
-                recordDefinition.setGeometryFactory(setGeometryFactory);
+              GeometryFactory setGeometryFactory;
+              if (recordDefinition.hasGeometryField()) {
+                setGeometryFactory = setGeometryFactoryPrompt(geometryFactory);
+                if (setGeometryFactory != geometryFactory) {
+                  recordDefinition.setGeometryFactory(setGeometryFactory);
+                }
+              } else {
+                setGeometryFactory = GeometryFactory.DEFAULT_2D;
               }
-
               clearRecords();
               try (
                 BaseCloseable eventsDisabled = eventsDisabled()) {

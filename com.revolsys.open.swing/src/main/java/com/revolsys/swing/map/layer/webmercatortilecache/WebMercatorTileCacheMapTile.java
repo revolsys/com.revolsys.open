@@ -15,7 +15,7 @@ public class WebMercatorTileCacheMapTile extends GeoreferencedImageMapTile {
 
   public WebMercatorTileCacheMapTile(final WebMercatorTileCacheLayer layer, final int zoomLevel,
     final double resolution, final int tileX, final int tileY) {
-    super(layer.getClient().getBoundingBox(zoomLevel, tileX, tileY), 256, 256, resolution);
+    super(layer.getClient().getBoundingBox(zoomLevel, tileX, tileY), 256, 256);
     this.layer = layer;
     this.zoomLevel = zoomLevel;
     this.tileX = tileX;

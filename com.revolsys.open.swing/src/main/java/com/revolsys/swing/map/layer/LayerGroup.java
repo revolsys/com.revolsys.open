@@ -103,6 +103,9 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       menu.<LayerGroup> addMenuItem("group", "Open File Layer...", "page:add",
         LayerGroup::actionOpenFileLayer, false);
 
+      menu.<LayerGroup> addMenuItem("group", "Open URL Layer...", "page:add",
+        LayerGroup::actionOpenUrlLayer, false);
+
       menu.<LayerGroup> addMenuItem("group", "Import Project...", "map:import",
         LayerGroup::actionImportProject, false);
 
@@ -284,6 +287,27 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       }
     }
     SwingUtil.saveFileChooserDirectory(getClass(), "currentDirectory", fileChooser);
+  }
+
+  private void actionOpenUrlLayer() {
+    final Window window = SwingUtil.getActiveWindow();
+
+    final String urlString = JOptionPane.showInputDialog(window, "URL");
+
+    if (Property.hasValue(urlString)) {
+      final URL url = UrlUtil.getUrl(urlString);
+      final Object menuSource = MenuFactory.getMenuSource();
+      final LayerGroup layerGroup;
+      if (menuSource instanceof LayerGroupTreeNode) {
+        final LayerGroupTreeNode node = (LayerGroupTreeNode)menuSource;
+        layerGroup = node.getGroup();
+      } else if (menuSource instanceof LayerGroup) {
+        layerGroup = (LayerGroup)menuSource;
+      } else {
+        layerGroup = Project.get();
+      }
+      Invoke.background("Open: " + url, () -> layerGroup.openFile(url));
+    }
   }
 
   protected <V extends Layer> void addDescendants(final List<V> layers, final Class<V> layerClass) {

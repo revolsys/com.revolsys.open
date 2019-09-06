@@ -694,10 +694,10 @@ public final class ShapefileGeometryHandler {
     if (geometry.getAxisCount() >= 4) {
       for (final Vertex vertex : geometry.vertices()) {
         final double m = vertex.getM();
-        if (Double.isNaN(m)) {
-          out.writeLEDouble(0);
-        } else {
+        if (Double.isFinite(m)) {
           out.writeLEDouble(m);
+        } else {
+          out.writeLEDouble(0);
         }
       }
     } else {
@@ -711,7 +711,7 @@ public final class ShapefileGeometryHandler {
     if (coordinates.getAxisCount() >= 4) {
       for (int i = 0; i < coordinates.getVertexCount(); i++) {
         final double m = coordinates.getM(i);
-        if (!Double.isNaN(m)) {
+        if (Double.isFinite(m)) {
           out.writeLEDouble(m);
         } else {
           out.writeLEDouble(0);
@@ -735,12 +735,12 @@ public final class ShapefileGeometryHandler {
     final BoundingBox boundingBox = geometry.getBoundingBox();
     final double minM = boundingBox.getMin(3);
     final double maxM = boundingBox.getMax(3);
-    if (Double.isNaN(minM) || Double.isNaN(maxM)) {
-      out.writeLEDouble(0);
-      out.writeLEDouble(0);
-    } else {
+    if (Double.isFinite(minM) && Double.isFinite(maxM)) {
       out.writeLEDouble(minM);
       out.writeLEDouble(maxM);
+    } else {
+      out.writeLEDouble(0);
+      out.writeLEDouble(0);
     }
   }
 
@@ -751,7 +751,7 @@ public final class ShapefileGeometryHandler {
     for (final LineString ring : coordinatesList) {
       for (int i = 0; i < ring.getVertexCount(); i++) {
         double m = ring.getCoordinate(i, 2);
-        if (Double.isNaN(m)) {
+        if (!Double.isFinite(m)) {
           m = 0;
         }
         minM = Math.min(m, minM);
@@ -843,10 +843,10 @@ public final class ShapefileGeometryHandler {
       writeXy(out, point);
 
       final double m = point.getM();
-      if (Double.isNaN(m)) {
-        out.writeLEDouble(0);
-      } else {
+      if (Double.isFinite(m)) {
         out.writeLEDouble(m);
+      } else {
+        out.writeLEDouble(0);
       }
     } else {
       throw new IllegalArgumentException(
@@ -869,10 +869,10 @@ public final class ShapefileGeometryHandler {
       }
       writeXy(out, point);
       final double z = point.getZ();
-      if (Double.isNaN(z)) {
-        out.writeLEDouble(0);
-      } else {
+      if (Double.isFinite(z)) {
         out.writeLEDouble(z);
+      } else {
+        out.writeLEDouble(0);
       }
     } else {
       throw new IllegalArgumentException(
@@ -891,16 +891,16 @@ public final class ShapefileGeometryHandler {
       out.writeLEInt(ShapefileConstants.POINT_ZM_SHAPE);
       writeXy(out, point);
       final double z = point.getZ();
-      if (Double.isNaN(z)) {
-        out.writeLEDouble(0);
-      } else {
+      if (Double.isFinite(z)) {
         out.writeLEDouble(z);
+      } else {
+        out.writeLEDouble(0);
       }
       final double m = point.getM();
-      if (Double.isNaN(m)) {
-        out.writeLEDouble(0);
-      } else {
+      if (Double.isFinite(m)) {
         out.writeLEDouble(m);
+      } else {
+        out.writeLEDouble(0);
       }
     } else {
       throw new IllegalArgumentException(
@@ -1087,10 +1087,10 @@ public final class ShapefileGeometryHandler {
     if (geometry.getAxisCount() >= 3) {
       for (final Vertex vertex : geometry.vertices()) {
         final double z = vertex.getZ();
-        if (Double.isNaN(z)) {
-          out.writeLEDouble(0);
-        } else {
+        if (Double.isFinite(z)) {
           out.writeLEDouble(z);
+        } else {
+          out.writeLEDouble(0);
         }
       }
     } else {
@@ -1104,10 +1104,10 @@ public final class ShapefileGeometryHandler {
     if (coordinates.getAxisCount() >= 3) {
       for (int i = 0; i < coordinates.getVertexCount(); i++) {
         final double z = coordinates.getZ(i);
-        if (Double.isNaN(z)) {
-          out.writeLEDouble(0);
-        } else {
+        if (Double.isFinite(z)) {
           out.writeLEDouble(z);
+        } else {
+          out.writeLEDouble(0);
         }
       }
     } else {
@@ -1128,12 +1128,12 @@ public final class ShapefileGeometryHandler {
     final BoundingBox boundingBox = geometry.getBoundingBox();
     final double min = boundingBox.getMin(2);
     final double max = boundingBox.getMax(2);
-    if (Double.isNaN(min) || Double.isNaN(max)) {
-      out.writeLEDouble(0);
-      out.writeLEDouble(0);
-    } else {
+    if (Double.isFinite(min) && Double.isFinite(max)) {
       out.writeLEDouble(min);
       out.writeLEDouble(max);
+    } else {
+      out.writeLEDouble(0);
+      out.writeLEDouble(0);
     }
   }
 
@@ -1144,7 +1144,7 @@ public final class ShapefileGeometryHandler {
     for (final LineString ring : coordinatesList) {
       for (int i = 0; i < ring.getVertexCount(); i++) {
         double z = ring.getCoordinate(i, 2);
-        if (Double.isNaN(z)) {
+        if (!Double.isFinite(z)) {
           z = 0;
         }
         minZ = Math.min(z, minZ);

@@ -31,8 +31,8 @@ public class EnvelopeN extends Envelope {
       this.yMin = boundingBox.getMinY();
       this.xMax = boundingBox.getMaxX();
       this.yMax = boundingBox.getMaxY();
-      this.zMin = boundingBox.getMin(2);
-      this.zMax = boundingBox.getMax(2);
+      this.zMin = -10000;
+      this.zMax = 10000;
       this.spatialReference = spatialReference;
     }
   }

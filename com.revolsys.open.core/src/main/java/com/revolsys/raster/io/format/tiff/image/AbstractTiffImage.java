@@ -9,7 +9,10 @@ import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.InflaterInputStream;
 
@@ -19,9 +22,11 @@ import org.jeometry.common.number.Doubles;
 import org.jeometry.common.number.Integers;
 import org.jeometry.common.number.Longs;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.raster.AbstractGeoreferencedImage;
+import com.revolsys.raster.GeoreferencedImageMapTile;
 import com.revolsys.raster.io.format.tiff.TiffDirectory;
 import com.revolsys.raster.io.format.tiff.TiffImageFactory;
 import com.revolsys.raster.io.format.tiff.code.GeoTiffKey;
@@ -40,6 +45,64 @@ import com.revolsys.raster.io.format.tiff.compression.TiffPackbitsInputStream;
 import com.revolsys.raster.io.format.tiff.compression.TiffThunderscanInputStream;
 
 public abstract class AbstractTiffImage extends AbstractGeoreferencedImage implements TiffImage {
+
+  private class TiffImageTiledMapTile extends GeoreferencedImageMapTile {
+    private final int tileX;
+
+    private final int tileY;
+
+    private TiffImageTiledMapTile(final int tileX, final int tileY, final int tileWidth,
+      final int tileHeight) {
+      super(newTileBoundingBox(tileX, tileY, tileWidth, tileHeight), tileWidth, tileHeight);
+      this.tileX = tileX;
+      this.tileY = tileY;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+      if (this == obj) {
+        return true;
+      } else if (obj instanceof TiffImageTiledMapTile) {
+        final TiffImageTiledMapTile other = (TiffImageTiledMapTile)obj;
+        if (this.tileX != other.tileX) {
+          return false;
+        } else if (this.tileY != other.tileY) {
+          return false;
+        } else {
+          return true;
+        }
+      } else {
+        return false;
+      }
+    }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + this.tileX;
+      result = prime * result + this.tileY;
+      return result;
+    }
+
+    @Override
+    protected BufferedImage loadBuffferedImage() {
+      try (
+        ChannelReader in = AbstractTiffImage.this.directory.newChannelReader()) {
+        final int tileIndex = this.tileY * AbstractTiffImage.this.tileCountX + this.tileX;
+        final int actualTileWidth = getWidthPixels();
+        final int actualTileHeight = getHeightPixels();
+        final BufferedImage bufferedImage = newBufferedImage(actualTileWidth, actualTileHeight);
+
+        readImagePart(in, bufferedImage, AbstractTiffImage.this.tileOffsets,
+          AbstractTiffImage.this.tileByteCounts, tileIndex, 0, 0,
+          AbstractTiffImage.this.tileWidthPixels, actualTileHeight, actualTileWidth);
+
+        return bufferedImage;
+      }
+    }
+
+  }
 
   private static Map<GeoTiffKey, Object> getGeoKeys(final TiffDirectory directory) {
     final Map<GeoTiffKey, Object> geoKeys = new LinkedHashMap<>();
@@ -97,11 +160,11 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
 
   private final long[] tileByteCounts;
 
-  private final int tileHeight;
+  private final int tileHeightPixels;
 
   private final long[] tileOffsets;
 
-  private final int tileWidth;
+  private final int tileWidthPixels;
 
   protected int planarConfiguration;
 
@@ -137,8 +200,8 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
       Longs.EMPTY_ARRAY);
     this.pixelResolutionUnit = directory.getInt(TiffBaselineTag.ResolutionUnit, 1);
 
-    this.tileWidth = directory.getInt(TiffExtensionTag.TileWidth, -1);
-    this.tileHeight = directory.getInt(TiffExtensionTag.TileLength, -1);
+    this.tileWidthPixels = directory.getInt(TiffExtensionTag.TileWidth, -1);
+    this.tileHeightPixels = directory.getInt(TiffExtensionTag.TileLength, -1);
     this.tileOffsets = directory.getLongArray(TiffExtensionTag.TileOffsets, this.stripOffsets);
     this.tileByteCounts = directory.getLongArray(TiffExtensionTag.TileByteCounts,
       this.stripByteCounts);
@@ -195,10 +258,10 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
         setBoundingBox(x1, y1, pixelWidth, -pixelHeight);
       }
     }
-    this.tileCountX = (imageWidth + this.tileWidth - 1) / this.tileWidth;
-    this.tileCountY = (imageHeight + this.tileHeight - 1) / this.tileHeight;
+    this.tileCountX = (imageWidth + this.tileWidthPixels - 1) / this.tileWidthPixels;
+    this.tileCountY = (imageHeight + this.tileHeightPixels - 1) / this.tileHeightPixels;
     this.stripCount = (imageHeight + this.rowsPerStrip - 1) / this.rowsPerStrip;
-    if (this.tileWidth > 0 && this.tileHeight > 0) {
+    if (isTiled()) {
       this.stripOrTileCount = this.tileCountX + this.tileCountY;
     } else {
       this.stripOrTileCount = this.stripCount;
@@ -212,6 +275,65 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
     return in.getInputStream(offset, byteCount);
   }
 
+  @Override
+  public List<GeoreferencedImageMapTile> getOverlappingMapTiles(BoundingBox boundingBox) {
+    final BoundingBox imageBoundingBox = getBoundingBox();
+    boundingBox = boundingBox.bboxToCs(this);
+    if (bboxIntersects(imageBoundingBox)) {
+      final List<GeoreferencedImageMapTile> tiles = new ArrayList<>();
+      if (isTiled()) {
+        final int lastTileWidthPixels = getImageWidth() % this.tileWidthPixels;
+        final int lastTileHeightPixels = getImageHeight() % this.tileHeightPixels;
+        final double tileWidth = getResolutionX() * this.tileWidthPixels;
+        final double tileHeight = getResolutionY() * this.tileHeightPixels;
+        final double imageMinX = imageBoundingBox.getMinX();
+        final double imageMaxY = imageBoundingBox.getMaxY();
+
+        final double minX = boundingBox.getMinX();
+        final double minY = boundingBox.getMinY();
+        final double maxX = boundingBox.getMaxX();
+        final double maxY = boundingBox.getMaxY();
+
+        // Tiles start at the North-West corner of the map
+        int minTileX = (int)Math.floor((minX - imageMinX) / tileWidth);
+        if (minTileX < 0) {
+          minTileX = 0;
+        }
+        int minTileY = (int)Math.floor((imageMaxY - maxY) / tileHeight);
+        if (minTileY < 0) {
+          minTileY = 0;
+        }
+        int maxTileX = (int)Math.floor((maxX - imageMinX) / tileWidth);
+        if (maxTileX >= this.tileCountX) {
+          maxTileX = this.tileCountX - 1;
+        }
+        int maxTileY = (int)Math.floor((imageMaxY - minY) / tileHeight);
+        if (maxTileY >= this.tileCountY) {
+          maxTileY = this.tileCountY - 1;
+        }
+
+        int tileHeightPixels = this.tileHeightPixels;
+        for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
+          if (tileY == this.tileCountY - 1) {
+            tileHeightPixels = lastTileHeightPixels;
+          }
+          int tileWidthPixels = this.tileWidthPixels;
+          for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
+            if (tileX == this.tileCountX - 1) {
+              tileWidthPixels = lastTileWidthPixels;
+            }
+            final GeoreferencedImageMapTile tile = new TiffImageTiledMapTile(tileX, tileY,
+              tileWidthPixels, tileHeightPixels);
+            tiles.add(tile);
+          }
+        }
+      }
+      return tiles;
+    } else {
+      return Collections.emptyList();
+    }
+  }
+
   public TiffPhotogrametricInterpretation getPhotometricInterpretation() {
     return this.photometricInterpretation;
   }
@@ -223,7 +345,7 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
       BufferedImage bufferedImage;
       try (
         ChannelReader in = this.directory.newChannelReader()) {
-        if (this.tileWidth > 0 && this.tileHeight > 0) {
+        if (isTiled()) {
           bufferedImage = newBufferedImageTiles(in);
         } else if (this.stripOffsets.length > 0) {
           bufferedImage = newBufferedImageStrips(in);
@@ -251,11 +373,15 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
   }
 
   public int getTileHeight() {
-    return this.tileHeight;
+    return this.tileHeightPixels;
   }
 
   public int getTileWidth() {
-    return this.tileWidth;
+    return this.tileWidthPixels;
+  }
+
+  public boolean isTiled() {
+    return this.tileWidthPixels > 0 && this.tileHeightPixels > 0;
   }
 
   private BufferedImage newBufferedImage() {
@@ -266,9 +392,28 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
 
   protected abstract BufferedImage newBufferedImage(int imageWidth, int imageHeight);
 
+  private BufferedImage newBufferedImageStrip(final ChannelReader in, final int stripIndex) {
+    if (stripIndex >= 0 && stripIndex < this.stripCount) {
+      final int imageWidth = getImageWidth();
+      final int imageHeight = getImageHeight();
+      final int imageY = stripIndex * this.rowsPerStrip;
+      final int index = stripIndex;
+      int stripHeight = this.rowsPerStrip;
+      if (stripIndex == this.stripCount - 1) {
+        stripHeight = imageHeight - imageY;
+      }
+      final BufferedImage bufferedImage = newBufferedImage(imageWidth, stripHeight);
+      readImagePart(in, bufferedImage, this.stripOffsets, this.stripByteCounts, index, 0, 0,
+        imageWidth, stripHeight, imageWidth);
+      return bufferedImage;
+    } else {
+      throw new IllegalArgumentException(
+        "Strip not found " + stripIndex + " not in 0.." + (this.stripCount - 1));
+    }
+  }
+
   private BufferedImage newBufferedImageStrips(final ChannelReader in) {
-    BufferedImage bufferedImage;
-    bufferedImage = newBufferedImage();
+    final BufferedImage bufferedImage = newBufferedImage();
     final int imageWidth = getImageWidth();
     final int imageHeight = getImageHeight();
     for (int stripIndex = 0; stripIndex < this.stripCount; stripIndex++) {
@@ -285,35 +430,34 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
   }
 
   private BufferedImage newBufferedImageTiles(final ChannelReader in) {
-    BufferedImage bufferedImage;
-    bufferedImage = newBufferedImage();
+    final BufferedImage bufferedImage = newBufferedImage();
     final int imageWidth = getImageWidth();
     final int imageHeight = getImageHeight();
 
-    int lastTileWidth = imageWidth % this.tileWidth;
+    int lastTileWidth = imageWidth % this.tileWidthPixels;
     if (lastTileWidth == 0) {
-      lastTileWidth = this.tileWidth;
+      lastTileWidth = this.tileWidthPixels;
     }
-    int lastTileHeight = imageHeight % this.tileHeight;
+    int lastTileHeight = imageHeight % this.tileHeightPixels;
     if (lastTileHeight == 0) {
-      lastTileHeight = this.tileHeight;
+      lastTileHeight = this.tileHeightPixels;
     }
     int tileIndex = 0;
     for (int tileY = 0; tileY < this.tileCountY; tileY++) {
-      final int imageY = tileY * this.tileHeight;
-      int actualTileHeight = this.tileHeight;
+      final int imageY = tileY * this.tileHeightPixels;
+      int actualTileHeight = this.tileHeightPixels;
       if (tileY == this.tileCountY - 1) {
         actualTileHeight = lastTileHeight;
       }
       for (int tileX = 0; tileX < this.tileCountX; tileX++) {
-        final int imageX = tileX * this.tileWidth;
-        int actualTileWidth = this.tileWidth;
+        final int imageX = tileX * this.tileWidthPixels;
+        int actualTileWidth = this.tileWidthPixels;
         if (tileX == this.tileCountX - 1) {
           actualTileWidth = lastTileWidth;
         }
 
         readImagePart(in, bufferedImage, this.tileOffsets, this.tileByteCounts, tileIndex, imageX,
-          imageY, this.tileWidth, actualTileHeight, actualTileWidth);
+          imageY, this.tileWidthPixels, actualTileHeight, actualTileWidth);
 
         tileIndex++;
       }
@@ -421,6 +565,19 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
     }
   }
 
+  public BoundingBox newTileBoundingBox(final int tileX, final int tileY, final int tileWidthPixels,
+    final int tileHeightPixels) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final double resolutionX = getResolutionX();
+    final double resolutionY = getResolutionY();
+    final BoundingBox imageBoundingBox = getBoundingBox();
+    final double minX = imageBoundingBox.getMinX() + tileX * this.tileWidthPixels * resolutionX;
+    final double maxY = imageBoundingBox.getMaxY() - tileY * this.tileHeightPixels * resolutionY;
+    final double maxX = minX + tileWidthPixels * resolutionX + resolutionX;
+    final double minY = maxY - tileHeightPixels * resolutionY - resolutionX;
+    return geometryFactory.newBoundingBox(minX, maxY, maxX, minY);
+  }
+
   protected void readImagePart(final ChannelReader in, final BufferedImage bufferedImage,
     final long[] offsets, final long[] counts, final int partIndex, final int imageX,
     final int imageY, final int dataWidth, final int dataHeight, final int cropWidth) {
@@ -488,6 +645,22 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
       }
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
+    }
+  }
+
+  @Override
+  public void setBoundingBox(final BoundingBox boundingBox) {
+    super.setBoundingBox(boundingBox);
+    final double minX = boundingBox.getMinX();
+    final double minY = boundingBox.getMinY();
+    double gridTileWidth;
+    double gridTileHeight;
+    if (isTiled()) {
+      gridTileWidth = this.tileWidthPixels * getResolutionX();
+      gridTileHeight = this.tileHeightPixels * getResolutionY();
+    } else {
+      gridTileWidth = boundingBox.getWidth();
+      gridTileHeight = this.rowsPerStrip * getResolutionY();
     }
   }
 

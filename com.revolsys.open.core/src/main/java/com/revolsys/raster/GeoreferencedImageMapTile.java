@@ -7,9 +7,9 @@ import com.revolsys.util.AbstractMapTile;
 
 public abstract class GeoreferencedImageMapTile extends AbstractMapTile<GeoreferencedImage> {
 
-  public GeoreferencedImageMapTile(final BoundingBox boundingBox, final int width, final int height,
-    final double resolution) {
-    super(boundingBox, width, height, resolution);
+  public GeoreferencedImageMapTile(final BoundingBox boundingBox, final int width,
+    final int height) {
+    super(boundingBox, width, height);
   }
 
   @Override

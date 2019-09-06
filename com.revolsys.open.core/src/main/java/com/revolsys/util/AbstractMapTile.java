@@ -7,20 +7,16 @@ import com.revolsys.geometry.model.GeometryFactory;
 public abstract class AbstractMapTile<D> implements BoundingBoxProxy {
   private final BoundingBox boundingBox;
 
-  private final int height;
+  private final int heightPixels;
 
-  private final double resolution;
-
-  private final int width;
+  private final int widthPixels;
 
   private D data;
 
-  public AbstractMapTile(final BoundingBox boundingBox, final int width, final int height,
-    final double resolution) {
+  public AbstractMapTile(final BoundingBox boundingBox, final int width, final int height) {
     this.boundingBox = boundingBox;
-    this.width = width;
-    this.height = height;
-    this.resolution = resolution;
+    this.widthPixels = width;
+    this.heightPixels = height;
   }
 
   @Override
@@ -46,16 +42,12 @@ public abstract class AbstractMapTile<D> implements BoundingBoxProxy {
     return this.boundingBox.getGeometryFactory();
   }
 
-  public int getHeight() {
-    return this.height;
+  public int getHeightPixels() {
+    return this.heightPixels;
   }
 
-  public double getResolution() {
-    return this.resolution;
-  }
-
-  public int getWidth() {
-    return this.width;
+  public int getWidthPixels() {
+    return this.widthPixels;
   }
 
   public final D loadData() {

@@ -381,7 +381,7 @@ public class ChannelReader implements BaseCloseable {
           this.buffer.clear();
         }
       } else {
-        throw new IllegalArgumentException("Not supported");
+        throw new IllegalArgumentException("Seek not supported");
       }
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
@@ -395,7 +395,7 @@ public class ChannelReader implements BaseCloseable {
         final long position = channel.size() - distance;
         seek(position);
       } else {
-        throw new IllegalArgumentException("Not supported");
+        throw new IllegalArgumentException("Seek not supported");
       }
     } catch (final IOException e) {
       throw Exceptions.wrap(e);

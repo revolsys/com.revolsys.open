@@ -1,5 +1,7 @@
 package com.revolsys.raster.io.format.tiff;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.jeometry.common.logging.Logs;
@@ -14,6 +16,7 @@ import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
 import org.jeometry.coordinatesystem.model.unit.LinearUnit;
 
 import com.revolsys.collection.map.Maps;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.raster.GeoreferencedImage;
@@ -24,8 +27,10 @@ import com.revolsys.raster.io.format.tiff.code.GeoTiffCoordinateTransformationCo
 import com.revolsys.raster.io.format.tiff.code.GeoTiffKey;
 import com.revolsys.raster.io.format.tiff.code.GeoTiffKeyProjectionParameterName;
 import com.revolsys.raster.io.format.tiff.code.GeoTiffKeys;
+import com.revolsys.raster.io.format.tiff.code.TiffPhotogrametricInterpretation;
 import com.revolsys.raster.io.format.tiff.image.TiffCommonsImagingImage;
 import com.revolsys.raster.io.format.tiff.image.TiffImage;
+import com.revolsys.raster.io.format.tiff.image.TiffMultiResolutionImage;
 import com.revolsys.spring.resource.Resource;
 
 public class TiffImageFactory extends AbstractIoFactory
@@ -112,12 +117,27 @@ public class TiffImageFactory extends AbstractIoFactory
   public GeoreferencedImage readGeoreferencedImage(final Resource resource) {
     try (
       TiffDirectoryIterator iterator = new TiffDirectoryIterator(resource)) {
+      final List<TiffImage> images = new ArrayList<>();
+      BoundingBox boundingBox = BoundingBox.empty();
       for (final TiffDirectory directory : iterator) {
-        return directory.getImage();
+        if (directory.getPhotogrametricInterpretation() != TiffPhotogrametricInterpretation.MASK) {
+          final TiffImage image = directory.getImage();
+          if (boundingBox.isEmpty()) {
+            boundingBox = image.getBoundingBox();
+          } else if (!image.hasBoundingBox()) {
+            image.setBoundingBox(boundingBox);
+          }
+          images.add(image);
+        }
+      }
+      if (images.size() == 1) {
+        return images.get(0);
+      } else if (!images.isEmpty()) {
+        return new TiffMultiResolutionImage(images);
       }
     } catch (final Exception e) {
       Logs.error(TiffImageFactory.class,
-        "Cannot read TIFF, falling back to commons-imaging library: " + resource);
+        "Cannot read TIFF, falling back to commons-imaging library: " + resource, e);
     }
     return new TiffCommonsImagingImage(resource);
   }

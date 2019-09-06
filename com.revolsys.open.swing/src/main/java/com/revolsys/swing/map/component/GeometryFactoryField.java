@@ -84,7 +84,7 @@ public class GeometryFactoryField extends BaseComboBox<Integer> implements ItemL
    */
   public static <GFP extends GeometryFactoryProxy> void promptGeometryFactory(final String title,
     final GFP geometryFactoryProxy, final Consumer<GeometryFactory> action) {
-    if (geometryFactoryProxy.isHasHorizontalCoordinateSystem()) {
+    if (geometryFactoryProxy != null && geometryFactoryProxy.isHasHorizontalCoordinateSystem()) {
       final GeometryFactory geometryFactory = geometryFactoryProxy.getGeometryFactory();
       action.accept(geometryFactory);
     } else {

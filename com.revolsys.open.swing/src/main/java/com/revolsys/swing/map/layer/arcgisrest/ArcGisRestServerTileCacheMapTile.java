@@ -20,7 +20,7 @@ public class ArcGisRestServerTileCacheMapTile extends GeoreferencedImageMapTile 
     final MapService mapService, final int zoomLevel, final double resolution, final int tileX,
     final int tileY) {
     super(mapService.getBoundingBox(zoomLevel, tileX, tileY), mapService.getTileInfo().getCols(),
-      mapService.getTileInfo().getRows(), resolution);
+      mapService.getTileInfo().getRows());
     this.layer = layer;
     this.mapService = mapService;
     this.zoomLevel = zoomLevel;

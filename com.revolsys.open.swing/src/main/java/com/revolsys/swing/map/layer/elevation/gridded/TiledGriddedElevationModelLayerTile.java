@@ -23,7 +23,7 @@ public class TiledGriddedElevationModelLayerTile extends AbstractMapTile<Gridded
   public TiledGriddedElevationModelLayerTile(final TiledGriddedElevationModelLayer layer,
     final BoundingBox tileBoundingBox, final int coordinateSystemId, final int tileSize,
     final int resolution, final int tileX, final int tileY) {
-    super(tileBoundingBox, tileSize / resolution, tileSize / resolution, resolution);
+    super(tileBoundingBox, tileSize / resolution, tileSize / resolution);
     this.layer = layer;
     this.coordinateSystemId = coordinateSystemId;
     this.tileSize = tileSize;

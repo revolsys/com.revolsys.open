@@ -4,6 +4,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -24,9 +25,11 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.raster.GeoreferencedImage;
+import com.revolsys.raster.GeoreferencedImageMapTile;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.raster.GeoreferencedImageWriterFactory;
 import com.revolsys.raster.MappedLocation;
+import com.revolsys.raster.TiledGeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.SwingUtil;
@@ -36,12 +39,47 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.io.SwingIo;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.AbstractLayer;
+import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
 public class GeoreferencedImageLayer extends AbstractLayer {
+
+  private class TiledLayer extends AbstractTiledGeoreferencedImageLayer<GeoreferencedImageMapTile> {
+    private final TiledGeoreferencedImage tiledImage = (TiledGeoreferencedImage)GeoreferencedImageLayer.this.image;
+
+    public TiledLayer() {
+      super("");
+      addPropertyChangeListener(GeoreferencedImageLayer.this);
+    }
+
+    @Override
+    public List<GeoreferencedImageMapTile> getOverlappingMapTiles(final ViewRenderer view) {
+      final BoundingBox boundingBox = view.getBoundingBox();
+      final double metresPerPixel = view.getMetresPerPixel();
+      return this.tiledImage.getOverlappingMapTiles(boundingBox, metresPerPixel);
+    }
+
+    @Override
+    public double getResolution(final ViewRenderer view) {
+      final BoundingBox boundingBox = view.getBoundingBox();
+      final double metresPerPixel = view.getMetresPerPixel();
+      return this.tiledImage.getResolution(boundingBox, metresPerPixel);
+    }
+
+    private AbstractLayerRenderer<GeoreferencedImageLayer> newLayerRenderer() {
+      final AbstractLayerRenderer<AbstractTiledGeoreferencedImageLayer<GeoreferencedImageMapTile>> tiledRenderer = getRenderer();
+      return new AbstractLayerRenderer<GeoreferencedImageLayer>("") {
+        @Override
+        public void render(final ViewRenderer view, final GeoreferencedImageLayer layer) {
+          tiledRenderer.render(view, TiledLayer.this);
+        }
+      };
+    }
+  }
 
   static {
     MenuFactory.addMenuInitializer(GeoreferencedImageLayer.class, (menu) -> {
@@ -360,6 +398,14 @@ public class GeoreferencedImageLayer extends AbstractLayer {
       setGeometryFactoryPrompt(geometryFactory);
       setExists(true);
       Property.addListener(image, this);
+      if (image instanceof TiledGeoreferencedImage) {
+        final TiledLayer tiledLayer = new TiledLayer();
+        final AbstractLayerRenderer<GeoreferencedImageLayer> tiledRenderer = tiledLayer
+          .newLayerRenderer();
+        setRenderer(tiledRenderer);
+      } else {
+        setRenderer(new GeoreferencedImageLayerRenderer(this));
+      }
     }
     firePropertyChange("image", old, this.image);
   }

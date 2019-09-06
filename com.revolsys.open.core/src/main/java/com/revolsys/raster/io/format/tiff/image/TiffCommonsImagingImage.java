@@ -22,8 +22,8 @@ import org.jeometry.common.logging.Logs;
 
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.raster.AbstractGeoreferencedImage;
-import com.revolsys.raster.io.format.tiff.GeoTiffConstants;
 import com.revolsys.raster.io.format.tiff.TiffImageFactory;
+import com.revolsys.raster.io.format.tiff.code.GeoTiffConstants;
 import com.revolsys.raster.io.format.tiff.code.GeoTiffKey;
 import com.revolsys.raster.io.format.tiff.code.GeoTiffKeys;
 import com.revolsys.spring.resource.Resource;

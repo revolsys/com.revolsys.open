@@ -2494,19 +2494,21 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     synchronized (this.formRecords) {
       for (final LayerRecord record : records) {
         final LayerRecord proxiedRecord = getRecordProxied(record);
-        final int index = proxiedRecord.indexOf(this.formRecords);
-        if (index == -1) {
-        } else {
-          removeRecordFromCache(this.cacheIdForm, proxiedRecord);
-          this.formRecords.remove(index);
-          final Component component = this.formComponents.remove(index);
-          if (component instanceof LayerRecordForm) {
-            final LayerRecordForm form = (LayerRecordForm)component;
-            forms.add(form);
-          }
-          final Window window = this.formWindows.remove(index);
-          if (window != null) {
-            windows.add(window);
+        if (proxiedRecord != null) {
+          final int index = proxiedRecord.indexOf(this.formRecords);
+          if (index == -1) {
+          } else {
+            removeRecordFromCache(this.cacheIdForm, proxiedRecord);
+            this.formRecords.remove(index);
+            final Component component = this.formComponents.remove(index);
+            if (component instanceof LayerRecordForm) {
+              final LayerRecordForm form = (LayerRecordForm)component;
+              forms.add(form);
+            }
+            final Window window = this.formWindows.remove(index);
+            if (window != null) {
+              windows.add(window);
+            }
           }
         }
       }

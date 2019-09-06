@@ -598,10 +598,14 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
   private void updateResolution() {
     if (!this.boundingBox.isBboxEmpty()) {
       if (this.imageWidth > 0) {
-        setResolutionX(this.boundingBox.getWidth() / this.imageWidth);
+        double width = this.boundingBox.getWidth();
+        double resolutionX = width / this.imageWidth;
+        setResolutionX(resolutionX);
       }
       if (this.imageHeight > 0) {
-        setResolutionY(this.boundingBox.getHeight() / this.imageHeight);
+        double height = this.boundingBox.getHeight();
+        double resolutionY = height / this.imageHeight;
+        setResolutionY(resolutionY);
       }
     }
   }

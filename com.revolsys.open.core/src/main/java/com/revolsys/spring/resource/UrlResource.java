@@ -11,6 +11,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.ByteBuffer;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Path;
 import java.util.Map;
 
@@ -20,6 +22,9 @@ import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 
 import com.revolsys.io.FileUtil;
+import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.HttpChannelReader;
+import com.revolsys.io.channels.HttpSeekableByteChannel;
 import com.revolsys.io.file.Paths;
 import com.revolsys.util.Base64;
 import com.revolsys.util.Property;
@@ -494,8 +499,26 @@ public class UrlResource extends AbstractResource {
   }
 
   @Override
+  public ChannelReader newChannelReader(final ByteBuffer byteBuffer) {
+    if (getProtocol().startsWith("http")) {
+      return new HttpChannelReader(this.url);
+    } else {
+      return super.newChannelReader(byteBuffer);
+    }
+  }
+
+  @Override
   public UrlResource newChildResource(final CharSequence childPath) {
     return createRelative(childPath.toString());
+  }
+
+  @Override
+  public ReadableByteChannel newReadableByteChannel() {
+    if (getProtocol().startsWith("http")) {
+      return new HttpSeekableByteChannel(this.url);
+    } else {
+      return super.newReadableByteChannel();
+    }
   }
 
   public UrlResource newUrlResource(final Map<String, ? extends Object> parameters) {

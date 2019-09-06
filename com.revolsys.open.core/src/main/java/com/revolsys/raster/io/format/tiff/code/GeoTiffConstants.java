@@ -1,4 +1,4 @@
-package com.revolsys.raster.io.format.tiff;
+package com.revolsys.raster.io.format.tiff.code;
 
 public interface GeoTiffConstants {
 

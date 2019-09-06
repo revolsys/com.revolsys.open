@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import org.jeometry.common.function.BiConsumerDouble;
 import org.jeometry.common.number.Doubles;
 
 import com.revolsys.collection.map.MapEx;
@@ -69,6 +70,26 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
 
   public CustomRectangularMapGrid(final Map<String, ? extends Object> properties) {
     setProperties(properties);
+  }
+
+  public void forEachTile(final BoundingBoxProxy boundingBox, final BiConsumerDouble action) {
+    final BoundingBox convertedBoundingBox = boundingBox.getBoundingBox()
+      .bboxToCs(getGeometryFactory());
+
+    final int minX = getGridFloor(this.originX, this.tileWidth, convertedBoundingBox.getMinX());
+    final int minY = getGridFloor(this.originY, this.tileHeight, convertedBoundingBox.getMinY());
+    final int maxX = getGridCeil(this.originX, this.tileWidth, convertedBoundingBox.getMaxX());
+    final int maxY = getGridCeil(this.originY, this.tileHeight, convertedBoundingBox.getMaxY());
+
+    final int numX = (int)Math.ceil((maxX - minX) / this.tileWidth);
+    final int numY = (int)Math.ceil((maxY - minY) / this.tileWidth);
+    for (int i = 0; i < numY; i++) {
+      final double y = minY + i * this.tileHeight;
+      for (int j = 0; j < numX; j++) {
+        final double x = minX + j * this.tileWidth;
+        action.accept(x, y);
+      }
+    }
   }
 
   public void forEachTile(final BoundingBoxProxy boundingBox,

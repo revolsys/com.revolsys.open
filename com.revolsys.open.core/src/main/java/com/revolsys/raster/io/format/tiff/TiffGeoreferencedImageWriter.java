@@ -30,6 +30,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractWriter;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageWriter;
+import com.revolsys.raster.io.format.tiff.code.GeoTiffConstants;
 import com.revolsys.raster.io.format.tiff.code.GeoTiffCoordinateTransformationCode;
 import com.revolsys.raster.io.format.tiff.code.GeoTiffKey;
 import com.revolsys.raster.io.format.tiff.code.GeoTiffKeyProjectionParameterName;

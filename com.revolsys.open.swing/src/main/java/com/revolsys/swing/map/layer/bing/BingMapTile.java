@@ -13,7 +13,7 @@ public class BingMapTile extends GeoreferencedImageMapTile {
 
   public BingMapTile(final BingLayer layer, final BoundingBox boundingBox, final String quadKey,
     final double resolution) {
-    super(boundingBox, 256, 256, resolution);
+    super(boundingBox, 256, 256);
     this.layer = layer;
     this.quadKey = quadKey;
   }
