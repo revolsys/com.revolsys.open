@@ -7,32 +7,11 @@ import com.revolsys.raster.io.format.tiff.TiffDirectory;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
 import com.revolsys.raster.io.format.tiff.code.TiffTag;
 
-public class TiffDirectoryEntrySignedByteArray extends AbstractTiffDirectoryEntryArray<byte[]> {
+public class TiffDirectoryEntrySignedByteArray extends AbstractTiffDirectoryEntry<byte[]> {
 
-  public static TiffDirectoryEntrySignedByteArray newEntry(final TiffFieldType type,
-    final TiffTag tag, final TiffDirectory directory, final ChannelReader in) {
-    final long count = directory.readOffsetOrCount(in);
-    final int maxInlineCount = directory.getMaxInlineCount(1);
-    if (count <= maxInlineCount) {
-      final byte[] value = new byte[(int)count];
-      for (int i = 0; i < count; i++) {
-        value[i] = in.getByte();
-      }
-      in.skipBytes((int)(maxInlineCount - count));
-      return new TiffDirectoryEntrySignedByteArray(type, tag, count, value);
-    } else {
-      return new TiffDirectoryEntrySignedByteArray(type, tag, directory, in, count);
-    }
-  }
-
-  private TiffDirectoryEntrySignedByteArray(final TiffFieldType type, final TiffTag tag,
-    final long count, final byte[] value) {
-    super(type, tag, count, value);
-  }
-
-  public TiffDirectoryEntrySignedByteArray(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory, final ChannelReader in, final long count) {
-    super(type, tag, directory, in, count);
+  public TiffDirectoryEntrySignedByteArray(final TiffTag tag, final TiffDirectory directory,
+    final ChannelReader in) {
+    super(tag, directory, in);
   }
 
   @Override
@@ -46,6 +25,15 @@ public class TiffDirectoryEntrySignedByteArray extends AbstractTiffDirectoryEntr
   }
 
   @Override
+  public Number getNumber() {
+    if (getCount() == 1) {
+      return this.value[0];
+    } else {
+      throw new IllegalStateException("Cannot get single value from array of size " + getCount());
+    }
+  }
+
+  @Override
   public Number getNumber(final int index) {
     return this.value[index];
   }
@@ -56,7 +44,12 @@ public class TiffDirectoryEntrySignedByteArray extends AbstractTiffDirectoryEntr
   }
 
   @Override
-  protected byte[] loadArrayValueDo(final ChannelReader in, final int count) {
+  public TiffFieldType getType() {
+    return TiffFieldType.SBYTE;
+  }
+
+  @Override
+  protected byte[] loadValueDo(final ChannelReader in, final int count) {
     final byte[] value = new byte[count];
     for (int i = 0; i < count; i++) {
       value[i] = in.getByte();

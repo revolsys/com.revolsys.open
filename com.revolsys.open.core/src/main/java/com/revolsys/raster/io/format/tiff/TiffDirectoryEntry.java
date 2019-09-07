@@ -109,9 +109,12 @@ public interface TiffDirectoryEntry {
   }
 
   default double[] getDoubleArray() {
-    return new double[] {
-      getDouble()
-    };
+    final int count = (int)getCount();
+    final double[] value = new double[count];
+    for (int i = 0; i < count; i++) {
+      value[i] = getDouble(i);
+    }
+    return value;
   }
 
   default float getFloat() {
@@ -144,9 +147,12 @@ public interface TiffDirectoryEntry {
   }
 
   default int[] getIntArray() {
-    return new int[] {
-      getInt()
-    };
+    final int count = (int)getCount();
+    final int[] value = new int[count];
+    for (int i = 0; i < count; i++) {
+      value[i] = getInt(i);
+    }
+    return value;
   }
 
   default long getLong() {
@@ -160,9 +166,12 @@ public interface TiffDirectoryEntry {
   }
 
   default long[] getLongArray() {
-    return new long[] {
-      getLong()
-    };
+    final int count = (int)getCount();
+    final long[] value = new long[count];
+    for (int i = 0; i < count; i++) {
+      value[i] = getLong(i);
+    }
+    return value;
   }
 
   default Number getNumber() {
@@ -202,8 +211,13 @@ public interface TiffDirectoryEntry {
 
   <V> V getValue();
 
+  default int getValueSizeBytes() {
+    final TiffFieldType type = getType();
+    return type.getSizeBytes();
+  }
+
   default boolean isArray() {
-    return false;
+    return getCount() > 1;
   }
 
   default boolean isLoaded() {

@@ -3,43 +3,31 @@ package com.revolsys.raster.io.format.tiff.code;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jeometry.common.function.Function4;
+import org.jeometry.common.function.Function3;
 
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.raster.io.format.tiff.TiffDirectory;
 import com.revolsys.raster.io.format.tiff.TiffDirectoryEntry;
 import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryAscii;
-import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryDouble;
 import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryDoubleArray;
-import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryFloat;
 import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryFloatArray;
-import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntrySignedByte;
 import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntrySignedByteArray;
-import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntrySignedInt;
 import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntrySignedIntArray;
-import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntrySignedLong;
 import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntrySignedLongArray;
-import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntrySignedRational;
 import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntrySignedRationalArray;
-import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntrySignedShort;
 import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntrySignedShortArray;
-import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryUnsignedByte;
+import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryUndefinedArray;
 import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryUnsignedByteArray;
-import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryUnsignedInt;
 import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryUnsignedIntArray;
-import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryUnsignedLong;
 import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryUnsignedLongArray;
-import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryUnsignedRational;
 import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryUnsignedRationalArray;
-import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryUnsignedShort;
 import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryUnsignedShortArray;
 
 public enum TiffFieldType {
   // 8-bit unsigned integer
   BYTE(//
     1, //
-    TiffDirectoryEntryUnsignedByte::new, //
-    TiffDirectoryEntryUnsignedByteArray::newEntry//
+    TiffDirectoryEntryUnsignedByteArray::new//
   ),
   // 8-bit byte that contains a 7-bit ASCII code; the last
   // byte must be NUL (binary zero)
@@ -50,79 +38,76 @@ public enum TiffFieldType {
   // 16-bit (2-byte) unsigned integer
   SHORT(//
     3, //
-    TiffDirectoryEntryUnsignedShort::new, //
-    TiffDirectoryEntryUnsignedShortArray::newEntry//
+    2, //
+    TiffDirectoryEntryUnsignedShortArray::new//
   ),
   // 32-bit (4-byte) unsigned integer
   LONG(//
     4, //
-    TiffDirectoryEntryUnsignedInt::new, //
-    TiffDirectoryEntryUnsignedIntArray::newEntry//
+    4, //
+    TiffDirectoryEntryUnsignedIntArray::new//
   ),
   // Two LONGs: the first represents the
   // numerator of a fraction; the second, the
   // denominator
   RATIONAL(//
     5, //
-    TiffDirectoryEntryUnsignedRational::new, //
+    8, //
     TiffDirectoryEntryUnsignedRationalArray::new//
   ),
   // 8-bit signed (twos-complement) integer.
   SBYTE(//
     6, //
-    TiffDirectoryEntrySignedByte::new, //
-    TiffDirectoryEntrySignedByteArray::newEntry//
+    TiffDirectoryEntrySignedByteArray::new//
   ),
   // 8-bit byte that may contain anything,
   // depending on the definition of the field
   UNDEFINED(//
     7, //
-    TiffDirectoryEntryUnsignedByte::new, //
-    TiffDirectoryEntrySignedByteArray::newEntry//
+    TiffDirectoryEntryUndefinedArray::new//
   ),
   // 16-bit (2-byte) signed (twos-complement) integer
   SSHORT(//
     8, //
-    TiffDirectoryEntrySignedShort::new, //
-    TiffDirectoryEntrySignedShortArray::newEntry//
+    2, //
+    TiffDirectoryEntrySignedShortArray::new//
   ),
   // 32-bit (4-byte) signed (twos-complement) integer
   SLONG(//
     9, //
-    TiffDirectoryEntrySignedInt::new, //
-    TiffDirectoryEntrySignedIntArray::newEntry//
+    4, //
+    TiffDirectoryEntrySignedIntArray::new//
   ),
   // Two SLONG’s: the first represents the
   // numerator of a fraction, the second the
   // denominator
   SRATIONAL(//
     10, //
-    TiffDirectoryEntrySignedRational::new, //
+    8, //
     TiffDirectoryEntrySignedRationalArray::new//
   ),
   // Single precision (4-byte) IEEE format
   FLOAT(//
     11, //
-    TiffDirectoryEntryFloat::new, //
-    TiffDirectoryEntryFloatArray::newEntry//
+    TiffDirectoryEntryFloatArray::new//
   ),
   // Double precision (8-byte) IEEE format
   DOUBLE(//
     12, //
-    TiffDirectoryEntryDouble::new, //
-    TiffDirectoryEntryDoubleArray::newEntry//
+    8, //
+    TiffDirectoryEntryDoubleArray::new//
   ),
   // 64-bit (8-byte) unsigned (twos-complement) integer
   LONG8(//
     16, //
-    TiffDirectoryEntryUnsignedLong::new, //
-    TiffDirectoryEntryUnsignedLongArray::newEntry//
+    8, //
+    TiffDirectoryEntryUnsignedLongArray::new//
   ),
   // 64-bit (8-byte) signed (twos-complement) integer
   SLONG8(//
     17, //
-    TiffDirectoryEntrySignedLong::new, //
-    TiffDirectoryEntrySignedLongArray::newEntry//
+    8, //
+    TiffDirectoryEntrySignedLongArray::new//
   );
 
   private static Map<Integer, TiffFieldType> ENUM_BY_TYPE = new HashMap<>();
@@ -139,21 +124,24 @@ public enum TiffFieldType {
 
   private final int type;
 
-  private final Function4<TiffFieldType, TiffTag, TiffDirectory, ChannelReader, TiffDirectoryEntry> newDirectoryEntryFunction;
+  private final int sizeBytes;
 
-  private final Function4<TiffFieldType, TiffTag, TiffDirectory, ChannelReader, TiffDirectoryEntry> newDirectoryEntryArrayFunction;
+  private final Function3<TiffTag, TiffDirectory, ChannelReader, TiffDirectoryEntry> newDirectoryEntryFunction;
 
   private TiffFieldType(final int type,
-    final Function4<TiffFieldType, TiffTag, TiffDirectory, ChannelReader, TiffDirectoryEntry> newDirectoryEntryFunction) {
-    this(type, newDirectoryEntryFunction, null);
+    final Function3<TiffTag, TiffDirectory, ChannelReader, TiffDirectoryEntry> newDirectoryEntryFunction) {
+    this(type, 1, newDirectoryEntryFunction);
   }
 
-  private TiffFieldType(final int type,
-    final Function4<TiffFieldType, TiffTag, TiffDirectory, ChannelReader, TiffDirectoryEntry> newDirectoryEntryFunction,
-    final Function4<TiffFieldType, TiffTag, TiffDirectory, ChannelReader, TiffDirectoryEntry> newDirectoryEntryArrayFunction) {
+  private TiffFieldType(final int type, final int sizeBytes,
+    final Function3<TiffTag, TiffDirectory, ChannelReader, TiffDirectoryEntry> newDirectoryEntryFunction) {
     this.type = type;
+    this.sizeBytes = sizeBytes;
     this.newDirectoryEntryFunction = newDirectoryEntryFunction;
-    this.newDirectoryEntryArrayFunction = newDirectoryEntryArrayFunction;
+  }
+
+  public int getSizeBytes() {
+    return this.sizeBytes;
   }
 
   public int getType() {
@@ -162,15 +150,7 @@ public enum TiffFieldType {
 
   public TiffDirectoryEntry newDirectoryEntry(final TiffTag tag, final TiffDirectory directory,
     final ChannelReader in) {
-    return this.newDirectoryEntryFunction.apply(this, tag, directory, in);
+    return this.newDirectoryEntryFunction.apply(tag, directory, in);
   }
 
-  public TiffDirectoryEntry newDirectoryEntryArray(final TiffTag tag, final TiffDirectory directory,
-    final ChannelReader in) {
-    if (this.newDirectoryEntryArrayFunction == null) {
-      throw new IllegalArgumentException("Array of " + this + " not supported");
-    } else {
-      return this.newDirectoryEntryArrayFunction.apply(this, tag, directory, in);
-    }
-  }
 }

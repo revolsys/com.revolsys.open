@@ -7,33 +7,11 @@ import com.revolsys.raster.io.format.tiff.TiffDirectory;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
 import com.revolsys.raster.io.format.tiff.code.TiffTag;
 
-public class TiffDirectoryEntryUnsignedIntArray extends AbstractTiffDirectoryEntryArray<long[]> {
+public class TiffDirectoryEntryUnsignedIntArray extends AbstractTiffDirectoryEntry<long[]> {
 
-  public static TiffDirectoryEntryUnsignedIntArray newEntry(final TiffFieldType type,
-    final TiffTag tag, final TiffDirectory directory, final ChannelReader in) {
-    final long count = directory.readOffsetOrCount(in);
-    final int maxInlineCount = directory.getMaxInlineCount(4);
-    if (count <= maxInlineCount) {
-      final long[] value = new long[(int)count];
-      for (int i = 0; i < count; i++) {
-        value[i] = in.getUnsignedInt();
-      }
-      in.skipBytes((int)(maxInlineCount - count) * 4);
-      return new TiffDirectoryEntryUnsignedIntArray(type, tag, count, value);
-
-    } else {
-      return new TiffDirectoryEntryUnsignedIntArray(type, tag, directory, in, count);
-    }
-  }
-
-  private TiffDirectoryEntryUnsignedIntArray(final TiffFieldType type, final TiffTag tag,
-    final long count, final long[] value) {
-    super(type, tag, count, value);
-  }
-
-  private TiffDirectoryEntryUnsignedIntArray(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory, final ChannelReader in, final long count) {
-    super(type, tag, directory, in, count);
+  public TiffDirectoryEntryUnsignedIntArray(final TiffTag tag, final TiffDirectory directory,
+    final ChannelReader in) {
+    super(tag, directory, in);
   }
 
   @Override
@@ -47,6 +25,15 @@ public class TiffDirectoryEntryUnsignedIntArray extends AbstractTiffDirectoryEnt
   }
 
   @Override
+  public Number getNumber() {
+    if (getCount() == 1) {
+      return this.value[0];
+    } else {
+      throw new IllegalStateException("Cannot get single value from array of size " + getCount());
+    }
+  }
+
+  @Override
   public Number getNumber(final int index) {
     return this.value[index];
   }
@@ -57,7 +44,12 @@ public class TiffDirectoryEntryUnsignedIntArray extends AbstractTiffDirectoryEnt
   }
 
   @Override
-  protected long[] loadArrayValueDo(final ChannelReader in, final int count) {
+  public TiffFieldType getType() {
+    return TiffFieldType.LONG;
+  }
+
+  @Override
+  protected long[] loadValueDo(final ChannelReader in, final int count) {
     final long[] value = new long[count];
     for (int i = 0; i < count; i++) {
       value[i] = in.getUnsignedInt();

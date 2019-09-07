@@ -7,22 +7,25 @@ import com.revolsys.raster.io.format.tiff.TiffDirectory;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
 import com.revolsys.raster.io.format.tiff.code.TiffTag;
 
-public class TiffDirectoryEntrySignedRationalArray
-  extends AbstractTiffDirectoryEntryArray<double[]> {
+public class TiffDirectoryEntrySignedRationalArray extends AbstractTiffDirectoryEntry<double[]> {
 
-  public TiffDirectoryEntrySignedRationalArray(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory, final ChannelReader in) {
-    super(type, tag, directory, in);
-  }
-
-  public TiffDirectoryEntrySignedRationalArray(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory, final ChannelReader in, final long count) {
-    super(type, tag, directory, in, count);
+  public TiffDirectoryEntrySignedRationalArray(final TiffTag tag, final TiffDirectory directory,
+    final ChannelReader in) {
+    super(tag, directory, in);
   }
 
   @Override
   public double getDouble(final int index) {
     return this.value[index];
+  }
+
+  @Override
+  public Number getNumber() {
+    if (getCount() == 1) {
+      return this.value[0];
+    } else {
+      throw new IllegalStateException("Cannot get single value from array of size " + getCount());
+    }
   }
 
   @Override
@@ -36,7 +39,12 @@ public class TiffDirectoryEntrySignedRationalArray
   }
 
   @Override
-  protected double[] loadArrayValueDo(final ChannelReader in, final int count) {
+  public TiffFieldType getType() {
+    return TiffFieldType.SRATIONAL;
+  }
+
+  @Override
+  protected double[] loadValueDo(final ChannelReader in, final int count) {
     final double[] value = new double[count];
     for (int i = 0; i < count; i++) {
       final double numerator = in.getInt();

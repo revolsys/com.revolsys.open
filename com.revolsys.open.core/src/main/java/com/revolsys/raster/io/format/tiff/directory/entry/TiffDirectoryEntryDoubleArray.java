@@ -7,30 +7,11 @@ import com.revolsys.raster.io.format.tiff.TiffDirectory;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
 import com.revolsys.raster.io.format.tiff.code.TiffTag;
 
-public class TiffDirectoryEntryDoubleArray extends AbstractTiffDirectoryEntryArray<double[]> {
+public class TiffDirectoryEntryDoubleArray extends AbstractTiffDirectoryEntry<double[]> {
 
-  public static TiffDirectoryEntryDoubleArray newEntry(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory, final ChannelReader in) {
-    final long count = directory.readOffsetOrCount(in);
-    final boolean bigTiff = directory.isBigTiff();
-    if (count == 1 && bigTiff) {
-      final double[] value = new double[(int)count];
-      value[0] = in.getDouble();
-      return new TiffDirectoryEntryDoubleArray(type, tag, count, value);
-
-    } else {
-      return new TiffDirectoryEntryDoubleArray(type, tag, directory, in, count);
-    }
-  }
-
-  public TiffDirectoryEntryDoubleArray(final TiffFieldType type, final TiffTag tag,
-    final long count, final double[] value) {
-    super(type, tag, count, value);
-  }
-
-  public TiffDirectoryEntryDoubleArray(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory, final ChannelReader in, final long count) {
-    super(type, tag, directory, in, count);
+  public TiffDirectoryEntryDoubleArray(final TiffTag tag, final TiffDirectory directory,
+    final ChannelReader in) {
+    super(tag, directory, in);
   }
 
   @Override
@@ -44,6 +25,15 @@ public class TiffDirectoryEntryDoubleArray extends AbstractTiffDirectoryEntryArr
   }
 
   @Override
+  public Number getNumber() {
+    if (getCount() == 1) {
+      return this.value[0];
+    } else {
+      throw new IllegalStateException("Cannot get single value from array of size " + getCount());
+    }
+  }
+
+  @Override
   public Number getNumber(final int index) {
     return this.value[index];
   }
@@ -54,7 +44,12 @@ public class TiffDirectoryEntryDoubleArray extends AbstractTiffDirectoryEntryArr
   }
 
   @Override
-  protected double[] loadArrayValueDo(final ChannelReader in, final int count) {
+  public TiffFieldType getType() {
+    return TiffFieldType.DOUBLE;
+  }
+
+  @Override
+  protected double[] loadValueDo(final ChannelReader in, final int count) {
     final double[] value = new double[count];
     for (int i = 0; i < count; i++) {
       value[i] = in.getDouble();

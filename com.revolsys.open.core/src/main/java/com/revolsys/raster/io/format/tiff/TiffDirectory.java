@@ -61,12 +61,7 @@ public class TiffDirectory {
           in.skipBytes(16);
         } else {
           final TiffTag tiffTag = TiffTags.getTag(tag);
-          final TiffDirectoryEntry entry;
-          if (tiffTag.isArray()) {
-            entry = fieldType.newDirectoryEntryArray(tiffTag, this, in);
-          } else {
-            entry = fieldType.newDirectoryEntry(tiffTag, this, in);
-          }
+          final TiffDirectoryEntry entry = fieldType.newDirectoryEntry(tiffTag, this, in);
 
           this.entryByTag.put(tiffTag, entry);
         }
@@ -83,13 +78,7 @@ public class TiffDirectory {
           in.skipBytes(8);
         } else {
           final TiffTag tiffTag = TiffTags.getTag(tag);
-          final TiffDirectoryEntry entry;
-          if (tiffTag.isArray()) {
-            entry = fieldType.newDirectoryEntryArray(tiffTag, this, in);
-          } else {
-            entry = fieldType.newDirectoryEntry(tiffTag, this, in);
-          }
-
+          final TiffDirectoryEntry entry = fieldType.newDirectoryEntry(tiffTag, this, in);
           this.entryByTag.put(tiffTag, entry);
         }
       }
@@ -281,6 +270,14 @@ public class TiffDirectory {
       return 8 / dataSize;
     } else {
       return 4 / dataSize;
+    }
+  }
+
+  public int getMaxInlineSize() {
+    if (this.bigTiff) {
+      return 8;
+    } else {
+      return 4;
     }
   }
 

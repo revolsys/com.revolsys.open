@@ -7,38 +7,25 @@ import com.revolsys.raster.io.format.tiff.TiffDirectory;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
 import com.revolsys.raster.io.format.tiff.code.TiffTag;
 
-public class TiffDirectoryEntryFloatArray extends AbstractTiffDirectoryEntryArray<float[]> {
+public class TiffDirectoryEntryFloatArray extends AbstractTiffDirectoryEntry<float[]> {
 
-  public static TiffDirectoryEntryFloatArray newEntry(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory, final ChannelReader in) {
-    final long count = directory.readOffsetOrCount(in);
-    final int maxInlineCount = directory.getMaxInlineCount(4);
-    if (count <= maxInlineCount) {
-      final float[] value = new float[(int)count];
-      for (int i = 0; i < count; i++) {
-        value[i] = in.getFloat();
-      }
-      in.skipBytes((int)(maxInlineCount - count) * 4);
-      return new TiffDirectoryEntryFloatArray(type, tag, count, value);
-
-    } else {
-      return new TiffDirectoryEntryFloatArray(type, tag, directory, in, count);
-    }
-  }
-
-  private TiffDirectoryEntryFloatArray(final TiffFieldType type, final TiffTag tag,
-    final long count, final float[] value) {
-    super(type, tag, count, value);
-  }
-
-  private TiffDirectoryEntryFloatArray(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory, final ChannelReader in, final long count) {
-    super(type, tag, directory, in, count);
+  public TiffDirectoryEntryFloatArray(final TiffTag tag, final TiffDirectory directory,
+    final ChannelReader in) {
+    super(tag, directory, in);
   }
 
   @Override
   public float getFloat(final int index) {
     return this.value[index];
+  }
+
+  @Override
+  public Number getNumber() {
+    if (getCount() == 1) {
+      return this.value[0];
+    } else {
+      throw new IllegalStateException("Cannot get single value from array of size " + getCount());
+    }
   }
 
   @Override
@@ -52,7 +39,12 @@ public class TiffDirectoryEntryFloatArray extends AbstractTiffDirectoryEntryArra
   }
 
   @Override
-  protected float[] loadArrayValueDo(final ChannelReader in, final int count) {
+  public TiffFieldType getType() {
+    return TiffFieldType.FLOAT;
+  }
+
+  @Override
+  protected float[] loadValueDo(final ChannelReader in, final int count) {
     final float[] value = new float[count];
     for (int i = 0; i < count; i++) {
       value[i] = in.getFloat();

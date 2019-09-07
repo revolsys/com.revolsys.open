@@ -7,33 +7,20 @@ import com.revolsys.raster.io.format.tiff.TiffDirectory;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
 import com.revolsys.raster.io.format.tiff.code.TiffTag;
 
-public class TiffDirectoryEntryUnsignedByteArray extends AbstractTiffDirectoryEntryArray<short[]> {
+public class TiffDirectoryEntryUnsignedByteArray extends AbstractTiffDirectoryEntry<short[]> {
 
-  public static TiffDirectoryEntryUnsignedByteArray newEntry(final TiffFieldType type,
-    final TiffTag tag, final TiffDirectory directory, final ChannelReader in) {
-    final long count = directory.readOffsetOrCount(in);
-    final int maxInlineCount = directory.getMaxInlineCount(1);
-    if (count <= maxInlineCount) {
-      final short[] value = new short[(int)count];
-      for (int i = 0; i < count; i++) {
-        value[i] = in.getUnsignedByte();
-      }
-      in.skipBytes((int)(maxInlineCount - count));
-      return new TiffDirectoryEntryUnsignedByteArray(type, tag, count, value);
+  public TiffDirectoryEntryUnsignedByteArray(final TiffTag tag, final TiffDirectory directory,
+    final ChannelReader in) {
+    super(tag, directory, in);
+  }
 
+  @Override
+  public Number getNumber() {
+    if (getCount() == 1) {
+      return this.value[0];
     } else {
-      return new TiffDirectoryEntryUnsignedByteArray(type, tag, directory, in, count);
+      throw new IllegalStateException("Cannot get single value from array of size " + getCount());
     }
-  }
-
-  private TiffDirectoryEntryUnsignedByteArray(final TiffFieldType type, final TiffTag tag,
-    final long count, final short[] value) {
-    super(type, tag, count, value);
-  }
-
-  private TiffDirectoryEntryUnsignedByteArray(final TiffFieldType type, final TiffTag tag,
-    final TiffDirectory directory, final ChannelReader in, final long count) {
-    super(type, tag, directory, in, count);
   }
 
   @Override
@@ -52,7 +39,12 @@ public class TiffDirectoryEntryUnsignedByteArray extends AbstractTiffDirectoryEn
   }
 
   @Override
-  protected short[] loadArrayValueDo(final ChannelReader in, final int count) {
+  public TiffFieldType getType() {
+    return TiffFieldType.BYTE;
+  }
+
+  @Override
+  protected short[] loadValueDo(final ChannelReader in, final int count) {
     final short[] value = new short[count];
     for (int i = 0; i < count; i++) {
       value[i] = in.getUnsignedByte();
