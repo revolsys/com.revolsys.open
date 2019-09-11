@@ -30,6 +30,8 @@ public class TiffDirectoryIterator
 
   private boolean bigTiff;
 
+  private TiffDirectory lastDirectory;
+
   public TiffDirectoryIterator(final Resource resource) {
     this.resource = resource;
     final ChannelReader in = resource.newChannelReader();
@@ -84,11 +86,16 @@ public class TiffDirectoryIterator
   @Override
   public TiffDirectory next() {
     if (this.directoryOffset == 0) {
+      this.lastDirectory = null;
       throw new NoSuchElementException();
     } else {
-      final TiffDirectory directory = new TiffDirectory(this.bigTiff, this.resource, this.in,
-        this.index++, this.directoryOffset);
+      final TiffDirectory directory = new TiffDirectory(this.resource, this.in, this.index++,
+        this.directoryOffset, this.bigTiff);
       this.directoryOffset = directory.getNextOffset();
+      if (this.lastDirectory != null) {
+        this.lastDirectory.setNextDirectory(directory);
+      }
+      this.lastDirectory = directory;
       return directory;
     }
   }

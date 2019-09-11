@@ -3,10 +3,13 @@ package com.revolsys.raster.io.format.tiff;
 import java.io.PrintStream;
 import java.lang.ref.WeakReference;
 import java.nio.ByteOrder;
-import java.util.LinkedHashMap;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
+import java.util.TreeMap;
 
 import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.raster.io.format.tiff.code.TiffBaselineTag;
 import com.revolsys.raster.io.format.tiff.code.TiffCompression;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
@@ -26,67 +29,48 @@ import com.revolsys.spring.resource.Resource;
 
 public class TiffDirectory {
 
-  private final Map<TiffTag, TiffDirectoryEntry> entryByTag = new LinkedHashMap<>();
+  private final Map<TiffTag, TiffDirectoryEntry> entryByTag = new TreeMap<>(
+    (a, b) -> Integer.compare(a.getId(), b.getId()));
 
   private final int index;
 
   private final long offset;
 
-  private final long nextOffset;
+  private long nextOffset;
 
   private WeakReference<TiffImage> imageReference = new WeakReference<TiffImage>(null);
 
   private final Resource resource;
 
+  private TiffDirectory nextDirectory;
+
   private final ByteOrder byteOrder;
 
   private final boolean bigTiff;
 
-  public TiffDirectory(final boolean bigTiff, final Resource resource, final ChannelReader in,
-    final int index, final long offset) {
+  public TiffDirectory(final Resource resource, final ChannelReader in, final int index,
+    final long offset, final boolean bigTiff) {
     this.resource = resource;
     this.bigTiff = bigTiff;
     this.byteOrder = in.getByteOrder();
     this.index = index;
     this.offset = offset;
-    in.seek(offset);
-    if (bigTiff) {
-      final long recordCount = in.getLong();
-      for (int i = 0; i < recordCount; i++) {
-        final int tag = in.getUnsignedShort();
-        final int type = in.getUnsignedShort();
 
-        final TiffFieldType fieldType = TiffFieldType.valueByType(type);
-        if (fieldType == null) {
-          in.skipBytes(16);
-        } else {
-          final TiffTag tiffTag = TiffTags.getTag(tag);
-          final TiffDirectoryEntry entry = fieldType.newDirectoryEntry(tiffTag, this, in);
+    readDirectory(in);
+  }
 
-          this.entryByTag.put(tiffTag, entry);
-        }
-      }
-      this.nextOffset = in.getLong();
-    } else {
-      final int recordCount = in.getUnsignedShort();
-      for (int i = 0; i < recordCount; i++) {
-        final int tag = in.getUnsignedShort();
-        final int type = in.getUnsignedShort();
+  public TiffDirectory(final Resource resource, final int index, final ByteOrder byteOrder,
+    final boolean bigTiff, final long offset) {
+    this.resource = resource;
+    this.index = index;
+    this.byteOrder = byteOrder;
+    this.bigTiff = bigTiff;
+    this.offset = offset;
+  }
 
-        final TiffFieldType fieldType = TiffFieldType.valueByType(type);
-        if (fieldType == null) {
-          in.skipBytes(8);
-        } else {
-          final TiffTag tiffTag = TiffTags.getTag(tag);
-          final TiffDirectoryEntry entry = fieldType.newDirectoryEntry(tiffTag, this, in);
-          this.entryByTag.put(tiffTag, entry);
-        }
-      }
-      this.nextOffset = in.getUnsignedInt();
-    }
-    for (final TiffDirectoryEntry entry : this.entryByTag.values()) {
-      entry.loadValue(in);
-    }
+  protected void addEntry(final TiffDirectoryEntry entry) {
+    final TiffTag tag = entry.getTag();
+    this.entryByTag.put(tag, entry);
   }
 
   public void dump(final PrintStream out) {
@@ -97,7 +81,7 @@ public class TiffDirectory {
     out.print(" (0x");
     out.print(Long.toHexString(this.offset));
     out.print(") next ");
-    out.print(this.nextOffset);
+    out.print(getNextOffset());
     out.print(" (");
     if (this.nextOffset != 0) {
       out.print("0x");
@@ -175,8 +159,16 @@ public class TiffDirectory {
     }
   }
 
+  public Collection<TiffDirectoryEntry> getEntries() {
+    return Collections.unmodifiableCollection(this.entryByTag.values());
+  }
+
   public TiffDirectoryEntry getEntry(final TiffTag tag) {
     return this.entryByTag.get(tag);
+  }
+
+  public int getEntryCount() {
+    return this.entryByTag.size();
   }
 
   public TiffDirectoryEntry getEntryRequired(final TiffTag tag) {
@@ -282,7 +274,11 @@ public class TiffDirectory {
   }
 
   public long getNextOffset() {
-    return this.nextOffset;
+    if (this.nextDirectory == null) {
+      return this.nextOffset;
+    } else {
+      return this.nextDirectory.getOffset();
+    }
   }
 
   public long getOffset() {
@@ -356,12 +352,43 @@ public class TiffDirectory {
     }
   }
 
+  public void readDirectory(final ChannelReader in) {
+    in.seek(this.offset);
+    long recordCount;
+    int skipSize;
+    if (isBigTiff()) {
+      recordCount = in.getLong();
+      skipSize = 16;
+    } else {
+      recordCount = in.getUnsignedShort();
+      skipSize = 8;
+    }
+    for (int i = 0; i < recordCount; i++) {
+      final TiffTag tag = TiffTags.readTag(in);
+      final TiffFieldType fieldType = TiffFieldType.readValue(in);
+      if (fieldType == null) {
+        in.skipBytes(skipSize);
+      } else {
+        final TiffDirectoryEntry entry = fieldType.newDirectoryEntry(tag, this, in);
+        addEntry(entry);
+      }
+    }
+    this.nextOffset = readOffsetOrCount(in);
+    for (final TiffDirectoryEntry entry : this.entryByTag.values()) {
+      entry.readValue(in);
+    }
+  }
+
   public long readOffsetOrCount(final ChannelReader in) {
     if (this.bigTiff) {
       return in.getUnsignedLong();
     } else {
       return in.getUnsignedInt();
     }
+  }
+
+  void setNextDirectory(final TiffDirectory nextDirectory) {
+    this.nextDirectory = nextDirectory;
   }
 
   protected RuntimeException throwRequired(final TiffTag tag) {
@@ -372,4 +399,13 @@ public class TiffDirectory {
   public String toString() {
     return "TiffDirectory " + this.index + ": " + this.resource;
   }
+
+  public void writeOffsetOrCount(final ChannelWriter out, final long value) {
+    if (isBigTiff()) {
+      out.putUnsignedLong(value);
+    } else {
+      out.putUnsignedInt(value);
+    }
+  }
+
 }

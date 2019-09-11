@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer.record.table;
 
-import java.awt.Color;
 import java.awt.Font;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -24,7 +23,6 @@ import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.decorator.FontHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jdesktop.swingx.table.TableColumnModelExt;
@@ -38,7 +36,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.table.TablePanel;
-import com.revolsys.swing.table.highlighter.ColorHighlighter;
+import com.revolsys.swing.table.highlighter.OddEvenColorHighlighter;
 import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
@@ -104,24 +102,18 @@ public class RecordLayerTable extends RecordRowTable {
   })
   protected void addDeletedRecordHighlighter() {
     final RecordLayerTableModel model = getModel();
-    final HighlightPredicate predicate = (renderer, adapter) -> {
-      try {
-        final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-        return model.isDeleted(rowIndex);
-      } catch (final Throwable e) {
-      }
-      return false;
-    };
+    final OddEvenColorHighlighter colorHighlighter = addColorHighlighter(
+      (rowIndex, columnIndex) -> {
+        try {
+          final LayerRecord record = model.getRecord(rowIndex);
+          final AbstractRecordLayer layer = model.getLayer();
+          return layer.isDeleted(record);
+        } catch (final Throwable e) {
+          return false;
+        }
+      }, WebColors.LightPink, WebColors.Crimson);
 
-    addHighlighter(
-      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.EVEN),
-        WebColors.newAlpha(WebColors.Pink, 127), WebColors.FireBrick, WebColors.LightCoral,
-        WebColors.FireBrick));
-
-    addHighlighter(
-      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.ODD),
-        WebColors.Pink, WebColors.FireBrick, WebColors.Crimson, WebColors.White));
-
+    final HighlightPredicate predicate = colorHighlighter.getHighlightPredicate();
     final Font tableFont = getFont();
     final Map<TextAttribute, Object> fontAttributes = (Map)tableFont.getAttributes();
     fontAttributes.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
@@ -133,49 +125,29 @@ public class RecordLayerTable extends RecordRowTable {
   @Override
   protected void addModifiedRecordHighlighter() {
     final RecordLayerTableModel model = getModel();
-    final HighlightPredicate predicate = (renderer, adapter) -> {
+    addColorHighlighter((rowIndex, columnIndex) -> {
       try {
-        final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
         final LayerRecord record = model.getRecord(rowIndex);
         final AbstractRecordLayer layer = model.getLayer();
         return layer.isModified(record);
       } catch (final Throwable e) {
         return false;
       }
-    };
-
-    addHighlighter(
-      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.EVEN),
-        WebColors.newAlpha(WebColors.LimeGreen, 127), WebColors.Black,
-        WebColors.newAlpha(WebColors.DarkGreen, 191), Color.WHITE));
-
-    addHighlighter(
-      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.ODD),
-        WebColors.LimeGreen, WebColors.Black, WebColors.DarkGreen, Color.WHITE));
+    }, WebColors.newAlpha(WebColors.LimeGreen, 127), WebColors.newAlpha(WebColors.DarkGreen, 191));
   }
 
   @Override
   protected void addNewRecordHighlighter() {
     final RecordLayerTableModel model = getModel();
-    final HighlightPredicate predicate = (renderer, adapter) -> {
+    addColorHighlighter((rowIndex, columnIndex) -> {
       try {
-        final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
         final LayerRecord record = model.getRecord(rowIndex);
         final AbstractRecordLayer layer = model.getLayer();
         return layer.isNew(record);
       } catch (final Throwable e) {
         return false;
       }
-    };
-
-    addHighlighter(
-      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.EVEN),
-        WebColors.newAlpha(WebColors.LightSkyBlue, 127), WebColors.Black,
-        WebColors.newAlpha(WebColors.RoyalBlue, 191), Color.WHITE));
-
-    addHighlighter(
-      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.ODD),
-        WebColors.LightSkyBlue, WebColors.Black, WebColors.RoyalBlue, Color.WHITE));
+    }, WebColors.LightSkyBlue, WebColors.CornflowerBlue);
   }
 
   public void copyFieldValue() {

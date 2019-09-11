@@ -3,16 +3,10 @@ package com.revolsys.raster.io.format.tiff.directory.entry;
 import java.util.Arrays;
 
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.raster.io.format.tiff.TiffDirectory;
+import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
-import com.revolsys.raster.io.format.tiff.code.TiffTag;
 
 public class TiffDirectoryEntryFloatArray extends AbstractTiffDirectoryEntry<float[]> {
-
-  public TiffDirectoryEntryFloatArray(final TiffTag tag, final TiffDirectory directory,
-    final ChannelReader in) {
-    super(tag, directory, in);
-  }
 
   @Override
   public float getFloat(final int index) {
@@ -50,5 +44,13 @@ public class TiffDirectoryEntryFloatArray extends AbstractTiffDirectoryEntry<flo
       value[i] = in.getFloat();
     }
     return value;
+  }
+
+  @Override
+  public void writeValueDo(final ChannelWriter out) {
+    for (int i = 0; i < this.value.length; i++) {
+      final float number = this.value[i];
+      out.putFloat(number);
+    }
   }
 }

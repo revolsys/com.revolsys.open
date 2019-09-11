@@ -3,15 +3,20 @@ package com.revolsys.raster.io.format.tiff.directory.entry;
 import java.util.Arrays;
 
 import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.raster.io.format.tiff.TiffDirectory;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
-import com.revolsys.raster.io.format.tiff.code.TiffTag;
 
 public class TiffDirectoryEntryUnsignedLongArray extends AbstractTiffDirectoryEntry<long[]> {
+  public TiffDirectoryEntryUnsignedLongArray() {
+  }
 
-  public TiffDirectoryEntryUnsignedLongArray(final TiffTag tag, final TiffDirectory directory,
-    final ChannelReader in) {
-    super(tag, directory, in);
+  public TiffDirectoryEntryUnsignedLongArray(final TiffDirectory directory, final int count) {
+    this(directory, new long[count]);
+  }
+
+  public TiffDirectoryEntryUnsignedLongArray(final TiffDirectory directory, final long[] value) {
+    super(directory, value, value.length);
   }
 
   @Override
@@ -55,5 +60,13 @@ public class TiffDirectoryEntryUnsignedLongArray extends AbstractTiffDirectoryEn
       value[i] = in.getUnsignedLong();
     }
     return value;
+  }
+
+  @Override
+  public void writeValueDo(final ChannelWriter out) {
+    for (int i = 0; i < this.value.length; i++) {
+      final long number = this.value[i];
+      out.putLong(number);
+    }
   }
 }

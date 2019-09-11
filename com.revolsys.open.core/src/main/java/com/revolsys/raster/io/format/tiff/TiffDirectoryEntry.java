@@ -5,12 +5,12 @@ import java.io.PrintStream;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
 import com.revolsys.raster.io.format.tiff.code.TiffPrivateTag;
 import com.revolsys.raster.io.format.tiff.code.TiffTag;
 
 public interface TiffDirectoryEntry {
-
   default void dump(final PrintStream out) {
     final TiffTag tag = getTag();
     if (tag instanceof TiffPrivateTag) {
@@ -27,7 +27,7 @@ public interface TiffDirectoryEntry {
     final TiffFieldType type = getType();
     out.print(type);
     out.print(" (");
-    out.print(type.getType());
+    out.print(type.getId());
     out.print(") ");
 
     final long count = getCount();
@@ -97,6 +97,8 @@ public interface TiffDirectoryEntry {
   default long getCount() {
     return 1;
   }
+
+  TiffDirectory getDirectory();
 
   default double getDouble() {
     final Number number = getNumber();
@@ -191,6 +193,8 @@ public interface TiffDirectoryEntry {
     }
   }
 
+  long getOffset();
+
   default short getShort() {
     final Number number = getNumber();
     return number.shortValue();
@@ -199,6 +203,10 @@ public interface TiffDirectoryEntry {
   default short getShort(final int index) {
     final Number number = getNumber(index);
     return number.shortValue();
+  }
+
+  default int getSizeBytes() {
+    return (int)getCount() * getValueSizeBytes();
   }
 
   default String getString() {
@@ -220,10 +228,22 @@ public interface TiffDirectoryEntry {
     return getCount() > 1;
   }
 
+  default boolean isInline() {
+    final int maxInlineSize = getDirectory().getMaxInlineSize();
+    final long size = getCount() * getValueSizeBytes();
+    return size <= maxInlineSize;
+  }
+
   default boolean isLoaded() {
     return true;
   }
 
-  default void loadValue(final ChannelReader in) {
+  void readEntry(TiffTag tag, TiffDirectory directory, ChannelReader in);
+
+  default void readValue(final ChannelReader in) {
   }
+
+  void writeEntry(TiffDirectory directory, ChannelWriter out);
+
+  void writeValue(ChannelWriter out);
 }

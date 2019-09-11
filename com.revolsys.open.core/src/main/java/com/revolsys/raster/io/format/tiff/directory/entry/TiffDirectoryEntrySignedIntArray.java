@@ -3,16 +3,10 @@ package com.revolsys.raster.io.format.tiff.directory.entry;
 import java.util.Arrays;
 
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.raster.io.format.tiff.TiffDirectory;
+import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
-import com.revolsys.raster.io.format.tiff.code.TiffTag;
 
 public class TiffDirectoryEntrySignedIntArray extends AbstractTiffDirectoryEntry<int[]> {
-
-  public TiffDirectoryEntrySignedIntArray(final TiffTag tag, final TiffDirectory directory,
-    final ChannelReader in) {
-    super(tag, directory, in);
-  }
 
   @Override
   public int getInt(final int index) {
@@ -55,5 +49,13 @@ public class TiffDirectoryEntrySignedIntArray extends AbstractTiffDirectoryEntry
       value[i] = in.getInt();
     }
     return value;
+  }
+
+  @Override
+  public void writeValueDo(final ChannelWriter out) {
+    for (int i = 0; i < this.value.length; i++) {
+      final int number = this.value[i];
+      out.putInt(number);
+    }
   }
 }

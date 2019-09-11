@@ -1,15 +1,12 @@
 package com.revolsys.raster.io.format.tiff.directory.entry;
 
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.raster.io.format.tiff.TiffDirectory;
+import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
-import com.revolsys.raster.io.format.tiff.code.TiffTag;
 
 public class TiffDirectoryEntryAscii extends AbstractTiffDirectoryEntry<String> {
 
-  public TiffDirectoryEntryAscii(final TiffTag tag, final TiffDirectory directory,
-    final ChannelReader in) {
-    super(tag, directory, in);
+  public TiffDirectoryEntryAscii() {
   }
 
   @Override
@@ -25,5 +22,10 @@ public class TiffDirectoryEntryAscii extends AbstractTiffDirectoryEntry<String> 
   @Override
   protected String loadValueDo(final ChannelReader in, final int count) {
     return in.getUsAsciiString(count);
+  }
+
+  @Override
+  public void writeValueDo(final ChannelWriter out) {
+    out.putString(this.value, this.value.length());
   }
 }

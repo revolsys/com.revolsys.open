@@ -8,7 +8,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.jdesktop.swingx.decorator.HighlightPredicate;
-import org.jdesktop.swingx.decorator.HighlightPredicate.AndHighlightPredicate;
 import org.jeometry.common.awt.WebColors;
 
 import com.revolsys.beans.ObjectPropertyException;
@@ -17,7 +16,7 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.TablePanel;
-import com.revolsys.swing.table.highlighter.ColorHighlighter;
+import com.revolsys.swing.table.highlighter.OddEvenColorHighlighter;
 import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.model.RecordListTableModel;
 
@@ -114,14 +113,9 @@ public class RecordLayerErrorsTableModel extends RecordListTableModel
       final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
       return columnIndex == 0;
     };
-    table.addHighlighter(
-      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.EVEN),
-        WebColors.newAlpha(WebColors.Pink, 127), WebColors.FireBrick, WebColors.LightCoral,
-        WebColors.FireBrick));
+    table.addHighlighter(new OddEvenColorHighlighter(predicate,
+      WebColors.newAlpha(WebColors.Pink, 127), WebColors.LightCoral));
 
-    table.addHighlighter(
-      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.ODD),
-        WebColors.Pink, WebColors.FireBrick, WebColors.Crimson, WebColors.White));
     return new TablePanel(table);
   }
 

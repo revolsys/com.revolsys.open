@@ -12,7 +12,7 @@ import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJTable;
 
-public class LambdaTableModel<R> extends AbstractTableModel {
+public class LambdaRowTableModel<R> extends AbstractTableModel {
 
   private static final long serialVersionUID = 1L;
 
@@ -20,10 +20,10 @@ public class LambdaTableModel<R> extends AbstractTableModel {
 
   private List<R> rows = new ArrayList<>();
 
-  public LambdaTableModel() {
+  public LambdaRowTableModel() {
   }
 
-  public LambdaTableModel(final List<R> rows) {
+  public LambdaRowTableModel(final List<R> rows) {
     super();
     this.rows = rows;
   }

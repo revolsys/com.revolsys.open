@@ -146,6 +146,7 @@ public interface Record
     return -1;
   }
 
+  @Override
   Record clone();
 
   @Override

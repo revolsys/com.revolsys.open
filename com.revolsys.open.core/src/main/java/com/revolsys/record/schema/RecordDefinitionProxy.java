@@ -188,12 +188,39 @@ public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, Geo
     }
   }
 
-  default boolean isIdField(final String fieldName) {
-    if (fieldName == null) {
+  default boolean isGeometryField(final int fieldIndex) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
       return false;
     } else {
-      final String idFieldName = getIdFieldName();
-      return fieldName.equals(idFieldName);
+      return recordDefinition.getGeometryFieldIndexes().contains(fieldIndex);
+    }
+  }
+
+  default boolean isGeometryField(final String fieldName) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (fieldName == null || recordDefinition == null) {
+      return false;
+    } else {
+      return recordDefinition.getGeometryFieldNames().contains(fieldName);
+    }
+  }
+
+  default boolean isIdField(final int fieldIndex) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
+      return false;
+    } else {
+      return recordDefinition.getIdFieldIndexes().contains(fieldIndex);
+    }
+  }
+
+  default boolean isIdField(final String fieldName) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (fieldName == null || recordDefinition == null) {
+      return false;
+    } else {
+      return recordDefinition.getIdFieldNames().contains(fieldName);
     }
   }
 

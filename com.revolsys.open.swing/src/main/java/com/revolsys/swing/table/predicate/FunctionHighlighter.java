@@ -4,10 +4,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.util.function.BiFunction;
 
-import javax.swing.BorderFactory;
-import javax.swing.border.Border;
-
-import org.jdesktop.swingx.decorator.BorderHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
@@ -17,23 +13,6 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.swing.table.highlighter.OutsideBorderHighlighter;
 
 public class FunctionHighlighter implements HighlightPredicate {
-
-  public static Highlighter border(final BiFunction<Component, ComponentAdapter, Boolean> function,
-    final Border border) {
-    final HighlightPredicate predicate = new FunctionHighlighter(function);
-    return new BorderHighlighter(predicate, border);
-  }
-
-  public static Highlighter border(final BiFunction<Component, ComponentAdapter, Boolean> function,
-    final Color color) {
-    return border(function, color, 1);
-  }
-
-  public static Highlighter border(final BiFunction<Component, ComponentAdapter, Boolean> function,
-    final Color color, final int thickness) {
-    final Border border = BorderFactory.createLineBorder(color, thickness);
-    return border(function, border);
-  }
 
   public static Highlighter color(final BiFunction<Component, ComponentAdapter, Boolean> function,
     final Color cellBackground, final Color cellForeground, final Color selectedBackground,

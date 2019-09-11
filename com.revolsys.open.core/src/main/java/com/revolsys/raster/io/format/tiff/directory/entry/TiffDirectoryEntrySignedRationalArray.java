@@ -3,16 +3,14 @@ package com.revolsys.raster.io.format.tiff.directory.entry;
 import java.util.Arrays;
 
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.raster.io.format.tiff.TiffDirectory;
+import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
-import com.revolsys.raster.io.format.tiff.code.TiffTag;
 
 public class TiffDirectoryEntrySignedRationalArray extends AbstractTiffDirectoryEntry<double[]> {
 
-  public TiffDirectoryEntrySignedRationalArray(final TiffTag tag, final TiffDirectory directory,
-    final ChannelReader in) {
-    super(tag, directory, in);
-  }
+  private int numerator;
+
+  private int denominator;
 
   @Override
   public double getDouble(final int index) {
@@ -47,10 +45,16 @@ public class TiffDirectoryEntrySignedRationalArray extends AbstractTiffDirectory
   protected double[] loadValueDo(final ChannelReader in, final int count) {
     final double[] value = new double[count];
     for (int i = 0; i < count; i++) {
-      final double numerator = in.getInt();
-      final double denominator = in.getInt();
-      value[i] = numerator / denominator;
+      this.numerator = in.getInt();
+      this.denominator = in.getInt();
+      value[i] = this.numerator / this.denominator;
     }
     return value;
+  }
+
+  @Override
+  protected void writeValueDo(final ChannelWriter out) {
+    out.putInt(this.numerator);
+    out.putInt(this.denominator);
   }
 }

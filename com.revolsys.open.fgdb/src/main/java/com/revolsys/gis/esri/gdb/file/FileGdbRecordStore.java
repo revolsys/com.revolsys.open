@@ -615,9 +615,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   public RecordDefinitionImpl getRecordDefinition(final PathName schemaName, final String path,
     final String tableDefinition) {
     try {
-      // if (path.endsWith("TRANSPORT_LINE")) {
-      System.out.println(tableDefinition);
-      // }
       final XmlProcessor parser = new EsriGdbXmlParser();
       final DETable deTable = parser.process(tableDefinition);
       final String tableName = deTable.getName();

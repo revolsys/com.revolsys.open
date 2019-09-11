@@ -20,6 +20,7 @@ import javax.swing.event.CellEditorListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableModel;
 
 import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.data.type.DataType;
@@ -63,7 +64,8 @@ public class RecordTableCellEditor extends AbstractCellEditor
 
   public RecordTableCellEditor(final BaseJTable table) {
     this.table = table;
-    table.getModel().addTableModelListener(this);
+    final TableModel model = table.getModel();
+    model.addTableModelListener(this);
   }
 
   public synchronized void addMouseListener(final MouseListener l) {
@@ -97,6 +99,11 @@ public class RecordTableCellEditor extends AbstractCellEditor
     return value;
   }
 
+  protected String getColumnFieldName(final int rowIndex, final int columnIndex) {
+    final AbstractRecordTableModel model = (AbstractRecordTableModel)getTableModel();
+    return model.getColumnFieldName(rowIndex, columnIndex);
+  }
+
   public JComponent getEditorComponent() {
     return this.editorComponent;
   }
@@ -110,7 +117,7 @@ public class RecordTableCellEditor extends AbstractCellEditor
   }
 
   protected RecordDefinition getRecordDefinition() {
-    final AbstractRecordTableModel tableModel = getTableModel();
+    final AbstractRecordTableModel tableModel = (AbstractRecordTableModel)getTableModel();
     return tableModel.getRecordDefinition();
   }
 
@@ -120,9 +127,8 @@ public class RecordTableCellEditor extends AbstractCellEditor
     rowIndex = table.convertRowIndexToModel(rowIndex);
     columnIndex = table.convertColumnIndexToModel(columnIndex);
     this.oldValue = value;
-    final AbstractRecordTableModel model = getTableModel();
-    this.fieldName = model.getColumnFieldName(rowIndex, columnIndex);
-    final RecordDefinition recordDefinition = model.getRecordDefinition();
+    this.fieldName = getColumnFieldName(rowIndex, columnIndex);
+    final RecordDefinition recordDefinition = getRecordDefinition();
     this.dataType = recordDefinition.getFieldType(this.fieldName);
     final Field field = newField(this.fieldName);
     this.editorComponent = (JComponent)field;
@@ -161,8 +167,8 @@ public class RecordTableCellEditor extends AbstractCellEditor
     return this.editorComponent;
   }
 
-  protected AbstractRecordTableModel getTableModel() {
-    return (AbstractRecordTableModel)this.table.getModel();
+  protected TableModel getTableModel() {
+    return this.table.getModel();
   }
 
   @Override

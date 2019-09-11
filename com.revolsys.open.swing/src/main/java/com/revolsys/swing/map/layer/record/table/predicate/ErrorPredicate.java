@@ -18,12 +18,28 @@ public class ErrorPredicate implements HighlightPredicate {
 
   public static void add(final RecordRowTable table) {
     final RecordRowTableModel model = table.getTableModel();
-    final Highlighter highlighter = getHighlighter(model);
-    table.addHighlighter(highlighter);
+    // final Highlighter highlighter = getHighlighter(model);
+    // table.addHighlighter(highlighter);
+    table.addColorHighlighter((rowIndex, columnIndex) -> {
+      final Record record = model.getRecord(rowIndex);
+      if (record != null) {
+        final Class<?> columnClass = model.getColumnClass(columnIndex);
+        if (Geometry.class.isAssignableFrom(columnClass)) {
+          return false;
+        } else {
+          final String fieldName = model.getColumnFieldName(columnIndex);
+          if (!record.isValid(fieldName)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }, WebColors.Pink, WebColors.Red);
   }
 
   public static Highlighter getHighlighter(final RecordRowTableModel model) {
     final ErrorPredicate predicate = new ErrorPredicate(model);
+
     return new ColorHighlighter(predicate, WebColors.newAlpha(Color.RED, 64), Color.RED, Color.RED,
       Color.YELLOW);
   }

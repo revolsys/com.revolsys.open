@@ -3,17 +3,30 @@ package com.revolsys.raster.io.format.tiff.image;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.number.Integers;
 
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.raster.io.format.tiff.TiffDirectory;
+import com.revolsys.raster.io.format.tiff.TiffDirectoryBuilder;
 import com.revolsys.raster.io.format.tiff.code.TiffBaselineTag;
 import com.revolsys.raster.io.format.tiff.code.TiffExtensionTag;
+import com.revolsys.raster.io.format.tiff.code.TiffPhotogrametricInterpretation;
 import com.revolsys.raster.io.format.tiff.compression.TiffDecompressor;
 
 public class TiffRgbFullColorImage extends AbstractTiffImage {
+  public static Consumer<TiffDirectoryBuilder> initBits(final int bitsPerSample) {
+    return directory -> {
+      directory //
+        .setUnsignedShort(TiffBaselineTag.PhotometricInterpretation,
+          TiffPhotogrametricInterpretation.RGB.getId()) //
+        .setBitsPerSample(bitsPerSample, bitsPerSample, bitsPerSample)//
+      ;
+    };
+  }
+
   private int alphaByteIndex = -1;
 
   final int[] bitsPerSamples;

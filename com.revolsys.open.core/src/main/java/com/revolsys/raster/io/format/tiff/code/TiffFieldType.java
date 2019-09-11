@@ -2,8 +2,7 @@ package com.revolsys.raster.io.format.tiff.code;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.jeometry.common.function.Function3;
+import java.util.function.Supplier;
 
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.raster.io.format.tiff.TiffDirectory;
@@ -110,47 +109,54 @@ public enum TiffFieldType {
     TiffDirectoryEntrySignedLongArray::new//
   );
 
-  private static Map<Integer, TiffFieldType> ENUM_BY_TYPE = new HashMap<>();
+  private static Map<Integer, TiffFieldType> ENUM_BY_ID = new HashMap<>();
 
   static {
     for (final TiffFieldType fieldType : TiffFieldType.values()) {
-      ENUM_BY_TYPE.put(fieldType.type, fieldType);
+      ENUM_BY_ID.put(fieldType.id, fieldType);
     }
   }
 
-  public static TiffFieldType valueByType(final int type) {
-    return ENUM_BY_TYPE.get(type);
+  public static TiffFieldType readValue(final ChannelReader in) {
+    final int tag = in.getUnsignedShort();
+    return valueById(tag);
   }
 
-  private final int type;
+  public static TiffFieldType valueById(final int type) {
+    return ENUM_BY_ID.get(type);
+  }
+
+  private final int id;
 
   private final int sizeBytes;
 
-  private final Function3<TiffTag, TiffDirectory, ChannelReader, TiffDirectoryEntry> newDirectoryEntryFunction;
+  private final Supplier<TiffDirectoryEntry> newDirectoryEntryFunction;
+
+  private TiffFieldType(final int id, final int sizeBytes,
+    final Supplier<TiffDirectoryEntry> newDirectoryEntryFunction) {
+    this.id = id;
+    this.sizeBytes = sizeBytes;
+    this.newDirectoryEntryFunction = newDirectoryEntryFunction;
+  }
 
   private TiffFieldType(final int type,
-    final Function3<TiffTag, TiffDirectory, ChannelReader, TiffDirectoryEntry> newDirectoryEntryFunction) {
+    final Supplier<TiffDirectoryEntry> newDirectoryEntryFunction) {
     this(type, 1, newDirectoryEntryFunction);
   }
 
-  private TiffFieldType(final int type, final int sizeBytes,
-    final Function3<TiffTag, TiffDirectory, ChannelReader, TiffDirectoryEntry> newDirectoryEntryFunction) {
-    this.type = type;
-    this.sizeBytes = sizeBytes;
-    this.newDirectoryEntryFunction = newDirectoryEntryFunction;
+  public int getId() {
+    return this.id;
   }
 
   public int getSizeBytes() {
     return this.sizeBytes;
   }
 
-  public int getType() {
-    return this.type;
-  }
-
   public TiffDirectoryEntry newDirectoryEntry(final TiffTag tag, final TiffDirectory directory,
     final ChannelReader in) {
-    return this.newDirectoryEntryFunction.apply(tag, directory, in);
+    final TiffDirectoryEntry entry = this.newDirectoryEntryFunction.get();
+    entry.readEntry(tag, directory, in);
+    return entry;
   }
 
 }

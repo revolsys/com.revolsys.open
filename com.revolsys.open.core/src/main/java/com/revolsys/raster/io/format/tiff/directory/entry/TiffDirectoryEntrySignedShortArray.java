@@ -3,16 +3,10 @@ package com.revolsys.raster.io.format.tiff.directory.entry;
 import java.util.Arrays;
 
 import com.revolsys.io.channels.ChannelReader;
-import com.revolsys.raster.io.format.tiff.TiffDirectory;
+import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
-import com.revolsys.raster.io.format.tiff.code.TiffTag;
 
 public class TiffDirectoryEntrySignedShortArray extends AbstractTiffDirectoryEntry<short[]> {
-
-  public TiffDirectoryEntrySignedShortArray(final TiffTag tag, final TiffDirectory directory,
-    final ChannelReader in) {
-    super(tag, directory, in);
-  }
 
   @Override
   public Number getNumber() {
@@ -50,5 +44,13 @@ public class TiffDirectoryEntrySignedShortArray extends AbstractTiffDirectoryEnt
       value[i] = in.getShort();
     }
     return value;
+  }
+
+  @Override
+  public void writeValueDo(final ChannelWriter out) {
+    for (int i = 0; i < this.value.length; i++) {
+      final short number = this.value[i];
+      out.putShort(number);
+    }
   }
 }

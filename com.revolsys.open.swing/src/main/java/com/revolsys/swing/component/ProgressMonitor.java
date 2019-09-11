@@ -31,6 +31,11 @@ public class ProgressMonitor extends JDialog implements Cancellable, WindowListe
 
   public static void background(final Component component, final String title, final String note,
     final Consumer<ProgressMonitor> task, final int max) {
+    background(component, title, note, task, max, null);
+  }
+
+  public static void background(final Component component, final String title, final String note,
+    final Consumer<ProgressMonitor> task, final int max, final Runnable doneTask) {
     Invoke.later(() -> {
       final ProgressMonitor progressMonitor = new ProgressMonitor(component, title, note, true,
         max);
@@ -44,6 +49,10 @@ public class ProgressMonitor extends JDialog implements Cancellable, WindowListe
       }, r -> {
         progressMonitor.done = true;
         progressMonitor.setVisible(false);
+        if (!progressMonitor.cancelled && doneTask != null) {
+          component.requestFocus();
+          doneTask.run();
+        }
       });
       if (!progressMonitor.done) {
         progressMonitor.setVisible(true);
@@ -123,6 +132,10 @@ public class ProgressMonitor extends JDialog implements Cancellable, WindowListe
   public void cancel() {
     this.cancelled = true;
     this.propertyChangeSupport.firePropertyChange("cancelled", false, true);
+  }
+
+  public void finish() {
+    Invoke.later(() -> this.progressBar.setValue(this.progressBar.getMaximum()));
   }
 
   public PropertyChangeSupport getPropertyChangeSupport() {

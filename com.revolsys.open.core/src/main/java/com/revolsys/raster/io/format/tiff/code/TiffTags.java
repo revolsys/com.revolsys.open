@@ -3,6 +3,8 @@ package com.revolsys.raster.io.format.tiff.code;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.revolsys.io.channels.ChannelReader;
+
 public class TiffTags {
 
   private static final Map<Integer, TiffTag> TAG_BY_ID = new HashMap<>();
@@ -29,5 +31,10 @@ public class TiffTags {
       return new TiffCustomTag(tag);
     }
     return tiffTag;
+  }
+
+  public static TiffTag readTag(final ChannelReader in) {
+    final int tag = in.getUnsignedShort();
+    return getTag(tag);
   }
 }

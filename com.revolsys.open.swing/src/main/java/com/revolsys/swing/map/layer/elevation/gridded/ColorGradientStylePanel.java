@@ -7,7 +7,7 @@ import com.revolsys.elevation.gridded.rasterizer.gradient.GradientStop;
 import com.revolsys.elevation.gridded.rasterizer.gradient.MultiStopLinearGradient;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.table.TablePanel;
-import com.revolsys.swing.table.lambda.LambdaTableModel;
+import com.revolsys.swing.table.lambda.LambdaRowTableModel;
 
 public class ColorGradientStylePanel extends ValueField {
 
@@ -19,7 +19,7 @@ public class ColorGradientStylePanel extends ValueField {
   public ColorGradientStylePanel(final ColorGradientGriddedElevationModelRasterizer style) {
     super("gradient", null);
     final MultiStopLinearGradient gradient = (MultiStopLinearGradient)style.getGradient();
-    final LambdaTableModel<GradientStop> tableModel = new LambdaTableModel<>(gradient.getStops());
+    final LambdaRowTableModel<GradientStop> tableModel = new LambdaRowTableModel<>(gradient.getStops());
 
     tableModel.addColumnIndex();
 

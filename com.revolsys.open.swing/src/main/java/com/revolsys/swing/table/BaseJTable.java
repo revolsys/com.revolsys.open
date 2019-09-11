@@ -30,9 +30,11 @@ import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.function.BiFunctionInt;
 
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.table.highlighter.OddEvenColorHighlighter;
 
 public class BaseJTable extends JXTable {
   private static final long serialVersionUID = 1L;
@@ -74,6 +76,15 @@ public class BaseJTable extends JXTable {
       () -> editRelativeCell(1, 0));
 
     putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+  }
+
+  public OddEvenColorHighlighter addColorHighlighter(final BiFunctionInt<Boolean> filter,
+    final Color color1, final Color color2) {
+    final HighlightPredicate predicate = newPredicateModelRowColumn(filter);
+    final OddEvenColorHighlighter highlighter = new OddEvenColorHighlighter(predicate, color1,
+      color2);
+    addHighlighter(highlighter);
+    return highlighter;
   }
 
   protected void addLastRowBorderPredicate() {
@@ -261,6 +272,19 @@ public class BaseJTable extends JXTable {
     return this.initializingColumnWidths;
   }
 
+  public HighlightPredicate newPredicateModelRowColumn(final BiFunctionInt<Boolean> filter) {
+    final HighlightPredicate predicate = (renderer, adapter) -> {
+      try {
+        final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
+        final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
+        return filter.accept(rowIndex, columnIndex);
+      } catch (final IndexOutOfBoundsException e) {
+      }
+      return false;
+    };
+    return predicate;
+  }
+
   @Override
   public Component prepareRenderer(final TableCellRenderer renderer, final int row,
     final int column) {
@@ -313,11 +337,19 @@ public class BaseJTable extends JXTable {
     tableChanged(e);
   }
 
-  public void setColumnWidth(final int i, final int width) {
+  public BaseJTable setColumnPreferredWidth(final int i, final int width) {
+    final TableColumnExt column = getColumnExt(i);
+    column.setWidth(width);
+    column.setPreferredWidth(width);
+    return this;
+  }
+
+  public BaseJTable setColumnWidth(final int i, final int width) {
     final TableColumnExt column = getColumnExt(i);
     column.setMinWidth(width);
     column.setWidth(width);
     column.setMaxWidth(width);
+    return this;
   }
 
   public void setMinWidth(final int columnIndex, final int width) {

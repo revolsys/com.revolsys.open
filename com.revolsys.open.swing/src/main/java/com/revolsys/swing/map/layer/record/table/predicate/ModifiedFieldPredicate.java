@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer.record.table.predicate;
 
-import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.JComponent;
@@ -16,7 +15,7 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.table.highlighter.ColorHighlighter;
+import com.revolsys.swing.table.highlighter.OddEvenColorHighlighter;
 import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
 
@@ -24,15 +23,8 @@ public class ModifiedFieldPredicate implements HighlightPredicate {
   public static void add(final RecordRowTable table) {
     final RecordRowTableModel model = table.getModel();
     final ModifiedFieldPredicate predicate = new ModifiedFieldPredicate(model);
-    final Color lime50 = WebColors.newAlpha(WebColors.Lime, 127);
-
-    table.addHighlighter(
-      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.EVEN), lime50,
-        WebColors.Black, lime50, WebColors.Black));
-
-    table.addHighlighter(
-      new ColorHighlighter(new AndHighlightPredicate(predicate, HighlightPredicate.ODD),
-        WebColors.Lime, WebColors.Black, WebColors.Lime, WebColors.Black));
+    table
+      .addHighlighter(new OddEvenColorHighlighter(predicate, WebColors.Lime, WebColors.LimeGreen));
   }
 
   private final RecordRowTableModel model;
