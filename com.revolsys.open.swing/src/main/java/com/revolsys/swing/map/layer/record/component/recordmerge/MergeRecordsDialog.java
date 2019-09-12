@@ -160,6 +160,9 @@ public class MergeRecordsDialog extends JDialog {
           this.undoManager.addEdit(multipleUndo);
         }
         this.mergedRecordsPanel.remove(tablePanel);
+        if (this.mergedRecordsPanel.getTabCount() == 0) {
+          setVisible(false);
+        }
       });
     final BaseJTable table = tablePanel.getTable();
 
@@ -167,8 +170,8 @@ public class MergeRecordsDialog extends JDialog {
       WebColors.Red);
     addHighlighter(table, mergeableRecord, MergeFieldMatchType.OVERRIDDEN, WebColors.Moccasin,
       WebColors.DarkOrange);
-    addHighlighter(table, mergeableRecord, MergeFieldMatchType.ALLOWED_NOT_EQUAL, WebColors.PaleTurquoise,
-      WebColors.DarkTurquoise);
+    addHighlighter(table, mergeableRecord, MergeFieldMatchType.ALLOWED_NOT_EQUAL,
+      WebColors.PaleTurquoise, WebColors.DarkTurquoise);
     addHighlighter(table, mergeableRecord, MergeFieldMatchType.EQUAL, WebColors.LightGreen,
       WebColors.Green);
 
