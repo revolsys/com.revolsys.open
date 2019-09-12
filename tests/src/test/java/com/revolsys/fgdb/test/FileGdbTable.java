@@ -72,7 +72,7 @@ public class FileGdbTable {
         geometryType = 4;
       } else {
         throw new IllegalArgumentException(
-          "Geometry matchType not supported " + geometryClass.getSimpleName());
+          "Geometry type not supported " + geometryClass.getSimpleName());
       }
     }
 

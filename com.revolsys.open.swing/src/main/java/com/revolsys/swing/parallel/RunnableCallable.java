@@ -12,7 +12,7 @@ import com.revolsys.parallel.AbstractRunnable;
  *
  * <p>NOTE: This class is designed to be used for a single invocation only.</p>
  *
- * @param <T> The matchType of the result.
+ * @param <T> The type of the result.
  */
 public class RunnableCallable<T> extends AbstractRunnable {
   /** The callable to invoke. */

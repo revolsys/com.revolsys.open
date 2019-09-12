@@ -440,6 +440,13 @@ public class BoundingBoxTest implements TestConstants {
   }
 
   @Test
+  public void testIntersectsLine() {
+
+    Assert.assertTrue(RectangleUtil.intersectsLine(5, 0, 6, 11, //
+      0, 0, 10, 10));
+  }
+
+  @Test
   public void testLineString() {
     for (final GeometryFactory geometryFactory : GEOMETRY_FACTORIES) {
       final LineString empty = geometryFactory.lineString();

@@ -41,7 +41,7 @@ import java.util.Vector;
  *
  * ToDo:
  * - add syntax pattern parsing
- * Syntax patterns are similar to Java matchType signatures
+ * Syntax patterns are similar to Java type signatures
  *  F - float
  *  I - int
  *  L - long

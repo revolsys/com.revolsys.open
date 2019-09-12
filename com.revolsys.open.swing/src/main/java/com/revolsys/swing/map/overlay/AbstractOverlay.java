@@ -493,6 +493,7 @@ public class AbstractOverlay extends JComponent implements MapOverlay, PropertyC
       for (final LayerRecord record : records) {
         if (layer.isVisible(record)) {
           final Geometry recordGeometry = record.getGeometry();
+          System.out.println(recordGeometry.distance(boundingBox.getCentre()));
           final CloseLocation closeLocation = this.map.findCloseLocation(layer, record,
             recordGeometry);
           if (closeLocation != null) {

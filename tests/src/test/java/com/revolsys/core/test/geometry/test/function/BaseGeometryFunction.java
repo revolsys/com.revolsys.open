@@ -117,7 +117,7 @@ public abstract class BaseGeometryFunction implements GeometryFunction, Comparab
 
   /**
    * Two functions are the same if they have the
-   * same signature (name, parameter types and return matchType).
+   * same signature (name, parameter types and return type).
    *
    * @param obj
    * @return true if this object is the same as the <tt>obj</tt> argument

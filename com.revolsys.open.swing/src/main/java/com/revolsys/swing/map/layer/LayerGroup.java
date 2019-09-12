@@ -835,7 +835,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
               addLayer(layer);
             } else if (object != null) {
               Logs.error(this,
-                "Unexpected object matchType " + object.getClass() + " in " + childResource);
+                "Unexpected object type " + object.getClass() + " in " + childResource);
             }
           } else {
             Logs.error(LayerGroup.class, "Layer not found: " + childResource);

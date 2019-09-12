@@ -258,7 +258,7 @@ public class FgdbReader {
   // field = new XmlField(fieldName, length, required);
   // break;
   // default:
-  // System.out.println("Unknown field matchType " + fieldName + " " + fieldType);
+  // System.out.println("Unknown field type " + fieldName + " " + fieldType);
   // return null;
   // }
   // field.setProperty("ALIAS", fieldAlias);
@@ -286,7 +286,7 @@ public class FgdbReader {
   // break;
   //
   // default:
-  // System.out.println("Unknown geometry matchType " + geometryType);
+  // System.out.println("Unknown geometry type " + geometryType);
   // break;
   // }
   // final int unknown1 = this.in.read();

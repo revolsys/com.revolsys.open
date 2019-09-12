@@ -99,7 +99,7 @@ public class WebServiceConnectionTrees extends ConnectionManagerTrees {
         final String username = usernameField.getText();
         final String password = passwordField.getText();
         final MapEx config = new LinkedHashMapEx();
-        config.put("j:matchType", type);
+        config.put("j:type", type);
         config.put("name", name);
         config.put("serviceUrl", url);
         config.put("username", username);

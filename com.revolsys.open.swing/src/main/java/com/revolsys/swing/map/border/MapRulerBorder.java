@@ -53,7 +53,7 @@ public class MapRulerBorder extends AbstractBorder {
   /**
    * Construct a new list of steps in measurable units from the double array.
    *
-   * @param <U> The matchType of unit (e.g. {@link Angle} or {@link Length}).
+   * @param <U> The type of unit (e.g. {@link Angle} or {@link Length}).
    * @param unit The unit of measure.
    * @param steps The list of steps.
    * @return The list of step measures.

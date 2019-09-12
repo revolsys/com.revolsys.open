@@ -213,10 +213,10 @@ public class TestReader {
     if (precisionModelElement == null) {
       return 0;
     }
-    final Attribute typeAttribute = precisionModelElement.getAttribute("matchType");
+    final Attribute typeAttribute = precisionModelElement.getAttribute("type");
     final Attribute scaleAttribute = precisionModelElement.getAttribute("scale");
     if (typeAttribute == null && scaleAttribute == null) {
-      throw new TestParseException("Missing matchType attribute in <precisionModel>");
+      throw new TestParseException("Missing type attribute in <precisionModel>");
     }
     if (scaleAttribute != null
       || typeAttribute != null && typeAttribute.getValue().trim().equalsIgnoreCase("FIXED")) {

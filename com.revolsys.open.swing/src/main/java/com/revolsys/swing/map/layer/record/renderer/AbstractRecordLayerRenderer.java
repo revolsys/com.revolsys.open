@@ -92,7 +92,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
           return new RecordDefinitionSqlFilter(recordDefinitionProxy, query);
         }
       } else {
-        Logs.error(AbstractRecordLayerRenderer.class, "Unknown filter matchType " + type);
+        Logs.error(AbstractRecordLayerRenderer.class, "Unknown filter type " + type);
       }
     }
     return Predicates.all();
