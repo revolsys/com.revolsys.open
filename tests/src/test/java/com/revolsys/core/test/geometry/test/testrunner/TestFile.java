@@ -164,7 +164,7 @@ public class TestFile extends TestSuite implements MapSerializer {
   @Override
   public MapEx toMap() {
     final MapEx map = new LinkedHashMapEx();
-    map.put("type", "test");
+    map.put("matchType", "test");
     addToMap(map, "testDescription", this.testDescription);
 
     final Map<String, Object> properties = getProperties();

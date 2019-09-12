@@ -228,7 +228,7 @@ public class GeometryMethodOperation implements GeometryOperation {
       }
       throw (Error)t;
     }
-    throw new JTSTestReflectionException("Unsupported result type: " + method.getReturnType());
+    throw new JTSTestReflectionException("Unsupported result matchType: " + method.getReturnType());
   }
 
 }

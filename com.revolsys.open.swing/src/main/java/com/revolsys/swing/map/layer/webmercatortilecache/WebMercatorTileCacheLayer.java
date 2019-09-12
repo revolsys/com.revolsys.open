@@ -138,7 +138,7 @@ public class WebMercatorTileCacheLayer
   @Override
   public MapEx toMap() {
     final MapEx map = super.toMap();
-    map.put("type", "webMercatorTileCacheLayer");
+    map.put("matchType", "webMercatorTileCacheLayer");
     addToMap(map, "url", this.url);
     return map;
   }

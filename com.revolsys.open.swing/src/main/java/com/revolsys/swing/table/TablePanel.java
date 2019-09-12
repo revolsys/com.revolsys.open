@@ -26,6 +26,7 @@ import com.revolsys.collection.EmptyReference;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.table.lambda.column.ColumnBasedTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
@@ -135,16 +136,18 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
 
     add(this.scrollPane, BorderLayout.CENTER);
 
-    final MenuFactory menu = model.getMenu();
+    if (!(model instanceof ColumnBasedTableModel)) {
+      final MenuFactory menu = model.getMenu();
 
-    menu.addMenuItemTitleIcon("dataTransfer", "Copy Field Value", "page_copy",
-      new ObjectPropertyEnableCheck(this, "canCopy"), this::copyFieldValue);
+      menu.addMenuItemTitleIcon("dataTransfer", "Copy Field Value", "page_copy",
+        new ObjectPropertyEnableCheck(this, "canCopy"), this::copyFieldValue);
 
-    menu.addMenuItemTitleIcon("dataTransfer", "Cut Field Value", "cut", this::isCanCut,
-      this::cutFieldValue);
+      menu.addMenuItemTitleIcon("dataTransfer", "Cut Field Value", "cut", this::isCanCut,
+        this::cutFieldValue);
 
-    menu.addMenuItemTitleIcon("dataTransfer", "Paste Field Value", "paste_plain",
-      new ObjectPropertyEnableCheck(this, "canPaste"), this::pasteFieldValue);
+      menu.addMenuItemTitleIcon("dataTransfer", "Paste Field Value", "paste_plain",
+        new ObjectPropertyEnableCheck(this, "canPaste"), this::pasteFieldValue);
+    }
   }
 
   @Override

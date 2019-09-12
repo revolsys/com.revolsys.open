@@ -105,9 +105,9 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
   public BaseStylePanel(final LayerRenderer<?> renderer, final boolean showScaleFields) {
     super(new VerticalLayout());
     this.renderer = renderer;
-    addReadOnlyFieldName("type");
+    addReadOnlyFieldName("matchType");
     Property.addListener(renderer, this);
-    addPanel(this, "General", renderer, "name", "type", "visible");
+    addPanel(this, "General", renderer, "name", "matchType", "visible");
     if (showScaleFields) {
       addPanel(this, "Scales", renderer, "minimumScale", "maximumScale");
     }

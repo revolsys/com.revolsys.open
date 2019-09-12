@@ -1,14 +1,13 @@
 package com.revolsys.record;
 
 public class FieldValueInvalidException extends IllegalArgumentException {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private final String fieldName;
 
   private final Object value;
+
+  private final String messageText;
 
   public FieldValueInvalidException(final String fieldName, final Object value,
     final String message) {
@@ -20,6 +19,7 @@ public class FieldValueInvalidException extends IllegalArgumentException {
     super("Invalid " + fieldName + "=" + value + ":" + message, e);
     this.fieldName = fieldName;
     this.value = value;
+    this.messageText = message;
   }
 
   public FieldValueInvalidException(final String fieldName, final Object value, final Throwable e) {
@@ -28,6 +28,10 @@ public class FieldValueInvalidException extends IllegalArgumentException {
 
   public String getFieldName() {
     return this.fieldName;
+  }
+
+  public String getMessageText() {
+    return this.messageText;
   }
 
   public Object getValue() {

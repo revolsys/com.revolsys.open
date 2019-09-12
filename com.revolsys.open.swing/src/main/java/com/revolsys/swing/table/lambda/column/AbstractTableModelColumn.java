@@ -25,6 +25,8 @@ public class AbstractTableModelColumn implements TableModelColumn {
 
   private MenuFactory headerMenuFactory;
 
+  private MenuFactory menuFactory;
+
   private int columnIndex;
 
   public AbstractTableModelColumn() {
@@ -84,6 +86,27 @@ public class AbstractTableModelColumn implements TableModelColumn {
   }
 
   @Override
+  public BaseJPopupMenu getMenu() {
+    if (this.menuFactory == null) {
+      return null;
+    } else {
+      return this.menuFactory.newJPopupMenu();
+    }
+  }
+
+  @Override
+  public BaseJPopupMenu getMenu(final int rowIndex) {
+    return getMenu();
+  }
+
+  public synchronized MenuFactory getMenuFactory() {
+    if (this.menuFactory == null) {
+      this.menuFactory = new MenuFactory(this.columnName);
+    }
+    return this.menuFactory;
+  }
+
+  @Override
   public Object getValueAt(final int rowIndex) {
     return null;
   }
@@ -119,6 +142,11 @@ public class AbstractTableModelColumn implements TableModelColumn {
     this.columnIndex = columnIndex;
   }
 
+  public AbstractTableModelColumn setMenuFactory(final MenuFactory menuFactory) {
+    this.menuFactory = menuFactory;
+    return this;
+  }
+
   @Override
   public void setValueAt(final Object value, final int rowIndex) {
   }
@@ -127,6 +155,13 @@ public class AbstractTableModelColumn implements TableModelColumn {
     final BiConsumer<AbstractTableModelColumn, MenuFactory> action) {
     final MenuFactory headerMenuFactory = getHeaderMenuFactory();
     action.accept(this, headerMenuFactory);
+    return this;
+  }
+
+  public AbstractTableModelColumn withMenu(
+    final BiConsumer<AbstractTableModelColumn, MenuFactory> action) {
+    final MenuFactory menuFactory = getMenuFactory();
+    action.accept(this, menuFactory);
     return this;
   }
 }

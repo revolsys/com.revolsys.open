@@ -21,9 +21,11 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.vertex.Vertex;
+import com.revolsys.record.FieldValueInvalidException;
 import com.revolsys.record.Record;
 import com.revolsys.record.Records;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 
 public class DirectionalFields extends AbstractRecordDefinitionProperty {
   public static final String PROPERTY_NAME = DirectionalFields.class.getName() + ".propertyName";
@@ -68,11 +70,6 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     return property.getCantMergeFieldNames(point, record1, record2, equalExcludeFieldNames);
   }
 
-  public static DirectionalFields getProperty(final Record record) {
-    final RecordDefinition recordDefinition = record.getRecordDefinition();
-    return getProperty(recordDefinition);
-  }
-
   public static DirectionalFields getProperty(final RecordDefinition recordDefinition) {
     DirectionalFields property = recordDefinition.getProperty(PROPERTY_NAME);
     if (property == null) {
@@ -80,6 +77,11 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
       property.setRecordDefinition(recordDefinition);
     }
     return property;
+  }
+
+  public static DirectionalFields getProperty(final RecordDefinitionProxy proxy) {
+    final RecordDefinition recordDefinition = proxy.getRecordDefinition();
+    return getProperty(recordDefinition);
   }
 
   public static Record getReverseRecord(final Record record) {
@@ -923,5 +925,14 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
   @Override
   public String toString() {
     return "DirectionalFields";
+  }
+
+  public void validateFieldAtMergeEnd(final Map<String, Object> mergedValues,
+    final String fieldName, final Object value) {
+    if (isFromField(fieldName) || isToField(fieldName)) {
+      if (value != null) {
+        throw new FieldValueInvalidException(fieldName, value, value + " != null");
+      }
+    }
   }
 }

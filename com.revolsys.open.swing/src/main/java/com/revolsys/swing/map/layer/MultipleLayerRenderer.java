@@ -12,7 +12,7 @@ import com.revolsys.util.Property;
 /**
  *
  *
- * @param <C> The type of child
+ * @param <C> The matchType of child
  */
 public interface MultipleLayerRenderer<L extends Layer, C extends LayerRenderer<L>> {
 

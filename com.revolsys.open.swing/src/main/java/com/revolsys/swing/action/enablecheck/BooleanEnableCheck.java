@@ -2,13 +2,13 @@ package com.revolsys.swing.action.enablecheck;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
 
-public class SimpleEnableCheck extends AbstractEnableCheck implements PropertyChangeSupportProxy {
+public class BooleanEnableCheck extends AbstractEnableCheck implements PropertyChangeSupportProxy {
 
-  public SimpleEnableCheck() {
+  public BooleanEnableCheck() {
     this(true);
   }
 
-  public SimpleEnableCheck(final boolean enabled) {
+  public BooleanEnableCheck(final boolean enabled) {
     super(enabled);
   }
 

@@ -843,7 +843,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     final Field nameField = (Field)SwingUtil.addObjectField(panel, this, "name");
     Property.addListener(nameField, "name", this.beanPropertyListener);
 
-    final String type = Property.get(this, "type");
+    final String type = Property.get(this, "matchType");
     final String typeLabel = CaseConverter.toCapitalizedWords(type);
     SwingUtil.addLabelledReadOnlyTextField(panel, "Type", typeLabel);
 
@@ -1140,7 +1140,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   public void setProperty(final String name, final Object value) {
     // TODO see if we can get the JavaBeanUtil set property to work with
     // conversions
-    if (name.equals("type")) {
+    if (name.equals("matchType")) {
     } else if (name.equals("minimumScale")) {
       setMinimumScale(((Number)value).longValue());
     } else if (name.equals("open")) {

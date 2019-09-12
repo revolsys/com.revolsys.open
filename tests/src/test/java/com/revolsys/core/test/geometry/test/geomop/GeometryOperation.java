@@ -49,10 +49,10 @@ import com.revolsys.geometry.model.Geometry;
  */
 public interface GeometryOperation {
   /**
-   * Gets the class of the return type of the given operation.
+   * Gets the class of the return matchType of the given operation.
    *
    * @param opName the name of the operation
-   * @return the class of the return type of the specified operation
+   * @return the class of the return matchType of the specified operation
    */
   public Class getReturnType(String opName);
 

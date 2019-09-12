@@ -135,7 +135,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     textName = textName.replaceAll("\"([^\"]+)\"", "$1");
     textStyle.setTextName(textName);
     final MapEx symbol = labelProperties.getValue("symbol");
-    if ("esriTS".equals(symbol.getString("type"))) {
+    if ("esriTS".equals(symbol.getString("matchType"))) {
       final Color textFill = getColor(symbol);
       textStyle.setTextFill(textFill);
 
@@ -298,7 +298,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     if (drawingInfo != null) {
       final MapEx rendererProperties = drawingInfo.getValue("renderer");
       if (rendererProperties != null) {
-        final String rendererType = rendererProperties.getString("type");
+        final String rendererType = rendererProperties.getString("matchType");
         if ("simple".equals(rendererType)) {
           final AbstractRecordLayerRenderer renderer = newSymbolRenderer(rendererProperties,
             "symbol");
@@ -393,7 +393,7 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
     if (symbolProperties == null) {
       return null;
     } else {
-      final String symbolType = symbolProperties.getString("type");
+      final String symbolType = symbolProperties.getString("matchType");
       if ("esriSMS".equals(symbolType)) {
         return newSimpleMarkerRenderer(symbolProperties);
       } else if ("esriSLS".equals(symbolType)) {

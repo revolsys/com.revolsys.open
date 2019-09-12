@@ -251,7 +251,7 @@ public final class EpsgCoordinateSystemsLoader {
 
           final MapEx coordinateReferenceSystem = getCoordinateReferenceSystemById(id) //
             .add("name", name) //
-            .add("type", type) //
+            .add("matchType", type) //
             .add("area", this.areaById.get(areaId)) //
             .add("coordinateSystem", this.coordinateSystemById.get(coordinateSystemId)) //
           ;
@@ -291,7 +291,7 @@ public final class EpsgCoordinateSystemsLoader {
         final MapEx coordinateSystem = new LinkedHashMapEx() //
           .add("id", id) //
           .add("name", record.get("coord_sys_name")) //
-          .add("type", type) //
+          .add("matchType", type) //
           .add("axes", new ArrayList<MapEx>());
         this.coordinateSystemById.put(id, coordinateSystem);
       }
@@ -327,7 +327,7 @@ public final class EpsgCoordinateSystemsLoader {
         final MapEx coordinateOperation = new LinkedHashMapEx() //
           .add("id", id) //
           .add("name", name) //
-          .add("type", type);
+          .add("matchType", type);
 
         if (sourceCoordinateSystemId > 0) {
           coordinateOperation.add("sourceCoordinateSystemId", sourceCoordinateSystemId);
@@ -490,7 +490,7 @@ public final class EpsgCoordinateSystemsLoader {
         final MapEx datum = new LinkedHashMapEx() //
           .add("id", id) //
           .add("name", name) //
-          .add("type", type) //
+          .add("matchType", type) //
         ;
         if (ellipsoidId > 0) {
           datum.add("ellipsoid", this.ellipsoidById.get(ellipsoidId));

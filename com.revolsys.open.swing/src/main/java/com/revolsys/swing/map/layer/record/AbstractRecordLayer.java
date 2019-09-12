@@ -109,8 +109,8 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.record.component.MergeRecordsDialog;
 import com.revolsys.swing.map.layer.record.component.RecordLayerFields;
+import com.revolsys.swing.map.layer.record.component.recordmerge.MergeRecordsDialog;
 import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
@@ -1146,18 +1146,22 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (record1 == record2) {
       return record1;
     } else {
-      final String sourceIdFieldName = getIdFieldName();
-      final Object id1 = record1.getValue(sourceIdFieldName);
-      final Object id2 = record2.getValue(sourceIdFieldName);
       int compare = 0;
-      if (id1 == null) {
-        if (id2 != null) {
-          compare = 1;
+      for (final String idFieldName : getIdFieldNames()) {
+        final Object id1 = record1.getValue(idFieldName);
+        final Object id2 = record2.getValue(idFieldName);
+        if (id1 == null) {
+          if (id2 != null) {
+            compare = 1;
+          }
+        } else if (id2 == null) {
+          compare = -1;
+        } else {
+          compare = CompareUtil.compare(id1, id2);
         }
-      } else if (id2 == null) {
-        compare = -1;
-      } else {
-        compare = CompareUtil.compare(id1, id2);
+        if (compare != 0) {
+          break;
+        }
       }
       if (compare == 0) {
         final Geometry geometry1 = record1.getGeometry();
@@ -1178,7 +1182,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       } else {
         final DirectionalFields property = DirectionalFields.getProperty(getRecordDefinition());
         final Map<String, Object> newValues = property.getMergedMap(point, record1, record2);
-        newValues.remove(getIdFieldName());
+        for (final String idFieldName : getIdFieldNames()) {
+          newValues.remove(idFieldName);
+        }
         return new ArrayRecord(getRecordDefinition(), newValues);
       }
     }

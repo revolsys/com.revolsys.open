@@ -2,6 +2,8 @@ package com.revolsys.swing.table;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
@@ -30,11 +32,15 @@ import org.jdesktop.swingx.renderer.DefaultTableRenderer;
 import org.jdesktop.swingx.table.ColumnFactory;
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.function.BiFunctionInt;
+import org.jeometry.common.function.Function3;
 
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.highlighter.OddEvenColorHighlighter;
+import com.revolsys.util.Property;
 
 public class BaseJTable extends JXTable {
   private static final long serialVersionUID = 1L;
@@ -80,6 +86,16 @@ public class BaseJTable extends JXTable {
 
   public OddEvenColorHighlighter addColorHighlighter(final BiFunctionInt<Boolean> filter,
     final Color color1, final Color color2) {
+    final HighlightPredicate predicate = newPredicateModelRowColumn(filter);
+    final OddEvenColorHighlighter highlighter = new OddEvenColorHighlighter(predicate, color1,
+      color2);
+    addHighlighter(highlighter);
+    return highlighter;
+  }
+
+  public OddEvenColorHighlighter addColorHighlighter(
+    final Function3<Component, Integer, Integer, Boolean> filter, final Color color1,
+    final Color color2) {
     final HighlightPredicate predicate = newPredicateModelRowColumn(filter);
     final OddEvenColorHighlighter highlighter = new OddEvenColorHighlighter(predicate, color1,
       color2);
@@ -145,6 +161,31 @@ public class BaseJTable extends JXTable {
     }
   }
 
+  private void copyCurrentCell() {
+    final TableModel model = getTableModel();
+    final Object value = model.getValueAt(TablePanel.getEventRow(), TablePanel.getEventColumn());
+
+    final String copyValue;
+    if (model instanceof AbstractTableModel) {
+      final AbstractTableModel tableModel = (AbstractTableModel)model;
+      copyValue = tableModel.toCopyValue(TablePanel.getEventRow(), TablePanel.getEventColumn(),
+        value);
+    } else {
+      copyValue = DataTypes.toString(value);
+    }
+    final StringSelection transferable = new StringSelection(copyValue);
+    ClipboardUtil.setContents(transferable);
+  }
+
+  public void copyFieldValue() {
+    if (isEditingCurrentCell()) {
+      if (!getCellEditor().stopCellEditing()) {
+        return;
+      }
+    }
+    copyCurrentCell();
+  }
+
   @Override
   protected void createDefaultRenderers() {
     super.createDefaultRenderers();
@@ -156,6 +197,21 @@ public class BaseJTable extends JXTable {
   protected RowSorter<? extends TableModel> createDefaultRowSorter() {
     final TableModel model = getModel();
     return new BaseRowSorter(model);
+  }
+
+  public void cutFieldValue() {
+    if (isEditingCurrentCell()) {
+      if (!getCellEditor().stopCellEditing()) {
+        return;
+      }
+    }
+    copyCurrentCell();
+    final int eventRow = TablePanel.getEventRow();
+    final int eventColumn = TablePanel.getEventColumn();
+    final TableModel tableModel = getTableModel();
+    if (eventRow > -1 && eventColumn > -1 && tableModel.isCellEditable(eventRow, eventColumn)) {
+      tableModel.setValueAt(null, eventRow, eventColumn);
+    }
   }
 
   public void dispose() {
@@ -273,7 +329,7 @@ public class BaseJTable extends JXTable {
   }
 
   public HighlightPredicate newPredicateModelRowColumn(final BiFunctionInt<Boolean> filter) {
-    final HighlightPredicate predicate = (renderer, adapter) -> {
+    return (renderer, adapter) -> {
       try {
         final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
         final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
@@ -282,7 +338,36 @@ public class BaseJTable extends JXTable {
       }
       return false;
     };
-    return predicate;
+  }
+
+  private HighlightPredicate newPredicateModelRowColumn(
+    final Function3<Component, Integer, Integer, Boolean> filter) {
+    return (renderer, adapter) -> {
+      try {
+        final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
+        final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
+        return filter.apply(renderer, rowIndex, columnIndex);
+      } catch (final IndexOutOfBoundsException e) {
+      }
+      return false;
+    };
+  }
+
+  public void pasteFieldValue() {
+    if (isEditingCurrentCell()) {
+      if (!getCellEditor().stopCellEditing()) {
+        return;
+      }
+    }
+    final String value = ClipboardUtil.getContents(DataFlavor.stringFlavor);
+    if (Property.hasValue(value)) {
+      final TableModel tableModel = getTableModel();
+      final int eventRow = TablePanel.getEventRow();
+      final int eventColumn = TablePanel.getEventColumn();
+      if (tableModel.isCellEditable(eventRow, eventColumn)) {
+        tableModel.setValueAt(value, eventRow, eventColumn);
+      }
+    }
   }
 
   @Override

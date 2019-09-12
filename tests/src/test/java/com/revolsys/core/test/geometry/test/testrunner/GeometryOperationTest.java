@@ -246,7 +246,7 @@ public class GeometryOperationTest extends junit.framework.TestCase implements M
   @Override
   public MapEx toMap() {
     final MapEx map = new LinkedHashMapEx();
-    map.put("type", "test");
+    map.put("matchType", "test");
     addToMap(map, "description", this.testDescription);
 
     map.put("propertyName", this.geometryIndex.toLowerCase());

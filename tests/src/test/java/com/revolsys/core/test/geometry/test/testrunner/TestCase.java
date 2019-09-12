@@ -169,7 +169,7 @@ public class TestCase extends junit.framework.TestSuite implements MapSerializer
   @Override
   public MapEx toMap() {
     final MapEx map = new LinkedHashMapEx();
-    map.put("type", "test");
+    map.put("matchType", "test");
 
     if (Property.hasValue(this.testDescription)) {
       map.put("description", this.testDescription);

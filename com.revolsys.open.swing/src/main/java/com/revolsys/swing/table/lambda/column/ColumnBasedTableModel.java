@@ -3,12 +3,15 @@ package com.revolsys.swing.table.lambda.column;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JMenuItem;
 import javax.swing.table.TableColumn;
 
 import com.revolsys.record.Record;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJTable;
+import com.revolsys.util.Property;
 
 public class ColumnBasedTableModel extends AbstractTableModel {
 
@@ -90,6 +93,43 @@ public class ColumnBasedTableModel extends AbstractTableModel {
     } else {
       return column.getHeaderMenu();
     }
+  }
+
+  @Override
+  public BaseJPopupMenu getMenu(final int rowIndex, final int columnIndex) {
+    BaseJPopupMenu menu = null;
+    final TableModelColumn column = getColumn(columnIndex);
+    if (column != null) {
+      menu = column.getMenu(rowIndex);
+    }
+    if (menu == null) {
+      menu = super.getMenu(rowIndex, columnIndex);
+    }
+    if (menu.getComponentCount() > 0) {
+      menu.addSeparator();
+    }
+    final Object value = getValueAt(rowIndex, columnIndex);
+
+    final boolean canCopy = Property.hasValue(value);
+    final BaseJTable table = getTable();
+    final boolean cellEditable = isCellEditable(rowIndex, columnIndex);
+    if (cellEditable) {
+      final JMenuItem cutMenu = RunnableAction.newMenuItem("Cut Field Value", "cut",
+        table::cutFieldValue);
+      cutMenu.setEnabled(canCopy);
+      menu.add(cutMenu);
+    }
+
+    final JMenuItem copyMenu = RunnableAction.newMenuItem("Copy Field Value", "page_copy",
+      table::copyFieldValue);
+    copyMenu.setEnabled(canCopy);
+    menu.add(copyMenu);
+
+    if (cellEditable) {
+      menu.add(
+        RunnableAction.newMenuItem("Paste Field Value", "paste_plain", table::pasteFieldValue));
+    }
+    return menu;
   }
 
   @Override

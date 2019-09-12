@@ -14,16 +14,13 @@ public interface TableModelColumn {
 
   String getColumnName();
 
-  default BaseJPopupMenu getHeaderMenu() {
-    final MenuFactory headerMenuFactory = getHeaderMenuFactory();
-    if (headerMenuFactory == null) {
-      return null;
-    } else {
-      return headerMenuFactory.newJPopupMenu();
-    }
-  }
+  BaseJPopupMenu getHeaderMenu();
 
   MenuFactory getHeaderMenuFactory();
+
+  BaseJPopupMenu getMenu();
+
+  BaseJPopupMenu getMenu(int rowIndex);
 
   Object getValueAt(int rowIndex);
 

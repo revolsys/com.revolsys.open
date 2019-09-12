@@ -93,7 +93,7 @@ public class GeometryFunctionOperation implements GeometryOperation {
     if (func.getReturnType() == int.class) {
       return new IntegerResult((Integer)func.invoke(geometry, actualArgs));
     }
-    throw new JTSTestReflectionException("Unsupported result type: " + func.getReturnType());
+    throw new JTSTestReflectionException("Unsupported result matchType: " + func.getReturnType());
   }
 
   @Override

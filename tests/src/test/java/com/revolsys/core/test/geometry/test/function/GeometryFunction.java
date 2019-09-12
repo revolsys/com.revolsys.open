@@ -46,7 +46,7 @@ public interface GeometryFunction {
 
   /**
    * Two functions are the same if they have the
-   * same name, parameter types and return type.
+   * same name, parameter types and return matchType.
    *
    * @param obj
    * @return true if this object is the same as the <tt>obj</tt> argument
@@ -91,9 +91,9 @@ public interface GeometryFunction {
   Class[] getParameterTypes();
 
   /**
-   * Gets the return type of this function
+   * Gets the return matchType of this function
    *
-   * @return the type of the value returned by this function
+   * @return the matchType of the value returned by this function
    */
   Class getReturnType();
 
