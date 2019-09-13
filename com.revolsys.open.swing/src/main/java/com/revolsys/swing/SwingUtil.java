@@ -429,7 +429,9 @@ public interface SwingUtil {
   }
 
   static Window getWindowAncestor(final Component component) {
-    if (component == null) {
+    if (component instanceof Window) {
+      return (Window)component;
+    } else if (component == null) {
       return null;
     } else {
       return SwingUtilities.getWindowAncestor(component);

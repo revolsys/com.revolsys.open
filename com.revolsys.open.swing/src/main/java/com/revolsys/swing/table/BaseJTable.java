@@ -23,6 +23,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
 import org.jdesktop.swingx.JXTable;
+import org.jdesktop.swingx.decorator.AbstractHighlighter;
 import org.jdesktop.swingx.decorator.BorderHighlighter;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.ComponentAdapter;
@@ -34,12 +35,12 @@ import org.jdesktop.swingx.table.TableColumnExt;
 import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.function.BiFunctionInt;
-import org.jeometry.common.function.Function3;
 
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.highlighter.OddEvenColorHighlighter;
+import com.revolsys.swing.table.highlighter.TableModelHighlighter;
 import com.revolsys.util.Property;
 
 public class BaseJTable extends JXTable {
@@ -93,14 +94,15 @@ public class BaseJTable extends JXTable {
     return highlighter;
   }
 
-  public OddEvenColorHighlighter addColorHighlighter(
-    final Function3<Component, Integer, Integer, Boolean> filter, final Color color1,
-    final Color color2) {
-    final HighlightPredicate predicate = newPredicateModelRowColumn(filter);
-    final OddEvenColorHighlighter highlighter = new OddEvenColorHighlighter(predicate, color1,
-      color2);
-    addHighlighter(highlighter);
-    return highlighter;
+  public void addHighlighter(final TableModelHighlighter highlighter) {
+    addHighlighter(new AbstractHighlighter() {
+      @Override
+      protected Component doHighlight(final Component component, final ComponentAdapter adapter) {
+        final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
+        final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
+        return highlighter.highlight(component, adapter, rowIndex, columnIndex);
+      }
+    });
   }
 
   protected void addLastRowBorderPredicate() {
@@ -334,19 +336,6 @@ public class BaseJTable extends JXTable {
         final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
         final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
         return filter.accept(rowIndex, columnIndex);
-      } catch (final IndexOutOfBoundsException e) {
-      }
-      return false;
-    };
-  }
-
-  private HighlightPredicate newPredicateModelRowColumn(
-    final Function3<Component, Integer, Integer, Boolean> filter) {
-    return (renderer, adapter) -> {
-      try {
-        final int rowIndex = adapter.convertRowIndexToModel(adapter.row);
-        final int columnIndex = adapter.convertColumnIndexToModel(adapter.column);
-        return filter.apply(renderer, rowIndex, columnIndex);
       } catch (final IndexOutOfBoundsException e) {
       }
       return false;

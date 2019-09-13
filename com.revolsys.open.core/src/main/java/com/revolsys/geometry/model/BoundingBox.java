@@ -995,10 +995,8 @@ public interface BoundingBox
         double x;
         if ((out1 & OutCode.OUT_RIGHT) != 0) {
           x = getMaxX();
-          out1 &= ~OutCode.OUT_RIGHT;
         } else {
-          x = getMaxX();
-          out1 &= ~OutCode.OUT_LEFT;
+          x = getMinX();
         }
         y1 = y1 + (x - x1) * (y2 - y1) / (x2 - x1);
         x1 = x;
@@ -1006,14 +1004,13 @@ public interface BoundingBox
         double y;
         if ((out1 & OutCode.OUT_TOP) != 0) {
           y = getMaxY();
-          out1 &= ~OutCode.OUT_TOP;
         } else {
           y = getMinY();
-          out1 &= ~OutCode.OUT_BOTTOM;
         }
         x1 = x1 + (y - y1) * (x2 - x1) / (y2 - y1);
         y1 = y;
       }
+      out1 = getOutcode(x1, y1);
     }
     return true;
   }

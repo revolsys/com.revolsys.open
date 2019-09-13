@@ -81,6 +81,8 @@ class MergeFieldOriginalFieldState {
         final int recordIndex = this.mergeOriginalRecord.recordIndex;
         if (this.ignoreField) {
           this.matchType = MergeFieldMatchType.ALLOWED_NOT_EQUAL;
+        } else if (originalValue == null) {
+          this.matchType = MergeFieldMatchType.WAS_NULL;
         } else if (directionalFields.isFromField(this.fieldName) && recordIndex != 0) {
           directionalFields.validateFieldAtMergeEnd(this.mergeOriginalRecord, this.fieldName,
             originalValue);

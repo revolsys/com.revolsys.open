@@ -1,7 +1,6 @@
 package com.revolsys.swing.map.layer.record.component.recordmerge;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.SortOrder;
 import javax.swing.WindowConstants;
 
-import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.record.schema.RecordDefinition;
@@ -76,44 +74,6 @@ public class MergeRecordsDialog extends JDialog {
     initDialog();
   }
 
-  private void addHighlighter(final BaseJTable table, final MergeableRecord mergeableRecord,
-    final MergeFieldMatchType matchType, final Color color, final Color colorSelected) {
-    if (matchType != MergeFieldMatchType.EQUAL) {
-      addOriginalRecordFieldHighlighter(table, mergeableRecord, matchType, color, colorSelected);
-    }
-    addMessageHighlighter(table, mergeableRecord, matchType, color, colorSelected);
-  }
-
-  private void addMessageHighlighter(final BaseJTable table, final MergeableRecord mergeableRecord,
-    final MergeFieldMatchType matchType, final Color color1, final Color color2) {
-    table.addColorHighlighter((rowIndex, columnIndex) -> {
-      final MergeFieldMatchType rowMatchType = mergeableRecord.getMatchType(rowIndex);
-      if (rowMatchType == matchType && columnIndex == 3) {
-        return true;
-      }
-      return false;
-    }, color1, color2);
-  }
-
-  private void addOriginalRecordFieldHighlighter(final BaseJTable table,
-    final MergeableRecord mergeableRecord, final MergeFieldMatchType messageType, final Color c1,
-    final Color c2) {
-    table.addColorHighlighter((renderer, rowIndex, columnIndex) -> {
-      if (columnIndex > 3) {
-        final int recordIndex = columnIndex - 4;
-        final MergeOriginalRecord originalRecord = mergeableRecord.getOriginalRecord(recordIndex);
-        final int fieldIndex = rowIndex;
-        final MergeFieldOriginalFieldState fieldState = originalRecord.getFieldState(fieldIndex);
-        if (fieldState.isMatchType(messageType)) {
-          ((JComponent)renderer)
-            .setToolTipText("<html><b color='red'>" + fieldState.getMessage() + "</b></html>");
-          return true;
-        }
-      }
-      return false;
-    }, c1, c2);
-  }
-
   protected void initDialog() {
     setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
     setMinimumSize(new Dimension(600, 100));
@@ -166,14 +126,7 @@ public class MergeRecordsDialog extends JDialog {
       });
     final BaseJTable table = tablePanel.getTable();
 
-    addHighlighter(table, mergeableRecord, MergeFieldMatchType.ERROR, WebColors.Pink,
-      WebColors.Red);
-    addHighlighter(table, mergeableRecord, MergeFieldMatchType.OVERRIDDEN, WebColors.Moccasin,
-      WebColors.DarkOrange);
-    addHighlighter(table, mergeableRecord, MergeFieldMatchType.ALLOWED_NOT_EQUAL,
-      WebColors.PaleTurquoise, WebColors.DarkTurquoise);
-    addHighlighter(table, mergeableRecord, MergeFieldMatchType.EQUAL, WebColors.LightGreen,
-      WebColors.Green);
+    newTableHighlighter(table, mergeableRecord);
 
     table.setSortOrder(2, SortOrder.ASCENDING);
 
@@ -186,6 +139,33 @@ public class MergeRecordsDialog extends JDialog {
       table.setColumnPreferredWidth(3 + i, 120);
     }
     return tablePanel;
+  }
+
+  private void newTableHighlighter(final BaseJTable table, final MergeableRecord mergeableRecord) {
+    table.addHighlighter((renderer, adaptor, fieldIndex, columnIndex) -> {
+      if (columnIndex >= 3) {
+        final boolean selected = adaptor.isSelected();
+        final boolean even = adaptor.row % 2 == 0;
+        if (columnIndex == 3) {
+          final MergeFieldMatchType rowMatchType = mergeableRecord.getMatchType(fieldIndex);
+          rowMatchType.setColor(renderer, selected, even);
+        } else if (columnIndex > 3) {
+          final int recordIndex = columnIndex - 4;
+          final MergeOriginalRecord originalRecord = mergeableRecord.getOriginalRecord(recordIndex);
+          final MergeFieldOriginalFieldState fieldState = originalRecord.getFieldState(fieldIndex);
+          final MergeFieldMatchType matchType = fieldState.getMatchType();
+          if (matchType != MergeFieldMatchType.EQUAL) {
+            matchType.setColor(renderer, selected, even);
+            final String message = fieldState.getMessage();
+            if (message != null) {
+              ((JComponent)renderer)
+                .setToolTipText("<html><b color='red'>" + message + "</b></html>");
+            }
+          }
+        }
+      }
+      return renderer;
+    });
   }
 
   private ColumnBasedTableModel newTableModel(final MergeableRecord mergeableRecord) {

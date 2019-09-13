@@ -119,6 +119,7 @@ public class ProgressMonitor extends JDialog implements Cancellable, WindowListe
     add(buttonPanel);
     setLocationRelativeTo(component);
     pack();
+    setAlwaysOnTop(true);
     setResizable(false);
   }
 

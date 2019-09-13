@@ -1572,7 +1572,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final List<LayerRecord> records = getRecords(boundingBox);
     for (final Iterator<LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
       final LayerRecord layerRecord = iterator.next();
-      if (!isVisible(layerRecord) || isDeleted(layerRecord)) {
+      if (!isVisible(layerRecord) || isDeleted(layerRecord)
+        || !layerRecord.getGeometry().intersectsBbox(boundingBox)) {
         iterator.remove();
       }
     }
