@@ -18,9 +18,9 @@ package com.revolsys.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.jexl2.Expression;
-import org.apache.commons.jexl2.JexlContext;
-import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlExpression;
 import org.jeometry.common.logging.Logs;
 
 /**
@@ -43,12 +43,13 @@ public final class JexlUtil {
     jexlExpression.append("'").append(text.replaceAll("'", "' + \"'\" + '")).append("'");
   }
 
-  public static Object evaluateExpression(final JexlContext context, final Expression expression) {
+  public static Object evaluateExpression(final JexlContext context,
+    final JexlExpression expression) {
     try {
       return expression.evaluate(context);
     } catch (final Exception e) {
       Logs.error(JexlUtil.class,
-        "Unable to evaluate expression '" + expression.getExpression() + "': " + e.getMessage(), e);
+        "Unable to evaluate expression '" + expression.getSourceText() + "': " + e.getMessage(), e);
       return null;
     }
   }
@@ -62,7 +63,7 @@ public final class JexlUtil {
    * @return The expression object for the string expression.
    * @throws Exception If there was an error creating the expression.
    */
-  public static Expression newExpression(final String expression) throws Exception {
+  public static JexlExpression newExpression(final String expression) throws Exception {
     return newExpression(expression, DEFAULT_EXPRESSION_PATTERN);
   }
 
@@ -88,8 +89,8 @@ public final class JexlUtil {
    * @return The expression object for the string expression.
    * @throws Exception If there was an error creating the expression.
    */
-  public static Expression newExpression(final String expression, final String expressionPattern)
-    throws Exception {
+  public static JexlExpression newExpression(final String expression,
+    final String expressionPattern) throws Exception {
     final String newExpression = expression.replaceAll("\n", "");
     // Wrap the entires expression in '' and replace the expressions in the
     // form "${expr)" to ' + expr + '
@@ -117,7 +118,7 @@ public final class JexlUtil {
       expr = expr.replaceAll(" \\+ '' \\+ ", " + ");
       expr = expr.replaceAll("^'' \\+ ", "");
       expr = expr.replaceAll("\\+ ''$", "");
-      return new JexlEngine().createExpression(expr);
+      return new JexlBuilder().create().createExpression(expr);
     } else {
       return null;
     }

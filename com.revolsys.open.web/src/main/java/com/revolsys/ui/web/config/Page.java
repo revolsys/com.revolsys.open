@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.jexl3.JexlExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.expression.EvaluationContext;
@@ -65,7 +66,7 @@ public class Page extends Component {
 
   private String title = "";
 
-  private org.apache.commons.jexl2.Expression titleExpression;
+  private JexlExpression titleExpression;
 
   private StringTemplate titleTemplate;
 

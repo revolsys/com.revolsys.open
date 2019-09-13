@@ -26,7 +26,7 @@ import java.util.Map;
 import javax.servlet.ServletException;
 import javax.servlet.jsp.PageContext;
 
-import org.apache.commons.jexl2.Expression;
+import org.apache.commons.jexl3.JexlExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,7 +105,7 @@ public class JavaComponent extends Component {
         Object value = this.properties.get(propertyName);
         final WebUiContext niceContext = WebUiContext.get();
         try {
-          final Expression expression = JexlUtil.newExpression(value.toString());
+          final JexlExpression expression = JexlUtil.newExpression(value.toString());
           if (expression != null) {
             value = niceContext.evaluateExpression(expression);
           }

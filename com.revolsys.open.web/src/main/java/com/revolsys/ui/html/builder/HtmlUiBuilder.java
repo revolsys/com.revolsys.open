@@ -25,9 +25,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.jexl2.Expression;
-import org.apache.commons.jexl2.JexlContext;
-import org.apache.commons.jexl2.MapContext;
+import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlExpression;
+import org.apache.commons.jexl3.MapContext;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.logging.Logs;
 import org.slf4j.Logger;
@@ -689,7 +689,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
     final String message = getMessage(messageName);
     if (message != null) {
       try {
-        final Expression expression = JexlUtil.newExpression(message);
+        final JexlExpression expression = JexlUtil.newExpression(message);
         if (expression != null) {
           final JexlContext context = new MapContext(variables);
           return (String)expression.evaluate(context);

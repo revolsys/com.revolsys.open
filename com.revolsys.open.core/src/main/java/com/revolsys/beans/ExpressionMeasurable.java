@@ -7,8 +7,8 @@ import java.util.Objects;
 import javax.measure.Quantity;
 import javax.measure.Unit;
 
-import org.apache.commons.jexl2.Expression;
-import org.apache.commons.jexl2.JexlContext;
+import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlExpression;
 
 import com.revolsys.util.JexlUtil;
 
@@ -26,9 +26,9 @@ public class ExpressionMeasurable<Q extends Quantity<Q>> extends AbstractQuantit
 
   private JexlContext context;
 
-  private final Expression expression;
+  private final JexlExpression expression;
 
-  protected ExpressionMeasurable(final Expression expression, final JexlContext context,
+  protected ExpressionMeasurable(final JexlExpression expression, final JexlContext context,
     final Unit<Q> unit) {
     super(unit);
     this.expression = expression;

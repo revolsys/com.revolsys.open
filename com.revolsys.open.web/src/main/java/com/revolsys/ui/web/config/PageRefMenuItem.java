@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.jexl2.Expression;
+import org.apache.commons.jexl3.JexlExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +90,7 @@ public class PageRefMenuItem extends MenuItem {
         final Map.Entry param = (Map.Entry)params.next();
         final Object key = param.getKey();
         if (!uriParams.containsKey(key)) {
-          final Object value = context.evaluateExpression((Expression)param.getValue());
+          final Object value = context.evaluateExpression((JexlExpression)param.getValue());
           uriParams.put(key, value);
         }
       }

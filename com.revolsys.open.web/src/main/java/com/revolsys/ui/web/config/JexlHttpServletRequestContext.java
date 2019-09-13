@@ -24,7 +24,7 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.jexl2.JexlContext;
+import org.apache.commons.jexl3.JexlContext;
 import org.springframework.web.util.UrlPathHelper;
 
 public class JexlHttpServletRequestContext implements JexlContext {

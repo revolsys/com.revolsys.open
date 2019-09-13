@@ -21,9 +21,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.jexl2.Expression;
-import org.apache.commons.jexl2.JexlContext;
-import org.apache.commons.jexl2.JexlEngine;
+import org.apache.commons.jexl3.JexlBuilder;
+import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,20 +80,20 @@ public class WebUiContext {
     this.response = response;
   }
 
-  public Object evaluateExpression(final Expression expression) {
+  public Object evaluateExpression(final JexlExpression expression) {
     final JexlContext jexlContext = new JexlHttpServletRequestContext(this.request);
     try {
       return expression.evaluate(jexlContext);
     } catch (final Exception e) {
       log.error(
-        "Unable to evaluate expression " + expression.getExpression() + ": " + e.getMessage(), e);
+        "Unable to evaluate expression " + expression.getSourceText() + ": " + e.getMessage(), e);
       return null;
     }
   }
 
   public Object evaluateExpression(final String expression) {
     try {
-      return evaluateExpression(new JexlEngine().createExpression(expression));
+      return evaluateExpression(new JexlBuilder().create().createExpression(expression));
     } catch (final Exception e) {
       log.error("Unable to create expression " + expression + ": " + e.getMessage(), e);
       return null;

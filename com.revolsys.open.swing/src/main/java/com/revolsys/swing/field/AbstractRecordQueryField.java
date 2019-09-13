@@ -320,9 +320,11 @@ public abstract class AbstractRecordQueryField extends ValueField
         } else if (selectedIndex >= size) {
           selectedIndex = size - 1;
         }
-        this.list.setSelectedIndex(selectedIndex);
-        setSelectedRecord(this.listModel.getElementAt(selectedIndex));
-        e.consume();
+        if (selectedIndex > 0 && selectedIndex < this.listModel.getSize()) {
+          this.list.setSelectedIndex(selectedIndex);
+          setSelectedRecord(this.listModel.getElementAt(selectedIndex));
+          e.consume();
+        }
       break;
       case KeyEvent.VK_ENTER:
         // if (size > 0) {

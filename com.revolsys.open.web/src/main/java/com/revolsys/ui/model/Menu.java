@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.apache.commons.jexl2.Expression;
-import org.apache.commons.jexl2.JexlContext;
+import org.apache.commons.jexl3.JexlContext;
+import org.apache.commons.jexl3.JexlExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanNameAware;
@@ -24,7 +24,7 @@ public class Menu extends BaseObjectWithProperties implements Cloneable, BeanNam
 
   private String anchor;
 
-  private final Map<String, Expression> dynamicParameters = new HashMap<>();
+  private final Map<String, JexlExpression> dynamicParameters = new HashMap<>();
 
   private String iconName;
 
@@ -46,11 +46,11 @@ public class Menu extends BaseObjectWithProperties implements Cloneable, BeanNam
 
   private String title;
 
-  private Expression titleExpression;
+  private JexlExpression titleExpression;
 
   private String uri;
 
-  private Expression uriExpression;
+  private JexlExpression uriExpression;
 
   private boolean visible = true;
 
@@ -103,7 +103,7 @@ public class Menu extends BaseObjectWithProperties implements Cloneable, BeanNam
   public void addParameter(final String name, final Object value) {
     if (value != null) {
       this.parameters.put(name, value);
-      Expression expression = null;
+      JexlExpression expression = null;
       try {
         expression = JexlUtil.newExpression(value.toString());
       } catch (final Exception e) {
@@ -188,9 +188,9 @@ public class Menu extends BaseObjectWithProperties implements Cloneable, BeanNam
       Map<String, Object> params;
       if (context != null) {
         params = new HashMap<>(this.staticParameters);
-        for (final Entry<String, Expression> param : this.dynamicParameters.entrySet()) {
+        for (final Entry<String, JexlExpression> param : this.dynamicParameters.entrySet()) {
           final String key = param.getKey();
-          final Expression expression = param.getValue();
+          final JexlExpression expression = param.getValue();
           final Object value = JexlUtil.evaluateExpression(context, expression);
           params.put(key, value);
         }

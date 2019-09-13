@@ -18,8 +18,8 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.apache.commons.jexl2.Expression;
-import org.apache.commons.jexl2.MapContext;
+import org.apache.commons.jexl3.JexlExpression;
+import org.apache.commons.jexl3.MapContext;
 import org.jeometry.common.logging.Logs;
 import org.springframework.beans.InvalidPropertyException;
 import org.springframework.beans.MethodInvocationException;
@@ -240,7 +240,7 @@ public class ScriptTool {
         if (logFileName != null) {
           try {
             while (logFileName.contains("${")) {
-              final Expression expression = JexlUtil.newExpression(logFileName);
+              final JexlExpression expression = JexlUtil.newExpression(logFileName);
               final MapContext context = new MapContext(ThreadSharedProperties.getProperties());
               logFileName = (String)JexlUtil.evaluateExpression(context, expression);
             }

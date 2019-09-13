@@ -24,14 +24,14 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.jexl2.JexlContext;
+import org.apache.commons.jexl3.JexlContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.UrlPathHelper;
 
 public class HttpServletRequestJexlContext implements JexlContext {
 
-  private final ThreadLocal<Map<String, Object>> localAttributes = new ThreadLocal<>();
+  private final java.lang.ThreadLocal<Map<String, Object>> localAttributes = new java.lang.ThreadLocal<>();
 
   private final ServletContext servletContext;
 

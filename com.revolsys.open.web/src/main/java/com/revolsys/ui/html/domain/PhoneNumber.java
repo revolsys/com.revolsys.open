@@ -21,8 +21,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.jexl2.Expression;
-import org.apache.commons.jexl2.MapContext;
+import org.apache.commons.jexl3.JexlExpression;
+import org.apache.commons.jexl3.MapContext;
 
 import com.revolsys.util.JexlUtil;
 
@@ -136,7 +136,7 @@ public final class PhoneNumber {
         for (int i = 1; i <= matcher.groupCount(); i++) {
           values.put("n" + i, matcher.group(i));
         }
-        Expression expression;
+        JexlExpression expression;
         try {
           expression = JexlUtil.newExpression(format);
         } catch (final Exception e) {
