@@ -441,6 +441,8 @@ public class BoundingBoxTest implements TestConstants {
 
   @Test
   public void testIntersectsLine() {
+    Assert.assertTrue(RectangleUtil.intersectsLine(1222313.1, 467757.96, 1222314.1, 467758.95, //
+      1222422.3, 467833.7, 1222308.1, 467755.4));
 
     Assert.assertTrue(RectangleUtil.intersectsLine(5, 0, 6, 11, //
       0, 0, 10, 10));

@@ -485,7 +485,6 @@ public class AbstractOverlay extends JComponent implements MapOverlay, PropertyC
     this.snapEventY = MouseOverlay.getEventY();
     this.snapCentre = MouseOverlay.getEventPoint();
     final BoundingBox boundingBox = getHotspotBoundingBox();
-
     final Map<Point, Set<CloseLocation>> snapLocations = new HashMap<>();
     final List<AbstractRecordLayer> layers = getSnapLayers();
     for (final AbstractRecordLayer layer : layers) {
@@ -493,7 +492,6 @@ public class AbstractOverlay extends JComponent implements MapOverlay, PropertyC
       for (final LayerRecord record : records) {
         if (layer.isVisible(record)) {
           final Geometry recordGeometry = record.getGeometry();
-          System.out.println(recordGeometry.distance(boundingBox.getCentre()));
           final CloseLocation closeLocation = this.map.findCloseLocation(layer, record,
             recordGeometry);
           if (closeLocation != null) {

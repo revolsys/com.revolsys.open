@@ -55,7 +55,6 @@ import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.LayerRecordMenu;
-import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.marker.MarkerRenderer;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
@@ -1196,13 +1195,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       }
     }
     drawXorGeometry(graphics);
-    final BoundingBox hotspotBoundingBox = getHotspotBoundingBox();
-    view.drawBboxOutline(GeometryStyle.line(WebColors.Fuchsia), hotspotBoundingBox);
-    for (final Point point : getSnapPointLocationMap().keySet()) {
-      view.drawMarker(
-        MarkerStyle.marker(MarkerStyle.ELLIPSE, 20, WebColors.Fuchsia, WebColors.Fuchsia), point,
-        0);
-    }
   }
 
   @Override

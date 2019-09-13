@@ -108,12 +108,30 @@ public enum OutCode {
 
   private boolean inside;
 
+  private int code;
+
   private OutCode(final Side side, final AboveBelow aboveBelow) {
     this.left = side.isLeft();
     this.right = side.isRight();
     this.top = aboveBelow.isAbove();
     this.bottom = aboveBelow.isBelow();
     this.inside = aboveBelow.isOn() && side.isOn();
+    int code = 0;
+    if (this.left) {
+      code |= OUT_LEFT;
+    } else if (this.right) {
+      code |= OUT_RIGHT;
+    }
+    if (this.top) {
+      code |= OUT_TOP;
+    } else if (this.bottom) {
+      code |= OUT_BOTTOM;
+    }
+    this.code = code;
+  }
+
+  public int getCode() {
+    return this.code;
   }
 
   public boolean isBottom() {
@@ -128,12 +146,20 @@ public enum OutCode {
     return this.left;
   }
 
+  public boolean isOutside() {
+    return !this.inside;
+  }
+
   public boolean isRight() {
     return this.right;
   }
 
   public boolean isTop() {
     return this.top;
+  }
+
+  public boolean isX(final OutCode out) {
+    return (this.code & out.code) != 0;
   }
 
 }

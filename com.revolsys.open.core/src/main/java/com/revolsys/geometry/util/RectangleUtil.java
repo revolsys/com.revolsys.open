@@ -421,28 +421,33 @@ public class RectangleUtil {
 
   public static boolean intersectsLine(final double minX, final double minY, final double maxX,
     final double maxY, double x1, double y1, final double x2, final double y2) {
-    int out1, out2;
-    if ((out2 = OutCode.getOutcode(minX, minY, maxX, maxY, x2, y2)) == 0) {
+    final int out2 = OutCode.getOutcode(minX, minY, maxX, maxY, x2, y2);
+    if (out2 == 0) {
       return true;
     }
-    while ((out1 = OutCode.getOutcode(minX, minY, maxX, maxY, x1, y1)) != 0) {
+    int out1 = OutCode.getOutcode(minX, minY, maxX, maxY, x1, y1);
+    while (out1 != 0) {
       if ((out1 & out2) != 0) {
         return false;
       } else if ((out1 & (OutCode.OUT_LEFT | OutCode.OUT_RIGHT)) != 0) {
         double x;
-        if (OutCode.isRight(out1)) {
+        if ((out1 & OutCode.OUT_RIGHT) != 0) {
           x = maxX;
+          out1 &= ~OutCode.OUT_RIGHT;
         } else {
           x = minX;
+          out1 &= ~OutCode.OUT_LEFT;
         }
         y1 = y1 + (x - x1) * (y2 - y1) / (x2 - x1);
         x1 = x;
       } else {
         double y;
-        if (OutCode.isBottom(out1)) {
+        if ((out1 & OutCode.OUT_TOP) != 0) {
           y = maxY;
+          out1 &= ~OutCode.OUT_TOP;
         } else {
           y = minY;
+          out1 &= ~OutCode.OUT_BOTTOM;
         }
         x1 = x1 + (y - y1) * (x2 - x1) / (y2 - y1);
         y1 = y;

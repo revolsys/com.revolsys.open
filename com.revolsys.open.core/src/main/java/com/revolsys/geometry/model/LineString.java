@@ -81,7 +81,6 @@ import com.revolsys.geometry.operation.RectangleIntersection;
 import com.revolsys.geometry.operation.overlay.OverlayOp;
 import com.revolsys.geometry.operation.overlay.snap.SnapIfNeededOverlayOp;
 import com.revolsys.geometry.util.Points;
-import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
@@ -1581,10 +1580,6 @@ public interface LineString extends Lineal {
     if (isEmpty() || boundingBox.isEmpty()) {
       return false;
     } else {
-      final double minX = boundingBox.getMinX();
-      final double maxX = boundingBox.getMaxX();
-      final double minY = boundingBox.getMinY();
-      final double maxY = boundingBox.getMaxY();
       final int vertexCount = getVertexCount();
       final GeometryFactory geometryFactory = boundingBox.getGeometryFactory();
       final CoordinatesOperation coordinatesOperation = getCoordinatesOperation(geometryFactory);
@@ -1595,8 +1590,7 @@ public interface LineString extends Lineal {
         for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
           final double x = getX(vertexIndex);
           final double y = getY(vertexIndex);
-          if (RectangleUtil.intersectsLine(minX, minY, maxX, maxY, //
-            previousX, previousY, x, y)) {
+          if (boundingBox.intersectsLine(previousX, previousY, x, y)) {
             return true;
           }
           previousX = x;
@@ -1613,8 +1607,7 @@ public interface LineString extends Lineal {
           coordinatesOperation.perform(point);
           final double x = point.x;
           final double y = point.y;
-          if (RectangleUtil.intersectsLine(minX, minY, maxX, maxY, //
-            previousX, previousY, x, y)) {
+          if (boundingBox.intersectsLine(previousX, previousY, x, y)) {
             return true;
           }
           previousX = x;

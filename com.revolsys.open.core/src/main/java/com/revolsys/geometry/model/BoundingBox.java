@@ -924,6 +924,14 @@ public interface BoundingBox
     return getMin(2);
   }
 
+  default int getOutcode(final double x, final double y) {
+    final double minX = getMinX();
+    final double minY = getMinY();
+    final double maxX = getMaxX();
+    final double maxY = getMaxY();
+    return OutCode.getOutcode(minX, minY, maxX, maxY, x, y);
+  }
+
   default Point getRandomPointWithin() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     final double x = getMinX() + getWidth() * Math.random();
@@ -972,6 +980,42 @@ public interface BoundingBox
     final GeometryFactory geometryFactory = getGeometryFactory();
     final Unit<Length> unit = geometryFactory.getHorizontalLengthUnit();
     return Quantities.getQuantity(width, unit);
+  }
+
+  default boolean intersectsLine(double x1, double y1, final double x2, final double y2) {
+    final int out2 = getOutcode(x2, y2);
+    if (out2 == 0) {
+      return true;
+    }
+    int out1 = getOutcode(x1, y1);
+    while (out1 != 0) {
+      if ((out1 & out2) != 0) {
+        return false;
+      } else if ((out1 & (OutCode.OUT_LEFT | OutCode.OUT_RIGHT)) != 0) {
+        double x;
+        if ((out1 & OutCode.OUT_RIGHT) != 0) {
+          x = getMaxX();
+          out1 &= ~OutCode.OUT_RIGHT;
+        } else {
+          x = getMaxX();
+          out1 &= ~OutCode.OUT_LEFT;
+        }
+        y1 = y1 + (x - x1) * (y2 - y1) / (x2 - x1);
+        x1 = x;
+      } else {
+        double y;
+        if ((out1 & OutCode.OUT_TOP) != 0) {
+          y = getMaxY();
+          out1 &= ~OutCode.OUT_TOP;
+        } else {
+          y = getMinY();
+          out1 &= ~OutCode.OUT_BOTTOM;
+        }
+        x1 = x1 + (y - y1) * (x2 - x1) / (y2 - y1);
+        y1 = y;
+      }
+    }
+    return true;
   }
 
   @Override

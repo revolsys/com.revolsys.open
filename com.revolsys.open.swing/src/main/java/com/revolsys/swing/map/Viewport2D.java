@@ -36,7 +36,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
 
   public static final Geometry EMPTY_GEOMETRY = GeometryFactory.DEFAULT_3D.geometry();
 
-  private static final int HOTSPOT_PIXELS = 10;
+  private static final int HOTSPOT_PIXELS = 6;
 
   private static List<Double> GEOGRAPHIC_UNITS_PER_PIXEL = Arrays.asList(5.0, 2.0, 1.0, 0.5, 0.2,
     0.1, 0.05, 0.02, 0.01, 0.005, 0.002, 0.001, 0.0005, 0.0002, 0.0001, 0.00005, 0.00002, 0.00001,
