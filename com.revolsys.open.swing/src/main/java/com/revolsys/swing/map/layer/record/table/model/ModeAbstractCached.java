@@ -16,6 +16,7 @@ import javax.swing.ListSelectionModel;
 
 import com.revolsys.collection.list.ListByIndexIterator;
 import com.revolsys.collection.list.Lists;
+import com.revolsys.record.RecordState;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -308,11 +309,15 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
 
   protected void removeCachedRecord(final LayerRecord record) {
     Invoke.later(() -> {
-      final int index = record.removeFrom(this.records);
-      if (index != -1) {
-        clearCurrentRecord();
-        setRecordCount(this.recordCount - 1);
-        this.model.fireTableRowsDeleted(index, index);
+      for (int recordIndex = 0; recordIndex < this.recordCount;) {
+        final LayerRecord record2 = this.records.get(recordIndex);
+        if (record2.getState() == RecordState.DELETED || record2.isSame(record)) {
+          clearCurrentRecord();
+          setRecordCount(this.recordCount - 1);
+          this.model.fireTableRowsDeleted(recordIndex, recordIndex);
+        } else {
+          recordIndex++;
+        }
       }
     });
   }

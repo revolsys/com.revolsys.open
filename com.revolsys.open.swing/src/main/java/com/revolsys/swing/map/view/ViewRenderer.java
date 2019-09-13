@@ -71,7 +71,7 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
   private static PointDoubleXYOrientation getPointWithOrientationCentre(
     final GeometryFactory geometryFactory2dFloating, final Geometry geometry) {
     double orientation = 0;
-    Point point = null;
+    Point point = geometryFactory2dFloating.point();
     if (geometry instanceof LineString) {
       final LineString line = geometry.convertGeometry(geometryFactory2dFloating, 2);
 
@@ -91,6 +91,9 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     } else {
       point = geometry.getPointWithin();
       point = point.convertPoint2d(geometryFactory2dFloating);
+    }
+    if (point == null) {
+      point = geometryFactory2dFloating.point();
     }
     return new PointDoubleXYOrientation(point, orientation);
   }
