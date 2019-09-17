@@ -533,15 +533,15 @@
 
   <repositories>
     <repository>
-        <id>jcenter</id>
-        <url>https://jcenter.bintray.com/</url>
-        <releases>
-           <enabled>true</enabled>
-        </releases>
-        <snapshots>
-          <enabled>false</enabled>
-        </snapshots>
-     </repository>
+      <id>jcenter</id>
+      <url>https://jcenter.bintray.com/</url>
+      <releases>
+         <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
   </repositories>
 
   <properties>

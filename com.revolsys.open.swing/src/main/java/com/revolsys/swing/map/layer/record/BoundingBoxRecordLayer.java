@@ -37,14 +37,6 @@ public class BoundingBoxRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public BoundingBoxRecordLayer clone() {
-    final BoundingBoxRecordLayer clone = (BoundingBoxRecordLayer)super.clone();
-    clone.boundingBox = null;
-    clone.worker = null;
-    return clone;
-  }
-
-  @Override
   public BoundingBox getBoundingBox() {
     return this.boundingBox;
   }

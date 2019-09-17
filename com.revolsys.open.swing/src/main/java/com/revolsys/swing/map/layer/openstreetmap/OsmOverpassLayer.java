@@ -33,20 +33,13 @@ public class OsmOverpassLayer extends AbstractRecordLayer {
     return new OsmOverpassLayer(properties);
   }
 
-  private Map<BoundingBox, OsmDocument> boundingBoxTileMap = new HashMap<>();
+  private final Map<BoundingBox, OsmDocument> boundingBoxTileMap = new HashMap<>();
 
   private String serverUrl = "http://api.openstreetmap.org/";
 
   public OsmOverpassLayer(final Map<String, Object> properties) {
     super("openStreetMapVectorApi");
     setProperties(properties);
-  }
-
-  @Override
-  public OsmOverpassLayer clone() {
-    final OsmOverpassLayer clone = (OsmOverpassLayer)super.clone();
-    clone.boundingBoxTileMap = new HashMap<>();
-    return clone;
   }
 
   @Override

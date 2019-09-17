@@ -526,14 +526,17 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
         exists = initializeDo();
       }
       setExists(exists);
-      if (exists && Property.getBoolean(this, "showTableView")) {
-        Invoke.later(this::showTableView);
-      }
     } catch (final RuntimeException e) {
       Logs.error(this, getPath() + ": Unable to initialize layer", e);
       setExists(false);
     } finally {
       setInitialized(true);
+    }
+    if (isExists()) {
+      initializePost();
+      if (Property.getBoolean(this, "showTableView")) {
+        Invoke.later(this::showTableView);
+      }
     }
   }
 
@@ -571,6 +574,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     final MenuFactory layerMenu = getMenu();
     context.setVariable("layerMenu", layerMenu);
     return context;
+  }
+
+  protected void initializePost() {
   }
 
   @Override

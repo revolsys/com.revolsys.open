@@ -194,12 +194,6 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public ArcGisRestServerRecordLayer clone() {
-    final ArcGisRestServerRecordLayer clone = (ArcGisRestServerRecordLayer)super.clone();
-    return clone;
-  }
-
-  @Override
   protected void forEachRecordInternal(final Query query,
     final Consumer<? super LayerRecord> consumer) {
     try (

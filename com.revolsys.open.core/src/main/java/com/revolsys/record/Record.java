@@ -249,8 +249,9 @@ public interface Record
     return false;
   }
 
-  default void delete() {
+  default boolean deleteRecord() {
     getRecordDefinition().deleteRecord(this);
+    return true;
   }
 
   default double distance(final Geometry geometry) {

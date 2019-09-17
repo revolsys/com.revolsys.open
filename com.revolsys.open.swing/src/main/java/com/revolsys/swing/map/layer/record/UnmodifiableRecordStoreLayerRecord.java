@@ -1,5 +1,7 @@
 package com.revolsys.swing.map.layer.record;
 
+import java.util.Map;
+
 import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -10,6 +12,16 @@ public class UnmodifiableRecordStoreLayerRecord extends RecordStoreLayerRecord {
   public UnmodifiableRecordStoreLayerRecord(final RecordStoreLayer layer,
     final RecordDefinition recordDefinition) {
     super(layer, recordDefinition);
+  }
+
+  protected void refreshValues(final Map<String, ? extends Object> newValues) {
+    final RecordState state = getState();
+    try {
+      super.setState(RecordState.INITIALIZING);
+      setValues(newValues);
+    } finally {
+      super.setState(state);
+    }
   }
 
   @Override

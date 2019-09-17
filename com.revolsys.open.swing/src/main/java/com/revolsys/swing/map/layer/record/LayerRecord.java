@@ -21,6 +21,12 @@ public interface LayerRecord extends Record {
   default void clearChanges() {
   }
 
+  @Override
+  default boolean deleteRecord() {
+    final AbstractRecordLayer layer = getLayer();
+    return layer.deleteRecord(this);
+  }
+
   default BaseCloseable eventsDisabled() {
     final AbstractRecordLayer layer = getLayer();
     return layer.eventsDisabled();

@@ -126,7 +126,11 @@ public class PointRecordMap {
   }
 
   private Point getKey(final Point point) {
-    return point.newPoint2D();
+    if (point == null) {
+      return null;
+    } else {
+      return point.newPoint2D();
+    }
   }
 
   private Point getKey(final Record record) {
@@ -186,18 +190,20 @@ public class PointRecordMap {
 
   public void removeRecord(final Record record) {
     final Point key = getKey(record);
-    final List<Record> objects = this.recordMap.get(key);
-    if (objects != null) {
-      objects.remove(record);
-      if (objects.isEmpty()) {
-        if (isRemoveEmptyLists()) {
-          this.recordMap.remove(key);
+    if (key != null) {
+      final List<Record> records = this.recordMap.get(key);
+      if (records != null) {
+        records.remove(record);
+        if (records.isEmpty()) {
+          if (isRemoveEmptyLists()) {
+            this.recordMap.remove(key);
+          }
+        } else if (this.comparator != null) {
+          Collections.sort(records, this.comparator);
         }
-      } else if (this.comparator != null) {
-        Collections.sort(objects, this.comparator);
       }
+      this.size--;
     }
-    this.size--;
   }
 
   public void setRemoveEmptyLists(final boolean removeEmptyLists) {

@@ -34,20 +34,13 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
     return new OpenStreetMapApiLayer(config);
   }
 
-  private Map<BoundingBox, OsmDocument> boundingBoxTileMap = new HashMap<>();
+  private final Map<BoundingBox, OsmDocument> boundingBoxTileMap = new HashMap<>();
 
   private String serverUrl = "http://www.overpass-api.de/api/xapi?";
 
   public OpenStreetMapApiLayer(final Map<String, ? extends Object> config) {
     super("openStreetMapVectorApi");
     setProperties(config);
-  }
-
-  @Override
-  public OpenStreetMapApiLayer clone() {
-    final OpenStreetMapApiLayer clone = (OpenStreetMapApiLayer)super.clone();
-    clone.boundingBoxTileMap = new HashMap<>();
-    return clone;
   }
 
   @Override

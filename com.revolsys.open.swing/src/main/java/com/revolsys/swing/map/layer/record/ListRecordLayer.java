@@ -76,13 +76,6 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public ListRecordLayer clone() {
-    final ListRecordLayer clone = (ListRecordLayer)super.clone();
-    clone.records = new ArrayList<>();
-    return clone;
-  }
-
-  @Override
   protected void deleteRecordPost(final LayerRecord record) {
     super.deleteRecordPost(record);
     removeRecord(record);
