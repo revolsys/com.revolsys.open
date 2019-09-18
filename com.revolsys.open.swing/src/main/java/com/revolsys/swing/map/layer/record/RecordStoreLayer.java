@@ -580,17 +580,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public boolean isLayerRecord(final Record record) {
-    if (record instanceof LayerRecord) {
-      final LayerRecord layerRecord = (LayerRecord)record;
-      if (layerRecord.getLayer() == this) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @Override
   public boolean isReadOnly() {
     return !hasIdField() || super.isReadOnly();
   }

@@ -16,13 +16,11 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
   @Override
   public boolean addRecord(final LayerRecord record) {
     final L layer = this.layer;
-    if (layer.isLayerRecord(record)) {
-      synchronized (layer.getSync()) {
-        if (!(record.getState() == RecordState.DELETED && !layer.isDeleted(record))) {
-          if (!containsRecord(record)) {
-            final LayerRecord recordProxied = layer.getRecordProxied(record);
-            return addRecordDo(recordProxied);
-          }
+    synchronized (layer.getSync()) {
+      if (!(record.getState() == RecordState.DELETED && !layer.isDeleted(record))) {
+        final LayerRecord recordProxied = layer.getProxiedRecord(record);
+        if (!containsRecordDo(recordProxied)) {
+          return addRecordDo(recordProxied);
         }
       }
     }
@@ -31,6 +29,20 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
 
   public abstract boolean addRecordDo(LayerRecord record);
 
+  @Override
+  public final boolean containsRecord(final LayerRecord record) {
+    final L layer = this.layer;
+    synchronized (layer.getSync()) {
+      final LayerRecord recordProxied = layer.getProxiedRecord(record);
+      if (recordProxied != null) {
+        return containsRecordDo(recordProxied);
+      }
+    }
+    return false;
+  }
+
+  public abstract boolean containsRecordDo(LayerRecord record);
+
   public String getCacheId() {
     return this.cacheId;
   }
@@ -38,9 +50,9 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
   @Override
   public boolean removeRecord(final LayerRecord record) {
     final L layer = this.layer;
-    if (layer.isLayerRecord(record)) {
-      synchronized (layer.getSync()) {
-        final LayerRecord proxiedRecord = layer.getProxiedRecord(record);
+    synchronized (layer.getSync()) {
+      final LayerRecord proxiedRecord = layer.getProxiedRecord(record);
+      if (proxiedRecord != null) {
         return removeRecordDo(proxiedRecord);
       }
     }
@@ -51,11 +63,14 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
 
   @Override
   public boolean replaceRecord(final LayerRecord record) {
-    if (removeRecord(record)) {
-      return addRecord(record);
-    } else {
-      return false;
+    final L layer = this.layer;
+    synchronized (layer.getSync()) {
+      final LayerRecord proxiedRecord = layer.getProxiedRecord(record);
+      if (removeRecordDo(proxiedRecord)) {
+        return addRecordDo(proxiedRecord);
+      }
     }
+    return false;
   }
 
   @Override

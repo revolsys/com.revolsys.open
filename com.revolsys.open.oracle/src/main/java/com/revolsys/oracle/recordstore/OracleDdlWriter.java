@@ -226,9 +226,11 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     final List<Record> values) {
     final PrintWriter out = getOut();
     Long nextValue = 0L;
-    for (final Record object : values) {
-      final Identifier id = object.getIdentifier();
-      for (final Object value : id.getValues()) {
+    for (final Record record : values) {
+      final Identifier id = record.getIdentifier();
+
+      for (int i = 0; i < id.getValueCount(); i++) {
+        final Object value = id.getValue(i);
         if (value instanceof Number) {
           final Number number = (Number)value;
           final long longValue = number.longValue();

@@ -1247,11 +1247,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected LayerRecord getProxiedRecord(LayerRecord record) {
-    if (record instanceof AbstractProxyLayerRecord) {
-      final AbstractProxyLayerRecord proxy = (AbstractProxyLayerRecord)record;
-      record = proxy.getRecordProxied();
+    if (record != null && record.getLayer() == this) {
+      if (record instanceof AbstractProxyLayerRecord) {
+        final AbstractProxyLayerRecord proxy = (AbstractProxyLayerRecord)record;
+        record = proxy.getRecordProxied();
+      }
+      return record;
+    } else {
+      return null;
     }
-    return record;
   }
 
   public List<LayerRecord> getProxiedRecords() {
@@ -1365,15 +1369,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       return this.recordMenu;
     }
     return null;
-  }
-
-  protected LayerRecord getRecordProxied(final LayerRecord record) {
-    if (record instanceof AbstractProxyLayerRecord) {
-      final AbstractProxyLayerRecord proxyRecord = (AbstractProxyLayerRecord)record;
-      return proxyRecord.getRecordProxied();
-    } else {
-      return record;
-    }
   }
 
   public List<LayerRecord> getRecords() {
@@ -1927,6 +1922,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public boolean isLayerRecord(final Record record) {
     if (record == null) {
       return false;
+    } else if (record instanceof LayerRecord) {
+      final LayerRecord layerRecord = (LayerRecord)record;
+      return isLayerRecord(layerRecord);
     } else if (record.getRecordDefinition() == getRecordDefinition()) {
       return true;
     } else {
@@ -2398,7 +2396,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final List<Window> windows = new ArrayList<>();
     synchronized (this.formRecords) {
       for (final LayerRecord record : records) {
-        final LayerRecord proxiedRecord = getRecordProxied(record);
+        final LayerRecord proxiedRecord = getProxiedRecord(record);
         if (proxiedRecord != null) {
           final int index = proxiedRecord.indexOf(this.formRecords);
           if (index == -1) {
@@ -2475,9 +2473,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     ShortCounter.deccrement(this.proxiedRecordIdentifiers, identifier);
   }
 
-  protected boolean removeRecordFromCache(LayerRecord record) {
+  protected boolean removeRecordFromCache(final LayerRecord record) {
     boolean removed = false;
-    record = getProxiedRecord(record);
     synchronized (getSync()) {
       if (isLayerRecord(record)) {
         for (final RecordCache cache : this.recordCache.values()) {
@@ -3036,7 +3033,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void showForm(final LayerRecord record, final String fieldName) {
     Invoke.later(() -> {
       if (record != null && !record.isDeleted()) {
-        final LayerRecord proxiedRecord = getRecordProxied(record);
+        final LayerRecord proxiedRecord = getProxiedRecord(record);
         final int index;
         Window window;
         synchronized (this.formRecords) {

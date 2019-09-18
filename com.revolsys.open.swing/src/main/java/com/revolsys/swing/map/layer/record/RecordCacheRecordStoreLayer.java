@@ -40,14 +40,14 @@ public class RecordCacheRecordStoreLayer extends AbstractRecordCache<RecordStore
   }
 
   @Override
-  public boolean containsRecord(final LayerRecord record) {
+  public boolean containsRecordDo(final LayerRecord record) {
     final Identifier identifier = record.getIdentifier();
     if (identifier != null) {
       if (this.identifiers.contains(identifier)) {
         return true;
       }
     }
-    return this.parentCache.containsRecord(record);
+    return this.parentCache.containsRecordDo(record);
   }
 
   @Override

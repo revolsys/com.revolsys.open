@@ -13,7 +13,6 @@ import java.util.List;
 import javax.measure.Quantity;
 import javax.measure.quantity.Length;
 
-import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.model.Ellipsoid;
 
@@ -664,7 +663,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
 
   protected boolean setGeometryFactoryDo(final GeometryFactory geometryFactory) {
     final GeometryFactory oldGeometryFactory = this.geometryFactory;
-    if (DataType.equal(oldGeometryFactory, geometryFactory)) {
+    if (oldGeometryFactory != null && oldGeometryFactory.equals(geometryFactory)) {
       return false;
     } else {
       if (geometryFactory == null) {

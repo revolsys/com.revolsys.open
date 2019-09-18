@@ -376,11 +376,17 @@ public class PropertyChangeSupport implements Serializable {
    */
   public void firePropertyChange(final String propertyName, final Object oldValue,
     final Object newValue) {
-    if (!DataType.equal(oldValue, newValue)) {
-      final PropertyChangeEvent event = new PropertyChangeEvent(this.source, propertyName, oldValue,
-        newValue);
-      firePropertyChangeDo(event);
+    if (oldValue == null) {
+      if (newValue == null) {
+        return;
+      }
+    } else if (newValue == null) {
+    } else if (oldValue.equals(newValue)) {
+      return;
     }
+    final PropertyChangeEvent event = new PropertyChangeEvent(this.source, propertyName, oldValue,
+      newValue);
+    firePropertyChangeDo(event);
   }
 
   private void firePropertyChangeDo(final PropertyChangeEvent event) {

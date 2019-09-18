@@ -401,7 +401,7 @@ public class GeometryStyle extends MarkerStyle {
         }
       }
     }
-    this.lineDashArray = Collections.unmodifiableList(dashArray);
+    this.lineDashArray = dashArray;
     firePropertyChange("lineDashArray", oldValue, this.lineDashArray);
     return this;
   }

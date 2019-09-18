@@ -72,11 +72,10 @@ public class FieldCalculator extends AbstractUpdateField implements DocumentList
       if (id == null) {
         return null;
       } else {
-        final List<Object> values = id.getValues();
-        if (values.size() == 1) {
-          return values.get(0);
+        if (id.isSingle()) {
+          return id.getValue(0);
         }
-        return values;
+        return id.getValues();
       }
     }
     return value;

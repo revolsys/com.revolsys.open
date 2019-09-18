@@ -492,7 +492,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   @Override
   public void setBoundingBox(final BoundingBox boundingBox) {
-    if (!DataType.equal(boundingBox, this.boundingBox)) {
+    if (this.boundingBox != null && !this.boundingBox.equals(boundingBox)) {
       setGeometryFactory(boundingBox.getGeometryFactory());
       this.boundingBox = boundingBox;
       updateResolution();
@@ -598,13 +598,13 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
   private void updateResolution() {
     if (!this.boundingBox.isBboxEmpty()) {
       if (this.imageWidth > 0) {
-        double width = this.boundingBox.getWidth();
-        double resolutionX = width / this.imageWidth;
+        final double width = this.boundingBox.getWidth();
+        final double resolutionX = width / this.imageWidth;
         setResolutionX(resolutionX);
       }
       if (this.imageHeight > 0) {
-        double height = this.boundingBox.getHeight();
-        double resolutionY = height / this.imageHeight;
+        final double height = this.boundingBox.getHeight();
+        final double resolutionY = height / this.imageHeight;
         setResolutionY(resolutionY);
       }
     }

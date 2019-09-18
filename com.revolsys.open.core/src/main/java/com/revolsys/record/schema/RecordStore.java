@@ -478,18 +478,17 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     if (recordDefinition == null || id == null) {
       return null;
     } else {
-      final List<Object> values = id.getValues();
       final List<String> idFieldNames = recordDefinition.getIdFieldNames();
       if (idFieldNames.isEmpty()) {
         throw new IllegalArgumentException(typePath + " does not have a primary key");
-      } else if (values.size() != idFieldNames.size()) {
+      } else if (id.getValueCount() != idFieldNames.size()) {
         throw new IllegalArgumentException(
           id + " not a valid id for " + typePath + " requires " + idFieldNames);
       } else {
         final Query query = new Query(recordDefinition);
         for (int i = 0; i < idFieldNames.size(); i++) {
           final String name = idFieldNames.get(i);
-          final Object value = values.get(i);
+          final Object value = id.getValue(i);
           final FieldDefinition field = recordDefinition.getField(name);
           query.and(Q.equal(field, value));
         }
