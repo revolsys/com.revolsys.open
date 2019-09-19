@@ -69,6 +69,13 @@ public class RStarTree<T> implements SpatialIndex<T> {
     return node.getMinimum(sortBoundingBoxProxysByAreaEnlargement(bound));
   }
 
+  @Override
+  public void clear() {
+    this.root = null;
+    this.size = 0;
+
+  }
+
   protected boolean equalsItem(final RStarLeaf<T> leaf, final T item) {
     final boolean equalsItemDo = leaf.getItem() == item;
     return equalsItemDo;

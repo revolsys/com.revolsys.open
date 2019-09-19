@@ -54,6 +54,11 @@ public class RecordSpatialIndex<R extends Record> implements SpatialIndex<R> {
   }
 
   @Override
+  public void clear() {
+    this.spatialIndex.clear();
+  }
+
+  @Override
   public boolean forEach(final Consumer<? super R> action) {
     return this.spatialIndex.forEach(action);
   }
@@ -215,11 +220,8 @@ public class RecordSpatialIndex<R extends Record> implements SpatialIndex<R> {
 
   public boolean removeRecord(final R record) {
     if (record != null) {
-      final Geometry geometry = record.getGeometry();
-      if (geometry != null) {
-        final BoundingBox boundinBox = geometry.getBoundingBox();
-        return this.spatialIndex.removeItem(boundinBox, record);
-      }
+      final BoundingBox boundinBox = record.getBoundingBox();
+      return this.spatialIndex.removeItem(boundinBox, record);
     }
     return false;
   }

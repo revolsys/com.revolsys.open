@@ -23,7 +23,13 @@ public class RTree<T> implements SpatialIndex<T> {
 
   public RTree(final int minEntries, final int maxEntries) {
     this.maxEntries = maxEntries;
-    this.root = new RTreeLeaf<>(maxEntries);
+    clear();
+  }
+
+  @Override
+  public void clear() {
+    this.size = 0;
+    this.root = new RTreeLeaf<>(this.maxEntries);
   }
 
   @Override

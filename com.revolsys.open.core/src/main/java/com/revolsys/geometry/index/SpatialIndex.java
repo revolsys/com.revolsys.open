@@ -59,6 +59,7 @@ import com.revolsys.visitor.SingleObjectVisitor;
  * @version 1.7
  */
 public interface SpatialIndex<T> extends GeometryFactoryProxy {
+  void clear();
 
   default boolean forEach(final BoundingBoxProxy boundingBoxProxy,
     final Consumer<? super T> action) {

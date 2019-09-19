@@ -128,6 +128,11 @@ public class StrTree<I>
   }
 
   @Override
+  public void clear() {
+    this.root = null;
+  }
+
+  @Override
   public int compare(final Boundable<I> o1, final Boundable<I> o2) {
     return Double.compare(o1.getCentreY(), o2.getCentreY());
   }

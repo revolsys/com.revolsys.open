@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javax.swing.Icon;
+import javax.swing.JPopupMenu;
 
 import org.jeometry.common.logging.Logs;
 
@@ -102,20 +103,23 @@ public class LayerRecordMenu extends MenuFactory {
     return addMenuItem(this, groupName, index, name, toolTip, iconName, enabledFilter, consumer);
   }
 
-  public void showMenu(final LayerRecord record, final MouseEvent e) {
-    if (record != null) {
+  public JPopupMenu showMenu(final LayerRecord record, final MouseEvent e) {
+    if (record == null) {
+      return null;
+    } else {
       setEventRecord(record);
-      super.showMenu(this.layer, e);
+      return super.showMenu(this.layer, e);
     }
   }
 
   @Override
-  public void showMenu(final Object source, final Component component, final int x, final int y) {
-    super.showMenu(source, component, x, y);
+  public JPopupMenu showMenu(final Object source, final Component component, final int x,
+    final int y) {
+    return super.showMenu(source, component, x, y);
   }
 
   @Override
-  public boolean showMenu(final Object source, final MouseEvent e) {
+  public JPopupMenu showMenu(final Object source, final MouseEvent e) {
     return super.showMenu(this.layer, e);
   }
 }

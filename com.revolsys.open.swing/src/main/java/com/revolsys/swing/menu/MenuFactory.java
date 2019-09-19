@@ -608,25 +608,26 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     this.name = name;
   }
 
-  public void showMenu(final Component component, final int x, final int y) {
+  public JPopupMenu showMenu(final Component component, final int x, final int y) {
     final JPopupMenu menu = newJPopupMenu();
     showMenu(menu, component, x, y);
+    return menu;
   }
 
-  public void showMenu(final Object source, final Component component, final int x, final int y) {
+  public JPopupMenu showMenu(final Object source, final Component component, final int x,
+    final int y) {
     setMenuSource(source);
-    showMenu(component, x, y);
+    return showMenu(component, x, y);
   }
 
-  public boolean showMenu(final Object source, final MouseEvent e) {
+  public JPopupMenu showMenu(final Object source, final MouseEvent e) {
     if (e.isPopupTrigger() && !e.isConsumed()) {
       final Component component = e.getComponent();
       final int x = e.getX();
       final int y = e.getY();
-      showMenu(source, component, x + 5, y);
-      return true;
+      return showMenu(source, component, x + 5, y);
     } else {
-      return false;
+      return null;
     }
   }
 

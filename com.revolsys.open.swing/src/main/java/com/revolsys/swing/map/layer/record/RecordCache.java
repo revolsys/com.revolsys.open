@@ -20,6 +20,8 @@ public interface RecordCache {
 
   <R extends LayerRecord> void forEachRecord(Consumer<R> action);
 
+  String getCacheId();
+
   default <R extends LayerRecord> List<R> getRecords() {
     final List<R> records = new ArrayList<>();
     final Consumer<R> action = records::add;
@@ -36,4 +38,5 @@ public interface RecordCache {
   boolean removeRecord(LayerRecord record);
 
   boolean replaceRecord(LayerRecord record);
+
 }

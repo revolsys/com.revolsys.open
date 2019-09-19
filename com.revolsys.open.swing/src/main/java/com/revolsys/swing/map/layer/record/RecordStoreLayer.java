@@ -98,10 +98,16 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   protected void addCachedRecordIds(final Set<Identifier> identifiers) {
-    final Consumer<RecordCacheRecordStoreLayer> action = records -> {
-      records.addIdentifiersToSet(identifiers);
-    };
-    forEachRecordCache(action);
+    forEachRecordCache(cache -> {
+      if (cache instanceof RecordCacheDelegating) {
+        final RecordCacheDelegating delegating = (RecordCacheDelegating)cache;
+        cache = delegating.getCache();
+      }
+      if (cache instanceof RecordCacheRecordStoreLayer) {
+        final RecordCacheRecordStoreLayer storeCached = (RecordCacheRecordStoreLayer)cache;
+        storeCached.addIdentifiersToSet(identifiers);
+      }
+    });
   }
 
   protected void cancelLoading(final BoundingBox loadedBoundingBox) {
@@ -167,6 +173,15 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return result;
   }
 
+  protected RecordStoreLayerRecord findCachedRecord(final LayerRecord record) {
+    final Identifier identifier = record.getIdentifier();
+    if (identifier == null) {
+      return null;
+    } else {
+      return this.recordsByIdentifier.get(identifier);
+    }
+  }
+
   @Override
   protected void forEachRecordInternal(Query query, final Consumer<? super LayerRecord> consumer) {
     if (isExists()) {
@@ -196,7 +211,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
               if (identifier == null) {
                 record = newProxyLayerRecordNoId(record);
               } else {
-                final LayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
+                final LayerRecord cachedRecord = findCachedRecord(record);
                 if (cachedRecord != null) {
                   record = cachedRecord;
                   if (record.isChanged() || isDeleted(record)) {
@@ -275,7 +290,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   @Override
   protected <R extends LayerRecord> R getCachedRecord(final Identifier identifier) {
     final RecordDefinition recordDefinition = getInternalRecordDefinition();
-
     synchronized (getSync()) {
       LayerRecord record = this.recordsByIdentifier.get(identifier);
       if (record == null) {
@@ -309,11 +323,11 @@ public class RecordStoreLayer extends AbstractRecordLayer {
    * @param identifier
    * @param record
    */
-  LayerRecord getCachedRecord(final Identifier identifier, final LayerRecord record,
+  protected LayerRecord getCachedRecord(final Identifier identifier, final LayerRecord record,
     final boolean updateRecord) {
     assert !(record instanceof AbstractProxyLayerRecord);
     synchronized (getSync()) {
-      final RecordStoreLayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
+      final RecordStoreLayerRecord cachedRecord = findCachedRecord(record);
       if (cachedRecord == null) {
         addCachedRecord(identifier, record);
         return record;
@@ -699,8 +713,10 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       if (identifier == null) {
         record = new NoIdProxyLayerRecord(this, record);
       } else {
-        addCachedRecord(identifier, record);
-        record = newProxyLayerRecord(identifier);
+        synchronized (getSync()) {
+          addCachedRecord(identifier, record);
+          record = newProxyLayerRecord(identifier);
+        }
       }
     }
     return (R)record;

@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.undo.UndoableEdit;
 
 import org.jeometry.common.awt.WebColors;
@@ -1058,7 +1059,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         final LayerRecord record = location.getRecord();
         if (record != null) {
           final LayerRecordMenu menu = record.getMenu();
-          menu.showMenu(record, event);
+          cancel();
+          final JPopupMenu popupMenu = menu.showMenu(record, event);
         }
         event.consume();
         return true;

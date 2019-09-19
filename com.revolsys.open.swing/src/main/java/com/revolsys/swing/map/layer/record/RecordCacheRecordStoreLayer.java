@@ -53,9 +53,10 @@ public class RecordCacheRecordStoreLayer extends AbstractRecordCache<RecordStore
   @Override
   public <R extends LayerRecord> void forEachRecord(final Consumer<R> action) {
     this.parentCache.forEachRecord(action);
+    final RecordStoreLayer layer = this.layer;
     for (final Identifier identifier : this.identifiers) {
       @SuppressWarnings("unchecked")
-      final R record = (R)this.layer.getRecordById(identifier);
+      final R record = (R)layer.getRecordById(identifier);
       if (record != null) {
         action.accept(record);
       }
