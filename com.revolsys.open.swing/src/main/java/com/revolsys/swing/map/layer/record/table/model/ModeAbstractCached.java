@@ -312,6 +312,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
       for (int recordIndex = 0; recordIndex < this.recordCount;) {
         final LayerRecord record2 = this.records.get(recordIndex);
         if (record2.getState() == RecordState.DELETED || record2.isSame(record)) {
+          this.records.remove(recordIndex);
           clearCurrentRecord();
           setRecordCount(this.recordCount - 1);
           this.model.fireTableRowsDeleted(recordIndex, recordIndex);

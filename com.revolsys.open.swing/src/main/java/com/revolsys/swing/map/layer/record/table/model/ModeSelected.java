@@ -17,7 +17,6 @@ public class ModeSelected extends ModeAbstractCached {
 
   public ModeSelected(final RecordLayerTableModel model) {
     super(RecordLayerTableModel.MODE_RECORDS_SELECTED, model);
-    final AbstractRecordLayer layer = getLayer();
   }
 
   @Override

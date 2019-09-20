@@ -84,7 +84,6 @@ public class ListRecordLayer extends AbstractRecordLayer {
   @Override
   protected void deleteRecordsPost(final List<LayerRecord> recordsDeleted,
     final List<LayerRecord> recordsSelected) {
-    removeFromIndex(recordsDeleted);
     for (final LayerRecord record : recordsDeleted) {
       removeRecord(record);
     }
@@ -227,7 +226,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   protected void removeRecord(final LayerRecord record) {
-    removeFromIndex(record);
+    removeRecordFromCache(record);
     synchronized (this.records) {
       record.removeFrom(this.records);
     }

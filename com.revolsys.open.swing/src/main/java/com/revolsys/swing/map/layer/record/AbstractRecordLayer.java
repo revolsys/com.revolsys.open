@@ -781,7 +781,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected void deleteRecordPre(final LayerRecord record) {
-    removeFromIndex(record);
     removeRecordFromCache(record);
   }
 
@@ -875,7 +874,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  protected void fireHasChangedRecords() {
+  public void fireHasChangedRecords() {
     final boolean hasChangedRecords = isHasChangedRecords();
     firePropertyChange("hasChangedRecords", !hasChangedRecords, hasChangedRecords);
   }
@@ -1760,7 +1759,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   private boolean internalCancelChanges(final RecordCache cache) {
     boolean cancelled = true;
     for (final LayerRecord record : cache.getRecords()) {
-      removeFromIndex(record);
       try {
         cache.removeRecord(record);
         if (cache == this.recordCacheNew) {
@@ -2361,7 +2359,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
     if (deleted) {
       removeRecordFromCache(record);
-      removeFromIndex(record);
       return true;
     } else {
       return false;
@@ -2497,16 +2494,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         return this.index.removeRecord(boundingBox, record);
       }
     }
-  }
-
-  public void removeFromIndex(final Collection<? extends LayerRecord> records) {
-    for (final LayerRecord record : records) {
-      removeFromIndex(record);
-    }
-  }
-
-  public void removeFromIndex(final LayerRecord record) {
-    this.recordCacheIndex.removeRecord(record);
   }
 
   protected void removeHighlightedRecord(final LayerRecord record) {
