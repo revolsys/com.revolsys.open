@@ -12,6 +12,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.simplify.DouglasPeuckerSimplifier;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
+import com.revolsys.swing.component.ProgressMonitor;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.NumberTextField;
 
@@ -24,11 +25,12 @@ public class RecordLayerActions {
 
   public static void generalize(final List<LayerRecord> records, final Double distanceTolerance) {
     if (distanceTolerance != null) {
-      for (final LayerRecord record : records) {
+      ProgressMonitor.background("Generalize " + records.size() + " records", records, record -> {
         final Geometry geometry = record.getGeometry();
-        final Geometry newGeometry = DouglasPeuckerSimplifier.simplify(geometry, distanceTolerance);
+        final Geometry newGeometry = DouglasPeuckerSimplifier.simplify(geometry, distanceTolerance,
+          true);
         record.setGeometryValue(newGeometry);
-      }
+      });
     }
   }
 

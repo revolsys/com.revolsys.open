@@ -97,6 +97,10 @@ public class DouglasPeuckerSimplifier {
       } else {
         final Point[] newPts = DouglasPeuckerLineSimplifier.simplify(coords,
           DouglasPeuckerSimplifier.this.distanceTolerance);
+        if (DouglasPeuckerSimplifier.this.fixedLineEnds && coords instanceof LineString) {
+          newPts[0] = coords.getFromPoint();
+          newPts[newPts.length - 1] = coords.getToPoint();
+        }
         return new LineStringDouble(newPts);
       }
     }
@@ -147,29 +151,37 @@ public class DouglasPeuckerSimplifier {
   /**
    * Simplifies a geometry using a given tolerance.
    *
-   * @param geom geometry to simplify
+   * @param geometry geometry to simplify
    * @param distanceTolerance the tolerance to use
    * @return a simplified version of the geometry
    */
-  public static Geometry simplify(final Geometry geom, final double distanceTolerance) {
-    final DouglasPeuckerSimplifier tss = new DouglasPeuckerSimplifier(geom);
+  public static Geometry simplify(final Geometry geometry, final double distanceTolerance) {
+    return simplify(geometry, distanceTolerance, false);
+  }
+
+  public static Geometry simplify(final Geometry geometry, final double distanceTolerance,
+    final boolean fixedLineEnds) {
+    final DouglasPeuckerSimplifier tss = new DouglasPeuckerSimplifier(geometry, fixedLineEnds);
     tss.setDistanceTolerance(distanceTolerance);
     return tss.getResultGeometry();
   }
 
   private double distanceTolerance;
 
-  private final Geometry inputGeom;
+  private final Geometry geometry;
 
   private boolean isEnsureValidTopology = true;
+
+  private final boolean fixedLineEnds;
 
   /**
    * Creates a simplifier for a given geometry.
    *
-   * @param inputGeom the geometry to simplify
+   * @param geometry the geometry to simplify
    */
-  public DouglasPeuckerSimplifier(final Geometry inputGeom) {
-    this.inputGeom = inputGeom;
+  private DouglasPeuckerSimplifier(final Geometry geometry, final boolean fixedLineEnds) {
+    this.geometry = geometry;
+    this.fixedLineEnds = fixedLineEnds;
   }
 
   /**
@@ -179,11 +191,11 @@ public class DouglasPeuckerSimplifier {
    */
   public Geometry getResultGeometry() {
     // empty input produces an empty result
-    if (this.inputGeom.isEmpty()) {
-      return this.inputGeom.clone();
+    if (this.geometry.isEmpty()) {
+      return this.geometry.clone();
     }
 
-    return new DPTransformer(this.isEnsureValidTopology).transform(this.inputGeom);
+    return new DPTransformer(this.isEnsureValidTopology).transform(this.geometry);
   }
 
   /**

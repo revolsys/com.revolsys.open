@@ -6,6 +6,7 @@ import java.awt.FlowLayout;
 import java.awt.Window;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -58,6 +59,21 @@ public class ProgressMonitor extends JDialog implements Cancellable, WindowListe
         progressMonitor.setVisible(true);
       }
     });
+  }
+
+  public static <V> void background(final String title, final Collection<V> objects,
+    final Consumer<V> action) {
+    background(SwingUtil.getActiveWindow(), title, null, monitor -> {
+      for (final V object : monitor.cancellable(objects)) {
+        action.accept(object);
+        monitor.addProgress();
+      }
+    }, objects.size());
+  }
+
+  public static void background(final String title, final String note,
+    final Consumer<ProgressMonitor> task, final int max) {
+    background(SwingUtil.getActiveWindow(), title, note, task, max);
   }
 
   public static void ui(final Component component, final String title, final String note,
