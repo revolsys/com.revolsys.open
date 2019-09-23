@@ -37,19 +37,15 @@ public class SetRecordsFieldValue extends AbstractUpdateField {
   }
 
   @Override
-  protected String getProgressMonitorTitle() {
-    return "Set " + this.getFieldDefinition().getName() + "=" + this.editField.getFieldValue();
-  }
-
-  @Override
-  protected void initDialog() {
-    // setMinimumSize(new Dimension(300, 50));
-    super.initDialog();
+  protected String getProgressMonitorNote() {
+    final FieldDefinition fieldDefinition = getFieldDefinition();
+    return "Set " + fieldDefinition.getName() + "="
+      + fieldDefinition.getCodeValue(this.editField.getFieldValue());
   }
 
   @Override
   protected JPanel initFieldPanel() {
-    final FieldDefinition fieldDefinition = this.getFieldDefinition();
+    final FieldDefinition fieldDefinition = getFieldDefinition();
 
     final JPanel fieldPanel = new JPanel();
     final String fieldName = fieldDefinition.getName();
@@ -68,7 +64,7 @@ public class SetRecordsFieldValue extends AbstractUpdateField {
 
   @Override
   public void updateRecord(final LayerRecord record) {
-    final String fieldName = this.getFieldDefinition().getName();
+    final String fieldName = getFieldDefinition().getName();
     final Object value = this.editField.getFieldValue();
     record.setValue(fieldName, value);
   }

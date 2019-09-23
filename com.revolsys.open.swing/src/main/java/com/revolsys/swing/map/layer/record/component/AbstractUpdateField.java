@@ -1,13 +1,13 @@
 package com.revolsys.swing.map.layer.record.component;
 
 import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -16,8 +16,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
 
 import org.jdesktop.swingx.VerticalLayout;
@@ -27,13 +25,13 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.swing.component.ProgressMonitor;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerErrors;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.TablePanel;
 
 public abstract class AbstractUpdateField extends JDialog {
@@ -92,70 +90,46 @@ public abstract class AbstractUpdateField extends JDialog {
   }
 
   private void finish() {
+    final Window parent = (Window)getParent();
     if (this.recordCount > 100) {
       final int confirm = JOptionPane.showConfirmDialog(this,
-        "<html>Update <b style='color:#32CD32'>" + this.recordCountString
-          + "</b> records? This may take a long time or fail if there are many records.</html>",
-        "Update Records?", JOptionPane.YES_NO_OPTION);
+        "<html><p>Update <b style='color:#32CD32'>" + this.recordCountString + "</b> records?</p>"
+          + "<p>This may take a long time or fail if there are many records.</html>",
+        "Update Records?</p><html>", JOptionPane.YES_NO_OPTION);
       if (confirm != JOptionPane.YES_OPTION) {
         setVisible(false);
         return;
       }
     }
-    final ProgressMonitor progressMonitor = new ProgressMonitor(this, getProgressMonitorTitle(),
-      "Updated 0 of " + this.recordCountString, 0, 100);
-    progressMonitor.setProgress(0);
     setVisible(false);
-    final AtomicInteger progress = new AtomicInteger();
-    final SwingWorker<?, ?> task = new SwingWorker<Void, Void>() {
-      @Override
-      protected Void doInBackground() throws Exception {
-        final Set<String> fieldNames = new LinkedHashSet<>();
-        fieldNames.add(AbstractUpdateField.this.fieldDefinition.getName());
-        fieldNames.addAll(AbstractUpdateField.this.layer.getFieldNames());
-        final RecordLayerErrors errors = new RecordLayerErrors("Setting Field Values",
-          AbstractUpdateField.this.layer, fieldNames);
-        AbstractUpdateField.this.tableModel.forEachRecord((record) -> {
-          if (progressMonitor.isCanceled()) {
-            throw new CancellationException();
-          } else {
-            try {
-              updateRecord(record);
-            } catch (final WrappedException e) {
-              errors.addRecord(record, e.getCause());
-            } catch (final Throwable e) {
-              errors.addRecord(record, e);
-            }
-            final int updateCount = progress.incrementAndGet();
-            if (updateCount < AbstractUpdateField.this.recordCount) {
-              final int updatePercent = (int)Math
-                .floor(updateCount * 100 / (double)AbstractUpdateField.this.recordCount);
-              if (updatePercent < 100) {
-                setProgress(updatePercent);
-              }
-            }
+
+    final String title = getTitle();
+    final String note = getProgressMonitorNote();
+    final Set<String> fieldNames = new LinkedHashSet<>();
+    fieldNames.add(AbstractUpdateField.this.fieldDefinition.getName());
+    fieldNames.addAll(AbstractUpdateField.this.layer.getFieldNames());
+    final RecordLayerErrors errors = new RecordLayerErrors("Setting Field Values",
+      AbstractUpdateField.this.layer, fieldNames);
+    ProgressMonitor.background(parent, title, note, progressMonitor -> {
+      AbstractUpdateField.this.tableModel.forEachRecord((record) -> {
+        if (progressMonitor.isCancelled()) {
+          throw new CancellationException();
+        } else {
+          try {
+            updateRecord(record);
+          } catch (final WrappedException e) {
+            errors.addRecord(record, e.getCause());
+          } catch (final Throwable e) {
+            errors.addRecord(record, e);
           }
-        });
-        setProgress(100);
-        if (!isCancelled()) {
-          errors.showErrorDialog();
+          progressMonitor.addProgress();
         }
-        return null;
-      }
+      });
 
-      @Override
-      protected void done() {
-      }
-
-    };
-    task.addPropertyChangeListener((event) -> {
-      if ("progress" == event.getPropertyName()) {
-        final int percent = (Integer)event.getNewValue();
-        progressMonitor.setProgress(percent);
-        progressMonitor.setNote("Updated " + progress + " of " + this.recordCountString);
-      }
+    }, this.recordCount, () -> {
+      errors.showErrorDialog();
     });
-    Invoke.worker(task);
+
   }
 
   protected FieldDefinition getFieldDefinition() {
@@ -166,7 +140,7 @@ public abstract class AbstractUpdateField extends JDialog {
     return this.layer;
   }
 
-  protected String getProgressMonitorTitle() {
+  protected String getProgressMonitorNote() {
     return "Set " + this.fieldDefinition.getName();
   }
 

@@ -481,10 +481,7 @@ public interface Record
     Object value = getValue(fieldName);
     if (Property.hasValue(value)) {
       final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
-      final CodeTable codeTable = fieldDefinition.getCodeTable();
-      if (codeTable != null) {
-        value = codeTable.getValue(value);
-      }
+      value = fieldDefinition.getCodeValue(value);
     }
     return (T)value;
   }
@@ -494,10 +491,7 @@ public interface Record
     Object value = getValue(fieldIndex);
     if (Property.hasValue(value)) {
       final FieldDefinition fieldDefinition = getFieldDefinition(fieldIndex);
-      final CodeTable codeTable = fieldDefinition.getCodeTable();
-      if (codeTable != null) {
-        value = codeTable.getValue(value);
-      }
+      value = fieldDefinition.getCodeValue(value);
     }
     return (T)value;
   }

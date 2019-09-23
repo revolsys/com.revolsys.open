@@ -113,8 +113,8 @@ public class FieldCalculator extends AbstractUpdateField implements DocumentList
   }
 
   @Override
-  protected String getProgressMonitorTitle() {
-    return "Calculating " + this.getFieldDefinition().getName() + " values";
+  protected String getProgressMonitorNote() {
+    return "Calculating " + getFieldDefinition().getName() + " values";
   }
 
   @Override
@@ -139,7 +139,7 @@ public class FieldCalculator extends AbstractUpdateField implements DocumentList
 
   @Override
   protected JPanel initFieldPanel() {
-    final FieldDefinition fieldDefinition = this.getFieldDefinition();
+    final FieldDefinition fieldDefinition = getFieldDefinition();
     final String fieldName = fieldDefinition.getName();
 
     final JPanel fieldPanel = new JPanel(new VerticalLayout());

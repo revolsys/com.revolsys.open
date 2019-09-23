@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.record;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.swing.JLabel;
 
@@ -18,6 +19,13 @@ import com.revolsys.swing.field.NumberTextField;
 
 public class RecordLayerActions {
 
+  public static void background(final String title, final List<LayerRecord> records,
+    final Consumer<LayerRecord> action) {
+    final int recordCount = records.size();
+    final String fullTitle = title + " " + recordCount + " records";
+    ProgressMonitor.background(fullTitle, records, action);
+  }
+
   public static void generalize(final AbstractRecordLayer layer, final List<LayerRecord> records) {
     final Double distanceTolerance = generalizeGetDistance(layer);
     generalize(records, distanceTolerance);
@@ -25,12 +33,14 @@ public class RecordLayerActions {
 
   public static void generalize(final List<LayerRecord> records, final Double distanceTolerance) {
     if (distanceTolerance != null) {
-      ProgressMonitor.background("Generalize " + records.size() + " records", records, record -> {
+      final Consumer<LayerRecord> action = record -> {
         final Geometry geometry = record.getGeometry();
         final Geometry newGeometry = DouglasPeuckerSimplifier.simplify(geometry, distanceTolerance,
           true);
         record.setGeometryValue(newGeometry);
-      });
+      };
+      final String title = "Generalize";
+      background(title, records, action);
     }
   }
 

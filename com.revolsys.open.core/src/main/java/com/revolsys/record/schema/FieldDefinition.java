@@ -364,6 +364,17 @@ public class FieldDefinition extends BaseObjectWithProperties
     return this.codeTable;
   }
 
+  @SuppressWarnings("unchecked")
+  public <V> V getCodeValue(final Object value) {
+    if (value != null && this.codeTable != null) {
+      final V codeValue = this.codeTable.getValue(value);
+      if (codeValue != null) {
+        return codeValue;
+      }
+    }
+    return (V)value;
+  }
+
   /**
    * Get the data type of the field value.
    *
