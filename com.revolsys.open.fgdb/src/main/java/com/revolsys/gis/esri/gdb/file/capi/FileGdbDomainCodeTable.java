@@ -55,11 +55,6 @@ public class FileGdbDomainCodeTable implements CodeTable {
     }
   }
 
-  @Override
-  public Map<Identifier, List<Object>> getCodes() {
-    return this.domain.getCodes();
-  }
-
   public Domain getDomain() {
     return this.domain;
   }
@@ -70,8 +65,8 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
-  public Identifier getIdentifier(final List<Object> values, final boolean loadMissing) {
-    final Identifier id = this.domain.getIdentifier(values, loadMissing);
+  public Identifier getIdentifier(final List<Object> values) {
+    final Identifier id = this.domain.getIdentifier(values);
     if (id == null) {
       return newIdentifier((String)values.get(0));
     }
@@ -89,7 +84,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
 
   @Override
   public List<Identifier> getIdentifiers() {
-    return new ArrayList<>(getCodes().keySet());
+    return new ArrayList<>(this.domain.getIdentifiers());
   }
 
   @Override

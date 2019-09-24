@@ -13,6 +13,7 @@ import java.util.zip.ZipInputStream;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.number.BigDecimals;
 import org.jeometry.common.number.Doubles;
+import org.jeometry.common.number.Numbers;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.MapEx;
@@ -224,7 +225,8 @@ public class EsriAsciiGriddedElevationModelReader extends AbstractIterator<Point
       double yCorner = Double.NaN;
       while (Double.isNaN(this.elevation)) {
         String keyword = Readers.readKeyword(reader);
-        if (BigDecimals.isNumber(keyword)) {
+        final Object value = keyword;
+        if (Numbers.isNumber(value)) {
           this.elevation = Doubles.toValid(keyword);
         } else {
           keyword = keyword.toLowerCase();

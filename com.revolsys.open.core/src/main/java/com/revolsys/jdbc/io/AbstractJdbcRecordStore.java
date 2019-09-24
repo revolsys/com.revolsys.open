@@ -46,7 +46,7 @@ import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
-import com.revolsys.record.code.AbstractCodeTable;
+import com.revolsys.record.code.AbstractMultiValueCodeTable;
 import com.revolsys.record.io.RecordStoreExtension;
 import com.revolsys.record.io.RecordStoreQueryReader;
 import com.revolsys.record.io.RecordWriter;
@@ -840,8 +840,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     this.batchSize = batchSize;
   }
 
-  public void setCodeTables(final List<AbstractCodeTable> codeTables) {
-    for (final AbstractCodeTable codeTable : codeTables) {
+  public void setCodeTables(final List<AbstractMultiValueCodeTable> codeTables) {
+    for (final AbstractMultiValueCodeTable codeTable : codeTables) {
       addCodeTable(codeTable);
     }
   }

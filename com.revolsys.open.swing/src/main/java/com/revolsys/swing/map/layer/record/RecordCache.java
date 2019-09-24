@@ -1,12 +1,15 @@
 package com.revolsys.swing.map.layer.record;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
 public interface RecordCache {
 
-  boolean addRecord(LayerRecord record);
+  default boolean addRecord(final LayerRecord record) {
+    throw new UnsupportedOperationException();
+  }
 
   default void addRecords(final Iterable<? extends LayerRecord> records) {
     for (final LayerRecord record : records) {
@@ -14,11 +17,15 @@ public interface RecordCache {
     }
   }
 
-  void clearRecords();
+  default void clearRecords() {
+  }
 
-  boolean containsRecord(LayerRecord record);
+  default boolean containsRecord(final LayerRecord record) {
+    throw new UnsupportedOperationException();
+  }
 
-  <R extends LayerRecord> void forEachRecord(Consumer<R> action);
+  default <R extends LayerRecord> void forEachRecord(final Consumer<R> action) {
+  }
 
   String getCacheId();
 
@@ -29,14 +36,28 @@ public interface RecordCache {
     return records;
   }
 
-  int getSize();
+  default int getSize() {
+    return 0;
+  }
 
   default boolean hasRecords() {
     return getSize() > 0;
   }
 
+  default boolean removeContainsRecord(final LayerRecord record) {
+    throw new UnsupportedOperationException();
+  }
+
   boolean removeRecord(LayerRecord record);
 
-  boolean replaceRecord(LayerRecord record);
+  default void removeRecords(final Collection<? extends LayerRecord> records) {
+    for (final LayerRecord record : records) {
+      removeRecord(record);
+    }
+  }
+
+  default boolean replaceRecord(final LayerRecord record) {
+    return false;
+  }
 
 }

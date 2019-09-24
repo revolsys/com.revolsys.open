@@ -33,20 +33,33 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
 
   @Override
   public final boolean containsRecord(final LayerRecord record) {
-    final L layer = this.layer;
-    synchronized (layer.getSync()) {
-      final LayerRecord recordProxied = layer.getProxiedRecord(record);
-      if (recordProxied != null) {
-        return containsRecordDo(recordProxied);
-      }
+    final LayerRecord recordProxied = this.layer.getProxiedRecord(record);
+    if (recordProxied != null) {
+      return containsRecordDo(recordProxied);
     }
     return false;
   }
 
   public abstract boolean containsRecordDo(LayerRecord record);
 
+  @Override
   public String getCacheId() {
     return this.cacheId;
+  }
+
+  @Override
+  public boolean removeContainsRecord(final LayerRecord record) {
+    final L layer = this.layer;
+    synchronized (layer.getSync()) {
+      final LayerRecord recordProxied = this.layer.getProxiedRecord(record);
+      if (recordProxied != null) {
+        if (containsRecordDo(record)) {
+          removeRecordDo(record);
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   @Override
@@ -58,7 +71,7 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
         return removeRecordDo(proxiedRecord);
       }
     }
-    return false;
+    return true;
   }
 
   public abstract boolean removeRecordDo(LayerRecord proxiedRecord);
@@ -68,7 +81,7 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
     final L layer = this.layer;
     synchronized (layer.getSync()) {
       final LayerRecord proxiedRecord = layer.getProxiedRecord(record);
-      if (removeRecordDo(proxiedRecord)) {
+      if (removeContainsRecord(proxiedRecord)) {
         return addRecordDo(proxiedRecord);
       }
     }

@@ -1,6 +1,6 @@
 package com.revolsys.swing.map.layer.record;
 
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -8,7 +8,7 @@ import org.jeometry.common.data.identifier.Identifier;
 
 public class RecordCacheRecordStoreLayer extends AbstractRecordCache<RecordStoreLayer> {
 
-  private final Set<Identifier> identifiers = new LinkedHashSet<>();
+  final Set<Identifier> identifiers = new HashSet<>();
 
   protected final RecordCacheCollection parentCache;
 
@@ -18,10 +18,6 @@ public class RecordCacheRecordStoreLayer extends AbstractRecordCache<RecordStore
     this.parentCache = parentCache;
   }
 
-  public void addIdentifiersToSet(final Set<Identifier> identifiers) {
-    identifiers.addAll(this.identifiers);
-  }
-
   @Override
   public boolean addRecordDo(final LayerRecord record) {
     final Identifier identifier = record.getIdentifier();
@@ -29,13 +25,17 @@ public class RecordCacheRecordStoreLayer extends AbstractRecordCache<RecordStore
       return this.parentCache.addRecordDo(record);
     } else {
       this.layer.getCachedRecord(identifier, record, false);
-      return this.identifiers.add(identifier);
+      synchronized (this.identifiers) {
+        return this.identifiers.add(identifier);
+      }
     }
   }
 
   @Override
   public void clearRecords() {
-    this.identifiers.clear();
+    synchronized (this.identifiers) {
+      this.identifiers.clear();
+    }
     this.parentCache.clearRecords();
   }
 
@@ -43,8 +43,10 @@ public class RecordCacheRecordStoreLayer extends AbstractRecordCache<RecordStore
   public boolean containsRecordDo(final LayerRecord record) {
     final Identifier identifier = record.getIdentifier();
     if (identifier != null) {
-      if (this.identifiers.contains(identifier)) {
-        return true;
+      synchronized (this.identifiers) {
+        if (this.identifiers.contains(identifier)) {
+          return true;
+        }
       }
     }
     return this.parentCache.containsRecordDo(record);
@@ -70,17 +72,19 @@ public class RecordCacheRecordStoreLayer extends AbstractRecordCache<RecordStore
 
   @Override
   public boolean removeRecordDo(final LayerRecord record) {
-    boolean removed = false;
     final Identifier identifier = record.getIdentifier();
     if (identifier != null) {
-      removed |= this.identifiers.remove(identifier);
+      synchronized (this.identifiers) {
+        this.identifiers.remove(identifier);
+      }
     }
-    removed |= this.parentCache.removeRecordDo(record);
-    return removed;
+    this.parentCache.removeRecordDo(record);
+    return true;
+
   }
 
   @Override
   public String toString() {
-    return this.identifiers.size() + "\t" + this.parentCache.getSize();
+    return this.parentCache.toString() + "\t" + this.identifiers.size();
   }
 }

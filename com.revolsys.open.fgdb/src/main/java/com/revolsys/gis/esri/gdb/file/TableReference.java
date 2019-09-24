@@ -189,13 +189,15 @@ public class TableReference extends CloseableValueHolder<Table> {
       .threadGeodatabaseResult(geodatabase -> geodatabase.openTable(this.catalogPath));
   }
 
-  synchronized TableWrapper writeLock() {
+  synchronized TableWrapper writeLock(final boolean loadOnlyMode) {
     final Table table = getValue();
     final boolean locked = this.lockCount > 0;
     this.lockCount++;
     if (!locked) {
       this.recordStore.lockTable(table);
-      table.setLoadOnlyMode(true);
+      if (loadOnlyMode) {
+        table.setLoadOnlyMode(true);
+      }
     }
     return this.locker;
   }

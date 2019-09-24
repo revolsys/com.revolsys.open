@@ -16,7 +16,7 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
-import com.revolsys.record.code.SimpleCodeTable;
+import com.revolsys.record.code.SingleValueCodeTable;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.GeometryType;
@@ -320,7 +320,7 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
       final List<MapEx> codedValues = (List<MapEx>)domain.get("codedValues");
 
       if ("codedValue".equals(domainType) && Property.hasValuesAll(domainName, codedValues)) {
-        final SimpleCodeTable codeTable = new SimpleCodeTable(domainName);
+        final SingleValueCodeTable codeTable = new SingleValueCodeTable(domainName);
         for (final MapEx codedValue : codedValues) {
           final String code = codedValue.getString("code");
           final String description = codedValue.getString("name");

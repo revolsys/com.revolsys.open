@@ -32,7 +32,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.code.CodeTable;
-import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.io.ListRecordReader;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordStoreConnection;
@@ -275,14 +274,12 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     }
   }
 
-  @SuppressWarnings("unchecked")
-  default <V extends CodeTable> V getCodeTable(final PathName typePath) {
+  default <CT extends CodeTable> CT getCodeTable(final PathName typePath) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     if (recordDefinition == null) {
       return null;
     } else {
-      final CodeTableProperty codeTable = CodeTableProperty.getProperty(recordDefinition);
-      return (V)codeTable;
+      return recordDefinition.getCodeTable();
     }
   }
 

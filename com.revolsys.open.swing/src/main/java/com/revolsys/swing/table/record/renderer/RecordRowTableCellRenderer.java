@@ -8,6 +8,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import org.jeometry.common.number.BigDecimals;
+import org.jeometry.common.number.Numbers;
 
 import com.revolsys.record.Record;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
@@ -39,7 +40,7 @@ public class RecordRowTableCellRenderer extends DefaultTableCellRenderer {
       }
       super.getTableCellRendererComponent(table, displayValue, selected, hasFocus, rowIndex,
         columnIndex);
-      if (BigDecimals.isNumber(displayValue)) {
+      if (Numbers.isNumber(displayValue)) {
         setHorizontalAlignment(SwingConstants.RIGHT);
         setHorizontalTextPosition(SwingConstants.RIGHT);
       } else {

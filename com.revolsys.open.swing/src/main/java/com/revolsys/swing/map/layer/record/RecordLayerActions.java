@@ -19,13 +19,6 @@ import com.revolsys.swing.field.NumberTextField;
 
 public class RecordLayerActions {
 
-  public static void background(final String title, final List<LayerRecord> records,
-    final Consumer<LayerRecord> action) {
-    final int recordCount = records.size();
-    final String fullTitle = title + " " + recordCount + " records";
-    ProgressMonitor.background(fullTitle, records, action);
-  }
-
   public static void generalize(final AbstractRecordLayer layer, final List<LayerRecord> records) {
     final Double distanceTolerance = generalizeGetDistance(layer);
     generalize(records, distanceTolerance);
@@ -40,7 +33,7 @@ public class RecordLayerActions {
         record.setGeometryValue(newGeometry);
       };
       final String title = "Generalize";
-      background(title, records, action);
+      ProgressMonitor.background(title, records, action);
     }
   }
 

@@ -41,6 +41,8 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
 
   void destroy();
 
+  <CT extends CodeTable> CT getCodeTable();
+
   CodeTable getCodeTableByFieldName(CharSequence fieldName);
 
   Object getDefaultValue(String fieldName);

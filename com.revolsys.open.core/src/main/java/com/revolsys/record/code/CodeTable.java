@@ -7,21 +7,43 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import javax.swing.JComponent;
 
 import org.jeometry.common.compare.CompareUtil;
 import org.jeometry.common.data.identifier.Identifier;
-import org.jeometry.common.data.type.DataType;
 
-import com.revolsys.collection.list.Lists;
+import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
 
 public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
+  static CodeTable newCodeTable(final Map<String, ? extends Object> config) {
+    if (config.containsKey("valueFieldNames")) {
+      return new MultiValueCodeTableProperty(config);
+    } else {
+      return new SingleValueCodeTableProperty(config);
+    }
+  }
+
+  static CodeTable newCodeTable(final String name, final Object source) {
+    try (
+      final RecordReader reader = RecordReader.newRecordReader(source)) {
+      final int fieldCount = reader.getRecordDefinition().getFieldCount();
+      if (fieldCount == 2) {
+        return SingleValueCodeTable.newCodeTable(name, reader);
+      } else {
+        return MultiValueCodeTable.newCodeTable(name, reader);
+      }
+    }
+  }
+
+  default void addValue(final Record record) {
+    throw new UnsupportedOperationException("addValue");
+  }
+
   @Override
   default int compare(final Object value1, final Object value2) {
     if (value1 == null) {
@@ -39,24 +61,11 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
     }
   }
 
-  Map<Identifier, List<Object>> getCodes();
-
   default List<String> getFieldNameAliases() {
     return Collections.emptyList();
   }
 
-  default Identifier getIdentifier(final List<Object> values) {
-    return getIdentifier(values, true);
-  }
-
-  default Identifier getIdentifier(final List<Object> values, final boolean loadMissing) {
-    for (final Entry<Identifier, List<Object>> entry : getCodes().entrySet()) {
-      if (DataType.equal(entry.getValue(), values)) {
-        return entry.getKey();
-      }
-    }
-    return null;
-  }
+  Identifier getIdentifier(final List<Object> values);
 
   default Identifier getIdentifier(final Map<String, ? extends Object> valueMap) {
     final List<String> valueFieldNames = getValueFieldNames();
@@ -68,16 +77,16 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
     return getIdentifier(values);
   }
 
+  default Identifier getIdentifier(final Object value) {
+    return getIdentifier(Collections.singletonList(value));
+  }
+
   default Identifier getIdentifier(final Object... values) {
     final List<Object> valueList = Arrays.asList(values);
     return getIdentifier(valueList);
   }
 
-  default List<Identifier> getIdentifiers() {
-    final Map<Identifier, List<Object>> codes = getCodes();
-    final Set<Identifier> keySet = codes.keySet();
-    return Lists.toArray(keySet);
-  }
+  List<Identifier> getIdentifiers();
 
   default Identifier getIdExact(final List<Object> values) {
     return getIdExact(values, true);
@@ -167,16 +176,7 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
     return values;
   }
 
-  default List<Object> getValues(final Identifier id) {
-    if (id != null) {
-      final Map<Identifier, List<Object>> codes = getCodes();
-      final List<Object> values = codes.get(id);
-      if (values != null) {
-        return Collections.unmodifiableList(values);
-      }
-    }
-    return null;
-  }
+  List<Object> getValues(final Identifier id);
 
   default List<Object> getValues(final Object id) {
     final Identifier identifier = Identifier.newIdentifier(id);
@@ -209,5 +209,9 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
         refresh();
       }
     }
+  }
+
+  default void setLoadMissingCodes(final boolean loadMissingCodes) {
+    throw new UnsupportedOperationException("setLoadMissingNodes");
   }
 }

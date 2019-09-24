@@ -111,11 +111,6 @@ public class Domain implements CodeTable, Cloneable {
     return this.codedValues;
   }
 
-  @Override
-  public Map<Identifier, List<Object>> getCodes() {
-    return Collections.unmodifiableMap(this.idValueMap);
-  }
-
   public String getDescription() {
     return this.description;
   }
@@ -134,7 +129,7 @@ public class Domain implements CodeTable, Cloneable {
   }
 
   @Override
-  public Identifier getIdentifier(final List<Object> values, final boolean loadMissing) {
+  public Identifier getIdentifier(final List<Object> values) {
     if (values.size() == 1) {
       final Object value = values.get(0);
       if (value == null) {

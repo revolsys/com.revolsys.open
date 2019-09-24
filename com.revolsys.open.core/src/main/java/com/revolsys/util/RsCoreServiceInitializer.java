@@ -15,7 +15,7 @@ import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.raster.commonsimaging.CommonsImagingServiceInitializer;
-import com.revolsys.record.code.CodeTableProperty;
+import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.mapguide.MapGuideWebService;
@@ -52,17 +52,14 @@ public class RsCoreServiceInitializer implements ServiceInitializer {
       return FieldDefinition.newFieldDefinition(config);
     });
 
-    MapObjectFactoryRegistry.newFactory("recordDefinition", "Data Record Definition", config -> {
-      return RecordDefinitionImpl.newRecordDefinition(config);
-    });
+    MapObjectFactoryRegistry.newFactory("recordDefinition", "Data Record Definition",
+      config -> RecordDefinitionImpl.newRecordDefinition(config));
 
-    MapObjectFactoryRegistry.newFactory("recordStore", "Record Store", config -> {
-      return RecordStore.newRecordStoreInitialized(config);
-    });
+    MapObjectFactoryRegistry.newFactory("recordStore", "Record Store",
+      config -> RecordStore.newRecordStoreInitialized(config));
 
-    MapObjectFactoryRegistry.newFactory("codeTable", "Code Table", config -> {
-      return new CodeTableProperty(config);
-    });
+    MapObjectFactoryRegistry.newFactory("codeTable", "Code Table",
+      config -> CodeTable.newCodeTable(config));
 
     MapObjectFactoryRegistry.newFactory("recordReaderFactoryFile",
       "Factory to create a RecordReader from a file", config -> {

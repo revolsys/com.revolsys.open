@@ -33,7 +33,6 @@ import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
-import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.property.RecordDefinitionProperty;
 import com.revolsys.record.property.ValueRecordDefinitionProperty;
@@ -57,6 +56,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   private Map<String, CodeTable> codeTableByFieldNameMap = new HashMap<>();
 
   private Map<String, Object> defaultValues = new HashMap<>();
+
+  private CodeTable codeTable;
 
   private String description;
 
@@ -165,6 +166,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
       recordDefinition.getFields());
     setPolygonRingDirection(recordDefinition.getPolygonRingDirection());
     setIdFieldIndex(recordDefinition.getIdFieldIndex());
+    this.codeTable = recordDefinition.getCodeTable();
   }
 
   public RecordDefinitionImpl(final RecordStoreSchema schema, final PathName pathName) {
@@ -366,6 +368,12 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     this.superClasses.clear();
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <CT extends CodeTable> CT getCodeTable() {
+    return (CT)this.codeTable;
+  }
+
   @Override
   public CodeTable getCodeTableByFieldName(final CharSequence fieldName) {
     if (fieldName == null) {
@@ -384,10 +392,9 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
       if (codeTable == null && recordStore != null) {
         codeTable = recordStore.getCodeTableByFieldName(fieldName);
       }
-      if (codeTable instanceof CodeTableProperty) {
-        @SuppressWarnings("resource")
-        final CodeTableProperty property = (CodeTableProperty)codeTable;
-        if (property.getRecordDefinition() == this) {
+      if (codeTable instanceof RecordDefinitionProxy) {
+        final RecordDefinitionProxy proxy = (RecordDefinitionProxy)codeTable;
+        if (proxy.getRecordDefinition() == this) {
           return null;
         }
       }
@@ -753,6 +760,10 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     } else {
       addField(newFieldDefinition);
     }
+  }
+
+  public void setCodeTable(final CodeTable codeTable) {
+    this.codeTable = codeTable;
   }
 
   public void setCodeTableByFieldNameMap(final Map<String, CodeTable> codeTableByFieldNameMap) {

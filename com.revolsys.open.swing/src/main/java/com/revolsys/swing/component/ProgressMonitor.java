@@ -87,11 +87,11 @@ public class ProgressMonitor implements Cancellable {
 
   public static void background(final Component component, final String title, final String note,
     final Consumer<ProgressMonitor> task, final int max) {
-    background(component, title, note, task, max, null);
+    background(component, title, note, task, max, (Consumer<Boolean>)null);
   }
 
   public static void background(final Component component, final String title, final String note,
-    final Consumer<ProgressMonitor> task, final int max, final Runnable doneTask) {
+    final Consumer<ProgressMonitor> task, final int max, final Consumer<Boolean> doneTask) {
     Invoke.later(() -> {
       final ProgressMonitor progressMonitor = new ProgressMonitor(component, title, note, true,
         max);
@@ -106,13 +106,18 @@ public class ProgressMonitor implements Cancellable {
       }, r -> {
         progressMonitor.dialog.progressBar.setValue(progressMonitor.progress);
         progressMonitor.setDone();
-        if (!progressMonitor.cancelled && doneTask != null) {
-          component.requestFocus();
-          doneTask.run();
+        component.requestFocus();
+        if (doneTask != null) {
+          doneTask.accept(!progressMonitor.cancelled);
         }
       });
       progressMonitor.show();
     });
+  }
+
+  public static void background(final Component component, final String title, final String note,
+    final Consumer<ProgressMonitor> task, final int max, final Runnable doneTask) {
+    background(component, title, note, task, max, completed -> doneTask.run());
   }
 
   public static <V> void background(final String title, final Collection<V> objects,
@@ -123,6 +128,16 @@ public class ProgressMonitor implements Cancellable {
         monitor.addProgress();
       }
     }, objects.size());
+  }
+
+  public static <V> void background(final String title, final Collection<V> objects,
+    final Consumer<V> action, final Consumer<Boolean> doneTask) {
+    background(SwingUtil.getActiveWindow(), title, null, monitor -> {
+      for (final V object : monitor.cancellable(objects)) {
+        action.accept(object);
+        monitor.addProgress();
+      }
+    }, objects.size(), doneTask);
   }
 
   public static void background(final String title, final String note,

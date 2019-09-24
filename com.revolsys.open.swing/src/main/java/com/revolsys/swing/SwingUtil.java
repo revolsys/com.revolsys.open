@@ -30,7 +30,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map.Entry;
 
 import javax.swing.ActionMap;
 import javax.swing.ComboBoxEditor;
@@ -623,17 +622,15 @@ public interface SwingUtil {
         comboBox.setSelectedIndex(0);
       }
       int longestLength = -1;
-      for (final Entry<Identifier, List<Object>> codes : codeTable.getCodes().entrySet()) {
+      for (final Identifier identifier : codeTable.getIdentifiers()) {
         int length = 0;
         if (idSuffix) {
-          final Identifier identifier = codes.getKey();
           length += identifier.toString().length() + 3;
         }
-        final List<Object> values = codes.getValue();
+        final List<Object> values = codeTable.getValues(identifier);
         if (values != null && !values.isEmpty()) {
           final String text = Strings.toString(values);
           length += text.length();
-
         }
         if (length > longestLength) {
           longestLength = length;

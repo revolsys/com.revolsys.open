@@ -422,11 +422,6 @@ public class AbstractOverlay extends JComponent implements MapOverlay, PropertyC
     return this.map.getProjectFrame();
   }
 
-  protected List<LayerRecord> getSelectedRecords(final BoundingBox boundingBox) {
-    final MapPanel map = getMap();
-    return map.getSelectedRecords(boundingBox);
-  }
-
   protected List<AbstractRecordLayer> getSnapLayers() {
     final Project project = getProject();
     final MapPanel map = getMap();

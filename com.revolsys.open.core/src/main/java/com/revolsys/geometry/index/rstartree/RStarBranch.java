@@ -173,6 +173,7 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
     final boolean isRoot) {
 
     if (bboxIntersects(boundingBox)) {
+      boolean removed = false;
       // this is the easy part: remove nodes if they need to be removed
 
       for (final Iterator<RStarNode<T>> iterator = this.items.iterator(); iterator.hasNext();) {
@@ -183,18 +184,20 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
             if (leafRemoveFilter.test(leaf)) {
               iterator.remove();
               tree.size--;
+              removed = true;
             }
           } else {
             final RStarBranch<T> node = (RStarBranch<T>)item;
             if (node.remove(tree, boundingBox, leafRemoveFilter, itemsToReinsert, false)) {
               iterator.remove();
+              removed = true;
             }
           }
         }
 
       }
 
-      return removeIfEmpty(tree, isRoot, itemsToReinsert);
+      return removed && removeIfEmpty(tree, isRoot, itemsToReinsert);
     }
 
     return false;

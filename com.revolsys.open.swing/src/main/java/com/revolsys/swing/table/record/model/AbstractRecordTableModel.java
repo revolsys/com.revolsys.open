@@ -88,7 +88,7 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel
 
   public void loadCodeTable(final CodeTable codeTable) {
     if (codeTable.isLoadAll() && !codeTable.isLoaded()) {
-      codeTable.getCodes();
+      codeTable.refreshIfNeeded();
       fireTableDataChanged();
     }
   }

@@ -16,17 +16,23 @@ public class RecordCacheCollection extends AbstractRecordCache<AbstractRecordLay
 
   @Override
   public boolean addRecordDo(final LayerRecord record) {
-    return this.records.add(record);
+    synchronized (this.records) {
+      return this.records.add(record);
+    }
   }
 
   @Override
   public void clearRecords() {
-    this.records.clear();
+    synchronized (this.records) {
+      this.records.clear();
+    }
   }
 
   @Override
   public boolean containsRecordDo(final LayerRecord record) {
-    return record.contains(this.records);
+    synchronized (this.records) {
+      return record.contains(this.records);
+    }
   }
 
   @Override
@@ -48,11 +54,14 @@ public class RecordCacheCollection extends AbstractRecordCache<AbstractRecordLay
 
   @Override
   public boolean removeRecordDo(final LayerRecord record) {
-    return record.removeFrom(this.records) != -1;
+    synchronized (this.records) {
+      record.removeFrom(this.records);
+    }
+    return true;
   }
 
   @Override
   public String toString() {
-    return getSize() + "\t" + super.toString();
+    return super.toString() + "\t" + getSize() + "\t";
   }
 }

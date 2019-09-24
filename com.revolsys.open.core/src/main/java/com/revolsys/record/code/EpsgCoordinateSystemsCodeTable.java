@@ -69,39 +69,47 @@ public class EpsgCoordinateSystemsCodeTable implements CodeTable {
   }
 
   @Override
-  public Map<Identifier, List<Object>> getCodes() {
-    return this.codes;
+  public Identifier getIdentifier(final List<Object> values) {
+    if (values.size() == 1) {
+      return getIdentifier(values.get(0));
+    } else {
+      return null;
+    }
   }
 
   @Override
   public Identifier getIdentifier(final Object... values) {
     if (values.length == 1) {
-      final Object value = values[0];
-      CoordinateSystem coordinateSystem = null;
-      if (value instanceof CoordinateSystem) {
-        coordinateSystem = (CoordinateSystem)value;
-      } else {
-        try {
-          final Integer intValue = DataTypes.INT.toObject(value);
-          final Identifier id = Identifier.newIdentifier(intValue);
-          if (this.codes.containsKey(id)) {
-            return id;
-          }
-        } catch (final Exception e) {
-          coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(value.toString());
-        }
-      }
-      if (coordinateSystem != null) {
-        final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
-        final Identifier id = Identifier.newIdentifier(coordinateSystemId);
+      return getIdentifier(values[0]);
+    }
+    return null;
+  }
+
+  @Override
+  public Identifier getIdentifier(final Object value) {
+    CoordinateSystem coordinateSystem = null;
+    if (value instanceof CoordinateSystem) {
+      coordinateSystem = (CoordinateSystem)value;
+    } else {
+      try {
+        final Integer intValue = DataTypes.INT.toObject(value);
+        final Identifier id = Identifier.newIdentifier(intValue);
         if (this.codes.containsKey(id)) {
           return id;
-        } else {
-          return null;
         }
+      } catch (final Exception e) {
+        coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(value.toString());
+      }
+    }
+    if (coordinateSystem != null) {
+      final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
+      final Identifier id = Identifier.newIdentifier(coordinateSystemId);
+      if (this.codes.containsKey(id)) {
+        return id;
       }
     }
     return null;
+
   }
 
   @Override

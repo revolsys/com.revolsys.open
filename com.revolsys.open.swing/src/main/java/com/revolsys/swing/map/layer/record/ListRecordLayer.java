@@ -76,21 +76,20 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected void deleteRecordPost(final LayerRecord record) {
-    super.deleteRecordPost(record);
-    removeRecord(record);
+  protected boolean deleteRecordDo(final LayerRecord record) {
+    record.removeFrom(this.records);
+    return super.deleteRecordDo(record);
   }
 
   @Override
-  protected void deleteRecordsPost(final List<LayerRecord> recordsDeleted,
-    final List<LayerRecord> recordsSelected) {
+  protected void deleteRecordsPost(final List<LayerRecord> recordsDeleted) {
     for (final LayerRecord record : recordsDeleted) {
       removeRecord(record);
     }
     refreshBoundingBox();
     fireRecordsChanged();
     fireEmpty();
-    super.deleteRecordsPost(recordsDeleted, recordsSelected);
+    super.deleteRecordsPost(recordsDeleted);
     saveChanges(recordsDeleted);
   }
 

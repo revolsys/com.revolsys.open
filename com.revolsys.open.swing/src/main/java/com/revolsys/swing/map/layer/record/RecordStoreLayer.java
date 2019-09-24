@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +55,8 @@ import com.revolsys.util.Property;
 import com.revolsys.util.count.LabelCountMap;
 
 public class RecordStoreLayer extends AbstractRecordLayer {
+  private List<Set<Identifier>> cacheIdentifiers;
+
   private BoundingBox loadedBoundingBox = BoundingBox.empty();
 
   private BoundingBox loadingBoundingBox = BoundingBox.empty();
@@ -91,23 +92,17 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     super(type);
   }
 
+  protected synchronized void addCachedIdentifiers(final Set<Identifier> identifiers) {
+    if (this.cacheIdentifiers == null) {
+      this.cacheIdentifiers = new ArrayList<>();
+    }
+    this.cacheIdentifiers.add(identifiers);
+  }
+
   protected void addCachedRecord(final Identifier identifier, final LayerRecord record) {
     synchronized (getSync()) {
       this.recordsByIdentifier.put(identifier, (RecordStoreLayerRecord)record);
     }
-  }
-
-  protected void addCachedRecordIds(final Set<Identifier> identifiers) {
-    forEachRecordCache(cache -> {
-      if (cache instanceof RecordCacheDelegating) {
-        final RecordCacheDelegating delegating = (RecordCacheDelegating)cache;
-        cache = delegating.getCache();
-      }
-      if (cache instanceof RecordCacheRecordStoreLayer) {
-        final RecordCacheRecordStoreLayer storeCached = (RecordCacheRecordStoreLayer)cache;
-        storeCached.addIdentifiersToSet(identifiers);
-      }
-    });
   }
 
   protected void cancelLoading(final BoundingBox loadedBoundingBox) {
@@ -121,26 +116,12 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
   }
 
-  protected Set<Identifier> cleanCachedRecordIds() {
-    final Set<Identifier> identifiers = new HashSet<>();
-    addCachedRecordIds(identifiers);
-
-    addProxiedRecordIdsToCollection(identifiers);
-    return identifiers;
-  }
-
   /**
    * Remove any cached records that are currently not used.
    */
   @Override
   protected void cleanCachedRecords() {
-    synchronized (getSync()) {
-      super.cleanCachedRecords();
-      final Set<Identifier> identifiers = cleanCachedRecordIds();
-      synchronized (getSync()) {
-        this.recordsByIdentifier.keySet().retainAll(identifiers);
-      }
-    }
+    super.cleanCachedRecords();
   }
 
   @Override
@@ -163,14 +144,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     if (loadingWorker != null) {
       loadingWorker.cancel(true);
     }
-  }
-
-  @Override
-  protected boolean deleteRecordDo(final LayerRecord record) {
-    final Identifier identifier = record.getIdentifier();
-    final boolean result = super.deleteRecordDo(record);
-    removeFromRecordIdToRecordMap(identifier);
-    return result;
   }
 
   protected RecordStoreLayerRecord findCachedRecord(final LayerRecord record) {
@@ -593,6 +566,15 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return super.initializeDo();
   }
 
+  public boolean isIdentifierCached(final Identifier identifier) {
+    for (final Set<Identifier> identifiers : this.cacheIdentifiers) {
+      if (identifiers.contains(identifier)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   @Override
   public boolean isReadOnly() {
     return !hasIdField() || super.isReadOnly();
@@ -733,14 +715,21 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected RecordCache newRecordCache(final String cacheId) {
-    final RecordCacheCollection parentCache = (RecordCacheCollection)super.newRecordCache(cacheId);
-    return new RecordCacheRecordStoreLayer(cacheId, this, parentCache);
+  protected Collection<LayerRecord> newRecordCacheCollection() {
+    return new ArrayList<>();
   }
 
   @Override
-  protected Collection<LayerRecord> newRecordCacheCollection() {
-    return new ArrayList<>();
+  protected RecordCache newRecordCacheDo(final String cacheId) {
+    return newRecordCacheRecordStoreLayer(cacheId);
+  }
+
+  protected final RecordCacheRecordStoreLayer newRecordCacheRecordStoreLayer(final String cacheId) {
+    final RecordCacheCollection parentCache = newRecordCacheCollection(cacheId);
+    final RecordCacheRecordStoreLayer recordCache = new RecordCacheRecordStoreLayer(cacheId, this,
+      parentCache);
+    addCachedIdentifiers(recordCache.identifiers);
+    return recordCache;
   }
 
   protected RecordReader newRecordStoreRecordReader(final Query query) {
@@ -758,7 +747,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   protected boolean postSaveDeletedRecord(final LayerRecord record) {
     final boolean deleted = super.postSaveDeletedRecord(record);
     if (deleted) {
-      this.recordCacheDeleted.removeRecord(record);
+      this.recordCacheDeletedInternal.removeContainsRecord(record);
     }
     return deleted;
   }
@@ -813,15 +802,27 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
   }
 
-  private void removeFromRecordIdToRecordMap(final Identifier identifier) {
+  private void removeFromRecordByIdentifier(final Identifier identifier) {
     synchronized (getSync()) {
       this.recordsByIdentifier.remove(identifier);
     }
   }
 
   @Override
+  protected boolean removeRecordFromCache(final LayerRecord record) {
+    final boolean removed = super.removeRecordFromCache(record);
+    if (removed) {
+      final Identifier identifier = record.getIdentifier();
+      if (identifier != null) {
+        removeFromRecordByIdentifier(identifier);
+      }
+    }
+    return removed;
+  }
+
+  @Override
   public void revertChanges(final LayerRecord record) {
-    this.recordCacheDeleted.removeRecord(record);
+    this.recordCacheDeletedInternal.removeRecord(record);
     super.revertChanges(record);
   }
 
@@ -870,7 +871,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             if (!deleted) {
               record.setState(RecordState.PERSISTED);
             }
-            removeFromRecordIdToRecordMap(identifier);
+            removeFromRecordByIdentifier(identifier);
             return true;
           } catch (final Throwable e) {
             throw transaction.setRollbackOnly(e);

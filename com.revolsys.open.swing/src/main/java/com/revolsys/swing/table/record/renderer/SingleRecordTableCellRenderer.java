@@ -12,6 +12,7 @@ import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.JXTable;
 import org.jeometry.common.number.BigDecimals;
+import org.jeometry.common.number.Numbers;
 
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
@@ -58,7 +59,7 @@ public class SingleRecordTableCellRenderer implements TableCellRenderer {
     } else {
       final String text = model.toDisplayValue(rowIndex, rowIndex, value);
       this.valueComponent.setText(text);
-      if (BigDecimals.isNumber(text)) {
+      if (Numbers.isNumber(text)) {
         this.valueComponent.setHorizontalAlignment(SwingConstants.RIGHT);
         this.valueComponent.setHorizontalTextPosition(SwingConstants.RIGHT);
       } else {

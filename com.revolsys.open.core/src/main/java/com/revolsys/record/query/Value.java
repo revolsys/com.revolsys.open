@@ -17,9 +17,9 @@ import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.field.JdbcFieldDefinitions;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
-import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
@@ -167,9 +167,9 @@ public class Value implements QueryValue {
         if (recordDefinition != null) {
           final String fieldName = field.getName();
           codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
-          if (codeTable instanceof CodeTableProperty) {
-            final CodeTableProperty codeTableProperty = (CodeTableProperty)codeTable;
-            if (codeTableProperty.getRecordDefinition() == recordDefinition) {
+          if (codeTable instanceof RecordDefinitionProxy) {
+            final RecordDefinitionProxy proxy = (RecordDefinitionProxy)codeTable;
+            if (proxy.getRecordDefinition() == recordDefinition) {
               codeTable = null;
             }
           }

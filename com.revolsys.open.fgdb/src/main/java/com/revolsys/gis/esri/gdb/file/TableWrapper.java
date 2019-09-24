@@ -43,7 +43,7 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
       return tableReference.valueFunctionSync(table -> {
         try (
           BaseCloseable lock = writeLock();
-          final FileGdbEnumRowsIterator rows = search(typePath, "OBJECTID", whereClause, false)) {
+          final FileGdbEnumRowsIterator rows = search(typePath, "OBJECTID", whereClause, true)) {
           for (final Row row : rows) {
             setLoadOnlyMode(false);
             table.deleteRow(row);
@@ -269,7 +269,7 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
 
   default TableWrapper writeLock() {
     final TableReference tableReference = getTableReference();
-    return tableReference.writeLock();
+    return tableReference.writeLock(false);
   }
 
 }

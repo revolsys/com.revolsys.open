@@ -407,11 +407,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   }
 
   @Override
-  protected List<LayerRecord> getSelectedRecords(final BoundingBox boundingBox) {
-    return super.getSelectedRecords(boundingBox);
-  }
-
-  @Override
   protected List<AbstractRecordLayer> getSnapLayers() {
     final Project project = getProject();
     final double scale = project.getMapPanel().getScale();

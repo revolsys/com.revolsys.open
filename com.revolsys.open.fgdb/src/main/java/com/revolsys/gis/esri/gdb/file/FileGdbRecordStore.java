@@ -749,7 +749,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     if (table == null) {
       return null;
     } else {
-      return table.writeLock();
+      return table.writeLock(true);
     }
   }
 
@@ -782,10 +782,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   private TableWrapper getTableWrapper(final Record record) {
     final TableReference tableReference = getTableReference(record);
     if (tableReference != null) {
-      try (
-        TableWrapper tableWrapper = tableReference.connect()) {
-        return tableWrapper;
-      }
+      return tableReference.connect();
     }
     return null;
   }
@@ -1366,10 +1363,31 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     if (recordDefinition != null) {
       final TableReference table = getTableReference(recordDefinition);
       if (table != null) {
-        return table.writeLock();
+        return table.writeLock(false);
       }
     }
     return null;
+  }
+
+  public BaseCloseable writeLock(final RecordDefinitionProxy recordDefinition) {
+    if (recordDefinition != null) {
+      final PathName pathName = recordDefinition.getPathName();
+      if (pathName != null) {
+        return new BaseCloseable() {
+          private BaseCloseable wrapper = writeLock(pathName);
+
+          @Override
+          public synchronized void close() {
+            if (this.wrapper != null) {
+              this.wrapper.close();
+              this.wrapper = null;
+            }
+          }
+        };
+      }
+    }
+    return () -> {
+    };
   }
 
 }

@@ -50,6 +50,11 @@ public class RecordCacheDelegating implements RecordCache {
   }
 
   @Override
+  public boolean removeContainsRecord(final LayerRecord record) {
+    return this.cache.removeContainsRecord(record);
+  }
+
+  @Override
   public boolean replaceRecord(final LayerRecord record) {
     return this.cache.replaceRecord(record);
   }

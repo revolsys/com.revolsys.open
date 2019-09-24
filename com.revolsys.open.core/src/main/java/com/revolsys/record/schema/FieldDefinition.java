@@ -25,7 +25,6 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
-import com.revolsys.record.code.CodeTableProperty;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -854,16 +853,8 @@ public class FieldDefinition extends BaseObjectWithProperties
       } else {
         final Identifier id = codeTable.getIdentifier(value);
         if (id == null) {
-          String codeTableName;
-          if (codeTable instanceof CodeTableProperty) {
-            @SuppressWarnings("resource")
-            final CodeTableProperty property = (CodeTableProperty)codeTable;
-            codeTableName = property.getTypeName();
-          } else {
-            codeTableName = codeTable.toString();
-          }
           throw new IllegalArgumentException(
-            "Unable to find code for '" + value + "' in " + codeTableName);
+            "Unable to find code for '" + value + "' in " + codeTable.getName());
         }
       }
     }

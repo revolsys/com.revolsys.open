@@ -13,6 +13,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,7 +39,6 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.number.Doubles;
 
 import com.revolsys.collection.map.Maps;
-import com.revolsys.geometry.index.RecordSpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
@@ -73,7 +73,6 @@ import com.revolsys.swing.map.layer.NullLayer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.LayerRecordQuadTree;
 import com.revolsys.swing.map.list.LayerGroupListModel;
 import com.revolsys.swing.map.listener.FileDropTargetListener;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
@@ -184,7 +183,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private SelectMapCoordinateSystem selectCoordinateSystem;
 
-  private RecordSpatialIndex<LayerRecord> selectedRecordsIndex;
+  private final List<AbstractRecordLayer> selectedRecordLayers = new ArrayList<>();
 
   private final GlobalBooleanValue settingBoundingBox = new GlobalBooleanValue(false);
 
@@ -218,7 +217,6 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     this.projectFrame = projectFrame;
     this.preferences = preferences;
     this.project = project;
-    this.selectedRecordsIndex = LayerRecordQuadTree.newIndex(project.getGeometryFactory());
 
     this.baseMapLayers = project.getBaseMapLayers();
     project.setProperty(MAP_PANEL, this);
@@ -643,10 +641,6 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     return this.viewport.getScales();
   }
 
-  public List<LayerRecord> getSelectedRecords(final BoundingBox boundingBox) {
-    return this.selectedRecordsIndex.getItems(boundingBox);
-  }
-
   public ToolBar getToolBar() {
     return this.toolBar;
   }
@@ -706,7 +700,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   public boolean mouseMovedCloseSelected(final MouseEvent event) {
     if (isOverlayAction(SelectRecordsOverlay.ACTION_SELECT_RECORDS)
-      || isOverlayAction(ZoomOverlay.ACTION_ZOOM_BOX) || isOverlayAction(ZoomOverlay.ACTION_PAN)) {
+      || isOverlayAction(ZoomOverlay.ACTION_ZOOM_BOX) || isOverlayAction(ZoomOverlay.ACTION_PAN)
+      || this.selectedRecordLayers.isEmpty()) {
       clearCloseSelected();
       return false;
     } else {
@@ -715,16 +710,21 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
       final BoundingBox boundingBox = getHotspotBoundingBox();
       final List<LayerRecord> closeRecords = new ArrayList<>();
       final List<CloseLocation> closeLocations = new ArrayList<>();
-      for (final LayerRecord closeRecord : getSelectedRecords(boundingBox)) {
-        final AbstractRecordLayer layer = closeRecord.getLayer();
-        if (layer.isVisible(scale) && layer.isVisible(closeRecord)) {
-          final Geometry geometry = closeRecord.getGeometry();
-          final CloseLocation closeLocation = findCloseLocation(layer, closeRecord, geometry);
-          if (closeLocation != null) {
-            closeRecords.add(closeRecord);
-            closeLocations.add(closeLocation);
+      try {
+        for (final AbstractRecordLayer layer : this.selectedRecordLayers) {
+          for (final LayerRecord closeRecord : layer.getSelectedRecords(boundingBox)) {
+            if (layer.isVisible(scale) && layer.isVisible(closeRecord)) {
+              final Geometry geometry = closeRecord.getGeometry();
+              final CloseLocation closeLocation = findCloseLocation(layer, closeRecord, geometry);
+              if (closeLocation != null) {
+                closeRecords.add(closeRecord);
+                closeLocations.add(closeLocation);
+              }
+            }
           }
+
         }
+      } catch (final ConcurrentModificationException e) {
       }
       this.closeSelectedRecords = closeRecords;
       this.closeSelectedLocations = closeLocations;
@@ -888,12 +888,19 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     final String propertyName = event.getPropertyName();
     final Object oldValue = event.getOldValue();
     final Object newValue = event.getNewValue();
-    if (AbstractRecordLayer.RECORDS_SELECTED.equals(propertyName)) {
-      final List<LayerRecord> oldRecords = (List<LayerRecord>)oldValue;
-      this.selectedRecordsIndex.removeRecords(oldRecords);
-
-      final List<LayerRecord> newRecords = (List<LayerRecord>)newValue;
-      this.selectedRecordsIndex.addRecords(newRecords);
+    if ("hasSelectedRecords".equals(propertyName)) {
+      if (source instanceof AbstractRecordLayer) {
+        final AbstractRecordLayer layer = (AbstractRecordLayer)source;
+        synchronized (this.selectedRecordLayers) {
+          if (Boolean.TRUE.equals(newValue)) {
+            if (!this.selectedRecordLayers.contains(layer)) {
+              this.selectedRecordLayers.add(layer);
+            }
+          } else {
+            this.selectedRecordLayers.remove(layer);
+          }
+        }
+      }
     } else if (source == this.project) {
       if ("viewBoundingBox".equals(propertyName)) {
         final BoundingBox boundingBox = (BoundingBox)newValue;
@@ -958,21 +965,6 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
           } else if (!this.baseMapLayers.isHasVisibleLayer()) {
             this.baseMapLayerField.setSelectedIndex(0);
           }
-        }
-      }
-    } else if (source instanceof LayerRecord) {
-      final LayerRecord record = (LayerRecord)source;
-      if (propertyName.equals(record.getGeometryFieldName())) {
-        if (record.isSelected()) {
-          final Geometry oldGeometry = (Geometry)oldValue;
-          if (oldGeometry == null) {
-            final BoundingBox boundingBox = record.getGeometry().getBoundingBox();
-            this.selectedRecordsIndex.removeItem(boundingBox, record);
-          } else {
-            final BoundingBox boundingBox = oldGeometry.getBoundingBox();
-            this.selectedRecordsIndex.removeItem(boundingBox, record);
-          }
-          this.selectedRecordsIndex.addRecord(record);
         }
       }
     }
@@ -1049,11 +1041,6 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private void setGeometryFactory(final GeometryFactory oldGeometryFactory,
     final GeometryFactory newGeometryFactory) {
-    final RecordSpatialIndex<LayerRecord> selectedRecordsIndex = LayerRecordQuadTree
-      .newIndex(newGeometryFactory);
-    AbstractRecordLayer.forEachSelectedRecords(this.project, selectedRecordsIndex::addRecords);
-    this.selectedRecordsIndex = selectedRecordsIndex;
-
     this.project.setGeometryFactory(newGeometryFactory);
     this.viewport.setGeometryFactory(newGeometryFactory);
 
