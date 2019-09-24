@@ -211,6 +211,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   private final LinkedList<Pair<String, Color>> messageStack = new LinkedList<>();
 
+  private boolean menuVisible;
+
   public MapPanel(final ProjectFrame projectFrame, final Preferences preferences,
     final Project project) {
     super(new BorderLayout());
@@ -673,6 +675,10 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     return this.initializing;
   }
 
+  public boolean isMenuVisible() {
+    return this.menuVisible;
+  }
+
   public boolean isOverlayAction(final String overlayAction) {
     if (overlayAction == null) {
       return false;
@@ -1084,6 +1090,10 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     if (component != null) {
       component.setEnabled(enabled);
     }
+  }
+
+  public void setMenuVisible(final boolean menuVisible) {
+    this.menuVisible = menuVisible;
   }
 
   public void setMessage(final String overlayAction, final String message, final Color color) {

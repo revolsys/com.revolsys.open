@@ -26,6 +26,10 @@ public class ToolTipOverlay extends AbstractOverlay {
     clearText();
   }
 
+  @Override
+  protected void cancel() {
+  }
+
   public void clearText() {
     this.label.setText("");
     this.label.setVisible(false);

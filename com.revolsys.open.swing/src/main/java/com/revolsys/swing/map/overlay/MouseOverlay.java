@@ -12,8 +12,7 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Consumer;
 
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
@@ -81,11 +80,29 @@ public class MouseOverlay extends JComponent
       if (component != this) {
         final Component oppositeComponent = e.getOppositeComponent();
         if (oppositeComponent != SwingUtilities.getWindowAncestor(this)) {
-          for (final Component overlay : getOverlays()) {
+          forEachOverlay(overlay -> {
             if (overlay instanceof FocusListener) {
               final FocusListener listener = (FocusListener)overlay;
               listener.focusLost(e);
             }
+          });
+        }
+      }
+    }
+  }
+
+  private void forEachOverlay(final Consumer<Component> action) {
+    final Container parent = getParent();
+    if (parent instanceof JLayeredPane) {
+      final JLayeredPane layeredPane = (JLayeredPane)parent;
+      final int componentCount = layeredPane.getComponentCount();
+      for (int i = 0; i < componentCount; i++) {
+        final Component component = layeredPane.getComponent(i);
+        if (component.isEnabled() && !(component instanceof MouseOverlay)) {
+          if (this.mapPanel.isMenuVisible()) {
+            return;
+          } else {
+            action.accept(component);
           }
         }
       }
@@ -106,64 +123,58 @@ public class MouseOverlay extends JComponent
     return this.viewport.getGeometryFactory();
   }
 
-  private List<Component> getOverlays() {
-    final List<Component> overlays = new ArrayList<>();
-    final Container parent = getParent();
-    if (parent instanceof JLayeredPane) {
-      final JLayeredPane layeredPane = (JLayeredPane)parent;
-      for (final Component component : layeredPane.getComponents()) {
-        if (component.isEnabled() && !(component instanceof MouseOverlay)) {
-          overlays.add(component);
-        }
-      }
-    }
-    return overlays;
-  }
-
   @Override
   public void keyPressed(final KeyEvent e) {
-    for (final Component overlay : getOverlays()) {
-      if (overlay instanceof KeyListener) {
-        final KeyListener listener = (KeyListener)overlay;
-        listener.keyPressed(e);
-        if (e.isConsumed()) {
-          return;
+    if (!this.mapPanel.isMenuVisible()) {
+      forEachOverlay(overlay -> {
+        if (overlay instanceof KeyListener) {
+          final KeyListener listener = (KeyListener)overlay;
+          listener.keyPressed(e);
+          if (e.isConsumed()) {
+            return;
+          }
         }
-      }
+      });
     }
   }
 
   @Override
   public void keyReleased(final KeyEvent e) {
-    for (final Component overlay : getOverlays()) {
-      if (overlay instanceof KeyListener) {
-        final KeyListener listener = (KeyListener)overlay;
-        listener.keyReleased(e);
-        if (e.isConsumed()) {
-          return;
+    if (!this.mapPanel.isMenuVisible()) {
+      forEachOverlay(overlay -> {
+        if (overlay instanceof KeyListener) {
+          final KeyListener listener = (KeyListener)overlay;
+          listener.keyReleased(e);
+          if (e.isConsumed()) {
+            return;
+          }
         }
-      }
+      });
     }
   }
 
   @Override
   public void keyTyped(final KeyEvent e) {
-    for (final Component overlay : getOverlays()) {
-      if (overlay instanceof KeyListener) {
-        final KeyListener listener = (KeyListener)overlay;
-        listener.keyTyped(e);
-        if (e.isConsumed()) {
-          return;
+    if (!this.mapPanel.isMenuVisible()) {
+      forEachOverlay(overlay -> {
+        if (overlay instanceof KeyListener) {
+          final KeyListener listener = (KeyListener)overlay;
+          listener.keyTyped(e);
+          if (e.isConsumed()) {
+            return;
+          }
         }
-      }
+      });
     }
   }
 
   @Override
   public void mouseClicked(final MouseEvent e) {
-    updateEventPoint(e);
+    if (!this.mapPanel.isMenuVisible()) {
+      updateEventPoint(e);
+    }
     requestFocusInWindow();
-    for (final Component overlay : getOverlays()) {
+    forEachOverlay(overlay -> {
       if (overlay instanceof MouseListener) {
         final MouseListener listener = (MouseListener)overlay;
         listener.mouseClicked(e);
@@ -171,21 +182,23 @@ public class MouseOverlay extends JComponent
           return;
         }
       }
-    }
+    });
   }
 
   @Override
   public void mouseDragged(final MouseEvent e) {
-    updateEventPoint(e);
-    requestFocusInWindow();
-    for (final Component overlay : getOverlays()) {
-      if (overlay instanceof MouseMotionListener) {
-        final MouseMotionListener listener = (MouseMotionListener)overlay;
-        listener.mouseDragged(e);
-        if (e.isConsumed()) {
-          return;
+    if (!this.mapPanel.isMenuVisible()) {
+      updateEventPoint(e);
+      requestFocusInWindow();
+      forEachOverlay(overlay -> {
+        if (overlay instanceof MouseMotionListener) {
+          final MouseMotionListener listener = (MouseMotionListener)overlay;
+          listener.mouseDragged(e);
+          if (e.isConsumed()) {
+            return;
+          }
         }
-      }
+      });
     }
   }
 
@@ -193,7 +206,7 @@ public class MouseOverlay extends JComponent
   public void mouseEntered(final MouseEvent e) {
     updateEventPoint(e);
     requestFocusInWindow();
-    for (final Component overlay : getOverlays()) {
+    forEachOverlay(overlay -> {
       if (overlay instanceof MouseListener) {
         final MouseListener listener = (MouseListener)overlay;
         listener.mouseEntered(e);
@@ -201,7 +214,7 @@ public class MouseOverlay extends JComponent
           return;
         }
       }
-    }
+    });
   }
 
   @Override
@@ -210,7 +223,7 @@ public class MouseOverlay extends JComponent
     MouseOverlay.y = -1;
     MouseOverlay.point = GeometryFactory.DEFAULT_3D.point();
     this.mapPanel.mouseExitedCloseSelected(event);
-    for (final Component overlay : getOverlays()) {
+    forEachOverlay(overlay -> {
       if (overlay instanceof MouseListener) {
         final MouseListener listener = (MouseListener)overlay;
         listener.mouseExited(event);
@@ -218,77 +231,86 @@ public class MouseOverlay extends JComponent
           return;
         }
       }
-    }
+    });
   }
 
   @Override
   public void mouseMoved(final MouseEvent event) {
-    updateEventPoint(event);
-    try {
-      requestFocusInWindow();
-      this.mapPanel.mouseMovedCloseSelected(event);
-      for (final Component overlay : getOverlays()) {
-        if (overlay instanceof MouseMotionListener) {
-          final MouseMotionListener listener = (MouseMotionListener)overlay;
-          listener.mouseMoved(event);
-          if (event.isConsumed()) {
-            return;
+    if (!this.mapPanel.isMenuVisible()) {
+      try {
+        requestFocusInWindow();
+        updateEventPoint(event);
+        this.mapPanel.mouseMovedCloseSelected(event);
+        forEachOverlay(overlay -> {
+          if (overlay instanceof MouseMotionListener) {
+            final MouseMotionListener listener = (MouseMotionListener)overlay;
+            listener.mouseMoved(event);
+            if (event.isConsumed()) {
+              return;
+            }
           }
-        }
+        });
+      } catch (final RuntimeException e) {
+        Logs.error(this, "Mouse move error", e);
       }
-    } catch (final RuntimeException e) {
-      Logs.error(this, "Mouse move error", e);
     }
   }
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    updateEventPoint(e);
-    final Window window = SwingUtil.getWindowAncestor(this);
-    window.setAlwaysOnTop(true);
-    window.toFront();
-    window.setFocusableWindowState(true);
-    window.requestFocus();
-    window.setAlwaysOnTop(false);
+    if (!this.mapPanel.isMenuVisible()) {
+      requestFocusInWindow();
 
-    requestFocusInWindow();
-    for (final Component overlay : getOverlays()) {
-      if (overlay instanceof MouseListener) {
-        final MouseListener listener = (MouseListener)overlay;
-        listener.mousePressed(e);
-        if (e.isConsumed()) {
-          return;
+      updateEventPoint(e);
+      final Window window = SwingUtil.getWindowAncestor(this);
+      window.setAlwaysOnTop(true);
+      window.toFront();
+      window.setFocusableWindowState(true);
+      window.requestFocus();
+      window.setAlwaysOnTop(false);
+
+      forEachOverlay(overlay -> {
+        if (overlay instanceof MouseListener) {
+          final MouseListener listener = (MouseListener)overlay;
+          listener.mousePressed(e);
+          if (e.isConsumed()) {
+            return;
+          }
         }
-      }
+      });
     }
   }
 
   @Override
   public void mouseReleased(final MouseEvent e) {
-    updateEventPoint(e);
-    requestFocusInWindow();
-    for (final Component overlay : getOverlays()) {
-      if (overlay instanceof MouseListener) {
-        final MouseListener listener = (MouseListener)overlay;
-        listener.mouseReleased(e);
-        if (e.isConsumed()) {
-          return;
+    if (!this.mapPanel.isMenuVisible()) {
+      requestFocusInWindow();
+      updateEventPoint(e);
+      forEachOverlay(overlay -> {
+        if (overlay instanceof MouseListener) {
+          final MouseListener listener = (MouseListener)overlay;
+          listener.mouseReleased(e);
+          if (e.isConsumed()) {
+            return;
+          }
         }
-      }
+      });
     }
   }
 
   @Override
   public void mouseWheelMoved(final MouseWheelEvent e) {
-    updateEventPoint(e);
-    for (final Component overlay : getOverlays()) {
-      if (overlay instanceof MouseWheelListener) {
-        final MouseWheelListener listener = (MouseWheelListener)overlay;
-        listener.mouseWheelMoved(e);
-        if (e.isConsumed()) {
-          return;
+    if (!this.mapPanel.isMenuVisible()) {
+      updateEventPoint(e);
+      forEachOverlay(overlay -> {
+        if (overlay instanceof MouseWheelListener) {
+          final MouseWheelListener listener = (MouseWheelListener)overlay;
+          listener.mouseWheelMoved(e);
+          if (e.isConsumed()) {
+            return;
+          }
         }
-      }
+      });
     }
   }
 

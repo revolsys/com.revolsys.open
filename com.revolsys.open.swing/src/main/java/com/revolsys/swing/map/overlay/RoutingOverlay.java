@@ -291,9 +291,7 @@ public class RoutingOverlay extends AbstractOverlay {
   private boolean modePopupMenu(final MouseEvent event) {
     if (event.isPopupTrigger() && this.layer != null) {
       final LayerRecord record = getCloseRecord();
-      if (record != null) {
-        final LayerRecordMenu menu = record.getMenu();
-        menu.showMenu(record, event);
+      if (showMenu(record, event)) {
         return true;
       }
     }

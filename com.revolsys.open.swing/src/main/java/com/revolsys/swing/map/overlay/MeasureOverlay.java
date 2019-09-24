@@ -87,7 +87,8 @@ public class MeasureOverlay extends AbstractOverlay {
     );
   }
 
-  private void cancel() {
+  @Override
+  protected void cancel() {
     modeMeasureClear();
   }
 

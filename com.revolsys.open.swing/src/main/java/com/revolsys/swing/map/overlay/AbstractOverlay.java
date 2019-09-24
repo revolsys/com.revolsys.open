@@ -2,6 +2,8 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -27,6 +29,10 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.swing.JComponent;
+import javax.swing.JLayeredPane;
+import javax.swing.JPopupMenu;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.undo.UndoableEdit;
 
 import org.jeometry.common.awt.WebColors;
@@ -53,6 +59,7 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
@@ -60,8 +67,9 @@ import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
 
-public class AbstractOverlay extends JComponent implements MapOverlay, PropertyChangeListener,
-  BaseMouseListener, BaseMouseMotionListener, MouseWheelListener, KeyListener, FocusListener {
+public abstract class AbstractOverlay extends JComponent
+  implements MapOverlay, PropertyChangeListener, BaseMouseListener, BaseMouseMotionListener,
+  MouseWheelListener, KeyListener, FocusListener {
   public static final Cursor CURSOR_LINE_ADD_NODE = Icons.getCursor("cursor_line_node_add", 8, 6);
 
   public static final Cursor CURSOR_LINE_SNAP = Icons.getCursor("cursor_line_snap", 8, 4);
@@ -197,6 +205,23 @@ public class AbstractOverlay extends JComponent implements MapOverlay, PropertyC
     text.append(",");
     final double y = point.getY();
     text.append(Doubles.toString(Doubles.makePrecise(scale, y)));
+  }
+
+  protected abstract void cancel();
+
+  private void cancelAll() {
+    final Container parent = getParent();
+    if (parent instanceof JLayeredPane) {
+      final JLayeredPane layeredPane = (JLayeredPane)parent;
+      final int componentCount = layeredPane.getComponentCount();
+      for (int i = 0; i < componentCount; i++) {
+        final Component component = layeredPane.getComponent(i);
+        if (component.isEnabled() && component instanceof AbstractOverlay) {
+          final AbstractOverlay overlay = (AbstractOverlay)component;
+          overlay.cancel();
+        }
+      }
+    }
   }
 
   public boolean canOverrideOverlayAction(final String newAction) {
@@ -774,5 +799,33 @@ public class AbstractOverlay extends JComponent implements MapOverlay, PropertyC
   public void setXorGeometry(final Geometry xorGeometry) {
     this.xorGeometry = xorGeometry;
     repaint();
+  }
+
+  protected boolean showMenu(final LayerRecord record, final MouseEvent event) {
+    if (record != null) {
+      final LayerRecordMenu menu = record.getMenu();
+      final JPopupMenu popupMenu = menu.showMenu(record, event);
+      if (popupMenu != null) {
+        cancelAll();
+        event.consume();
+        final MapPanel map = getMap();
+        map.setMenuVisible(true);
+        popupMenu.addPopupMenuListener(new PopupMenuListener() {
+          @Override
+          public void popupMenuCanceled(final PopupMenuEvent e) {
+            map.setMenuVisible(false);
+          }
+
+          @Override
+          public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
+          }
+
+          @Override
+          public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
+          }
+        });
+      }
+    }
+    return true;
   }
 }

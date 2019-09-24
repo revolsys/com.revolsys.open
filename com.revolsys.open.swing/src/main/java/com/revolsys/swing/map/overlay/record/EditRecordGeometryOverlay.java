@@ -24,7 +24,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
 import javax.swing.undo.UndoableEdit;
 
 import org.jeometry.common.awt.WebColors;
@@ -55,7 +54,6 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.marker.MarkerRenderer;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
@@ -1052,13 +1050,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     if (event.isPopupTrigger()) {
       for (final CloseLocation location : getMouseOverLocations()) {
         final LayerRecord record = location.getRecord();
-        if (record != null) {
-          final LayerRecordMenu menu = record.getMenu();
-          cancel();
-          final JPopupMenu popupMenu = menu.showMenu(record, event);
+        if (showMenu(record, event)) {
+          return true;
         }
-        event.consume();
-        return true;
       }
     }
     return false;

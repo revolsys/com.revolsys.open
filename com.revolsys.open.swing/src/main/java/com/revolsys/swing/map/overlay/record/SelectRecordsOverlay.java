@@ -42,7 +42,6 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
@@ -204,11 +203,9 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       final MapPanel map = getMap();
       for (final CloseLocation location : map.getCloseSelectedLocations()) {
         final LayerRecord record = location.getRecord();
-        if (record != null) {
-          final LayerRecordMenu menu = record.getMenu();
-          menu.showMenu(record, event);
+        if (showMenu(record, event)) {
+          return true;
         }
-        return true;
       }
     }
     return false;
