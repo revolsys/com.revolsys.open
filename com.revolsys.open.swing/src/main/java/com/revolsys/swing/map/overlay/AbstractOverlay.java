@@ -818,12 +818,17 @@ public abstract class AbstractOverlay extends JComponent
 
           @Override
           public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
+            map.setMenuVisible(false);
           }
 
           @Override
           public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
+            map.setMenuVisible(true);
           }
         });
+        if (!popupMenu.isVisible()) {
+          map.setMenuVisible(false);
+        }
       }
     }
     return true;
