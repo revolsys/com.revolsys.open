@@ -7,16 +7,15 @@ import java.awt.FlowLayout;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.WindowConstants;
 
 import com.revolsys.swing.action.RunnableAction;
+import com.revolsys.swing.component.BaseDialog;
 
-public class PreferencesDialog extends JDialog {
-  private static final PreferencesDialog INSTANCE = new PreferencesDialog();
+public class PreferencesDialog extends BaseDialog {
 
   private static final long serialVersionUID = 1L;
 
@@ -25,7 +24,7 @@ public class PreferencesDialog extends JDialog {
   private final JTabbedPane tabs = new JTabbedPane();
 
   public PreferencesDialog() {
-    super(null, "Preferences", ModalityType.APPLICATION_MODAL);
+    super("Preferences", ModalityType.APPLICATION_MODAL);
     add(this.tabs, BorderLayout.CENTER);
 
     final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));

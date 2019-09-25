@@ -37,16 +37,15 @@ import javax.swing.InputMap;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -261,21 +260,6 @@ public interface SwingUtil {
     }
   }
 
-  static Window getActiveWindow() {
-    final KeyboardFocusManager keyboardFocusManager = KeyboardFocusManager
-      .getCurrentKeyboardFocusManager();
-    final Window activeWindow = keyboardFocusManager.getActiveWindow();
-    if (activeWindow == null) {
-      final Window[] windows = Window.getOwnerlessWindows();
-      for (final Window window : windows) {
-        if (window.isVisible()) {
-          return window;
-        }
-      }
-    }
-    return activeWindow;
-  }
-
   static Component getInvoker(final JMenuItem menuItem) {
     MenuContainer menuContainer = menuItem.getParent();
     while (menuContainer != null && !(menuContainer instanceof JPopupMenu)) {
@@ -301,7 +285,7 @@ public interface SwingUtil {
 
   static Rectangle getScreenBounds(Component component) {
     if (component == null) {
-      component = SwingUtil.getActiveWindow();
+      component = SwingUtil.windowActive();
     }
     Point mousePosition;
     if (component == null) {
@@ -1015,20 +999,26 @@ public interface SwingUtil {
     }
   }
 
-  static void showErrorDialog(final Window window, final String title, final String message,
-    final Throwable e) {
-    final String exceptionMessage = e.getMessage().replaceAll("\n", "<br />");
-    final String errorMessage = "<html><body><p style=\"margin-bottom: 10px\"><strong>" + message
-      + "</strong></p><pre>" + exceptionMessage + "</pre></body></p>";
+  static Window windowActive() {
+    final KeyboardFocusManager keyboardFocusManager = KeyboardFocusManager
+      .getCurrentKeyboardFocusManager();
+    final Window activeWindow = keyboardFocusManager.getActiveWindow();
+    if (activeWindow == null) {
+      final Window[] windows = Window.getOwnerlessWindows();
+      for (final Window window : windows) {
+        if (window.isVisible()) {
+          return window;
+        }
+      }
+    }
+    return activeWindow;
+  }
 
-    final JScrollPane scrollPane = new JScrollPane(new JLabel(errorMessage));
-    final Dimension preferredSize = scrollPane.getPreferredSize();
-    final Rectangle bounds = SwingUtil.getScreenBounds(window);
-    final int width = Math.min(bounds.width - 200, preferredSize.width + 20);
-    final int height = Math.min(bounds.height - 100, preferredSize.height + 20);
-
-    scrollPane.setPreferredSize(new Dimension(width, height));
-
-    JOptionPane.showMessageDialog(window, scrollPane, title, JOptionPane.ERROR_MESSAGE);
+  static Window windowOnTop() {
+    final Window activeWindow = windowActive();
+    final JDialog f = new JDialog(activeWindow);
+    f.setAlwaysOnTop(true);
+    f.requestFocus();
+    return f;
   }
 }

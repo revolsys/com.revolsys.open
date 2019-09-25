@@ -83,7 +83,7 @@ public class Log4jTableModel extends AbstractTableModel {
           row = table.convertRowIndexToModel(row);
           if (row != -1) {
             final List<Object> loggingEvent = model.rows.get(row);
-            LoggingEventPanel.showDialog(table, loggingEvent);
+            LoggingEventPanel.showDialog(loggingEvent);
           }
         }
       }

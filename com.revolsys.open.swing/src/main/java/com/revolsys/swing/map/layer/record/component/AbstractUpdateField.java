@@ -1,7 +1,6 @@
 package com.revolsys.swing.map.layer.record.component;
 
 import java.awt.FlowLayout;
-import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
@@ -12,7 +11,6 @@ import java.util.concurrent.CancellationException;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -22,9 +20,11 @@ import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.exception.WrappedException;
 
 import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.swing.component.BaseDialog;
 import com.revolsys.swing.component.ProgressMonitor;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -34,7 +34,7 @@ import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.TablePanel;
 
-public abstract class AbstractUpdateField extends JDialog {
+public abstract class AbstractUpdateField extends BaseDialog {
   private static final long serialVersionUID = 1L;
 
   protected static EnableCheck newEnableCheck() {
@@ -71,7 +71,7 @@ public abstract class AbstractUpdateField extends JDialog {
   private final String recordCountString;
 
   protected AbstractUpdateField(final String title) {
-    super(SwingUtil.getActiveWindow(), title, ModalityType.APPLICATION_MODAL);
+    super(title, ModalityType.APPLICATION_MODAL);
     this.table = TablePanel.getEventTable();
     this.tableModel = this.table.getModel();
     this.layer = this.table.getLayer();
@@ -90,9 +90,8 @@ public abstract class AbstractUpdateField extends JDialog {
   }
 
   private void finish() {
-    final Window parent = (Window)getParent();
     if (this.recordCount > 100) {
-      final int confirm = JOptionPane.showConfirmDialog(this,
+      final int confirm = Dialogs.showConfirmDialog(
         "<html><p>Update <b style='color:#32CD32'>" + this.recordCountString + "</b> records?</p>"
           + "<p>This may take a long time or fail if there are many records.</html>",
         "Update Records?</p><html>", JOptionPane.YES_NO_OPTION);
@@ -110,7 +109,7 @@ public abstract class AbstractUpdateField extends JDialog {
     fieldNames.addAll(AbstractUpdateField.this.layer.getFieldNames());
     final RecordLayerErrors errors = new RecordLayerErrors("Setting Field Values",
       AbstractUpdateField.this.layer, fieldNames);
-    ProgressMonitor.background(parent, title, note, progressMonitor -> {
+    ProgressMonitor.background(title, note, progressMonitor -> {
       AbstractUpdateField.this.tableModel.forEachRecord((record) -> {
         if (progressMonitor.isCancelled()) {
           throw new CancellationException();

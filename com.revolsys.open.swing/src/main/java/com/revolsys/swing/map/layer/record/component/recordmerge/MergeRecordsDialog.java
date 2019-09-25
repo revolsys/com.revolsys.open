@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -23,6 +22,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.TabbedPane;
 import com.revolsys.swing.action.RunnableAction;
+import com.revolsys.swing.component.BaseDialog;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ProgressMonitor;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -42,15 +42,15 @@ import com.revolsys.swing.undo.MultipleUndo;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
 
-public class MergeRecordsDialog extends JDialog {
+public class MergeRecordsDialog extends BaseDialog {
 
   private static final long serialVersionUID = 1L;
 
   public static void showDialog(final AbstractRecordLayer layer) {
     final RecordMerger recordMerger = new RecordMerger(layer);
     final Window window = SwingUtil.getWindowAncestor(layer.getMapPanel());
-    ProgressMonitor.background(window, "Merge " + layer.getName() + " Records", null,
-      recordMerger::run, 100, () -> {
+    ProgressMonitor.background("Merge " + layer.getName() + " Records", null, recordMerger::run,
+      100, () -> {
         new MergeRecordsDialog(window, layer, recordMerger) //
           .setVisible(true);
       });

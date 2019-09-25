@@ -85,7 +85,7 @@ public class RecordLayerErrors {
         panel.setPreferredSize(
           new Dimension(screenBounds.width - 300, tableModel.getRowCount() * 22 + 75));
 
-        final Window window = SwingUtil.getActiveWindow();
+        final Window window = SwingUtil.windowOnTop();
         final JOptionPane pane = new JOptionPane(panel, JOptionPane.ERROR_MESSAGE,
           JOptionPane.DEFAULT_OPTION, null, null, null);
 

@@ -51,6 +51,7 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
@@ -332,8 +333,8 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
   public void addZoomBookmark() {
     final BoundingBox boundingBox = getBoundingBox();
     if (!boundingBox.isEmpty()) {
-      final String name = JOptionPane.showInputDialog(this, "Enter bookmark name",
-        "Add Zoom Bookmark", JOptionPane.QUESTION_MESSAGE);
+      final String name = Dialogs.showInputDialog("Enter bookmark name", "Add Zoom Bookmark",
+        JOptionPane.QUESTION_MESSAGE);
       if (Property.hasValue(name)) {
         final Project project = getProject();
         project.addZoomBookmark(name, boundingBox);
@@ -887,7 +888,6 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     final Object source = event.getSource();

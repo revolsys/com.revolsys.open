@@ -1,7 +1,6 @@
 package com.revolsys.swing.component;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Window;
@@ -13,7 +12,6 @@ import java.util.function.Consumer;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -30,7 +28,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Cancellable;
 
 public class ProgressMonitor implements Cancellable {
-  private class ProgressMonitorDialog extends JDialog {
+  private class ProgressMonitorDialog extends BaseDialog {
     private static final long serialVersionUID = -5843323756390303783L;
 
     private final JButton cancelButton;
@@ -43,9 +41,8 @@ public class ProgressMonitor implements Cancellable {
 
     private final JLabel countLabel = new JLabel("0");
 
-    private ProgressMonitorDialog(final Component component, final String title, final String note,
-      final boolean canCancel) {
-      super(SwingUtil.getWindowAncestor(component), title, ModalityType.APPLICATION_MODAL);
+    private ProgressMonitorDialog(final String title, final String note, final boolean canCancel) {
+      super(title, ModalityType.APPLICATION_MODAL);
       setMinimumSize(new Dimension(title.length() * 20, 100));
       setLayout(new VerticalLayout(5));
       setMaximumSize(new Dimension(400, 40));
@@ -73,7 +70,8 @@ public class ProgressMonitor implements Cancellable {
       this.cancelButton.setEnabled(canCancel);
       buttonPanel.add(this.cancelButton);
       add(buttonPanel);
-      setLocationRelativeTo(component);
+      ProgressMonitor.this.activeWindow = SwingUtil.windowActive();
+      setLocationRelativeTo(ProgressMonitor.this.activeWindow);
       pack();
       setAlwaysOnTop(true);
       setResizable(false);
@@ -85,16 +83,35 @@ public class ProgressMonitor implements Cancellable {
     }
   }
 
-  public static void background(final Component component, final String title, final String note,
-    final Consumer<ProgressMonitor> task, final int max) {
-    background(component, title, note, task, max, (Consumer<Boolean>)null);
+  public static <V> void background(final String title, final Collection<V> objects,
+    final Consumer<V> action) {
+    background(title, null, monitor -> {
+      for (final V object : monitor.cancellable(objects)) {
+        action.accept(object);
+        monitor.addProgress();
+      }
+    }, objects.size());
   }
 
-  public static void background(final Component component, final String title, final String note,
+  public static <V> void background(final String title, final Collection<V> objects,
+    final Consumer<V> action, final Consumer<Boolean> doneTask) {
+    background(title, null, monitor -> {
+      for (final V object : monitor.cancellable(objects)) {
+        action.accept(object);
+        monitor.addProgress();
+      }
+    }, objects.size(), doneTask);
+  }
+
+  public static void background(final String title, final String note,
+    final Consumer<ProgressMonitor> task, final int max) {
+    background(title, note, task, max, (Consumer<Boolean>)null);
+  }
+
+  public static void background(final String title, final String note,
     final Consumer<ProgressMonitor> task, final int max, final Consumer<Boolean> doneTask) {
     Invoke.later(() -> {
-      final ProgressMonitor progressMonitor = new ProgressMonitor(component, title, note, true,
-        max);
+      final ProgressMonitor progressMonitor = new ProgressMonitor(title, note, true, max);
       Invoke.background(title, () -> {
         try {
           task.accept(progressMonitor);
@@ -106,7 +123,6 @@ public class ProgressMonitor implements Cancellable {
       }, r -> {
         progressMonitor.dialog.progressBar.setValue(progressMonitor.progress);
         progressMonitor.setDone();
-        component.requestFocus();
         if (doneTask != null) {
           doneTask.accept(!progressMonitor.cancelled);
         }
@@ -115,41 +131,15 @@ public class ProgressMonitor implements Cancellable {
     });
   }
 
-  public static void background(final Component component, final String title, final String note,
-    final Consumer<ProgressMonitor> task, final int max, final Runnable doneTask) {
-    background(component, title, note, task, max, completed -> doneTask.run());
-  }
-
-  public static <V> void background(final String title, final Collection<V> objects,
-    final Consumer<V> action) {
-    background(SwingUtil.getActiveWindow(), title, null, monitor -> {
-      for (final V object : monitor.cancellable(objects)) {
-        action.accept(object);
-        monitor.addProgress();
-      }
-    }, objects.size());
-  }
-
-  public static <V> void background(final String title, final Collection<V> objects,
-    final Consumer<V> action, final Consumer<Boolean> doneTask) {
-    background(SwingUtil.getActiveWindow(), title, null, monitor -> {
-      for (final V object : monitor.cancellable(objects)) {
-        action.accept(object);
-        monitor.addProgress();
-      }
-    }, objects.size(), doneTask);
-  }
-
   public static void background(final String title, final String note,
-    final Consumer<ProgressMonitor> task, final int max) {
-    background(SwingUtil.getActiveWindow(), title, note, task, max);
+    final Consumer<ProgressMonitor> task, final int max, final Runnable doneTask) {
+    background(title, note, task, max, completed -> doneTask.run());
   }
 
-  public static void ui(final Component component, final String title, final String note,
-    final boolean canCancel, final Consumer<ProgressMonitor> task) {
+  public static void ui(final String title, final String note, final boolean canCancel,
+    final Consumer<ProgressMonitor> task) {
     Invoke.later(() -> {
-      final ProgressMonitor progressMonitor = new ProgressMonitor(component, title, note, canCancel,
-        0);
+      final ProgressMonitor progressMonitor = new ProgressMonitor(title, note, canCancel, 0);
       Invoke.workerDone(title, () -> {
         try {
           task.accept(progressMonitor);
@@ -162,6 +152,8 @@ public class ProgressMonitor implements Cancellable {
       progressMonitor.show();
     });
   }
+
+  private Window activeWindow;
 
   private boolean cancelled = false;
 
@@ -186,10 +178,10 @@ public class ProgressMonitor implements Cancellable {
     }
   };
 
-  private ProgressMonitor(final Component component, final String title, final String note,
-    final boolean canCancel, final int max) {
+  private ProgressMonitor(final String title, final String note, final boolean canCancel,
+    final int max) {
     this.max = max;
-    this.dialog = new ProgressMonitorDialog(component, title, note, canCancel);
+    this.dialog = new ProgressMonitorDialog(title, note, canCancel);
   }
 
   public synchronized void addProgress() {
@@ -227,6 +219,9 @@ public class ProgressMonitor implements Cancellable {
   private void setDone() {
     this.done = true;
     this.dialog.setVisible(false);
+    if (this.activeWindow != null) {
+      this.activeWindow.requestFocus();
+    }
   }
 
   public void setVisible(final Window window) {

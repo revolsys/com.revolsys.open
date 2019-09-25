@@ -744,12 +744,13 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     return FileGdbRecordStoreFactory.DESCRIPTION;
   }
 
-  public TableWrapper getTableLocked(final RecordDefinition recordDefinition) {
+  public TableWrapper getTableLocked(final RecordDefinition recordDefinition,
+    final boolean loadOnlyMode) {
     final TableReference table = getTableReference(recordDefinition);
     if (table == null) {
       return null;
     } else {
-      return table.writeLock(true);
+      return table.writeLock(loadOnlyMode);
     }
   }
 
@@ -1118,7 +1119,13 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   @Override
   public FileGdbWriter newRecordWriter(final RecordDefinition recordDefinition) {
     final RecordDefinition fgdbRecordDefinition = getRecordDefinition(recordDefinition);
-    return new FileGdbWriter(this, fgdbRecordDefinition);
+    return newRecordWriter(fgdbRecordDefinition, true);
+  }
+
+  public FileGdbWriter newRecordWriter(final RecordDefinition recordDefinition,
+    final boolean loadOnlyMode) {
+    final RecordDefinition fgdbRecordDefinition = getRecordDefinition(recordDefinition);
+    return new FileGdbWriter(this, fgdbRecordDefinition, loadOnlyMode);
   }
 
   private RecordStoreSchema newSchema(final Geodatabase geodatabase, final PathName schemaPath,

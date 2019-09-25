@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dialog.ModalityType;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.LayoutManager;
@@ -25,6 +24,7 @@ import javax.swing.WindowConstants;
 import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.exception.Exceptions;
 
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
@@ -221,13 +221,13 @@ public class ValueField extends JPanel implements Field {
   public <V> V showDialog(final Component parent) {
     Window window;
     if (parent == null) {
-      window = SwingUtil.getActiveWindow();
+      window = SwingUtil.windowOnTop();
     } else if (parent instanceof Window) {
       window = (Window)parent;
     } else {
       window = SwingUtilities.windowForComponent(parent);
     }
-    final JDialog dialog = new JDialog(window, this.title, ModalityType.APPLICATION_MODAL);
+    final JDialog dialog = Dialogs.newModal(this.title);
     if (this.iconImage != null) {
       dialog.setIconImage(this.iconImage);
     }

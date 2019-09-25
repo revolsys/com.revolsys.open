@@ -60,7 +60,7 @@ public class BaseMain implements UncaughtExceptionHandler {
       final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
       final String threadName = Thread.currentThread().getName();
       final String stackTrace = e.getMessage() + "\n" + Strings.toString("\n", e.getStackTrace());
-      LoggingEventPanel.showDialog(null, timestamp, Level.ERROR, getClass().getName(),
+      LoggingEventPanel.showDialog(timestamp, Level.ERROR, getClass().getName(),
         "Unable to start application:" + e.getMessage(), threadName, stackTrace);
     } finally {
       Logs.error(this, "Unable to start application " + this.name, e);
@@ -152,6 +152,6 @@ public class BaseMain implements UncaughtExceptionHandler {
       .setThrown(e)
       .build();
 
-    LoggingEventPanel.showDialog(null, event);
+    LoggingEventPanel.showDialog(event);
   }
 }

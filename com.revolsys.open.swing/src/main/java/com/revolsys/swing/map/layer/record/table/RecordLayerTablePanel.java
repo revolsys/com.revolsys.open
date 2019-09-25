@@ -175,7 +175,7 @@ public class RecordLayerTablePanel extends TablePanel
       }
     };
     final int rowCount = this.tableModel.getRowCount();
-    ProgressMonitor.background(this, "Copy Values", "", action, rowCount);
+    ProgressMonitor.background("Copy Values", "", action, rowCount);
   }
 
   private void actionExportRecords() {

@@ -44,6 +44,7 @@ import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
@@ -256,6 +257,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     return false;
   }
 
+  @Override
   protected void cancel() {
     clearMouseOverLocations();
     if (this.addCompleteAction != null) {
@@ -1078,7 +1080,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         }
         event.consume();
       } else {
-        JOptionPane.showMessageDialog(this, "There are too many " + size
+        Dialogs.showMessageDialog("There are too many " + size
           + " selected to view. Maximum 10. Select fewer records or move mouse to middle of geometry.",
           "Too Many Selected Records", JOptionPane.ERROR_MESSAGE);
         event.consume();

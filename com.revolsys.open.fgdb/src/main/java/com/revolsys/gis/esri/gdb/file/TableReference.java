@@ -108,6 +108,10 @@ public class TableReference extends CloseableValueHolder<Table> {
     return (TableWrapper)super.connect();
   }
 
+  public String getCatalogPath() {
+    return this.catalogPath;
+  }
+
   public PathName getPathName() {
     return this.pathName;
   }

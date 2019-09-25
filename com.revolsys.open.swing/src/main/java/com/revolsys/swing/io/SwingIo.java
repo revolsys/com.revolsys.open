@@ -14,6 +14,7 @@ import com.revolsys.io.IoFactory;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.filter.FileNameExtensionFilter;
 import com.revolsys.predicate.Predicates;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.PreferencesUtil;
@@ -53,7 +54,7 @@ public class SwingIo {
       fileChooser.setMultiSelectionEnabled(false);
       fileChooser.setSelectedFile(new File(fileChooser.getCurrentDirectory(), baseName));
 
-      final int returnVal = fileChooser.showSaveDialog(SwingUtil.getActiveWindow());
+      final int returnVal = Dialogs.showSaveDialog(fileChooser);
       if (returnVal == JFileChooser.APPROVE_OPTION) {
         final FileNameExtensionFilter fileFilter = (FileNameExtensionFilter)fileChooser
           .getFileFilter();

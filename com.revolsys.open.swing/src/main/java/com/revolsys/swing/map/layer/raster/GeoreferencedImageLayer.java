@@ -32,6 +32,7 @@ import com.revolsys.raster.MappedLocation;
 import com.revolsys.raster.TiledGeoreferencedImage;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.TabbedValuePanel;
@@ -359,7 +360,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
           firePropertyChange("preEditable", false, true);
           if (isHasChanges()) {
             final Integer result = Invoke.andWait(() -> {
-              return JOptionPane.showConfirmDialog(JOptionPane.getRootFrame(),
+              return Dialogs.showConfirmDialog(
                 "The layer has unsaved changes. Click Yes to save changes. Click No to discard changes. Click Cancel to continue editing.",
                 "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
             });

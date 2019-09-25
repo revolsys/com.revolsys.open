@@ -76,7 +76,7 @@ public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V>
 
   @Override
   protected final void done() {
-    final Window activeWindow = SwingUtil.getActiveWindow();
+    final Window activeWindow = SwingUtil.windowActive();
     if (isShowBusyCursor() && activeWindow != null) {
       Component component;
       Component glassPane = null;

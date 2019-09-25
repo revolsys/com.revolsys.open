@@ -14,8 +14,8 @@ import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGridFactory;
 import com.revolsys.gis.grid.RectangularMapTile;
 import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.component.TabbedValuePanel;
-import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
@@ -134,14 +134,13 @@ public class GridLayer extends AbstractLayer {
   public void zoomToSheet() {
     final LayerGroup project = getProject();
     if (project != null) {
-      final MapPanel map = getMapPanel();
       final RectangularMapGrid grid = getGrid();
       final String gridName = grid.getName();
       final String preferenceName = CaseConverter.toCapitalizedWords(gridName) + "Mapsheet";
       String mapsheet = PreferencesUtil.getString(getClass(), preferenceName);
 
       final String title = "Zoom to Mapsheet: " + getName();
-      mapsheet = (String)JOptionPane.showInputDialog(map,
+      mapsheet = (String)Dialogs.showInputDialog(
         new JLabel("<html><p>" + gridName + "</p><p>Enter mapsheet to zoom to.</p></html>"), title,
         JOptionPane.QUESTION_MESSAGE, null, null, mapsheet);
       zoomToSheet(mapsheet);
@@ -152,7 +151,6 @@ public class GridLayer extends AbstractLayer {
     final Project project = getProject();
     if (project != null) {
       if (Property.hasValue(mapsheet)) {
-        final MapPanel map = getMapPanel();
         final RectangularMapGrid grid = getGrid();
         final String gridName = grid.getName();
         try {
@@ -161,7 +159,7 @@ public class GridLayer extends AbstractLayer {
           project.setViewBoundingBox(boundingBox);
         } catch (final Throwable e) {
           final String message = "Invalid mapsheet " + mapsheet + " for " + gridName;
-          JOptionPane.showMessageDialog(map, message);
+          Dialogs.showMessageDialog(message);
         } finally {
           final String preferenceName = CaseConverter.toCapitalizedWords(gridName) + "Mapsheet";
           PreferencesUtil.setString(getClass(), preferenceName, mapsheet);

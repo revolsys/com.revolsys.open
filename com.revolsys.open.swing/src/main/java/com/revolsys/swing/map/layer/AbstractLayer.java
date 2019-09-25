@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.TextArea;
-import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.ref.Reference;
@@ -28,7 +27,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
 import org.jdesktop.swingx.JXTable;
@@ -58,6 +56,7 @@ import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.swing.Borders;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.Panels;
 import com.revolsys.swing.RsSwingServiceInitializer;
@@ -69,7 +68,6 @@ import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.listener.BeanPropertyListener;
-import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.component.GeometryFactoryField;
 import com.revolsys.swing.map.layer.menu.TreeItemScaleMenu;
@@ -298,7 +296,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   public void deleteWithConfirm() {
-    final int confirm = JOptionPane.showConfirmDialog(getMapPanel(),
+    final int confirm = Dialogs.showConfirmDialog(
       "Delete the layer and any child layers? This action cannot be undone.", "Delete Layer",
       JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
     if (confirm == JOptionPane.YES_OPTION) {
@@ -1239,16 +1237,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     if (this.exists) {
       if (checkShowProperties()) {
         try {
-          final MapPanel map = getMapPanel();
-          final Window window;
-          if (map == null) {
-            window = SwingUtil.getActiveWindow();
-          } else {
-            window = SwingUtilities.getWindowAncestor(map);
-          }
           final TabbedValuePanel panel = newPropertiesPanel();
           panel.setSelectdTab(tabName);
-          panel.showDialog(window);
+          panel.showDialog();
           refresh();
         } finally {
           removeProperty("INTERNAL_PROPERTIES_VISIBLE");

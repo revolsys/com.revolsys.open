@@ -21,15 +21,19 @@ public class FileGdbWriter extends AbstractRecordWriter {
 
   private PathName pathName;
 
+  private final boolean loadOnlyMode;
+
   FileGdbWriter(final FileGdbRecordStore recordStore) {
-    this.recordStore = recordStore;
+    this(recordStore, null, true);
   }
 
-  FileGdbWriter(final FileGdbRecordStore recordStore, final RecordDefinition recordDefinition) {
+  FileGdbWriter(final FileGdbRecordStore recordStore, final RecordDefinition recordDefinition,
+    final boolean loadOnlyMode) {
     this.recordStore = recordStore;
+    this.loadOnlyMode = loadOnlyMode;
     if (recordDefinition != null) {
       this.pathName = recordDefinition.getPathName();
-      this.table = recordStore.getTableLocked(recordDefinition);
+      this.table = recordStore.getTableLocked(recordDefinition, loadOnlyMode);
       this.recordDefinition = recordDefinition;
     }
   }
@@ -101,7 +105,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
     synchronized (this.tablesByCatalogPath) {
       TableWrapper table = this.tablesByCatalogPath.get(catalogPath);
       if (table == null) {
-        table = this.recordStore.getTableLocked(recordDefinition);
+        table = this.recordStore.getTableLocked(recordDefinition, this.loadOnlyMode);
         if (table != null) {
           this.tablesByCatalogPath.put(catalogPath, table);
         }

@@ -9,6 +9,7 @@ import javax.swing.JDialog;
 
 import org.jeometry.common.logging.Logs;
 
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.WindowManager;
 
 public class BaseDialog extends JDialog {
@@ -58,6 +59,10 @@ public class BaseDialog extends JDialog {
   public BaseDialog(final Frame owner, final String title, final boolean modal,
     final GraphicsConfiguration gc) {
     super(owner, title, modal, gc);
+  }
+
+  public BaseDialog(final String title, final ModalityType modalityType) {
+    this(SwingUtil.windowOnTop(), title, modalityType);
   }
 
   public BaseDialog(final Window owner) {

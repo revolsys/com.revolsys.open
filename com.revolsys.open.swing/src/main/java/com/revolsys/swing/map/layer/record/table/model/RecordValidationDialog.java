@@ -3,9 +3,7 @@ package com.revolsys.swing.map.layer.record.table.model;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dialog.ModalityType;
 import java.awt.Rectangle;
-import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Closeable;
@@ -32,6 +30,7 @@ import org.jeometry.common.awt.WebColors;
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -249,10 +248,7 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     Invoke.later(() -> {
       final String layerPath = this.layer.getPath();
 
-      final Window window = SwingUtil.getActiveWindow();
-
-      final JDialog dialog = new JDialog(window, "Error " + title + " for " + layerPath,
-        ModalityType.APPLICATION_MODAL);
+      final JDialog dialog = Dialogs.newModal("Error " + title + " for " + layerPath);
       dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
       dialog.setLayout(new BorderLayout());

@@ -205,7 +205,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
         if (this.sql.startsWith("SELECT")) {
           this.rows = this.table.query(this.sql, true);
         } else {
-          this.rows = this.table.search(this.catalogPath, this.fields, this.sql, true);
+          this.rows = this.table.search(this.fields, this.sql, true);
         }
       } else {
         BoundingBox boundingBox = this.boundingBox;
@@ -221,7 +221,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
         if ("1 = 1".equals(sql)) {
           sql = "";
         }
-        this.rows = this.table.search(this.catalogPath, this.fields, sql, envelope, true);
+        this.rows = this.table.search(this.fields, sql, envelope, true);
       }
       if (this.rows == null) {
         close();

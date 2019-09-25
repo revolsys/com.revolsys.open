@@ -87,6 +87,7 @@ import com.revolsys.record.query.functions.Function;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Borders;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BasePanel;
@@ -606,7 +607,7 @@ public class QueryWhereConditionField extends ValueField
     if (this.valid) {
       super.save(dialog);
     } else {
-      JOptionPane.showMessageDialog(this,
+      Dialogs.showMessageDialog(
         "<html><p>Cannot save the advanced query as the SQL is valid.<p></p>Fix the SQL or use the cancel button on the Advanced Search window to cancel the changes.<p></html>",
         "SQL Invalid", JOptionPane.ERROR_MESSAGE);
     }

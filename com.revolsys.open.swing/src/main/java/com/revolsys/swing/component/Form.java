@@ -3,10 +3,8 @@ package com.revolsys.swing.component;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dialog.ModalityType;
 import java.awt.FlowLayout;
 import java.awt.LayoutManager;
-import java.awt.Window;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,7 +18,6 @@ import java.util.function.Consumer;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import org.jeometry.common.data.type.DataType;
@@ -28,6 +25,7 @@ import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.field.Field;
@@ -348,20 +346,7 @@ public class Form extends BasePanel {
   }
 
   public boolean showDialog() {
-    final Window window = SwingUtil.getActiveWindow();
-    return showDialog(window);
-  }
-
-  public boolean showDialog(final Component component) {
-    Window window;
-    if (component == null) {
-      window = SwingUtil.getActiveWindow();
-    } else if (component instanceof Window) {
-      window = (Window)component;
-    } else {
-      window = SwingUtilities.windowForComponent(component);
-    }
-    final JDialog dialog = new JDialog(window, this.title, ModalityType.APPLICATION_MODAL);
+    final JDialog dialog = Dialogs.newModal(this.title);
     dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
     dialog.setLayout(new BorderLayout());
 

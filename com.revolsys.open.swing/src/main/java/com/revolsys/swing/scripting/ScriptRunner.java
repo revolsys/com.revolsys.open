@@ -18,6 +18,7 @@ import javax.tools.ToolProvider;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.filter.FileNameExtensionFilter;
 import com.revolsys.process.JavaProcess;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.logging.LoggingEventPanel;
 import com.revolsys.util.PreferencesUtil;
@@ -50,7 +51,7 @@ public class ScriptRunner {
     fileChooser.addChoosableFileFilter(javaFilter);
 
     fileChooser.setMultiSelectionEnabled(false);
-    final int returnVal = fileChooser.showOpenDialog(window);
+    final int returnVal = Dialogs.showOpenDialog(fileChooser);
     if (returnVal == JFileChooser.APPROVE_OPTION) {
       final File selectedFile = fileChooser.getSelectedFile();
       final File scriptFile = FileUtil.getFile(selectedFile);
@@ -146,14 +147,13 @@ public class ScriptRunner {
   }
 
   private void showErrorDialog(final Class<?> scriptClass, final Throwable e) {
-    LoggingEventPanel.showDialog(SwingUtil.getActiveWindow(), "Error running script file:<br /> " //
+    LoggingEventPanel.showDialog("Error running script file:<br /> " //
       + "<code>" + this.scriptFile + "</code><br />"//
       + e.getMessage(), e);
   }
 
   private void showErrorDialog(final String message) {
-    JOptionPane.showMessageDialog(SwingUtil.getActiveWindow(), "<html>Script file:<br /> "
-      + "<code>" + this.scriptFile + "</code><br />" + message + "</html>", "Script Error",
-      JOptionPane.ERROR_MESSAGE);
+    Dialogs.showMessageDialog("<html>Script file:<br /> " + "<code>" + this.scriptFile
+      + "</code><br />" + message + "</html>", "Script Error", JOptionPane.ERROR_MESSAGE);
   }
 }

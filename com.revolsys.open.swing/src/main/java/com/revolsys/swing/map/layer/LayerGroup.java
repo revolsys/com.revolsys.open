@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer;
 
-import java.awt.Window;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
 import java.net.URL;
@@ -46,6 +45,7 @@ import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.component.GeometryFactoryField;
@@ -167,8 +167,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   private LayerGroup actionAddLayerGroup() {
-    final String name = JOptionPane.showInputDialog(SwingUtil.getActiveWindow(),
-      "Enter the name of the new Layer Group.", "Add Layer Group", JOptionPane.PLAIN_MESSAGE);
+    final String name = Dialogs.showInputDialog("Enter the name of the new Layer Group.",
+      "Add Layer Group", JOptionPane.PLAIN_MESSAGE);
     if (Property.hasValue(name)) {
       final LayerGroup newGroup = new LayerGroup(name);
       addLayer(newGroup);
@@ -202,8 +202,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     } else {
       fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     }
-    final Window window = SwingUtil.getActiveWindow();
-    final int returnVal = fileChooser.showOpenDialog(window);
+    final int returnVal = Dialogs.showOpenDialog(fileChooser);
     if (returnVal == JFileChooser.APPROVE_OPTION) {
       final File projectDirectory = fileChooser.getSelectedFile();
       if (projectDirectory != null) {
@@ -217,8 +216,6 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   private void actionOpenFileLayer() {
-    final Window window = SwingUtil.getActiveWindow();
-
     final JFileChooser fileChooser = SwingUtil.newFileChooser(getClass(), "currentDirectory");
     fileChooser.setMultiSelectionEnabled(true);
 
@@ -269,7 +266,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     fileChooser.setAcceptAllFileFilterUsed(false);
     fileChooser.setFileFilter(allFilter);
 
-    final int status = fileChooser.showDialog(window, "Open Files");
+    final int status = Dialogs.showDialog(fileChooser, "Open Files");
     if (status == JFileChooser.APPROVE_OPTION) {
       final Object menuSource = MenuFactory.getMenuSource();
       final LayerGroup layerGroup;
@@ -290,9 +287,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   private void actionOpenUrlLayer() {
-    final Window window = SwingUtil.getActiveWindow();
-
-    final String urlString = JOptionPane.showInputDialog(window, "URL");
+    final String urlString = Dialogs.showInputDialog("URL");
 
     if (Property.hasValue(urlString)) {
       final URL url = UrlUtil.getUrl(urlString);

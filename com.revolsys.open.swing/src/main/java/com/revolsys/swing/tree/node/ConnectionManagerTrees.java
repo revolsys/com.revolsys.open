@@ -1,6 +1,5 @@
 package com.revolsys.swing.tree.node;
 
-import java.awt.Window;
 import java.io.File;
 import java.nio.file.Path;
 
@@ -13,6 +12,7 @@ import com.revolsys.connection.Connection;
 import com.revolsys.connection.ConnectionRegistry;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.filter.FileNameExtensionFilter;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
@@ -36,7 +36,7 @@ public class ConnectionManagerTrees {
 
   private static void deleteConnection(final Connection connection) {
     if (!connection.isReadOnly()) {
-      final int confirm = JOptionPane.showConfirmDialog(SwingUtil.getActiveWindow(),
+      final int confirm = Dialogs.showConfirmDialog(
         "Delete connection '" + connection.getName() + "'? This action cannot be undone.",
         "Delete Connection", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
       if (confirm == JOptionPane.YES_OPTION) {
@@ -55,8 +55,6 @@ public class ConnectionManagerTrees {
       connectionType += " Connection";
     }
 
-    final Window window = SwingUtil.getActiveWindow();
-
     final Class<?> chooserClass = connectionRegistry.getClass();
     final JFileChooser fileChooser = SwingUtil.newFileChooser(chooserClass, "currentDirectory");
     fileChooser.setDialogTitle("Export " + connectionType);
@@ -74,7 +72,7 @@ public class ConnectionManagerTrees {
     fileChooser.setSelectedFile(
       new File(fileChooser.getCurrentDirectory(), connectionName + "." + fileExtension));
 
-    final int status = fileChooser.showSaveDialog(window);
+    final int status = Dialogs.showSaveDialog(fileChooser);
     if (status == JFileChooser.APPROVE_OPTION) {
       Invoke.background("Export " + connectionType, () -> {
         File file = fileChooser.getSelectedFile();
@@ -95,8 +93,6 @@ public class ConnectionManagerTrees {
       name += " Connection";
     }
 
-    final Window window = SwingUtil.getActiveWindow();
-
     final Class<?> chooserClass = connectionRegistry.getClass();
     final JFileChooser fileChooser = SwingUtil.newFileChooser(chooserClass, "currentDirectory");
     fileChooser.setDialogTitle("Import " + name);
@@ -110,7 +106,7 @@ public class ConnectionManagerTrees {
     fileChooser.setAcceptAllFileFilterUsed(false);
     fileChooser.setFileFilter(allFilter);
 
-    final int status = fileChooser.showDialog(window, "Import");
+    final int status = Dialogs.showDialog(fileChooser, "Import");
     if (status == JFileChooser.APPROVE_OPTION) {
       Invoke.background("Import " + name, () -> {
         for (final File file : fileChooser.getSelectedFiles()) {

@@ -4,7 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dialog.ModalityType;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.Window;
@@ -66,6 +65,7 @@ import com.revolsys.record.property.DirectionalFields;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.Panels;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.TabbedPane;
@@ -1470,8 +1470,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
 
   public boolean showAddDialog() {
     final String title = "Add New " + getName();
-    final Window activeWindow = SwingUtil.getActiveWindow();
-    final JDialog dialog = new JDialog(activeWindow, title, ModalityType.APPLICATION_MODAL);
+    final JDialog dialog = Dialogs.newModal(title);
     dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     dialog.setLayout(new BorderLayout());
 

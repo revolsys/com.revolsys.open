@@ -86,6 +86,7 @@ import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.ByteArrayResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BaseDialog;
@@ -194,7 +195,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       synchronized (getSync()) {
         if (this.index == null) {
           this.index = newSpatialIndex();
-          forEachRecord(this.index::addRecord);
+          forEachRecord(record -> {
+            if (!isDeleted(record)) {
+              this.index.addRecord(record);
+            }
+          });
         }
       }
       return this.index;
@@ -231,11 +236,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     public boolean removeRecord(final LayerRecord record) {
       synchronized (getSync()) {
         super.removeRecord(record);
-        synchronized (this) {
-          if (this.index != null) {
-            this.index.removeRecord(record.newRecordProxy());
-          }
-        }
+        this.index = null;
       }
       return true;
     }
@@ -658,7 +659,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           fireRecordsChanged();
         }
         if (!cancelled) {
-          JOptionPane.showMessageDialog(getMapPanel(),
+          Dialogs.showMessageDialog(
             "<html><p>There was an error cancelling changes for one or more records.</p>" + "<p>"
               + getPath() + "</p>" + "<p>Check the logging panel for details.</html>",
             "Error Cancelling Changes", JOptionPane.ERROR_MESSAGE);
@@ -729,7 +730,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final boolean globalConfirmDeleteRecords = Preferences.getValue("com.revolsys.gis",
       PREFERENCE_CONFIRM_DELETE_RECORDS);
     if (globalConfirmDeleteRecords || this.confirmDeleteRecords) {
-      final int confirm = JOptionPane.showConfirmDialog(getMapPanel(),
+      final int confirm = Dialogs.showConfirmDialog(
         "Delete " + recordCount + " records" + suffix + "? This action cannot be undone.",
         "Delete Records" + suffix, JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
       return confirm == JOptionPane.YES_OPTION;
@@ -1184,7 +1185,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final RecordDefinition recordDefinition = getRecordDefinition();
       final FieldDefinition geometryField = recordDefinition.getGeometryField();
       if (geometryField != null) {
-        final MapPanel parentComponent = getMapPanel();
         Geometry geometry = null;
         DataType geometryDataType = null;
         Class<?> layerGeometryClass = null;
@@ -1218,7 +1218,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
                 final Geometry sourceGeometry = sourceRecord.getGeometry();
                 if (sourceGeometry == null) {
                   if (alert) {
-                    JOptionPane.showMessageDialog(parentComponent,
+                    Dialogs.showMessageDialog(
                       "Clipboard does not contain a record with a geometry.", "Paste Geometry",
                       JOptionPane.ERROR_MESSAGE);
                   }
@@ -1227,7 +1227,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
                 geometry = geometryFactory.geometry(layerGeometryClass, sourceGeometry);
                 if (geometry == null) {
                   if (alert) {
-                    JOptionPane.showMessageDialog(parentComponent,
+                    Dialogs.showMessageDialog(
                       "Clipboard should contain a record with a " + geometryDataType + " not a "
                         + sourceGeometry.getGeometryType() + ".",
                       "Paste Geometry", JOptionPane.ERROR_MESSAGE);
@@ -1236,7 +1236,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
                 }
               } else {
                 if (alert) {
-                  JOptionPane.showMessageDialog(parentComponent,
+                  Dialogs.showMessageDialog(
                     "Clipboard contains more than one record. Copy a single record.",
                     "Paste Geometry", JOptionPane.ERROR_MESSAGE);
                 }
@@ -1248,14 +1248,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           }
           if (geometry == null) {
             if (alert) {
-              JOptionPane.showMessageDialog(parentComponent,
-                "Clipboard does not contain a record with a geometry.", "Paste Geometry",
-                JOptionPane.ERROR_MESSAGE);
+              Dialogs.showMessageDialog("Clipboard does not contain a record with a geometry.",
+                "Paste Geometry", JOptionPane.ERROR_MESSAGE);
             }
           } else if (geometry.isEmpty()) {
             if (alert) {
-              JOptionPane.showMessageDialog(parentComponent,
-                "Clipboard contains an empty geometry.", "Paste Geometry",
+              Dialogs.showMessageDialog("Clipboard contains an empty geometry.", "Paste Geometry",
                 JOptionPane.ERROR_MESSAGE);
             }
             return null;
@@ -2306,7 +2304,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
       }
     } catch (final Throwable e) {
-      LoggingEventPanel.showDialog(getMapPanel(), "Unexpected error pasting records", e);
+      LoggingEventPanel.showDialog("Unexpected error pasting records", e);
       return;
     }
     RecordValidationDialog.validateRecords("Pasting Records", this, newRecords, (validator) -> {
@@ -2693,7 +2691,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         final boolean hasChanges = isHasChanges();
         if (hasChanges) {
           final Integer result = Invoke.andWait(() -> {
-            return JOptionPane.showConfirmDialog(JOptionPane.getRootFrame(),
+            return Dialogs.showConfirmDialog(
               "The layer has unsaved changes. Click Yes to save changes. Click No to discard changes. Click Cancel to continue editing.",
               "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
           });
@@ -3002,8 +3000,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
       }
     } else {
-      final Window window = SwingUtil.getActiveWindow();
-      JOptionPane.showMessageDialog(window,
+      Dialogs.showMessageDialog(
         "Adding records is not enabled for the " + getPath()
           + " layer. If possible make the layer editable",
         "Cannot Add Record", JOptionPane.ERROR_MESSAGE);
@@ -3035,7 +3032,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           form = newForm(record);
           if (form != null) {
             final String title = LayerRecordForm.getTitle(record);
-            final Window parent = SwingUtil.getActiveWindow();
+            final Window parent = getMapPanel().getProjectFrame();
             window = new BaseDialog(parent, title);
             window.add(form);
             window.pack();

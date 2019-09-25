@@ -33,9 +33,7 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
   }
 
   default boolean deleteRecord(final Record record) {
-
     final Integer objectId = record.getInteger("OBJECTID");
-    final PathName typePath = record.getPathName();
     if (objectId != null) {
       final FileGdbRecordStore recordStore = getRecordStore();
       final String whereClause = "OBJECTID=" + objectId;
@@ -43,7 +41,7 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
       return tableReference.valueFunctionSync(table -> {
         try (
           BaseCloseable lock = writeLock();
-          final FileGdbEnumRowsIterator rows = search(typePath, "OBJECTID", whereClause, true)) {
+          final FileGdbEnumRowsIterator rows = search("OBJECTID", whereClause, true)) {
           for (final Row row : rows) {
             setLoadOnlyMode(false);
             table.deleteRow(row);
@@ -142,8 +140,8 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
     return new FileGdbEnumRowsIterator(this, rows);
   }
 
-  default FileGdbEnumRowsIterator search(final Object typePath, final String fields,
-    final String whereClause, final boolean recycling) {
+  default FileGdbEnumRowsIterator search(final String fields, final String whereClause,
+    final boolean recycling) {
     final TableReference tableReference = getTableReference();
     final EnumRows rows = tableReference.valueFunctionSync(table -> {
       try {
@@ -153,7 +151,7 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
           final StringBuilder logQuery = new StringBuilder("ERROR executing query SELECT ");
           logQuery.append(fields);
           logQuery.append(" FROM ");
-          logQuery.append(typePath);
+          logQuery.append(tableReference.getCatalogPath());
           if (Property.hasValue(whereClause)) {
             logQuery.append(" WHERE ");
             logQuery.append(whereClause);
@@ -166,8 +164,8 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
     return new FileGdbEnumRowsIterator(this, rows);
   }
 
-  default FileGdbEnumRowsIterator search(final Object typePath, final String fields,
-    final String whereClause, final Envelope boundingBox, final boolean recycling) {
+  default FileGdbEnumRowsIterator search(final String fields, final String whereClause,
+    final Envelope boundingBox, final boolean recycling) {
     EnumRows rows = null;
     if (!boundingBox.IsEmpty()) {
       final TableReference tableReference = getTableReference();
@@ -179,7 +177,7 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
             final StringBuilder logQuery = new StringBuilder("ERROR executing query SELECT ");
             logQuery.append(fields);
             logQuery.append(" FROM ");
-            logQuery.append(typePath);
+            logQuery.append(tableReference.getCatalogPath());
             logQuery.append(" WHERE ");
             if (Property.hasValue(whereClause)) {
               logQuery.append(whereClause);
@@ -223,7 +221,7 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
       final TableReference tableReference = getTableReference();
       tableReference.valueConsumeSync(table -> {
         try (
-          final FileGdbEnumRowsIterator rows = search(typePath, "*", whereClause, false)) {
+          final FileGdbEnumRowsIterator rows = search("*", whereClause, false)) {
           for (final Row row : rows) {
             try {
               for (final FieldDefinition field : recordDefinition.getFields()) {

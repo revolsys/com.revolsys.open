@@ -8,9 +8,9 @@ import java.nio.file.Paths;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 import com.revolsys.io.FileUtil;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
@@ -58,15 +58,14 @@ public class FileField extends ValueField implements Field {
   private void browseClick() {
     try {
 
-      if (JFileChooser.APPROVE_OPTION == this.fileChooser
-        .showOpenDialog(SwingUtilities.windowForComponent(this))) {
+      if (JFileChooser.APPROVE_OPTION == Dialogs.showOpenDialog(this.fileChooser)) {
         final File file = this.fileChooser.getSelectedFile();
         if (file != null) {
           this.fileName.setText(file.getCanonicalPath());
         }
       }
     } catch (final Throwable t) {
-      JOptionPane.showMessageDialog(this, t.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+      Dialogs.showMessageDialog(t.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
   }
 

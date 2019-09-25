@@ -30,7 +30,7 @@ import org.jdesktop.swingx.HorizontalLayout;
 import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.VerticalLayout;
 
-import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.dnd.transferhandler.ListReorderableTransferHandler;
 import com.revolsys.swing.field.ArrayListComboBoxModel;
@@ -179,8 +179,8 @@ public class FieldNamesSetPanel extends ValueField
   }
 
   private void actionAdd() {
-    final String name = JOptionPane.showInputDialog(SwingUtil.getActiveWindow(),
-      "Enter the name of the new field set.", "Add Field Set", JOptionPane.PLAIN_MESSAGE);
+    final String name = Dialogs.showInputDialog("Enter the name of the new field set.",
+      "Add Field Set", JOptionPane.PLAIN_MESSAGE);
     if (Property.hasValue(name)) {
       boolean found = false;
       for (int i = 0; i < this.fieldNamesSetNamesModel.size(); i++) {
@@ -233,8 +233,8 @@ public class FieldNamesSetPanel extends ValueField
     if ("All".equalsIgnoreCase(fieldSetName)) {
       Toolkit.getDefaultToolkit().beep();
     } else {
-      final int result = JOptionPane.showConfirmDialog(SwingUtil.getActiveWindow(),
-        "Delete field set " + fieldSetName + ".", "Delete Field Set", JOptionPane.YES_NO_OPTION);
+      final int result = Dialogs.showConfirmDialog("Delete field set " + fieldSetName + ".",
+        "Delete Field Set", JOptionPane.YES_NO_OPTION);
       if (result == JOptionPane.YES_OPTION) {
         for (int i = 0; i < this.fieldNamesSetNamesModel.size(); i++) {
           final String name2 = this.fieldNamesSetNamesModel.get(i);
@@ -329,7 +329,7 @@ public class FieldNamesSetPanel extends ValueField
     if ("All".equalsIgnoreCase(oldName)) {
       Toolkit.getDefaultToolkit().beep();
     } else {
-      final String newName = (String)JOptionPane.showInputDialog(SwingUtil.getActiveWindow(),
+      final String newName = (String)Dialogs.showInputDialog(
         "Enter the new name for the field set.", "Rename Field Set", JOptionPane.PLAIN_MESSAGE,
         null, null, oldName);
       if (Property.hasValue(newName)) {
@@ -339,8 +339,8 @@ public class FieldNamesSetPanel extends ValueField
           if (oldName.equalsIgnoreCase(name)) {
             index = i;
           } else if (newName.equalsIgnoreCase(name)) {
-            JOptionPane.showMessageDialog(SwingUtil.getActiveWindow(),
-              "New name already in use: " + newName, "Rename Field Set", JOptionPane.ERROR_MESSAGE);
+            Dialogs.showMessageDialog("New name already in use: " + newName, "Rename Field Set",
+              JOptionPane.ERROR_MESSAGE);
             return;
           }
         }

@@ -60,6 +60,7 @@ import com.revolsys.raster.GeoreferencedImageWriterFactory;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.spring.resource.PathResource;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.EventQueue;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
@@ -284,7 +285,7 @@ public class ProjectFrame extends BaseFrame {
       } else {
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
       }
-      final int returnVal = fileChooser.showOpenDialog(this);
+      final int returnVal = Dialogs.showOpenDialog(fileChooser);
       if (returnVal == JFileChooser.APPROVE_OPTION) {
         final File projectDirectory = fileChooser.getSelectedFile();
         final File parentDirectory = projectDirectory.getParentFile();

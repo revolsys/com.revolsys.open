@@ -1,12 +1,9 @@
 package com.revolsys.swing.logging;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Window;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.util.List;
@@ -19,7 +16,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
 import org.apache.commons.io.output.StringBuilderWriter;
@@ -29,7 +25,7 @@ import org.apache.logging.log4j.core.impl.ThrowableProxy;
 import org.jdesktop.swingx.plaf.basic.core.BasicTransferable;
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.layout.GroupLayouts;
@@ -89,17 +85,17 @@ public class LoggingEventPanel extends JPanel {
     }
   }
 
-  public static void showDialog(final Component parent, final List<Object> event) {
+  public static void showDialog(final List<Object> event) {
     final Timestamp timestamp = (Timestamp)event.get(0);
     final Level level = (Level)event.get(1);
     final String loggerName = (String)event.get(2);
     final String message = (String)event.get(3);
     final String threadName = (String)event.get(4);
     final String stackTrace = getStackTrace((ThrowableProxy)event.get(5)); // TODO
-    showDialog(parent, timestamp, level, loggerName, message, threadName, stackTrace);
+    showDialog(timestamp, level, loggerName, message, threadName, stackTrace);
   }
 
-  public static void showDialog(final Component parent, final LogEvent event) {
+  public static void showDialog(final LogEvent event) {
     final long time = event.getTimeMillis();
     final Timestamp timestamp = new Timestamp(time);
 
@@ -109,11 +105,10 @@ public class LoggingEventPanel extends JPanel {
     final String loggerName = event.getLoggerName();
     final String threadName = event.getThreadName();
     final Object message = event.getMessage();
-    showDialog(parent, timestamp, level, loggerName, message, threadName, stackTrace);
+    showDialog(timestamp, level, loggerName, message, threadName, stackTrace);
   }
 
-  public static void showDialog(final Component parent, final String title, final String message,
-    final Throwable e) {
+  public static void showDialog(final String title, final String message, final Throwable e) {
     Invoke.later(() -> {
       final StringBuilderWriter stackTrace = new StringBuilderWriter();
       try (
@@ -124,21 +119,21 @@ public class LoggingEventPanel extends JPanel {
       final LoggingEventPanel panel = new LoggingEventPanel(null, null, null, null, message,
         stackTrace);
 
-      panel.showDialog(parent, title);
+      panel.showDialog(title);
     });
   }
 
-  public static void showDialog(final Component parent, final String message, final Throwable e) {
-    showDialog(parent, "Error", message, e);
+  public static void showDialog(final String message, final Throwable e) {
+    showDialog("Error", message, e);
   }
 
-  public static void showDialog(final Component parent, final Timestamp timestamp,
-    final Level level, final String loggerName, final Object message, final String threadName,
+  public static void showDialog(final Timestamp timestamp, final Level level,
+    final String loggerName, final Object message, final String threadName,
     final String stackTrace) {
     Invoke.later(() -> {
       final LoggingEventPanel panel = new LoggingEventPanel(timestamp, level, loggerName,
         threadName, message, stackTrace);
-      panel.showDialog(parent, "Application Log Details");
+      panel.showDialog("Application Log Details");
     });
   }
 
@@ -169,14 +164,8 @@ public class LoggingEventPanel extends JPanel {
     setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
   }
 
-  private void showDialog(final Component parent, final String title) {
-    final Window window;
-    if (parent == null) {
-      window = SwingUtil.getActiveWindow();
-    } else {
-      window = SwingUtilities.getWindowAncestor(parent);
-    }
-    final JDialog dialog = new JDialog(window, title, ModalityType.APPLICATION_MODAL);
+  private void showDialog(final String title) {
+    final JDialog dialog = Dialogs.newModal(title);
     dialog.setLayout(new BorderLayout());
     dialog.add(this, BorderLayout.CENTER);
     final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
