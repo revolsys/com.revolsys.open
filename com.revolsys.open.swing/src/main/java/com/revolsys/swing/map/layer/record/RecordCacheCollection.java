@@ -36,7 +36,7 @@ public class RecordCacheCollection extends AbstractRecordCache<AbstractRecordLay
   }
 
   @Override
-  public <R extends LayerRecord> void forEachRecord(final Consumer<R> action) {
+  public <R extends LayerRecord> void forEachRecordDo(final Consumer<R> action) {
     try {
       final AbstractRecordLayer layer = this.layer;
       for (final LayerRecord record : this.records) {

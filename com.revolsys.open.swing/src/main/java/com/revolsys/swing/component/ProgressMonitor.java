@@ -15,6 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.UIManager;
 
@@ -24,6 +25,7 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
+import com.revolsys.swing.parallel.AbstractSwingWorker;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Cancellable;
 
@@ -81,6 +83,12 @@ public class ProgressMonitor implements Cancellable {
         this.progressBar.setValue(progress);
       });
     }
+
+    @Override
+    public void removeNotify() {
+      super.removeNotify();
+      this.timer.stop();
+    }
   }
 
   public static <V> void background(final String title, final Collection<V> objects,
@@ -112,21 +120,39 @@ public class ProgressMonitor implements Cancellable {
     final Consumer<ProgressMonitor> task, final int max, final Consumer<Boolean> doneTask) {
     Invoke.later(() -> {
       final ProgressMonitor progressMonitor = new ProgressMonitor(title, note, true, max);
-      Invoke.background(title, () -> {
-        try {
-          task.accept(progressMonitor);
-        } catch (final Throwable e) {
-          Logs.error(ProgressMonitor.class, e);
+      final SwingWorker<Object, Object> worker = new AbstractSwingWorker<>() {
+
+        @Override
+        protected Object handleBackground() {
+          try {
+            task.accept(progressMonitor);
+          } catch (final Throwable e) {
+            Logs.error(ProgressMonitor.class, e);
+          }
+          progressMonitor.progress = progressMonitor.max;
+          return null;
         }
-        progressMonitor.progress = progressMonitor.max;
-        return null;
-      }, r -> {
-        progressMonitor.dialog.progressBar.setValue(progressMonitor.progress);
-        progressMonitor.setDone();
-        if (doneTask != null) {
-          doneTask.accept(!progressMonitor.cancelled);
+
+        @Override
+        protected void handleCancelled() {
+          progressMonitor.setDone();
         }
-      });
+
+        @Override
+        protected void handleDone(final Object result) {
+          progressMonitor.setDone();
+          if (doneTask != null) {
+            doneTask.accept(!progressMonitor.cancelled);
+          }
+        }
+
+        @Override
+        protected void handleException(final Throwable exception) {
+          progressMonitor.setDone();
+          Logs.error(ProgressMonitor.class, exception);
+        }
+      };
+      Invoke.worker(worker);
       progressMonitor.show();
     });
   }

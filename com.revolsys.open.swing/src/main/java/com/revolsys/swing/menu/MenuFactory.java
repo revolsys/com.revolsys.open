@@ -16,6 +16,7 @@ import javax.swing.JComponent;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JPopupMenu.Separator;
 import javax.swing.SwingUtilities;
 
 import org.jeometry.common.logging.Logs;
@@ -391,6 +392,24 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return action;
   }
 
+  private boolean canAddSeparator(final JMenu menu) {
+    final int componentCount = menu.getMenuComponentCount();
+    if (componentCount == 0) {
+      return false;
+    } else {
+      return !(menu.getMenuComponent(componentCount - 1) instanceof Separator);
+    }
+  }
+
+  private boolean canAddSeparator(final JPopupMenu menu) {
+    final int componentCount = menu.getComponentCount();
+    if (componentCount == 0) {
+      return false;
+    } else {
+      return !(menu.getComponent(componentCount - 1) instanceof Separator);
+    }
+  }
+
   public void clear() {
     this.groups.clear();
   }
@@ -530,13 +549,10 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
       final boolean enabled = this.enableCheck.isEnabled();
       menu.setEnabled(enabled);
     }
-    boolean first = true;
     for (final String groupName : this.groupNames) {
       final List<ComponentFactory<?>> factories = this.groups.get(groupName);
       if (factories != null && !factories.isEmpty()) {
-        if (first) {
-          first = false;
-        } else {
+        if (canAddSeparator(menu)) {
           menu.addSeparator();
         }
         for (final ComponentFactory<?> factory : factories) {
@@ -563,7 +579,6 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
       final boolean enabled = this.enableCheck.isEnabled();
       menu.setEnabled(enabled);
     }
-    boolean first = true;
     for (final String groupName : this.groupNames) {
       boolean groupHasItem = false;
       final List<ComponentFactory<?>> factories = this.groups.get(groupName);
@@ -576,9 +591,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
             }
             if (!groupHasItem) {
               groupHasItem = true;
-              if (first) {
-                first = false;
-              } else {
+              if (canAddSeparator(menu)) {
                 menu.addSeparator();
               }
             }

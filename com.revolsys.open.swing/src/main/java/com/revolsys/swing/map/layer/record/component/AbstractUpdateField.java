@@ -19,6 +19,7 @@ import javax.swing.WindowConstants;
 import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.exception.WrappedException;
 
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.SwingUtil;
@@ -93,8 +94,8 @@ public abstract class AbstractUpdateField extends BaseDialog {
     if (this.recordCount > 100) {
       final int confirm = Dialogs.showConfirmDialog(
         "<html><p>Update <b style='color:#32CD32'>" + this.recordCountString + "</b> records?</p>"
-          + "<p>This may take a long time or fail if there are many records.</html>",
-        "Update Records?</p><html>", JOptionPane.YES_NO_OPTION);
+          + "<p>This may take a long time or fail if there are many records.</p></html>",
+        "Update Records?", JOptionPane.YES_NO_OPTION);
       if (confirm != JOptionPane.YES_OPTION) {
         setVisible(false);
         return;
@@ -110,21 +111,25 @@ public abstract class AbstractUpdateField extends BaseDialog {
     final RecordLayerErrors errors = new RecordLayerErrors("Setting Field Values",
       AbstractUpdateField.this.layer, fieldNames);
     ProgressMonitor.background(title, note, progressMonitor -> {
-      AbstractUpdateField.this.tableModel.forEachRecord((record) -> {
-        if (progressMonitor.isCancelled()) {
-          throw new CancellationException();
-        } else {
-          try {
-            updateRecord(record);
-          } catch (final WrappedException e) {
-            errors.addRecord(record, e.getCause());
-          } catch (final Throwable e) {
-            errors.addRecord(record, e);
+      try (
+        BaseCloseable eventsDisabled = this.layer.eventsDisabled()) {
+        AbstractUpdateField.this.tableModel.forEachRecord((record) -> {
+          if (progressMonitor.isCancelled()) {
+            throw new CancellationException();
+          } else {
+            try {
+              updateRecord(record);
+            } catch (final WrappedException e) {
+              errors.addRecord(record, e.getCause());
+            } catch (final Throwable e) {
+              errors.addRecord(record, e);
+            }
+            progressMonitor.addProgress();
           }
-          progressMonitor.addProgress();
-        }
-      });
-
+        });
+      } finally {
+        this.layer.fireRecordsChanged();
+      }
     }, this.recordCount, () -> {
       errors.showErrorDialog();
     });

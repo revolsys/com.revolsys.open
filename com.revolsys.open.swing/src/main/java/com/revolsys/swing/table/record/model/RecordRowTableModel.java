@@ -302,9 +302,8 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     return records;
   }
 
-  protected Object getRecordValue(final Record record, final String name) {
-    final Object value = record.getValue(name);
-    return value;
+  protected Object getRecordValue(int columnIndex, final Record record, final String name) {
+    return record.getValue(name);
   }
 
   public Map<Integer, SortOrder> getSortedColumns() {
@@ -335,7 +334,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
         return LOADING_VALUE;
       } else {
         final String name = getColumnFieldName(columnIndex);
-        return getRecordValue(record, name);
+        return getRecordValue(columnIndex, record, name);
       }
     }
   }

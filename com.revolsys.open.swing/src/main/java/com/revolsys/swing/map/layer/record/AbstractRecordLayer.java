@@ -241,6 +241,18 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       return true;
     }
 
+    @Override
+    public boolean replaceRecord(final LayerRecord record) {
+      synchronized (getSync()) {
+        if (super.replaceRecord(record)) {
+          this.index = null;
+          return true;
+        } else {
+          return false;
+        }
+      }
+    }
+
     public boolean replaceRecord(final LayerRecord record, final BoundingBox oldBoundingBox) {
       synchronized (getSync()) {
         final RecordSpatialIndex<LayerRecord> index = this.index;
@@ -689,7 +701,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected void cleanCachedRecords() {
-    System.gc();
   }
 
   public void clearHighlightedRecords() {

@@ -1016,9 +1016,13 @@ public interface SwingUtil {
 
   static Window windowOnTop() {
     final Window activeWindow = windowActive();
-    final JDialog f = new JDialog(activeWindow);
-    f.setAlwaysOnTop(true);
-    f.requestFocus();
-    return f;
+    if (activeWindow instanceof JDialog) {
+      return activeWindow;
+    } else {
+      final JDialog window = new JDialog(activeWindow);
+      window.setAlwaysOnTop(true);
+      window.requestFocus();
+      return window;
+    }
   }
 }

@@ -320,6 +320,7 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
     }
   }
 
+  @Override
   protected void cancel() {
     moveImageClear();
     moveCornerClear();
@@ -339,7 +340,6 @@ public class EditGeoreferencedImageOverlay extends AbstractOverlay {
 
   protected void clearCachedImage() {
     this.cachedImage = null;
-    System.gc();
   }
 
   @Override
