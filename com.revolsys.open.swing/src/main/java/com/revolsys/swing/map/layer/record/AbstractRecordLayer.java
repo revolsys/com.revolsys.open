@@ -61,6 +61,7 @@ import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
@@ -196,11 +197,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       synchronized (getSync()) {
         if (this.index == null) {
           this.index = newSpatialIndex();
-          forEachRecord(record -> {
+          final Consumer<LayerRecord> action = record -> {
             if (!isDeleted(record)) {
               this.index.addRecord(record);
             }
-          });
+          };
+          forEachRecord(action);
         }
       }
       return this.index;
@@ -927,7 +929,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected void fireSelected() {
-    final int selectionCount = getSelectionCount();
+    final int selectionCount = getSelectedRecordsCount();
     final boolean selected = selectionCount > 0;
     firePropertyChange("hasSelectedRecords", !selected, selected);
     firePropertyChange("selectionCount", -1, selectionCount);
@@ -973,6 +975,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected void forEachRecordInternal(final Query query,
     final Consumer<? super LayerRecord> consumer) {
+  }
+
+  public <R extends Record> void forEachSelectedRecord(final Consumer<R> action) {
+    this.recordCacheSelected.forEachRecord(action);
   }
 
   @SuppressWarnings("unchecked")
@@ -1543,9 +1549,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   @Override
   public BoundingBox getSelectedBoundingBox() {
-    final BoundingBox boundingBox = super.getSelectedBoundingBox();
-    final List<LayerRecord> records = getSelectedRecords();
-    return boundingBox.bboxEdit(editor -> editor.addAllBbox(records));
+    final BoundingBoxEditor boundingBox = super.getSelectedBoundingBox().bboxEditor();
+    forEachSelectedRecord(boundingBox::addBbox);
+    return boundingBox.getBoundingBox();
   }
 
   public List<LayerRecord> getSelectedRecords() {
@@ -1556,7 +1562,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return this.recordCacheSelected.getRecords(boundingBox);
   }
 
-  public int getSelectionCount() {
+  public int getSelectedRecordsCount() {
     return getRecordCountCached(this.recordCacheSelected);
   }
 
@@ -2400,32 +2406,34 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public <R extends LayerRecord> void processRecords(final CharSequence title,
-    final Collection<R> records, final Consumer<? super R> action) {
+  public <R1 extends LayerRecord, R2 extends Record> void processRecords(final CharSequence title,
+    final Collection<R1> records, final Consumer<R2> action) {
     processRecords(title, records, action, null);
   }
 
-  public <R extends LayerRecord> void processRecords(final CharSequence title,
-    final Collection<R> records, final Consumer<? super R> action,
+  public <R1 extends LayerRecord, R2 extends Record> void processRecords(final CharSequence title,
+    final Collection<R1> records, final Consumer<R2> action,
     final Consumer<ProgressMonitor> afterAction) {
-    ProgressMonitor.background(title, records, action, afterAction);
+    final int recordCount = records.size();
+    final Consumer<Consumer<R1>> forEachAction = records::forEach;
+    processRecords(title, recordCount, forEachAction, action, afterAction);
   }
 
-  public <R extends LayerRecord> void processRecords(final CharSequence title,
-    final int recordCount, final Consumer<Consumer<? super R>> forEachAction,
-    final Consumer<? super R> action) {
+  public <R1 extends LayerRecord, R2 extends Record> void processRecords(final CharSequence title,
+    final int recordCount, final Consumer<Consumer<R1>> forEachAction, final Consumer<R2> action) {
     processRecords(title, recordCount, forEachAction, action, null);
   }
 
-  public <R extends LayerRecord> void processRecords(final CharSequence title,
-    final int recordCount, final Consumer<Consumer<? super R>> forEachAction,
-    final Consumer<? super R> action, final Consumer<ProgressMonitor> afterAction) {
+  @SuppressWarnings("unchecked")
+  public <R1 extends LayerRecord, R2 extends Record> void processRecords(final CharSequence title,
+    final int recordCount, final Consumer<Consumer<R1>> forEachAction, final Consumer<R2> action,
+    final Consumer<ProgressMonitor> afterAction) {
     ProgressMonitor.background(title, null, progressMonitor -> {
-      final Consumer<? super R> monitorAction = record -> {
+      final Consumer<R1> monitorAction = record -> {
         if (progressMonitor.isCancelled()) {
           throw new CancellationException();
         } else {
-          action.accept(record);
+          action.accept((R2)record);
           progressMonitor.addProgress();
         }
       };
@@ -2593,7 +2601,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final List<LayerRecord> allRecords = new ArrayList<>();
       for (final RecordCache recordCache : Arrays.asList(this.recordCacheDeleted,
         this.recordCacheModified, this.recordCacheNew)) {
-        recordCache.forEachRecord(allRecords::add);
+        final Consumer<LayerRecord> action = allRecords::add;
+        recordCache.forEachRecord(action);
       }
       return saveChanges(allRecords);
     } else {

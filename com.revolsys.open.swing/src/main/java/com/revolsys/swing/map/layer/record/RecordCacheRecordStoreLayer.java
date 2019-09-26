@@ -6,6 +6,8 @@ import java.util.function.Consumer;
 
 import org.jeometry.common.data.identifier.Identifier;
 
+import com.revolsys.record.Record;
+
 public class RecordCacheRecordStoreLayer extends AbstractRecordCache<RecordStoreLayer> {
 
   final Set<Identifier> identifiers = new HashSet<>();
@@ -53,7 +55,7 @@ public class RecordCacheRecordStoreLayer extends AbstractRecordCache<RecordStore
   }
 
   @Override
-  public <R extends LayerRecord> void forEachRecordDo(final Consumer<R> action) {
+  public <R extends Record> void forEachRecordDo(final Consumer<R> action) {
     this.parentCache.forEachRecord(action);
     final RecordStoreLayer layer = this.layer;
     for (final Identifier identifier : this.identifiers) {

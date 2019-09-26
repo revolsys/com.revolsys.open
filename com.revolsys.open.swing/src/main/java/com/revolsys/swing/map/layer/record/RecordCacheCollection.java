@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.record;
 import java.util.Collection;
 import java.util.function.Consumer;
 
+import com.revolsys.record.Record;
 import com.revolsys.util.ExitLoopException;
 
 public class RecordCacheCollection extends AbstractRecordCache<AbstractRecordLayer> {
@@ -36,11 +37,12 @@ public class RecordCacheCollection extends AbstractRecordCache<AbstractRecordLay
   }
 
   @Override
-  public <R extends LayerRecord> void forEachRecordDo(final Consumer<R> action) {
+  public <R extends Record> void forEachRecordDo(final Consumer<R> action) {
     try {
       final AbstractRecordLayer layer = this.layer;
       for (final LayerRecord record : this.records) {
-        final R proxyRecord = layer.newProxyLayerRecord(record);
+        @SuppressWarnings("unchecked")
+        final R proxyRecord = (R)layer.newProxyLayerRecord(record);
         action.accept(proxyRecord);
       }
     } catch (final ExitLoopException e) {

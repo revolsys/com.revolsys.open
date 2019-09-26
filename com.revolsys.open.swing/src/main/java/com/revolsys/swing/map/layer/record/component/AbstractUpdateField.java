@@ -6,6 +6,7 @@ import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -109,16 +110,17 @@ public abstract class AbstractUpdateField extends BaseDialog {
     final RecordLayerErrors errors = new RecordLayerErrors("Setting Field Values",
       AbstractUpdateField.this.layer, fieldNames);
 
+    final Consumer<LayerRecord> action = record -> {
+      try {
+        updateRecord(record);
+      } catch (final WrappedException e) {
+        errors.addRecord(record, e.getCause());
+      } catch (final Throwable e) {
+        errors.addRecord(record, e);
+      }
+    };
     this.layer.processRecords(title, this.recordCount,
-      AbstractUpdateField.this.tableModel::forEachRecord, record -> {
-        try {
-          updateRecord(record);
-        } catch (final WrappedException e) {
-          errors.addRecord(record, e.getCause());
-        } catch (final Throwable e) {
-          errors.addRecord(record, e);
-        }
-      }, monitor -> {
+      AbstractUpdateField.this.tableModel::forEachRecord, action, monitor -> {
         if (!monitor.isCancelled()) {
           Invoke.later(() -> errors.showErrorDialog());
         }

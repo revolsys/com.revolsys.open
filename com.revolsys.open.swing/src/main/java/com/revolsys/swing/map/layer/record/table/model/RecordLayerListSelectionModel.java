@@ -57,7 +57,7 @@ public class RecordLayerListSelectionModel extends DefaultListSelectionModel {
   @Override
   public boolean isSelectionEmpty() {
     final AbstractRecordLayer layer = this.model.getLayer();
-    return layer.getSelectionCount() == 0;
+    return layer.getSelectedRecordsCount() == 0;
   }
 
   @Override

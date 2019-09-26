@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
+import com.revolsys.record.Record;
+
 public interface RecordCache {
 
   default boolean addRecord(final LayerRecord record) {
@@ -24,7 +26,7 @@ public interface RecordCache {
     throw new UnsupportedOperationException();
   }
 
-  default <R extends LayerRecord> void forEachRecord(final Consumer<R> action) {
+  default <R extends Record> void forEachRecord(final Consumer<R> action) {
   }
 
   String getCacheId();

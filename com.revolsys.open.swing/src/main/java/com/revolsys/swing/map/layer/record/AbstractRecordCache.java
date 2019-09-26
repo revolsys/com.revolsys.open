@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.record;
 
 import java.util.function.Consumer;
 
+import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 
 public abstract class AbstractRecordCache<L extends AbstractRecordLayer> implements RecordCache {
@@ -45,14 +46,14 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
   public abstract boolean containsRecordDo(LayerRecord record);
 
   @Override
-  public final <R extends LayerRecord> void forEachRecord(final Consumer<R> action) {
+  public final <R extends Record> void forEachRecord(final Consumer<R> action) {
     final L layer = this.layer;
     synchronized (layer.getSync()) {
       forEachRecordDo(action);
     }
   }
 
-  protected abstract <R extends LayerRecord> void forEachRecordDo(Consumer<R> action);
+  protected abstract <R extends Record> void forEachRecordDo(Consumer<R> action);
 
   @Override
   public String getCacheId() {

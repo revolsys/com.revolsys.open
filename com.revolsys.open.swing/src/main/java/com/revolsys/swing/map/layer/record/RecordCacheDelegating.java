@@ -2,6 +2,8 @@ package com.revolsys.swing.map.layer.record;
 
 import java.util.function.Consumer;
 
+import com.revolsys.record.Record;
+
 public class RecordCacheDelegating implements RecordCache {
 
   protected final RecordCache cache;
@@ -26,7 +28,7 @@ public class RecordCacheDelegating implements RecordCache {
   }
 
   @Override
-  public <R extends LayerRecord> void forEachRecord(final Consumer<R> action) {
+  public <R extends Record> void forEachRecord(final Consumer<R> action) {
     this.cache.forEachRecord(action);
   }
 
@@ -45,13 +47,13 @@ public class RecordCacheDelegating implements RecordCache {
   }
 
   @Override
-  public boolean removeRecord(final LayerRecord record) {
-    return this.cache.removeRecord(record);
+  public boolean removeContainsRecord(final LayerRecord record) {
+    return this.cache.removeContainsRecord(record);
   }
 
   @Override
-  public boolean removeContainsRecord(final LayerRecord record) {
-    return this.cache.removeContainsRecord(record);
+  public boolean removeRecord(final LayerRecord record) {
+    return this.cache.removeRecord(record);
   }
 
   @Override
