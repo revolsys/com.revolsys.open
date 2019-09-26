@@ -6,7 +6,6 @@ import java.awt.event.WindowEvent;
 import java.text.DecimalFormat;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.concurrent.CancellationException;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -19,20 +18,19 @@ import javax.swing.WindowConstants;
 import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.exception.WrappedException;
 
-import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BaseDialog;
-import com.revolsys.swing.component.ProgressMonitor;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerErrors;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.TablePanel;
 
 public abstract class AbstractUpdateField extends BaseDialog {
@@ -110,30 +108,21 @@ public abstract class AbstractUpdateField extends BaseDialog {
     fieldNames.addAll(AbstractUpdateField.this.layer.getFieldNames());
     final RecordLayerErrors errors = new RecordLayerErrors("Setting Field Values",
       AbstractUpdateField.this.layer, fieldNames);
-    ProgressMonitor.background(title, note, progressMonitor -> {
-      try (
-        BaseCloseable eventsDisabled = this.layer.eventsDisabled()) {
-        AbstractUpdateField.this.tableModel.forEachRecord((record) -> {
-          if (progressMonitor.isCancelled()) {
-            throw new CancellationException();
-          } else {
-            try {
-              updateRecord(record);
-            } catch (final WrappedException e) {
-              errors.addRecord(record, e.getCause());
-            } catch (final Throwable e) {
-              errors.addRecord(record, e);
-            }
-            progressMonitor.addProgress();
-          }
-        });
-      } finally {
-        this.layer.fireRecordsChanged();
-      }
-    }, this.recordCount, () -> {
-      errors.showErrorDialog();
-    });
 
+    this.layer.processRecords(title, this.recordCount,
+      AbstractUpdateField.this.tableModel::forEachRecord, record -> {
+        try {
+          updateRecord(record);
+        } catch (final WrappedException e) {
+          errors.addRecord(record, e.getCause());
+        } catch (final Throwable e) {
+          errors.addRecord(record, e);
+        }
+      }, monitor -> {
+        if (!monitor.isCancelled()) {
+          Invoke.later(() -> errors.showErrorDialog());
+        }
+      });
   }
 
   protected FieldDefinition getFieldDefinition() {

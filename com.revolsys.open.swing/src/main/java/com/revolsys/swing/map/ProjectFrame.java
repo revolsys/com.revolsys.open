@@ -72,6 +72,7 @@ import com.revolsys.swing.component.DnDTabbedPane;
 import com.revolsys.swing.component.TabClosableTitle;
 import com.revolsys.swing.io.SwingIo;
 import com.revolsys.swing.logging.Log4jTableModel;
+import com.revolsys.swing.map.layer.AbstractLayer.PanelComponentHolder;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
@@ -374,7 +375,12 @@ public class ProjectFrame extends BaseFrame {
           ));
         }
       } else {
-        panel.activatePanelComponent(component, config);
+        Component panelComponent = component;
+        if (component instanceof PanelComponentHolder) {
+          final PanelComponentHolder holder = (PanelComponentHolder)component;
+          panelComponent = holder.getPanel();
+        }
+        panel.activatePanelComponent(panelComponent, config);
         if (selectTab) {
           tabs.setSelectedComponent(component);
         }

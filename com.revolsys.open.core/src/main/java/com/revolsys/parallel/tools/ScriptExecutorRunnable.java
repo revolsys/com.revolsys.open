@@ -139,7 +139,6 @@ public class ScriptExecutorRunnable extends AbstractRunnable {
         pipeline.startAndWait();
       } finally {
         applicationContext.close();
-        System.gc();
       }
     } catch (final BeanCreationException e) {
       final Throwable cause = getBeanExceptionCause(e);

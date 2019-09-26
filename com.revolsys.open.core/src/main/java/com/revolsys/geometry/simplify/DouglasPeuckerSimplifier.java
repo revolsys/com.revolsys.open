@@ -97,7 +97,7 @@ public class DouglasPeuckerSimplifier {
       } else {
         final Point[] newPts = DouglasPeuckerLineSimplifier.simplify(coords,
           DouglasPeuckerSimplifier.this.distanceTolerance);
-        if (DouglasPeuckerSimplifier.this.fixedLineEnds && coords instanceof LineString) {
+        if (DouglasPeuckerSimplifier.this.fixedLineEnds && !(coords instanceof LinearRing)) {
           newPts[0] = coords.getFromPoint();
           newPts[newPts.length - 1] = coords.getToPoint();
         }

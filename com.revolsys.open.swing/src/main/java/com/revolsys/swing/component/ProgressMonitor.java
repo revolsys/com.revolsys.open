@@ -43,8 +43,9 @@ public class ProgressMonitor implements Cancellable {
 
     private final JLabel countLabel = new JLabel("0");
 
-    private ProgressMonitorDialog(final String title, final String note, final boolean canCancel) {
-      super(title, ModalityType.APPLICATION_MODAL);
+    private ProgressMonitorDialog(final CharSequence title, final String note,
+      final boolean canCancel) {
+      super(title.toString(), ModalityType.APPLICATION_MODAL);
       setMinimumSize(new Dimension(title.length() * 20, 100));
       setLayout(new VerticalLayout(5));
       setMaximumSize(new Dimension(400, 40));
@@ -91,32 +92,33 @@ public class ProgressMonitor implements Cancellable {
     }
   }
 
-  public static <V> void background(final String title, final Collection<V> objects,
-    final Consumer<V> action) {
+  public static <V> void background(final CharSequence title, final Collection<V> objects,
+    final Consumer<? super V> action, final Consumer<ProgressMonitor> afterAction) {
     background(title, null, monitor -> {
-      for (final V object : monitor.cancellable(objects)) {
-        action.accept(object);
-        monitor.addProgress();
+      try {
+        for (final V object : monitor.cancellable(objects)) {
+          action.accept(object);
+          monitor.addProgress();
+        }
+      } finally {
+        if (afterAction != null) {
+          afterAction.accept(monitor);
+        }
       }
     }, objects.size());
   }
 
-  public static <V> void background(final String title, final Collection<V> objects,
-    final Consumer<V> action, final Consumer<Boolean> doneTask) {
-    background(title, null, monitor -> {
-      for (final V object : monitor.cancellable(objects)) {
-        action.accept(object);
-        monitor.addProgress();
-      }
-    }, objects.size(), doneTask);
+  public static void background(final CharSequence title, final Consumer<ProgressMonitor> task,
+    final int max) {
+    background(title, null, task, max, (Consumer<Boolean>)null);
   }
 
-  public static void background(final String title, final String note,
+  public static void background(final CharSequence title, final String note,
     final Consumer<ProgressMonitor> task, final int max) {
     background(title, note, task, max, (Consumer<Boolean>)null);
   }
 
-  public static void background(final String title, final String note,
+  public static void background(final CharSequence title, final String note,
     final Consumer<ProgressMonitor> task, final int max, final Consumer<Boolean> doneTask) {
     Invoke.later(() -> {
       final ProgressMonitor progressMonitor = new ProgressMonitor(title, note, true, max);
@@ -136,6 +138,10 @@ public class ProgressMonitor implements Cancellable {
         @Override
         protected void handleCancelled() {
           progressMonitor.setDone();
+          if (doneTask != null) {
+            doneTask.accept(false);
+            ;
+          }
         }
 
         @Override
@@ -150,6 +156,10 @@ public class ProgressMonitor implements Cancellable {
         protected void handleException(final Throwable exception) {
           progressMonitor.setDone();
           Logs.error(ProgressMonitor.class, exception);
+          if (doneTask != null) {
+            doneTask.accept(false);
+            ;
+          }
         }
       };
       Invoke.worker(worker);
@@ -157,16 +167,16 @@ public class ProgressMonitor implements Cancellable {
     });
   }
 
-  public static void background(final String title, final String note,
+  public static void background(final CharSequence title, final String note,
     final Consumer<ProgressMonitor> task, final int max, final Runnable doneTask) {
     background(title, note, task, max, completed -> doneTask.run());
   }
 
-  public static void ui(final String title, final String note, final boolean canCancel,
+  public static void ui(final CharSequence title, final String note, final boolean canCancel,
     final Consumer<ProgressMonitor> task) {
     Invoke.later(() -> {
       final ProgressMonitor progressMonitor = new ProgressMonitor(title, note, canCancel, 0);
-      Invoke.workerDone(title, () -> {
+      Invoke.workerDone(title.toString(), () -> {
         try {
           task.accept(progressMonitor);
         } catch (final Throwable e) {
@@ -204,7 +214,7 @@ public class ProgressMonitor implements Cancellable {
     }
   };
 
-  private ProgressMonitor(final String title, final String note, final boolean canCancel,
+  private ProgressMonitor(final CharSequence title, final String note, final boolean canCancel,
     final int max) {
     this.max = max;
     this.dialog = new ProgressMonitorDialog(title, note, canCancel);

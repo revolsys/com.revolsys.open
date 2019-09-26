@@ -91,6 +91,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.BaseDialog;
 import com.revolsys.swing.component.BasePanel;
+import com.revolsys.swing.component.ProgressMonitor;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.dnd.ClipboardUtil;
@@ -2397,6 +2398,53 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (!records.isEmpty()) {
       firePropertyChange("selectedRecordsByBoundingBox", false, true);
     }
+  }
+
+  public <R extends LayerRecord> void processRecords(final CharSequence title,
+    final Collection<R> records, final Consumer<? super R> action) {
+    processRecords(title, records, action, null);
+  }
+
+  public <R extends LayerRecord> void processRecords(final CharSequence title,
+    final Collection<R> records, final Consumer<? super R> action,
+    final Consumer<ProgressMonitor> afterAction) {
+    ProgressMonitor.background(title, records, action, afterAction);
+  }
+
+  public <R extends LayerRecord> void processRecords(final CharSequence title,
+    final int recordCount, final Consumer<Consumer<? super R>> forEachAction,
+    final Consumer<? super R> action) {
+    processRecords(title, recordCount, forEachAction, action, null);
+  }
+
+  public <R extends LayerRecord> void processRecords(final CharSequence title,
+    final int recordCount, final Consumer<Consumer<? super R>> forEachAction,
+    final Consumer<? super R> action, final Consumer<ProgressMonitor> afterAction) {
+    ProgressMonitor.background(title, null, progressMonitor -> {
+      final Consumer<? super R> monitorAction = record -> {
+        if (progressMonitor.isCancelled()) {
+          throw new CancellationException();
+        } else {
+          action.accept(record);
+          progressMonitor.addProgress();
+        }
+      };
+
+      try (
+        BaseCloseable eventsDisabled = eventsDisabled()) {
+        forEachAction.accept(monitorAction);
+      } catch (final CancellationException e) {
+      } finally {
+        if (afterAction != null) {
+          try {
+            afterAction.accept(progressMonitor);
+          } catch (final Exception e) {
+            Logs.error(this, "Unable to post-process " + title, e);
+          }
+        }
+        fireRecordsChanged();
+      }
+    }, recordCount);
   }
 
   @Override

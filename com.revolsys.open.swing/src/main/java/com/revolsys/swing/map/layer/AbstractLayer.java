@@ -86,6 +86,25 @@ import com.revolsys.value.ThreadBooleanValue;
 
 public abstract class AbstractLayer extends BaseObjectWithProperties
   implements Layer, PropertyChangeListener, PropertyChangeSupportProxy, ToolTipProxy {
+  public class PanelComponentHolder extends BasePanel {
+    public PanelComponentHolder() {
+      super(new BorderLayout());
+    }
+
+    public Component getPanel() {
+      if (getComponentCount() == 0) {
+        return this;
+      } else {
+        return getComponent(0);
+      }
+    }
+
+    private void setPanel(final Component component) {
+      add(component, BorderLayout.CENTER);
+    }
+
+  }
+
   private static final AtomicLong ID_GEN = new AtomicLong();
 
   public static final String PLUGIN_TABLE_VIEW = "tableView";
@@ -695,16 +714,16 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       if (isExists()) {
         return newTableViewComponent(config);
       } else {
-        return new BasePanel(new BorderLayout());
+        return new PanelComponentHolder();
       }
     } else {
-      final BasePanel basePanel = new BasePanel(new BorderLayout());
+      final PanelComponentHolder basePanel = new PanelComponentHolder();
       addPropertyChangeListener("initialized", (event) -> {
         if (isExists()) {
           Invoke.later(() -> {
             final Component tableViewComponent = newTableViewComponent(config);
             if (tableViewComponent != null) {
-              basePanel.add(tableViewComponent, BorderLayout.CENTER);
+              basePanel.setPanel(tableViewComponent);
               removePropertyChangeListener("initialized", this);
             }
           });

@@ -8,7 +8,6 @@ import java.util.function.Consumer;
 import javax.swing.Icon;
 import javax.swing.JMenu;
 
-import com.revolsys.record.Record;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -31,28 +30,24 @@ public class EditRecordMenu extends MenuFactory {
     }
   }
 
-  public <R extends Record> RunnableAction addMenuItemRecord(final String groupName,
-    final CharSequence name, final String iconName, final Consumer<R> consumer) {
+  public <R extends LayerRecord> RunnableAction addMenuItemRecord(final String groupName,
+    final CharSequence name, final String iconName, final Consumer<? super R> consumer) {
     return addMenuItemRecord(groupName, -1, name, null, iconName, null, consumer);
   }
 
-  public <R extends Record> RunnableAction addMenuItemRecord(final String groupName,
+  public <R extends LayerRecord> RunnableAction addMenuItemRecord(final String groupName,
     final CharSequence name, final String iconName, final EnableCheck enableCheck,
-    final Consumer<R> consumer) {
-    return addMenuItemRecord(groupName, -1, name, null, iconName, enableCheck, consumer);
+    final Consumer<? super R> action) {
+    return addMenuItemRecord(groupName, -1, name, null, iconName, enableCheck, action);
   }
 
-  @SuppressWarnings("unchecked")
-  public <R extends Record> RunnableAction addMenuItemRecord(final String groupName,
+  public <R extends LayerRecord> RunnableAction addMenuItemRecord(final String groupName,
     final int index, final CharSequence name, final String toolTip, final String iconName,
-    final EnableCheck enableCheck, final Consumer<R> consumer) {
+    final EnableCheck enableCheck, final Consumer<? super R> action) {
 
     return addMenuItemRecords(groupName, index, name, toolTip, iconName, enableCheck,
-      (layer, records) -> {
-        for (final LayerRecord record : records) {
-          consumer.accept((R)record);
-        }
-      });
+      (final AbstractRecordLayer layer, final List<R> records) -> layer.processRecords(name,
+        records, action));
   }
 
   public <R extends LayerRecord> RunnableAction addMenuItemRecords(final String groupName,
@@ -75,9 +70,8 @@ public class EditRecordMenu extends MenuFactory {
     final AbstractRecordLayer layer = this.layer;
     @SuppressWarnings("unchecked")
     final List<R> records = (List<R>)this.records;
-    final RunnableAction action = MenuFactory.newMenuItem(name, toolTip, icon, enableCheck, () -> {
-      consumer.accept(layer, records);
-    });
+    final RunnableAction action = MenuFactory.newMenuItem(name, toolTip, icon, enableCheck,
+      () -> consumer.accept(layer, records));
     addComponentFactory(groupName, index, action);
     return action;
   }

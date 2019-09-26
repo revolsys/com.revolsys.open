@@ -443,6 +443,7 @@ public class Project extends LayerGroup {
   }
 
   public boolean saveAllSettings() {
+    saveChanges();
     if (isReadOnly()) {
       return true;
     } else {
