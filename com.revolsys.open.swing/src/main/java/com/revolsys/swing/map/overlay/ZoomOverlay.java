@@ -6,7 +6,6 @@ import java.awt.Cursor;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
 import java.awt.event.FocusEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -87,6 +86,7 @@ public class ZoomOverlay extends AbstractOverlay {
     addOverlayAction(ACTION_PAN, CURSOR_PAN);
   }
 
+  @Override
   protected void cancel() {
     panClear();
     zoomBoxClear();
@@ -358,7 +358,7 @@ public class ZoomOverlay extends AbstractOverlay {
         this.zoomBoxX2, this.zoomBoxY2).newBoundingBox();
 
       if (boundingBox.isEmpty()) {
-        Toolkit.getDefaultToolkit().beep();
+        SwingUtil.beep();
       } else {
         final MapPanel map = getMap();
         map.setBoundingBox(boundingBox);

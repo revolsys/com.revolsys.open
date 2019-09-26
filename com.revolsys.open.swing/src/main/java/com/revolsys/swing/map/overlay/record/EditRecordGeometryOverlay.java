@@ -2,7 +2,6 @@ package com.revolsys.swing.map.overlay.record;
 
 import java.awt.Cursor;
 import java.awt.Graphics2D;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -565,7 +564,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
                 if (geometryEditor.isModified()) {
                   final Geometry newGeometry = geometryEditor.newGeometry();
                   if (newGeometry.isEmpty()) {
-                    Toolkit.getDefaultToolkit().beep();
+                    SwingUtil.beep();
                   } else {
                     final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
                     edit.addEdit(geometryEdit);
@@ -575,7 +574,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
                 edit.addEdit(new DeleteVertexUndoEdit(this.addGeometryEditor, vertexId));
               }
             } catch (final Exception t) {
-              Toolkit.getDefaultToolkit().beep();
+              SwingUtil.beep();
             }
           }
         }

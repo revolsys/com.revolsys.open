@@ -226,6 +226,13 @@ public interface SwingUtil {
     window.setSize(width, height);
   }
 
+  static void beep() {
+    Invoke.later(() -> {
+      final Toolkit toolkit = Toolkit.getDefaultToolkit();
+      toolkit.beep();
+    });
+  }
+
   static void dispose(final Window window) {
     if (window != null) {
       Invoke.later(() -> {

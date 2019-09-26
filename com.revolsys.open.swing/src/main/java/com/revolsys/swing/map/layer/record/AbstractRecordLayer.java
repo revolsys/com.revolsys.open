@@ -2455,6 +2455,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }, recordCount);
   }
 
+  public <R1 extends LayerRecord, R2 extends Record> void processRecords(final CharSequence title,
+    final R1 record, final Consumer<R2> action) {
+    processRecords(title, Collections.singleton(record), action, null);
+  }
+
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
     super.propertyChange(event);

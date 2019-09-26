@@ -1,7 +1,6 @@
 package com.revolsys.swing.map.form;
 
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -31,6 +30,7 @@ import org.jdesktop.swingx.JXList;
 import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.swing.Dialogs;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.dnd.transferhandler.ListReorderableTransferHandler;
 import com.revolsys.swing.field.ArrayListComboBoxModel;
@@ -231,7 +231,7 @@ public class FieldNamesSetPanel extends ValueField
   private void actionDelete() {
     final String fieldSetName = this.fieldNamesSetNamesModel.getSelectedItem();
     if ("All".equalsIgnoreCase(fieldSetName)) {
-      Toolkit.getDefaultToolkit().beep();
+      SwingUtil.beep();
     } else {
       final int result = Dialogs.showConfirmDialog("Delete field set " + fieldSetName + ".",
         "Delete Field Set", JOptionPane.YES_NO_OPTION);
@@ -327,7 +327,7 @@ public class FieldNamesSetPanel extends ValueField
   private void actionRename() {
     final String oldName = this.fieldNamesSetNamesModel.getSelectedItem();
     if ("All".equalsIgnoreCase(oldName)) {
-      Toolkit.getDefaultToolkit().beep();
+      SwingUtil.beep();
     } else {
       final String newName = (String)Dialogs.showInputDialog(
         "Enter the new name for the field set.", "Rename Field Set", JOptionPane.PLAIN_MESSAGE,

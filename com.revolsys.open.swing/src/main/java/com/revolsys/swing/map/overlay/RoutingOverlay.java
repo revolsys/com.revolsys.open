@@ -34,6 +34,7 @@ import com.revolsys.geometry.model.Lineal;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.record.Record;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -168,6 +169,7 @@ public class RoutingOverlay extends AbstractOverlay {
     }
   }
 
+  @Override
   public void cancel() {
     modeClear();
   }
@@ -260,7 +262,7 @@ public class RoutingOverlay extends AbstractOverlay {
 
     } else if (keyCode == KeyEvent.VK_2 && (event.isControlDown() || event.isAltDown())) {
       if (this.layer == null) {
-        Toolkit.getDefaultToolkit().beep();
+        SwingUtil.beep();
       } else {
         final int updateIndex = this.setRecord2Index.incrementAndGet();
         Invoke.background("Set Record 2", this::getCloseRecord,
@@ -364,7 +366,7 @@ public class RoutingOverlay extends AbstractOverlay {
 
   public void setRecord1(final LayerRecord record1, final int updateIndex) {
     if (record1 == null) {
-      Toolkit.getDefaultToolkit().beep();
+      SwingUtil.beep();
     } else if (updateIndex == this.setRecord1Index.get()) {
       final Geometry geometry1 = record1.getGeometry();
       if (geometry1 instanceof Lineal) {
@@ -381,7 +383,7 @@ public class RoutingOverlay extends AbstractOverlay {
 
   public void setRecord2(final LayerRecord record2, final int updateIndex) {
     if (record2 == null) {
-      Toolkit.getDefaultToolkit().beep();
+      SwingUtil.beep();
     } else if (updateIndex == this.setRecord2Index.get()) {
       final Geometry geometry2 = record2.getGeometry();
       if (geometry2 instanceof Lineal) {
@@ -451,7 +453,7 @@ public class RoutingOverlay extends AbstractOverlay {
           map.setMessage(SHORTEST_ROUTE, "From/to records are the same", WebColors.Orange);
         } else if (this.mergedLine.isGeometryCollection()) {
           map.setMessage(SHORTEST_ROUTE, "No Route Found", WebColors.Red);
-          Toolkit.getDefaultToolkit().beep();
+          SwingUtil.beep();
         } else {
           map.setMessage(SHORTEST_ROUTE, this.records.size() + " records in route",
             WebColors.Green);

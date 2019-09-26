@@ -3,7 +3,6 @@ package com.revolsys.swing.map.overlay;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Toolkit;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -39,6 +38,7 @@ import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.swing.Icons;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
@@ -153,7 +153,7 @@ public class MeasureOverlay extends AbstractOverlay {
             return geometryEditor.newGeometry();
           }
         } catch (final Exception e) {
-          Toolkit.getDefaultToolkit().beep();
+          SwingUtil.beep();
           return geometry;
         }
       }
