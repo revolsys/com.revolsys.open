@@ -216,7 +216,6 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
 
       validateRequired(record, recordDefinition);
 
-      final PathName typePath = sourceRecordDefinition.getPathName();
       final String whereClause = "OBJECTID=" + objectId;
       final TableReference tableReference = getTableReference();
       tableReference.valueConsumeSync(table -> {

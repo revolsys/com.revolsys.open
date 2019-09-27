@@ -11,17 +11,22 @@ public class FileGdbRecordStoreSchema extends RecordStoreSchema {
 
   private final FileGdbRecordStore recordStore;
 
-  public FileGdbRecordStoreSchema(final FileGdbRecordStore recordStore) {
+  FileGdbRecordStoreSchema(final FileGdbRecordStore recordStore) {
     super(recordStore);
     this.recordStore = recordStore;
     this.catalogPath = "\\";
   }
 
-  public FileGdbRecordStoreSchema(final FileGdbRecordStoreSchema parentSchema,
+  FileGdbRecordStoreSchema(final FileGdbRecordStoreSchema parentSchema,
     final PathName childSchemaPath) {
     super(parentSchema, childSchemaPath);
     this.recordStore = parentSchema.getRecordStore();
     this.catalogPath = FileGdbRecordStore.toCatalogPath(childSchemaPath);
+  }
+
+  @Override
+  public boolean equalsRecordStore(final RecordStore recordStore) {
+    return recordStore == this.recordStore;
   }
 
   public String getCatalogPath() {
@@ -32,11 +37,6 @@ public class FileGdbRecordStoreSchema extends RecordStoreSchema {
   @Override
   public <V extends RecordStore> V getRecordStore() {
     return (V)this.recordStore;
-  }
-
-  @Override
-  public boolean equalsRecordStore(final RecordStore recordStore) {
-    return recordStore == this.recordStore;
   }
 
 }

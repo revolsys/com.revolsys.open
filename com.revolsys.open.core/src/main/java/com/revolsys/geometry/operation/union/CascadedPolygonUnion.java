@@ -263,7 +263,7 @@ public class CascadedPolygonUnion {
     if (this.polygons == null) {
       throw new IllegalStateException("union() method cannot be called twice");
     } else if (this.polygons.isEmpty()) {
-      return this.geometryFactory.polygon();
+      return GeometryFactory.DEFAULT_2D.polygon();
     } else {
       this.geometryFactory = this.polygons.get(0).getGeometryFactory();
 

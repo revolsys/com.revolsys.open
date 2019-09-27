@@ -25,8 +25,6 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
 
   private BoundingBox boundingBox;
 
-  private final String catalogPath;
-
   private int count;
 
   private String fields;
@@ -51,32 +49,31 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
 
   private boolean closed = false;
 
-  FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String catalogPath,
-    final String whereClause) {
-    this(recordStore, catalogPath, "*", whereClause, null, 0, -1);
+  FileGdbQueryIterator(final FileGdbRecordStore recordStore,
+    final FileGdbRecordDefinition recordDefinition, final String whereClause) {
+    this(recordStore, recordDefinition, "*", whereClause, null, 0, -1);
   }
 
-  FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String catalogPath,
-    final String whereClause, final BoundingBox boundingBox, final Query query, final int offset,
-    final int limit) {
-    this(recordStore, catalogPath, "*", whereClause, boundingBox, offset, limit);
+  FileGdbQueryIterator(final FileGdbRecordStore recordStore,
+    final FileGdbRecordDefinition recordDefinition, final String whereClause,
+    final BoundingBox boundingBox, final Query query, final int offset, final int limit) {
+    this(recordStore, recordDefinition, "*", whereClause, boundingBox, offset, limit);
     final RecordFactory<Record> recordFactory = query.getRecordFactory();
     if (recordFactory != null) {
       this.recordFactory = recordFactory;
     }
   }
 
-  FileGdbQueryIterator(final FileGdbRecordStore recordStore, final String catalogPath,
-    final String fields, final String sql, final BoundingBox boundingBox, final int offset,
-    final int limit) {
-    this.catalogPath = catalogPath;
+  FileGdbQueryIterator(final FileGdbRecordStore recordStore,
+    final FileGdbRecordDefinition recordDefinition, final String fields, final String sql,
+    final BoundingBox boundingBox, final int offset, final int limit) {
     this.sql = sql;
-    this.recordDefinition = recordStore.getRecordDefinition(catalogPath);
+    this.recordDefinition = recordDefinition;
     if (this.recordDefinition == null) {
       this.closed = true;
     } else {
       this.recordStore = recordStore;
-      this.table = recordStore.getTableReference(this.recordDefinition).connect();
+      this.table = recordDefinition.getTableReference().connect();
       if ("*".equals(fields)) {
         this.fields = Strings.toString(this.recordDefinition.getFieldNames());
       } else {
@@ -118,7 +115,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
               }
             }
           } catch (final Throwable e) {
-            Logs.error(this, "Error closing query: " + this.catalogPath, e);
+            Logs.error(this, "Error closing query: " + this.recordDefinition.getPathName(), e);
           } finally {
             this.boundingBox = null;
             this.recordStore = null;
@@ -252,6 +249,6 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
 
   @Override
   public String toString() {
-    return this.catalogPath + " " + this.sql;
+    return this.recordDefinition.getPathName() + " " + this.sql;
   }
 }

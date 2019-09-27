@@ -79,7 +79,12 @@ public class FileGdbRecordDefinition extends RecordDefinitionImpl {
 
   private final TableReference tableReference;
 
-  public FileGdbRecordDefinition(final FileGdbRecordStoreSchema schema,
+  FileGdbRecordDefinition(final FileGdbRecordStore recordStore, final PathName schemaName,
+    final String tableDefinition) {
+    this(recordStore.getSchema(schemaName), tableDefinition);
+  }
+
+  private FileGdbRecordDefinition(final FileGdbRecordStoreSchema schema,
     final String tableDefinition) {
     super(schema);
     this.recordStore = schema.getRecordStore();
@@ -171,6 +176,11 @@ public class FileGdbRecordDefinition extends RecordDefinitionImpl {
     this.tableReference = recordStore.getTableReference(typePath, this.catalogPath);
   }
 
+  @Override
+  public boolean equalsRecordStore(final RecordStore recordStore) {
+    return recordStore == this.recordStore;
+  }
+
   public String getCatalogPath() {
     return this.catalogPath;
   }
@@ -186,16 +196,11 @@ public class FileGdbRecordDefinition extends RecordDefinitionImpl {
     return (V)this.recordStore;
   }
 
-  public TableWrapper lockTable(final boolean loadOnlyMode) {
-    return this.tableReference.writeLock(loadOnlyMode);
-  }
-
   TableReference getTableReference() {
     return this.tableReference;
   }
 
-  @Override
-  public boolean equalsRecordStore(final RecordStore recordStore) {
-    return recordStore == this.recordStore;
+  public TableWrapper lockTable(final boolean loadOnlyMode) {
+    return this.tableReference.writeLock(loadOnlyMode);
   }
 }
