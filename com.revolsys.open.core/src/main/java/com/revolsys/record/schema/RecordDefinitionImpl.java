@@ -169,6 +169,14 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     this.codeTable = recordDefinition.getCodeTable();
   }
 
+  public RecordDefinitionImpl(final RecordStoreSchema schema) {
+    super(schema);
+    final RecordStore recordStore = getRecordStore();
+    if (recordStore != null) {
+      this.recordFactory = recordStore.getRecordFactory();
+    }
+  }
+
   public RecordDefinitionImpl(final RecordStoreSchema schema, final PathName pathName) {
     super(schema, pathName);
     final RecordStore recordStore = getRecordStore();

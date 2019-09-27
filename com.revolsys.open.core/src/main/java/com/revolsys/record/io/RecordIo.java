@@ -3,6 +3,8 @@ package com.revolsys.record.io;
 import com.revolsys.io.Writer;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.spring.resource.PathResource;
+import com.revolsys.spring.resource.Resource;
 
 public interface RecordIo {
 
@@ -40,12 +42,19 @@ public interface RecordIo {
 
   static void copyRecords(final RecordDefinition recordDefinition,
     final Iterable<? extends Record> records, final Object target) {
-    try (
-      RecordWriter writer = RecordWriter.newRecordWriter(recordDefinition, target)) {
-      if (writer == null) {
-        throw new IllegalArgumentException("Unable to create writer " + target);
-      } else {
-        copyRecords(records, writer);
+    if (target != null) {
+      final Resource resource = Resource.getResource(target);
+      if (resource instanceof PathResource) {
+        final PathResource pathResource = (PathResource)resource;
+        pathResource.deleteDirectory();
+      }
+      try (
+        RecordWriter writer = RecordWriter.newRecordWriter(recordDefinition, resource)) {
+        if (writer == null) {
+          throw new IllegalArgumentException("Unable to create writer " + target);
+        } else {
+          copyRecords(records, writer);
+        }
       }
     }
   }

@@ -221,13 +221,12 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       } else if (layer instanceof AbstractRecordLayer) {
         final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
         if (recordLayer.isSelectable(scale)) {
-          final List<LayerRecord> selectedRecords = recordLayer.getSelectedRecords();
-          for (final LayerRecord selectedRecord : selectedRecords) {
+          recordLayer.forEachSelectedRecord((final LayerRecord selectedRecord) -> {
             final Geometry geometry = selectedRecord.getGeometry();
             if (boundingBox.intersects(geometry)) {
               results.add(selectedRecord);
             }
-          }
+          });
         }
       }
     }
@@ -1100,7 +1099,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   @Override
   public void mouseExited(final MouseEvent e) {
+
     if (isOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES)) {
+      modeEditGeometryVerticesClear();
     } else if (isOverlayAction(ACTION_MOVE_GEOMETRY)) {
     } else if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
     } else if (isOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES)) {

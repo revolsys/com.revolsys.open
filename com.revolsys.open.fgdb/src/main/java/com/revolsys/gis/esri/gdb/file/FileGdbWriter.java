@@ -1,76 +1,92 @@
 package com.revolsys.gis.esri.gdb.file;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jeometry.common.io.PathName;
+import org.jeometry.common.io.PathNameProxy;
 
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.record.schema.RecordStore;
 
 public class FileGdbWriter extends AbstractRecordWriter {
   private FileGdbRecordStore recordStore;
 
-  private final Map<String, TableWrapper> tablesByCatalogPath = new HashMap<>();
+  private final Map<PathName, TableWrapper> tablesByPathName = new HashMap<>();
 
   private RecordDefinition recordDefinition;
 
-  private TableWrapper table;
+  private FileGdbRecordDefinition fileGdbRecordDefinition;
 
-  private PathName pathName;
+  private TableWrapper table;
 
   private final boolean loadOnlyMode;
 
+  private final List<TableWrapper> tables = new ArrayList<>();
+
   FileGdbWriter(final FileGdbRecordStore recordStore) {
-    this(recordStore, null, true);
+    this.recordStore = recordStore;
+    this.loadOnlyMode = true;
   }
 
   FileGdbWriter(final FileGdbRecordStore recordStore, final RecordDefinition recordDefinition,
-    final boolean loadOnlyMode) {
+    final FileGdbRecordDefinition fileGdbRecordDefinition, final boolean loadOnlyMode) {
     this.recordStore = recordStore;
     this.loadOnlyMode = loadOnlyMode;
     if (recordDefinition != null) {
-      this.pathName = recordDefinition.getPathName();
-      this.table = recordStore.getTableLocked(recordDefinition, loadOnlyMode);
       this.recordDefinition = recordDefinition;
+      this.fileGdbRecordDefinition = fileGdbRecordDefinition;
+      final PathName pathName = recordDefinition.getPathName();
+      final PathName fileGdbPathName = fileGdbRecordDefinition.getPathName();
+      this.table = fileGdbRecordDefinition.lockTable(loadOnlyMode);
+      this.tables.add(this.table);
+      this.tablesByPathName.put(pathName, this.table);
+      this.tablesByPathName.put(fileGdbPathName, this.table);
     }
   }
 
   @Override
   public void close() {
-    try {
-      synchronized (this.tablesByCatalogPath) {
-        for (final TableWrapper table : this.tablesByCatalogPath.values()) {
+    synchronized (this.tablesByPathName) {
+      try {
+        for (final TableWrapper table : this.tables) {
           table.close();
         }
-        final TableWrapper table = this.table;
+      } finally {
+        this.recordDefinition = null;
+        this.fileGdbRecordDefinition = null;
+        this.tablesByPathName.clear();
+        this.tables.clear();
+        this.recordStore = null;
         this.table = null;
+      }
+    }
+  }
+
+  public void closeTable(final PathName pathName) {
+    if (pathName != null) {
+      synchronized (this.tablesByPathName) {
+        final TableWrapper table = this.tablesByPathName.remove(pathName);
         if (table != null) {
+          if (table == this.table) {
+            this.table = null;
+            this.recordDefinition = null;
+            this.fileGdbRecordDefinition = null;
+          }
+          this.tables.remove(table);
           table.close();
+          this.tablesByPathName.values().remove(table);
         }
       }
-    } finally {
-      this.tablesByCatalogPath.clear();
-      this.recordStore = null;
     }
   }
 
-  public void closeTable(final PathName typePath) {
-    synchronized (this.tablesByCatalogPath) {
-      final String catalogPath = this.recordStore.getCatalogPath(typePath);
-      final TableWrapper table = this.tablesByCatalogPath.remove(catalogPath);
-      if (table != null) {
-        table.close();
-      }
-    }
-  }
-
-  private void deleteRecord(final Record record) {
-    final TableWrapper table = getTable(record);
-    if (table != null) {
-      table.deleteRecord(record);
+  public void closeTable(final PathNameProxy pathName) {
+    if (pathName != null) {
+      closeTable(pathName.getPathName());
     }
   }
 
@@ -88,37 +104,41 @@ public class FileGdbWriter extends AbstractRecordWriter {
     return this.recordStore;
   }
 
-  private TableWrapper getTable(final Record record) {
-    final RecordDefinition recordDefinition = record.getRecordDefinition();
-    return getTable(recordDefinition);
-  }
-
   private TableWrapper getTable(final RecordDefinition recordDefinition) {
-    if (this.recordDefinition != null) {
-      if (this.recordDefinition == recordDefinition) {
-        return this.table;
-      } else if (recordDefinition.getPathName().equals(this.pathName)) {
-        return this.table;
-      }
-    }
-    final String catalogPath = this.recordStore.getCatalogPath(recordDefinition);
-    synchronized (this.tablesByCatalogPath) {
-      TableWrapper table = this.tablesByCatalogPath.get(catalogPath);
-      if (table == null) {
-        table = this.recordStore.getTableLocked(recordDefinition, this.loadOnlyMode);
-        if (table != null) {
-          this.tablesByCatalogPath.put(catalogPath, table);
+    synchronized (this.tablesByPathName) {
+      if (recordDefinition == null) {
+        return null;
+      } else if (this.table != null) {
+        if (this.recordDefinition == recordDefinition //
+          || this.fileGdbRecordDefinition == recordDefinition //
+        ) {
+          return this.table;
         }
       }
-      return table;
+      final PathName pathName = recordDefinition.getPathName();
+      TableWrapper table = this.tablesByPathName.get(pathName);
+      if (table == null) {
+        final FileGdbRecordDefinition fileGdbRecordDefinition = this.recordStore
+          .getRecordDefinition(recordDefinition);
+        if (fileGdbRecordDefinition == null) {
+          throw new IllegalArgumentException("Tables doesn't exist " + pathName);
+        } else {
+          final PathName fileGdbPathName = fileGdbRecordDefinition.getPathName();
+          if (!fileGdbPathName.equals(pathName)) {
+            table = this.tablesByPathName.get(fileGdbPathName);
+            if (table != null) {
+              this.tablesByPathName.put(pathName, table);
+              return table;
+            }
+          }
+          table = this.recordStore.getTableLocked(recordDefinition, this.loadOnlyMode);
+          this.tables.add(table);
+          this.tablesByPathName.put(pathName, table);
+          this.tablesByPathName.put(fileGdbPathName, table);
+        }
+      }
     }
-  }
-
-  private void insertRecord(final Record record) {
-    final TableWrapper table = getTable(record);
-    if (table != null) {
-      table.insertRecord(record);
-    }
+    return this.table;
   }
 
   public boolean isClosed() {
@@ -127,43 +147,38 @@ public class FileGdbWriter extends AbstractRecordWriter {
 
   @Override
   public String toString() {
-    if (this.pathName == null) {
+    if (this.fileGdbRecordDefinition == null) {
       return this.recordStore.toString();
     } else {
-      return this.pathName + "\n" + this.recordStore;
-    }
-  }
-
-  private void updateRecord(final Record record) {
-    final TableWrapper table = getTable(record);
-    if (table != null) {
-      table.updateRecord(record);
+      return this.fileGdbRecordDefinition.getPathName() + "\n" + this.recordStore;
     }
   }
 
   @Override
   public void write(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
-    final RecordStore recordStore = recordDefinition.getRecordStore();
-    if (recordStore == this.recordStore) {
-      switch (record.getState()) {
-        case NEW:
-          insertRecord(record);
-        break;
-        case MODIFIED:
-          updateRecord(record);
-        break;
-        case PERSISTED:
-        // No action required
-        break;
-        case DELETED:
-          deleteRecord(record);
-        break;
-        default:
-          throw new IllegalStateException("State not known");
+    final TableWrapper table = getTable(recordDefinition);
+    if (table != null) {
+      if (recordDefinition.equalsRecordStore(this.recordStore)) {
+        switch (record.getState()) {
+          case NEW:
+            table.insertRecord(record);
+          break;
+          case MODIFIED:
+            table.updateRecord(record);
+          break;
+          case PERSISTED:
+          // No action required
+          break;
+          case DELETED:
+            table.deleteRecord(record);
+          break;
+          default:
+            throw new IllegalStateException("State not known");
+        }
+      } else {
+        table.insertRecord(record);
       }
-    } else {
-      insertRecord(record);
     }
   }
 

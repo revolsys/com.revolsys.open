@@ -35,7 +35,8 @@ import com.revolsys.util.CancellableProxy;
 import com.revolsys.util.Property;
 import com.revolsys.util.count.LabelCounters;
 
-public class Query extends BaseObjectWithProperties implements Cloneable, CancellableProxy {
+public class Query extends BaseObjectWithProperties
+  implements Cloneable, CancellableProxy, RecordDefinitionProxy {
   private static void addFilter(final Query query, final RecordDefinition recordDefinition,
     final Map<String, ?> filter, final AbstractMultiCondition multipleCondition) {
     if (filter != null && !filter.isEmpty()) {
@@ -331,6 +332,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this.cancellable;
   }
 
+  @Override
   public List<String> getFieldNames() {
     return this.fieldNames;
   }
@@ -363,10 +365,12 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this.parameters;
   }
 
+  @Override
   public RecordDefinition getRecordDefinition() {
     return this.recordDefinition;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <V extends Record> RecordFactory<V> getRecordFactory() {
     return (RecordFactory<V>)this.recordFactory;

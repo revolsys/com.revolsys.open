@@ -85,6 +85,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.ByteArrayResource;
+import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.Dialogs;
@@ -900,8 +901,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final Object target) {
     final RecordDefinition recordDefinition = newRecordDefinition(fieldNames);
     if (recordDefinition != null) {
+      final Resource resource = Resource.getResource(target);
+      if (resource instanceof PathResource) {
+        final PathResource pathResource = (PathResource)resource;
+        pathResource.deleteDirectory();
+      }
       try (
-        RecordWriter writer = RecordWriter.newRecordWriter(recordDefinition, target)) {
+        RecordWriter writer = RecordWriter.newRecordWriter(recordDefinition, resource)) {
         forEachRecordInternal(query, writer::write);
       }
     }

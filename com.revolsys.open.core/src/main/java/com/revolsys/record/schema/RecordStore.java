@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.date.Dates;
 import org.jeometry.common.io.PathName;
+import org.jeometry.common.io.PathNameProxy;
 import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -331,11 +332,28 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     }
   }
 
+  default RecordDefinition getRecordDefinition(final PathNameProxy path) {
+    if (path == null) {
+      return null;
+    } else {
+      final PathName pathName = path.getPathName();
+      return getRecordDefinition(pathName);
+    }
+  }
+
   default <RD extends RecordDefinition> RD getRecordDefinition(
     final RecordDefinition objectRecordDefinition) {
     final String typePath = objectRecordDefinition.getPath();
-    final RD recordDefinition = getRecordDefinition(typePath);
-    return recordDefinition;
+    return getRecordDefinition(typePath);
+  }
+
+  default <RD extends RecordDefinition> RD getRecordDefinition(
+    final RecordDefinitionProxy recordDefinition) {
+    if (recordDefinition != null) {
+      final RecordDefinition rd = recordDefinition.getRecordDefinition();
+      return getRecordDefinition(rd);
+    }
+    return null;
   }
 
   @Override

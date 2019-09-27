@@ -20,6 +20,10 @@ public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithPro
     this(null, pathName);
   }
 
+  public AbstractRecordStoreSchemaElement(final RecordStoreSchema schema) {
+    this.schema = schema;
+  }
+
   public AbstractRecordStoreSchemaElement(final RecordStoreSchema schema, final PathName pathName) {
     this.schema = schema;
     this.pathName = pathName;
@@ -109,6 +113,10 @@ public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithPro
     } else {
       return this.pathName.hashCode();
     }
+  }
+
+  protected void setPathName(final PathName pathName) {
+    this.pathName = pathName;
   }
 
   protected void setPathName(final String path) {

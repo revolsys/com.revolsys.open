@@ -197,6 +197,10 @@ public class PathResource extends AbstractResource implements WritableResource {
     }
   }
 
+  public boolean deleteDirectory() {
+    return com.revolsys.io.file.Paths.deleteDirectories(this.path);
+  }
+
   /**
    * This implementation compares the underlying PathUtil references.
    */

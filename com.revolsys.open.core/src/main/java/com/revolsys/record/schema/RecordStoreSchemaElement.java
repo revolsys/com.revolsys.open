@@ -35,4 +35,9 @@ public interface RecordStoreSchemaElement extends GeometryFactoryProxy, ObjectWi
       return false;
     }
   }
+
+  default boolean equalsRecordStore(final RecordStore recordStore) {
+    return getRecordStore() == recordStore;
+  }
+
 }

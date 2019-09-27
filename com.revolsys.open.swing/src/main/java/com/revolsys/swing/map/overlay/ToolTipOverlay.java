@@ -2,6 +2,7 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 
 import javax.swing.BorderFactory;
@@ -21,7 +22,7 @@ public class ToolTipOverlay extends AbstractOverlay {
     setLayout(null);
     this.label.setOpaque(true);
     this.label.setBorder(BorderFactory.createLineBorder(WebColors.Black));
-    this.label.setBackground(WebColors.newAlpha(WebColors.Yellow, 111));
+    this.label.setBackground(WebColors.newAlpha(WebColors.Yellow, 170));
     add(this.label);
     clearText();
   }
@@ -34,6 +35,11 @@ public class ToolTipOverlay extends AbstractOverlay {
     this.label.setText("");
     this.label.setVisible(false);
     repaint();
+  }
+
+  @Override
+  public void mouseExited(final MouseEvent e) {
+    clearText();
   }
 
   public void setText(int x, int y, final CharSequence text) {
