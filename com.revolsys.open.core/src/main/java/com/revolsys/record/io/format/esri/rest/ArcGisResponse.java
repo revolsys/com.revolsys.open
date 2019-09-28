@@ -117,6 +117,8 @@ public abstract class ArcGisResponse<V> extends AbstractWebService<V> implements
 
   private boolean hasError = false;
 
+  private boolean cannotFindHost;
+
   public ArcGisResponse() {
   }
 
@@ -183,6 +185,14 @@ public abstract class ArcGisResponse<V> extends AbstractWebService<V> implements
     setProperties(properties);
   }
 
+  protected boolean isCannotFindHost() {
+    if (this.parent instanceof ArcGisResponse<?>) {
+      return ((ArcGisResponse<?>)this.parent).isCannotFindHost();
+    } else {
+      return this.cannotFindHost;
+    }
+  }
+
   @Override
   public boolean isHasError() {
     return this.hasError;
@@ -203,12 +213,16 @@ public abstract class ArcGisResponse<V> extends AbstractWebService<V> implements
       try (
         BaseCloseable noCache = FileResponseCache.disable()) {
         refreshDo();
+        setCannotFindHost(false);
         this.hasError = false;
       } catch (final WrappedException e) {
         this.hasError = true;
         final Throwable cause = Exceptions.unwrap(e);
         if (cause instanceof UnknownHostException) {
-          Logs.error(this, "Cannot find host " + cause.getMessage());
+          if (!isCannotFindHost()) {
+            setCannotFindHost(true);
+            Logs.error(this, getPathName() + " Cannot find host " + cause.getMessage());
+          }
         }
       } catch (final Throwable e) {
         this.hasError = true;
@@ -238,6 +252,14 @@ public abstract class ArcGisResponse<V> extends AbstractWebService<V> implements
         this.initialized = true;
         refresh();
       }
+    }
+  }
+
+  private void setCannotFindHost(final boolean cannotFindHost) {
+    if (this.parent instanceof ArcGisResponse<?>) {
+      ((ArcGisResponse<?>)this.parent).cannotFindHost = cannotFindHost;
+    } else {
+      this.cannotFindHost = cannotFindHost;
     }
   }
 
