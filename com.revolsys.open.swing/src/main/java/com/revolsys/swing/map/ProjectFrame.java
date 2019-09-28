@@ -783,10 +783,10 @@ public class ProjectFrame extends BaseFrame {
 
     if (OS.isWindows()) {
       file.addMenuItemTitleIcon("exit", "Exit", null, this::exit)
-        .setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_MASK));
+        .setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_F4, InputEvent.ALT_DOWN_MASK));
     } else if (OS.isUnix()) {
       file.addMenuItemTitleIcon("exit", "Exit", null, this::exit)
-        .setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_MASK));
+        .setAcceleratorKey(KeyStroke.getKeyStroke(KeyEvent.VK_Q, InputEvent.CTRL_DOWN_MASK));
     }
 
     return file;

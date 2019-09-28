@@ -124,12 +124,13 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
   public void setAcceleratorControlKey(final int keyCode) {
     int modifiers;
     if (OS.isMac()) {
-      modifiers = InputEvent.META_MASK;
+      modifiers = InputEvent.META_DOWN_MASK;
     } else {
-      modifiers = InputEvent.CTRL_MASK;
+      modifiers = InputEvent.CTRL_DOWN_MASK;
     }
-    setAcceleratorKey(KeyStroke.getKeyStroke(keyCode, modifiers));
-    setMnemonicKey(keyCode);
+    final KeyStroke keyStroke = KeyStroke.getKeyStroke(keyCode, modifiers);
+    setAcceleratorKey(keyStroke);
+    // setMnemonicKey(keyCode);
   }
 
   public void setAcceleratorKey(final KeyStroke keyStroke) {
@@ -137,11 +138,11 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
   }
 
   public void setAcceleratorShiftControlKey(final int keyCode) {
-    int modifiers = InputEvent.SHIFT_MASK;
+    int modifiers = InputEvent.SHIFT_DOWN_MASK;
     if (OS.isMac()) {
-      modifiers |= InputEvent.META_MASK;
+      modifiers |= InputEvent.META_DOWN_MASK;
     } else {
-      modifiers |= InputEvent.CTRL_MASK;
+      modifiers |= InputEvent.CTRL_DOWN_MASK;
     }
     setAcceleratorKey(KeyStroke.getKeyStroke(keyCode, modifiers));
   }

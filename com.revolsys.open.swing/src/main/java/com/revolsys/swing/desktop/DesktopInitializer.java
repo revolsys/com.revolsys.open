@@ -20,6 +20,8 @@ import com.revolsys.util.OS;
 public class DesktopInitializer {
   public static void initialize(final Image image, final Set<File> initialFiles) {
     if (OS.isMac()) {
+      System.setProperty("apple.laf.useScreenMenuBar", "true");
+
       if (image != null) {
         final Taskbar taskbar = Taskbar.getTaskbar();
         taskbar.setIconImage(image);
