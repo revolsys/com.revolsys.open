@@ -173,7 +173,8 @@ public class MavenRepositoryCache extends MavenRepository {
         final PathResource fileResource = new PathResource(file);
         super.setRoot(fileResource);
       } catch (final Throwable e) {
-        throw new IllegalArgumentException("Maven cache must resolve to a local directory " + root);
+        throw new IllegalArgumentException("Maven cache must resolve to a local directory " + root,
+          e);
       }
     }
   }
