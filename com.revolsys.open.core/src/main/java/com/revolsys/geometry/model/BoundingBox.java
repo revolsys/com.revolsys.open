@@ -26,7 +26,6 @@ import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.model.util.BoundingBoxEditor;
 import com.revolsys.geometry.util.BoundingBoxUtil;
-import com.revolsys.io.FileUtil;
 import com.revolsys.logging.Logs;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.wkt.WktParser;
@@ -195,44 +194,65 @@ public interface BoundingBox extends Emptyable, BoundingBoxProxy {
   static BoundingBox newBoundingBox(final String wkt) {
     if (Property.hasValue(wkt)) {
       try {
-        GeometryFactory geometryFactory = null;
+        int coordinateSystemId = 0;
         final PushbackReader reader = new PushbackReader(new StringReader(wkt), 20);
         WktParser.skipWhitespace(reader);
         if (WktParser.hasText(reader, "SRID=")) {
           final Integer srid = WktParser.parseInteger(reader);
           if (srid != null) {
-            geometryFactory = GeometryFactory.floating(srid, 2);
+            coordinateSystemId = srid;
           }
-          WktParser.hasText(reader, ";");
+          WktParser.hasChar(reader, ';');
         }
-        if (WktParser.hasText(reader, "BBOX(")) {
-          final Double x1 = WktParser.parseDouble(reader);
-          if (WktParser.hasText(reader, ",")) {
-            WktParser.skipWhitespace(reader);
-            final Double y1 = WktParser.parseDouble(reader);
-            WktParser.skipWhitespace(reader);
-            final Double x2 = WktParser.parseDouble(reader);
-            if (WktParser.hasText(reader, ",")) {
-              WktParser.skipWhitespace(reader);
-              final Double y2 = WktParser.parseDouble(reader);
-              return new BoundingBoxDoubleGf(geometryFactory, 2, x1, y1, x2, y2);
+        if (WktParser.hasText(reader, "BBOX")) {
+          int axisCount = 2;
+          if (WktParser.hasSpace(reader)) {
+            if (WktParser.hasChar(reader, 'Z')) {
+              axisCount = 3;
+            } else if (WktParser.hasChar(reader, 'M')) {
+              axisCount = 4;
             } else {
-              throw new IllegalArgumentException(
-                "Expecting a ',' not " + FileUtil.getString(reader));
+              reader.unread(' ');
             }
-
-          } else {
-            throw new IllegalArgumentException("Expecting a ',' not " + FileUtil.getString(reader));
           }
-        } else if (WktParser.hasText(reader, "BBOX EMPTY")) {
-          return new BoundingBoxDoubleGf(geometryFactory);
+          final GeometryFactory geometryFactory = GeometryFactory.floating(coordinateSystemId,
+            axisCount);
+
+          if (WktParser.hasText(reader, "(")) {
+            final double[] bounds = new double[axisCount * 2];
+            for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+              if (axisIndex > 0) {
+                WktParser.skipWhitespace(reader);
+                WktParser.hasChar(reader, ','); // Remove later old format BBOX
+              }
+              bounds[axisIndex] = WktParser.parseDouble(reader);
+            }
+            if (WktParser.hasSpace(reader) || WktParser.hasChar(reader, ',')) {
+              for (int axisIndex = 0; axisIndex < axisCount; axisIndex++) {
+                if (axisIndex > 0) {
+                  WktParser.skipWhitespace(reader);
+                  WktParser.hasChar(reader, ','); // Remove later old format
+                                                  // BBOX
+                }
+                bounds[axisCount + axisIndex] = WktParser.parseDouble(reader);
+              }
+              if (WktParser.hasChar(reader, ')')) {
+                return geometryFactory.newBoundingBox(axisCount, bounds);
+              }
+            }
+          } else if (WktParser.hasText(reader, " EMPTY")) {
+            return geometryFactory.bboxEmpty();
+          }
         }
+      } catch (final IllegalArgumentException e) {
+        throw new IllegalArgumentException("Invalid BBOX " + wkt, e);
       } catch (final IOException e) {
         throw Exceptions.wrap("Error reading WKT:" + wkt, e);
       }
+      throw new IllegalArgumentException("Invalid BBOX " + wkt);
+    } else {
+      return empty();
     }
-
-    return EMPTY;
   }
 
   static String toString(final BoundingBox boundingBox) {

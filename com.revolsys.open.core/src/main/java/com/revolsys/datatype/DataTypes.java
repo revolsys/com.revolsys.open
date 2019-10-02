@@ -95,8 +95,8 @@ public final class DataTypes {
 
   public static final DataType FLOAT = new Floats();
 
-  public static final DataType GEOMETRY = FunctionDataType.newToObjectEquals("Geometry",
-    Geometry.class, Geometry::newGeometry, Geometry::equalsExact);
+  public static final GeometryDataType<Geometry> GEOMETRY = new GeometryDataType<>(Geometry.class,
+    value -> Geometry.newGeometry(value));
 
   public static final DataType GEOMETRY_COLLECTION = FunctionDataType.newToObjectEquals(
     "GeometryCollection", GeometryCollection.class, GeometryCollection::newGeometryCollection,

@@ -9,7 +9,7 @@
   <parent>
     <groupId>com.revolsys.open</groupId>
     <artifactId>com.revolsys.open.parent</artifactId>
-    <version>GBA-2.1.7-RELEASE</version>
+    <version>GBA-SNAPSHOT</version>
   </parent>
   <dependencies>
     <dependency>

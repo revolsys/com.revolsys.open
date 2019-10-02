@@ -36,6 +36,18 @@ public class WktParser {
     }
   }
 
+  public static boolean hasSpace(final PushbackReader reader) throws IOException {
+    final int character = reader.read();
+    if (character < 0) {
+      return false;
+    } else if (character == ' ') {
+      return true;
+    } else {
+      reader.unread(character);
+      return false;
+    }
+  }
+
   public static boolean hasText(final PushbackReader reader, final String expected)
     throws IOException {
     final int length = expected.length();
