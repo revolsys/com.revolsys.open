@@ -1,5 +1,7 @@
 package com.revolsys.gis.esri.gdb.file;
 
+import java.util.function.Supplier;
+
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 
@@ -264,9 +266,22 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
     }
   }
 
+  default void withTableLock(final Runnable action) {
+    try (
+      BaseCloseable lock = writeLock()) {
+      valueConsumeSync(table -> action.run());
+    }
+  }
+
+  default <V> V withTableLock(final Supplier<V> action) {
+    try (
+      BaseCloseable lock = writeLock()) {
+      return valueFunctionSync(table -> action.get());
+    }
+  }
+
   default TableWrapper writeLock() {
     final TableReference tableReference = getTableReference();
     return tableReference.writeLock(false);
   }
-
 }

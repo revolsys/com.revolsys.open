@@ -810,9 +810,16 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (record.getState() == RecordState.DELETED) {
       return false;
     } else {
-      final List<LayerRecord> records = Collections.singletonList(record);
-      deleteRecords(records);
-      return true;
+      removeForms(Collections.singletonList(record));
+      final List<LayerRecord> recordsDeleted = new ArrayList<>();
+      final boolean deleted = deleteSingleRecordDo(record);
+      if (deleted) {
+        final LayerRecord recordProxy = record.newRecordProxy();
+        recordsDeleted.add(recordProxy);
+        deleteRecordsPost(recordsDeleted);
+        return true;
+      }
+      return false;
     }
   }
 
@@ -833,30 +840,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void deleteRecords(final Collection<? extends LayerRecord> records) {
     removeForms(records);
     final List<LayerRecord> recordsDeleted = new ArrayList<>();
-    try (
-      BaseCloseable eventsEnabled = eventsDisabled()) {
-      synchronized (getSync()) {
-        final boolean canDelete = isCanDeleteRecords();
-        for (final LayerRecord record : records) {
-          removeRecordFromCache(record);
-          boolean deleted = false;
-          if (this.recordCacheNew.removeContainsRecord(record)) {
-            record.setState(RecordState.DELETED);
-            deleted = true;
-          } else if (canDelete) {
-            if (deleteRecordDo(record)) {
-              deleted = true;
-            }
-          }
-          if (deleted) {
-            final LayerRecord recordProxy = record.newRecordProxy();
-            recordsDeleted.add(recordProxy);
-          }
-        }
+    processRecords("Delete Records", records, (final LayerRecord record) -> {
+      final boolean deleted = deleteSingleRecordDo(record);
+      if (deleted) {
+        final LayerRecord recordProxy = record.newRecordProxy();
+        recordsDeleted.add(recordProxy);
       }
-    }
-
-    deleteRecordsPost(recordsDeleted);
+    }, monitor -> {
+      deleteRecordsPost(recordsDeleted);
+    });
   }
 
   protected void deleteRecordsPost(final List<LayerRecord> recordsDeleted) {
@@ -878,6 +870,19 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public boolean deleteRecordWithConfirm(final LayerRecord record) {
     final List<LayerRecord> records = Collections.singletonList(record);
     return deleteRecordsWithConfirm(records);
+  }
+
+  protected boolean deleteSingleRecordDo(final LayerRecord record) {
+    removeRecordFromCache(record);
+    if (this.recordCacheNew.removeContainsRecord(record)) {
+      record.setState(RecordState.DELETED);
+      return true;
+    } else if (isCanDeleteRecords()) {
+      if (deleteRecordDo(record)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public void exportRecords(final Iterable<LayerRecord> records,
@@ -2446,7 +2451,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
       try (
         BaseCloseable eventsDisabled = eventsDisabled()) {
-        forEachAction.accept(monitorAction);
+        processRecordsDo(forEachAction, monitorAction);
       } catch (final CancellationException e) {
       } finally {
         if (afterAction != null) {
@@ -2459,6 +2464,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         fireRecordsChanged();
       }
     }, recordCount);
+  }
+
+  protected <R1 extends LayerRecord> void processRecordsDo(
+    final Consumer<Consumer<R1>> forEachAction, final Consumer<R1> monitorAction) {
+    forEachAction.accept(monitorAction);
   }
 
   public <R1 extends LayerRecord, R2 extends Record> void processRecords(final CharSequence title,
@@ -2686,7 +2696,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             BaseCloseable eventsEnabled = eventsDisabled()) {
             synchronized (getSync()) {
               try {
-                final boolean saved = internalSaveChanges(errors, record);
+                final boolean saved = saveSingleRecordDo(errors, record);
                 if (!saved) {
                   errors.addRecord(record, "Unknown error");
                 }
@@ -2726,7 +2736,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     for (final LayerRecord record : records) {
       synchronized (getSync()) {
         try {
-          final boolean saved = internalSaveChanges(errors, record);
+          final boolean saved = saveSingleRecordDo(errors, record);
           if (!saved) {
             errors.addRecord(record, "Unknown error");
           }
@@ -2735,6 +2745,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
       }
     }
+  }
+
+  protected boolean saveSingleRecordDo(final RecordLayerErrors errors, final LayerRecord record) {
+    return internalSaveChanges(errors, record);
   }
 
   public void setCanAddRecords(final boolean canAddRecords) {

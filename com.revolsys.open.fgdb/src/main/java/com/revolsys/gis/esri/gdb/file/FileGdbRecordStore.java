@@ -593,6 +593,15 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     return FileGdbRecordStoreFactory.DESCRIPTION;
   }
 
+  public TableWrapper getTable(final PathName path) {
+    final TableReference table = getTableReference(path);
+    if (table == null) {
+      return null;
+    } else {
+      return table.connect();
+    }
+  }
+
   public TableWrapper getTableLocked(final RecordDefinition recordDefinition,
     final boolean loadOnlyMode) {
     final TableReference table = getTableReference(recordDefinition);
@@ -1060,7 +1069,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         geodatabase.closeTable(table);
         table.delete();
       });
-      final FileGdbRecordDefinition recordDefinition = new FileGdbRecordDefinition(this, PathName.newPathName(schemaPath), tableDefinition);
+      final FileGdbRecordDefinition recordDefinition = new FileGdbRecordDefinition(this,
+        PathName.newPathName(schemaPath), tableDefinition);
       initRecordDefinition(recordDefinition);
       schema.addElement(recordDefinition);
       return recordDefinition;
@@ -1138,7 +1148,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         for (int i = 0; i < childFeatureClasses.size(); i++) {
           final String childCatalogPath = childFeatureClasses.get(i);
           final String tableDefinition = geodatabase.getTableDefinition(childCatalogPath);
-          final FileGdbRecordDefinition recordDefinition = new FileGdbRecordDefinition(this, schemaPath, tableDefinition);
+          final FileGdbRecordDefinition recordDefinition = new FileGdbRecordDefinition(this,
+            schemaPath, tableDefinition);
           initRecordDefinition(recordDefinition);
           final PathName childPath = recordDefinition.getPathName();
           elementsByPath.put(childPath, recordDefinition);

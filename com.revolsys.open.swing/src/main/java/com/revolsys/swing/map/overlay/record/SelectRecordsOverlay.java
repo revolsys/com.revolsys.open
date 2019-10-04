@@ -134,6 +134,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     selectRecords(boundingBox, AbstractRecordLayer::addSelectedRecords);
   }
 
+  @Override
   protected void cancel() {
     selectBoxClear();
     repaint();
@@ -322,7 +323,8 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     if (viewport != null) {
       try (
         final ImageViewport imageViewport = new ImageViewport(viewport,
-          BufferedImage.TYPE_INT_ARGB_PRE);) {
+          BufferedImage.TYPE_INT_ARGB_PRE)) {
+        imageViewport.setBoundingBox(imageViewport.getBoundingBox());
         final ViewRenderer view = imageViewport.newViewRenderer();
         if (view.isViewValid()) {
           final Project project = getProject();

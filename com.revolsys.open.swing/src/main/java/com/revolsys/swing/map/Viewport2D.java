@@ -166,7 +166,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     this.project = new WeakReference<>(parentViewport.getProject());
     this.viewWidth = cacheBoundingBox.getViewWidthPixels();
     this.viewHeight = cacheBoundingBox.getViewHeightPixels();
-    setGeometryFactory(this.boundingBox.getGeometryFactory());
+    setGeometryFactory(cacheBoundingBox.getGeometryFactory());
     this.boundingBox = cacheBoundingBox.getBoundingBox();
     this.cacheBoundingBox = cacheBoundingBox;
   }
