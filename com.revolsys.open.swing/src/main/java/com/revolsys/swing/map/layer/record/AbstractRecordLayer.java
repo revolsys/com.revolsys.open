@@ -2417,6 +2417,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
+  public <R1 extends LayerRecord, R2 extends Record> void processRecord(final CharSequence title,
+    final R1 record, final Consumer<R2> action) {
+    processRecords(title, Collections.singleton(record), action, null);
+  }
+
   public <R1 extends LayerRecord, R2 extends Record> void processRecords(final CharSequence title,
     final Collection<R1> records, final Consumer<R2> action) {
     processRecords(title, records, action, null);
@@ -2469,11 +2474,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   protected <R1 extends LayerRecord> void processRecordsDo(
     final Consumer<Consumer<R1>> forEachAction, final Consumer<R1> monitorAction) {
     forEachAction.accept(monitorAction);
-  }
-
-  public <R1 extends LayerRecord, R2 extends Record> void processRecords(final CharSequence title,
-    final R1 record, final Consumer<R2> action) {
-    processRecords(title, Collections.singleton(record), action, null);
   }
 
   @Override
