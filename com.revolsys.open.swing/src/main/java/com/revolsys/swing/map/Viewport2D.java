@@ -130,7 +130,7 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
 
   private double maxUnitsPerPixel;
 
-  protected ViewportCacheBoundingBox cacheBoundingBox = new ViewportCacheBoundingBox();
+  protected ViewportCacheBoundingBox cacheBoundingBox = ViewportCacheBoundingBox.EMPTY;
 
   public Viewport2D() {
   }
@@ -466,11 +466,14 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
   }
 
   protected synchronized void resetView(final double viewWidth, final double viewHeight) {
-    this.viewWidth = viewWidth;
-    this.viewHeight = viewHeight;
-    this.unitsPerPixel = 0;
-    final BoundingBox boundingBox = getBoundingBox();
-    setBoundingBox(boundingBox);
+    if (viewWidth != this.viewWidth || viewHeight != this.viewHeight) {
+      this.viewWidth = viewWidth;
+      this.viewHeight = viewHeight;
+      this.unitsPerPixel = 0;
+      final BoundingBox boundingBox = getBoundingBox();
+      setBoundingBox(boundingBox);
+      updateCacheBoundingBox();
+    }
   }
 
   public BoundingBox setBoundingBox(BoundingBox boundingBox) {
@@ -505,7 +508,9 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
           if (!this.unitsPerPixelList.isEmpty() && viewHeightPixels > 0) {
             final double magnitudePower = Doubles.makePreciseFloor(1, Math.log10(unitsPerPixel));
             double newUnitsPerPixel;
-            if (geometryFactory.isProjected() && magnitudePower < 0
+            if (Math.abs(unitsPerPixel - this.unitsPerPixel) < 1e-8) {
+              newUnitsPerPixel = unitsPerPixel;
+            } else if (geometryFactory.isProjected() && magnitudePower < 0
               || geometryFactory.isGeographic() && magnitudePower < -5) {
               newUnitsPerPixel = getClosestUnitsPerPixel(unitsPerPixel);
             } else {
@@ -600,9 +605,10 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
   }
 
   private synchronized void setBoundingBoxInternal(final BoundingBox boundingBox) {
-    this.boundingBox = boundingBox;
-    this.cacheBoundingBox.cancel();
-    this.cacheBoundingBox = new ViewportCacheBoundingBox(this);
+    if (!boundingBox.equals(this.boundingBox)) {
+      this.boundingBox = boundingBox;
+      updateCacheBoundingBox();
+    }
   }
 
   public void setCentre(Point centre) {
@@ -833,6 +839,19 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
   }
 
   public void update() {
+  }
+
+  private void updateCacheBoundingBox() {
+    if (this.viewWidth == 0 || this.viewHeight == 0 || this.boundingBox.isEmpty()) {
+      if (this.cacheBoundingBox != ViewportCacheBoundingBox.EMPTY) {
+        this.cacheBoundingBox.cancel();
+        this.cacheBoundingBox = ViewportCacheBoundingBox.EMPTY;
+      }
+    } else if (!this.cacheBoundingBox.isDimension(this.viewWidth, this.viewHeight)
+      || !this.boundingBox.equals(this.cacheBoundingBox.getBoundingBox())) {
+      this.cacheBoundingBox.cancel();
+      this.cacheBoundingBox = new ViewportCacheBoundingBox(this);
+    }
   }
 
   public void zoomIn() {

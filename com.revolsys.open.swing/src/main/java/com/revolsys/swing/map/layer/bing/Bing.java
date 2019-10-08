@@ -15,9 +15,8 @@ public interface Bing {
     dialog.setIconImage("bing");
 
     SwingUtil.addLabel(dialog, "Imagery Set");
-    final ComboBox<ImagerySet> imagerySetField = ComboBox.newComboBox("imagerySet", ImagerySet.Road,
-      ImagerySet.Aerial, ImagerySet.AerialWithLabels, ImagerySet.CollinsBart,
-      ImagerySet.OrdnanceSurvey);
+    final ComboBox<ImagerySet> imagerySetField = ComboBox.newComboBox("imagerySet",
+      ImagerySet.values());
     dialog.add(imagerySetField);
 
     GroupLayouts.makeColumns(dialog, 2, true, true);

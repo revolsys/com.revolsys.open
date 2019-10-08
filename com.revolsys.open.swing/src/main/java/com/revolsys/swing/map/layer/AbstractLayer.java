@@ -535,7 +535,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     return true;
   }
 
-  protected void initializeForce() {
+  protected synchronized void initializeForce() {
     try {
       final boolean exists;
       try (

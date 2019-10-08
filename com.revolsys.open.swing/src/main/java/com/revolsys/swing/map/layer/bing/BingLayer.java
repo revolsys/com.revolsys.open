@@ -1,22 +1,21 @@
 package com.revolsys.swing.map.layer.bing;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.logging.Logs;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.parallel.ExecutorServiceFactory;
-import com.revolsys.swing.map.layer.raster.AbstractTiledGeoreferencedImageLayer;
+import com.revolsys.raster.GeoreferencedImage;
+import com.revolsys.swing.map.layer.AbstractLayer;
+import com.revolsys.swing.map.layer.BaseMapLayer;
+import com.revolsys.swing.map.layer.raster.ViewFunctionImageLayerRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.CaseConverter;
 
-public class BingLayer extends AbstractTiledGeoreferencedImageLayer<BingMapTile> {
+public class BingLayer extends AbstractLayer implements BaseMapLayer {
   public static final GeometryFactory GEOMETRY_FACTORY = GeometryFactory.floating3d(EpsgId.WGS84);
 
   private static final BoundingBox MAX_BOUNDING_BOX = GEOMETRY_FACTORY.newBoundingBox(-180, -85,
@@ -31,7 +30,11 @@ public class BingLayer extends AbstractTiledGeoreferencedImageLayer<BingMapTile>
   BingLayer() {
     super("bing");
     setIcon("bing");
+    setReadOnly(true);
+    setSelectSupported(false);
+    setQuerySupported(false);
     setGeometryFactory(GeometryFactory.worldMercator());
+    setRenderer(new ViewFunctionImageLayerRenderer<>(this, this::newImage));
   }
 
   public BingLayer(final Map<String, ? extends Object> properties) {
@@ -44,8 +47,8 @@ public class BingLayer extends AbstractTiledGeoreferencedImageLayer<BingMapTile>
   public boolean equals(final Object other) {
     if (other instanceof BingLayer) {
       final BingLayer layer = (BingLayer)other;
-      if (DataType.equal(layer.getImagerySet(), getImagerySet())) {
-        if (DataType.equal(layer.getMapLayer(), getMapLayer())) {
+      if (layer.imagerySet == this.imagerySet) {
+        if (layer.mapLayer == this.mapLayer) {
           return true;
         }
       }
@@ -71,54 +74,23 @@ public class BingLayer extends AbstractTiledGeoreferencedImageLayer<BingMapTile>
   }
 
   @Override
-  public List<BingMapTile> getOverlappingMapTiles(final ViewRenderer view) {
-    final List<BingMapTile> tiles = new ArrayList<>();
-    try {
-      final double metresPerPixel = view.getMetresPerPixel();
-      final BingClient client = this.client;
-      final int zoomLevel = client.getZoomLevel(metresPerPixel);
-      final double resolution = getResolution(view);
-      final BoundingBox geographicBoundingBox = view.getBoundingBox()
-        .bboxToCs(GEOMETRY_FACTORY)
-        .bboxIntersection(MAX_BOUNDING_BOX);
-      final double minX = geographicBoundingBox.getMinX();
-      final double minY = geographicBoundingBox.getMinY();
-      final double maxX = geographicBoundingBox.getMaxX();
-      final double maxY = geographicBoundingBox.getMaxY();
-
-      // Tiles start at the North-West corner of the map
-      final int minTileY = client.getTileY(zoomLevel, maxY);
-      final int maxTileY = client.getTileY(zoomLevel, minY);
-      final int minTileX = client.getTileX(zoomLevel, minX);
-      final int maxTileX = client.getTileX(zoomLevel, maxX);
-
-      for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
-        for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
-          final String quadKey = client.getQuadKey(zoomLevel, tileX, tileY);
-          final BoundingBox boundingBox = client.getBoundingBox(zoomLevel, tileX, tileY);
-          final BingMapTile tile = new BingMapTile(this, boundingBox, quadKey, resolution);
-          tiles.add(tile);
-        }
-      }
-
-    } catch (final Throwable e) {
-      Logs.error(this, "Error getting tile envelopes", e);
-    }
-    return tiles;
-  }
-
-  @Override
-  public double getResolution(final ViewRenderer view) {
-    final double metresPerPixel = view.getMetresPerPixel();
-    final int zoomLevel = this.client.getZoomLevel(metresPerPixel);
-    return this.client.getResolution(zoomLevel);
-  }
-
-  @Override
   protected boolean initializeDo() {
     final String bingMapsKey = getProperty("bingMapsKey");
     this.client = new BingClient(bingMapsKey);
     return true;
+  }
+
+  private GeoreferencedImage newImage(final ViewRenderer view) {
+    try {
+      final BingClient client = this.client;
+      final double metresPerPixel = view.getMetresPerPixel();
+      final int zoomLevel = client.getZoomLevel(this.imagerySet, metresPerPixel);
+      final BoundingBox boundingBox = view.getBoundingBox();
+      return client.getMapImage(this.imagerySet, this.mapLayer, boundingBox, zoomLevel);
+    } catch (final Throwable t) {
+      // setError(t);
+      return null;
+    }
   }
 
   public void setClient(final BingClient client) {

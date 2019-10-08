@@ -50,6 +50,11 @@ public abstract class AbstractMapTile<D> implements BoundingBoxProxy {
     return this.widthPixels;
   }
 
+  @Override
+  public int hashCode() {
+    return this.boundingBox.hashCode();
+  }
+
   public final D loadData() {
     final D data = loadDataDo();
     this.data = data;

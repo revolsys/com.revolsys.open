@@ -261,12 +261,14 @@ public class ZoomOverlay extends AbstractOverlay {
 
   public boolean panFinish(final MouseEvent event) {
     if (event.getButton() == this.panButton) {
-      if (clearOverlayAction(ACTION_PAN) && this.panX1 != -1) {
+      final int panX1 = this.panX1;
+      if (clearOverlayAction(ACTION_PAN) && panX1 != -1) {
         this.panImage = null;
-        if (this.panX1 != this.panX2 || this.panY1 != this.panY2) {
+        final int panY1 = this.panY1;
+        if (panX1 != this.panX2 || panY1 != this.panY2) {
           final java.awt.Point point = event.getPoint();
           final Viewport2D viewport = getViewport();
-          final Point fromPoint = viewport.toModelPoint(this.panX1, this.panY1);
+          final Point fromPoint = viewport.toModelPoint(panX1, panY1);
           final Point toPoint = viewport.toModelPoint(point);
 
           final double deltaX = fromPoint.getX() - toPoint.getX();
@@ -275,11 +277,13 @@ public class ZoomOverlay extends AbstractOverlay {
           final BoundingBox boundingBox = viewport.getBoundingBox() //
             .bboxEdit(editor -> editor.move(deltaX, deltaY));
 
+          panClear();
           final MapPanel map = getMap();
           map.setBoundingBox(boundingBox);
+        } else {
+          panClear();
+          repaint();
         }
-        panClear();
-        repaint();
         return true;
       }
     }

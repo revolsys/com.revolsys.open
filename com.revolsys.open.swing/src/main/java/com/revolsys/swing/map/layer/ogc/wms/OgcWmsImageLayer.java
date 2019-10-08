@@ -10,11 +10,15 @@ import org.jeometry.common.exception.WrappedException;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.wms.WmsClient;
 import com.revolsys.gis.wms.capabilities.WmsLayerDefinition;
+import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.BaseMapLayer;
+import com.revolsys.swing.map.layer.raster.ViewFunctionImageLayerRenderer;
+import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Property;
 import com.revolsys.webservice.WebService;
 import com.revolsys.webservice.WebServiceConnectionManager;
@@ -35,7 +39,7 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
     setReadOnly(true);
     setSelectSupported(false);
     setQuerySupported(false);
-    setRenderer(new OgcWmsImageLayerRenderer(this));
+    setRenderer(new ViewFunctionImageLayerRenderer<>(this, this::newImage));
   }
 
   public OgcWmsImageLayer(final Map<String, ? extends Object> properties) {
@@ -131,6 +135,28 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
 
   public boolean isHasError() {
     return this.hasError;
+  }
+
+  private GeoreferencedImage newImage(final ViewRenderer view) {
+    try {
+      final WmsLayerDefinition wmsLayerDefinition = this.wmsLayerDefinition;
+      if (wmsLayerDefinition != null) {
+        if (!view.isCancelled()) {
+          final BoundingBox viewportBoundingBox = view.getBoundingBox();
+          final BoundingBox queryBoundingBox = viewportBoundingBox
+            .bboxIntersection(wmsLayerDefinition.getLatLonBoundingBox());
+          final int viewWidthPixels = (int)Math.ceil(view.getViewWidthPixels());
+          final int viewHeightPixels = (int)Math.ceil(view.getViewHeightPixels());
+          return wmsLayerDefinition.getMapImage(queryBoundingBox, viewWidthPixels,
+            viewHeightPixels);
+        }
+      }
+    } catch (final Throwable t) {
+      if (!view.isCancelled()) {
+        Logs.error(this, "Unable to get image", t);
+      }
+    }
+    return null;
   }
 
   @Override

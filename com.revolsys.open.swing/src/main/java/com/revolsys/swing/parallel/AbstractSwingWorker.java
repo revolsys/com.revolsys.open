@@ -32,24 +32,34 @@ public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V>
   }
 
   private void doDoneTask() {
-    if (isCancelled()) {
-      handleCancelled();
-    } else {
-      try {
-        final B result = get();
-        if (this.logTimes) {
-          final long time = System.currentTimeMillis();
-          handleDone(result);
-          Dates.printEllapsedTime(toString(), time);
-        } else {
-          handleDone(result);
-        }
-      } catch (final CancellationException | InterruptedException e) {
+    try {
+      if (isCancelled()) {
         handleCancelled();
-      } catch (final ExecutionException e) {
-        handleException(e.getCause());
+      } else {
+        try {
+          final B result = get();
+          if (this.logTimes) {
+            final long time = System.currentTimeMillis();
+            handleDone(result);
+            Dates.printEllapsedTime(toString(), time);
+          } else {
+            handleDone(result);
+          }
+        } catch (final CancellationException | InterruptedException e) {
+          handleCancelled();
+        } catch (final ExecutionException e) {
+          handleException(e.getCause());
+        } catch (final Throwable e) {
+          handleException(e);
+        }
+      }
+    } catch (final Throwable e) {
+      Logs.error(getClass(), e);
+    } finally {
+      try {
+        handleFinished();
       } catch (final Throwable e) {
-        handleException(e);
+        Logs.error(getClass(), e);
       }
     }
   }
@@ -131,6 +141,9 @@ public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V>
 
   protected void handleException(final Throwable exception) {
     Logs.error(this, "Unable to execute:" + this, exception);
+  }
+
+  protected void handleFinished() {
   }
 
   public boolean isShowBusyCursor() {

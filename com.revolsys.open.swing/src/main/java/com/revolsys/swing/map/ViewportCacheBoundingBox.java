@@ -10,15 +10,19 @@ import java.util.function.Supplier;
 
 import javax.swing.SwingWorker;
 
-import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.map.layer.Layer;
+import com.revolsys.swing.parallel.AbstractSwingWorker;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Cancellable;
 
 public class ViewportCacheBoundingBox implements BoundingBoxProxy, Cancellable {
+  public static final ViewportCacheBoundingBox EMPTY = new ViewportCacheBoundingBox();
+
   private BoundingBox boundingBox = BoundingBox.empty();
 
   private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_2D;
@@ -43,7 +47,8 @@ public class ViewportCacheBoundingBox implements BoundingBoxProxy, Cancellable {
 
   private final Map<Layer, Map<Object, Object>> cachedItemsByLayer = new HashMap<>();
 
-  public ViewportCacheBoundingBox() {
+  private ViewportCacheBoundingBox() {
+    this.cancelled = true;
   }
 
   public ViewportCacheBoundingBox(final int width, final int height) {
@@ -104,53 +109,113 @@ public class ViewportCacheBoundingBox implements BoundingBoxProxy, Cancellable {
 
   @SuppressWarnings("unchecked")
   public <V> V getCachedItem(final Layer layer, final Object key) {
-    final Map<Object, Object> cachedItems = this.cachedItemsByLayer.get(layer);
-    if (cachedItems == null) {
-      return null;
+    if (hasDimension()) {
+      final Map<Object, Object> cachedItems;
+      synchronized (this.cachedItemsByLayer) {
+        cachedItems = this.cachedItemsByLayer.get(layer);
+      }
+      if (cachedItems == null) {
+        return null;
+      } else {
+        synchronized (cachedItems) {
+          return (V)cachedItems.get(key);
+        }
+      }
     } else {
-      return (V)cachedItems.get(key);
+      return null;
     }
   }
 
   @SuppressWarnings("unchecked")
   public <V> V getCachedItem(final Layer layer, final Object key, final Supplier<V> constructor) {
-    Map<Object, Object> cachedItems = this.cachedItemsByLayer.get(layer);
-    if (cachedItems == null) {
-      cachedItems = new HashMap<>();
+    if (hasDimension()) {
+      final Map<Object, Object> cachedItems = getCachedItems(layer);
+      synchronized (cachedItems) {
+        Object item = cachedItems.get(key);
+        if (item == null) {
+          item = constructor.get();
+          cachedItems.put(key, item);
+        }
+        return (V)item;
+      }
+    } else {
+      return null;
     }
-    Object item = cachedItems.get(key);
-    if (item == null) {
-      item = constructor.get();
-      cachedItems.put(key, item);
-    }
-    return (V)item;
   }
 
   @SuppressWarnings("unchecked")
-  public <V> V getCachedItemFuture(final Layer layer, final Object key,
-    final Supplier<Future<V>> futureConstructor) {
-    Map<Object, Object> cachedItems = this.cachedItemsByLayer.get(layer);
-    if (cachedItems == null) {
-      cachedItems = new HashMap<>();
-      this.cachedItemsByLayer.put(layer, cachedItems);
-    }
-    Future<V> future = (Future<V>)cachedItems.get(key);
-    if (future == null) {
-      future = futureConstructor.get();
-      this.tasks.add(future);
-      cachedItems.put(key, future);
-    }
+  public <V> V getCachedItemFuture(final String taskName, final Layer layer, final Object key,
+    final Supplier<V> constructor) {
+    if (hasDimension()) {
+      final Map<Object, Object> cachedItems = getCachedItems(layer);
 
-    if (future.isDone() && !future.isCancelled()) {
-      try {
-        return future.get();
-      } catch (final InterruptedException e) {
+      synchronized (cachedItems) {
+        final Object cachedItem = cachedItems.get(key);
+        SwingWorker<V, Object> worker;
+        if (cachedItem instanceof SwingWorker) {
+          worker = (SwingWorker<V, Object>)cachedItem;
+        } else if (cachedItem == null) {
+          worker = null;
+        } else {
+          return (V)cachedItem;
+        }
+
+        if (worker == null || worker.isCancelled()) {
+          worker = new AbstractSwingWorker<>() {
+            @Override
+            public String getTaskTitle() {
+              return taskName;
+            }
+
+            @Override
+            protected V handleBackground() {
+              try {
+                final V value = constructor.get();
+                synchronized (cachedItems) {
+                  cachedItems.put(key, value);
+                }
+                return value;
+              } catch (final Throwable t) {
+                if (!isCancelled()) {
+                  Logs.error(this, t);
+                }
+                return null;
+              }
+            }
+
+            protected void handleFinished() {
+              ViewportCacheBoundingBox.this.tasks.remove(this);
+              layer.firePropertyChange("redraw", false, true);
+            }
+          };
+          cachedItems.put(key, worker);
+          this.tasks.add(worker);
+          Invoke.worker(worker);
+        }
+        if (worker.isDone()) {
+          try {
+            return worker.get();
+          } catch (InterruptedException | ExecutionException e) {
+
+          }
+        }
+
         return null;
-      } catch (final ExecutionException e) {
-        throw Exceptions.wrap(e);
       }
+    } else {
+      return null;
     }
-    return null;
+  }
+
+  private Map<Object, Object> getCachedItems(final Layer layer) {
+    synchronized (this.cachedItemsByLayer) {
+      Map<Object, Object> cachedItems = this.cachedItemsByLayer.get(layer);
+      if (cachedItems == null) {
+        cachedItems = new HashMap<>();
+        this.cachedItemsByLayer.put(layer, cachedItems);
+      }
+      return cachedItems;
+    }
   }
 
   @Override
@@ -186,9 +251,19 @@ public class ViewportCacheBoundingBox implements BoundingBoxProxy, Cancellable {
     return this.viewWidthPixels;
   }
 
+  public boolean hasDimension() {
+    return !this.cancelled && this.viewHeightPixels != 0 && this.viewWidthPixels != 0;
+  }
+
   @Override
   public boolean isCancelled() {
     return this.cancelled;
+  }
+
+  public synchronized boolean isDimension(final double viewWidthPixels,
+    final double viewHeightPixels) {
+    return this.viewWidthPixels == (int)Math.ceil(viewWidthPixels)
+      && this.viewHeightPixels == (int)Math.ceil(viewHeightPixels);
   }
 
   @Override

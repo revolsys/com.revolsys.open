@@ -7,12 +7,19 @@ import com.revolsys.raster.GeoreferencedImageMapTile;
 
 public class BingMapTile extends GeoreferencedImageMapTile {
 
-  private final BingLayer layer;
+  private final BingTiledLayer layer;
 
   private final String quadKey;
 
-  public BingMapTile(final BingLayer layer, final BoundingBox boundingBox, final String quadKey,
-    final double resolution) {
+  public BingMapTile(final BingTiledLayer layer, final BoundingBox boundingBox, final int width,
+    final int height) {
+    super(boundingBox, width, height);
+    this.layer = layer;
+    this.quadKey = "";
+  }
+
+  public BingMapTile(final BingTiledLayer layer, final BoundingBox boundingBox,
+    final String quadKey, final double resolution) {
     super(boundingBox, 256, 256);
     this.layer = layer;
     this.quadKey = quadKey;
@@ -31,6 +38,10 @@ public class BingMapTile extends GeoreferencedImageMapTile {
     return false;
   }
 
+  public BingTiledLayer getLayer() {
+    return this.layer;
+  }
+
   public String getQuadKey() {
     return this.quadKey;
   }
@@ -42,7 +53,7 @@ public class BingMapTile extends GeoreferencedImageMapTile {
 
   @Override
   public BufferedImage loadBuffferedImage() {
-    final BingLayer layer = this.layer;
+    final BingTiledLayer layer = this.layer;
     try {
       final BingClient client = layer.getClient();
       final ImagerySet imagerySet = layer.getImagerySet();

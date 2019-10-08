@@ -95,40 +95,42 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
   public void render(final ViewRenderer view, final AbstractTiledLayer<D, T> layer) {
     final GeometryFactory viewportGeometryFactory = view.getGeometryFactory();
     final double viewResolution = view.getMetresPerPixel();
-    final double layerResolution = layer.getResolution(view);
-    synchronized (this.cachedTiles) {
-      if (viewResolution != this.viewResolution
-        || viewportGeometryFactory != this.geometryFactory) {
-        this.layerResolution = layerResolution;
-        this.viewResolution = viewResolution;
-        this.geometryFactory = viewportGeometryFactory;
-        clearCachedTiles();
-      }
-    }
-    final List<Runnable> tasks = new ArrayList<>();
-    final List<T> mapTiles = layer.getOverlappingMapTiles(view);
-    final BooleanCancellable cancellable = this.cancellable;
-    for (final ListIterator<T> iterator = mapTiles.listIterator(); !cancellable.isCancelled()
-      && iterator.hasNext();) {
-      final T mapTile = iterator.next();
+    if (viewResolution > 0) {
+      final double layerResolution = layer.getResolution(view);
       synchronized (this.cachedTiles) {
-        T cachedTile = getCachedTile(mapTile);
-        if (cachedTile == null) {
-          cachedTile = mapTile;
-          this.cachedTiles.put(cachedTile, cachedTile);
-          final Runnable task = new TileLoadTask<>(this, cancellable, cachedTile);
-          tasks.add(task);
+        if (viewResolution != this.viewResolution
+          || viewportGeometryFactory != this.geometryFactory) {
+          this.layerResolution = layerResolution;
+          this.viewResolution = viewResolution;
+          this.geometryFactory = viewportGeometryFactory;
+          clearCachedTiles();
         }
-        iterator.set(cachedTile);
       }
-    }
-    if (!mapTiles.isEmpty()) {
-      renderTiles(view, cancellable, mapTiles);
-    }
-    synchronized (this.loadingTasks) {
-      this.loadingTasks.addAll(tasks);
-      tileLoaderManager.setDescription("Load tiles: " + layer.getPath());
-      tileLoaderManager.addTasks(tasks);
+      final List<Runnable> tasks = new ArrayList<>();
+      final List<T> mapTiles = layer.getOverlappingMapTiles(view);
+      final BooleanCancellable cancellable = this.cancellable;
+      for (final ListIterator<T> iterator = mapTiles.listIterator(); !cancellable.isCancelled()
+        && iterator.hasNext();) {
+        final T mapTile = iterator.next();
+        synchronized (this.cachedTiles) {
+          T cachedTile = getCachedTile(mapTile);
+          if (cachedTile == null) {
+            cachedTile = mapTile;
+            this.cachedTiles.put(cachedTile, cachedTile);
+            final Runnable task = new TileLoadTask<>(this, cancellable, cachedTile);
+            tasks.add(task);
+          }
+          iterator.set(cachedTile);
+        }
+      }
+      if (!mapTiles.isEmpty()) {
+        renderTiles(view, cancellable, mapTiles);
+      }
+      synchronized (this.loadingTasks) {
+        this.loadingTasks.addAll(tasks);
+        tileLoaderManager.setDescription("Load tiles: " + layer.getPath());
+        tileLoaderManager.addTasks(tasks);
+      }
     }
   }
 

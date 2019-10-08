@@ -111,6 +111,11 @@ public class LayerRendererOverlay extends JComponent
     if (source == this.cachedImage) {
       repaint();
     } else if (!(source instanceof MapPanel)) {
+      if (source == this.layer) {
+        if (this.layer.isDeleted()) {
+          setLayer(NullLayer.INSTANCE);
+        }
+      }
       final String propertyName = e.getPropertyName();
       if (!IGNORE_PROPERTY_NAMES.contains(propertyName)) {
         if (this.layer instanceof Project) {

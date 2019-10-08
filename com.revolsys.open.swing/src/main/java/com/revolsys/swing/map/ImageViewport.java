@@ -35,9 +35,7 @@ public class ImageViewport extends Graphics2DViewport {
     super(parentViewport);
     final int viewWidthPixels = this.cacheBoundingBox.getViewWidthPixels();
     final int viewHeightPixels = this.cacheBoundingBox.getViewHeightPixels();
-    if (viewWidthPixels > 0 && viewHeightPixels > 0) {
-      newImage(viewWidthPixels, viewHeightPixels, BufferedImage.TYPE_INT_ARGB_PRE);
-    }
+    newImage(viewWidthPixels, viewHeightPixels, BufferedImage.TYPE_INT_ARGB_PRE);
   }
 
   public BufferedGeoreferencedImage getGeoreferencedImage() {
@@ -51,8 +49,10 @@ public class ImageViewport extends Graphics2DViewport {
 
   private void newImage(final int viewWidthPixels, final int viewHeightPixels,
     final int imageType) {
-    this.image = new BufferedImage(viewWidthPixels, viewHeightPixels, imageType);
-    final Graphics2D graphics = (Graphics2D)this.image.getGraphics();
-    setGraphics(graphics);
+    if (viewWidthPixels > 0 && viewHeightPixels > 0) {
+      this.image = new BufferedImage(viewWidthPixels, viewHeightPixels, imageType);
+      final Graphics2D graphics = (Graphics2D)this.image.getGraphics();
+      setGraphics(graphics);
+    }
   }
 }
