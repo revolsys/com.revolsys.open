@@ -155,28 +155,26 @@ public class LayerRendererOverlay extends JComponent
 
   private GeoreferencedImage refreshImage(final Cancellable cancellable) {
     final Viewport2D viewport = this.viewport;
-    if (this.layer != null) {
+    if (this.layer != null && viewport.isViewValid()) {
       try (
         final ImageViewport imageViewport = new ImageViewport(viewport)) {
         final ViewRenderer view = imageViewport.newViewRenderer();
-        if (view.isViewValid()) {
-          view.setCancellable(cancellable);
-          view.renderLayer(this.layer);
-          if (this.showAreaBoundingBox) {
-            final BoundingBox areaBoundingBox = view.getAreaBoundingBox();
-            if (!areaBoundingBox.isEmpty()) {
-              final Polygon viewportPolygon = view.bboxEdit(editor -> editor.expandPercent(0.1))
-                .toPolygon(0);
-              final Polygon areaPolygon = areaBoundingBox
-                .bboxEdit(editor -> editor.expandDelta(imageViewport.getUnitsPerPixel()))
-                .toPolygon(0);
-              final Geometry drawPolygon = viewportPolygon.difference(areaPolygon);
-              view.drawGeometry(drawPolygon, STYLE_AREA);
-            }
+        view.setCancellable(cancellable);
+        view.renderLayer(this.layer);
+        if (this.showAreaBoundingBox) {
+          final BoundingBox areaBoundingBox = view.getAreaBoundingBox();
+          if (!areaBoundingBox.isEmpty()) {
+            final Polygon viewportPolygon = view.bboxEdit(editor -> editor.expandPercent(0.1))
+              .toPolygon(0);
+            final Polygon areaPolygon = areaBoundingBox
+              .bboxEdit(editor -> editor.expandDelta(imageViewport.getUnitsPerPixel()))
+              .toPolygon(0);
+            final Geometry drawPolygon = viewportPolygon.difference(areaPolygon);
+            view.drawGeometry(drawPolygon, STYLE_AREA);
           }
-          if (!cancellable.isCancelled()) {
-            return imageViewport.getGeoreferencedImage();
-          }
+        }
+        if (!cancellable.isCancelled()) {
+          return imageViewport.getGeoreferencedImage();
         }
       } catch (final Throwable t) {
         if (!cancellable.isCancelled()) {
@@ -204,9 +202,6 @@ public class LayerRendererOverlay extends JComponent
         Property.addListener(layer, this);
         if (layer.getParent() instanceof BaseMapLayerGroup) {
           layer.setVisible(true);
-        }
-        if (layer.isInitialized()) {
-          layer.refresh();
         }
       }
       redraw();

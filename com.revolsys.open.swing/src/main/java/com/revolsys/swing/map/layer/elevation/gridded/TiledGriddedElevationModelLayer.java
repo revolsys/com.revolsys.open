@@ -114,7 +114,8 @@ public class TiledGriddedElevationModelLayer
   }
 
   @Override
-  public List<TiledGriddedElevationModelLayerTile> getOverlappingMapTiles(final ViewRenderer view) {
+  public List<TiledGriddedElevationModelLayerTile> getOverlappingMapTiles(
+    final AbstractTiledLayerRenderer<?, ?> renderer, final ViewRenderer view) {
     final List<TiledGriddedElevationModelLayerTile> tiles = new ArrayList<>();
     try {
       final int resolution = (int)getResolution(view);

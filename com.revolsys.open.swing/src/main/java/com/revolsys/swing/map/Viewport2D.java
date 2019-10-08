@@ -437,6 +437,10 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
     return this.initialized;
   }
 
+  public boolean isViewValid() {
+    return this.viewWidth > 0 && this.viewHeight > 0 && getProject() != null;
+  }
+
   public boolean isZoomByUnitsPerPixel() {
     return this.zoomByUnitsPerPixel;
   }

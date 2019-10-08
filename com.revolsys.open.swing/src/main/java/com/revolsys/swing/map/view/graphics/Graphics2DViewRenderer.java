@@ -23,6 +23,7 @@ import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.measure.Quantity;
@@ -836,11 +837,12 @@ public class Graphics2DViewRenderer extends ViewRenderer {
 
   @Override
   public <V> V getCachedItemBackground(final String taskName, final Layer layer, final Object key,
-    final Supplier<V> constructor) {
+    final Supplier<V> constructor, final Consumer<Throwable> errorHandler) {
     if (isBackgroundDrawingEnabled()) {
-      return this.cacheBoundingBox.getCachedItemFuture(taskName, layer, key, constructor);
+      return this.cacheBoundingBox.getCachedItemFuture(taskName, layer, key, constructor,
+        errorHandler);
     } else {
-      return this.cacheBoundingBox.getCachedItem(layer, key, constructor);
+      return super.getCachedItemBackground(taskName, layer, key, constructor, errorHandler);
     }
   }
 

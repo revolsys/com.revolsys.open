@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
@@ -38,6 +40,10 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
   private double layerResolution;
 
   private double viewResolution;
+
+  private boolean hasError = false;
+
+  private final Object errorSync = new Object();
 
   public AbstractTiledLayerRenderer(final String type, final AbstractTiledLayer<D, T> layer) {
     super(type, layer);
@@ -107,7 +113,7 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
         }
       }
       final List<Runnable> tasks = new ArrayList<>();
-      final List<T> mapTiles = layer.getOverlappingMapTiles(view);
+      final List<T> mapTiles = layer.getOverlappingMapTiles(this, view);
       final BooleanCancellable cancellable = this.cancellable;
       for (final ListIterator<T> iterator = mapTiles.listIterator(); !cancellable.isCancelled()
         && iterator.hasNext();) {
@@ -142,6 +148,25 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
     for (final T mapTile : cancellable.cancellable(mapTiles)) {
       renderTile(view, cancellable, mapTile);
     }
+  }
+
+  public void setError(final String message, final Throwable e) {
+    synchronized (this.errorSync) {
+      if (!this.hasError) {
+        this.hasError = true;
+        Logs.error(getClass(), message, e);
+      }
+    }
+  }
+
+  @Override
+  public void setLayer(final AbstractTiledLayer<D, T> layer) {
+    super.setLayer(layer);
+    layer.addPropertyChangeListener("refresh", e -> {
+      synchronized (this.errorSync) {
+        this.hasError = false;
+      }
+    });
   }
 
   public void setLoaded(final TileLoadTask<D, T> tileLoadTask) {

@@ -6,11 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.swing.SwingWorker;
-
-import org.jeometry.common.logging.Logs;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
@@ -102,6 +101,10 @@ public class ViewportCacheBoundingBox implements BoundingBoxProxy, Cancellable {
     }
   }
 
+  public synchronized void clearCache(final Layer layer) {
+    this.cachedItemsByLayer.remove(layer);
+  }
+
   @Override
   public BoundingBox getBoundingBox() {
     return this.boundingBox;
@@ -145,7 +148,7 @@ public class ViewportCacheBoundingBox implements BoundingBoxProxy, Cancellable {
 
   @SuppressWarnings("unchecked")
   public <V> V getCachedItemFuture(final String taskName, final Layer layer, final Object key,
-    final Supplier<V> constructor) {
+    final Supplier<V> constructor, final Consumer<Throwable> errorHandler) {
     if (hasDimension()) {
       final Map<Object, Object> cachedItems = getCachedItems(layer);
 
@@ -169,17 +172,16 @@ public class ViewportCacheBoundingBox implements BoundingBoxProxy, Cancellable {
 
             @Override
             protected V handleBackground() {
-              try {
-                final V value = constructor.get();
-                synchronized (cachedItems) {
-                  cachedItems.put(key, value);
-                }
-                return value;
-              } catch (final Throwable t) {
-                if (!isCancelled()) {
-                  Logs.error(this, t);
-                }
-                return null;
+              final V value = constructor.get();
+              synchronized (cachedItems) {
+                cachedItems.put(key, value);
+              }
+              return value;
+            }
+
+            protected void handleException(final Throwable exception) {
+              if (!isCancelled()) {
+                errorHandler.accept(exception);
               }
             }
 
@@ -270,4 +272,5 @@ public class ViewportCacheBoundingBox implements BoundingBoxProxy, Cancellable {
   public String toString() {
     return getBoundingBox() + " " + this.viewWidthPixels + "x" + this.viewHeightPixels;
   }
+
 }

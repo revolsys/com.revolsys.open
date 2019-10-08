@@ -100,7 +100,6 @@ public class BingClient {
     BoundingBox boundingBox, final int zoomLevel) {
     boundingBox = boundingBox //
       .bboxToCs(WORLD_MERCATOR);
-
     final double resolution = METRES_PER_PIXEL[zoomLevel - 1];
     final double minX = Math.floor(boundingBox.getMinX() / resolution) * resolution;
     final double minY = Math.floor(boundingBox.getMinY() / resolution) * resolution;

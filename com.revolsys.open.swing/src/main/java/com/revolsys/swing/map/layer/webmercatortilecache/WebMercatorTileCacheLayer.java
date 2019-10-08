@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.logging.Logs;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
 import com.revolsys.collection.map.MapEx;
@@ -16,6 +15,7 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.raster.AbstractTiledGeoreferencedImageLayer;
+import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
@@ -58,7 +58,8 @@ public class WebMercatorTileCacheLayer
   }
 
   @Override
-  public List<WebMercatorTileCacheMapTile> getOverlappingMapTiles(final ViewRenderer view) {
+  public List<WebMercatorTileCacheMapTile> getOverlappingMapTiles(
+    final AbstractTiledLayerRenderer<?, ?> renderer, final ViewRenderer view) {
     final List<WebMercatorTileCacheMapTile> tiles = new ArrayList<>();
     try {
       final double metresPerPixel = view.getMetresPerPixel();
@@ -87,7 +88,7 @@ public class WebMercatorTileCacheLayer
       }
 
     } catch (final Throwable e) {
-      Logs.error(this, "Error getting tile envelopes", e);
+      setError(e);
     }
     return tiles;
   }

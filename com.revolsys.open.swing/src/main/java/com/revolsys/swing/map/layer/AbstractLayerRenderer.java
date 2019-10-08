@@ -61,7 +61,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   public AbstractLayerRenderer(final String type, final T layer) {
     this(type);
-    this.layer = layer;
+    setLayer(layer);
   }
 
   @SuppressWarnings("unchecked")

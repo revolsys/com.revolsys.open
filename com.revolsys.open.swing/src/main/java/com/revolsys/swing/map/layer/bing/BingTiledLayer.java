@@ -13,6 +13,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.swing.map.layer.raster.AbstractTiledGeoreferencedImageLayer;
+import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.CaseConverter;
 
@@ -71,7 +72,8 @@ public class BingTiledLayer extends AbstractTiledGeoreferencedImageLayer<BingMap
   }
 
   @Override
-  public List<BingMapTile> getOverlappingMapTiles(final ViewRenderer view) {
+  public List<BingMapTile> getOverlappingMapTiles(final AbstractTiledLayerRenderer<?, ?> renderer,
+    final ViewRenderer view) {
     final List<BingMapTile> tiles = new ArrayList<>();
     try {
       final double metresPerPixel = view.getMetresPerPixel();

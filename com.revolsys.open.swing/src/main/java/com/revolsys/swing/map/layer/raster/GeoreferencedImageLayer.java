@@ -42,6 +42,7 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.Project;
+import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
@@ -58,7 +59,8 @@ public class GeoreferencedImageLayer extends AbstractLayer {
     }
 
     @Override
-    public List<GeoreferencedImageMapTile> getOverlappingMapTiles(final ViewRenderer view) {
+    public List<GeoreferencedImageMapTile> getOverlappingMapTiles(
+      final AbstractTiledLayerRenderer<?, ?> renderer, final ViewRenderer view) {
       final BoundingBox boundingBox = view.getBoundingBox();
       final double metresPerPixel = view.getMetresPerPixel();
       return this.tiledImage.getOverlappingMapTiles(boundingBox, metresPerPixel);
@@ -73,7 +75,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
 
     private AbstractLayerRenderer<GeoreferencedImageLayer> newLayerRenderer() {
       final AbstractLayerRenderer<AbstractTiledGeoreferencedImageLayer<GeoreferencedImageMapTile>> tiledRenderer = getRenderer();
-      return new AbstractLayerRenderer<GeoreferencedImageLayer>("") {
+      return new AbstractLayerRenderer<>("") {
         @Override
         public void render(final ViewRenderer view, final GeoreferencedImageLayer layer) {
           tiledRenderer.render(view, TiledLayer.this);

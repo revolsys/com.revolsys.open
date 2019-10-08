@@ -81,16 +81,11 @@ public class BingLayer extends AbstractLayer implements BaseMapLayer {
   }
 
   private GeoreferencedImage newImage(final ViewRenderer view) {
-    try {
-      final BingClient client = this.client;
-      final double metresPerPixel = view.getMetresPerPixel();
-      final int zoomLevel = client.getZoomLevel(this.imagerySet, metresPerPixel);
-      final BoundingBox boundingBox = view.getBoundingBox();
-      return client.getMapImage(this.imagerySet, this.mapLayer, boundingBox, zoomLevel);
-    } catch (final Throwable t) {
-      // setError(t);
-      return null;
-    }
+    final BingClient client = this.client;
+    final double metresPerPixel = view.getMetresPerPixel();
+    final int zoomLevel = client.getZoomLevel(this.imagerySet, metresPerPixel);
+    final BoundingBox boundingBox = view.getBoundingBox();
+    return client.getMapImage(this.imagerySet, this.mapLayer, boundingBox, zoomLevel);
   }
 
   public void setClient(final BingClient client) {

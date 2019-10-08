@@ -39,8 +39,13 @@ public class ImageViewport extends Graphics2DViewport {
   }
 
   public BufferedGeoreferencedImage getGeoreferencedImage() {
+    final BufferedImage image = this.image;
     final BoundingBox boundingBox = getBoundingBox();
-    return new BufferedGeoreferencedImage(boundingBox, this.image);
+    if (image == null) {
+      return null;
+    } else {
+      return new BufferedGeoreferencedImage(boundingBox, image);
+    }
   }
 
   public BufferedImage getImage() {

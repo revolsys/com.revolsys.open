@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -302,8 +303,13 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
   }
 
   public <V> V getCachedItemBackground(final String taskName, final Layer layer, final Object key,
-    final Supplier<V> constructor) {
-    return this.cacheBoundingBox.getCachedItem(layer, key, constructor);
+    final Supplier<V> constructor, final Consumer<Throwable> errorHandler) {
+    try {
+      return this.cacheBoundingBox.getCachedItem(layer, key, constructor);
+    } catch (final Throwable e) {
+      errorHandler.accept(e);
+      return null;
+    }
   }
 
   public <G extends Geometry> G getGeometry(final G geometry) {

@@ -63,6 +63,7 @@ public class WebMercatorTileCacheMapTile extends GeoreferencedImageMapTile {
       final BufferedImage image = client.getMapImage(this.zoomLevel, this.tileX, this.tileY);
       return image;
     } catch (final Throwable e) {
+      this.layer.setError(e);
       return null;
     }
   }

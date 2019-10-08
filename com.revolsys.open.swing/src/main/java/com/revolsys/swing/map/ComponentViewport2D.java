@@ -13,6 +13,7 @@ import javax.swing.JComponent;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
@@ -31,6 +32,8 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
     this.component = component;
     Property.addListener(project, "geometryFactory", this);
     Property.addListener(project, "viewBoundingBox", this);
+    Property.addListener(project, "refresh", this);
+    Property.addListener(project, "visible", this);
     component.addComponentListener(new ComponentAdapter() {
       @Override
       public void componentResized(final ComponentEvent e) {
@@ -62,8 +65,10 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    if (isInitialized() && event.getSource() == getProject()) {
-      if (event.getPropertyName().equals("viewBoundingBox")) {
+    final Object source = event.getSource();
+    final String propertyName = event.getPropertyName();
+    if (isInitialized() && source == getProject()) {
+      if (propertyName.equals("viewBoundingBox")) {
         // final BoundingBox boundingBox =
         // (BoundingBox)event.getNewValue();
         // if (isInitialized()) {
@@ -73,6 +78,17 @@ public class ComponentViewport2D extends Viewport2D implements PropertyChangeLis
         // }
       } else {
         Invoke.later(this::updateCachedFields);
+      }
+
+    }
+    if (source instanceof Layer) {
+      final Layer layer = (Layer)source;
+      if ("visible".equals(propertyName)) {
+        if (Boolean.FALSE == event.getNewValue()) {
+          this.cacheBoundingBox.clearCache(layer);
+        }
+      } else if ("refresh".equals(propertyName)) {
+        this.cacheBoundingBox.clearCache(layer);
       }
     }
   }

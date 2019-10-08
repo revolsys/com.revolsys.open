@@ -23,6 +23,7 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.raster.AbstractTiledGeoreferencedImageLayer;
+import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.CaseConverter;
@@ -111,42 +112,41 @@ public class ArcGisRestServerTileCacheLayer
   }
 
   @Override
-  public List<ArcGisRestServerTileCacheMapTile> getOverlappingMapTiles(final ViewRenderer view) {
+  public List<ArcGisRestServerTileCacheMapTile> getOverlappingMapTiles(
+    final AbstractTiledLayerRenderer<?, ?> renderer, final ViewRenderer view) {
     final List<ArcGisRestServerTileCacheMapTile> tiles = new ArrayList<>();
     final MapService mapService = getMapService();
     if (mapService != null) {
-      if (!isHasError()) {
-        try {
-          final double viewResolution = view.getMetresPerPixel();
-          final int zoomLevel = mapService.getZoomLevel(viewResolution);
-          final double resolution = mapService.getResolution(zoomLevel);
-          if (resolution > 0) {
-            final BoundingBox viewBoundingBox = view.getBoundingBox();
-            final BoundingBox maxBoundingBox = getBoundingBox();
-            final BoundingBox boundingBox = viewBoundingBox.bboxToCs(this)
-              .bboxIntersection(maxBoundingBox);
-            final double minX = boundingBox.getMinX();
-            final double minY = boundingBox.getMinY();
-            final double maxX = boundingBox.getMaxX();
-            final double maxY = boundingBox.getMaxY();
+      try {
+        final double viewResolution = view.getMetresPerPixel();
+        final int zoomLevel = mapService.getZoomLevel(viewResolution);
+        final double resolution = mapService.getResolution(zoomLevel);
+        if (resolution > 0) {
+          final BoundingBox viewBoundingBox = view.getBoundingBox();
+          final BoundingBox maxBoundingBox = getBoundingBox();
+          final BoundingBox boundingBox = viewBoundingBox.bboxToCs(this)
+            .bboxIntersection(maxBoundingBox);
+          final double minX = boundingBox.getMinX();
+          final double minY = boundingBox.getMinY();
+          final double maxX = boundingBox.getMaxX();
+          final double maxY = boundingBox.getMaxY();
 
-            // Tiles start at the North-West corner of the map
-            final int minTileX = mapService.getTileX(zoomLevel, minX);
-            final int minTileY = mapService.getTileY(zoomLevel, maxY);
-            final int maxTileX = mapService.getTileX(zoomLevel, maxX);
-            final int maxTileY = mapService.getTileY(zoomLevel, minY);
+          // Tiles start at the North-West corner of the map
+          final int minTileX = mapService.getTileX(zoomLevel, minX);
+          final int minTileY = mapService.getTileY(zoomLevel, maxY);
+          final int maxTileX = mapService.getTileX(zoomLevel, maxX);
+          final int maxTileY = mapService.getTileY(zoomLevel, minY);
 
-            for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
-              for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
-                final ArcGisRestServerTileCacheMapTile tile = new ArcGisRestServerTileCacheMapTile(
-                  this, mapService, zoomLevel, resolution, tileX, tileY);
-                tiles.add(tile);
-              }
+          for (int tileY = minTileY; tileY <= maxTileY; tileY++) {
+            for (int tileX = minTileX; tileX <= maxTileX; tileX++) {
+              final ArcGisRestServerTileCacheMapTile tile = new ArcGisRestServerTileCacheMapTile(
+                this, mapService, zoomLevel, resolution, tileX, tileY);
+              tiles.add(tile);
             }
           }
-        } catch (final Throwable e) {
-          setError(e);
         }
+      } catch (final Throwable e) {
+        setError(e);
       }
     }
     return tiles;
