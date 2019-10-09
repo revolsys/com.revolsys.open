@@ -1,5 +1,6 @@
 package com.revolsys.gis.esri.gdb.file;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -8,7 +9,10 @@ import org.jeometry.common.logging.Logs;
 
 import com.revolsys.esri.filegdb.jni.EnumRows;
 import com.revolsys.esri.filegdb.jni.Geodatabase;
+import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.esri.filegdb.jni.Table;
+import com.revolsys.io.BaseCloseable;
+import com.revolsys.record.Record;
 import com.revolsys.util.CloseableValueHolder;
 import com.revolsys.util.ValueHolder;
 import com.revolsys.util.ValueWrapper;
@@ -122,6 +126,31 @@ public class TableReference extends CloseableValueHolder<Table> {
 
   synchronized boolean isLocked() {
     return this.lockCount >= 0;
+  }
+
+  boolean modifyRecordRow(final Record record, String fieldSpec, final BiConsumer<Table, Row> action) {
+    final Integer objectId = record.getInteger("OBJECTID");
+    if (objectId != null) {
+      final String whereClause = "OBJECTID=" + objectId;
+      return valueFunctionSync(table -> {
+        try (
+          BaseCloseable lock = writeLock(false)) {
+          final EnumRows rows = table.search(fieldSpec, whereClause, false);
+          try {
+            final Row row = rows.next();
+            if (row != null) {
+              action.accept(table, row);
+              row.delete();
+              return true;
+            }
+          } finally {
+            closeRows(rows);
+          }
+        }
+        return false;
+      }, false);
+    }
+    return false;
   }
 
   @Override

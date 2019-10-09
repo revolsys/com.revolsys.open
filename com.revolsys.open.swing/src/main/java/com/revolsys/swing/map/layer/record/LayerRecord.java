@@ -1,7 +1,9 @@
 package com.revolsys.swing.map.layer.record;
 
 import java.beans.PropertyChangeEvent;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
@@ -222,6 +224,14 @@ public interface LayerRecord extends Record {
   default void postSaveNew() {
   }
 
+  default <R extends Record> void processRecord(final CharSequence title,
+    final Consumer<R> action) {
+    final AbstractRecordLayer layer = getLayer();
+    if (layer != null) {
+      layer.processRecords(title, Collections.singleton(this), action, null);
+    }
+  }
+
   default LayerRecord revertChanges() {
     return this;
   }
@@ -241,8 +251,5 @@ public interface LayerRecord extends Record {
         }
       }
     }
-  }
-
-  default void validate() {
   }
 }

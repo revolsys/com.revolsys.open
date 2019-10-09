@@ -35,27 +35,13 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
   }
 
   default boolean deleteRecord(final Record record) {
-    final Integer objectId = record.getInteger("OBJECTID");
-    if (objectId != null) {
-      final FileGdbRecordStore recordStore = getRecordStore();
-      final String whereClause = "OBJECTID=" + objectId;
-      final TableReference tableReference = getTableReference();
-      return tableReference.valueFunctionSync(table -> {
-        try (
-          BaseCloseable lock = writeLock();
-          final FileGdbEnumRowsIterator rows = search("OBJECTID", whereClause, true)) {
-          for (final Row row : rows) {
-            setLoadOnlyMode(false);
-            table.deleteRow(row);
-            record.setState(RecordState.DELETED);
-            recordStore.addStatistic("Delete", record);
-            return true;
-          }
-        }
-        return false;
-      }, false);
-    }
-    return false;
+    final FileGdbRecordStore recordStore = getRecordStore();
+    final TableReference tableReference = getTableReference();
+    return tableReference.modifyRecordRow(record, "OBJECTID", (table, row) -> {
+      table.deleteRow(row);
+      record.setState(RecordState.DELETED);
+      recordStore.addStatistic("Delete", record);
+    });
   }
 
   default PathName getPathName() {
@@ -210,7 +196,7 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
     final Object objectId = record.getValue("OBJECTID");
     if (objectId == null) {
       insertRecord(record);
-    } else {
+    } else if (record.getState() == RecordState.MODIFIED) {
       final FileGdbRecordStore recordStore = getRecordStore();
       final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
       final RecordDefinition recordDefinition = recordStore
@@ -218,37 +204,30 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
 
       validateRequired(record, recordDefinition);
 
-      final String whereClause = "OBJECTID=" + objectId;
       final TableReference tableReference = getTableReference();
-      tableReference.valueConsumeSync(table -> {
-        try (
-          final FileGdbEnumRowsIterator rows = search("*", whereClause, false)) {
-          for (final Row row : rows) {
+      tableReference.modifyRecordRow(record, "*", (table, row) -> {
+        try {
+          for (final FieldDefinition field : recordDefinition.getFields()) {
+            final String name = field.getName();
             try {
-              for (final FieldDefinition field : recordDefinition.getFields()) {
-                final String name = field.getName();
-                try {
-                  final Object value = record.getValue(name);
-                  final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
-                  esriField.setUpdateValue(record, row, value);
-                } catch (final Throwable e) {
-                  throw new ObjectPropertyException(record, name, e);
-                }
-              }
-              table.setLoadOnlyMode(false);
-              table.updateRow(row);
-              record.setState(RecordState.PERSISTED);
-              recordStore.addStatistic("Update", record);
-            } catch (final ObjectException e) {
-              if (e.getObject() == record) {
-                throw e;
-              } else {
-                throw new ObjectException(record, e);
-              }
+              final Object value = record.getValue(name);
+              final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
+              esriField.setUpdateValue(record, row, value);
             } catch (final Throwable e) {
-              throw new ObjectException(record, e);
+              throw new ObjectPropertyException(record, name, e);
             }
           }
+          table.updateRow(row);
+          record.setState(RecordState.PERSISTED);
+          recordStore.addStatistic("Update", record);
+        } catch (final ObjectException e) {
+          if (e.getObject() == record) {
+            throw e;
+          } else {
+            throw new ObjectException(record, e);
+          }
+        } catch (final Throwable e) {
+          throw new ObjectException(record, e);
         }
       });
     }
