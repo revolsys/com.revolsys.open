@@ -140,7 +140,6 @@ public class ProgressMonitor implements Cancellable {
           progressMonitor.setDone();
           if (doneTask != null) {
             doneTask.accept(false);
-            ;
           }
         }
 
@@ -210,7 +209,8 @@ public class ProgressMonitor implements Cancellable {
       final Window window = e.getWindow();
       window.removeWindowListener(getWindowListener());
       SwingUtil.dispose(ProgressMonitor.this.dialog);
-      window.toFront();
+      SwingUtil.toFront(window);
+      window.setAlwaysOnTop(false);
     }
   };
 

@@ -1289,7 +1289,21 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     final int keyCode = e.getKeyCode();
     if (keyCode == KeyEvent.VK_K) {
       if (!isOverlayAction(ACTION_ADD_GEOMETRY) && hasMouseOverLocation()) {
-        for (final CloseLocation mouseLocation : getMouseOverLocations()) {
+        final List<CloseLocation> locations = getMouseOverLocations();
+        final Map<AbstractRecordLayer, List<CloseLocation>> locationsByLayer = new TreeMap<>();
+        for (final CloseLocation location : locations) {
+          final LayerRecord record = location.getRecord();
+          final AbstractRecordLayer layer = record.getLayer();
+          Maps.addToList(locationsByLayer, layer, location);
+        }
+        for (final AbstractRecordLayer layer : locationsByLayer.keySet()) {
+          final List<CloseLocation> layerLocations = locationsByLayer.get(layer);
+          layer.processTasks("Split Records", layerLocations, location -> {
+            final LayerRecord record = location.getRecord();
+            layer.splitRecord(record, location);
+          });
+        }
+        for (final CloseLocation mouseLocation : locations) {
           final LayerRecord record = mouseLocation.getRecord();
           final AbstractRecordLayer layer = record.getLayer();
           layer.splitRecord(record, mouseLocation);

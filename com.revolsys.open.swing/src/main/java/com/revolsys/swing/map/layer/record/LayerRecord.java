@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.record;
 import java.beans.PropertyChangeEvent;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.jeometry.common.data.identifier.Identifier;
@@ -228,7 +229,9 @@ public interface LayerRecord extends Record {
     final Consumer<R> action) {
     final AbstractRecordLayer layer = getLayer();
     if (layer != null) {
-      layer.processRecords(title, Collections.singleton(this), action, null);
+      @SuppressWarnings("unchecked")
+      final Set<R> records = Collections.singleton((R)this);
+      layer.processTasks(title, records, action, null);
     }
   }
 

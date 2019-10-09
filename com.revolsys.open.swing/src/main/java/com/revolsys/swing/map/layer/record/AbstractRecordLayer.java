@@ -186,27 +186,33 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       }
     }
 
+    public void clearIndex() {
+      this.index = null;
+    }
+
     @Override
     public void clearRecords() {
       synchronized (getSync()) {
         super.clearRecords();
-        this.index = null;
+        clearIndex();
       }
     }
 
     private RecordSpatialIndex<LayerRecord> getIndex() {
       synchronized (getSync()) {
-        if (this.index == null) {
-          this.index = newSpatialIndex();
+        RecordSpatialIndex<LayerRecord> index = this.index;
+        if (index == null) {
+          final RecordSpatialIndex<LayerRecord> newIndex = newSpatialIndex();
+          this.index = index = newIndex;
           final Consumer<LayerRecord> action = record -> {
             if (!isDeleted(record)) {
-              this.index.addRecord(record);
+              newIndex.addRecord(record);
             }
           };
           forEachRecord(action);
         }
+        return index;
       }
-      return this.index;
     }
 
     @SuppressWarnings({
@@ -255,19 +261,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           return false;
         }
       }
-    }
-
-    public boolean replaceRecord(final LayerRecord record, final BoundingBox oldBoundingBox) {
-      synchronized (getSync()) {
-        final RecordSpatialIndex<LayerRecord> index = this.index;
-        if (index != null) {
-          final LayerRecord proxy = record.newRecordProxy();
-          index.removeRecord(proxy);
-          index.removeRecord(oldBoundingBox, proxy);
-          index.addRecord(proxy);
-        }
-      }
-      return true;
     }
 
     private void setGeometryFactory(final GeometryFactory geometryFactory) {
@@ -840,7 +833,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void deleteRecords(final Collection<? extends LayerRecord> records) {
     removeForms(records);
     final List<LayerRecord> recordsDeleted = new ArrayList<>();
-    processRecords("Delete Records", records, (final LayerRecord record) -> {
+    processTasks("Delete Records", records, (final LayerRecord record) -> {
       final boolean deleted = deleteSingleRecordDo(record);
       if (deleted) {
         final LayerRecord recordProxy = record.newRecordProxy();
@@ -2417,46 +2410,34 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public <R1 extends LayerRecord, R2 extends Record> void processRecord(final CharSequence title,
-    final R1 record, final Consumer<R2> action) {
-    processRecords(title, Collections.singleton(record), action, null);
+  public <A extends B, B> void processTasks(final CharSequence title, final Collection<A> records,
+    final Consumer<B> action) {
+    processTasks(title, records, action, null);
   }
 
-  public <R1 extends LayerRecord, R2 extends Record> void processRecords(final CharSequence title,
-    final Collection<R1> records, final Consumer<R2> action) {
-    processRecords(title, records, action, null);
-  }
-
-  public <R1 extends LayerRecord, R2 extends Record> void processRecords(final CharSequence title,
-    final Collection<R1> records, final Consumer<R2> action,
-    final Consumer<ProgressMonitor> afterAction) {
+  public <A extends B, B> void processTasks(final CharSequence title, final Collection<A> records,
+    final Consumer<B> action, final Consumer<ProgressMonitor> afterAction) {
     final int recordCount = records.size();
-    final Consumer<Consumer<R1>> forEachAction = records::forEach;
-    processRecords(title, recordCount, forEachAction, action, afterAction);
+    final Consumer<Consumer<A>> forEachAction = records::forEach;
+    processTasks(title, recordCount, forEachAction, action, afterAction);
   }
 
-  public <R1 extends LayerRecord, R2 extends Record> void processRecords(final CharSequence title,
-    final int recordCount, final Consumer<Consumer<R1>> forEachAction, final Consumer<R2> action) {
-    processRecords(title, recordCount, forEachAction, action, null);
-  }
-
-  @SuppressWarnings("unchecked")
-  public <R1 extends LayerRecord, R2 extends Record> void processRecords(final CharSequence title,
-    final int recordCount, final Consumer<Consumer<R1>> forEachAction, final Consumer<R2> action,
+  public <A extends B, B> void processTasks(final CharSequence title, final int taskCount,
+    final Consumer<Consumer<A>> forEachAction, final Consumer<B> action,
     final Consumer<ProgressMonitor> afterAction) {
     ProgressMonitor.background(title, null, progressMonitor -> {
-      final Consumer<R1> monitorAction = record -> {
+      final Consumer<A> monitorAction = value -> {
         if (progressMonitor.isCancelled()) {
           throw new CancellationException();
         } else {
-          action.accept((R2)record);
+          action.accept(value);
           progressMonitor.addProgress();
         }
       };
 
       try (
         BaseCloseable eventsDisabled = eventsDisabled()) {
-        processRecordsDo(forEachAction, monitorAction);
+        processTasksDo(forEachAction, monitorAction);
       } catch (final CancellationException e) {
       } finally {
         if (afterAction != null) {
@@ -2468,11 +2449,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
         fireRecordsChanged();
       }
-    }, recordCount);
+    }, taskCount);
   }
 
-  protected <R1 extends LayerRecord> void processRecordsDo(
-    final Consumer<Consumer<R1>> forEachAction, final Consumer<R1> monitorAction) {
+  protected <A> void processTasksDo(final Consumer<Consumer<A>> forEachAction,
+    final Consumer<A> monitorAction) {
     forEachAction.accept(monitorAction);
   }
 
@@ -2486,9 +2467,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         if (source instanceof LayerRecord) {
           final LayerRecord record = (LayerRecord)source;
           if (record.getLayer() == this) {
-            if (DataType.equal(propertyName, getGeometryFieldName())) {
-              final Geometry oldGeometry = (Geometry)event.getOldValue();
-              updateSpatialIndex(record, oldGeometry);
+            final String geometryFieldName = getGeometryFieldName();
+            if (propertyName.equals(geometryFieldName)) {
+              this.recordCacheIndex.clearIndex();
             }
           }
         }
@@ -3198,9 +3179,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     showTableView(config);
   }
 
-  public List<LayerRecord> splitRecord(final LayerRecord record,
-    final CloseLocation mouseLocation) {
-
+  public void splitRecord(final LayerRecord record, final CloseLocation mouseLocation) {
     final Geometry geometry = mouseLocation.getGeometry();
     if (geometry instanceof LineString) {
       final LineString line = (LineString)geometry;
@@ -3218,9 +3197,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       } else {
         final int pointIndex = vertexId[0];
         if (pointIndex == 0) {
-          return Collections.singletonList(record);
+          return;
         } else if (vertexCount - pointIndex < 2) {
-          return Collections.singletonList(record);
+          return;
         } else {
           line1 = line.subLine(pointIndex + 1);
           line2 = line.subLine(null, pointIndex, vertexCount - pointIndex, null);
@@ -3228,16 +3207,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
       }
       if (line1 == null || line2 == null) {
-        return Collections.singletonList(record);
+        return;
       }
 
-      return splitRecord(record, line, convertedPoint, line1, line2);
+      splitRecord(record, line, convertedPoint, line1, line2);
     }
-    return Arrays.asList(record);
   }
 
   /** Perform the actual split. */
-  protected List<LayerRecord> splitRecord(final LayerRecord record, final LineString line,
+  public List<LayerRecord> splitRecord(final LayerRecord record, final LineString line,
     final Point point, final LineString line1, final LineString line2) {
     if (line1.getLength() == 0) {
       if (line2.getLength() == 0) {
@@ -3357,13 +3335,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     } else if (state == RecordState.PERSISTED) {
       postSaveModifiedRecord(record);
       fireHasChangedRecords();
-    }
-  }
-
-  protected void updateSpatialIndex(final LayerRecord record, final Geometry oldGeometry) {
-    if (oldGeometry != null) {
-      final BoundingBox oldBoundingBox = oldGeometry.getBoundingBox();
-      this.recordCacheIndex.replaceRecord(record, oldBoundingBox);
     }
   }
 

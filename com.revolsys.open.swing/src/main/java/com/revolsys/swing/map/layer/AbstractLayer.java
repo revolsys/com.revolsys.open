@@ -53,6 +53,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
+import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.swing.Borders;
@@ -86,6 +87,9 @@ import com.revolsys.value.ThreadBooleanValue;
 
 public abstract class AbstractLayer extends BaseObjectWithProperties
   implements Layer, PropertyChangeListener, PropertyChangeSupportProxy, ToolTipProxy {
+  private class LayerSync {
+  }
+
   public class PanelComponentHolder extends BasePanel {
     public PanelComponentHolder() {
       super(new BorderLayout());
@@ -174,7 +178,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   private boolean editable = false;
 
-  private ThreadBooleanValue eventsEnabled = new ThreadBooleanValue(true);
+  private final ThreadBooleanValue eventsEnabled = new ThreadBooleanValue(true);
 
   private boolean exists = true;
 
@@ -182,7 +186,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   private Icon icon = Icons.getIcon("map");
 
-  private long id = ID_GEN.incrementAndGet();
+  private final long id = ID_GEN.incrementAndGet();
 
   private boolean initialized;
 
@@ -210,7 +214,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   private boolean selectSupported = true;
 
-  private Object sync = new Object();
+  private final LayerSync sync;
 
   private String type;
 
@@ -221,8 +225,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   private GeometryFactory selectedGeometryFactory;
 
   protected AbstractLayer(final String type) {
+    this.sync = new LayerSync();
     this.type = type;
-    getSync();
   }
 
   @Override
@@ -263,18 +267,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @Override
   public AbstractLayer clone() {
-    final AbstractLayer clone = (AbstractLayer)super.clone();
-    clone.beanPropertyListener = new BeanPropertyListener(clone);
-    clone.eventsEnabled = new ThreadBooleanValue(true);
-    clone.id = this.id = ID_GEN.incrementAndGet();
-    clone.initialized = false;
-    clone.layerGroup = null;
-    clone.propertyChangeSupport = new PropertyChangeSupport(clone);
-    if (clone.renderer != null) {
-      clone.renderer = clone.renderer.clone();
-    }
-    clone.sync = new Object();
-    return clone;
+    final MapEx config = toMap();
+    return MapObjectFactory.toObject(config);
   }
 
   @Override
@@ -507,9 +501,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   public Object getSync() {
-    if (this.sync == null) {
-      this.sync = new Object();
-    }
     return this.sync;
   }
 

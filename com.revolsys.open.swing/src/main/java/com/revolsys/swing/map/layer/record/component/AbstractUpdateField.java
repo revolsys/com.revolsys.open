@@ -103,7 +103,6 @@ public abstract class AbstractUpdateField extends BaseDialog {
     setVisible(false);
 
     final String title = getTitle();
-    final String note = getProgressMonitorNote();
     final Set<String> fieldNames = new LinkedHashSet<>();
     fieldNames.add(AbstractUpdateField.this.fieldDefinition.getName());
     fieldNames.addAll(AbstractUpdateField.this.layer.getFieldNames());
@@ -119,7 +118,7 @@ public abstract class AbstractUpdateField extends BaseDialog {
         errors.addRecord(record, e);
       }
     };
-    this.layer.processRecords(title, this.recordCount,
+    this.layer.processTasks(title, this.recordCount,
       AbstractUpdateField.this.tableModel::forEachRecord, action, monitor -> {
         if (!monitor.isCancelled()) {
           Invoke.later(() -> errors.showErrorDialog());

@@ -263,11 +263,9 @@ public class MouseOverlay extends JComponent
 
       updateEventPoint(e);
       final Window window = SwingUtil.getWindowAncestor(this);
-      window.setAlwaysOnTop(true);
-      window.toFront();
+      SwingUtil.toFront(window);
       window.setFocusableWindowState(true);
       window.requestFocus();
-      window.setAlwaysOnTop(false);
 
       forEachOverlay(overlay -> {
         if (overlay instanceof MouseListener) {

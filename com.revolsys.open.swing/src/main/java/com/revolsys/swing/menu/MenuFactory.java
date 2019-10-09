@@ -24,6 +24,7 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.beans.ClassRegistry;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.swing.Icons;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -176,13 +177,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
       final int numItems = menu.getSubElements().length;
       if (menu != null && numItems > 0) {
         final Window window = SwingUtilities.windowForComponent(component);
-        if (window != null) {
-          if (window.isAlwaysOnTop()) {
-            window.setAlwaysOnTop(true);
-            window.setAlwaysOnTop(false);
-          }
-          window.toFront();
-        }
+        SwingUtil.toFront(window);
         menu.validate();
         menu.show(component, x, y);
       }

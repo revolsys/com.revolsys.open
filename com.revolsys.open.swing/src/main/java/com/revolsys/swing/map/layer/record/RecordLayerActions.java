@@ -32,7 +32,7 @@ public class RecordLayerActions {
           true);
         record.setGeometryValue(newGeometry);
       };
-      layer.processRecords("Generalize", records, action);
+      layer.processTasks("Generalize", records, action);
     }
   }
 

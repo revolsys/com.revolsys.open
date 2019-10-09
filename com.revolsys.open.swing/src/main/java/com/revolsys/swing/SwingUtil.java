@@ -1006,6 +1006,19 @@ public interface SwingUtil {
     }
   }
 
+  static void toFront(final Window window) {
+    if (window != null) {
+      final boolean alwaysOnTop = window.isAlwaysOnTop();
+      try {
+        window.setAlwaysOnTop(false);
+        window.setAlwaysOnTop(true);
+        window.toFront();
+      } finally {
+        window.setAlwaysOnTop(alwaysOnTop);
+      }
+    }
+  }
+
   static Window windowActive() {
     final KeyboardFocusManager keyboardFocusManager = KeyboardFocusManager
       .getCurrentKeyboardFocusManager();

@@ -45,9 +45,9 @@ public class EditRecordMenu extends MenuFactory {
   public <R extends Record> RunnableAction addMenuItemRecord(final String groupName,
     final int index, final CharSequence name, final String toolTip, final String iconName,
     final EnableCheck enableCheck, final Consumer<R> action) {
-
+    @SuppressWarnings("unchecked")
     final BiConsumer<AbstractRecordLayer, List<LayerRecord>> recordsAction = (layer,
-      records) -> layer.processRecords(name, records, action);
+      records) -> layer.processTasks(name, (List<R>)records, action);
     return addMenuItemRecords(groupName, index, name, toolTip, iconName, enableCheck,
       recordsAction);
   }
