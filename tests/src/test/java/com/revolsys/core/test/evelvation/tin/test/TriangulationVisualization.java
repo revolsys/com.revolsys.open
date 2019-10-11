@@ -288,7 +288,7 @@ public class TriangulationVisualization {
 
   public static void tinVisualLas() {
     final PathResource sourceFile = new PathResource(
-      "/data/dem/elevation/las/bc_093g057c_xl2m_2015_dem_ground.las");
+      "/opt/data/dem/elevation/las/bc_093g057c_xl2m_2015_dem_ground.las");
     final TriangulatedIrregularNetwork tin;
     try (
       final LasPointCloud pointCloud = PointCloud.newPointCloud(sourceFile)) {
@@ -297,7 +297,7 @@ public class TriangulationVisualization {
     }
     if (writeFile) {
       tin.writeTriangulatedIrregularNetwork(
-        new PathResource("/data/elevation/tin/093/g/093g057.tin"));
+        new PathResource("/opt/data/elevation/tin/093/g/093g057.tin"));
     }
     displayTin(tin);
   }
