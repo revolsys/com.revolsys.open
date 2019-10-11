@@ -2425,7 +2425,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public <A extends B, B> void processTasks(final CharSequence title, final int taskCount,
     final Consumer<Consumer<A>> forEachAction, final Consumer<B> action,
     final Consumer<ProgressMonitor> afterAction) {
-    ProgressMonitor.background(title, null, progressMonitor -> {
+    Consumer<ProgressMonitor> task = progressMonitor -> {
       final Consumer<A> monitorAction = value -> {
         if (progressMonitor.isCancelled()) {
           throw new CancellationException();
@@ -2449,12 +2449,18 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
         fireRecordsChanged();
       }
-    }, taskCount);
+    };
+    task = processTasksWrap(task);
+    ProgressMonitor.background(title, null, task, taskCount);
   }
 
   protected <A> void processTasksDo(final Consumer<Consumer<A>> forEachAction,
     final Consumer<A> monitorAction) {
     forEachAction.accept(monitorAction);
+  }
+
+  protected Consumer<ProgressMonitor> processTasksWrap(final Consumer<ProgressMonitor> task) {
+    return task;
   }
 
   @Override

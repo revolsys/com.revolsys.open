@@ -15,6 +15,19 @@ import com.revolsys.swing.WindowManager;
 public class BaseDialog extends JDialog {
   private static final long serialVersionUID = 1L;
 
+  static Window windowParent() {
+    final Window activeWindow = SwingUtil.windowActive();
+    if (activeWindow == null) {
+      final JDialog window = new JDialog(activeWindow);
+      window.setAlwaysOnTop(true);
+      window.requestFocus();
+      return window;
+    } else {
+      activeWindow.toFront();
+      return activeWindow;
+    }
+  }
+
   public BaseDialog() {
     super();
   }
@@ -62,7 +75,7 @@ public class BaseDialog extends JDialog {
   }
 
   public BaseDialog(final String title, final ModalityType modalityType) {
-    this(SwingUtil.windowOnTop(), title, modalityType);
+    this(windowParent(), title, modalityType);
   }
 
   public BaseDialog(final Window owner) {

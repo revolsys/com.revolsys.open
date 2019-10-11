@@ -120,50 +120,52 @@ public class ProgressMonitor implements Cancellable {
 
   public static void background(final CharSequence title, final String note,
     final Consumer<ProgressMonitor> task, final int max, final Consumer<Boolean> doneTask) {
-    Invoke.later(() -> {
-      final ProgressMonitor progressMonitor = new ProgressMonitor(title, note, true, max);
-      final SwingWorker<Object, Object> worker = new AbstractSwingWorker<>() {
+    if (max > 0) {
+      Invoke.later(() -> {
+        final ProgressMonitor progressMonitor = new ProgressMonitor(title, note, true, max);
+        final SwingWorker<Object, Object> worker = new AbstractSwingWorker<>() {
 
-        @Override
-        protected Object handleBackground() {
-          try {
-            task.accept(progressMonitor);
-          } catch (final Throwable e) {
-            Logs.error(ProgressMonitor.class, e);
+          @Override
+          protected Object handleBackground() {
+            try {
+              task.accept(progressMonitor);
+            } catch (final Throwable e) {
+              Logs.error(ProgressMonitor.class, e);
+            }
+            progressMonitor.progress = progressMonitor.max;
+            return null;
           }
-          progressMonitor.progress = progressMonitor.max;
-          return null;
-        }
 
-        @Override
-        protected void handleCancelled() {
-          progressMonitor.setDone();
-          if (doneTask != null) {
-            doneTask.accept(false);
+          @Override
+          protected void handleCancelled() {
+            progressMonitor.setDone();
+            if (doneTask != null) {
+              doneTask.accept(false);
+            }
           }
-        }
 
-        @Override
-        protected void handleDone(final Object result) {
-          progressMonitor.setDone();
-          if (doneTask != null) {
-            doneTask.accept(!progressMonitor.cancelled);
+          @Override
+          protected void handleDone(final Object result) {
+            progressMonitor.setDone();
+            if (doneTask != null) {
+              doneTask.accept(!progressMonitor.cancelled);
+            }
           }
-        }
 
-        @Override
-        protected void handleException(final Throwable exception) {
-          progressMonitor.setDone();
-          Logs.error(ProgressMonitor.class, exception);
-          if (doneTask != null) {
-            doneTask.accept(false);
-            ;
+          @Override
+          protected void handleException(final Throwable exception) {
+            progressMonitor.setDone();
+            Logs.error(ProgressMonitor.class, exception);
+            if (doneTask != null) {
+              doneTask.accept(false);
+              ;
+            }
           }
-        }
-      };
-      Invoke.worker(worker);
-      progressMonitor.show();
-    });
+        };
+        Invoke.worker(worker);
+        progressMonitor.show();
+      });
+    }
   }
 
   public static void background(final CharSequence title, final String note,
