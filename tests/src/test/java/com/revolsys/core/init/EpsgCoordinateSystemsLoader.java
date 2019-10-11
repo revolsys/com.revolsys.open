@@ -629,7 +629,7 @@ public final class EpsgCoordinateSystemsLoader {
   private RecordWriter newTsvWriter(final RecordReader reader) {
     final RecordDefinition recordDefinition = reader.getRecordDefinition();
     final String name = recordDefinition.getPathName().getName();
-    final Resource resource = Resource.getResource("/Data/EPSG/" + name + ".tsv");
+    final Resource resource = Resource.getResource("/opt/data/EPSG/" + name + ".tsv");
     resource.createParentDirectories();
     return RecordWriter.newRecordWriter(recordDefinition, resource);
   }
@@ -687,7 +687,7 @@ public final class EpsgCoordinateSystemsLoader {
   private void writeJson(final String name, final IntHashMap<MapEx> valuesById) {
     for (final MapEx coordinateOperation : valuesById.values()) {
       final int id = coordinateOperation.getInteger("id");
-      final Resource resource = Resource.getResource("/Data/EPSG/" + name + "/" + id + ".json");
+      final Resource resource = Resource.getResource("/opt/data/EPSG/" + name + "/" + id + ".json");
       resource.createParentDirectories();
       Json.writeMap(coordinateOperation, resource);
     }
