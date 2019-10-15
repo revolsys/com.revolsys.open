@@ -1,12 +1,16 @@
 package com.revolsys.swing.menu;
 
 import java.awt.Component;
+import java.awt.Window;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
+import com.revolsys.swing.parallel.Invoke;
 
 public class BaseJPopupMenu extends JPopupMenu {
   private static final long serialVersionUID = 1L;
@@ -29,7 +33,7 @@ public class BaseJPopupMenu extends JPopupMenu {
   }
 
   public void showMenu(final Component component, final int x, final int y) {
-    MenuFactory.showMenu(this, component, x, y);
+    showMenu((Object)null, component, x, y);
   }
 
   public boolean showMenu(final MouseEvent e) {
@@ -41,6 +45,23 @@ public class BaseJPopupMenu extends JPopupMenu {
       return true;
     } else {
       return false;
+    }
+  }
+
+  public void showMenu(final Object source, final Component component, final int x, final int y) {
+    if (SwingUtil.isEventDispatchThread()) {
+      final int numItems = getSubElements().length;
+      if (numItems > 0) {
+        final Window window = SwingUtilities.windowForComponent(component);
+        SwingUtil.toFront(window);
+        MenuFactory.menuSource = source;
+        MenuFactory.currentWindow = window;
+        validate();
+        addPopupMenuListener(MenuFactory.POPUP_MENU_LISTENER);
+        show(component, x, y);
+      }
+    } else {
+      Invoke.later(() -> showMenu(source, component, x, y));
     }
   }
 }

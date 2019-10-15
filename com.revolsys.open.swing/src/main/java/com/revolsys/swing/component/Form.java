@@ -346,7 +346,7 @@ public class Form extends BasePanel {
   }
 
   public boolean showDialog() {
-    final JDialog dialog = Dialogs.newModal(this.title);
+    final JDialog dialog = Dialogs.newDocumentModal(this.title);
     dialog.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
     dialog.setLayout(new BorderLayout());
 

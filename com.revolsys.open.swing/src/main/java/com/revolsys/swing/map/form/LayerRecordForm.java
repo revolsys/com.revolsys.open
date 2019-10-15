@@ -1470,7 +1470,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
 
   public boolean showAddDialog() {
     final String title = "Add New " + getName();
-    final JDialog dialog = Dialogs.newModal(title);
+    final JDialog dialog = Dialogs.newDocumentModal(title);
     dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
     dialog.setLayout(new BorderLayout());
 

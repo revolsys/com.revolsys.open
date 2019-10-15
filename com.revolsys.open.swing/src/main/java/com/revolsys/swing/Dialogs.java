@@ -12,27 +12,43 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 
 import com.revolsys.swing.component.BaseDialog;
+import com.revolsys.swing.menu.MenuFactory;
 
 public class Dialogs {
 
+  public static Window getWindow() {
+    final Window currentWindow = MenuFactory.getCurrentWindow();
+    if (currentWindow == null) {
+      return SwingUtil.windowActive();
+    } else {
+      return currentWindow;
+    }
+  }
+
+  public static BaseDialog newDocumentModal(final String title) {
+    final Window parent = getWindow();
+    return new BaseDialog(parent, title, ModalityType.DOCUMENT_MODAL);
+  }
+
   public static BaseDialog newModal(final String title) {
-    return new BaseDialog(title, ModalityType.APPLICATION_MODAL);
+    final Window parent = getWindow();
+    return new BaseDialog(parent, title, ModalityType.APPLICATION_MODAL);
   }
 
   public static int showConfirmDialog(final Object message, final String title,
     final int optionType) {
-    final Window parent = SwingUtil.windowOnTop();
+    final Window parent = getWindow();
     return JOptionPane.showConfirmDialog(parent, message, title, optionType);
   }
 
   public static int showConfirmDialog(final Object message, final String title,
     final int optionType, final int messageType) {
-    final Window parent = SwingUtil.windowOnTop();
+    final Window parent = getWindow();
     return JOptionPane.showConfirmDialog(parent, message, title, optionType, messageType);
   }
 
   public static int showDialog(final JFileChooser fileChooser, final String approveButtonText) {
-    final Window parent = SwingUtil.windowOnTop();
+    final Window parent = getWindow();
     return fileChooser.showDialog(parent, approveButtonText);
   }
 
@@ -53,47 +69,47 @@ public class Dialogs {
   }
 
   public static String showInputDialog(final Object message, final String title) {
-    final Window parent = SwingUtil.windowOnTop();
+    final Window parent = getWindow();
     return JOptionPane.showInputDialog(parent, message, title);
   }
 
   public static String showInputDialog(final Object message, final String title,
     final int messageType) {
-    final Window parent = SwingUtil.windowOnTop();
+    final Window parent = getWindow();
     return JOptionPane.showInputDialog(parent, message, title, messageType);
   }
 
   public static Object showInputDialog(final Object message, final String title,
     final int messageType, final Icon icon, final Object[] selectionValues,
     final Object initialSelectionValue) {
-    final Window parent = SwingUtil.windowOnTop();
+    final Window parent = getWindow();
     return JOptionPane.showInputDialog(parent, message, title, messageType, icon, selectionValues,
       initialSelectionValue);
   }
 
   public static String showInputDialog(final String title) {
-    final Window parent = SwingUtil.windowOnTop();
+    final Window parent = getWindow();
     return JOptionPane.showInputDialog(parent, title);
   }
 
   public static void showMessageDialog(final Object message) {
-    final Window parent = SwingUtil.windowOnTop();
+    final Window parent = getWindow();
     JOptionPane.showMessageDialog(parent, message);
   }
 
   public static void showMessageDialog(final Object message, final String title,
     final int messageType) {
-    final Window parent = SwingUtil.windowOnTop();
+    final Window parent = getWindow();
     JOptionPane.showMessageDialog(parent, message, title, messageType);
   }
 
   public static int showOpenDialog(final JFileChooser fileChooser) {
-    final Window parent = SwingUtil.windowOnTop();
+    final Window parent = getWindow();
     return fileChooser.showOpenDialog(parent);
   }
 
   public static int showSaveDialog(final JFileChooser fileChooser) {
-    final Window parent = SwingUtil.windowOnTop();
+    final Window parent = getWindow();
     return fileChooser.showSaveDialog(parent);
   }
 }

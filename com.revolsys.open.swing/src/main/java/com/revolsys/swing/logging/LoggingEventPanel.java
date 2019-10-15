@@ -165,7 +165,7 @@ public class LoggingEventPanel extends JPanel {
   }
 
   private void showDialog(final String title) {
-    final JDialog dialog = Dialogs.newModal(title);
+    final JDialog dialog = Dialogs.newDocumentModal(title);
     dialog.setLayout(new BorderLayout());
     dialog.add(this, BorderLayout.CENTER);
     final JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));

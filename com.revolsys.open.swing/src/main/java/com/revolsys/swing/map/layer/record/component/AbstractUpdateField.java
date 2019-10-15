@@ -71,7 +71,7 @@ public abstract class AbstractUpdateField extends BaseDialog {
   private final String recordCountString;
 
   protected AbstractUpdateField(final String title) {
-    super(title, ModalityType.APPLICATION_MODAL);
+    super(title, ModalityType.DOCUMENT_MODAL);
     this.table = TablePanel.getEventTable();
     this.tableModel = this.table.getModel();
     this.layer = this.table.getLayer();

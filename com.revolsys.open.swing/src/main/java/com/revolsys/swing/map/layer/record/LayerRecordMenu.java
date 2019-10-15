@@ -17,6 +17,7 @@ import com.revolsys.record.Record;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.TreeNodes;
 
@@ -113,13 +114,13 @@ public class LayerRecordMenu extends MenuFactory {
   }
 
   @Override
-  public JPopupMenu showMenu(final Object source, final Component component, final int x,
+  public BaseJPopupMenu showMenu(final Object source, final Component component, final int x,
     final int y) {
-    return super.showMenu(source, component, x, y);
+    return super.showMenu(this.layer, component, x, y);
   }
 
   @Override
-  public JPopupMenu showMenu(final Object source, final MouseEvent e) {
+  public BaseJPopupMenu showMenu(final Object source, final MouseEvent e) {
     return super.showMenu(this.layer, e);
   }
 }

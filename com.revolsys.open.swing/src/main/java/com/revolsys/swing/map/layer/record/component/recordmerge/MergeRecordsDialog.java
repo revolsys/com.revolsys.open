@@ -66,7 +66,7 @@ public class MergeRecordsDialog extends BaseDialog {
 
   private MergeRecordsDialog(final Window window, final AbstractRecordLayer layer,
     final RecordMerger recordMerger) {
-    super(window, "Merge " + layer.getName() + " Records", ModalityType.APPLICATION_MODAL);
+    super(window, "Merge " + layer.getName() + " Records", ModalityType.DOCUMENT_MODAL);
     this.undoManager = layer.getMapPanel().getUndoManager();
     this.layer = layer;
     this.recordMerger = recordMerger;

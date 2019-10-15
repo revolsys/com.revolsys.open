@@ -248,7 +248,7 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     Invoke.later(() -> {
       final String layerPath = this.layer.getPath();
 
-      final JDialog dialog = Dialogs.newModal("Error " + title + " for " + layerPath);
+      final JDialog dialog = Dialogs.newDocumentModal("Error " + title + " for " + layerPath);
       dialog.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
       dialog.setLayout(new BorderLayout());

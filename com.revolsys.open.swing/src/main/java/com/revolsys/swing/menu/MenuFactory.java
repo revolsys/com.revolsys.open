@@ -18,6 +18,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JPopupMenu.Separator;
 import javax.swing.SwingUtilities;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import org.jeometry.common.logging.Logs;
 
@@ -30,6 +32,7 @@ import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.swing.field.Field;
+import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.util.Property;
 
@@ -40,7 +43,27 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
   private static final String KEY_POPUP_MENU = MenuFactory.class.getName() + ".popup";
 
-  private static Object menuSource;
+  static Object menuSource;
+
+  static Window currentWindow;
+
+  static PopupMenuListener POPUP_MENU_LISTENER = new PopupMenuListener() {
+
+    @Override
+    public void popupMenuCanceled(final PopupMenuEvent e) {
+      final JPopupMenu menu = (JPopupMenu)e.getSource();
+      menu.removePopupMenuListener(POPUP_MENU_LISTENER);
+      currentWindow = null;
+    }
+
+    @Override
+    public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
+    }
+
+    @Override
+    public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
+    }
+  };
 
   public static void addMenuInitializer(final Class<?> clazz,
     final Consumer<MenuFactory> initializer) {
@@ -92,6 +115,10 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
       final Class<?> clazz = object.getClass();
       return findMenu(clazz);
     }
+  }
+
+  public static Window getCurrentWindow() {
+    return currentWindow;
   }
 
   public static MenuFactory getMenu(final Class<?> clazz) {
@@ -171,15 +198,22 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     MenuFactory.menuSource = menuSource;
   }
 
-  public static void showMenu(final JPopupMenu menu, final Component component, final int x,
-    final int y) {
+  public static void showMenu(final Object menuSource, final JPopupMenu menu,
+    final Component component, final int x, final int y) {
     if (menu != null) {
-      final int numItems = menu.getSubElements().length;
-      if (menu != null && numItems > 0) {
-        final Window window = SwingUtilities.windowForComponent(component);
-        SwingUtil.toFront(window);
-        menu.validate();
-        menu.show(component, x, y);
+      if (SwingUtil.isEventDispatchThread()) {
+        MenuFactory.menuSource = menuSource;
+        final int numItems = menu.getSubElements().length;
+        if (menu != null && numItems > 0) {
+          final Window window = SwingUtilities.windowForComponent(component);
+          SwingUtil.toFront(window);
+          currentWindow = window;
+          menu.validate();
+          menu.addPopupMenuListener(POPUP_MENU_LISTENER);
+          menu.show(component, x, y);
+        }
+      } else {
+        Invoke.later(() -> showMenu(menuSource, menu, component, x, y));
       }
     }
   }
@@ -616,19 +650,19 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     this.name = name;
   }
 
-  public JPopupMenu showMenu(final Component component, final int x, final int y) {
-    final JPopupMenu menu = newJPopupMenu();
-    showMenu(menu, component, x, y);
+  public BaseJPopupMenu showMenu(final Object source, final Component component, final int x,
+    final int y) {
+    setMenuSource(source);
+    final BaseJPopupMenu menu = newJPopupMenu();
+    if (menu == null) {
+      setMenuSource(null);
+    } else {
+      menu.showMenu(source, component, x, y);
+    }
     return menu;
   }
 
-  public JPopupMenu showMenu(final Object source, final Component component, final int x,
-    final int y) {
-    setMenuSource(source);
-    return showMenu(component, x, y);
-  }
-
-  public JPopupMenu showMenu(final Object source, final MouseEvent e) {
+  public BaseJPopupMenu showMenu(final Object source, final MouseEvent e) {
     if (e.isPopupTrigger() && !e.isConsumed()) {
       final Component component = e.getComponent();
       final int x = e.getX();

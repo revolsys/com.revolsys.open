@@ -37,7 +37,6 @@ import javax.swing.InputMap;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -1032,17 +1031,5 @@ public interface SwingUtil {
       }
     }
     return activeWindow;
-  }
-
-  static Window windowOnTop() {
-    final Window activeWindow = windowActive();
-    if (activeWindow instanceof JDialog) {
-      return activeWindow;
-    } else {
-      final JDialog window = new JDialog(activeWindow);
-      window.setAlwaysOnTop(true);
-      window.requestFocus();
-      return window;
-    }
   }
 }

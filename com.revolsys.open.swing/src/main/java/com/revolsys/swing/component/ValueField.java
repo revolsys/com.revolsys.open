@@ -7,7 +7,6 @@ import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Image;
 import java.awt.LayoutManager;
-import java.awt.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -18,7 +17,6 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import org.jdesktop.swingx.VerticalLayout;
@@ -219,15 +217,7 @@ public class ValueField extends JPanel implements Field {
 
   @SuppressWarnings("unchecked")
   public <V> V showDialog(final Component parent) {
-    Window window;
-    if (parent == null) {
-      window = SwingUtil.windowOnTop();
-    } else if (parent instanceof Window) {
-      window = (Window)parent;
-    } else {
-      window = SwingUtilities.windowForComponent(parent);
-    }
-    final JDialog dialog = Dialogs.newModal(this.title);
+    final JDialog dialog = Dialogs.newDocumentModal(this.title);
     if (this.iconImage != null) {
       dialog.setIconImage(this.iconImage);
     }
@@ -273,7 +263,7 @@ public class ValueField extends JPanel implements Field {
     actionMap.put("save", new RunnableAction(saveRunnable));
 
     dialog.pack();
-    SwingUtil.autoAdjustPosition(window, dialog);
+    SwingUtil.autoAdjustPosition(dialog.getOwner(), dialog);
     this.saved = false;
     dialog.setVisible(true);
     final V value = (V)getFieldValue();

@@ -13,7 +13,6 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.JTableHeader;
@@ -25,6 +24,7 @@ import org.jeometry.common.data.type.DataTypes;
 import com.revolsys.collection.EmptyReference;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.dnd.ClipboardUtil;
+import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.lambda.column.ColumnBasedTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
@@ -209,18 +209,17 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
     setHeaderEventColumn(this.table, this.table.getTableHeader(), e);
     if (eventColumn > -1 && e.isPopupTrigger()) {
       e.consume();
-      final Object menuSource = getHeaderMenuSource();
-      MenuFactory.setMenuSource(menuSource);
-      final JPopupMenu menu = getHeaderMenu(eventColumn);
+      final BaseJPopupMenu menu = getHeaderMenu(eventColumn);
       if (menu != null) {
         final TableCellEditor cellEditor = this.table.getCellEditor();
         if (cellEditor != null) {
           cellEditor.stopCellEditing();
         }
         popupMouseEvent = new WeakReference<>(e);
+        final Object menuSource = getHeaderMenuSource();
         final int x = e.getX();
         final int y = e.getY();
-        MenuFactory.showMenu(menu, this.table, x, y);
+        menu.showMenu(menuSource, this.table, x, y);
       }
     }
   }
@@ -232,7 +231,7 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
       final AbstractTableModel tableModel = getTableModel();
       final Object menuSource = getMenuSource();
       MenuFactory.setMenuSource(menuSource);
-      final JPopupMenu menu = tableModel.getMenu(eventRow, eventColumn);
+      final BaseJPopupMenu menu = tableModel.getMenu(eventRow, eventColumn);
       if (menu != null) {
         final TableCellEditor cellEditor = this.table.getCellEditor();
         if (cellEditor == null || cellEditor.stopCellEditing()) {
@@ -241,14 +240,14 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
           if (component == this.table) {
             final int x = e.getX();
             final int y = e.getY();
-            MenuFactory.showMenu(menu, this.table, x + 5, y);
+            menu.showMenu(menuSource, this.table, x + 5, y);
           } else {
             final int xOnScreen = e.getXOnScreen();
             final int yOnScreen = e.getYOnScreen();
             final Point locationOnScreen = getLocationOnScreen();
             final int x = xOnScreen - locationOnScreen.x;
             final int y = yOnScreen - locationOnScreen.y;
-            MenuFactory.showMenu(menu, this, x + 5, y);
+            menu.showMenu(menuSource, this, x + 5, y);
           }
         }
       }
@@ -259,10 +258,10 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
     return this.headerMenu;
   }
 
-  public JPopupMenu getHeaderMenu(final int eventColumn) {
+  public BaseJPopupMenu getHeaderMenu(final int eventColumn) {
     final AbstractTableModel tableModel = getTableModel();
     if (tableModel != null) {
-      final JPopupMenu menu = tableModel.getHeaderMenu(eventColumn);
+      final BaseJPopupMenu menu = tableModel.getHeaderMenu(eventColumn);
       if (menu != null) {
         return menu;
       }

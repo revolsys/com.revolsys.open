@@ -186,7 +186,7 @@ public class RecordLayerTablePanel extends TablePanel
   }
 
   private void actionShowFieldSetsMenu() {
-    final JPopupMenu menu = new JPopupMenu();
+    final BaseJPopupMenu menu = new BaseJPopupMenu();
 
     final JMenuItem editMenuItem = RunnableAction.newMenuItem("Edit Field Sets",
       "fields_filter:edit", () -> {
@@ -209,7 +209,7 @@ public class RecordLayerTablePanel extends TablePanel
       }
       menu.add(menuItem);
     }
-    MenuFactory.showMenu(menu, this.fieldSetsButton, 10, 10);
+    menu.showMenu(layer, this.fieldSetsButton, 10, 10);
   }
 
   protected JToggleButton addGeometryFilterToggleButton(final ToolBar toolBar, final int index,
@@ -243,8 +243,8 @@ public class RecordLayerTablePanel extends TablePanel
   }
 
   @Override
-  public JPopupMenu getHeaderMenu(final int columnIndex) {
-    final JPopupMenu headerMenu = super.getHeaderMenu(columnIndex);
+  public BaseJPopupMenu getHeaderMenu(final int columnIndex) {
+    final BaseJPopupMenu headerMenu = super.getHeaderMenu(columnIndex);
     final String columnName = this.tableModel.getColumnName(columnIndex);
     final JMenuItem menuItem = new JMenuItem();
     final JLabel title = new JLabel(columnName);

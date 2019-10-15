@@ -15,6 +15,7 @@ import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.record.Record;
+import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -85,7 +86,7 @@ public class RecordLayerErrors {
         panel.setPreferredSize(
           new Dimension(screenBounds.width - 300, tableModel.getRowCount() * 22 + 75));
 
-        final Window window = SwingUtil.windowOnTop();
+        final Window window = Dialogs.getWindow();
         final JOptionPane pane = new JOptionPane(panel, JOptionPane.ERROR_MESSAGE,
           JOptionPane.DEFAULT_OPTION, null, null, null);
 
