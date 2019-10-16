@@ -612,23 +612,25 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
+  TableReference getTableReference(final FileGdbRecordDefinition recordDefinition,
+    final PathName pathName, final String catalogPath) {
+    synchronized (this.tableByCatalogPath) {
+      TableReference tableReference = this.tableByCatalogPath.get(catalogPath);
+      if (tableReference == null) {
+        tableReference = new TableReference(this, recordDefinition, this.geodatabase, pathName,
+          catalogPath);
+        this.tableByCatalogPath.put(catalogPath, tableReference);
+      }
+      return tableReference;
+    }
+  }
+
   private TableReference getTableReference(final PathName path) {
     final FileGdbRecordDefinition recordDefinition = getRecordDefinition(path);
     if (recordDefinition != null) {
       return recordDefinition.getTableReference();
     }
     return null;
-  }
-
-  TableReference getTableReference(final PathName pathName, final String catalogPath) {
-    synchronized (this.tableByCatalogPath) {
-      TableReference tableReference = this.tableByCatalogPath.get(catalogPath);
-      if (tableReference == null) {
-        tableReference = new TableReference(this, this.geodatabase, pathName, catalogPath);
-        this.tableByCatalogPath.put(catalogPath, tableReference);
-      }
-      return tableReference;
-    }
   }
 
   protected TableReference getTableReference(final RecordDefinition recordDefinition) {
@@ -1238,7 +1240,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   // TODO
-  // public <R> R withTable(final PathNameProxy pathName, final Function<TableWrapper, R> action,
+  // public <R> R withTable(final PathNameProxy pathName, final
+  // Function<TableWrapper, R> action,
   // final R defaultValue) {
   // final TableWrapper table = getTable(pathName);
   // if (table != null) {

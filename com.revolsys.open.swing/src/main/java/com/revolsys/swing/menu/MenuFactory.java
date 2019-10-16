@@ -51,9 +51,6 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
     @Override
     public void popupMenuCanceled(final PopupMenuEvent e) {
-      final JPopupMenu menu = (JPopupMenu)e.getSource();
-      menu.removePopupMenuListener(POPUP_MENU_LISTENER);
-      currentWindow = null;
     }
 
     @Override
@@ -62,6 +59,9 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
     @Override
     public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
+      final JPopupMenu menu = (JPopupMenu)e.getSource();
+      menu.removePopupMenuListener(POPUP_MENU_LISTENER);
+      currentWindow = null;
     }
   };
 

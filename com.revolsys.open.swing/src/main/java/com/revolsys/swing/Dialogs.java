@@ -13,13 +13,15 @@ import javax.swing.JScrollPane;
 
 import com.revolsys.swing.component.BaseDialog;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.parallel.Invoke;
 
 public class Dialogs {
 
   public static Window getWindow() {
     final Window currentWindow = MenuFactory.getCurrentWindow();
+    final Window activeWindow = SwingUtil.windowActive();
     if (currentWindow == null) {
-      return SwingUtil.windowActive();
+      return activeWindow;
     } else {
       return currentWindow;
     }
@@ -37,14 +39,15 @@ public class Dialogs {
 
   public static int showConfirmDialog(final Object message, final String title,
     final int optionType) {
-    final Window parent = getWindow();
-    return JOptionPane.showConfirmDialog(parent, message, title, optionType);
+    return showConfirmDialog(message, title, optionType, JOptionPane.QUESTION_MESSAGE);
   }
 
   public static int showConfirmDialog(final Object message, final String title,
     final int optionType, final int messageType) {
-    final Window parent = getWindow();
-    return JOptionPane.showConfirmDialog(parent, message, title, optionType, messageType);
+    return Invoke.andWait(() -> {
+      final Window parent = getWindow();
+      return JOptionPane.showConfirmDialog(parent, message, title, optionType, messageType);
+    });
   }
 
   public static int showDialog(final JFileChooser fileChooser, final String approveButtonText) {
@@ -93,14 +96,18 @@ public class Dialogs {
   }
 
   public static void showMessageDialog(final Object message) {
-    final Window parent = getWindow();
-    JOptionPane.showMessageDialog(parent, message);
+    Invoke.andWait(() -> {
+      final Window parent = getWindow();
+      JOptionPane.showMessageDialog(parent, message);
+    });
   }
 
   public static void showMessageDialog(final Object message, final String title,
     final int messageType) {
-    final Window parent = getWindow();
-    JOptionPane.showMessageDialog(parent, message, title, messageType);
+    Invoke.andWait(() -> {
+      final Window parent = getWindow();
+      JOptionPane.showMessageDialog(parent, message, title, messageType);
+    });
   }
 
   public static int showOpenDialog(final JFileChooser fileChooser) {

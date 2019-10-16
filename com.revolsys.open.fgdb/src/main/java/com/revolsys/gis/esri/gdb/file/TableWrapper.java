@@ -23,6 +23,39 @@ import com.revolsys.util.ValueHolderWrapper;
 
 public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
 
+  private static void deleteRecordRow(final TableReference tableReference, final Record record,
+    final Table table, final Row row) {
+    table.deleteRow(row);
+    record.setState(RecordState.DELETED);
+  }
+
+  private static void updateRecordRow(final TableReference tableReference, final Record record,
+    final Table table, final Row row) {
+    final RecordDefinition recordDefinition = tableReference.getRecordDefinition();
+    try {
+      for (final FieldDefinition field : recordDefinition.getFields()) {
+        final String name = field.getName();
+        try {
+          final Object value = record.getValue(name);
+          final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
+          esriField.setUpdateValue(record, row, value);
+        } catch (final Throwable e) {
+          throw new ObjectPropertyException(record, name, e);
+        }
+      }
+      table.updateRow(row);
+      record.setState(RecordState.PERSISTED);
+    } catch (final ObjectException e) {
+      if (e.getObject() == record) {
+        throw e;
+      } else {
+        throw new ObjectException(record, e);
+      }
+    } catch (final Throwable e) {
+      throw new ObjectException(record, e);
+    }
+  }
+
   default EnumRows closeRows(final EnumRows rows) {
     final TableReference tableReference = getTableReference();
     return tableReference.closeRows(rows);
@@ -37,16 +70,21 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
   default boolean deleteRecord(final Record record) {
     final FileGdbRecordStore recordStore = getRecordStore();
     final TableReference tableReference = getTableReference();
-    return tableReference.modifyRecordRow(record, "OBJECTID", (table, row) -> {
-      table.deleteRow(row);
-      record.setState(RecordState.DELETED);
+    if (tableReference.modifyRecordRow(record, "OBJECTID", TableWrapper::deleteRecordRow)) {
       recordStore.addStatistic("Delete", record);
-    });
+      return true;
+    } else {
+      return false;
+    }
   }
 
   default PathName getPathName() {
     final TableReference tableReference = getTableReference();
     return tableReference.getPathName();
+  }
+
+  default RecordDefinition getRecordDefinition() {
+    return getTableReference().getRecordDefinition();
   }
 
   default FileGdbRecordStore getRecordStore() {
@@ -197,39 +235,15 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
     if (objectId == null) {
       insertRecord(record);
     } else if (record.getState() == RecordState.MODIFIED) {
+      final TableReference tableReference = getTableReference();
       final FileGdbRecordStore recordStore = getRecordStore();
-      final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
-      final RecordDefinition recordDefinition = recordStore
-        .getRecordDefinition(sourceRecordDefinition);
+      final RecordDefinition recordDefinition = tableReference.getRecordDefinition();
 
       validateRequired(record, recordDefinition);
 
-      final TableReference tableReference = getTableReference();
-      tableReference.modifyRecordRow(record, "*", (table, row) -> {
-        try {
-          for (final FieldDefinition field : recordDefinition.getFields()) {
-            final String name = field.getName();
-            try {
-              final Object value = record.getValue(name);
-              final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
-              esriField.setUpdateValue(record, row, value);
-            } catch (final Throwable e) {
-              throw new ObjectPropertyException(record, name, e);
-            }
-          }
-          table.updateRow(row);
-          record.setState(RecordState.PERSISTED);
-          recordStore.addStatistic("Update", record);
-        } catch (final ObjectException e) {
-          if (e.getObject() == record) {
-            throw e;
-          } else {
-            throw new ObjectException(record, e);
-          }
-        } catch (final Throwable e) {
-          throw new ObjectException(record, e);
-        }
-      });
+      if (tableReference.modifyRecordRow(record, "*", TableWrapper::updateRecordRow)) {
+        recordStore.addStatistic("Update", record);
+      }
     }
   }
 

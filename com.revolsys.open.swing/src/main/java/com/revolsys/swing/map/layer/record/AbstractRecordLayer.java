@@ -738,9 +738,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final boolean globalConfirmDeleteRecords = Preferences.getValue("com.revolsys.gis",
       PREFERENCE_CONFIRM_DELETE_RECORDS);
     if (globalConfirmDeleteRecords || this.confirmDeleteRecords) {
-      final int confirm = Dialogs.showConfirmDialog(
-        "Delete " + recordCount + " records" + suffix + "? This action cannot be undone.",
-        "Delete Records" + suffix, JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+      final String message = "Delete " + recordCount + " records" + suffix
+        + "? This action cannot be undone.";
+      final String title = "Delete Records" + suffix;
+      final int confirm = Dialogs.showConfirmDialog(message, title, JOptionPane.YES_NO_OPTION,
+        JOptionPane.ERROR_MESSAGE);
       return confirm == JOptionPane.YES_OPTION;
     }
     return true;

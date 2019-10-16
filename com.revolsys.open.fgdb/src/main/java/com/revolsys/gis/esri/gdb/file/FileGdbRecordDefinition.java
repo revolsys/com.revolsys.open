@@ -173,7 +173,7 @@ public class FileGdbRecordDefinition extends RecordDefinitionImpl {
       setIdFieldName(deTable.getOIDFieldName());
     }
     this.catalogPath = deTable.getCatalogPath();
-    this.tableReference = recordStore.getTableReference(typePath, this.catalogPath);
+    this.tableReference = recordStore.getTableReference(this, typePath, this.catalogPath);
   }
 
   @Override

@@ -1,9 +1,9 @@
 package com.revolsys.gis.esri.gdb.file;
 
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.jeometry.common.function.Consumer4;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
@@ -77,9 +77,13 @@ public class TableReference extends CloseableValueHolder<Table> {
 
   private final PathName pathName;
 
-  TableReference(final FileGdbRecordStore recordStore, final ValueWrapper<Geodatabase> geodatabase,
+  private final FileGdbRecordDefinition recordDefinition;
+
+  TableReference(final FileGdbRecordStore recordStore,
+    final FileGdbRecordDefinition recordDefinition, final ValueWrapper<Geodatabase> geodatabase,
     final PathName pathName, final String catalogPath) {
     this.recordStore = recordStore;
+    this.recordDefinition = recordDefinition;
     this.geodatabase = geodatabase;
     this.pathName = pathName;
     this.catalogPath = catalogPath;
@@ -120,6 +124,10 @@ public class TableReference extends CloseableValueHolder<Table> {
     return this.pathName;
   }
 
+  public FileGdbRecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
+  }
+
   public FileGdbRecordStore getRecordStore() {
     return this.recordStore;
   }
@@ -128,7 +136,8 @@ public class TableReference extends CloseableValueHolder<Table> {
     return this.lockCount >= 0;
   }
 
-  boolean modifyRecordRow(final Record record, String fieldSpec, final BiConsumer<Table, Row> action) {
+  boolean modifyRecordRow(final Record record, final String fieldSpec,
+    final Consumer4<TableReference, Record, Table, Row> action) {
     final Integer objectId = record.getInteger("OBJECTID");
     if (objectId != null) {
       final String whereClause = "OBJECTID=" + objectId;
@@ -139,7 +148,7 @@ public class TableReference extends CloseableValueHolder<Table> {
           try {
             final Row row = rows.next();
             if (row != null) {
-              action.accept(table, row);
+              action.accept(this, record, table, row);
               row.delete();
               return true;
             }
