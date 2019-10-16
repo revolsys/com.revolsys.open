@@ -7,6 +7,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import org.jeometry.common.function.Consumer4;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
@@ -66,7 +67,7 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     menu.addMenuItem("convert", -1, name, iconName, enabledFilter, consumer, false);
   }
 
-  private List<AbstractRecordLayerRenderer> renderers = new ArrayList<>();
+  protected List<AbstractRecordLayerRenderer> renderers = new ArrayList<>();
 
   public AbstractMultipleRecordLayerRenderer(final String type, final AbstractRecordLayer layer,
     final LayerRenderer<?> parent) {
@@ -188,6 +189,10 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     return records;
   }
 
+  public int getRendererCount() {
+    return this.renderers.size();
+  }
+
   @Override
   public List<AbstractRecordLayerRenderer> getRenderers() {
     synchronized (this.renderers) {
@@ -207,7 +212,13 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
   @Override
   public boolean isVisible(final LayerRecord record) {
     if (super.isVisible() && super.isVisible(record)) {
-      for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
+      for (int i = 0; i < this.renderers.size(); i++) {
+        final AbstractRecordLayerRenderer renderer;
+        try {
+          renderer = this.renderers.get(i);
+        } catch (final ArrayIndexOutOfBoundsException e) {
+          return false;
+        }
         if (renderer.isVisible(record)) {
           return true;
         }
@@ -248,6 +259,20 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
 
   protected abstract void renderMultipleSelectedRecords(final ViewRenderer view,
     final AbstractRecordLayer layer, final List<LayerRecord> records);
+
+  protected void renderRecords(
+    final Consumer4<AbstractRecordLayerRenderer, ViewRenderer, AbstractRecordLayer, List<LayerRecord>> action,
+    final ViewRenderer view, final AbstractRecordLayer layer, final List<LayerRecord> records) {
+    for (int i = 0; i < this.renderers.size() && !view.isCancelled(); i++) {
+      AbstractRecordLayerRenderer renderer;
+      try {
+        renderer = this.renderers.get(i);
+      } catch (final ArrayIndexOutOfBoundsException e) {
+        return;
+      }
+      action.accept(renderer, view, layer, records);
+    }
+  }
 
   @Override
   protected final void renderRecords(final ViewRenderer view, final AbstractRecordLayer layer,

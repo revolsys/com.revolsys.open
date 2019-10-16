@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -61,6 +62,7 @@ import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.swing.tree.node.layer.LayerGroupTreeNode;
+import com.revolsys.util.Cancellable;
 import com.revolsys.util.OS;
 import com.revolsys.util.PreferencesUtil;
 import com.revolsys.util.Property;
@@ -1126,5 +1128,41 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     }
     addToMap(map, "layers", layerFiles);
     return map;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <L extends Layer> void walkLayers(final Cancellable cancellable, final Class<L> layerClass,
+    final Consumer<L> action) {
+    for (int i = 0; i < this.layers.size() && !cancellable.isCancelled(); i++) {
+      Layer layer;
+      try {
+        layer = this.layers.get(i);
+      } catch (final ArrayIndexOutOfBoundsException e) {
+        return;
+      }
+      if (layer instanceof LayerGroup) {
+        final LayerGroup layerGroup = (LayerGroup)layer;
+        layerGroup.walkLayers(cancellable, layerClass, action);
+      } else if (layerClass.isAssignableFrom(layer.getClass())) {
+        action.accept((L)layer);
+      }
+    }
+  }
+
+  public void walkLayers(final Cancellable cancellable, final Consumer<Layer> action) {
+    for (int i = 0; i < this.layers.size() && !cancellable.isCancelled(); i++) {
+      Layer layer;
+      try {
+        layer = this.layers.get(i);
+      } catch (final ArrayIndexOutOfBoundsException e) {
+        return;
+      }
+      if (layer instanceof LayerGroup) {
+        final LayerGroup layerGroup = (LayerGroup)layer;
+        layerGroup.walkLayers(cancellable, action);
+      } else {
+        action.accept(layer);
+      }
+    }
   }
 }

@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 
 import org.jeometry.common.awt.WebColors;
 
@@ -302,34 +303,19 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     repaint();
   }
 
-  private void refreshImageRenderer(final ViewRenderer view, final LayerGroup layerGroup) {
-    for (final Layer layer : layerGroup.getLayers()) {
-      if (layer instanceof LayerGroup) {
-        final LayerGroup childGroup = (LayerGroup)layer;
-        refreshImageRenderer(view, childGroup);
-      } else if (layer instanceof AbstractRecordLayer) {
-        final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
-        final AbstractRecordLayerRenderer layerRenderer = layer.getRenderer();
-        if (recordLayer.isSelectable()) {
-          final List<LayerRecord> selectedRecords = recordLayer.getSelectedRecords();
-          layerRenderer.renderSelectedRecords(view, recordLayer, selectedRecords);
-        }
-      }
-    }
-  }
-
   private GeoreferencedImage refreshImageSelected(final Cancellable cancellable) {
     final Viewport2D viewport = getViewport();
     if (viewport != null) {
       try (
         final ImageViewport imageViewport = new ImageViewport(viewport,
           BufferedImage.TYPE_INT_ARGB_PRE)) {
-        imageViewport.setBoundingBox(imageViewport.getBoundingBox());
         final ViewRenderer view = imageViewport.newViewRenderer();
         if (view.isViewValid()) {
           final Project project = getProject();
-          refreshImageRenderer(view, project);
-          refreshImageSelectedAndHighlighted(view, project);
+          final Consumer<AbstractRecordLayer> renderAction = layer -> refreshImageSelectedLayer(
+            view, layer);
+          project.walkLayers(cancellable, AbstractRecordLayer.class, renderAction);
+          refreshImageSelectedAndHighlighted(cancellable, view, project);
           return imageViewport.getGeoreferencedImage();
         }
       }
@@ -337,35 +323,40 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     return null;
   }
 
-  private void refreshImageSelectedAndHighlighted(final ViewRenderer view,
-    final LayerGroup layerGroup) {
+  private void refreshImageSelectedAndHighlighted(final Cancellable cancellable,
+    final ViewRenderer view, final LayerGroup layerGroup) {
     final GeometryFactory viewportGeometryFactory = getViewportGeometryFactory2d();
     final List<Geometry> highlightedGeometries = new ArrayList<>();
-    for (final Layer layer : layerGroup.getLayers()) {
-      if (layer instanceof LayerGroup) {
-        final LayerGroup childGroup = (LayerGroup)layer;
-        refreshImageSelectedAndHighlighted(view, childGroup);
-      } else if (layer instanceof AbstractRecordLayer) {
-        final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
-        if (recordLayer.isSelectable()) {
-          final List<LayerRecord> selectedRecords = recordLayer.getSelectedRecords();
-          for (final LayerRecord record : selectedRecords) {
-            if (record != null && recordLayer.isVisible(record)) {
-              if (!recordLayer.isDeleted(record)) {
-                final Geometry geometry = record.getGeometry();
-                if (recordLayer.isHighlighted(record)) {
-                  highlightedGeometries.add(geometry);
-                } else {
-                  this.selectRenderer.paintSelected(view, viewportGeometryFactory, geometry);
-                }
+
+    final Consumer<AbstractRecordLayer> renderAction = recordLayer -> {
+      if (recordLayer.isSelectable()) {
+        final List<LayerRecord> selectedRecords = recordLayer.getSelectedRecords();
+        for (final LayerRecord record : selectedRecords) {
+          if (record != null && recordLayer.isVisible(record)) {
+            if (!recordLayer.isDeleted(record)) {
+              final Geometry geometry = record.getGeometry();
+              if (recordLayer.isHighlighted(record)) {
+                highlightedGeometries.add(geometry);
+              } else {
+                this.selectRenderer.paintSelected(view, viewportGeometryFactory, geometry);
               }
             }
           }
         }
       }
-    }
+    };
+    layerGroup.walkLayers(cancellable, AbstractRecordLayer.class, renderAction);
+
     for (final Geometry geometry : highlightedGeometries) {
       this.highlightRenderer.paintSelected(view, viewportGeometryFactory, geometry);
+    }
+  }
+
+  private void refreshImageSelectedLayer(final ViewRenderer view, final AbstractRecordLayer layer) {
+    if (layer.isSelectable()) {
+      final AbstractRecordLayerRenderer layerRenderer = layer.getRenderer();
+      final List<LayerRecord> selectedRecords = layer.getSelectedRecords();
+      layerRenderer.renderSelectedRecords(view, layer, selectedRecords);
     }
   }
 

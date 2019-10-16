@@ -54,7 +54,7 @@ public class FilterMultipleRenderer extends AbstractMultipleRecordLayerRenderer 
     final List<LayerRecord> records,
     final BiConsumer<AbstractRecordLayerRenderer, List<LayerRecord>> action) {
     final double scaleForVisible = view.getScaleForVisible();
-    final List<AbstractRecordLayerRenderer> renderers = new ArrayList<>(getRenderers());
+    final List<AbstractRecordLayerRenderer> renderers = getRenderers();
     final List<List<LayerRecord>> rendererRecordsLists = new ArrayList<>();
     for (final AbstractRecordLayerRenderer renderer : renderers) {
       if (renderer.isVisible(scaleForVisible)) {

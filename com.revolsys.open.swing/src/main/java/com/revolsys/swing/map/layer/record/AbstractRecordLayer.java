@@ -40,6 +40,7 @@ import org.jeometry.common.compare.CompareUtil;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.date.Dates;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 import org.springframework.expression.EvaluationContext;
@@ -604,7 +605,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       return 0;
     } else {
       rendererGroup.addRenderer((AbstractRecordLayerRenderer)child);
-      return rendererGroup.getRenderers().size() - 1;
+      return rendererGroup.getRendererCount() - 1;
     }
   }
 
@@ -2982,6 +2983,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void setSelectedRecords(final Collection<LayerRecord> selectedRecords) {
+    final long startTime = System.currentTimeMillis();
     final List<LayerRecord> oldSelectedRecords = getSelectedRecords();
     synchronized (getSync()) {
       this.recordCacheSelected.clearRecords();
@@ -2995,6 +2997,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final List<LayerRecord> newSelectedRecords = getSelectedRecords();
     firePropertyChange(RECORDS_SELECTED, oldSelectedRecords, newSelectedRecords);
     fireSelected();
+    Dates.printEllapsedTime("setRecords", startTime);
   }
 
   public void setSelectedRecords(final LayerRecord... selectedRecords) {
