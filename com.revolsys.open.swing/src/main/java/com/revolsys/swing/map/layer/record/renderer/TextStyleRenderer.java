@@ -3,6 +3,7 @@ package com.revolsys.swing.map.layer.record.renderer;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.Icon;
@@ -91,6 +92,14 @@ public class TextStyleRenderer extends AbstractGeometryRecordLayerRenderer {
   protected void renderRecord(final ViewRenderer view, final AbstractRecordLayer layer,
     final LayerRecord record, final Geometry geometry) {
     view.drawText(record, geometry, this.style);
+  }
+
+  @Override
+  protected void renderSelectedRecordsDo(final ViewRenderer view, final AbstractRecordLayer layer,
+    final List<LayerRecord> records) {
+    if (isVisible(view)) {
+      super.renderSelectedRecordsDo(view, layer, records);
+    }
   }
 
   @Override

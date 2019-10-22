@@ -104,6 +104,14 @@ public class MarkerStyleRenderer extends AbstractGeometryRecordLayerRenderer {
   }
 
   @Override
+  protected void renderSelectedRecordsDo(final ViewRenderer view, final AbstractRecordLayer layer,
+    final List<LayerRecord> records) {
+    if (isVisible(view)) {
+      super.renderSelectedRecordsDo(view, layer, records);
+    }
+  }
+
+  @Override
   public void setProperties(final Map<String, ? extends Object> properties) {
     super.setProperties(properties);
     if (this.style != null) {

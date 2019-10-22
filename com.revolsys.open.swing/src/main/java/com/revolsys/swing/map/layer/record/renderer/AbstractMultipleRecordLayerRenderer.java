@@ -7,7 +7,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import org.jeometry.common.function.Consumer4;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
@@ -259,20 +258,6 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
 
   protected abstract void renderMultipleSelectedRecords(final ViewRenderer view,
     final AbstractRecordLayer layer, final List<LayerRecord> records);
-
-  protected void renderRecords(
-    final Consumer4<AbstractRecordLayerRenderer, ViewRenderer, AbstractRecordLayer, List<LayerRecord>> action,
-    final ViewRenderer view, final AbstractRecordLayer layer, final List<LayerRecord> records) {
-    for (int i = 0; i < this.renderers.size() && !view.isCancelled(); i++) {
-      AbstractRecordLayerRenderer renderer;
-      try {
-        renderer = this.renderers.get(i);
-      } catch (final ArrayIndexOutOfBoundsException e) {
-        return;
-      }
-      action.accept(renderer, view, layer, records);
-    }
-  }
 
   @Override
   protected final void renderRecords(final ViewRenderer view, final AbstractRecordLayer layer,
