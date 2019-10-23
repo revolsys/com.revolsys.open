@@ -1303,11 +1303,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             layer.splitRecord(record, location);
           });
         }
-        for (final CloseLocation mouseLocation : locations) {
-          final LayerRecord record = mouseLocation.getRecord();
-          final AbstractRecordLayer layer = record.getLayer();
-          layer.splitRecord(record, mouseLocation);
-        }
         e.consume();
         return true;
       }

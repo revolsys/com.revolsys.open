@@ -229,18 +229,20 @@ public class GeometryStyleRecordLayerRenderer extends AbstractGeometryRecordLaye
         return;
       }
     }
-    if (geometryType == GeometryDataTypes.POINT
-      || geometryType == GeometryDataTypes.MULTI_POINT) {
-      final Quantity<Length> markerWidth = this.style.getMarkerWidth();
-      final float width = (float)view.toDisplayValue(markerWidth);
-      if (width <= SelectedRecordsRenderer.STYLE_SIZE) {
-        return;
-      }
+    if (geometryType == GeometryDataTypes.POINT || geometryType == GeometryDataTypes.MULTI_POINT) {
+      if (this.style.getMarkerDx().getValue().intValue() == 0
+        && this.style.getMarkerDy().getValue().intValue() == 0) {
+        final Quantity<Length> markerWidth = this.style.getMarkerWidth();
+        final float width = (float)view.toDisplayValue(markerWidth);
+        if (width <= SelectedRecordsRenderer.STYLE_SIZE) {
+          return;
+        }
 
-      final Quantity<Length> markerHeight = this.style.getMarkerHeight();
-      final float height = (float)view.toDisplayValue(markerHeight);
-      if (height <= SelectedRecordsRenderer.STYLE_SIZE) {
-        return;
+        final Quantity<Length> markerHeight = this.style.getMarkerHeight();
+        final float height = (float)view.toDisplayValue(markerHeight);
+        if (height <= SelectedRecordsRenderer.STYLE_SIZE) {
+          return;
+        }
       }
     }
     renderRecordsDo(view, layer, records);
