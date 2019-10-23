@@ -881,7 +881,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
       final List<String> fieldNames = query.getFieldNames();
       if (fieldNames.isEmpty()) {
-        StringBuilders.append(sql, recordDefinition.getFieldNames());
+        StringBuilders.append(sql, fileGdbRecordDefinition.getFieldNames());
       } else {
         StringBuilders.append(sql, fieldNames);
       }
@@ -894,7 +894,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       boolean first = true;
       for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
         final CharSequence fieldName = entry.getKey();
-        final DataType dataType = recordDefinition.getFieldType(fieldName);
+
+        final DataType dataType = fileGdbRecordDefinition.getFieldType(fieldName);
         if (dataType != null && !Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
           if (first) {
             sql.append(" ORDER BY ");
@@ -914,8 +915,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           }
 
         } else {
-          Logs.error(this, "Unable to sort on " + recordDefinition.getPath() + "." + fieldName
-            + " as the ESRI library can't sort on " + dataType + " columns");
+          Logs.error(this, "Unable to sort on " + fileGdbRecordDefinition.getPath() + "."
+            + fieldName + " as the ESRI library can't sort on " + dataType + " columns");
         }
       }
     }
