@@ -19,9 +19,12 @@ import tec.uom.se.ComparableQuantity;
 import tec.uom.se.quantity.Quantities;
 
 public class SelectedRecordsRenderer {
+
+  public static final int STYLE_SIZE = 5;
+
   private final GeometryStyle highlightStyle = GeometryStyle
-    .polygon(WebColors.Lime, 5, WebColors.Lime) //
-    .setMarker("ellipse", 5, WebColors.Lime, 3, WebColors.Black);
+    .polygon(WebColors.Lime, STYLE_SIZE, WebColors.Lime) //
+    .setMarker("ellipse", STYLE_SIZE, WebColors.Lime, 3, WebColors.Black);
 
   private final GeometryStyle lineStyle = GeometryStyle.line(WebColors.Black);
 
