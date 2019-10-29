@@ -2,6 +2,7 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.KeyboardFocusManager;
 import java.awt.Window;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -190,7 +191,7 @@ public class MouseOverlay extends JComponent
   @Override
   public void mouseEntered(final MouseEvent e) {
     updateEventPoint(e);
-    requestFocusInWindow();
+    requestFocusIfNotWindow();
     forEachOverlay(overlay -> {
       if (!e.isConsumed() && overlay instanceof MouseListener) {
         final MouseListener listener = (MouseListener)overlay;
@@ -217,7 +218,7 @@ public class MouseOverlay extends JComponent
   public void mouseMoved(final MouseEvent event) {
     if (!this.mapPanel.isMenuVisible()) {
       try {
-        requestFocusInWindow();
+        requestFocusIfNotWindow();
         updateEventPoint(event);
         this.mapPanel.mouseMovedCloseSelected(event);
         forEachOverlay(overlay -> {
@@ -277,6 +278,15 @@ public class MouseOverlay extends JComponent
         }
       });
     }
+  }
+
+  public boolean requestFocusIfNotWindow() {
+    final Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager()
+      .getFocusOwner();
+    if (SwingUtil.getWindowAncestor(focusOwner) != SwingUtil.getWindowAncestor(this)) {
+      return super.requestFocusInWindow();
+    }
+    return true;
   }
 
   private void updateEventPoint(final MouseEvent e) {

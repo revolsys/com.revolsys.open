@@ -868,8 +868,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected boolean deleteSingleRecordDo(final LayerRecord record) {
+    final boolean isNewRecord = this.recordCacheNew.removeContainsRecord(record);
     removeRecordFromCache(record);
-    if (this.recordCacheNew.removeContainsRecord(record)) {
+    if (isNewRecord) {
       record.setState(RecordState.DELETED);
       return true;
     } else if (isCanDeleteRecords()) {
