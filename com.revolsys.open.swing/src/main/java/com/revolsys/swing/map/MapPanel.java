@@ -499,7 +499,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     final GeometryFactory geometryFactory = this.viewport.getGeometryFactory2dFloating();
     final Geometry convertedGeometry = geometry.convertGeometry(geometryFactory);
     final Pair<GeometryComponent, Double> closestGeometryComponent = convertedGeometry
-      .findClosestGeometryComponent(x, y, maxDistance);
+      .findGeometryComponentWithinDistance(x, y, maxDistance);
 
     if (!closestGeometryComponent.isEmpty()) {
       final GeometryComponent geometryComponent = closestGeometryComponent.getValue1();

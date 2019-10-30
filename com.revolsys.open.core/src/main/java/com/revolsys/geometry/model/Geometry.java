@@ -1339,6 +1339,74 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     }
   }
 
+  /**
+   * First the vertex or segment that is within the specified maxDistance. If a vertex is within the
+   * distance, then it is returned, even if a segment is closer.
+   * @param x
+   * @param y
+   * @param maxDistance
+   * @return
+   */
+  default Pair<GeometryComponent, Double> findGeometryComponentWithinDistance(final double x,
+    final double y, final double maxDistance) {
+    if (isEmpty()) {
+      return new Pair<>();
+    } else {
+      GeometryComponent closestComponent = null;
+      double closestDistance = Double.POSITIVE_INFINITY;
+      for (final Segment segment : segments()) {
+        boolean matched = false;
+        if (segment.isLineStart()) {
+          final Vertex from = segment.getGeometryVertex(0);
+          final double fromDistance = from.distance(x, y);
+          if (fromDistance == 0) {
+            return new Pair<>(from, 0.0);
+          } else if (fromDistance < maxDistance) {
+            if (fromDistance < closestDistance || //
+              fromDistance == closestDistance && !(closestComponent instanceof Vertex)) {
+              closestDistance = fromDistance;
+              closestComponent = from;
+              matched = true;
+            }
+          }
+        }
+
+        {
+          final Vertex to = segment.getGeometryVertex(1);
+          final double toDistance = to.distance(x, y);
+          if (toDistance == 0) {
+            return new Pair<>(to, 0.0);
+          } else if (toDistance < maxDistance) {
+            if (toDistance < closestDistance || //
+              toDistance == closestDistance && !(closestComponent instanceof Vertex)) {
+              closestDistance = toDistance;
+              closestComponent = to.clone();
+              matched = true;
+            }
+          }
+        }
+        if (!matched && !(closestComponent instanceof Vertex)) {
+          final double segmentDistance = segment.distance(x, y);
+          if (segmentDistance == 0) {
+            return new Pair<>(segment, 0.0);
+          } else {
+            if (segmentDistance < maxDistance) {
+              if (!(closestComponent instanceof Vertex) && segmentDistance < closestDistance) {
+                closestDistance = segmentDistance;
+                closestComponent = segment.clone();
+              }
+            }
+          }
+        }
+      }
+      if (Double.isFinite(closestDistance)) {
+        return new Pair<>(closestComponent, closestDistance);
+      } else {
+        return new Pair<>();
+      }
+    }
+  }
+
   default <R> R findSegment(final Function4Double<R> action) {
     return null;
   }
