@@ -1718,7 +1718,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
       final MenuFactory layerMenuFactory = MenuFactory.findMenu(this);
       if (layerMenuFactory != null) {
-        menu.addComponentFactory("default", 0, new WrappedMenuFactory("Layer", layerMenuFactory));
+        menu.addComponentFactory("default", 0, new WrappedMenuFactory("Layer", this::getMenu));
       }
 
       menu.addMenuItem("record", "View/Edit Record", "table_edit", notDeleted, this::showForm);
