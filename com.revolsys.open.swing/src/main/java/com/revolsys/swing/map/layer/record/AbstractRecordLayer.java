@@ -287,6 +287,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     PREFERENCE_PATH, "showAllRecordViewOnFilter", DataTypes.BOOLEAN, true)//
       .setCategoryTitle("Layers");
 
+  public static final PreferenceKey PREFERENCE_GENERALIZE_GEOMETRY_TOLERANCE = new PreferenceKey(
+    PREFERENCE_PATH, "generalizeGeometryTolerance", DataTypes.DOUBLE, 0.2)//
+      .setCategoryTitle("Layers");
+
   public static final String RECORD_CACHE_MODIFIED = "recordCacheModified";
 
   public static final String RECORD_DELETED_PERSISTED = "recordDeletedPersisted";
@@ -364,6 +368,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
       PreferenceFields.addField("com.revolsys.gis", PREFERENCE_SHOW_ALL_RECORDS_ON_FILTER);
       PreferenceFields.addField("com.revolsys.gis", PREFERENCE_CONFIRM_DELETE_RECORDS);
+      PreferenceFields.addField("com.revolsys.gis", PREFERENCE_GENERALIZE_GEOMETRY_TOLERANCE);
     });
   }
 
@@ -1072,6 +1077,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       }
     }
     return this.filter;
+  }
+
+  public double getGeneralizeGeometryTolerance() {
+    return Preferences.getValue("com.revolsys.gis", PREFERENCE_GENERALIZE_GEOMETRY_TOLERANCE);
   }
 
   public DataType getGeometryType() {

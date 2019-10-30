@@ -36,8 +36,8 @@ public class RecordLayerActions {
     final ValueField dialog = new ValueField(new BorderLayout());
     dialog.setTitle("Generalize Vertices");
 
-    final NumberTextField distanceField = new NumberTextField(DataTypes.DOUBLE, 10);
-    distanceField.setFieldValue(3.0);
+    final NumberTextField distanceField = new NumberTextField(DataTypes.DOUBLE, 10, 2);
+    distanceField.setFieldValue(layer.getGeneralizeGeometryTolerance());
     dialog.add(distanceField);
     final String unit = layer.getHorizontalCoordinateSystem().getLengthUnit().toString();
     final JLabel label = SwingUtil.newLabel("Distance Tolerance (" + unit + ")");
