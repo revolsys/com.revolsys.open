@@ -14,8 +14,6 @@ public interface TableModelColumn {
 
   String getColumnName();
 
-  BaseJPopupMenu getHeaderMenu();
-
   MenuFactory getHeaderMenuFactory();
 
   BaseJPopupMenu getMenu();

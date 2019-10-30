@@ -58,6 +58,7 @@ import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.model.TableRecordsMode;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.menu.MenuSourceHolder;
 import com.revolsys.swing.menu.ToggleButton;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.TableRowCount;
@@ -100,22 +101,23 @@ public class RecordLayerTablePanel extends TablePanel
 
     table.getTableCellEditor().addMouseListener(this);
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
-    MenuFactory.setMenuSource(table);
+    try (
+      MenuSourceHolder menuSource = new TablePanelEventSource(layer)) {
 
-    final MenuFactory headerMenu = getHeaderMenu();
-    SetRecordsFieldValue.addMenuItem(headerMenu);
-    FieldCalculator.addMenuItem(headerMenu);
-    headerMenu.addMenuItem("field", "Copy Raw Values", "page_white_copy",
-      () -> actionCopyColumnValues(false, false));
-    headerMenu.addMenuItem("field", "Copy Display Values", "page_white_copy",
-      () -> actionCopyColumnValues(true, false));
-    headerMenu.addMenuItem("field", "Copy Unique Display Values", "page_white_copy",
-      () -> actionCopyColumnValues(true, true));
+      final MenuFactory headerMenu = getHeaderMenu();
+      SetRecordsFieldValue.addMenuItem(headerMenu);
+      FieldCalculator.addMenuItem(headerMenu);
+      headerMenu.addMenuItem("field", "Copy Raw Values", "page_white_copy",
+        () -> actionCopyColumnValues(false, false));
+      headerMenu.addMenuItem("field", "Copy Display Values", "page_white_copy",
+        () -> actionCopyColumnValues(true, false));
+      headerMenu.addMenuItem("field", "Copy Unique Display Values", "page_white_copy",
+        () -> actionCopyColumnValues(true, true));
 
-    final LayerRecordMenu menu = this.layer.getRecordMenu();
-
-    final RecordTableCellEditor tableCellEditor = table.getTableCellEditor();
-    tableCellEditor.setPopupMenu(menu::newJPopupMenu);
+      final LayerRecordMenu menu = this.layer.getRecordMenu();
+      final RecordTableCellEditor tableCellEditor = table.getTableCellEditor();
+      tableCellEditor.setPopupMenu(menu::newJPopupMenu);
+    }
 
     newToolBar(pluginConfig);
 
@@ -243,7 +245,7 @@ public class RecordLayerTablePanel extends TablePanel
   }
 
   @Override
-  public BaseJPopupMenu getHeaderMenu(final int columnIndex) {
+  protected BaseJPopupMenu getHeaderMenu(final int columnIndex) {
     final BaseJPopupMenu headerMenu = super.getHeaderMenu(columnIndex);
     final String columnName = this.tableModel.getColumnName(columnIndex);
     final JMenuItem menuItem = new JMenuItem();

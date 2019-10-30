@@ -172,7 +172,7 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
     return SwingUtil.newField(clazz, "field", value);
   }
 
-  public BaseJPopupMenu getHeaderMenu(final int columnIndex) {
+  public MenuFactory getHeaderMenuFactory(final int columnIndex) {
     return null;
   }
 

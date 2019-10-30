@@ -57,10 +57,9 @@ public class BaseTreeListener
           final BaseTreeNode treeNode = (BaseTreeNode)node;
           userObject = treeNode.getUserObject();
         }
-        if (userObject == null) {
-          MenuFactory.setMenuSource(userObject);
-        } else {
-          MenuFactory.setMenuSource(node);
+        Object menuSource = userObject;
+        if (menuSource == null) {
+          menuSource = node;
         }
         listener.mouseClicked(e);
       }

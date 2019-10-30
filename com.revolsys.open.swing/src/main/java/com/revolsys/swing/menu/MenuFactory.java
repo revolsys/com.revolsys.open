@@ -3,6 +3,8 @@ package com.revolsys.swing.menu;
 import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,22 +19,17 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JPopupMenu.Separator;
-import javax.swing.SwingUtilities;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
 
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.beans.ClassRegistry;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.swing.Icons;
-import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.swing.field.Field;
-import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.util.Property;
 
@@ -43,27 +40,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
   private static final String KEY_POPUP_MENU = MenuFactory.class.getName() + ".popup";
 
-  static Object menuSource;
-
-  static Window currentWindow;
-
-  static PopupMenuListener POPUP_MENU_LISTENER = new PopupMenuListener() {
-
-    @Override
-    public void popupMenuCanceled(final PopupMenuEvent e) {
-    }
-
-    @Override
-    public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
-    }
-
-    @Override
-    public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
-      final JPopupMenu menu = (JPopupMenu)e.getSource();
-      menu.removePopupMenuListener(POPUP_MENU_LISTENER);
-      currentWindow = null;
-    }
-  };
+  private static Reference<MenuSourceHolder> menuSourceHolder = new WeakReference<>(null);
 
   public static void addMenuInitializer(final Class<?> clazz,
     final Consumer<MenuFactory> initializer) {
@@ -80,6 +57,14 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   public static void addToComponent(final JComponent component, final MenuFactory menuFactory) {
     component.putClientProperty(KEY_POPUP_MENU, menuFactory);
     ShowMenuMouseListener.addListener(component, menuFactory::newJPopupMenu, true);
+  }
+
+  public static void clearMenuSourceHolder(final MenuSourceHolder menuSourceHolder) {
+    synchronized (MenuSourceHolder.class) {
+      if (MenuFactory.menuSourceHolder.get() == menuSourceHolder) {
+        MenuFactory.menuSourceHolder = new WeakReference<>(null);
+      }
+    }
   }
 
   public static <V> EnableCheck enableCheck(final Predicate<V> filter) {
@@ -118,7 +103,12 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   }
 
   public static Window getCurrentWindow() {
-    return currentWindow;
+    final MenuSourceHolder menuSourceHolder = MenuFactory.menuSourceHolder.get();
+    if (menuSourceHolder == null) {
+      return null;
+    } else {
+      return menuSourceHolder.getWindow();
+    }
   }
 
   public static MenuFactory getMenu(final Class<?> clazz) {
@@ -149,9 +139,17 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return getMenu(clazz);
   }
 
-  @SuppressWarnings("unchecked")
-  public static <V> V getMenuSource() {
-    return (V)menuSource;
+  public static <S> S getMenuSource() {
+    final MenuSourceHolder menuSourceHolder = MenuFactory.menuSourceHolder.get();
+    if (menuSourceHolder == null) {
+      return null;
+    } else {
+      return menuSourceHolder.getSource();
+    }
+  }
+
+  public static MenuSourceHolder getMenuSourceHolder() {
+    return menuSourceHolder.get();
   }
 
   public static MenuFactory getPopupMenuFactory(final JComponent component) {
@@ -194,27 +192,9 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return action;
   }
 
-  public static void setMenuSource(final Object menuSource) {
-    MenuFactory.menuSource = menuSource;
-  }
-
-  public static void showMenu(final Object menuSource, final JPopupMenu menu,
-    final Component component, final int x, final int y) {
-    if (menu != null) {
-      if (SwingUtil.isEventDispatchThread()) {
-        MenuFactory.menuSource = menuSource;
-        final int numItems = menu.getSubElements().length;
-        if (menu != null && numItems > 0) {
-          final Window window = SwingUtilities.windowForComponent(component);
-          SwingUtil.toFront(window);
-          currentWindow = window;
-          menu.validate();
-          menu.addPopupMenuListener(POPUP_MENU_LISTENER);
-          menu.show(component, x, y);
-        }
-      } else {
-        Invoke.later(() -> showMenu(menuSource, menu, component, x, y));
-      }
+  public static void setMenuSourceHolder(final MenuSourceHolder menuSourceHolder) {
+    synchronized (MenuSourceHolder.class) {
+      MenuFactory.menuSourceHolder = new WeakReference<>(menuSourceHolder);
     }
   }
 
@@ -652,14 +632,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
 
   public BaseJPopupMenu showMenu(final Object source, final Component component, final int x,
     final int y) {
-    setMenuSource(source);
-    final BaseJPopupMenu menu = newJPopupMenu();
-    if (menu == null) {
-      setMenuSource(null);
-    } else {
-      menu.showMenu(source, component, x, y);
-    }
-    return menu;
+    return BaseJPopupMenu.showMenu(this::newJPopupMenu, source, component, x, y);
   }
 
   public BaseJPopupMenu showMenu(final Object source, final MouseEvent e) {
