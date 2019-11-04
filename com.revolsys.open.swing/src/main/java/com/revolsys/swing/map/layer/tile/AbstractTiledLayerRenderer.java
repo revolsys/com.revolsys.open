@@ -162,11 +162,13 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
   @Override
   public void setLayer(final AbstractTiledLayer<D, T> layer) {
     super.setLayer(layer);
-    layer.addPropertyChangeListener("refresh", e -> {
-      synchronized (this.errorSync) {
-        this.hasError = false;
-      }
-    });
+    if (layer != null) {
+      layer.addPropertyChangeListener("refresh", e -> {
+        synchronized (this.errorSync) {
+          this.hasError = false;
+        }
+      });
+    }
   }
 
   public void setLoaded(final TileLoadTask<D, T> tileLoadTask) {
