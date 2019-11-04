@@ -287,6 +287,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     PREFERENCE_PATH, "showAllRecordViewOnFilter", DataTypes.BOOLEAN, true)//
       .setCategoryTitle("Layers");
 
+  public static final PreferenceKey PREFERENCE_GENERALIZE_GEOMETRY_TOLERANCE = new PreferenceKey(
+    PREFERENCE_PATH, "generalizeGeometryTolerance", DataTypes.DOUBLE, 0.2)//
+      .setCategoryTitle("Layers");
+
   public static final String RECORD_CACHE_MODIFIED = "recordCacheModified";
 
   public static final String RECORD_DELETED_PERSISTED = "recordDeletedPersisted";
@@ -364,6 +368,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
       PreferenceFields.addField("com.revolsys.gis", PREFERENCE_SHOW_ALL_RECORDS_ON_FILTER);
       PreferenceFields.addField("com.revolsys.gis", PREFERENCE_CONFIRM_DELETE_RECORDS);
+      PreferenceFields.addField("com.revolsys.gis", PREFERENCE_GENERALIZE_GEOMETRY_TOLERANCE);
     });
   }
 
@@ -604,7 +609,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       return 0;
     } else {
       rendererGroup.addRenderer((AbstractRecordLayerRenderer)child);
-      return rendererGroup.getRenderers().size() - 1;
+      return rendererGroup.getRendererCount() - 1;
     }
   }
 
@@ -738,9 +743,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final boolean globalConfirmDeleteRecords = Preferences.getValue("com.revolsys.gis",
       PREFERENCE_CONFIRM_DELETE_RECORDS);
     if (globalConfirmDeleteRecords || this.confirmDeleteRecords) {
-      final int confirm = Dialogs.showConfirmDialog(
-        "Delete " + recordCount + " records" + suffix + "? This action cannot be undone.",
-        "Delete Records" + suffix, JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+      final String message = "Delete " + recordCount + " records" + suffix
+        + "? This action cannot be undone.";
+      final String title = "Delete Records" + suffix;
+      final int confirm = Dialogs.showConfirmDialog(message, title, JOptionPane.YES_NO_OPTION,
+        JOptionPane.ERROR_MESSAGE);
       return confirm == JOptionPane.YES_OPTION;
     }
     return true;
@@ -866,8 +873,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected boolean deleteSingleRecordDo(final LayerRecord record) {
+    final boolean isNewRecord = this.recordCacheNew.removeContainsRecord(record);
     removeRecordFromCache(record);
-    if (this.recordCacheNew.removeContainsRecord(record)) {
+    if (isNewRecord) {
       record.setState(RecordState.DELETED);
       return true;
     } else if (isCanDeleteRecords()) {
@@ -1069,6 +1077,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       }
     }
     return this.filter;
+  }
+
+  public double getGeneralizeGeometryTolerance() {
+    return Preferences.getValue("com.revolsys.gis", PREFERENCE_GENERALIZE_GEOMETRY_TOLERANCE);
   }
 
   public DataType getGeometryType() {
@@ -1706,7 +1718,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
       final MenuFactory layerMenuFactory = MenuFactory.findMenu(this);
       if (layerMenuFactory != null) {
-        menu.addComponentFactory("default", 0, new WrappedMenuFactory("Layer", layerMenuFactory));
+        menu.addComponentFactory("default", 0, new WrappedMenuFactory("Layer", this::getMenu));
       }
 
       menu.addMenuItem("record", "View/Edit Record", "table_edit", notDeleted, this::showForm);

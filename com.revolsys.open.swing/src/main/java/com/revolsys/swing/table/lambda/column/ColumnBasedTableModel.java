@@ -9,6 +9,7 @@ import javax.swing.table.TableColumn;
 import com.revolsys.record.Record;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.menu.BaseJPopupMenu;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.util.Property;
@@ -86,12 +87,12 @@ public class ColumnBasedTableModel extends AbstractTableModel {
   }
 
   @Override
-  public BaseJPopupMenu getHeaderMenu(final int columnIndex) {
+  public MenuFactory getHeaderMenuFactory(final int columnIndex) {
     final TableModelColumn column = getColumn(columnIndex);
     if (column == null) {
       return null;
     } else {
-      return column.getHeaderMenu();
+      return column.getHeaderMenuFactory();
     }
   }
 

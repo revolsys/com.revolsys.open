@@ -92,29 +92,16 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
     return getIdExact(values, true);
   }
 
-  default Identifier getIdExact(final List<Object> values, final boolean loadValues) {
-    return getIdentifier(values);
-  }
-
   default Identifier getIdExact(final Object... values) {
     final List<Object> valueList = Arrays.asList(values);
     return getIdExact(valueList);
   }
 
-  String getIdFieldName();
-
-  default <V> V getIdValue(final Object value) {
-    if (value == null) {
-      return null;
-    } else {
-      final Identifier identifier = getIdentifier(value);
-      if (identifier == null) {
-        return null;
-      } else {
-        return identifier.getValue(0);
-      }
-    }
+  default Identifier getIdExact(final Object value) {
+    return getIdExact(Collections.singletonList(value));
   }
+
+  String getIdFieldName();
 
   default Map<String, ? extends Object> getMap(final Identifier id) {
     final List<Object> values = getValues(id);

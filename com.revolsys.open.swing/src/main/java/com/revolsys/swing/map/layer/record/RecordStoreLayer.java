@@ -187,7 +187,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
                 final LayerRecord cachedRecord = findCachedRecord(record);
                 if (cachedRecord != null) {
                   record = cachedRecord;
-                  if (record.isChanged() || isDeleted(record)) {
+                  if (record.isChanged() || isDeleted(record) || isModified(record)) {
                     write = false;
                   }
                 }

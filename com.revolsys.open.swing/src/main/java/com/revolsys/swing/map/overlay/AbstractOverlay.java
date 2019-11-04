@@ -88,8 +88,6 @@ public abstract class AbstractOverlay extends JComponent
 
   private GeometryFactory geometryFactory;
 
-  private final int hotspotPixels = 6;
-
   private MapPanel map;
 
   private Point snapCentre;
@@ -303,8 +301,8 @@ public abstract class AbstractOverlay extends JComponent
         graphics.setXORMode(Color.WHITE);
         if (geometry instanceof Point) {
           final Point point = (Point)geometry;
-          final MarkerStyle markerStyle = MarkerStyle.marker("circle", getHotspotPixels() * 2,
-            WebColors.Blue, 0, WebColors.Blue);
+          final MarkerStyle markerStyle = MarkerStyle.marker("circle",
+            Viewport2D.HOTSPOT_PIXELS * 2, WebColors.Blue, 0, WebColors.Blue);
 
           this.view.renderMarker(markerStyle, point);
         } else {
@@ -330,7 +328,8 @@ public abstract class AbstractOverlay extends JComponent
     final int y = event.getY();
     final GeometryFactory geometryFactory = getGeometryFactory();
     final Point p1 = this.viewport.toModelPoint(x, y).convertPoint2d(geometryFactory);
-    final Point p2 = this.viewport.toModelPoint(x + getHotspotPixels(), y + getHotspotPixels())
+    final Point p2 = this.viewport
+      .toModelPoint(x + Viewport2D.HOTSPOT_PIXELS, y + Viewport2D.HOTSPOT_PIXELS)
       .convertPoint2d(geometryFactory);
 
     return p1.distancePoint(p2);
@@ -377,10 +376,6 @@ public abstract class AbstractOverlay extends JComponent
 
   protected BoundingBox getHotspotBoundingBox() {
     return getMap().getHotspotBoundingBox();
-  }
-
-  public int getHotspotPixels() {
-    return this.hotspotPixels;
   }
 
   public MapPanel getMap() {

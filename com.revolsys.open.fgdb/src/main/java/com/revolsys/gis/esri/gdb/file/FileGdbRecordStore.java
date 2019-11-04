@@ -612,23 +612,25 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
+  TableReference getTableReference(final FileGdbRecordDefinition recordDefinition,
+    final PathName pathName, final String catalogPath) {
+    synchronized (this.tableByCatalogPath) {
+      TableReference tableReference = this.tableByCatalogPath.get(catalogPath);
+      if (tableReference == null) {
+        tableReference = new TableReference(this, recordDefinition, this.geodatabase, pathName,
+          catalogPath);
+        this.tableByCatalogPath.put(catalogPath, tableReference);
+      }
+      return tableReference;
+    }
+  }
+
   private TableReference getTableReference(final PathName path) {
     final FileGdbRecordDefinition recordDefinition = getRecordDefinition(path);
     if (recordDefinition != null) {
       return recordDefinition.getTableReference();
     }
     return null;
-  }
-
-  TableReference getTableReference(final PathName pathName, final String catalogPath) {
-    synchronized (this.tableByCatalogPath) {
-      TableReference tableReference = this.tableByCatalogPath.get(catalogPath);
-      if (tableReference == null) {
-        tableReference = new TableReference(this, this.geodatabase, pathName, catalogPath);
-        this.tableByCatalogPath.put(catalogPath, tableReference);
-      }
-      return tableReference;
-    }
   }
 
   protected TableReference getTableReference(final RecordDefinition recordDefinition) {
@@ -879,7 +881,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
       final List<String> fieldNames = query.getFieldNames();
       if (fieldNames.isEmpty()) {
-        StringBuilders.append(sql, recordDefinition.getFieldNames());
+        StringBuilders.append(sql, fileGdbRecordDefinition.getFieldNames());
       } else {
         StringBuilders.append(sql, fieldNames);
       }
@@ -892,7 +894,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       boolean first = true;
       for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
         final CharSequence fieldName = entry.getKey();
-        final DataType dataType = recordDefinition.getFieldType(fieldName);
+
+        final DataType dataType = fileGdbRecordDefinition.getFieldType(fieldName);
         if (dataType != null && !Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
           if (first) {
             sql.append(" ORDER BY ");
@@ -912,8 +915,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           }
 
         } else {
-          Logs.error(this, "Unable to sort on " + recordDefinition.getPath() + "." + fieldName
-            + " as the ESRI library can't sort on " + dataType + " columns");
+          Logs.error(this, "Unable to sort on " + fileGdbRecordDefinition.getPath() + "."
+            + fieldName + " as the ESRI library can't sort on " + dataType + " columns");
         }
       }
     }
@@ -1238,7 +1241,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   // TODO
-  // public <R> R withTable(final PathNameProxy pathName, final Function<TableWrapper, R> action,
+  // public <R> R withTable(final PathNameProxy pathName, final
+  // Function<TableWrapper, R> action,
   // final R defaultValue) {
   // final TableWrapper table = getTable(pathName);
   // if (table != null) {

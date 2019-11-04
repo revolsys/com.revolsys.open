@@ -10,6 +10,8 @@ import java.beans.PropertyChangeEvent;
 import java.util.List;
 import java.util.Map;
 
+import javax.measure.Quantity;
+import javax.measure.quantity.Length;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
@@ -29,6 +31,7 @@ import com.revolsys.swing.map.layer.record.renderer.shape.LineStringShape;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePanel;
 import com.revolsys.swing.map.layer.record.style.panel.GeometryStylePreview;
+import com.revolsys.swing.map.overlay.record.SelectedRecordsRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
 
 public class GeometryStyleRecordLayerRenderer extends AbstractGeometryRecordLayerRenderer
@@ -212,6 +215,37 @@ public class GeometryStyleRecordLayerRenderer extends AbstractGeometryRecordLaye
         }
       }
     }
+  }
+
+  @Override
+  protected void renderSelectedRecordsDo(final ViewRenderer view, final AbstractRecordLayer layer,
+    final List<LayerRecord> records) {
+    final DataType geometryType = layer.getGeometryType();
+    if (geometryType == GeometryDataTypes.LINE_STRING
+      || geometryType == GeometryDataTypes.MULTI_LINE_STRING) {
+      final Quantity<Length> lineWidth = this.style.getLineWidth();
+      final float width = (float)view.toDisplayValue(lineWidth);
+      if (width <= SelectedRecordsRenderer.STYLE_SIZE) {
+        return;
+      }
+    }
+    if (geometryType == GeometryDataTypes.POINT || geometryType == GeometryDataTypes.MULTI_POINT) {
+      if (this.style.getMarkerDx().getValue().intValue() == 0
+        && this.style.getMarkerDy().getValue().intValue() == 0) {
+        final Quantity<Length> markerWidth = this.style.getMarkerWidth();
+        final float width = (float)view.toDisplayValue(markerWidth);
+        if (width <= SelectedRecordsRenderer.STYLE_SIZE) {
+          return;
+        }
+
+        final Quantity<Length> markerHeight = this.style.getMarkerHeight();
+        final float height = (float)view.toDisplayValue(markerHeight);
+        if (height <= SelectedRecordsRenderer.STYLE_SIZE) {
+          return;
+        }
+      }
+    }
+    renderRecordsDo(view, layer, records);
   }
 
   @Override

@@ -959,6 +959,10 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
     }
   }
 
+  public boolean isEmpty() {
+    return this.edgesById.isEmpty();
+  }
+
   /**
    * Merge the two edges at the node.
    *

@@ -482,7 +482,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
             firePropertyChange("hasFilterHistory", false, true);
           }
         }
-        if (this.layer.isShowAllRecordsOnFilter()) {
+        if (this.layer.isShowAllRecordsOnFilter() && !filter2.isEmpty()) {
           final TableRecordsMode modeAll = getTableRecordsMode(MODE_RECORDS_ALL);
           setTableRecordsMode(modeAll);
         }

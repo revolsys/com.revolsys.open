@@ -121,9 +121,9 @@ public abstract class AbstractMultiValueCodeTable extends AbstractCodeTable {
   }
 
   @Override
-  public Identifier getIdExact(final List<Object> values, final boolean loadValues) {
+  public Identifier getIdExact(final List<Object> values) {
     Identifier id = this.valueIdCache.get(values);
-    if (id == null && loadValues) {
+    if (id == null) {
       synchronized (this) {
         id = loadId(values, false);
         return this.valueIdCache.get(values);

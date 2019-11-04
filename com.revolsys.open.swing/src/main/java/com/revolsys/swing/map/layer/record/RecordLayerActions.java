@@ -11,6 +11,7 @@ import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.simplify.DouglasPeuckerSimplifier;
+import com.revolsys.record.Record;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
@@ -26,12 +27,7 @@ public class RecordLayerActions {
   public static void generalize(final AbstractRecordLayer layer, final List<LayerRecord> records,
     final Double distanceTolerance) {
     if (distanceTolerance != null) {
-      final Consumer<LayerRecord> action = record -> {
-        final Geometry geometry = record.getGeometry();
-        final Geometry newGeometry = DouglasPeuckerSimplifier.simplify(geometry, distanceTolerance,
-          true);
-        record.setGeometryValue(newGeometry);
-      };
+      final Consumer<LayerRecord> action = record -> generalizeRecord(record, distanceTolerance);
       layer.processTasks("Generalize", records, action);
     }
   }
@@ -40,8 +36,8 @@ public class RecordLayerActions {
     final ValueField dialog = new ValueField(new BorderLayout());
     dialog.setTitle("Generalize Vertices");
 
-    final NumberTextField distanceField = new NumberTextField(DataTypes.DOUBLE, 10);
-    distanceField.setFieldValue(2.0);
+    final NumberTextField distanceField = new NumberTextField(DataTypes.DOUBLE, 10, 2);
+    distanceField.setFieldValue(layer.getGeneralizeGeometryTolerance());
     dialog.add(distanceField);
     final String unit = layer.getHorizontalCoordinateSystem().getLengthUnit().toString();
     final JLabel label = SwingUtil.newLabel("Distance Tolerance (" + unit + ")");
@@ -55,6 +51,15 @@ public class RecordLayerActions {
       return null;
     }
 
+  }
+
+  public static void generalizeRecord(final Record record, final double distanceTolerance) {
+    final Geometry geometry = record.getGeometry();
+    if (geometry != null) {
+      final Geometry newGeometry = DouglasPeuckerSimplifier.simplify(geometry, distanceTolerance,
+        true);
+      record.setGeometryValue(newGeometry);
+    }
   }
 
 }

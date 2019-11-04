@@ -2,6 +2,7 @@ package com.revolsys.swing.map.overlay;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.KeyboardFocusManager;
 import java.awt.Window;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -127,12 +128,9 @@ public class MouseOverlay extends JComponent
   public void keyPressed(final KeyEvent e) {
     if (!this.mapPanel.isMenuVisible()) {
       forEachOverlay(overlay -> {
-        if (overlay instanceof KeyListener) {
+        if (!e.isConsumed() && overlay instanceof KeyListener) {
           final KeyListener listener = (KeyListener)overlay;
           listener.keyPressed(e);
-          if (e.isConsumed()) {
-            return;
-          }
         }
       });
     }
@@ -142,12 +140,9 @@ public class MouseOverlay extends JComponent
   public void keyReleased(final KeyEvent e) {
     if (!this.mapPanel.isMenuVisible()) {
       forEachOverlay(overlay -> {
-        if (overlay instanceof KeyListener) {
+        if (!e.isConsumed() && overlay instanceof KeyListener) {
           final KeyListener listener = (KeyListener)overlay;
           listener.keyReleased(e);
-          if (e.isConsumed()) {
-            return;
-          }
         }
       });
     }
@@ -157,12 +152,9 @@ public class MouseOverlay extends JComponent
   public void keyTyped(final KeyEvent e) {
     if (!this.mapPanel.isMenuVisible()) {
       forEachOverlay(overlay -> {
-        if (overlay instanceof KeyListener) {
+        if (!e.isConsumed() && overlay instanceof KeyListener) {
           final KeyListener listener = (KeyListener)overlay;
           listener.keyTyped(e);
-          if (e.isConsumed()) {
-            return;
-          }
         }
       });
     }
@@ -175,12 +167,9 @@ public class MouseOverlay extends JComponent
     }
     requestFocusInWindow();
     forEachOverlay(overlay -> {
-      if (overlay instanceof MouseListener) {
+      if (!e.isConsumed() && overlay instanceof MouseListener) {
         final MouseListener listener = (MouseListener)overlay;
         listener.mouseClicked(e);
-        if (e.isConsumed()) {
-          return;
-        }
       }
     });
   }
@@ -191,12 +180,9 @@ public class MouseOverlay extends JComponent
       updateEventPoint(e);
       requestFocusInWindow();
       forEachOverlay(overlay -> {
-        if (overlay instanceof MouseMotionListener) {
+        if (!e.isConsumed() && overlay instanceof MouseMotionListener) {
           final MouseMotionListener listener = (MouseMotionListener)overlay;
           listener.mouseDragged(e);
-          if (e.isConsumed()) {
-            return;
-          }
         }
       });
     }
@@ -205,14 +191,11 @@ public class MouseOverlay extends JComponent
   @Override
   public void mouseEntered(final MouseEvent e) {
     updateEventPoint(e);
-    requestFocusInWindow();
+    requestFocusIfNotWindow();
     forEachOverlay(overlay -> {
-      if (overlay instanceof MouseListener) {
+      if (!e.isConsumed() && overlay instanceof MouseListener) {
         final MouseListener listener = (MouseListener)overlay;
         listener.mouseEntered(e);
-        if (e.isConsumed()) {
-          return;
-        }
       }
     });
   }
@@ -227,9 +210,6 @@ public class MouseOverlay extends JComponent
       if (overlay instanceof MouseListener) {
         final MouseListener listener = (MouseListener)overlay;
         listener.mouseExited(event);
-        if (event.isConsumed()) {
-          return;
-        }
       }
     });
   }
@@ -238,16 +218,13 @@ public class MouseOverlay extends JComponent
   public void mouseMoved(final MouseEvent event) {
     if (!this.mapPanel.isMenuVisible()) {
       try {
-        requestFocusInWindow();
+        requestFocusIfNotWindow();
         updateEventPoint(event);
         this.mapPanel.mouseMovedCloseSelected(event);
         forEachOverlay(overlay -> {
-          if (overlay instanceof MouseMotionListener) {
+          if (!event.isConsumed() && overlay instanceof MouseMotionListener) {
             final MouseMotionListener listener = (MouseMotionListener)overlay;
             listener.mouseMoved(event);
-            if (event.isConsumed()) {
-              return;
-            }
           }
         });
       } catch (final RuntimeException e) {
@@ -268,12 +245,9 @@ public class MouseOverlay extends JComponent
       window.requestFocus();
 
       forEachOverlay(overlay -> {
-        if (overlay instanceof MouseListener) {
+        if (!e.isConsumed() && overlay instanceof MouseListener) {
           final MouseListener listener = (MouseListener)overlay;
           listener.mousePressed(e);
-          if (e.isConsumed()) {
-            return;
-          }
         }
       });
     }
@@ -285,12 +259,9 @@ public class MouseOverlay extends JComponent
       requestFocusInWindow();
       updateEventPoint(e);
       forEachOverlay(overlay -> {
-        if (overlay instanceof MouseListener) {
+        if (!e.isConsumed() && overlay instanceof MouseListener) {
           final MouseListener listener = (MouseListener)overlay;
           listener.mouseReleased(e);
-          if (e.isConsumed()) {
-            return;
-          }
         }
       });
     }
@@ -301,15 +272,21 @@ public class MouseOverlay extends JComponent
     if (!this.mapPanel.isMenuVisible()) {
       updateEventPoint(e);
       forEachOverlay(overlay -> {
-        if (overlay instanceof MouseWheelListener) {
+        if (!e.isConsumed() && overlay instanceof MouseWheelListener) {
           final MouseWheelListener listener = (MouseWheelListener)overlay;
           listener.mouseWheelMoved(e);
-          if (e.isConsumed()) {
-            return;
-          }
         }
       });
     }
+  }
+
+  public boolean requestFocusIfNotWindow() {
+    final Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager()
+      .getFocusOwner();
+    if (SwingUtil.getWindowAncestor(focusOwner) != SwingUtil.getWindowAncestor(this)) {
+      return super.requestFocusInWindow();
+    }
+    return true;
   }
 
   private void updateEventPoint(final MouseEvent e) {

@@ -673,9 +673,15 @@ public class Graphics2DViewRenderer extends ViewRenderer {
                 graphics.rotate(-Math.toRadians(orientation), 0, 0);
               }
               graphics.translate(dx, dy);
-              for (final String line : lines) {
+              for (int i = 0; i < lines.length; i++) {
+                final String line = lines[i];
                 graphics.translate(0, ascent);
-                final AffineTransform lineTransform = graphics.getTransform();
+                final AffineTransform lineTransform;
+                if (i == lines.length - 1) {
+                  lineTransform = null;
+                } else {
+                  lineTransform = graphics.getTransform();
+                }
                 final Rectangle2D bounds = fontMetrics.getStringBounds(line, graphics);
                 final double width = bounds.getWidth();
                 final double height = bounds.getHeight();
@@ -733,8 +739,10 @@ public class Graphics2DViewRenderer extends ViewRenderer {
                   graphics.drawString(line, (float)0, (float)0);
                 }
 
-                graphics.setTransform(lineTransform);
-                graphics.translate(0, leading + descent);
+                if (lineTransform != null) {
+                  graphics.setTransform(lineTransform);
+                  graphics.translate(0, leading + descent);
+                }
               }
             } finally {
               graphics.setPaint(paint);

@@ -69,15 +69,6 @@ public class AbstractTableModelColumn implements TableModelColumn {
   }
 
   @Override
-  public BaseJPopupMenu getHeaderMenu() {
-    if (this.headerMenuFactory == null) {
-      return null;
-    } else {
-      return this.headerMenuFactory.newJPopupMenu();
-    }
-  }
-
-  @Override
   public synchronized MenuFactory getHeaderMenuFactory() {
     if (this.headerMenuFactory == null) {
       this.headerMenuFactory = new MenuFactory(this.columnName);

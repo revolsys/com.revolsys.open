@@ -8,7 +8,7 @@ import java.util.function.Function;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 
-import com.revolsys.swing.menu.BaseJPopupMenu;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJTable;
 
@@ -122,8 +122,8 @@ public class LambdaRowTableModel<R> extends AbstractTableModel {
   }
 
   @Override
-  public BaseJPopupMenu getHeaderMenu(final int columnIndex) {
-    return getColumn(columnIndex).getHeaderMenu();
+  public MenuFactory getHeaderMenuFactory(final int columnIndex) {
+    return getColumn(columnIndex).getHeaderMenuFactory();
   }
 
   public R getRow(final int rowIndex) {

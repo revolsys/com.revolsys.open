@@ -9,90 +9,121 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.Closeable;
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.collection.EmptyReference;
 import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.menu.MenuSourceHolder;
 import com.revolsys.swing.table.lambda.column.ColumnBasedTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
 public class TablePanel extends JPanel implements MouseListener, Closeable {
-  private static int eventColumn;
+  protected class TablePanelEventSource extends MenuSourceHolder {
+    private int row;
 
-  private static int eventRow;
+    private int column;
 
-  private static Reference<BaseJTable> eventTable = new WeakReference<>(null);
+    private TablePanelEventSource(final int column, final MouseEvent event, final Object source) {
+      super(source, event);
+      this.row = -1;
+      this.column = column;
+    }
 
-  private static Reference<MouseEvent> popupMouseEvent = new WeakReference<>(null);
+    protected TablePanelEventSource(final MouseEvent event, final Object source) {
+      super(source, event);
+      if (event.getSource() == TablePanel.this.table) {
+        final Point point = event.getPoint();
+        this.row = TablePanel.this.table.rowAtPoint(point);
+        if (this.row > -1) {
+          this.row = TablePanel.this.table.convertRowIndexToModel(this.row);
+        }
+        this.column = TablePanel.this.table.columnAtPoint(point);
+        if (this.column > -1) {
+
+          this.column = TablePanel.this.table.convertColumnIndexToModel(this.column);
+        }
+        if (event.getButton() == MouseEvent.BUTTON3) {
+          if (TablePanel.this.table.isEditing()) {
+            TablePanel.this.table.getCellEditor().stopCellEditing();
+          }
+        }
+      }
+    }
+
+    public TablePanelEventSource(final Object source) {
+      super(source);
+      this.row = -1;
+      this.column = -1;
+    }
+
+    public int getColumn() {
+      return this.column;
+    }
+
+    public int getRow() {
+      return this.row;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends BaseJTable> T getTable() {
+      return (T)TablePanel.this.table;
+    }
+  }
 
   private static final long serialVersionUID = 1L;
 
   public static int getEventColumn() {
-    return eventColumn;
-  }
-
-  public static int getEventRow() {
-    return eventRow;
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <V extends JTable> V getEventTable() {
-    return (V)eventTable.get();
-  }
-
-  public static MouseEvent getPopupMouseEvent() {
-    return popupMouseEvent.get();
-  }
-
-  protected static void setEventRow(final BaseJTable table, final MouseEvent e) {
-    if (e.getSource() == table) {
-      final Point point = e.getPoint();
-      eventTable = new WeakReference<>(table);
-      final int eventRow = table.rowAtPoint(point);
-      final int eventColumn = table.columnAtPoint(point);
-      if (eventRow > -1 && eventColumn > -1) {
-        TablePanel.eventRow = table.convertRowIndexToModel(eventRow);
-        TablePanel.eventColumn = table.convertColumnIndexToModel(eventColumn);
-
-        if (e.getButton() == MouseEvent.BUTTON3) {
-          if (table.isEditing()) {
-            table.getCellEditor().stopCellEditing();
-          }
-        }
-      } else {
-        TablePanel.eventRow = -1;
-        TablePanel.eventColumn = -1;
-      }
+    final TablePanelEventSource holder = getEventHolder();
+    if (holder == null) {
+      return -1;
+    } else {
+      return holder.column;
     }
   }
 
-  protected static void setHeaderEventColumn(final BaseJTable table, final JTableHeader tableHeader,
-    final MouseEvent e) {
-    final Object source = e.getSource();
-    if (source == tableHeader) {
-      final Point point = e.getPoint();
-      eventTable = new WeakReference<>(table);
-      final int modelColumn = tableHeader.columnAtPoint(point);
-      TablePanel.eventRow = -1;
-      if (modelColumn > -1) {
-        TablePanel.eventColumn = table.convertColumnIndexToModel(modelColumn);
-      } else {
-        TablePanel.eventColumn = -1;
-      }
+  private static TablePanelEventSource getEventHolder() {
+    final MenuSourceHolder menuSourceHolder = MenuFactory.getMenuSourceHolder();
+    if (menuSourceHolder instanceof TablePanelEventSource) {
+      return (TablePanelEventSource)menuSourceHolder;
+
+    }
+    return null;
+  }
+
+  public static int getEventRow() {
+    final TablePanelEventSource holder = getEventHolder();
+    if (holder == null) {
+      return -1;
+    } else {
+      return holder.row;
+    }
+  }
+
+  public static <V extends BaseJTable> V getEventTable() {
+    final TablePanelEventSource holder = getEventHolder();
+    if (holder == null) {
+      return null;
+    } else {
+      return holder.getTable();
+    }
+  }
+
+  public static MouseEvent getPopupMouseEvent() {
+    final TablePanelEventSource holder = getEventHolder();
+    if (holder == null) {
+      return null;
+    } else {
+      return holder.getEvent();
     }
   }
 
@@ -122,10 +153,6 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
 
   public TablePanel(final BaseJTable table) {
     super(new BorderLayout());
-    eventRow = -1;
-    eventColumn = -1;
-    eventTable = new EmptyReference<>();
-    popupMouseEvent = new EmptyReference<>();
     this.table = table;
     final AbstractTableModel model = (AbstractTableModel)table.getModel();
     add(this.toolBar, BorderLayout.NORTH);
@@ -169,6 +196,8 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
   }
 
   private void copyCurrentCell() {
+    final int eventRow = getEventRow();
+    final int eventColumn = getEventColumn();
     final TableModel model = getTableModel();
     final Object value = model.getValueAt(eventRow, eventColumn);
 
@@ -201,53 +230,67 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
     copyCurrentCell();
     if (isCurrentCellEditable()) {
       final TableModel tableModel = getTableModel();
+      final int eventRow = getEventRow();
+      final int eventColumn = getEventColumn();
       tableModel.setValueAt(null, eventRow, eventColumn);
     }
   }
 
   protected void doHeaderMenu(final MouseEvent e) {
-    setHeaderEventColumn(this.table, this.table.getTableHeader(), e);
-    if (eventColumn > -1 && e.isPopupTrigger()) {
+    final Object source = e.getSource();
+    final JTableHeader tableHeader = this.table.getTableHeader();
+    if (e.isPopupTrigger() && source == tableHeader) {
       e.consume();
-      final BaseJPopupMenu menu = getHeaderMenu(eventColumn);
-      if (menu != null) {
-        final TableCellEditor cellEditor = this.table.getCellEditor();
-        if (cellEditor != null) {
-          cellEditor.stopCellEditing();
-        }
-        popupMouseEvent = new WeakReference<>(e);
+      final Point point = e.getPoint();
+      final int eventColumn = tableHeader.columnAtPoint(point);
+      if (eventColumn > -1) {
+        final int column = this.table.convertColumnIndexToModel(eventColumn);
         final Object menuSource = getHeaderMenuSource();
-        final int x = e.getX();
-        final int y = e.getY();
-        menu.showMenu(menuSource, this.table, x, y);
+        try (
+          final TablePanelEventSource menuSourceHolder = new TablePanelEventSource(column, e,
+            menuSource)) {
+          if (column > -1) {
+            final TableCellEditor cellEditor = this.table.getCellEditor();
+            if (cellEditor != null) {
+              cellEditor.stopCellEditing();
+            }
+
+            BaseJPopupMenu.showMenu(() -> getHeaderMenu(column), menuSourceHolder, this.table, e);
+          }
+        }
       }
+
     }
   }
 
   protected void doMenu(final MouseEvent e) {
-    setEventRow(this.table, e);
-    if (eventRow > -1 && e.isPopupTrigger()) {
-      e.consume();
-      final AbstractTableModel tableModel = getTableModel();
+    if (e.isPopupTrigger()) {
       final Object menuSource = getMenuSource();
-      MenuFactory.setMenuSource(menuSource);
-      final BaseJPopupMenu menu = tableModel.getMenu(eventRow, eventColumn);
-      if (menu != null) {
-        final TableCellEditor cellEditor = this.table.getCellEditor();
-        if (cellEditor == null || cellEditor.stopCellEditing()) {
-          popupMouseEvent = new WeakReference<>(e);
-          final Component component = e.getComponent();
-          if (component == this.table) {
-            final int x = e.getX();
-            final int y = e.getY();
-            menu.showMenu(menuSource, this.table, x + 5, y);
-          } else {
-            final int xOnScreen = e.getXOnScreen();
-            final int yOnScreen = e.getYOnScreen();
-            final Point locationOnScreen = getLocationOnScreen();
-            final int x = xOnScreen - locationOnScreen.x;
-            final int y = yOnScreen - locationOnScreen.y;
-            menu.showMenu(menuSource, this, x + 5, y);
+      try (
+        final TablePanelEventSource menuSourceHolder = new TablePanelEventSource(e, menuSource)) {
+        final int eventRow = menuSourceHolder.getRow();
+        final int eventColumn = menuSourceHolder.getColumn();
+        if (eventRow > -1) {
+          e.consume();
+          final AbstractTableModel tableModel = getTableModel();
+          final BaseJPopupMenu menu = tableModel.getMenu(eventRow, eventColumn);
+          if (menu != null) {
+            final TableCellEditor cellEditor = this.table.getCellEditor();
+            if (cellEditor == null || cellEditor.stopCellEditing()) {
+              final Component component = e.getComponent();
+              if (component == this.table) {
+                final int x = e.getX();
+                final int y = e.getY();
+                menu.showMenu(menuSourceHolder, this.table, x + 5, y);
+              } else {
+                final int xOnScreen = e.getXOnScreen();
+                final int yOnScreen = e.getYOnScreen();
+                final Point locationOnScreen = getLocationOnScreen();
+                final int x = xOnScreen - locationOnScreen.x;
+                final int y = yOnScreen - locationOnScreen.y;
+                menu.showMenu(menuSourceHolder, this, x + 5, y);
+              }
+            }
           }
         }
       }
@@ -258,15 +301,24 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
     return this.headerMenu;
   }
 
-  public BaseJPopupMenu getHeaderMenu(final int eventColumn) {
+  protected BaseJPopupMenu getHeaderMenu(final int eventColumn) {
+    final MenuFactory menuFactory = getHeaderMenuFactory(eventColumn);
+    if (menuFactory == null) {
+      return null;
+    } else {
+      return menuFactory.newJPopupMenu();
+    }
+  }
+
+  public MenuFactory getHeaderMenuFactory(final int eventColumn) {
     final AbstractTableModel tableModel = getTableModel();
     if (tableModel != null) {
-      final BaseJPopupMenu menu = tableModel.getHeaderMenu(eventColumn);
-      if (menu != null) {
-        return menu;
+      final MenuFactory menuFactory = tableModel.getHeaderMenuFactory(eventColumn);
+      if (menuFactory != null) {
+        return menuFactory;
       }
     }
-    return this.headerMenu.newJPopupMenu();
+    return this.headerMenu;
   }
 
   protected Object getHeaderMenuSource() {
@@ -314,6 +366,8 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
   }
 
   public boolean isCurrentCellEditable() {
+    final int eventRow = getEventRow();
+    final int eventColumn = getEventColumn();
     if (eventRow > -1 && eventColumn > -1) {
       return getTableModel().isCellEditable(eventRow, eventColumn);
     }
@@ -321,6 +375,8 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
   }
 
   public boolean isCurrentCellHasValue() {
+    final int eventRow = getEventRow();
+    final int eventColumn = getEventColumn();
     if (isEditingCurrentCell()) {
       return true;
     } else if (eventRow > -1 && eventColumn > -1) {
@@ -337,6 +393,8 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
 
   public boolean isEditingCurrentCell() {
     if (isEditing()) {
+      final int eventRow = getEventRow();
+      final int eventColumn = getEventColumn();
       if (eventRow > -1 && eventRow == this.table.getEditingRow()) {
         if (eventColumn > -1 && eventColumn == this.table.getEditingColumn()) {
           return true;
@@ -360,7 +418,6 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
 
   @Override
   public void mousePressed(final MouseEvent e) {
-    setEventRow(this.table, e);
     doMenu(e);
   }
 
@@ -378,6 +435,8 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
     final String value = ClipboardUtil.getContents(DataFlavor.stringFlavor);
     if (Property.hasValue(value)) {
       final TableModel tableModel = getTableModel();
+      final int eventRow = getEventRow();
+      final int eventColumn = getEventColumn();
       if (tableModel.isCellEditable(eventRow, eventColumn)) {
         tableModel.setValueAt(value, eventRow, eventColumn);
       }

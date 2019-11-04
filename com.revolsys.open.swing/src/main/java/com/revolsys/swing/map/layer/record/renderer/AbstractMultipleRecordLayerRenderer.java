@@ -66,7 +66,7 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     menu.addMenuItem("convert", -1, name, iconName, enabledFilter, consumer, false);
   }
 
-  private List<AbstractRecordLayerRenderer> renderers = new ArrayList<>();
+  protected List<AbstractRecordLayerRenderer> renderers = new ArrayList<>();
 
   public AbstractMultipleRecordLayerRenderer(final String type, final AbstractRecordLayer layer,
     final LayerRenderer<?> parent) {
@@ -188,6 +188,10 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     return records;
   }
 
+  public int getRendererCount() {
+    return this.renderers.size();
+  }
+
   @Override
   public List<AbstractRecordLayerRenderer> getRenderers() {
     synchronized (this.renderers) {
@@ -207,7 +211,13 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
   @Override
   public boolean isVisible(final LayerRecord record) {
     if (super.isVisible() && super.isVisible(record)) {
-      for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
+      for (int i = 0; i < this.renderers.size(); i++) {
+        final AbstractRecordLayerRenderer renderer;
+        try {
+          renderer = this.renderers.get(i);
+        } catch (final ArrayIndexOutOfBoundsException e) {
+          return false;
+        }
         if (renderer.isVisible(record)) {
           return true;
         }

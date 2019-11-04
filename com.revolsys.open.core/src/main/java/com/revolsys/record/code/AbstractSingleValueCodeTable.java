@@ -83,7 +83,8 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
   @Override
   public Identifier getIdentifier(final List<Object> values) {
     if (values.size() == 1) {
-      return getIdentifier(values.get(0));
+      final Object value = values.get(0);
+      return getIdentifier(value);
     } else {
       return null;
     }
@@ -96,10 +97,11 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
 
   @Override
   public Identifier getIdentifier(final Object... values) {
-    if (values == null || values.length != 1) {
-      return null;
+    if (values != null && values.length == 1) {
+      final Object value = values[0];
+      return getIdentifier(value);
     } else {
-      return getIdentifier(values[0]);
+      return null;
     }
   }
 
@@ -130,12 +132,31 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
   }
 
   @Override
-  public Identifier getIdExact(final List<Object> values, final boolean loadValues) {
-    Identifier id = this.valueIdCache.get(values);
-    if (id == null && loadValues) {
+  public Identifier getIdExact(final List<Object> values) {
+    if (values.size() == 1) {
+      final Object value = values.get(0);
+      return getIdExact(value);
+    }
+    return null;
+  }
+
+  @Override
+  public Identifier getIdExact(final Object... values) {
+    if (values != null && values.length == 1) {
+      final Object value = values[0];
+      return super.getIdExact(value);
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public Identifier getIdExact(final Object value) {
+    Identifier id = this.valueIdCache.get(value);
+    if (id == null) {
       synchronized (this) {
-        id = loadId(values, false);
-        return this.valueIdCache.get(values);
+        id = loadId(value, false);
+        return this.valueIdCache.get(value);
       }
     }
     return id;

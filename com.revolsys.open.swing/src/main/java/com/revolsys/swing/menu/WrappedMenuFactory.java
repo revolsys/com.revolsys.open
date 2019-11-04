@@ -1,6 +1,7 @@
 package com.revolsys.swing.menu;
 
 import java.awt.Component;
+import java.util.function.Supplier;
 
 import javax.swing.Icon;
 import javax.swing.JMenuItem;
@@ -8,18 +9,18 @@ import javax.swing.JMenuItem;
 import com.revolsys.swing.component.ComponentFactory;
 
 public class WrappedMenuFactory implements ComponentFactory<JMenuItem> {
-  private final MenuFactory menuFactory;
+  private final Supplier<MenuFactory> menuSupplier;
 
   private final String name;
 
-  public WrappedMenuFactory(final String name, final MenuFactory menuFactory) {
+  public WrappedMenuFactory(final String name, final Supplier<MenuFactory> menuSupplier) {
     this.name = name;
-    this.menuFactory = menuFactory;
+    this.menuSupplier = menuSupplier;
   }
 
   @Override
   public ComponentFactory<?> clone() {
-    return new WrappedMenuFactory(this.name, this.menuFactory);
+    return new WrappedMenuFactory(this.name, this.menuSupplier);
   }
 
   @Override
@@ -48,7 +49,7 @@ public class WrappedMenuFactory implements ComponentFactory<JMenuItem> {
 
   @Override
   public JMenuItem newComponent() {
-    return this.menuFactory.newJMenu(this.name, false);
+    return this.menuSupplier.get().newJMenu(this.name, false);
   }
 
   @Override
