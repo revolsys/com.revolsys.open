@@ -458,31 +458,28 @@ public class RecordLayerTableModel extends RecordRowTableModel
     setFieldNames(fieldNamesSet);
   }
 
-  public void setFilter(final Condition filter) {
-    Invoke.later(() -> {
-      final Condition filter2;
+  public void setFilter(Condition filter) {
+    if (Invoke.swingThread(this::setFilter, filter)) {
       if (filter == null) {
-        filter2 = Condition.ALL;
-      } else {
-        filter2 = filter;
+        filter = Condition.ALL;
       }
-      if (!DataType.equal(filter2, this.filter)) {
+      if (!DataType.equal(filter, this.filter)) {
         final Object oldValue = this.filter;
-        this.filter = filter2;
-        if (Property.isEmpty(filter2)) {
+        this.filter = filter;
+        if (Property.isEmpty(filter)) {
           this.rowFilterCondition = null;
         } else {
-          this.rowFilterCondition = new RecordRowPredicateRowFilter(filter2);
-          if (!DataType.equal(oldValue, filter2)) {
-            this.filterHistory.remove(filter2);
-            this.filterHistory.addFirst(filter2);
+          this.rowFilterCondition = new RecordRowPredicateRowFilter(filter);
+          if (!DataType.equal(oldValue, filter)) {
+            this.filterHistory.remove(filter);
+            this.filterHistory.addFirst(filter);
             while (this.filterHistory.size() > 20) {
               this.filterHistory.removeLast();
             }
             firePropertyChange("hasFilterHistory", false, true);
           }
         }
-        if (this.layer.isShowAllRecordsOnFilter() && !filter2.isEmpty()) {
+        if (this.layer.isShowAllRecordsOnFilter() && !filter.isEmpty()) {
           final TableRecordsMode modeAll = getTableRecordsMode(MODE_RECORDS_ALL);
           setTableRecordsMode(modeAll);
         }
@@ -497,7 +494,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
         final boolean hasFilter = isHasFilter();
         firePropertyChange("hasFilter", !hasFilter, hasFilter);
       }
-    });
+    }
   }
 
   public void setFilterByBoundingBox(boolean filterByBoundingBox) {
@@ -614,7 +611,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   public void setTableRecordsMode(final TableRecordsMode tableRecordsMode) {
-    Invoke.later(() -> {
+    if (Invoke.swingThread(this::setTableRecordsMode, tableRecordsMode)) {
       final TableRecordsMode oldMode = this.tableRecordsMode;
       final RecordLayerTable table = getTable();
       if (table != null && tableRecordsMode != null && tableRecordsMode != oldMode) {
@@ -654,7 +651,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
         firePropertyChange("filterByBoundingBoxSupported", !filterByBoundingBoxSupported,
           filterByBoundingBoxSupported);
       }
-    });
+    }
   }
 
   public void setUseRecordMenu(final boolean useRecordMenu) {

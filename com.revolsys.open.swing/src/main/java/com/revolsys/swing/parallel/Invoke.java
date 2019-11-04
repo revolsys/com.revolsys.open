@@ -200,6 +200,24 @@ public class Invoke {
     }
   }
 
+  public static <V> boolean swingThread(final Consumer<V> action, final V arg) {
+    if (SwingUtilities.isEventDispatchThread()) {
+      return true;
+    } else {
+      SwingUtilities.invokeLater(() -> action.accept(arg));
+      return false;
+    }
+  }
+
+  public static boolean swingThread(final Runnable action) {
+    if (SwingUtilities.isEventDispatchThread()) {
+      return true;
+    } else {
+      SwingUtilities.invokeLater(action);
+      return false;
+    }
+  }
+
   public static void worker(final SwingWorker<? extends Object, ? extends Object> worker) {
     boolean execute = true;
     final List<SwingWorker<?, ?>> oldWorkers;

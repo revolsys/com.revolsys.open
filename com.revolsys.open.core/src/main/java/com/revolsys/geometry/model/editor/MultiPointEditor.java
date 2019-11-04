@@ -110,6 +110,11 @@ public class MultiPointEditor extends AbstractGeometryCollectionEditor<Punctual,
     }
   }
 
+  @Override
+  public boolean hasPoint(final double x, final double y) {
+    return this.punctual.hasPoint(x, y);
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <GE extends Geometry> GE newGeometryEmpty() {

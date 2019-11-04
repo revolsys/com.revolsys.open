@@ -157,6 +157,17 @@ public interface Punctual extends Geometry {
     return getCoordinate(partIndex, Z);
   }
 
+  default boolean hasPoint(final double x, final double y) {
+    return false;
+  }
+
+  default boolean hasPoint(final Point point) {
+    final Point convertedPoint = point.convertPoint2d(this);
+    final double x = convertedPoint.getX();
+    final double y = convertedPoint.getY();
+    return hasPoint(x, y);
+  }
+
   @Override
   Punctual newGeometry(final GeometryFactory geometryFactory);
 

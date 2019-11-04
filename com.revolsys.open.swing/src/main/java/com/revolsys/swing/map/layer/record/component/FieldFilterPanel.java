@@ -204,7 +204,7 @@ public class FieldFilterPanel extends JComponent
   }
 
   public void clear() {
-    Invoke.later(() -> {
+    if (Invoke.swingThread(this::clear)) {
       try (
         BaseCloseable settingFilter = this.settingFilter.closeable(true)) {
         String searchField = this.previousSearchFieldName;
@@ -214,7 +214,7 @@ public class FieldFilterPanel extends JComponent
         setSearchFieldName(searchField);
         setFilter(Condition.ALL);
       }
-    });
+    }
   }
 
   public void close() {
@@ -335,7 +335,7 @@ public class FieldFilterPanel extends JComponent
 
   public void setFilter(final Condition filter) {
     if (!this.fieldNames.isEmpty()) {
-      Invoke.later(() -> {
+      if (Invoke.swingThread(this::setFilter, filter)) {
         try (
           BaseCloseable settingFilter = this.settingFilter.closeable(true)) {
           setSearchFilter(filter);
@@ -449,7 +449,7 @@ public class FieldFilterPanel extends JComponent
             this.searchFieldPanel.setVisible(false);
           }
         }
-      });
+      }
     }
   }
 

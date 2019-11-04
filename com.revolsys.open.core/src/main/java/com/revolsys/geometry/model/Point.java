@@ -898,6 +898,11 @@ public interface Point extends Punctual, Serializable, BoundingBox {
   }
 
   @Override
+  default boolean hasPoint(final double x, final double y) {
+    return equalsVertex(x, y);
+  }
+
+  @Override
   default Geometry intersectionBbox(final BoundingBox boundingBox) {
     notNullSameCs(boundingBox);
     if (bboxCoveredBy(boundingBox)) {

@@ -227,6 +227,16 @@ public class MultiPointImpl implements MultiPoint {
   }
 
   @Override
+  public boolean hasPoint(final double x, final double y) {
+    for (final Point point : this.points) {
+      if (point.hasPoint(x, y)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   public boolean isEmpty() {
     return false;
   }
