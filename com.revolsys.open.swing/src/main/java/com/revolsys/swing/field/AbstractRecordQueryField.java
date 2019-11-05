@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -188,7 +189,10 @@ public abstract class AbstractRecordQueryField extends ValueField
 
   @Override
   public void focusGained(final FocusEvent e) {
-    showMenu();
+    final Object source = e.getSource();
+    if (!(source instanceof JComponent) && ((JComponent)source).getParent() != this) {
+      showMenu();
+    }
   }
 
   @Override
@@ -514,6 +518,7 @@ public abstract class AbstractRecordQueryField extends ValueField
 
   protected void setSearchResults(final int searchIndex, final Collection<Record> records,
     final Record selectedRecord) {
+
     Invoke.later(() -> {
       if (searchIndex == this.searchIndex.get()) {
         this.busyLabel.setBusy(false);
@@ -558,10 +563,6 @@ public abstract class AbstractRecordQueryField extends ValueField
         y = componentHeight;
 
       }
-      // } else {
-      // x = this.getWidth();
-      // y = 0;
-      // }
       this.menu.show(this, x, y);
       this.menu.pack();
     }
