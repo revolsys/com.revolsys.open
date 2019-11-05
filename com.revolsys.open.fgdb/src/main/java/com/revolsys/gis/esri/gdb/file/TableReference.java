@@ -42,9 +42,15 @@ public class TableReference extends CloseableValueHolder<Table> {
   }
 
   private class EsriFileGdbTableLock implements TableWrapper {
+    private final boolean loadOnly;
+
+    public EsriFileGdbTableLock(final boolean loadOnly) {
+      this.loadOnly = loadOnly;
+    }
+
     @Override
     public void close() {
-      writeUnlock();
+      writeUnlock(this.loadOnly);
     }
 
     @Override
@@ -63,9 +69,13 @@ public class TableReference extends CloseableValueHolder<Table> {
     }
   };
 
-  private final TableWrapper locker = new EsriFileGdbTableLock();
+  private final TableWrapper locker = new EsriFileGdbTableLock(false);
+
+  private final TableWrapper lockerLoadOnly = new EsriFileGdbTableLock(true);
 
   private int lockCount = 0;
+
+  private int loadOnlyCount = 0;
 
   private final String catalogPath;
 
@@ -237,23 +247,38 @@ public class TableReference extends CloseableValueHolder<Table> {
     this.lockCount++;
     if (!locked) {
       this.recordStore.lockTable(table);
-      if (loadOnlyMode) {
+
+    }
+    if (loadOnlyMode) {
+      if (++this.loadOnlyCount == 1) {
         table.setLoadOnlyMode(true);
       }
+      return this.lockerLoadOnly;
+    } else {
+      return this.locker;
     }
-    return this.locker;
   }
 
-  private synchronized void writeUnlock() {
+  private synchronized void writeUnlock(final boolean loadOnly) {
     try {
       if (!isClosed()) {
-        final boolean locked = this.lockCount > 0;
+        final Table table = this.value;
+        if (loadOnly) {
+          final boolean wasLoadOnly = this.loadOnlyCount > 0;
+          this.loadOnlyCount--;
+          if (this.loadOnlyCount <= 0) {
+            this.loadOnlyCount = 0;
+            if (table != null && wasLoadOnly) {
+              table.setLoadOnlyMode(false);
+            }
+          }
+        }
+
+        final boolean wasLocked = this.lockCount > 0;
         this.lockCount--;
         if (this.lockCount <= 0) {
           this.lockCount = 0;
-          final Table table = this.value;
-          if (table != null && locked) {
-            table.setLoadOnlyMode(false);
+          if (table != null && wasLocked) {
             this.recordStore.unlockTable(table);
           }
         }

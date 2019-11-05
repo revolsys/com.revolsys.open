@@ -602,6 +602,15 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
+  public TableWrapper getTableLocked(final PathName path) {
+    final TableReference table = getTableReference(path);
+    if (table == null) {
+      return null;
+    } else {
+      return table.writeLock(false);
+    }
+  }
+
   public TableWrapper getTableLocked(final RecordDefinition recordDefinition,
     final boolean loadOnlyMode) {
     final TableReference table = getTableReference(recordDefinition);
@@ -1224,7 +1233,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   void unlockTable(final Table table) {
     synchronized (this.geodatabase) {
       synchronized (API_SYNC) {
-        table.setWriteLock(); // Sometimes FGDB loses the lock
+        // table.setWriteLock(); // Sometimes FGDB loses the lock
         table.freeWriteLock();
       }
     }
@@ -1240,16 +1249,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
   }
 
-  // TODO
-  // public <R> R withTable(final PathNameProxy pathName, final
-  // Function<TableWrapper, R> action,
-  // final R defaultValue) {
-  // final TableWrapper table = getTable(pathName);
-  // if (table != null) {
-  // // table.valueFunctionSync(action, defaultValue);
-  // }
-  // }
-
   public BaseCloseable writeLock(final PathName path) {
     final TableReference table = getTableReference(path);
     if (table == null) {
@@ -1257,27 +1256,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     } else {
       return table.writeLock(false);
     }
-  }
-
-  public BaseCloseable writeLock(final RecordDefinitionProxy recordDefinition) {
-    if (recordDefinition != null) {
-      final PathName pathName = recordDefinition.getPathName();
-      if (pathName != null) {
-        return new BaseCloseable() {
-          private BaseCloseable wrapper = writeLock(pathName);
-
-          @Override
-          public synchronized void close() {
-            if (this.wrapper != null) {
-              this.wrapper.close();
-              this.wrapper = null;
-            }
-          }
-        };
-      }
-    }
-    return () -> {
-    };
   }
 
 }
