@@ -2488,6 +2488,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             final String geometryFieldName = getGeometryFieldName();
             if (propertyName.equals(geometryFieldName)) {
               this.recordCacheIndex.clearIndex();
+              this.recordCacheSelected.clearIndex();
             }
           }
         }
@@ -2888,6 +2889,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @Override
   protected GeometryFactory setGeometryFactoryDo(final GeometryFactory geometryFactory) {
     this.recordCacheIndex.setGeometryFactory(geometryFactory);
+    this.recordCacheSelected.setGeometryFactory(geometryFactory);
     return super.setGeometryFactoryDo(geometryFactory);
   }
 
