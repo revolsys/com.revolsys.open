@@ -696,7 +696,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   protected boolean modeAddGeometryFinish(final MouseEvent event) {
     final int button = event.getButton();
     if (isOverlayAction(ACTION_ADD_GEOMETRY)) {
-      if (button == MouseEvent.BUTTON3) {
+      if (button == MouseEvent.BUTTON3 && !event.isAltDown()) {
         this.addGeometryAddVertexActive = false;
         clearXor();
       } else if (button == MouseEvent.BUTTON1) {

@@ -1,15 +1,22 @@
 package com.revolsys.swing.menu;
 
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Window;
 import java.awt.event.MouseEvent;
 import java.util.function.Supplier;
 
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
+
+import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
@@ -28,11 +35,11 @@ public class BaseJPopupMenu extends JPopupMenu {
     return menu;
   }
 
-  public static void showMenu(final Supplier<BaseJPopupMenu> menuConstructor,
+  public static BaseJPopupMenu showMenu(final Supplier<BaseJPopupMenu> menuConstructor,
     final MenuSourceHolder menuSourceHolder, final Component component, final MouseEvent event) {
     final int x = event.getX();
     final int y = event.getY();
-    showMenu(menuConstructor, menuSourceHolder, component, x, y);
+    return showMenu(menuConstructor, menuSourceHolder, component, x, y);
   }
 
   public static BaseJPopupMenu showMenu(final Supplier<BaseJPopupMenu> menuConstructor,
@@ -40,6 +47,14 @@ public class BaseJPopupMenu extends JPopupMenu {
     try (
       MenuSourceHolder menuSourceHolder = new MenuSourceHolder(menuSource)) {
       return showMenu(menuConstructor, menuSourceHolder, component, x, y);
+    }
+  }
+
+  public static BaseJPopupMenu showMenu(final Supplier<BaseJPopupMenu> menuConstructor,
+    final Object menuSource, final Component component, final MouseEvent event) {
+    try (
+      MenuSourceHolder menuSourceHolder = new MenuSourceHolder(menuSource)) {
+      return showMenu(menuConstructor, menuSourceHolder, component, event);
     }
   }
 
@@ -58,6 +73,21 @@ public class BaseJPopupMenu extends JPopupMenu {
     final JMenuItem menuItem = RunnableAction.newMenuItem(title, iconName, runnable);
     add(menuItem);
     return menuItem;
+  }
+
+  public void addTitle(final String title) {
+    final JMenuItem menuItem = new JMenuItem();
+    final JLabel titleLabel = new JLabel(title);
+    titleLabel.setFont(menuItem.getFont().deriveFont(Font.BOLD));
+    titleLabel.setBackground(menuItem.getBackground());
+    titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    titleLabel.setHorizontalTextPosition(SwingConstants.CENTER);
+    final JPanel labelPanel = new JPanel(new VerticalLayout());
+    labelPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+    labelPanel.setOpaque(false);
+    labelPanel.add(titleLabel);
+    add(labelPanel, 0);
+    add(new JPopupMenu.Separator(), 1);
   }
 
   public void showMenu(final Component component, final int x, final int y) {

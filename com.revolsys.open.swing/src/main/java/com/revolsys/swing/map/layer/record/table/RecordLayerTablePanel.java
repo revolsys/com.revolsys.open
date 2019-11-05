@@ -2,7 +2,6 @@ package com.revolsys.swing.map.layer.record.table;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -17,18 +16,13 @@ import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JToggleButton;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.table.TableCellEditor;
 
-import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
@@ -248,18 +242,7 @@ public class RecordLayerTablePanel extends TablePanel
   protected BaseJPopupMenu getHeaderMenu(final int columnIndex) {
     final BaseJPopupMenu headerMenu = super.getHeaderMenu(columnIndex);
     final String columnName = this.tableModel.getColumnName(columnIndex);
-    final JMenuItem menuItem = new JMenuItem();
-    final JLabel title = new JLabel(columnName);
-    title.setFont(menuItem.getFont().deriveFont(Font.BOLD));
-    title.setBackground(menuItem.getBackground());
-    title.setHorizontalAlignment(SwingConstants.CENTER);
-    title.setHorizontalTextPosition(SwingConstants.CENTER);
-    final JPanel labelPanel = new JPanel(new VerticalLayout());
-    labelPanel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
-    labelPanel.setOpaque(false);
-    labelPanel.add(title);
-    headerMenu.add(labelPanel, 0);
-    headerMenu.add(new JPopupMenu.Separator(), 1);
+    headerMenu.addTitle(columnName);
     return headerMenu;
   }
 

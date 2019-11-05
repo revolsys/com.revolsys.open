@@ -137,8 +137,8 @@ public class FileGdbWriter extends AbstractRecordWriter {
           this.tablesByPathName.put(fileGdbPathName, table);
         }
       }
+      return table;
     }
-    return this.table;
   }
 
   public boolean isClosed() {
@@ -158,7 +158,10 @@ public class FileGdbWriter extends AbstractRecordWriter {
   public void write(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final TableWrapper table = getTable(recordDefinition);
-    if (table != null) {
+    if (table == null) {
+      throw new IllegalArgumentException(
+        getRecordStore() + " doesn't have table " + recordDefinition);
+    } else {
       if (recordDefinition.equalsRecordStore(this.recordStore)) {
         switch (record.getState()) {
           case NEW:

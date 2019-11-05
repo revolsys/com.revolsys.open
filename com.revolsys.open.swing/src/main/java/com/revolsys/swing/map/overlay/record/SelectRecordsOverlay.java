@@ -203,10 +203,18 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   private boolean modePopupMenu(final MouseEvent event) {
     if (event.isPopupTrigger()) {
       final MapPanel map = getMap();
-      for (final CloseLocation location : map.getCloseSelectedLocations()) {
-        final LayerRecord record = location.getRecord();
+      final List<CloseLocation> closeSelectedLocations = map.getCloseSelectedLocations();
+      if (closeSelectedLocations.isEmpty() && (event.isAltDown() || event.isControlDown())) {
+        final LayerRecord record = map.getCloseRecord();
         if (showMenu(record, event)) {
           return true;
+        }
+      } else {
+        for (final CloseLocation location : closeSelectedLocations) {
+          final LayerRecord record = location.getRecord();
+          if (showMenu(record, event)) {
+            return true;
+          }
         }
       }
     }

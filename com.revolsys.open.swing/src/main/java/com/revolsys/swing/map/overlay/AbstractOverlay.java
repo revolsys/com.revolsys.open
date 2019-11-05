@@ -56,6 +56,7 @@ import com.revolsys.swing.map.ComponentViewport2D;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.Viewport2D;
+import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -63,6 +64,8 @@ import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
+import com.revolsys.swing.menu.BaseJPopupMenu;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.undo.SetObjectProperty;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
@@ -796,10 +799,10 @@ public abstract class AbstractOverlay extends JComponent
     repaint();
   }
 
-  protected boolean showMenu(final LayerRecord record, final MouseEvent event) {
-    if (record != null) {
-      final LayerRecordMenu menu = record.getMenu();
-      final JPopupMenu popupMenu = menu.showMenu(record, event);
+  protected boolean showMenu(final Layer layer, final MouseEvent event) {
+    if (layer != null) {
+      final MenuFactory menu = layer.getMenu();
+      final JPopupMenu popupMenu = menu.showMenu(layer, event);
       if (popupMenu != null) {
         cancelAll();
         event.consume();
@@ -828,4 +831,57 @@ public abstract class AbstractOverlay extends JComponent
     }
     return true;
   }
+
+  protected boolean showMenu(final LayerRecord record, final MouseEvent event) {
+    if (record != null) {
+      final JPopupMenu popupMenu;
+      final AbstractRecordLayer layer = record.getLayer();
+      if (event.isAltDown()) {
+        final MenuFactory menuFactory = layer.getMenu();
+
+        popupMenu = BaseJPopupMenu.showMenu(() -> {
+          final BaseJPopupMenu menu = menuFactory.newJPopupMenu();
+          final String title = layer.getName();
+          menu.addTitle(title);
+          return menu;
+        }, layer, this, event);
+      } else {
+        final LayerRecordMenu menuFactory = record.getMenu();
+        popupMenu = BaseJPopupMenu.showMenu(() -> {
+          LayerRecordMenu.setEventRecord(record);
+          final BaseJPopupMenu menu = menuFactory.newJPopupMenu();
+          final String title = layer.getName();
+          menu.addTitle(title);
+          return menu;
+        }, layer, this, event);
+      }
+      if (popupMenu != null) {
+        cancelAll();
+        event.consume();
+        final MapPanel map = getMap();
+        map.setMenuVisible(true);
+        popupMenu.addPopupMenuListener(new PopupMenuListener() {
+          @Override
+          public void popupMenuCanceled(final PopupMenuEvent e) {
+            map.setMenuVisible(false);
+          }
+
+          @Override
+          public void popupMenuWillBecomeInvisible(final PopupMenuEvent e) {
+            map.setMenuVisible(false);
+          }
+
+          @Override
+          public void popupMenuWillBecomeVisible(final PopupMenuEvent e) {
+            map.setMenuVisible(true);
+          }
+        });
+        if (!popupMenu.isVisible()) {
+          map.setMenuVisible(false);
+        }
+      }
+    }
+    return true;
+  }
+
 }

@@ -539,6 +539,38 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     return this.viewport.getBoundingBox();
   }
 
+  public LayerRecord getCloseRecord() {
+    final BoundingBox boundingBox = getHotspotBoundingBox();
+    final double scale = getViewport().getScale();
+    return getCloseRecord(this.project, boundingBox, scale);
+  }
+
+  private LayerRecord getCloseRecord(final LayerGroup layerGroup, final BoundingBox boundingBox,
+    final double scale) {
+    for (final Layer layer : layerGroup) {
+      if (layer.isVisible(scale)) {
+        if (layer instanceof LayerGroup) {
+          final LayerGroup childGroup = (LayerGroup)layer;
+          final LayerRecord record = getCloseRecord(childGroup, boundingBox, scale);
+          if (record != null) {
+            return record;
+          }
+        } else if (layer instanceof AbstractRecordLayer) {
+          final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
+          for (final LayerRecord record : recordLayer.getRecords(boundingBox)) {
+            if (recordLayer.isVisible(record)) {
+              final Geometry geometry = record.getGeometry();
+              if (geometry.intersects(geometry)) {
+                return record;
+              }
+            }
+          }
+        }
+      }
+    }
+    return null;
+  }
+
   public List<CloseLocation> getCloseSelectedLocations() {
     return this.closeSelectedLocations;
   }
