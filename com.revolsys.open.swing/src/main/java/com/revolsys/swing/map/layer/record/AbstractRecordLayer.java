@@ -3297,7 +3297,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     addToMap(map, "fieldNamesSets", getFieldNamesSets());
     addToMap(map, "fieldColumnWidths", getFieldColumnWidths());
     addToMap(map, "useFieldTitles", this.useFieldTitles);
-    addToMap(map, "confirmDeleteRecords", this.confirmDeleteRecords, false);
+    addToMap(map, "confirmDeleteRecords", this.confirmDeleteRecords);
     map.remove("filter");
     String where;
     if (Property.isEmpty(this.filter)) {
