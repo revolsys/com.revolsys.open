@@ -438,7 +438,11 @@ public abstract class AbstractOverlay extends JComponent
   }
 
   public Project getProject() {
-    return this.map.getProject();
+    if (this.map == null) {
+      return null;
+    } else {
+      return this.map.getProject();
+    }
   }
 
   public ProjectFrame getProjectFrame() {

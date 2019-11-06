@@ -996,37 +996,40 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         clearOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES);
         clearOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES);
         final MultipleUndo edit = new MultipleUndo();
-        for (final CloseLocation location : this.moveGeometryLocations) {
-          final GeometryFactory geometryFactory = location.getGeometryFactory();
-          final Point from = this.moveGeometryStart.convertGeometry(geometryFactory);
-          final Point to = this.moveGeometryEnd.convertGeometry(geometryFactory);
+        final List<CloseLocation> moveGeometryLocations = this.moveGeometryLocations;
+        if (moveGeometryLocations != null) {
+          for (final CloseLocation location : moveGeometryLocations) {
+            final GeometryFactory geometryFactory = location.getGeometryFactory();
+            final Point from = this.moveGeometryStart.convertGeometry(geometryFactory);
+            final Point to = this.moveGeometryEnd.convertGeometry(geometryFactory);
 
-          final double deltaX = to.getX() - from.getX();
-          final double deltaY = to.getY() - from.getY();
-          if (deltaX != 0 || deltaY != 0) {
-            final Geometry geometry = location.getGeometry();
-            if (geometry instanceof GeometryEditor<?>) {
-              final GeometryEditor<?> geometryEditor = (GeometryEditor<?>)geometry;
-              edit.addEdit(new MoveGeometryUndoEdit(geometryEditor, deltaX, deltaY));
-            } else {
-              final Geometry newGeometry = geometry.edit(editor -> {
-                editor.move(deltaX, deltaY);
-                for (final Vertex vertex : editor.vertices()) {
-                  final double z = getElevation(vertex);
-                  if (Double.isFinite(z)) {
-                    vertex.setZ(z);
+            final double deltaX = to.getX() - from.getX();
+            final double deltaY = to.getY() - from.getY();
+            if (deltaX != 0 || deltaY != 0) {
+              final Geometry geometry = location.getGeometry();
+              if (geometry instanceof GeometryEditor<?>) {
+                final GeometryEditor<?> geometryEditor = (GeometryEditor<?>)geometry;
+                edit.addEdit(new MoveGeometryUndoEdit(geometryEditor, deltaX, deltaY));
+              } else {
+                final Geometry newGeometry = geometry.edit(editor -> {
+                  editor.move(deltaX, deltaY);
+                  for (final Vertex vertex : editor.vertices()) {
+                    final double z = getElevation(vertex);
+                    if (Double.isFinite(z)) {
+                      vertex.setZ(z);
+                    }
                   }
-                }
-                return editor;
-              });
-              final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
-              edit.addEdit(geometryEdit);
+                  return editor;
+                });
+                final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
+                edit.addEdit(geometryEdit);
+              }
             }
           }
-        }
-        if (!edit.isEmpty()) {
-          edit.addEdit(new ClearXorUndoEdit());
-          addUndo(edit);
+          if (!edit.isEmpty()) {
+            edit.addEdit(new ClearXorUndoEdit());
+            addUndo(edit);
+          }
         }
         modeMoveGeometryClear();
         repaint();

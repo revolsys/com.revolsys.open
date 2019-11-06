@@ -193,7 +193,7 @@ public class TableReference extends CloseableValueHolder<Table> {
   @Override
   protected void valueClose(final Table table) {
     try {
-      this.geodatabase.valueConsumeSync(geodatabase -> {
+      this.recordStore.threadGeodatabaseResult(geodatabase -> {
         try {
           geodatabase.closeTable(table);
         } catch (final Exception e) {
@@ -201,6 +201,7 @@ public class TableReference extends CloseableValueHolder<Table> {
         } finally {
           table.delete();
         }
+        return null;
       });
     } finally {
 
