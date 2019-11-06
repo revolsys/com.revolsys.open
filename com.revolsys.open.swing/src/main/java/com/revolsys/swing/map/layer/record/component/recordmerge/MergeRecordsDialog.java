@@ -188,29 +188,27 @@ public class MergeRecordsDialog extends BaseDialog {
         @Override
         public BaseJPopupMenu getMenu(final int fieldIndex) {
           final MergeFieldMatchType matchType = matchTypes.get(fieldIndex);
-          if (matchType == MergeFieldMatchType.ERROR
+          if (matchType == MergeFieldMatchType.VALUES_DIFFERENT
             || matchType == MergeFieldMatchType.OVERRIDDEN) {
             final BaseJPopupMenu menu = new BaseJPopupMenu();
             final Set<Object> values = new HashSet<>();
-            {
+            if (mergeableRecord.isValid(fieldIndex)) {
               final Object value = mergeableRecord.getCodeValue(fieldIndex);
               values.add(value);
             }
             for (final MergeOriginalRecord originalRecord : mergeableRecord.originalRecords) {
-              final Object originalValue = originalRecord.getCodeValue(fieldIndex);
-              values.add(originalValue);
+              if (originalRecord.isValid(fieldIndex)) {
+                final Object originalValue = originalRecord.getCodeValue(fieldIndex);
+                values.add(originalValue);
+              }
             }
             for (final Object value : values) {
               final String menuTitle = "<html><b>Use:</b> <b color='red'>"
                 + DataTypes.toString(value) + "</b></html>";
               menu.add(new RunnableAction(menuTitle, () -> {
+                mergeableRecord.setOverwriteValue(fieldIndex, values);
                 mergeableRecord.setValue(fieldIndex, value);
                 mergeableRecord.mergeValidateField(fieldIndex);
-                for (final MergeOriginalRecord originalRecord : mergeableRecord.originalRecords) {
-                  final MergeFieldOriginalFieldState fieldState = originalRecord
-                    .getFieldState(fieldIndex);
-                  fieldState.setOverrideError(true);
-                }
                 mergeableRecord.mergeValidateField(fieldIndex);
               }));
             }
@@ -220,7 +218,7 @@ public class MergeRecordsDialog extends BaseDialog {
                 for (final MergeOriginalRecord originalRecord : mergeableRecord.originalRecords) {
                   final MergeFieldOriginalFieldState fieldState = originalRecord
                     .getFieldState(fieldIndex);
-                  fieldState.setOverrideError(false);
+                  fieldState.clearOverrideError();
                 }
                 mergeableRecord.mergeValidateField(fieldIndex);
               }));
@@ -228,6 +226,17 @@ public class MergeRecordsDialog extends BaseDialog {
             return menu;
           }
           return null;
+        }
+
+        @Override
+        public boolean isCellEditable(final int rowIndex) {
+
+          if (super.isCellEditable(rowIndex)) {
+            if (mergeableRecord.getMatchType(rowIndex) != MergeFieldMatchType.CANT_MERGE) {
+              return true;
+            }
+          }
+          return false;
         }
       } //
         .setCellEditor(table -> new RecordLayerTableCellEditor(table, this.layer) {
@@ -245,20 +254,11 @@ public class MergeRecordsDialog extends BaseDialog {
         public BaseJPopupMenu getMenu(final int fieldIndex) {
           final MergeFieldOriginalFieldState fieldState = originalRecord.getFieldStates()
             .get(fieldIndex);
-          if (fieldState.isMatchType(MergeFieldMatchType.ERROR)) {
-            final BaseJPopupMenu menu = new BaseJPopupMenu();
-            final String menuTitle = "<html><b>Ignore:</b> <b color='red'>"
-              + fieldState.getMessage() + "</b></html>";
-            menu.add(new RunnableAction(menuTitle, () -> {
-              fieldState.setOverrideError(true);
-              mergeableRecord.mergeValidateField(fieldIndex);
-            }));
-            return menu;
-          } else if (fieldState.isMatchType(MergeFieldMatchType.OVERRIDDEN)) {
+          if (fieldState.isMatchType(MergeFieldMatchType.OVERRIDDEN)) {
             final BaseJPopupMenu menu = new BaseJPopupMenu();
             final String menuTitle = "<html><b color='red'>Remove Override</b></html>";
             menu.add(new RunnableAction(menuTitle, () -> {
-              fieldState.setOverrideError(false);
+              // fieldState.setOverrideError(false);
               mergeableRecord.mergeValidateField(fieldIndex);
             }));
             return menu;

@@ -13,8 +13,6 @@ public class SetFieldValueUndoableEdit extends AbstractUndoableEdit {
   public static SetFieldValueUndoableEdit newUndoableEdit(final UndoManager undoManager,
     final Field field, final Object oldValue, final Object newValue) {
     if (undoManager == null) {
-      field.setFieldValue(newValue);
-      ((JComponent)field).requestFocusInWindow();
       return null;
     } else {
       final SetFieldValueUndoableEdit edit = new SetFieldValueUndoableEdit(field, oldValue,

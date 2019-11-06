@@ -66,8 +66,8 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
     synchronized (layer.getSync()) {
       final LayerRecord recordProxied = this.layer.getProxiedRecord(record);
       if (recordProxied != null) {
-        if (containsRecordDo(record)) {
-          removeRecordDo(record);
+        if (containsRecordDo(recordProxied)) {
+          removeRecordDo(recordProxied);
           return true;
         }
       }

@@ -186,9 +186,9 @@ public class FieldSupport {
       return false;
     } else {
       this.value = value;
+      this.field.firePropertyChange(this.name, oldValue, value);
       final UndoManager parent = this.undoManager.getParent();
       SetFieldValueUndoableEdit.newUndoableEdit(parent, this.field, oldValue, value);
-      this.field.firePropertyChange(this.name, oldValue, value);
       return true;
     }
   }

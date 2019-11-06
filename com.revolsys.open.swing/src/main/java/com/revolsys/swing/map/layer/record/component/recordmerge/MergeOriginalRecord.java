@@ -82,9 +82,9 @@ class MergeOriginalRecord extends ArrayRecord {
     }
   }
 
-  MergeFieldOriginalFieldState validateField(final String fieldName, final Object mergedValue) {
-    final int fieldIndex = getFieldIndex(fieldName);
-    final MergeFieldOriginalFieldState fieldState = getFieldStates().get(fieldIndex);
+  MergeFieldOriginalFieldState validateField(final int fieldIndex, final String fieldName,
+    final Object mergedValue) {
+    final MergeFieldOriginalFieldState fieldState = getFieldState(fieldIndex);
     final Object originalValue = getCodeValue(fieldName);
     fieldState.validateField(mergedValue, originalValue);
     return fieldState;

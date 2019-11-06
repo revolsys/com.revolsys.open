@@ -495,6 +495,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   private String where;
 
+  private List<String> dontMergeDifferentValueFieldNames = Collections.emptyList();
+
   protected AbstractRecordLayer(final String type) {
     super(type);
     setReadOnly(false);
@@ -1016,6 +1018,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final Class<?> typeClass = field.getTypeClass();
       return CompareUtil.getComparator(typeClass);
     }
+  }
+
+  public List<String> getDontMergeDifferentValueFieldNames() {
+    return this.dontMergeDifferentValueFieldNames;
   }
 
   public int getFieldColumnWidth(final String fieldName) {
@@ -2774,6 +2780,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void setConfirmDeleteRecords(final boolean confirmDeleteRecords) {
     this.confirmDeleteRecords = confirmDeleteRecords;
+  }
+
+  public void setDontMergeDifferentValueFieldNames(
+    final List<String> dontMergeDifferentValueFieldNames) {
+    this.dontMergeDifferentValueFieldNames = dontMergeDifferentValueFieldNames;
   }
 
   @Override

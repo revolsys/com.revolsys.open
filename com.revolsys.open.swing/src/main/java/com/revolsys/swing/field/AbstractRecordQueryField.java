@@ -457,9 +457,7 @@ public abstract class AbstractRecordQueryField extends ValueField
           final int searchIndex = this.searchIndex.incrementAndGet();
           Invoke.background("search", () -> queryDo(searchIndex, queryText));
         } else {
-          setSelectedRecord(null);
-          this.listModel.clear();
-          this.menu.setVisible(false);
+          clear();
           this.searchField.setFieldInvalid(
             "Minimum " + this.minSearchCharacters + " characters required for search",
             WebColors.Red, WebColors.Pink);
@@ -484,7 +482,15 @@ public abstract class AbstractRecordQueryField extends ValueField
     final String displayText = getDisplayText(identifier);
     super.setFieldValue(identifier);
     if (this.searchField != null) {
-      this.searchField.setFieldValue(displayText);
+      if (value == null) {
+        try (
+          BaseCloseable eventsDisabled = this.eventsDisabled()) {
+          this.searchField.setFieldValue("");
+          clear();
+        }
+      } else {
+        this.searchField.setFieldValue(displayText);
+      }
     }
 
     this.originalValue = identifier;
@@ -502,6 +508,12 @@ public abstract class AbstractRecordQueryField extends ValueField
       this.oldValueItem.setText(originalText);
     }
     return true;
+  }
+
+  private void clear() {
+    setSelectedRecord(null);
+    this.listModel.clear();
+    this.menu.setVisible(false);
   }
 
   public void setMaxResults(final int maxResults) {
