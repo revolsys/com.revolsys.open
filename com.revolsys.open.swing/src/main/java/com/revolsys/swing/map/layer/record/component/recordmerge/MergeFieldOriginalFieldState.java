@@ -1,7 +1,5 @@
 package com.revolsys.swing.map.layer.record.component.recordmerge;
 
-import java.util.List;
-
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
@@ -17,20 +15,18 @@ class MergeFieldOriginalFieldState {
 
   private final MergeOriginalRecord mergeOriginalRecord;
 
-  private final boolean ignoreField;
+  private final boolean notCompared;
 
   private String message;
 
   private final boolean dontMerge;
 
   public MergeFieldOriginalFieldState(final MergeOriginalRecord mergeOriginalRecord,
-    final String fieldName, final boolean ignoreField) {
+    final String fieldName, final boolean ignoreField, final boolean dontMerge) {
     this.mergeOriginalRecord = mergeOriginalRecord;
     this.fieldName = fieldName;
-    this.ignoreField = ignoreField;
-    final List<String> dontMergeDifferentValueFieldNames = mergeOriginalRecord.getLayer()
-      .getDontMergeDifferentValueFieldNames();
-    this.dontMerge = dontMergeDifferentValueFieldNames.contains(fieldName);
+    this.notCompared = ignoreField;
+    this.dontMerge = dontMerge;
 
   }
 
@@ -64,10 +60,14 @@ class MergeFieldOriginalFieldState {
     return this.fieldName + "=" + this.mergeOriginalRecord.getCodeValue(this.fieldName);
   }
 
-  public void validateField(final Object mergedValue, final Object originalValue) {
+  public MergeFieldOriginalFieldState validateField(final Object mergedValue,
+    final boolean overwridden) {
+    final Object originalValue = this.mergeOriginalRecord.getCodeValue(this.fieldName);
     this.matchType = MergeFieldMatchType.EQUAL;
     this.message = null;
-    if (!DataType.equal(mergedValue, originalValue)) {
+    if (this.notCompared) {
+      this.matchType = MergeFieldMatchType.NOT_COMPARED;
+    } else if (!DataType.equal(mergedValue, originalValue)) {
       try {
         final MergeableRecord mergeableRecord = this.mergeOriginalRecord.mergeableRecord;
         final AbstractRecordLayer layer = this.mergeOriginalRecord.getLayer();
@@ -75,8 +75,8 @@ class MergeFieldOriginalFieldState {
         final int recordIndex = this.mergeOriginalRecord.recordIndex;
         if (this.dontMerge) {
           this.matchType = MergeFieldMatchType.CANT_MERGE;
-        } else if (this.ignoreField) {
-          this.matchType = MergeFieldMatchType.ALLOWED_NOT_EQUAL;
+        } else if (overwridden) {
+          this.matchType = MergeFieldMatchType.OVERRIDDEN;
         } else if (originalValue == null) {
           this.matchType = MergeFieldMatchType.WAS_NULL;
         } else if (directionalFields.isFromField(this.fieldName) && recordIndex != 0) {
@@ -98,6 +98,7 @@ class MergeFieldOriginalFieldState {
         this.matchType = MergeFieldMatchType.VALUES_DIFFERENT;
       }
     }
+    return this;
   }
 
 }

@@ -13,7 +13,8 @@ enum MergeFieldMatchType {
   OVERRIDDEN(WebColors.Moccasin, WebColors.DarkOrange), //
   WAS_NULL(WebColors.PaleTurquoise, WebColors.DarkTurquoise), //
   ALLOWED_NOT_EQUAL(WebColors.PaleTurquoise, WebColors.DarkTurquoise), //
-  EQUAL(WebColors.LightGreen, WebColors.Green);
+  EQUAL(WebColors.LightGreen, WebColors.Green), //
+  NOT_COMPARED();
 
   private final String label;
 
@@ -24,6 +25,14 @@ enum MergeFieldMatchType {
   private final Color colorOdd;
 
   private final Color colorSelectedOdd;
+
+  private MergeFieldMatchType() {
+    this.label = CaseConverter.toCapitalizedWords(name());
+    this.color = null;
+    this.colorOdd = null;
+    this.colorSelected = null;
+    this.colorSelectedOdd = null;
+  }
 
   private MergeFieldMatchType(final Color color, final Color colorSelected) {
     this(color, colorSelected, null);
@@ -61,20 +70,22 @@ enum MergeFieldMatchType {
   }
 
   public Component setColor(final Component renderer, final boolean selected, final boolean even) {
-    if (selected) {
-      if (even) {
-        renderer.setBackground(this.colorSelected);
+    if (this.color != null) {
+      if (selected) {
+        if (even) {
+          renderer.setBackground(this.colorSelected);
+        } else {
+          renderer.setBackground(this.colorSelectedOdd);
+        }
+        renderer.setForeground(WebColors.White);
       } else {
-        renderer.setBackground(this.colorSelectedOdd);
+        if (even) {
+          renderer.setBackground(this.color);
+        } else {
+          renderer.setBackground(this.colorOdd);
+        }
+        renderer.setForeground(WebColors.Black);
       }
-      renderer.setForeground(WebColors.White);
-    } else {
-      if (even) {
-        renderer.setBackground(this.color);
-      } else {
-        renderer.setBackground(this.colorOdd);
-      }
-      renderer.setForeground(WebColors.Black);
     }
     return renderer;
   }

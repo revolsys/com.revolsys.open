@@ -61,7 +61,6 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
     if (this.record == null && this.layer != null) {
       final LayerRecord newRecord = this.layer.newLayerRecord(this.originalValues);
       this.layer.saveChanges(newRecord);
-      this.layer.addSelectedRecords(newRecord);
       this.record = newRecord;
     }
   }

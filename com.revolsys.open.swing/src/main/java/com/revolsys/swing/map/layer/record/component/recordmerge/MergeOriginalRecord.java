@@ -38,11 +38,17 @@ class MergeOriginalRecord extends ArrayRecord {
     if (this.fieldStates == null) {
       final List<MergeFieldOriginalFieldState> fieldStates = new ArrayList<>();
       final Collection<String> ignoreDifferentFieldNames = getLayer()
-        .getProperty("mergeRecordsIgnoreDifferentFieldNames", Collections.emptySet());
+        .getProperty("mergeRecordsNotComparedFieldNames", Collections.emptySet());
+      final Collection<String> blockNotEqualFieldNames = getLayer()
+        .getProperty("mergeRecordsBlockNotEqualFieldNames", Collections.emptySet());
+
       for (final String fieldName : this.mergeableRecord.getFieldNames()) {
-        final boolean ignoreField = isIdField(fieldName) || isGeometryField(fieldName)
-          || ignoreDifferentFieldNames.contains(fieldName);
-        fieldStates.add(new MergeFieldOriginalFieldState(this, fieldName, ignoreField));
+        final boolean dontMerge = blockNotEqualFieldNames.contains(fieldName);
+
+        final boolean ignoreField = (isIdField(fieldName) || isGeometryField(fieldName)
+          || ignoreDifferentFieldNames.contains(fieldName)) && !dontMerge;
+        final MergeFieldOriginalFieldState fieldState = new MergeFieldOriginalFieldState(this, fieldName, ignoreField, dontMerge);
+        fieldStates.add(fieldState);
       }
       this.fieldStates = fieldStates;
     }
@@ -82,11 +88,9 @@ class MergeOriginalRecord extends ArrayRecord {
     }
   }
 
-  MergeFieldOriginalFieldState validateField(final int fieldIndex, final String fieldName,
-    final Object mergedValue) {
+  MergeFieldOriginalFieldState validateField(final int fieldIndex, final Object mergedValue,
+    final boolean overwridden) {
     final MergeFieldOriginalFieldState fieldState = getFieldState(fieldIndex);
-    final Object originalValue = getCodeValue(fieldName);
-    fieldState.validateField(mergedValue, originalValue);
-    return fieldState;
+    return fieldState.validateField(mergedValue, overwridden);
   }
 }

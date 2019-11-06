@@ -23,7 +23,7 @@ class MergeableRecord extends ArrayRecord {
 
   final List<MergeFieldMatchType> matchTypes = new ArrayList<>();
 
-  final Map<Integer, Object> overwriteFieldValues = new HashMap<>();
+  final Map<Integer, Object> overrideFieldValues = new HashMap<>();
 
   final BooleanEnableCheck canMergeEnableCheck = new BooleanEnableCheck(true);
 
@@ -116,10 +116,11 @@ class MergeableRecord extends ArrayRecord {
     final List<MergeFieldMatchType> matchTypes = getMatchTypes();
     final String fieldName = getFieldName(fieldIndex);
     final Object mergedValue = getCodeValue(fieldName);
-    MergeFieldMatchType matchType = MergeFieldMatchType.EQUAL;
+    final boolean overwridden = this.overrideFieldValues.containsKey(fieldIndex);
+    MergeFieldMatchType matchType = MergeFieldMatchType.NOT_COMPARED;
     for (final MergeOriginalRecord originalRecord : this.originalRecords) {
       final MergeFieldOriginalFieldState fieldState = originalRecord.validateField(fieldIndex,
-        fieldName, mergedValue);
+        mergedValue, overwridden);
       if (fieldState.compareMatchType(matchType) < 0) {
         matchType = fieldState.getMatchType();
       }
@@ -149,16 +150,16 @@ class MergeableRecord extends ArrayRecord {
   }
 
   void setOverwriteValue(final int fieldIndex, final Object value) {
-    this.overwriteFieldValues.put(fieldIndex, value);
+    this.overrideFieldValues.put(fieldIndex, value);
   }
 
   @Override
   protected boolean setValue(final FieldDefinition fieldDefinition, final Object value) {
     final int fieldIndex = fieldDefinition.getIndex();
-    if (this.overwriteFieldValues != null && this.overwriteFieldValues.containsKey(fieldIndex)) {
-      final Object overwriteValue = this.overwriteFieldValues.get(fieldIndex);
+    if (this.overrideFieldValues != null && this.overrideFieldValues.containsKey(fieldIndex)) {
+      final Object overwriteValue = this.overrideFieldValues.get(fieldIndex);
       if (!Equals.equals(overwriteValue, value)) {
-        this.overwriteFieldValues.remove(fieldIndex);
+        this.overrideFieldValues.remove(fieldIndex);
       }
     }
     final boolean set = super.setValue(fieldDefinition, value);

@@ -15,9 +15,13 @@ public class CreateRecordUndo extends AbstractUndoableEdit {
 
   private final Map<String, Object> newValues;
 
-  public CreateRecordUndo(final AbstractRecordLayer layer, final Map<String, Object> newValues) {
+  private boolean selected;
+
+  public CreateRecordUndo(final AbstractRecordLayer layer, final Map<String, Object> newValues,
+    final boolean selected) {
     this.layer = layer;
     this.newValues = newValues;
+    this.selected = selected;
   }
 
   @Override
@@ -49,7 +53,10 @@ public class CreateRecordUndo extends AbstractUndoableEdit {
     if (Property.hasValue(this.newValues) && this.layerRecord == null) {
       this.layerRecord = this.layer.newLayerRecord(this.newValues);
       this.layer.saveChanges(this.layerRecord);
-      this.layer.addSelectedRecords(this.layerRecord);
+      if (this.selected) {
+        this.layer.addSelectedRecords(this.layerRecord);
+        this.selected = false;
+      }
     }
   }
 

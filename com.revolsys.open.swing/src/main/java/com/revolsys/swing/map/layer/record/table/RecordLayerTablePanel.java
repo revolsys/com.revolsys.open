@@ -462,16 +462,6 @@ public class RecordLayerTablePanel extends TablePanel
   @Override
   public MapEx toMap() {
     final MapEx map = new LinkedHashMapEx();
-
-    final String tableRecordsMode = this.tableModel.getTableRecordsMode().getKey();
-    addToMap(map, "fieldFilterMode", tableRecordsMode);
-
-    final String geometryFilterMode = this.tableModel.getGeometryFilterMode();
-    addToMap(map, "geometryFilterMode", geometryFilterMode);
-
-    if (this.fieldFilterPanel != null) {
-      addToMap(map, "searchField", this.fieldFilterPanel.getSearchFieldName());
-    }
     addToMap(map, "orderBy", this.tableModel.getOrderBy());
     return map;
   }

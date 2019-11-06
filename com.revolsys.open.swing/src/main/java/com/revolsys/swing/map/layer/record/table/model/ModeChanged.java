@@ -56,7 +56,7 @@ public class ModeChanged extends ModeAbstractCached {
 
   @Override
   protected void recordsDeleted(final List<LayerRecord> records) {
-    Invoke.later(() -> {
+    if (Invoke.swingThread(this::recordsDeleted, records)) {
       for (final LayerRecord record : records) {
         if (RecordState.DELETED == record.getState()) {
           removeCachedRecord(record);
@@ -64,6 +64,6 @@ public class ModeChanged extends ModeAbstractCached {
           addCachedRecord(record);
         }
       }
-    });
+    }
   }
 }

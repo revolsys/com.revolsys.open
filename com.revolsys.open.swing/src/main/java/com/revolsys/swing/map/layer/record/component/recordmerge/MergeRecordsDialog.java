@@ -36,6 +36,7 @@ import com.revolsys.swing.table.lambda.column.LayerRecordTableModelColumn;
 import com.revolsys.swing.table.lambda.column.RecordTableModelColumn;
 import com.revolsys.swing.table.record.model.RecordListTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
+import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.CreateRecordUndo;
 import com.revolsys.swing.undo.DeleteLayerRecordUndo;
 import com.revolsys.swing.undo.MultipleUndo;
@@ -107,13 +108,28 @@ public class MergeRecordsDialog extends BaseDialog {
     toolBar.addButton("default", "Merge Records", "table_row_merge",
       mergeableRecord.canMergeEnableCheck, () -> {
         final MultipleUndo multipleUndo = new MultipleUndo();
-        final CreateRecordUndo createRecordUndo = new CreateRecordUndo(this.layer, mergeableRecord);
+        multipleUndo.addEdit(new AbstractUndoableEdit() {
+
+          @Override
+          protected void undoDo() {
+            MergeRecordsDialog.this.layer.fireRecordsChanged();
+          }
+        });
+        final CreateRecordUndo createRecordUndo = new CreateRecordUndo(this.layer, mergeableRecord,
+          true);
         multipleUndo.addEdit(createRecordUndo);
         for (final MergeOriginalRecord originalRecord : mergeableRecord.originalRecords) {
           final DeleteLayerRecordUndo deleteRecordUndo = new DeleteLayerRecordUndo(
             originalRecord.originalRecord);
           multipleUndo.addEdit(deleteRecordUndo);
         }
+        multipleUndo.addEdit(new AbstractUndoableEdit() {
+          @Override
+          protected void redoDo() {
+            MergeRecordsDialog.this.layer.fireRecordsChanged();
+          }
+
+        });
         if (this.undoManager == null) {
           multipleUndo.redo();
         } else {
@@ -206,7 +222,7 @@ public class MergeRecordsDialog extends BaseDialog {
               final String menuTitle = "<html><b>Use:</b> <b color='red'>"
                 + DataTypes.toString(value) + "</b></html>";
               menu.add(new RunnableAction(menuTitle, () -> {
-                mergeableRecord.setOverwriteValue(fieldIndex, values);
+                mergeableRecord.setOverwriteValue(fieldIndex, value);
                 mergeableRecord.setValue(fieldIndex, value);
                 mergeableRecord.mergeValidateField(fieldIndex);
                 mergeableRecord.mergeValidateField(fieldIndex);
