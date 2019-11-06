@@ -948,6 +948,11 @@ public interface Record
     return Property.hasValue(value);
   }
 
+  default boolean hasValue(final int fieldIndex) {
+    final Object value = getValue(fieldIndex);
+    return Property.hasValue(value);
+  }
+
   default boolean hasValuesAll(final CharSequence... fieldNames) {
     for (final CharSequence fieldName : fieldNames) {
       if (!hasValue(fieldName)) {

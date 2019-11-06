@@ -21,9 +21,7 @@ public class ScratchRecordLayer extends ListRecordLayer {
 
       menu.addMenuItem("edit", -1, "Delete All Records", "table:delete",
         ScratchRecordLayer::isCanDeleteRecords, layer -> {
-          if (layer.confirmDeleteRecords(layer.records)) {
-            layer.clearRecords();
-          }
+          layer.confirmDeleteRecords(layer.records, records -> layer.clearRecords());
         }, true);
     });
   }

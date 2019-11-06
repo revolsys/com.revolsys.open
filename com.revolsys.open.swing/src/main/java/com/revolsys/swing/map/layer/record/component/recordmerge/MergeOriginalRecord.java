@@ -37,9 +37,10 @@ class MergeOriginalRecord extends ArrayRecord {
   List<MergeFieldOriginalFieldState> getFieldStates() {
     if (this.fieldStates == null) {
       final List<MergeFieldOriginalFieldState> fieldStates = new ArrayList<>();
-      final Collection<String> ignoreDifferentFieldNames = getLayer()
+      final AbstractRecordLayer layer = getLayer();
+      final Collection<String> ignoreDifferentFieldNames = layer
         .getProperty("mergeRecordsNotComparedFieldNames", Collections.emptySet());
-      final Collection<String> blockNotEqualFieldNames = getLayer()
+      final Collection<String> blockNotEqualFieldNames = layer
         .getProperty("mergeRecordsBlockNotEqualFieldNames", Collections.emptySet());
 
       for (final String fieldName : this.mergeableRecord.getFieldNames()) {

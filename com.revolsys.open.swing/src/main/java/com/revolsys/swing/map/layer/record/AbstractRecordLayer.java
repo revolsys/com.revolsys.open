@@ -124,6 +124,7 @@ import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.map.layer.record.style.panel.QueryFilterField;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
+import com.revolsys.swing.map.layer.record.table.model.BlockDeleteRecords;
 import com.revolsys.swing.map.layer.record.table.model.RecordDefinitionTableModel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerErrors;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
@@ -733,12 +734,54 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return MapObjectFactory.toObject(config);
   }
 
-  protected boolean confirmDeleteRecords(final Collection<? extends LayerRecord> records) {
-    return confirmDeleteRecords("", records);
+  protected <LR extends LayerRecord> boolean confirmDeleteRecords(final Collection<LR> records,
+    final Consumer<Collection<LR>> deleteAction) {
+    return confirmDeleteRecords("", records, deleteAction);
   }
 
-  protected boolean confirmDeleteRecords(final String suffix,
-    final Collection<? extends LayerRecord> records) {
+  protected <LR extends LayerRecord> boolean confirmDeleteRecords(final String suffix,
+    final Collection<LR> records, final Consumer<Collection<LR>> deleteAction) {
+    final Collection<String> blockNotEqualFieldNames = getProperty(
+      "mergeRecordsBlockNotEqualFieldNames");
+    if (blockNotEqualFieldNames != null) {
+      List<LR> blockedRecords = null;
+      List<LR> otherRecords = null;
+      int i = 0;
+      for (final LR record : records) {
+        boolean blocked = false;
+        if (!isDeleted(record)) {
+          for (final String fieldName : blockNotEqualFieldNames) {
+            if (record.hasValue(fieldName)) {
+              blocked = true;
+              if (blockedRecords == null) {
+                blockedRecords = new ArrayList<>();
+                otherRecords = new ArrayList<>();
+                int j = 0;
+                for (final LR otherRecord : records) {
+                  if (j < i) {
+                    otherRecords.add(otherRecord);
+                    j++;
+                  } else {
+                    break;
+                  }
+                }
+              }
+              blockedRecords.add(record);
+              break;
+            }
+          }
+          if (!blocked && otherRecords != null) {
+            otherRecords.add(record);
+          }
+          i++;
+        }
+      }
+      if (blockedRecords != null) {
+        BlockDeleteRecords.showErrorDialog(this, blockedRecords, otherRecords, deleteAction);
+        return false;
+      }
+    }
+    boolean delete;
     final int recordCount = records.size();
     final boolean globalConfirmDeleteRecords = Preferences.getValue("com.revolsys.gis",
       PREFERENCE_CONFIRM_DELETE_RECORDS);
@@ -748,9 +791,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final String title = "Delete Records" + suffix;
       final int confirm = Dialogs.showConfirmDialog(message, title, JOptionPane.YES_NO_OPTION,
         JOptionPane.ERROR_MESSAGE);
-      return confirm == JOptionPane.YES_OPTION;
+      delete = confirm == JOptionPane.YES_OPTION;
+    } else {
+      delete = true;
     }
-    return true;
+    if (delete) {
+      deleteAction.accept(records);
+    }
+    return delete;
   }
 
   public void copyRecordGeometry(final LayerRecord record) {
@@ -859,12 +907,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public boolean deleteRecordsWithConfirm(final Collection<? extends LayerRecord> records) {
-    if (confirmDeleteRecords(records)) {
-      deleteRecords(records);
-      return true;
-    } else {
-      return false;
-    }
+    return confirmDeleteRecords(records, this::deleteRecords);
   }
 
   public boolean deleteRecordWithConfirm(final LayerRecord record) {
