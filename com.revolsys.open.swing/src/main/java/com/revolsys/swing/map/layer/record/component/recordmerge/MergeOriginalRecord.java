@@ -1,8 +1,6 @@
 package com.revolsys.swing.map.layer.record.component.recordmerge;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.record.ArrayRecord;
@@ -37,18 +35,9 @@ class MergeOriginalRecord extends ArrayRecord {
   List<MergeFieldOriginalFieldState> getFieldStates() {
     if (this.fieldStates == null) {
       final List<MergeFieldOriginalFieldState> fieldStates = new ArrayList<>();
-      final AbstractRecordLayer layer = getLayer();
-      final Collection<String> ignoreDifferentFieldNames = layer
-        .getProperty("mergeRecordsNotComparedFieldNames", Collections.emptySet());
-      final Collection<String> blockNotEqualFieldNames = layer
-        .getProperty("mergeRecordsBlockNotEqualFieldNames", Collections.emptySet());
-
       for (final String fieldName : this.mergeableRecord.getFieldNames()) {
-        final boolean dontMerge = blockNotEqualFieldNames.contains(fieldName);
-
-        final boolean ignoreField = (isIdField(fieldName) || isGeometryField(fieldName)
-          || ignoreDifferentFieldNames.contains(fieldName)) && !dontMerge;
-        final MergeFieldOriginalFieldState fieldState = new MergeFieldOriginalFieldState(this, fieldName, ignoreField, dontMerge);
+        final MergeFieldOriginalFieldState fieldState = new MergeFieldOriginalFieldState(this,
+          fieldName);
         fieldStates.add(fieldState);
       }
       this.fieldStates = fieldStates;

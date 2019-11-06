@@ -9,7 +9,8 @@ import com.revolsys.util.CaseConverter;
 
 enum MergeFieldMatchType {
   CANT_MERGE(WebColors.HotPink, WebColors.MediumVioletRed, "Can't Merge"), //
-  VALUES_DIFFERENT(WebColors.Pink, WebColors.Red), //
+  NOT_EQUAL(WebColors.Pink, WebColors.Red), //
+  END_FIELD_NOT_VALID(WebColors.Pink, WebColors.Red), //
   OVERRIDDEN(WebColors.Moccasin, WebColors.DarkOrange), //
   WAS_NULL(WebColors.PaleTurquoise, WebColors.DarkTurquoise), //
   ALLOWED_NOT_EQUAL(WebColors.PaleTurquoise, WebColors.DarkTurquoise), //

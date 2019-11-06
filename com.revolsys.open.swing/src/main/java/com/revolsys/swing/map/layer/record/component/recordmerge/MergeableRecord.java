@@ -52,6 +52,10 @@ class MergeableRecord extends ArrayRecord {
     }
   }
 
+  void cleaOverrideValue(final int fieldIndex) {
+    this.overrideFieldValues.remove(fieldIndex);
+  }
+
   void fireRowUpdated(final int fieldIndex) {
     if (this.tableModel != null) {
       this.tableModel.fireTableRowsUpdated(fieldIndex, fieldIndex);
@@ -106,12 +110,6 @@ class MergeableRecord extends ArrayRecord {
     }
   }
 
-  void mergeValidateField(final int fieldIndex) {
-    mergeValidateFieldDo(fieldIndex);
-    fireRowUpdated(fieldIndex);
-    updateCanMerge();
-  }
-
   private MergeFieldMatchType mergeValidateFieldDo(final int fieldIndex) {
     final List<MergeFieldMatchType> matchTypes = getMatchTypes();
     final String fieldName = getFieldName(fieldIndex);
@@ -130,14 +128,18 @@ class MergeableRecord extends ArrayRecord {
     return matchType;
   }
 
-  void mergeValidateFields() {
+  void mergeValidateFields(final boolean firstRun) {
     final int fieldCount = getFieldCount();
     for (int fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++) {
       final MergeFieldMatchType matchType = mergeValidateFieldDo(fieldIndex);
-      if (matchType.ordinal() <= MergeFieldMatchType.VALUES_DIFFERENT.ordinal()) {
+      if (firstRun
+        && matchType.ordinal() <= MergeFieldMatchType.END_FIELD_NOT_VALID.ordinal()) {
         setValue(fieldIndex, null);
         mergeValidateFieldDo(fieldIndex);
       }
+    }
+    if (this.tableModel != null) {
+      this.tableModel.fireTableDataChanged();
     }
     updateCanMerge();
   }
@@ -149,7 +151,7 @@ class MergeableRecord extends ArrayRecord {
     }
   }
 
-  void setOverwriteValue(final int fieldIndex, final Object value) {
+  void setOverrideValue(final int fieldIndex, final Object value) {
     this.overrideFieldValues.put(fieldIndex, value);
   }
 
@@ -164,7 +166,7 @@ class MergeableRecord extends ArrayRecord {
     }
     final boolean set = super.setValue(fieldDefinition, value);
     if (set && this.tableModel != null) {
-      mergeValidateField(fieldIndex);
+      mergeValidateFields(false);
       fireRowUpdated(fieldIndex);
     }
     return set;
@@ -172,7 +174,7 @@ class MergeableRecord extends ArrayRecord {
 
   private void updateCanMerge() {
     for (final MergeFieldMatchType matchType : getMatchTypes()) {
-      if (matchType == MergeFieldMatchType.VALUES_DIFFERENT
+      if (matchType == MergeFieldMatchType.NOT_EQUAL
         || matchType == MergeFieldMatchType.CANT_MERGE) {
         this.canMergeEnableCheck.setEnabled(false);
         return;

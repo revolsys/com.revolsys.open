@@ -185,7 +185,7 @@ public class MergeRecordsDialog extends BaseDialog {
   }
 
   private ColumnBasedTableModel newTableModel(final MergeableRecord mergeableRecord) {
-    mergeableRecord.mergeValidateFields();
+    mergeableRecord.mergeValidateFields(true);
     final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
     final int fieldCount = recordDefinition.getFieldCount();
 
@@ -204,7 +204,8 @@ public class MergeRecordsDialog extends BaseDialog {
         @Override
         public BaseJPopupMenu getMenu(final int fieldIndex) {
           final MergeFieldMatchType matchType = matchTypes.get(fieldIndex);
-          if (matchType == MergeFieldMatchType.VALUES_DIFFERENT
+          if (matchType == MergeFieldMatchType.NOT_EQUAL
+            || matchType == MergeFieldMatchType.END_FIELD_NOT_VALID
             || matchType == MergeFieldMatchType.OVERRIDDEN) {
             final BaseJPopupMenu menu = new BaseJPopupMenu();
             final Set<Object> values = new HashSet<>();
@@ -213,7 +214,8 @@ public class MergeRecordsDialog extends BaseDialog {
               values.add(value);
             }
             for (final MergeOriginalRecord originalRecord : mergeableRecord.originalRecords) {
-              if (originalRecord.isValid(fieldIndex)) {
+              if (originalRecord.isValid(fieldIndex) && !originalRecord.getFieldState(fieldIndex)
+                .isMatchType(MergeFieldMatchType.END_FIELD_NOT_VALID)) {
                 final Object originalValue = originalRecord.getCodeValue(fieldIndex);
                 values.add(originalValue);
               }
@@ -222,21 +224,16 @@ public class MergeRecordsDialog extends BaseDialog {
               final String menuTitle = "<html><b>Use:</b> <b color='red'>"
                 + DataTypes.toString(value) + "</b></html>";
               menu.add(new RunnableAction(menuTitle, () -> {
-                mergeableRecord.setOverwriteValue(fieldIndex, value);
+                mergeableRecord.setOverrideValue(fieldIndex, value);
                 mergeableRecord.setValue(fieldIndex, value);
-                mergeableRecord.mergeValidateField(fieldIndex);
-                mergeableRecord.mergeValidateField(fieldIndex);
+                mergeableRecord.mergeValidateFields(false);
               }));
             }
             if (matchType == MergeFieldMatchType.OVERRIDDEN) {
               final String menuTitle = "<html><b color='red'>Remove Overrides</b></html>";
               menu.add(new RunnableAction(menuTitle, () -> {
-                for (final MergeOriginalRecord originalRecord : mergeableRecord.originalRecords) {
-                  final MergeFieldOriginalFieldState fieldState = originalRecord
-                    .getFieldState(fieldIndex);
-                  fieldState.clearOverrideError();
-                }
-                mergeableRecord.mergeValidateField(fieldIndex);
+                mergeableRecord.cleaOverrideValue(fieldIndex);
+                mergeableRecord.mergeValidateFields(false);
               }));
             }
             return menu;
@@ -265,23 +262,7 @@ public class MergeRecordsDialog extends BaseDialog {
 
     for (int i = 0; i < mergeableRecord.originalRecords.size(); i++) {
       final MergeOriginalRecord originalRecord = mergeableRecord.getOriginalRecord(i);
-      model.addColumn(new RecordTableModelColumn("Record " + (i + 1), originalRecord, false) {
-        @Override
-        public BaseJPopupMenu getMenu(final int fieldIndex) {
-          final MergeFieldOriginalFieldState fieldState = originalRecord.getFieldStates()
-            .get(fieldIndex);
-          if (fieldState.isMatchType(MergeFieldMatchType.OVERRIDDEN)) {
-            final BaseJPopupMenu menu = new BaseJPopupMenu();
-            final String menuTitle = "<html><b color='red'>Remove Override</b></html>";
-            menu.add(new RunnableAction(menuTitle, () -> {
-              // fieldState.setOverrideError(false);
-              mergeableRecord.mergeValidateField(fieldIndex);
-            }));
-            return menu;
-          }
-          return null;
-        }
-      });
+      model.addColumn(new RecordTableModelColumn("Record " + (i + 1), originalRecord, false));
     }
 
     mergeableRecord.tableModel = model;
