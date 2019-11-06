@@ -72,9 +72,10 @@ public class BlockDeleteRecords {
 
       String message = "<p><b style=\"color:red\">The following records cannot be deleted because they have values in the fields highlighted in red.</b></p>"
         + "<p>Edit those records to remove the values from those fields if you are sure you want to delete them.</p>";
-      if (otherRecords.size() > 0) {
-        message = message
-          + "<p style=\"color:red\">There are  other record(s) to  be deleted, click the Yes to delete those records, or No to not delete any records.</p>";
+      final int otherCount = otherRecords.size();
+      if (otherCount > 0) {
+        message = message + "<p style=\"color:red\">There are " + otherCount
+          + " other record(s) to  be deleted, click the Yes to delete those records, or No to not delete any records.</p>";
       }
       final BasePanel panel = new BasePanel(new VerticalLayout(),
         new JLabel("<html>" + message + "</html>"), tablePanel);
@@ -99,7 +100,7 @@ public class BlockDeleteRecords {
       dialog.setVisible(true);
       SwingUtil.dispose(dialog);
       final Integer result = (Integer)pane.getValue();
-      if (result == JOptionPane.YES_OPTION) {
+      if (result != null && result == JOptionPane.YES_OPTION) {
         deleteAction.accept(otherRecords);
       }
     });
