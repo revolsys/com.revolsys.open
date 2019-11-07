@@ -210,7 +210,7 @@ public abstract class AbstractOverlay extends JComponent
 
   protected abstract void cancel();
 
-  private void cancelAll() {
+  private void cancelMenu() {
     final Container parent = getParent();
     if (parent instanceof JLayeredPane) {
       final JLayeredPane layeredPane = (JLayeredPane)parent;
@@ -219,10 +219,14 @@ public abstract class AbstractOverlay extends JComponent
         final Component component = layeredPane.getComponent(i);
         if (component.isEnabled() && component instanceof AbstractOverlay) {
           final AbstractOverlay overlay = (AbstractOverlay)component;
-          overlay.cancel();
+          overlay.canelMenuDo();
         }
       }
     }
+  }
+
+  protected void canelMenuDo() {
+    cancel();
   }
 
   public boolean canOverrideOverlayAction(final String newAction) {
@@ -808,7 +812,7 @@ public abstract class AbstractOverlay extends JComponent
       final MenuFactory menu = layer.getMenu();
       final JPopupMenu popupMenu = menu.showMenu(layer, event);
       if (popupMenu != null) {
-        cancelAll();
+        cancelMenu();
         event.consume();
         final MapPanel map = getMap();
         map.setMenuVisible(true);
@@ -860,7 +864,7 @@ public abstract class AbstractOverlay extends JComponent
         }, layer, this, event);
       }
       if (popupMenu != null) {
-        cancelAll();
+        cancelMenu();
         event.consume();
         final MapPanel map = getMap();
         map.setMenuVisible(true);

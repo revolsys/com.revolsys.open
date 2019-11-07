@@ -47,6 +47,7 @@ import com.revolsys.swing.map.layer.record.style.marker.MarkerRenderer;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.util.Debug;
 
 public class RoutingOverlay extends AbstractOverlay {
 
@@ -174,6 +175,13 @@ public class RoutingOverlay extends AbstractOverlay {
     modeClear();
   }
 
+  @Override
+  protected void canelMenuDo() {
+    if (!isOverlayAction(SHORTEST_ROUTE)) {
+      super.canelMenuDo();
+    }
+  }
+
   public List<LayerRecord> getAllRecords() {
     return this.records;
   }
@@ -281,6 +289,9 @@ public class RoutingOverlay extends AbstractOverlay {
 
   private void modeClear() {
     clearOverlayAction(SHORTEST_ROUTE);
+    if (this.record1 != null) {
+      Debug.noOp();
+    }
     this.layer = null;
     this.record1 = null;
     this.record2 = null;
