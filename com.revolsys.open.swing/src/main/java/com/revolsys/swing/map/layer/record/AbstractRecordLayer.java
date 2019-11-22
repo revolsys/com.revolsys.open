@@ -139,6 +139,7 @@ import com.revolsys.swing.menu.WrappedMenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.preferences.PreferenceFields;
 import com.revolsys.swing.table.BaseJTable;
+import com.revolsys.swing.undo.MultipleUndo;
 import com.revolsys.swing.undo.SetRecordFieldValueUndo;
 import com.revolsys.util.PreferenceKey;
 import com.revolsys.util.Preferences;
@@ -270,6 +271,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         if (index != null) {
           index.setGeometryFactory(geometryFactory);
         }
+      }
+    }
+
+    @Override
+    public void setRecords(final Iterable<? extends LayerRecord> records) {
+      synchronized (getSync()) {
+        clearIndex();
+        super.setRecords(records);
       }
     }
   }
@@ -529,7 +538,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void addHighlightedRecords(final Collection<? extends LayerRecord> records) {
     synchronized (getSync()) {
       this.recordCacheHighlighted.addRecords(records);
-      cleanCachedRecords();
     }
     fireHighlighted();
   }
@@ -542,7 +550,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (this.recordCacheModified.addRecord(record)) {
       firePropertyChange(RECORD_CACHE_MODIFIED, null, record.newRecordProxy());
       fireHasChangedRecords();
-      cleanCachedRecords();
     }
   }
 
@@ -669,7 +676,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
           cancelled &= internalCancelChanges(this.recordCacheNew);
           cancelled &= internalCancelChanges(this.recordCacheDeletedInternal);
           cancelled &= internalCancelChanges(this.recordCacheModified);
-          cleanCachedRecords();
         } finally {
           fireRecordsChanged();
         }
@@ -703,13 +709,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  protected void cleanCachedRecords() {
-  }
-
   public void clearHighlightedRecords() {
     synchronized (getSync()) {
       this.recordCacheHighlighted.clearRecords();
-      cleanCachedRecords();
     }
     fireHighlighted();
   }
@@ -1397,7 +1399,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  protected LayerRecord getProxiedRecord(LayerRecord record) {
+  public LayerRecord getProxiedRecord(LayerRecord record) {
     if (record != null && record.getLayer() == this) {
       if (record instanceof AbstractProxyLayerRecord) {
         final AbstractProxyLayerRecord proxy = (AbstractProxyLayerRecord)record;
@@ -2157,6 +2159,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
+  public MultipleUndo newMultipleUndo() {
+    return new MultipleUndo();
+  }
+
   @Override
   public TabbedValuePanel newPropertiesPanel() {
     final TabbedValuePanel propertiesPanel = super.newPropertiesPanel();
@@ -2286,13 +2292,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return newSpatialIndex(this);
   }
 
-  protected RecordSpatialIndex<LayerRecord> newSpatialIndex(final Layer layer) {
+  protected RecordSpatialIndex<LayerRecord> newSpatialIndex(final AbstractRecordLayer layer) {
     final GeometryFactory geometryFactory = layer.getGeometryFactory();
-
     final BiPredicate<LayerRecord, LayerRecord> equalsItemFunction = LayerRecord::isSame;
-    final SpatialIndex<LayerRecord> spatialIndex = //
-        new RStarTree<LayerRecord>(geometryFactory).setEqualsItemFunction(equalsItemFunction);
-    // new LayerRecordQuadTree(geometryFactory);
+    final SpatialIndex<LayerRecord> spatialIndex = new RStarTree<LayerRecord>(geometryFactory)
+      .setEqualsItemFunction(equalsItemFunction);
     return new RecordSpatialIndex<>(spatialIndex);
   }
 
@@ -2480,42 +2484,42 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public <A extends B, B> void processTasks(final CharSequence title, final int taskCount,
     final Consumer<Consumer<A>> forEachAction, final Consumer<B> action,
     final Consumer<ProgressMonitor> afterAction) {
-    Consumer<ProgressMonitor> task = progressMonitor -> {
-      final Consumer<A> monitorAction = value -> {
-        if (progressMonitor.isCancelled()) {
-          throw new CancellationException();
-        } else {
-          action.accept(value);
-          progressMonitor.addProgress();
-        }
-      };
+    final Consumer<ProgressMonitor> task = progressMonitor -> processTasksDo(title, progressMonitor,
+      forEachAction, action, afterAction);
+    ProgressMonitor.background(title, null, task, taskCount);
+  }
 
-      try (
-        BaseCloseable eventsDisabled = eventsDisabled()) {
-        processTasksDo(forEachAction, monitorAction);
-      } catch (final CancellationException e) {
-      } finally {
-        if (afterAction != null) {
-          try {
-            afterAction.accept(progressMonitor);
-          } catch (final Exception e) {
-            Logs.error(this, "Unable to post-process " + title, e);
-          }
-        }
-        fireRecordsChanged();
+  protected <A extends B, B> void processTasksDo(final CharSequence title,
+    final ProgressMonitor progressMonitor, final Consumer<Consumer<A>> forEachAction,
+    final Consumer<B> action, final Consumer<ProgressMonitor> afterAction) {
+    final Consumer<A> monitorAction = value -> {
+      if (progressMonitor.isCancelled()) {
+        throw new CancellationException();
+      } else {
+        action.accept(value);
+        progressMonitor.addProgress();
       }
     };
-    task = processTasksWrap(task);
-    ProgressMonitor.background(title, null, task, taskCount);
+
+    try (
+      BaseCloseable eventsDisabled = eventsDisabled()) {
+      processTasksDo(forEachAction, monitorAction);
+    } catch (final CancellationException e) {
+    } finally {
+      if (afterAction != null) {
+        try {
+          afterAction.accept(progressMonitor);
+        } catch (final Exception e) {
+          Logs.error(this, "Unable to post-process " + title, e);
+        }
+      }
+      fireRecordsChanged();
+    }
   }
 
   protected <A> void processTasksDo(final Consumer<Consumer<A>> forEachAction,
     final Consumer<A> monitorAction) {
     forEachAction.accept(monitorAction);
-  }
-
-  protected Consumer<ProgressMonitor> processTasksWrap(final Consumer<ProgressMonitor> task) {
-    return task;
   }
 
   @Override
@@ -2545,7 +2549,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @Override
   protected void refreshDo() {
     setIndexRecords(null);
-    cleanCachedRecords();
   }
 
   @Override
@@ -2557,7 +2560,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   protected void removeForm(final LayerRecord record) {
     final List<LayerRecord> records = Collections.singletonList(record);
     removeForms(records);
-    cleanCachedRecords();
   }
 
   protected void removeForms(final Iterable<? extends LayerRecord> records) {
@@ -2654,7 +2656,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
         removeRecordFromCache(record);
         setSelectedHighlighted(record, selected, highlighted);
-        cleanCachedRecords();
       }
     }
   }
@@ -2694,7 +2695,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               try (
                 BaseCloseable eventsEnabled = eventsDisabled()) {
                 saveChangesDo(errors, validRecords);
-                cleanCachedRecords();
               } finally {
                 if (!errors.showErrorDialog()) {
                   allSaved.add(false);
@@ -2747,7 +2747,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
                 errors.addRecord(record, t);
               }
             }
-            cleanCachedRecords();
             record.fireRecordUpdated();
           } finally {
             if (!errors.showErrorDialog()) {
@@ -2938,19 +2937,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void setHighlightedRecords(final Collection<LayerRecord> highlightedRecords) {
     synchronized (getSync()) {
-      this.recordCacheHighlighted.clearRecords();
-      addHighlightedRecords(highlightedRecords);
+      this.recordCacheHighlighted.setRecords(highlightedRecords);
+      fireHighlighted();
     }
   }
 
   protected void setIndexRecords(final List<LayerRecord> records) {
     synchronized (getSync()) {
       if (hasGeometryField()) {
-        this.recordCacheIndex.clearRecords();
-        if (records != null) {
-          this.recordCacheIndex.addRecords(records);
-        }
-        cleanCachedRecords();
+        this.recordCacheIndex.setRecords(records);
         final List<LayerRecord> newRecords = getRecordsNew();
         for (final LayerRecord newRecord : newRecords) {
           if (newRecord.getState().isNew()) {
@@ -3013,6 +3008,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected void setRecordFactory(final RecordFactory<? extends LayerRecord> recordFactory) {
     this.recordFactory = recordFactory;
+  }
+
+  public boolean setRecordValue(final LayerRecord record, final CharSequence fieldName,
+    final Object value) {
+    return record.setValue(fieldName, value);
   }
 
   protected void setSelectedHighlighted(final LayerRecord record, final boolean selected,

@@ -238,7 +238,8 @@ public class FieldCalculator extends AbstractUpdateField implements DocumentList
       final String fieldName = fieldDefinition.getName();
       Object value = this.script.eval(bindings);
       value = fieldDefinition.toFieldValueException(value);
-      record.setValue(fieldName, value);
+      final AbstractRecordLayer layer = record.getLayer();
+      layer.setRecordValue(record, fieldName, value);
     } catch (final ScriptException e) {
       Exceptions.throwUncheckedException(e);
     }

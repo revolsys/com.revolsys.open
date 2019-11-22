@@ -14,8 +14,10 @@ public interface RecordCache {
   }
 
   default void addRecords(final Iterable<? extends LayerRecord> records) {
-    for (final LayerRecord record : records) {
-      addRecord(record);
+    if (records != null) {
+      for (final LayerRecord record : records) {
+        addRecord(record);
+      }
     }
   }
 
@@ -60,6 +62,11 @@ public interface RecordCache {
 
   default boolean replaceRecord(final LayerRecord record) {
     return false;
+  }
+
+  default void setRecords(final Iterable<? extends LayerRecord> records) {
+    clearRecords();
+    addRecords(records);
   }
 
 }

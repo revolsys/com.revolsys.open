@@ -654,11 +654,15 @@ public interface BoundingBox
   }
 
   default double distanceFromCenter(final BoundingBox boundingBox) {
+    final double x = boundingBox.getCentreX();
+    final double y = boundingBox.getCentreY();
+    return distanceFromCenter(x, y);
+  }
+
+  default double distanceFromCenter(final double x, final double y) {
     final double x1 = getCentreX();
     final double y1 = getCentreY();
-    final double x2 = boundingBox.getCentreX();
-    final double y2 = boundingBox.getCentreY();
-    return Points.distance(x1, y1, x2, y2);
+    return Points.distance(x1, y1, x, y);
   }
 
   default double edgeDeltas() {

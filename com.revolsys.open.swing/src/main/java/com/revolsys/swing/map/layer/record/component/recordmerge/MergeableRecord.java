@@ -132,8 +132,7 @@ class MergeableRecord extends ArrayRecord {
     final int fieldCount = getFieldCount();
     for (int fieldIndex = 0; fieldIndex < fieldCount; fieldIndex++) {
       final MergeFieldMatchType matchType = mergeValidateFieldDo(fieldIndex);
-      if (firstRun
-        && matchType.ordinal() <= MergeFieldMatchType.END_FIELD_NOT_VALID.ordinal()) {
+      if (firstRun && matchType.ordinal() <= MergeFieldMatchType.END_FIELD_NOT_VALID.ordinal()) {
         setValue(fieldIndex, null);
         mergeValidateFieldDo(fieldIndex);
       }
@@ -174,8 +173,7 @@ class MergeableRecord extends ArrayRecord {
 
   private void updateCanMerge() {
     for (final MergeFieldMatchType matchType : getMatchTypes()) {
-      if (matchType == MergeFieldMatchType.NOT_EQUAL
-        || matchType == MergeFieldMatchType.CANT_MERGE) {
+      if (matchType.compareTo(MergeFieldMatchType.END_FIELD_NOT_VALID) <= 0) {
         this.canMergeEnableCheck.setEnabled(false);
         return;
       }

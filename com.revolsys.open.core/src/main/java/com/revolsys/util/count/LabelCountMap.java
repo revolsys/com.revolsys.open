@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import com.revolsys.util.Counter;
-import com.revolsys.util.Debug;
 import com.revolsys.util.LongCounter;
 
 public class LabelCountMap extends AbstractLabelCounters {
@@ -33,9 +32,6 @@ public class LabelCountMap extends AbstractLabelCounters {
         return true;
       } else {
         counter.add(count);
-        if (counter.get() < 0) {
-          Debug.noOp();
-        }
         return false;
       }
     }

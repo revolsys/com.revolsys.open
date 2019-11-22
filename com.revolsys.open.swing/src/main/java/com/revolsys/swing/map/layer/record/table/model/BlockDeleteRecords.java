@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Window;
@@ -12,7 +13,6 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
-import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.awt.WebColors;
 
 import com.revolsys.collection.list.Lists;
@@ -32,6 +32,7 @@ public class BlockDeleteRecords {
     final List<LR> blockedRecords, final List<LR> otherRecords,
     final Consumer<Collection<LR>> deleteAction) {
     Invoke.later(() -> {
+      @SuppressWarnings("unchecked")
       final List<String> blockNotEqualFieldNames = Lists
         .toArray((Collection<String>)layer.getProperty("mergeRecordsBlockNotEqualFieldNames"));
 
@@ -77,11 +78,12 @@ public class BlockDeleteRecords {
         message = message + "<p style=\"color:red\">There are " + otherCount
           + " other record(s) to  be deleted, click the Yes to delete those records, or No to not delete any records.</p>";
       }
-      final BasePanel panel = new BasePanel(new VerticalLayout(),
-        new JLabel("<html>" + message + "</html>"), tablePanel);
+      final BasePanel panel = new BasePanel(new BorderLayout());
+      panel.add(new JLabel("<html>" + message + "</html>"), BorderLayout.NORTH);
+      panel.add(tablePanel, BorderLayout.CENTER);
       final Rectangle screenBounds = SwingUtil.getScreenBounds();
-      panel.setPreferredSize(
-        new Dimension(screenBounds.width - 300, tableModel.getRowCount() * 22 + 75));
+      panel.setPreferredSize(new Dimension(screenBounds.width - 300,
+        Math.min(tableModel.getRowCount() * 22 + 75, screenBounds.height - 150)));
 
       final Window window = Dialogs.getWindow();
       int option = JOptionPane.YES_NO_OPTION;

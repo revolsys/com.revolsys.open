@@ -25,8 +25,10 @@ public class LayerRecordQuadTree extends QuadTree<LayerRecord> {
 
   @Override
   protected boolean equalsItem(final LayerRecord record1, final LayerRecord record2) {
-    if (record1 == null || record2 == null) {
-      return record1 == record2;
+    if (record1 == record2) {
+      return true;
+    } else if (record1 == null || record2 == null) {
+      return false;
     } else {
       return record1.isSame(record2);
     }

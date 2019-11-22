@@ -226,11 +226,15 @@ public class Log4jTableModel extends AbstractTableModel {
 
   @Override
   public Object getValueAt(final int rowIndex, final int columnIndex) {
-    final List<Object> values = this.rows.get(rowIndex);
-    if (values == null) {
+    if (rowIndex >= this.rows.size()) {
       return null;
     } else {
-      return values.get(columnIndex);
+      final List<Object> values = this.rows.get(rowIndex);
+      if (values == null) {
+        return null;
+      } else {
+        return values.get(columnIndex);
+      }
     }
   }
 

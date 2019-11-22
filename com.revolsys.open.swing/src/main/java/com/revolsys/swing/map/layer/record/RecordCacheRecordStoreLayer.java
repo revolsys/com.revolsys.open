@@ -28,13 +28,29 @@ public class RecordCacheRecordStoreLayer extends AbstractRecordCache<RecordStore
     } else {
       this.layer.getCachedRecord(identifier, record, false);
       synchronized (this.identifiers) {
-        return this.identifiers.add(identifier);
+        if (this.identifiers.add(identifier)) {
+          this.layer.incrementReferenceCount(identifier);
+          return true;
+        } else {
+          return false;
+        }
       }
     }
   }
 
   @Override
+  public void addRecords(final Iterable<? extends LayerRecord> records) {
+    super.addRecords(records);
+    this.layer.rebuildReferenceCounts();
+  }
+
+  @Override
   public void clearRecords() {
+    clearRecordsDo();
+    this.layer.rebuildReferenceCounts();
+  }
+
+  public void clearRecordsDo() {
     synchronized (this.identifiers) {
       this.identifiers.clear();
     }
@@ -67,6 +83,10 @@ public class RecordCacheRecordStoreLayer extends AbstractRecordCache<RecordStore
     }
   }
 
+  public Set<Identifier> getIdentifiers() {
+    return this.identifiers;
+  }
+
   @Override
   public int getSize() {
     return this.parentCache.getSize() + this.identifiers.size();
@@ -77,12 +97,21 @@ public class RecordCacheRecordStoreLayer extends AbstractRecordCache<RecordStore
     final Identifier identifier = record.getIdentifier();
     if (identifier != null) {
       synchronized (this.identifiers) {
-        this.identifiers.remove(identifier);
+        if (this.identifiers.remove(identifier)) {
+          this.layer.decrementReferenceCount(identifier);
+        }
       }
     }
     this.parentCache.removeRecordDo(record);
     return true;
 
+  }
+
+  @Override
+  public void setRecords(final Iterable<? extends LayerRecord> records) {
+    clearRecordsDo();
+    super.addRecords(records);
+    this.layer.rebuildReferenceCounts();
   }
 
   @Override

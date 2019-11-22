@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 
+import com.revolsys.collection.ArrayUtil;
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
@@ -14,6 +15,15 @@ import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.util.ExitLoopException;
 
 public class RStarTree<T> implements SpatialIndex<T> {
+
+  private abstract class BoundingBoxComparator implements Comparator<RStarNode<T>> {
+    BoundingBox boundingBox;
+
+    protected Comparator<RStarNode<T>> comparator(final BoundingBox boundingBox) {
+      this.boundingBox = boundingBox;
+      return this;
+    }
+  }
 
   private static final int RTREE_CHOOSE_SUBTREE_P = 32;
 
@@ -30,6 +40,60 @@ public class RStarTree<T> implements SpatialIndex<T> {
   private BiPredicate<T, T> equalsItemFunction = (item1, item2) -> item1 == item2;
 
   private GeometryFactory geometryFactory;
+
+  private final Comparator<RStarNode<T>>[] sortMin = ArrayUtil.newArray(sortBoundingBoxByMin(0),
+    sortBoundingBoxByMin(1));
+
+  private final Comparator<RStarNode<T>>[] sortMax = ArrayUtil.newArray(sortBoundingBoxByMax(0),
+    sortBoundingBoxByMax(1));
+
+  private final BoundingBoxComparator sortAreaEnlargement = new BoundingBoxComparator() {
+
+    double area;
+
+    @Override
+    protected Comparator<RStarNode<T>> comparator(final BoundingBox boundingBox) {
+      this.area = boundingBox.getArea();
+      return super.comparator(boundingBox);
+    }
+
+    @Override
+    public int compare(final RStarNode<T> bi1, final RStarNode<T> bi2) {
+      final double value1 = this.area - bi1.getArea();
+      final double value2 = this.area - bi2.getArea();
+      return Double.compare(value1, value2);
+    }
+  };
+
+  private final BoundingBoxComparator sortOverlapEnlargement = new BoundingBoxComparator() {
+    @Override
+    public int compare(final RStarNode<T> bi1, final RStarNode<T> bi2) {
+      final double value1 = bi1.getBoundingBox().overlappingArea(this.boundingBox);
+      final double value2 = bi2.getBoundingBox().overlappingArea(this.boundingBox);
+      return Double.compare(value1, value2);
+    }
+  };
+
+  private final BoundingBoxComparator sortCentreDistance = new BoundingBoxComparator() {
+    private double centreX;
+
+    private double centreY;
+
+    @Override
+    protected Comparator<RStarNode<T>> comparator(final BoundingBox boundingBox) {
+      this.boundingBox = boundingBox;
+      this.centreX = boundingBox.getCentreX();
+      this.centreY = boundingBox.getCentreY();
+      return super.comparator(boundingBox);
+    }
+
+    @Override
+    public int compare(final RStarNode<T> bi1, final RStarNode<T> bi2) {
+      final double value1 = bi1.getBoundingBox().distanceFromCenter(this.centreX, this.centreY);
+      final double value2 = bi2.getBoundingBox().distanceFromCenter(this.centreX, this.centreY);
+      return Double.compare(value1, value2);
+    }
+  };
 
   public RStarTree() {
   }
@@ -55,18 +119,18 @@ public class RStarTree<T> implements SpatialIndex<T> {
         // data rectangle
 
         // Let A be the group of the first p entries
-        node.sortItems(sortBoundingBoxProxysByAreaEnlargement(bound));
+        node.sortItems(this.sortAreaEnlargement.comparator(bound));
 
         // From the items in A, considering all items in
         // N, choose the leaf whose rectangle needs least
         // overlap enlargement
 
-        return node.getMinimum(sortBoundingBoxProxysByOverlapEnlargement(bound),
+        return node.getMinimum(this.sortOverlapEnlargement.comparator(bound),
           RTREE_CHOOSE_SUBTREE_P);
       }
-      return node.getMinimum(sortBoundingBoxProxysByOverlapEnlargement(bound));
+      return node.getMinimum(this.sortOverlapEnlargement.comparator(bound));
     }
-    return node.getMinimum(sortBoundingBoxProxysByAreaEnlargement(bound));
+    return node.getMinimum(this.sortAreaEnlargement.comparator(bound));
   }
 
   @Override
@@ -217,7 +281,7 @@ public class RStarTree<T> implements SpatialIndex<T> {
       keePItemCount = 1;
     }
 
-    node.sortItems(sortBoundingBoxProxysByDistanceFromCenter(node.getBoundingBox()));
+    node.sortItems(this.sortCentreDistance.comparator(node.getBoundingBox()));
 
     final List<RStarNode<T>> removedItems = new ArrayList<>();
     for (int i = keePItemCount; i < itemCount; i++) {
@@ -293,7 +357,7 @@ public class RStarTree<T> implements SpatialIndex<T> {
     return this;
   }
 
-  Comparator<RStarNode<T>> sortBoundingBoxByMax(final int axis) {
+  private Comparator<RStarNode<T>> sortBoundingBoxByMax(final int axis) {
     return (bi1, bi2) -> {
       final double value1 = bi1.getBoundingBox().getMax(axis);
       final double value2 = bi2.getBoundingBox().getMax(axis);
@@ -301,37 +365,10 @@ public class RStarTree<T> implements SpatialIndex<T> {
     };
   }
 
-  Comparator<RStarNode<T>> sortBoundingBoxByMin(final int axis) {
+  private Comparator<RStarNode<T>> sortBoundingBoxByMin(final int axis) {
     return (bi1, bi2) -> {
       final double value1 = bi1.getBoundingBox().getMin(axis);
       final double value2 = bi2.getBoundingBox().getMin(axis);
-      return Double.compare(value1, value2);
-    };
-  }
-
-  Comparator<RStarNode<T>> sortBoundingBoxProxysByAreaEnlargement(final BoundingBox boundingBox) {
-    final double area = boundingBox.getArea();
-    return (bi1, bi2) -> {
-      final double value1 = area - bi1.getArea();
-      final double value2 = area - bi2.getArea();
-      return Double.compare(value1, value2);
-    };
-  }
-
-  Comparator<RStarNode<T>> sortBoundingBoxProxysByDistanceFromCenter(
-    final BoundingBox boundingBox) {
-    return (bi1, bi2) -> {
-      final double value1 = bi1.getBoundingBox().distanceFromCenter(boundingBox);
-      final double value2 = bi2.getBoundingBox().distanceFromCenter(boundingBox);
-      return Double.compare(value1, value2);
-    };
-  }
-
-  Comparator<RStarNode<T>> sortBoundingBoxProxysByOverlapEnlargement(
-    final BoundingBox boundingBox) {
-    return (bi1, bi2) -> {
-      final double value1 = bi1.getBoundingBox().overlappingArea(boundingBox);
-      final double value2 = bi2.getBoundingBox().overlappingArea(boundingBox);
       return Double.compare(value1, value2);
     };
   }
@@ -380,9 +417,9 @@ public class RStarTree<T> implements SpatialIndex<T> {
       for (int edge = 0; edge < 2; edge++) {
         // sort the items by the correct key (upper edge, lower edge)
         if (edge == 0) {
-          node.sortItems(sortBoundingBoxByMin(axis));
+          node.sortItems(this.sortMin[axis]);
         } else {
-          node.sortItems(sortBoundingBoxByMax(axis));
+          node.sortItems(this.sortMax[axis]);
         }
         // Distributions: pick a point m in the middle of the thing, call the
         // left

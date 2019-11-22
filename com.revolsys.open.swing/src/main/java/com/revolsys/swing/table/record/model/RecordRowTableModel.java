@@ -466,6 +466,11 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
 
   protected void setRecordValue(final Record record, final String fieldName, final Object value) {
     final Object objectValue = toObjectValue(fieldName, value);
+    setRecordValueDo(record, fieldName, objectValue);
+  }
+
+  protected void setRecordValueDo(final Record record, final String fieldName,
+    final Object objectValue) {
     record.setValue(fieldName, objectValue);
   }
 

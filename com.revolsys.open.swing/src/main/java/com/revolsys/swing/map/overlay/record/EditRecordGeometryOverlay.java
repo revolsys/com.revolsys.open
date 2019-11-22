@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -171,6 +172,17 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         ACTION_MOVE_GEOMETRY //
       );
     }
+  }
+
+  private void addEdit(final MultipleUndo allEdits, final Map<Layer, MultipleUndo> editsByLayer,
+    final AbstractRecordLayer layer, final UndoableEdit edit) {
+    MultipleUndo layerEdits = editsByLayer.get(layer);
+    if (layerEdits == null) {
+      layerEdits = layer.newMultipleUndo();
+      editsByLayer.put(layer, layerEdits);
+      allEdits.addEdit(layerEdits);
+    }
+    layerEdits.addEdit(edit);
   }
 
   private Point addElevation(final GeometryFactory geometryFactory, final Point newPoint) {
@@ -551,8 +563,10 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       }
     } else if (keyCode == KeyEvent.VK_BACK_SPACE || keyCode == KeyEvent.VK_DELETE) {
       if (hasMouseOverLocation()) {
-        final MultipleUndo edit = new MultipleUndo();
+        final MultipleUndo allEdits = new MultipleUndo();
+        final Map<Layer, MultipleUndo> editsByLayer = new HashMap<>();
         for (final CloseLocation location : getMouseOverLocations()) {
+          final AbstractRecordLayer layer = location.getLayer();
           final Geometry geometry = location.getGeometry();
           final int[] vertexId = location.getVertexId();
           if (vertexId != null) {
@@ -565,21 +579,23 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
                   if (newGeometry.isEmpty()) {
                     SwingUtil.beep();
                   } else {
-                    final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
-                    edit.addEdit(geometryEdit);
+                    final UndoableEdit edit = setGeometry(location, newGeometry);
+                    addEdit(allEdits, editsByLayer, layer, edit);
                   }
                 }
               } else {
-                edit.addEdit(new DeleteVertexUndoEdit(this.addGeometryEditor, vertexId));
+                final DeleteVertexUndoEdit edit = new DeleteVertexUndoEdit(this.addGeometryEditor,
+                  vertexId);
+                addEdit(allEdits, editsByLayer, layer, edit);
               }
             } catch (final Exception t) {
               SwingUtil.beep();
             }
           }
         }
-        if (!edit.isEmpty()) {
-          edit.addEdit(new ClearXorUndoEdit());
-          addUndo(edit);
+        if (!allEdits.isEmpty()) {
+          allEdits.addEdit(new ClearXorUndoEdit());
+          addUndo(allEdits);
         }
         clearMouseOverLocations();
       }
@@ -732,15 +748,19 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       if (this.addGeometryEditVerticesStart && hasMouseOverLocation()) {
         if (button == MouseEvent.BUTTON1) {
           this.addGeometryEditVerticesStart = false;
-          final MultipleUndo edit = new MultipleUndo();
+          final MultipleUndo allEdits = new MultipleUndo();
+          final Map<Layer, MultipleUndo> editsByLayer = new HashMap<>();
           final List<CloseLocation> locations = getMouseOverLocations();
           if (this.addGeometryPartDataType == GeometryDataTypes.LINE_STRING && !this.dragged
             && locations.size() == 1 && locations.get(0).isFromVertex()) {
             final CloseLocation location = locations.get(0);
-            edit.addEdit(new AppendVertexUndoEdit(this.addGeometryEditor, this.addGeometryPartIndex,
-              this.addGeometryPartDataType, location.getVertex()));
+            final AbstractRecordLayer layer = location.getLayer();
+            final AppendVertexUndoEdit edit = new AppendVertexUndoEdit(this.addGeometryEditor,
+              this.addGeometryPartIndex, this.addGeometryPartDataType, location.getVertex());
+            addEdit(allEdits, editsByLayer, layer, edit);
           } else {
             for (final CloseLocation location : locations) {
+              final AbstractRecordLayer layer = location.getLayer();
               Point newPoint;
               if (this.dragged) {
                 newPoint = getSnapOrEventPointWithElevation(event, location);
@@ -755,12 +775,12 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
               } else {
                 locationEdit = new SetVertexUndoEdit(this.addGeometryEditor, vertexId, newPoint);
               }
-              edit.addEdit(locationEdit);
+              addEdit(allEdits, editsByLayer, layer, locationEdit);
             }
           }
-          if (!edit.isEmpty()) {
-            edit.addEdit(new ClearXorUndoEdit());
-            addUndo(edit);
+          if (!allEdits.isEmpty()) {
+            allEdits.addEdit(new ClearXorUndoEdit());
+            addUndo(allEdits);
           }
           setMouseOverLocationsDo(Collections.emptyList());
           clearOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES);
@@ -908,7 +928,8 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       if (event.getButton() == MouseEvent.BUTTON1) {
         if (this.dragged) {
           try {
-            final MultipleUndo edit = new MultipleUndo();
+            final MultipleUndo allEdits = new MultipleUndo();
+            final Map<Layer, MultipleUndo> editsByLayer = new HashMap<>();
             final List<CloseLocation> locations = getMouseOverLocations();
             for (final CloseLocation location : locations) {
               final Point newPoint = getSnapOrEventPointWithElevation(event, location);
@@ -916,11 +937,12 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
               if (geometryEditor.isModified()) {
                 final Geometry newGeometry = geometryEditor.newGeometry();
                 final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
-                edit.addEdit(geometryEdit);
+                final AbstractRecordLayer layer = location.getLayer();
+                addEdit(allEdits, editsByLayer, layer, geometryEdit);
               }
             }
-            if (!edit.isEmpty()) {
-              addUndo(edit);
+            if (!allEdits.isEmpty()) {
+              addUndo(allEdits);
             }
           } finally {
             clearMouseOverLocations();
@@ -995,10 +1017,12 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       if (clearOverlayAction(ACTION_MOVE_GEOMETRY)) {
         clearOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES);
         clearOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES);
-        final MultipleUndo edit = new MultipleUndo();
+        final MultipleUndo allEdits = new MultipleUndo();
+        final Map<Layer, MultipleUndo> editsByLayer = new HashMap<>();
         final List<CloseLocation> moveGeometryLocations = this.moveGeometryLocations;
         if (moveGeometryLocations != null) {
           for (final CloseLocation location : moveGeometryLocations) {
+            final AbstractRecordLayer layer = location.getLayer();
             final GeometryFactory geometryFactory = location.getGeometryFactory();
             final Point from = this.moveGeometryStart.convertGeometry(geometryFactory);
             final Point to = this.moveGeometryEnd.convertGeometry(geometryFactory);
@@ -1009,7 +1033,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
               final Geometry geometry = location.getGeometry();
               if (geometry instanceof GeometryEditor<?>) {
                 final GeometryEditor<?> geometryEditor = (GeometryEditor<?>)geometry;
-                edit.addEdit(new MoveGeometryUndoEdit(geometryEditor, deltaX, deltaY));
+                final MoveGeometryUndoEdit edit = new MoveGeometryUndoEdit(geometryEditor, deltaX,
+                  deltaY);
+                addEdit(allEdits, editsByLayer, layer, edit);
               } else {
                 final Geometry newGeometry = geometry.edit(editor -> {
                   editor.move(deltaX, deltaY);
@@ -1021,14 +1047,14 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
                   }
                   return editor;
                 });
-                final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
-                edit.addEdit(geometryEdit);
+                final UndoableEdit edit = setGeometry(location, newGeometry);
+                addEdit(allEdits, editsByLayer, layer, edit);
               }
             }
           }
-          if (!edit.isEmpty()) {
-            edit.addEdit(new ClearXorUndoEdit());
-            addUndo(edit);
+          if (!allEdits.isEmpty()) {
+            allEdits.addEdit(new ClearXorUndoEdit());
+            addUndo(allEdits);
           }
         }
         modeMoveGeometryClear();

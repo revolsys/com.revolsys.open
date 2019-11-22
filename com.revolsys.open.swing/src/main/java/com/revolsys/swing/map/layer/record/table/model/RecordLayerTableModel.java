@@ -558,6 +558,11 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   @Override
+  protected void setRecordValueDo(final Record record, final String fieldName, final Object value) {
+    this.layer.setRecordValue((LayerRecord)record, fieldName, value);
+  }
+
+  @Override
   public SortOrder setSortOrder(final int columnIndex) {
     final SortOrder sortOrder = super.setSortOrder(columnIndex);
     final FieldDefinition fieldName = getColumnFieldDefinition(columnIndex);

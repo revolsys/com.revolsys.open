@@ -3,16 +3,20 @@ package com.revolsys.gis.esri.gdb.file;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.jeometry.common.function.Consumer4;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
+import com.revolsys.beans.ObjectException;
+import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.esri.filegdb.jni.EnumRows;
 import com.revolsys.esri.filegdb.jni.Geodatabase;
 import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.esri.filegdb.jni.Table;
+import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
+import com.revolsys.record.RecordState;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.util.CloseableValueHolder;
 import com.revolsys.util.ValueHolder;
 import com.revolsys.util.ValueWrapper;
@@ -126,6 +130,37 @@ public class TableReference extends CloseableValueHolder<Table> {
     return (TableWrapper)super.connect();
   }
 
+  boolean deleteRecordRow(final Record record) {
+    final Integer objectId = record.getInteger("OBJECTID");
+    if (objectId != null) {
+      final String whereClause = "OBJECTID=" + objectId;
+      final Table table = getValue();
+      synchronized (table) {
+        try (
+          BaseCloseable lock = writeLock(false)) {
+          final EnumRows rows = table.search("OBJECTID", whereClause, false);
+          try {
+            final Row row = rows.next();
+            if (row != null) {
+              table.deleteRow(row);
+              record.setState(RecordState.DELETED);
+              this.recordStore.addStatistic("Delete", record);
+              row.delete();
+              return true;
+            }
+          } finally {
+            try {
+              closeRows(rows);
+            } finally {
+              disconnect();
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
   public String getCatalogPath() {
     return this.catalogPath;
   }
@@ -146,32 +181,6 @@ public class TableReference extends CloseableValueHolder<Table> {
     return this.lockCount >= 0;
   }
 
-  boolean modifyRecordRow(final Record record, final String fieldSpec,
-    final Consumer4<TableReference, Record, Table, Row> action) {
-    final Integer objectId = record.getInteger("OBJECTID");
-    if (objectId != null) {
-      final String whereClause = "OBJECTID=" + objectId;
-      return valueFunctionSync(table -> {
-        try (
-          BaseCloseable lock = writeLock(false)) {
-          final EnumRows rows = table.search(fieldSpec, whereClause, false);
-          try {
-            final Row row = rows.next();
-            if (row != null) {
-              action.accept(this, record, table, row);
-              row.delete();
-              return true;
-            }
-          } finally {
-            closeRows(rows);
-          }
-        }
-        return false;
-      }, false);
-    }
-    return false;
-  }
-
   @Override
   protected TableWrapper newCloseable() {
     return new EsriFileGdbTableConnection();
@@ -188,6 +197,71 @@ public class TableReference extends CloseableValueHolder<Table> {
   @Override
   public String toString() {
     return this.recordStore.getFileName() + "\t" + this.catalogPath;
+  }
+
+  boolean updateRecordRow(final Record record) {
+    final Integer objectId = record.getInteger("OBJECTID");
+    if (objectId != null) {
+      validateRequired(record);
+      final String whereClause = "OBJECTID=" + objectId;
+      synchronized (this.geodatabase) {
+        final Table table = getValue();
+        try (
+          BaseCloseable lock = writeLock(false)) {
+          final EnumRows rows = table.search("*", whereClause, false);
+          try {
+            final Row row = rows.next();
+            if (row != null) {
+              try {
+                for (final FieldDefinition field : this.recordDefinition.getFields()) {
+                  final String name = field.getName();
+                  try {
+                    final Object value = record.getValue(name);
+                    final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
+                    esriField.setUpdateValue(record, row, value);
+                  } catch (final Throwable e) {
+                    throw new ObjectPropertyException(record, name, e);
+                  }
+                }
+                table.updateRow(row);
+                record.setState(RecordState.PERSISTED);
+              } catch (final ObjectException e) {
+                if (e.getObject() == record) {
+                  throw e;
+                } else {
+                  throw new ObjectException(record, e);
+                }
+              } catch (final Throwable e) {
+                throw new ObjectException(record, e);
+              }
+              row.delete();
+              this.recordStore.addStatistic("Update", record);
+
+              return true;
+            }
+          } finally {
+            try {
+              closeRows(rows);
+            } finally {
+              disconnect();
+            }
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  void validateRequired(final Record record) {
+    for (final FieldDefinition field : this.recordDefinition.getFields()) {
+      final String name = field.getName();
+      if (field.isRequired()) {
+        final Object value = record.getValue(name);
+        if (value == null && !((AbstractFileGdbFieldDefinition)field).isAutoCalculated()) {
+          throw new ObjectPropertyException(record, name, "Value required");
+        }
+      }
+    }
   }
 
   @Override

@@ -62,6 +62,11 @@ public class RecordCacheDelegating implements RecordCache {
   }
 
   @Override
+  public void setRecords(final Iterable<? extends LayerRecord> records) {
+    this.cache.setRecords(records);
+  }
+
+  @Override
   public String toString() {
     return this.cache.toString();
   }

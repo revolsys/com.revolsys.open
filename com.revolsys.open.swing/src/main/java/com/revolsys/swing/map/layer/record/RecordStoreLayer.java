@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.concurrent.CancellationException;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -21,6 +20,7 @@ import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.iterator.Iterators;
+import com.revolsys.collection.map.IntegerCountMap;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -64,11 +64,15 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   private SwingWorker<List<LayerRecord>, Void> loadingWorker;
 
   /** Cache of records from {@link Record#getIdentifier()} to {@link Record}. */
-  private final Map<Identifier, RecordStoreLayerRecord> recordsByIdentifier = new WeakHashMap<>();
+  private Map<Identifier, RecordStoreLayerRecord> recordsByIdentifier = new HashMap<>();
+
+  private IntegerCountMap<Identifier> recordCountsByIdentifier = new IntegerCountMap<>();
 
   private RecordStore recordStore;
 
   private PathName typePath;
+
+  private List<RecordCacheRecordStoreLayer> recordStoreLayerCaches;
 
   public RecordStoreLayer() {
     this("recordStoreLayer");
@@ -116,12 +120,12 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
   }
 
-  /**
-   * Remove any cached records that are currently not used.
-   */
-  @Override
-  protected void cleanCachedRecords() {
-    super.cleanCachedRecords();
+  public void decrementReferenceCount(final Identifier identifier) {
+    synchronized (getSync()) {
+      if (!this.recordCountsByIdentifier.decrementCount(identifier)) {
+        this.recordsByIdentifier.remove(identifier);
+      }
+    }
   }
 
   @Override
@@ -519,6 +523,12 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return (RS)this.recordStore;
   }
 
+  public void incrementReferenceCount(final Identifier identifier) {
+    synchronized (getSync()) {
+      this.recordCountsByIdentifier.incrementCount(identifier);
+    }
+  }
+
   @Override
   protected boolean initializeDo() {
     RecordStore recordStore = this.recordStore;
@@ -615,7 +625,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
       this.recordCacheNew.addRecord(newRecord);
       if (isEventsEnabled()) {
-        cleanCachedRecords();
       }
       final LayerRecord proxyRecord = new NewProxyLayerRecord(this, newRecord);
       fireRecordInserted(proxyRecord);
@@ -725,10 +734,14 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   protected final RecordCacheRecordStoreLayer newRecordCacheRecordStoreLayer(final String cacheId) {
+    if (this.recordStoreLayerCaches == null) {
+      this.recordStoreLayerCaches = new ArrayList<>();
+    }
     final RecordCacheCollection parentCache = newRecordCacheCollection(cacheId);
     final RecordCacheRecordStoreLayer recordCache = new RecordCacheRecordStoreLayer(cacheId, this,
       parentCache);
     addCachedIdentifiers(recordCache.identifiers);
+    this.recordStoreLayerCaches.add(recordCache);
     return recordCache;
   }
 
@@ -753,6 +766,21 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   protected void preDeleteRecord(final LayerRecord record) {
+  }
+
+  public void rebuildReferenceCounts() {
+    final Map<Identifier, RecordStoreLayerRecord> recordsByIdentifier = new HashMap<>();
+    final IntegerCountMap<Identifier> recordCountsByIdentifier = new IntegerCountMap<>();
+    final Map<Identifier, RecordStoreLayerRecord> oldRecordsByIdentifier = this.recordsByIdentifier;
+    for (final RecordCacheRecordStoreLayer recordCache : this.recordStoreLayerCaches) {
+      for (final Identifier identifier : recordCache.getIdentifiers()) {
+        final RecordStoreLayerRecord record = oldRecordsByIdentifier.get(identifier);
+        recordsByIdentifier.put(identifier, record);
+        recordCountsByIdentifier.incrementCount(identifier);
+      }
+    }
+    this.recordsByIdentifier = recordsByIdentifier;
+    this.recordCountsByIdentifier = recordCountsByIdentifier;
   }
 
   @Override
@@ -800,6 +828,10 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         }
       }
     }
+  }
+
+  void removeCachedRecord(final Identifier identifier) {
+    this.recordsByIdentifier.remove(identifier);
   }
 
   private void removeFromRecordByIdentifier(final Identifier identifier) {
@@ -909,8 +941,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   public void setRecordsToCache(final RecordCache recordCache,
     final Iterable<? extends LayerRecord> records) {
     synchronized (getSync()) {
-      recordCache.clearRecords();
-      recordCache.addRecords(records);
+      recordCache.setRecords(records);
     }
   }
 

@@ -72,7 +72,6 @@ public class ListRecordLayer extends AbstractRecordLayer {
       this.records.clear();
     }
     clearIndex();
-    cleanCachedRecords();
   }
 
   @Override

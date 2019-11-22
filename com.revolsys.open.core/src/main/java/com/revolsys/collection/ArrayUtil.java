@@ -29,6 +29,7 @@ public class ArrayUtil {
     }
   }
 
+  @SafeVarargs
   public static <T> T[] newArray(final T... o) {
     return o;
   }

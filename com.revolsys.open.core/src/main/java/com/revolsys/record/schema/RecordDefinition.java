@@ -133,6 +133,15 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
    */
   DataType getFieldType(int index);
 
+  default DataType getGeometryDataType() {
+    final FieldDefinition field = getGeometryField();
+    if (field == null) {
+      return null;
+    } else {
+      return field.getDataType();
+    }
+  }
+
   FieldDefinition getGeometryField();
 
   /**

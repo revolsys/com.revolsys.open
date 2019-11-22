@@ -156,6 +156,7 @@ public class LayerRendererOverlay extends JComponent
   private GeoreferencedImage refreshImage(final Cancellable cancellable) {
     final Viewport2D viewport = this.viewport;
     if (this.layer != null && viewport.isViewValid()) {
+      final long time = System.currentTimeMillis();
       try (
         final ImageViewport imageViewport = new ImageViewport(viewport)) {
         final ViewRenderer view = imageViewport.newViewRenderer();

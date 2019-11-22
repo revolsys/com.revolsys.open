@@ -66,7 +66,8 @@ public class SetRecordsFieldValue extends AbstractUpdateField {
   public void updateRecord(final LayerRecord record) {
     final String fieldName = getFieldDefinition().getName();
     final Object value = this.editField.getFieldValue();
-    record.setValue(fieldName, value);
+    final AbstractRecordLayer layer = record.getLayer();
+    layer.setRecordValue(record, fieldName, value);
   }
 
   public void validateField(final Field field, final FieldDefinition fieldDefinition) {
