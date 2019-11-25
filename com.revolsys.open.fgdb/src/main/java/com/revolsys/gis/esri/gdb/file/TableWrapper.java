@@ -209,14 +209,16 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
   default void withTableLock(final Runnable action) {
     try (
       BaseCloseable lock = writeLock()) {
-      valueConsumeSync(table -> action.run());
+      final TableReference tableReference = getTableReference();
+      tableReference.valueConsumeSync(table -> action.run());
     }
   }
 
   default <V> V withTableLock(final Supplier<V> action) {
     try (
       BaseCloseable lock = writeLock()) {
-      return valueFunctionSync(table -> action.get());
+      final TableReference tableReference = getTableReference();
+      return tableReference.valueFunctionSync(table -> action.get());
     }
   }
 

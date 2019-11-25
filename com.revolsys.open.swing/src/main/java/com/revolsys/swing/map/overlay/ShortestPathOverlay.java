@@ -49,13 +49,13 @@ import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Debug;
 
-public class RoutingOverlay extends AbstractOverlay {
+public class ShortestPathOverlay extends AbstractOverlay {
 
   private static final Cursor CURSOR = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
 
   private static final long serialVersionUID = 1L;
 
-  public static final String SHORTEST_ROUTE = "Shortest Route";
+  public static final String SHORTEST_PATH = "Shortest Path";
 
   private static final GeometryStyle STYLE_LINE = GeometryStyle.line(WebColors.DarkMagenta, 2);
 
@@ -71,29 +71,30 @@ public class RoutingOverlay extends AbstractOverlay {
   private static final MarkerStyle STYLE_VERTICES = MarkerStyle.marker("circle", 8,
     WebColors.DarkMagenta, 1, WebColors.Pink);
 
-  private static RoutingOverlay getOverlay(final AbstractRecordLayer layer) {
+  private static ShortestPathOverlay getOverlay(final AbstractRecordLayer layer) {
     final MapPanel map = layer.getMapPanel();
-    final RoutingOverlay routingOverlay = map.getMapOverlay(RoutingOverlay.class);
+    final ShortestPathOverlay routingOverlay = map.getMapOverlay(ShortestPathOverlay.class);
     return routingOverlay;
   }
 
   public static void initMenuItems(final AbstractRecordLayer layer, final LayerRecordMenu menu) {
     if (isLayerApplicable(layer)) {
 
-      menu.addMenuItem("route", "Route From Record", "route_from", (final LayerRecord record) -> {
-        final RoutingOverlay routingOverlay = getOverlay(layer);
-        final int updateIndex = routingOverlay.setRecord1Index.incrementAndGet();
-        routingOverlay.setRecord1(record, updateIndex);
-      });
+      menu.addMenuItem("shortestPath", "Shortest Path From Record", "route_from",
+        (final LayerRecord record) -> {
+          final ShortestPathOverlay routingOverlay = getOverlay(layer);
+          final int updateIndex = routingOverlay.setRecord1Index.incrementAndGet();
+          routingOverlay.setRecord1(record, updateIndex);
+        });
 
-      final Predicate<LayerRecord> routeMode = record -> {
-        final RoutingOverlay routingOverlay = getOverlay(layer);
+      final Predicate<LayerRecord> pathMode = record -> {
+        final ShortestPathOverlay routingOverlay = getOverlay(layer);
         return routingOverlay.isHasRecord1();
       };
 
-      menu.addMenuItem("route", "Route To Record", "route_to", routeMode,
+      menu.addMenuItem("shortestPath", "Shortest Path To Record", "route_to", pathMode,
         (final LayerRecord record) -> {
-          final RoutingOverlay routingOverlay = getOverlay(layer);
+          final ShortestPathOverlay routingOverlay = getOverlay(layer);
           final int updateIndex = routingOverlay.setRecord2Index.incrementAndGet();
           routingOverlay.setRecord2(record, updateIndex);
         });
@@ -122,10 +123,10 @@ public class RoutingOverlay extends AbstractOverlay {
 
   private final AtomicInteger setRecord2Index = new AtomicInteger();
 
-  public RoutingOverlay(final MapPanel map) {
+  public ShortestPathOverlay(final MapPanel map) {
     super(map);
     addOverlayAction( //
-      SHORTEST_ROUTE, //
+      SHORTEST_PATH, //
       CURSOR, //
       ZoomOverlay.ACTION_PAN, //
       ZoomOverlay.ACTION_ZOOM, //
@@ -177,7 +178,7 @@ public class RoutingOverlay extends AbstractOverlay {
 
   @Override
   protected void canelMenuDo() {
-    if (!isOverlayAction(SHORTEST_ROUTE)) {
+    if (!isOverlayAction(SHORTEST_PATH)) {
       super.canelMenuDo();
     }
   }
@@ -259,16 +260,16 @@ public class RoutingOverlay extends AbstractOverlay {
   public void keyPressed(final KeyEvent event) {
     final int keyCode = event.getKeyCode();
     if (keyCode == KeyEvent.VK_ESCAPE) {
-      if (isOverlayAction(SHORTEST_ROUTE)) {
+      if (isOverlayAction(SHORTEST_PATH)) {
         cancel();
       }
 
-    } else if (keyCode == KeyEvent.VK_1 && (event.isControlDown() || event.isAltDown())) {
+    } else if (keyCode == KeyEvent.VK_1 && event.isAltDown()) {
       final int updateIndex = this.setRecord1Index.incrementAndGet();
       Invoke.background("Set Record 1", this::getCloseRecord,
         record -> setRecord1(record, updateIndex));
 
-    } else if (keyCode == KeyEvent.VK_2 && (event.isControlDown() || event.isAltDown())) {
+    } else if (keyCode == KeyEvent.VK_2 && event.isAltDown()) {
       if (this.layer == null) {
         SwingUtil.beep();
       } else {
@@ -288,7 +289,7 @@ public class RoutingOverlay extends AbstractOverlay {
   }
 
   private void modeClear() {
-    clearOverlayAction(SHORTEST_ROUTE);
+    clearOverlayAction(SHORTEST_PATH);
     if (this.record1 != null) {
       Debug.noOp();
     }
@@ -369,7 +370,7 @@ public class RoutingOverlay extends AbstractOverlay {
     final String propertyName = event.getPropertyName();
     if (propertyName.equals("overlayAction")) {
       final MapPanel map = getMap();
-      if (!map.hasOverlayAction(SHORTEST_ROUTE)) {
+      if (!map.hasOverlayAction(SHORTEST_PATH)) {
         cancel();
       }
     }
@@ -382,10 +383,10 @@ public class RoutingOverlay extends AbstractOverlay {
       final Geometry geometry1 = record1.getGeometry();
       if (geometry1 instanceof Lineal) {
         getMap().clearToolTipText();
-        setOverlayActionClearOthers(SHORTEST_ROUTE);
+        setOverlayActionClearOthers(SHORTEST_PATH);
         this.layer = record1.getLayer();
         this.record1 = record1;
-        updateRoute();
+        updateShortestPath();
       } else {
         Toolkit.getDefaultToolkit().beep();
       }
@@ -399,7 +400,7 @@ public class RoutingOverlay extends AbstractOverlay {
       final Geometry geometry2 = record2.getGeometry();
       if (geometry2 instanceof Lineal) {
         this.record2 = record2;
-        updateRoute();
+        updateShortestPath();
       } else {
         Toolkit.getDefaultToolkit().beep();
       }
@@ -407,13 +408,13 @@ public class RoutingOverlay extends AbstractOverlay {
   }
 
   @SuppressWarnings("unchecked")
-  private void updateRoute() {
+  private void updateShortestPath() {
     final LayerRecord record1 = this.record1;
     final LayerRecord record2 = this.record2;
     final AbstractRecordLayer layer = this.layer;
     final MapPanel map = getMap();
     final BoundingBox viewBoundingBox = getViewport().getBoundingBox();
-    Invoke.background("Calculate Route", () -> {
+    Invoke.background("Calculate Shortest Path", () -> {
       final List<LayerRecord> records = new ArrayList<>();
       records.add(record1);
       final Geometry geometry1 = record1.getGeometry();
@@ -431,9 +432,9 @@ public class RoutingOverlay extends AbstractOverlay {
         final List<LayerRecord> viewRecords = layer.getRecords(boundingBox);
         final RecordGraph graph = new RecordGraph(viewRecords);
         final Node<Record> fromNode = graph.getNode(geometry1.getPoint());
-        final ShortestPath<Record> routes = new ShortestPath<>(graph, fromNode);
+        final ShortestPath<Record> paths = new ShortestPath<>(graph, fromNode);
         final Node<Record> toNode = graph.getNode(geometry2.getPoint());
-        final List<Edge<Record>> path = routes.getPath(toNode);
+        final List<Edge<Record>> path = paths.getPath(toNode);
         for (final Edge<Record> edge : path) {
           final LayerRecord record = (LayerRecord)edge.getObject();
           if (!record1.isSame(record) && !record2.isSame(record)) {
@@ -459,14 +460,14 @@ public class RoutingOverlay extends AbstractOverlay {
         this.mergedLine = (Lineal)result.get(1);
         this.vertices = (Punctual)result.get(2);
         if (record2 == null) {
-          map.setMessage(SHORTEST_ROUTE, "Select Route to Record", WebColors.Orange);
+          map.setMessage(SHORTEST_PATH, "Select Shortest Path to Record", WebColors.Orange);
         } else if (record1.isSame(record2)) {
-          map.setMessage(SHORTEST_ROUTE, "From/to records are the same", WebColors.Orange);
+          map.setMessage(SHORTEST_PATH, "From/to records are the same", WebColors.Orange);
         } else if (this.mergedLine.isGeometryCollection()) {
-          map.setMessage(SHORTEST_ROUTE, "No Route Found", WebColors.Red);
+          map.setMessage(SHORTEST_PATH, "No Shortest Path Found", WebColors.Red);
           SwingUtil.beep();
         } else {
-          map.setMessage(SHORTEST_ROUTE, this.records.size() + " records in route",
+          map.setMessage(SHORTEST_PATH, this.records.size() + " records in shortest path",
             WebColors.Green);
         }
       }

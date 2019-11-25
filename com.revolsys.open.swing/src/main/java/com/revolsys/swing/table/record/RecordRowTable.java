@@ -20,7 +20,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.listener.BaseMouseListener;
-import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.layer.record.table.predicate.ErrorPredicate;
 import com.revolsys.swing.map.layer.record.table.predicate.ModifiedFieldPredicate;
@@ -41,11 +40,7 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
       final RecordRowTable table = (RecordRowTable)eventTable;
       if (table != null) {
         final int eventRow = TablePanel.getEventRow();
-        if (eventRow != -1) {
-          final RecordRowTableModel model = table.getTableModel();
-          final V record = model.getRecord(eventRow);
-          return record;
-        }
+        return table.getRecord(eventRow);
       }
     }
     return null;
@@ -123,13 +118,14 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
     return (RecordRowTableModel)super.getModel();
   }
 
-  public LayerRecord getRecord(final int row) {
-    final RecordLayerTableModel model = getTableModel();
-    if (model == null) {
-      return null;
-    } else {
-      return model.getRecord(row);
+  public <V extends Record> V getRecord(final int row) {
+    if (row >= 0) {
+      final RecordLayerTableModel model = getTableModel();
+      if (model != null) {
+        return model.getRecord(row);
+      }
     }
+    return null;
   }
 
   public RecordDefinition getRecordDefinition() {

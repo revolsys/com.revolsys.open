@@ -132,7 +132,7 @@ import com.revolsys.swing.map.layer.record.table.model.RecordValidationDialog;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
 import com.revolsys.swing.map.overlay.CloseLocation;
-import com.revolsys.swing.map.overlay.RoutingOverlay;
+import com.revolsys.swing.map.overlay.ShortestPathOverlay;
 import com.revolsys.swing.map.overlay.record.EditRecordGeometryOverlay;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.menu.WrappedMenuFactory;
@@ -709,6 +709,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
+  protected <LR extends LayerRecord> boolean checkBlockDeleteRecord(final LR record) {
+    return !isDeleted(record);
+  }
+
   public void clearHighlightedRecords() {
     synchronized (getSync()) {
       this.recordCacheHighlighted.clearRecords();
@@ -751,7 +755,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       int i = 0;
       for (final LR record : records) {
         boolean blocked = false;
-        if (!isDeleted(record)) {
+        if (checkBlockDeleteRecord(record)) {
           for (final String fieldName : blockNotEqualFieldNames) {
             if (record.hasValue(fieldName)) {
               blocked = true;
@@ -772,11 +776,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
               break;
             }
           }
-          if (!blocked && otherRecords != null) {
-            otherRecords.add(record);
-          }
-          i++;
+
         }
+        if (!blocked && otherRecords != null) {
+          otherRecords.add(record);
+        }
+        i++;
       }
       if (blockedRecords != null) {
         BlockDeleteRecords.showErrorDialog(this, blockedRecords, otherRecords, deleteAction);
@@ -1789,7 +1794,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       menu.addMenuItem("record", "Revert Empty Fields", "field_empty_revert",
         hasModifiedEmptyFields, LayerRecord::revertEmptyFields);
 
-      RoutingOverlay.initMenuItems(this, menu);
+      ShortestPathOverlay.initMenuItems(this, menu);
 
       menu.addMenuItem("dnd", "Copy Record", "page_copy", this::copyRecordToClipboard);
 
@@ -2481,12 +2486,26 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     processTasks(title, recordCount, forEachAction, action, afterAction);
   }
 
+  public <A extends B, B> void processTasks(final CharSequence title, final Collection<A> records,
+    final Consumer<B> action, final Consumer<ProgressMonitor> afterAction,
+    final Runnable doneTask) {
+    final int recordCount = records.size();
+    final Consumer<Consumer<A>> forEachAction = records::forEach;
+    processTasks(title, recordCount, forEachAction, action, afterAction, doneTask);
+  }
+
   public <A extends B, B> void processTasks(final CharSequence title, final int taskCount,
     final Consumer<Consumer<A>> forEachAction, final Consumer<B> action,
     final Consumer<ProgressMonitor> afterAction) {
+    processTasks(title, taskCount, forEachAction, action, afterAction, null);
+  }
+
+  public <A extends B, B> void processTasks(final CharSequence title, final int taskCount,
+    final Consumer<Consumer<A>> forEachAction, final Consumer<B> action,
+    final Consumer<ProgressMonitor> afterAction, final Runnable doneTask) {
     final Consumer<ProgressMonitor> task = progressMonitor -> processTasksDo(title, progressMonitor,
       forEachAction, action, afterAction);
-    ProgressMonitor.background(title, null, task, taskCount);
+    ProgressMonitor.background(title, null, task, taskCount, doneTask);
   }
 
   protected <A extends B, B> void processTasksDo(final CharSequence title,

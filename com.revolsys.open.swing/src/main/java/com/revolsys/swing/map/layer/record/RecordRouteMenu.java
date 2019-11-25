@@ -5,7 +5,7 @@ import java.util.List;
 import javax.swing.JMenu;
 
 import com.revolsys.swing.map.MapPanel;
-import com.revolsys.swing.map.overlay.RoutingOverlay;
+import com.revolsys.swing.map.overlay.ShortestPathOverlay;
 import com.revolsys.swing.menu.MenuFactory;
 
 public class RecordRouteMenu extends MenuFactory {
@@ -25,7 +25,7 @@ public class RecordRouteMenu extends MenuFactory {
     if (menuSource instanceof AbstractRecordLayer) {
       final AbstractRecordLayer layer = (AbstractRecordLayer)menuSource;
       final MapPanel map = layer.getMapPanel();
-      final RoutingOverlay routingOverlay = map.getMapOverlay(RoutingOverlay.class);
+      final ShortestPathOverlay routingOverlay = map.getMapOverlay(ShortestPathOverlay.class);
       if (routingOverlay.getLayer() == layer) {
         final List<LayerRecord> records = routingOverlay.getAllRecords();
         if (!records.isEmpty()) {

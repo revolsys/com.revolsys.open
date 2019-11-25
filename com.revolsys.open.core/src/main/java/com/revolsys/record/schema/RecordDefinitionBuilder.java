@@ -41,6 +41,10 @@ public class RecordDefinitionBuilder {
     this.recordDefinition.setGeometryFactory(recordDefinition.getGeometryFactory());
   }
 
+  public RecordDefinitionBuilder(final RecordStoreSchema schema, final String pathName) {
+    this.recordDefinition = new RecordDefinitionImpl(schema, PathName.newPathName(pathName));
+  }
+
   public RecordDefinitionBuilder(final String pathName) {
     this(PathName.newPathName(pathName));
   }
@@ -89,6 +93,10 @@ public class RecordDefinitionBuilder {
     final int length, final int scale, final boolean required) {
     this.recordDefinition.addField(fieldName, type, length, scale, required);
     return this;
+  }
+
+  public PathName getPathName() {
+    return this.recordDefinition.getPathName();
   }
 
   public RecordDefinition getRecordDefinition() {

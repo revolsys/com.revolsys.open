@@ -1,5 +1,4 @@
-<project
-  xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
 >
@@ -29,6 +28,11 @@
       <groupId>net.java.dev.jna</groupId>
       <artifactId>jna</artifactId>
       <version>5.2.0</version>
+    </dependency>
+    <dependency>
+      <groupId>mil.nga.geopackage</groupId>
+      <artifactId>geopackage</artifactId>
+      <version>3.4.0</version>
     </dependency>
   </dependencies>
 </project>

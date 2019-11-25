@@ -84,7 +84,7 @@ import com.revolsys.swing.map.overlay.LayerRendererOverlay;
 import com.revolsys.swing.map.overlay.MapOverlay;
 import com.revolsys.swing.map.overlay.MeasureOverlay;
 import com.revolsys.swing.map.overlay.MouseOverlay;
-import com.revolsys.swing.map.overlay.RoutingOverlay;
+import com.revolsys.swing.map.overlay.ShortestPathOverlay;
 import com.revolsys.swing.map.overlay.ToolTipOverlay;
 import com.revolsys.swing.map.overlay.ZoomOverlay;
 import com.revolsys.swing.map.overlay.record.EditRecordGeometryOverlay;
@@ -310,7 +310,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     this.mouseOverlay = new MouseOverlay(this, this.layeredPane);
     new EditGeoreferencedImageOverlay(this);
     new MeasureOverlay(this);
-    new RoutingOverlay(this);
+    new ShortestPathOverlay(this);
     this.toolTipOverlay = new ToolTipOverlay(this);
   }
 

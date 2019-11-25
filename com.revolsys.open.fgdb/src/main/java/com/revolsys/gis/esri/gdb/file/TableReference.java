@@ -14,6 +14,7 @@ import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.esri.filegdb.jni.Table;
 import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
@@ -133,28 +134,19 @@ public class TableReference extends CloseableValueHolder<Table> {
   boolean deleteRecordRow(final Record record) {
     final Integer objectId = record.getInteger("OBJECTID");
     if (objectId != null) {
-      final String whereClause = "OBJECTID=" + objectId;
-      final Table table = getValue();
-      synchronized (table) {
+      // final String whereClause = "OBJECTID=" + objectId;
+      synchronized (this.geodatabase) {
+        // final Table table = getValue();
         try (
           BaseCloseable lock = writeLock(false)) {
-          final EnumRows rows = table.search("OBJECTID", whereClause, false);
-          try {
-            final Row row = rows.next();
-            if (row != null) {
-              table.deleteRow(row);
-              record.setState(RecordState.DELETED);
-              this.recordStore.addStatistic("Delete", record);
-              row.delete();
-              return true;
-            }
-          } finally {
-            try {
-              closeRows(rows);
-            } finally {
-              disconnect();
-            }
-          }
+          final String tableName = JdbcUtils.getQualifiedTableName(this.recordDefinition.getPath());
+          final String deleteSql = "DELETE FROM " + tableName + " WHERE OBJECTID=" + objectId;
+          final EnumRows rows = this.geodatabase.getValue().query(deleteSql, true);
+          closeRows(rows);
+
+          record.setState(RecordState.DELETED);
+          this.recordStore.addStatistic("Delete", record);
+          return true;
         }
       }
     }
@@ -186,7 +178,7 @@ public class TableReference extends CloseableValueHolder<Table> {
     return new EsriFileGdbTableConnection();
   }
 
-  synchronized EnumRows query(final String sql, final boolean recycling) {
+  EnumRows query(final String sql, final boolean recycling) {
     return this.geodatabase.valueFunctionSync(geodatabase -> geodatabase.query(sql, recycling));
   }
 
@@ -278,7 +270,6 @@ public class TableReference extends CloseableValueHolder<Table> {
         return null;
       });
     } finally {
-
       final ValueWrapper<Geodatabase> geodatabaseClosable = this.geodatabaseClosable;
       this.geodatabaseClosable = null;
       if (geodatabaseClosable != null) {

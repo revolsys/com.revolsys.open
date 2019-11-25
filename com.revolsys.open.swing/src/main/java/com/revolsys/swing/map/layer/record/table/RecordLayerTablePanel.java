@@ -2,6 +2,7 @@ package com.revolsys.swing.map.layer.record.table;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Point;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -56,7 +57,6 @@ import com.revolsys.swing.menu.MenuSourceHolder;
 import com.revolsys.swing.menu.ToggleButton;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.TableRowCount;
-import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
@@ -290,12 +290,14 @@ public class RecordLayerTablePanel extends TablePanel
   public void mouseClicked(final MouseEvent e) {
     super.mouseClicked(e);
     if (e.getClickCount() == 2 && SwingUtilities.isLeftMouseButton(e)) {
+      final RecordLayerTable table = getTable();
       if (isEditing()) {
-        final JTable table = getTable();
         final TableCellEditor cellEditor = table.getCellEditor();
         cellEditor.stopCellEditing();
       }
-      final LayerRecord record = RecordRowTable.getEventRecord();
+      final Point point = e.getPoint();
+      final int row = table.rowAtPoint(point);
+      final LayerRecord record = table.getRecord(row);
       this.layer.showForm(record);
     }
   }

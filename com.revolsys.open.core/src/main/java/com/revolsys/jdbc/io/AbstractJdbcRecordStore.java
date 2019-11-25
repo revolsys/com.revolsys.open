@@ -602,8 +602,11 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
               final String description = resultSet.getString("REMARKS");
               recordDefinition.setDescription(description);
 
-              final String tableType = resultSet.getString("TABLE_TYPE");
-              recordDefinition.setProperty("tableType", tableType);
+              try {
+                final String tableType = resultSet.getString("TABLE_TYPE");
+                recordDefinition.setProperty("tableType", tableType);
+              } catch (final SQLException e) {
+              }
             } else {
               tablePermissions = recordDefinition.getProperty("permissions");
             }

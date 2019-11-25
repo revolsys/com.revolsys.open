@@ -1,4 +1,4 @@
-package com.revolsys.geopackage;
+package com.revolsys.geopackage.old;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -91,12 +91,12 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory implements FileRecor
 
   @Override
   public String getName() {
-    return "GeoPackage Database";
+    return "GeoPackageFactory Database";
   }
 
   @Override
   public String getProductName() {
-    return "GeoPackage";
+    return "GeoPackageFactory";
   }
 
   @Override
