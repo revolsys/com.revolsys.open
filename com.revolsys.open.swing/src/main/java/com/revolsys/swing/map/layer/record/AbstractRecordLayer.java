@@ -364,7 +364,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       menu.addMenuItem("edit", -1, "Merge Selected Records", "table_row_merge",
         AbstractRecordLayer::isCanMergeRecords, AbstractRecordLayer::mergeSelectedRecords, false);
 
-      menu.addComponentFactory("tools", new RecordRouteMenu());
+      menu.addComponentFactory("tools", new RecordShortestPathMenu());
 
       menu.addMenuItem("dnd", -1, "Copy Selected Records", "page_copy", hasSelectedRecords,
         AbstractRecordLayer::copySelectedRecords, true);
@@ -421,6 +421,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         action.accept(records);
       }
     }
+  }
+
+  public static double getDefaultGeneralizeGeometryTolerance() {
+    return Preferences.getValue("com.revolsys.gis", PREFERENCE_GENERALIZE_GEOMETRY_TOLERANCE);
   }
 
   public static List<AbstractRecordLayer> getVisibleLayers(final LayerGroup group,
@@ -1130,7 +1134,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public double getGeneralizeGeometryTolerance() {
-    return Preferences.getValue("com.revolsys.gis", PREFERENCE_GENERALIZE_GEOMETRY_TOLERANCE);
+    return getDefaultGeneralizeGeometryTolerance();
   }
 
   public DataType getGeometryType() {

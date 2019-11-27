@@ -8,15 +8,15 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.overlay.ShortestPathOverlay;
 import com.revolsys.swing.menu.MenuFactory;
 
-public class RecordRouteMenu extends MenuFactory {
+public class RecordShortestPathMenu extends MenuFactory {
 
-  public RecordRouteMenu() {
-    setName("Route");
+  public RecordShortestPathMenu() {
+    setName("Shortest Path");
   }
 
   @Override
   public MenuFactory clone() {
-    return new RecordRouteMenu();
+    return new RecordShortestPathMenu();
   }
 
   @Override
@@ -30,7 +30,8 @@ public class RecordRouteMenu extends MenuFactory {
         final List<LayerRecord> records = routingOverlay.getAllRecords();
         if (!records.isEmpty()) {
           clear();
-          addMenuItem("zoom", "Zoom to Route", "magnifier", routingOverlay::actionZoomToRecords);
+          addMenuItem("zoom", "Zoom to Shortest Path", "magnifier",
+            routingOverlay::actionZoomToRecords);
           addMenuItem("select", "Set as Select Records", "cursor",
             routingOverlay::actionSelectRecords);
           addMenuItem("select", "Add to Selected Records", "cursor:add",

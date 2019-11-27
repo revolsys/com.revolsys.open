@@ -170,7 +170,11 @@ public class ProgressMonitor implements Cancellable {
 
   public static void background(final CharSequence title, final String note,
     final Consumer<ProgressMonitor> task, final int max, final Runnable doneTask) {
-    background(title, note, task, max, completed -> doneTask.run());
+    background(title, note, task, max, completed -> {
+      if (doneTask != null) {
+        doneTask.run();
+      }
+    });
   }
 
   public static void ui(final CharSequence title, final String note, final boolean canCancel,
