@@ -285,7 +285,18 @@ public class HttpSessionSecurityContextRepository implements SecurityContextRepo
 
   @Override
   public void saveContext(final SecurityContext context, final HttpServletRequest request,
-    final HttpServletResponse response) {
+    HttpServletResponse response) {
+    while (!(response instanceof SaveToSessionResponseWrapper)) {
+      if (response instanceof HttpServletResponseWrapper) {
+        final HttpServletResponseWrapper wrappedResponse = (HttpServletResponseWrapper)response;
+        response = (HttpServletResponse)wrappedResponse.getResponse();
+      } else {
+        return;
+      }
+      if (response == null) {
+        return;
+      }
+    }
     final SaveToSessionResponseWrapper responseWrapper = (SaveToSessionResponseWrapper)response;
     if (!responseWrapper.isContextSaved()) {
       responseWrapper.saveContext(context);
