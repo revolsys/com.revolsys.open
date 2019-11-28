@@ -722,6 +722,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
           geodatabase = getSingleThreadResult(() -> {
             return EsriFileGdb.createGeodatabase(this.fileName);
           });
+          final FileGdbRecordStoreSchema rootSchema = getRootSchema();
+          rootSchema.setInitialized(true);
         } else {
           throw new IllegalArgumentException("ESRI file geodatabase not found " + this.fileName);
         }
@@ -1029,6 +1031,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         }
         if (childSchema == null) {
           childSchema = new FileGdbRecordStoreSchema(schema, childSchemaPath);
+          childSchema.setInitialized(true);
           schema.addElement(childSchema);
         }
         schema = childSchema;

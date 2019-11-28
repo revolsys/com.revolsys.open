@@ -39,4 +39,9 @@ public class FileGdbRecordStoreSchema extends RecordStoreSchema {
     return (V)this.recordStore;
   }
 
+  @Override
+  protected void setInitialized(final boolean initialized) {
+    super.setInitialized(initialized);
+  }
+
 }

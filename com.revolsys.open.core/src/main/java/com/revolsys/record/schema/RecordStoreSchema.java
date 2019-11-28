@@ -372,4 +372,8 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
   }
+
+  protected void setInitialized(final boolean initialized) {
+    this.initialized = initialized;
+  }
 }
