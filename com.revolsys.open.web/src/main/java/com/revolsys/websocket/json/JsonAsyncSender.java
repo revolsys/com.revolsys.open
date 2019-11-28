@@ -44,6 +44,9 @@ public class JsonAsyncSender implements SendHandler {
 
   public void close() {
     this.open = false;
+    synchronized (this) {
+      notifyAll();
+    }
     if (this.session != null) {
       try {
         this.session.close();
@@ -67,7 +70,7 @@ public class JsonAsyncSender implements SendHandler {
       while (async == null) {
         synchronized (this) {
           try {
-            this.wait(1000);
+            wait(1000);
           } catch (final InterruptedException e) {
           }
           async = this.async;
