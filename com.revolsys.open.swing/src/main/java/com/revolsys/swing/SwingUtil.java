@@ -232,6 +232,12 @@ public interface SwingUtil {
     });
   }
 
+  static Component componentFocus() {
+    final KeyboardFocusManager keyboardFocusManager = KeyboardFocusManager
+      .getCurrentKeyboardFocusManager();
+    return keyboardFocusManager.getFocusOwner();
+  }
+
   static void dispose(final Window window) {
     if (window != null) {
       Invoke.later(() -> {

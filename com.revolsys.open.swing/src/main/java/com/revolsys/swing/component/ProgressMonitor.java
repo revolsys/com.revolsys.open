@@ -1,6 +1,7 @@
 package com.revolsys.swing.component;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Window;
@@ -74,6 +75,7 @@ public class ProgressMonitor implements Cancellable {
       buttonPanel.add(this.cancelButton);
       add(buttonPanel);
       ProgressMonitor.this.activeWindow = SwingUtil.windowActive();
+      ProgressMonitor.this.focusComponent = SwingUtil.componentFocus();
       setLocationRelativeTo(ProgressMonitor.this.activeWindow);
       pack();
       setAlwaysOnTop(true);
@@ -196,6 +198,8 @@ public class ProgressMonitor implements Cancellable {
 
   private Window activeWindow;
 
+  private Component focusComponent;
+
   private boolean cancelled = false;
 
   private final ProgressMonitorDialog dialog;
@@ -261,8 +265,14 @@ public class ProgressMonitor implements Cancellable {
   private void setDone() {
     this.done = true;
     this.dialog.setVisible(false);
+
     if (this.activeWindow != null) {
-      this.activeWindow.requestFocus();
+      if (!this.activeWindow.isActive()) {
+        this.activeWindow.requestFocus();
+      }
+    }
+    if (this.focusComponent != null) {
+      this.focusComponent.requestFocusInWindow();
     }
   }
 
