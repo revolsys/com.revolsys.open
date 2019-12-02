@@ -1,7 +1,6 @@
 package com.revolsys.gis.esri.gdb.file;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
@@ -9,7 +8,7 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.beans.ObjectException;
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.esri.filegdb.jni.EnumRows;
-import com.revolsys.esri.filegdb.jni.Geodatabase;
+import com.revolsys.esri.filegdb.jni.Envelope;
 import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.esri.filegdb.jni.Table;
 import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
@@ -18,9 +17,9 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.CloseableValueHolder;
 import com.revolsys.util.ValueHolder;
-import com.revolsys.util.ValueWrapper;
 
 public class TableReference extends CloseableValueHolder<Table> {
   private class EsriFileGdbTableConnection implements TableWrapper {
@@ -84,9 +83,9 @@ public class TableReference extends CloseableValueHolder<Table> {
 
   private final String catalogPath;
 
-  private final ValueWrapper<Geodatabase> geodatabase;
+  private final GeodatabaseReference geodatabase;
 
-  private ValueWrapper<Geodatabase> geodatabaseClosable;
+  private BaseCloseable geodatabaseClosable;
 
   private final FileGdbRecordStore recordStore;
 
@@ -94,36 +93,36 @@ public class TableReference extends CloseableValueHolder<Table> {
 
   private final FileGdbRecordDefinition recordDefinition;
 
+  private final String tableName;
+
   TableReference(final FileGdbRecordStore recordStore,
-    final FileGdbRecordDefinition recordDefinition, final ValueWrapper<Geodatabase> geodatabase,
+    final FileGdbRecordDefinition recordDefinition, final GeodatabaseReference geodatabase,
     final PathName pathName, final String catalogPath) {
     this.recordStore = recordStore;
     this.recordDefinition = recordDefinition;
     this.geodatabase = geodatabase;
     this.pathName = pathName;
     this.catalogPath = catalogPath;
+    this.tableName = JdbcUtils.getQualifiedTableName(this.recordDefinition.getPath());
   }
 
   @Override
   public void closeAfter() {
-    final ValueWrapper<Geodatabase> geodatabaseClosable = this.geodatabaseClosable;
+    final BaseCloseable geodatabaseClosable = this.geodatabaseClosable;
     this.geodatabaseClosable = null;
     if (geodatabaseClosable != null) {
       geodatabaseClosable.close();
     }
   }
 
-  EnumRows closeRows(final EnumRows rows) {
+  void closeRowsDo(final EnumRows rows) {
     if (rows != null) {
-      this.geodatabase.valueConsumeSync(g -> {
-        try {
-          rows.Close();
-        } finally {
-          rows.delete();
-        }
-      });
+      try {
+        rows.Close();
+      } finally {
+        rows.delete();
+      }
     }
-    return null;
   }
 
   @Override
@@ -134,15 +133,12 @@ public class TableReference extends CloseableValueHolder<Table> {
   boolean deleteRecordRow(final Record record) {
     final Integer objectId = record.getInteger("OBJECTID");
     if (objectId != null) {
-      // final String whereClause = "OBJECTID=" + objectId;
       synchronized (this.geodatabase) {
-        // final Table table = getValue();
         try (
           BaseCloseable lock = writeLock(false)) {
-          final String tableName = JdbcUtils.getQualifiedTableName(this.recordDefinition.getPath());
-          final String deleteSql = "DELETE FROM " + tableName + " WHERE OBJECTID=" + objectId;
-          final EnumRows rows = this.geodatabase.getValue().query(deleteSql, true);
-          closeRows(rows);
+          final String deleteSql = "DELETE FROM " + this.tableName + " WHERE OBJECTID=" + objectId;
+          final EnumRows rows = query(deleteSql, true);
+          closeRowsDo(rows);
 
           record.setState(RecordState.DELETED);
           this.recordStore.addStatistic("Delete", record);
@@ -157,8 +153,34 @@ public class TableReference extends CloseableValueHolder<Table> {
     return this.catalogPath;
   }
 
+  public synchronized Row getNext(final EnumRows rows) {
+    if (rows != null) {
+      final Table table = getValue();
+      if (table != null) {
+        try {
+          return rows.next();
+        } finally {
+          disconnect();
+        }
+      }
+    }
+    return null;
+  }
+
   public PathName getPathName() {
     return this.pathName;
+  }
+
+  public synchronized int getRecordCount() {
+    final Table table = getValue();
+    if (table != null) {
+      try {
+        return table.getRowCount();
+      } finally {
+        disconnect();
+      }
+    }
+    return 0;
   }
 
   public FileGdbRecordDefinition getRecordDefinition() {
@@ -167,6 +189,69 @@ public class TableReference extends CloseableValueHolder<Table> {
 
   public FileGdbRecordStore getRecordStore() {
     return this.recordStore;
+  }
+
+  public void insertRecord(final Record record) {
+    final FileGdbRecordStore recordStore = getRecordStore();
+    final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
+    final RecordDefinition recordDefinition = recordStore
+      .getRecordDefinition(sourceRecordDefinition);
+
+    try {
+      validateRequired(record);
+      synchronized (this) {
+        final Table table = getValue();
+        if (table != null) {
+          try {
+            final Row row = table.createRowObject();
+
+            try {
+              for (final FieldDefinition field : recordDefinition.getFields()) {
+                final String name = field.getName();
+                try {
+                  final Object value = record.getValue(name);
+                  final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
+                  esriField.setInsertValue(record, row, value);
+                } catch (final Throwable e) {
+                  throw new ObjectPropertyException(record, name, e);
+                }
+              }
+              synchronized (this.geodatabase) {
+                table.insertRow(row);
+              }
+              if (sourceRecordDefinition == recordDefinition) {
+                record.setState(RecordState.INITIALIZING);
+                try {
+                  for (final FieldDefinition field : recordDefinition.getFields()) {
+                    final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
+                    try {
+                      esriField.setPostInsertValue(record, row);
+                    } catch (final Throwable e) {
+                      throw new ObjectPropertyException(record, field.getName(), e);
+                    }
+                  }
+                } finally {
+                  record.setState(RecordState.PERSISTED);
+                }
+              }
+            } finally {
+              row.delete();
+              recordStore.addStatistic("Insert", record);
+            }
+          } finally {
+            disconnect();
+          }
+        }
+      }
+    } catch (final ObjectException e) {
+      if (e.getObject() == record) {
+        throw e;
+      } else {
+        throw new ObjectException(record, e);
+      }
+    } catch (final Throwable e) {
+      throw new ObjectException(record, e);
+    }
   }
 
   synchronized boolean isLocked() {
@@ -178,8 +263,34 @@ public class TableReference extends CloseableValueHolder<Table> {
     return new EsriFileGdbTableConnection();
   }
 
-  EnumRows query(final String sql, final boolean recycling) {
-    return this.geodatabase.valueFunctionSync(geodatabase -> geodatabase.query(sql, recycling));
+  public synchronized EnumRows query(final String sql, final boolean recycling) {
+    return this.geodatabase.query(sql, recycling);
+  }
+
+  public synchronized EnumRows search(final String subfields, final String whereClause,
+    final boolean recycling) {
+    final Table table = getValue();
+    if (table != null) {
+      try {
+        return table.search(subfields, whereClause, recycling);
+      } finally {
+        disconnect();
+      }
+    }
+    return null;
+  }
+
+  public synchronized EnumRows search(final String subfields, final String whereClause,
+    final Envelope boundingBox, final boolean recycling) {
+    final Table table = getValue();
+    if (table != null) {
+      try {
+        return table.search(subfields, whereClause, boundingBox, recycling);
+      } finally {
+        disconnect();
+      }
+    }
+    return null;
   }
 
   synchronized void setLoadOnlyMode(final boolean loadOnly) {
@@ -233,7 +344,7 @@ public class TableReference extends CloseableValueHolder<Table> {
             }
           } finally {
             try {
-              closeRows(rows);
+              closeRowsDo(rows);
             } finally {
               disconnect();
             }
@@ -258,53 +369,44 @@ public class TableReference extends CloseableValueHolder<Table> {
 
   @Override
   protected void valueClose(final Table table) {
-    try {
-      this.recordStore.threadGeodatabaseResult(geodatabase -> {
-        try {
-          geodatabase.closeTable(table);
-        } catch (final Exception e) {
-          Logs.error(this, "Unable to close table: " + this.catalogPath, e);
-        } finally {
-          table.delete();
-        }
-        return null;
-      });
-    } finally {
-      final ValueWrapper<Geodatabase> geodatabaseClosable = this.geodatabaseClosable;
-      this.geodatabaseClosable = null;
-      if (geodatabaseClosable != null) {
-        geodatabaseClosable.close();
-      }
-    }
-  }
-
-  @Override
-  public synchronized void valueConsumeSync(final Consumer<Table> action) {
-    synchronized (this.geodatabase) {
-      super.valueConsumeSync(action);
-    }
-  }
-
-  @Override
-  public synchronized <V> V valueFunctionSync(final Function<Table, V> action) {
-    synchronized (this.geodatabase) {
-      return valueFunction(action);
-    }
-  }
-
-  @Override
-  public synchronized <V> V valueFunctionSync(final Function<Table, V> action,
-    final V defaultValue) {
-    synchronized (this.geodatabase) {
-      return valueFunction(action, defaultValue);
-    }
+    this.geodatabase.closeTable(table, this.catalogPath);
   }
 
   @Override
   protected Table valueNew() {
     this.geodatabaseClosable = this.geodatabase.connect();
-    return this.recordStore
-      .threadGeodatabaseResult(geodatabase -> geodatabase.openTable(this.catalogPath));
+    return this.geodatabase.openTable(this.catalogPath);
+  }
+
+  public void withTableLock(final Runnable action) {
+    try (
+      BaseCloseable lock = writeLock(false)) {
+
+      final Table table = getValue();
+      if (table != null) {
+        try {
+          action.run();
+        } finally {
+          disconnect();
+        }
+      }
+    }
+  }
+
+  public <V> V withTableLock(final Supplier<V> action) {
+    try (
+      BaseCloseable lock = writeLock(false)) {
+
+      final Table table = getValue();
+      if (table != null) {
+        try {
+          return action.get();
+        } finally {
+          disconnect();
+        }
+      }
+    }
+    return null;
   }
 
   synchronized TableWrapper writeLock(final boolean loadOnlyMode) {

@@ -56,18 +56,14 @@ public abstract class CloseableValueHolder<R> extends ValueHolder<R> {
 
   protected synchronized void disconnect() {
     if (!isClosed()) {
-      final R value;
-      synchronized (this) {
-        this.referenceCount--;
-        if (this.referenceCount <= 0) {
-          value = this.value;
-          this.value = null;
-          this.referenceCount = 0;
-        } else {
-          value = null;
-        }
+      final boolean wasOpen = this.referenceCount > 0;
+      R value = null;
+      this.referenceCount--;
+      if (this.referenceCount <= 0) {
+        value = this.value;
+        this.value = null;
       }
-      if (value != null) {
+      if (value != null && wasOpen) {
         valueClose(value);
       }
     }

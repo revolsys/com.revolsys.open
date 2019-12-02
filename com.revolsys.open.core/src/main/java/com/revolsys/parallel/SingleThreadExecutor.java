@@ -11,25 +11,29 @@ public class SingleThreadExecutor implements BaseCloseable {
 
   private final Object callSync = new Object();
 
-  private final Object handleSync = new Object();
-
   private Throwable exception;
 
-  private Object result;
-
-  private boolean running = true;
-
-  private Callable<? extends Object> task;
-
-  private Runnable runnable;
-
-  private final Thread thread;
-
-  private final String threadName;
+  private final Object handleSync = new Object();
 
   private boolean hasTask;
 
   private final Runnable preRun;
+
+  private Object result;
+
+  private Runnable runnable;
+
+  private boolean running = false;
+
+  private final Object runningSync = new Object();
+
+  private boolean stopped = false;
+
+  private Callable<? extends Object> task;
+
+  private final Thread thread;
+
+  private final String threadName;
 
   public SingleThreadExecutor(final String threadName) {
     this(threadName, null);
@@ -50,10 +54,21 @@ public class SingleThreadExecutor implements BaseCloseable {
 
   @Override
   public void close() {
-    if (this.running) {
-      this.running = false;
-      this.thread.interrupt();
+    synchronized (this.runningSync) {
+      if (this.running) {
+        this.running = false;
+        this.runningSync.notifyAll();
+        this.thread.interrupt();
+      }
     }
+  }
+
+  public boolean isRunning() {
+    return this.running && !this.stopped;
+  }
+
+  public boolean isStopped() {
+    return this.stopped;
   }
 
   public boolean isThread() {
@@ -107,44 +122,70 @@ public class SingleThreadExecutor implements BaseCloseable {
   }
 
   private void taskHandler() {
-    IS_THREAD.set(Boolean.TRUE);
-    if (this.preRun != null && this.running) {
-      this.preRun.run();
-    }
-    while (this.running) {
-      synchronized (this.handleSync) {
-        while (!this.hasTask && this.running) {
-          try {
-            this.handleSync.wait();
-          } catch (final InterruptedException e) {
-            if (!this.running) {
-              synchronized (this.handleSync) {
-                this.handleSync.notifyAll();
-              }
-              return;
-            }
-          }
-        }
-        try {
-          if (this.task != null) {
-            this.result = this.task.call();
-          } else if (this.runnable != null) {
-            this.runnable.run();
-          }
-        } catch (final Throwable e) {
-          this.exception = e;
-        } finally {
-          this.runnable = null;
-          this.task = null;
-          this.hasTask = false;
-          this.handleSync.notifyAll();
+    try {
+      IS_THREAD.set(Boolean.TRUE);
+      if (this.preRun != null && !this.stopped) {
+        this.preRun.run();
+      }
+      synchronized (this.runningSync) {
+        if (!this.stopped) {
+          this.running = true;
+          this.runningSync.notifyAll();
         }
       }
+      while (this.running) {
+        synchronized (this.handleSync) {
+          while (!this.hasTask && this.running) {
+            try {
+              this.handleSync.wait();
+            } catch (final InterruptedException e) {
+              if (!this.running) {
+                synchronized (this.handleSync) {
+                  this.handleSync.notifyAll();
+                }
+                return;
+              }
+            }
+          }
+          try {
+            if (this.task != null) {
+              this.result = this.task.call();
+            } else if (this.runnable != null) {
+              this.runnable.run();
+            }
+          } catch (final Throwable e) {
+            this.exception = e;
+          } finally {
+            this.runnable = null;
+            this.task = null;
+            this.hasTask = false;
+            this.handleSync.notifyAll();
+          }
+        }
+      }
+    } finally {
+      this.running = false;
+      this.stopped = true;
     }
   }
 
   @Override
   public String toString() {
     return this.threadName;
+  }
+
+  public void waitForRunning() {
+    if (this.stopped) {
+      throw new IllegalStateException("Not running");
+    } else {
+      synchronized (this.runningSync) {
+        if (!this.running) {
+          try {
+            this.runningSync.wait();
+          } catch (final InterruptedException e) {
+          }
+        }
+      }
+    }
   }
 }

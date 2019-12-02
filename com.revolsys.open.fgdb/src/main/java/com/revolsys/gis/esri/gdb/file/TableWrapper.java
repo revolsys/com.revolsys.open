@@ -5,27 +5,23 @@ import java.util.function.Supplier;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 
-import com.revolsys.beans.ObjectException;
-import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.esri.filegdb.jni.EnumRows;
 import com.revolsys.esri.filegdb.jni.Envelope;
 import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.esri.filegdb.jni.Table;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.gis.esri.gdb.file.capi.type.AbstractFileGdbFieldDefinition;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
-import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Property;
 import com.revolsys.util.ValueHolderWrapper;
 
 public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
 
-  default EnumRows closeRows(final EnumRows rows) {
+  default void closeRows(final EnumRows rows) {
     final TableReference tableReference = getTableReference();
-    return tableReference.closeRows(rows);
+    tableReference.closeRowsDo(rows);
   }
 
   @Override
@@ -37,6 +33,11 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
   default boolean deleteRecord(final Record record) {
     final TableReference tableReference = getTableReference();
     return tableReference.deleteRecordRow(record);
+  }
+
+  default Row getNext(final EnumRows rows) {
+    final TableReference tableReference = getTableReference();
+    return tableReference.getNext(rows);
   }
 
   default PathName getPathName() {
@@ -62,58 +63,9 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
   }
 
   default void insertRecord(final Record record) {
-    final FileGdbRecordStore recordStore = getRecordStore();
-    final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
-    final RecordDefinition recordDefinition = recordStore
-      .getRecordDefinition(sourceRecordDefinition);
-
-    try {
-      final TableReference tableReference = getTableReference();
-      tableReference.validateRequired(record);
-      tableReference.valueConsumeSync(table -> {
-        final Row row = table.createRowObject();
-
-        try {
-          for (final FieldDefinition field : recordDefinition.getFields()) {
-            final String name = field.getName();
-            try {
-              final Object value = record.getValue(name);
-              final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
-              esriField.setInsertValue(record, row, value);
-            } catch (final Throwable e) {
-              throw new ObjectPropertyException(record, name, e);
-            }
-          }
-          table.insertRow(row);
-          if (sourceRecordDefinition == recordDefinition) {
-            record.setState(RecordState.INITIALIZING);
-            try {
-              for (final FieldDefinition field : recordDefinition.getFields()) {
-                final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
-                try {
-                  esriField.setPostInsertValue(record, row);
-                } catch (final Throwable e) {
-                  throw new ObjectPropertyException(record, field.getName(), e);
-                }
-              }
-            } finally {
-              record.setState(RecordState.PERSISTED);
-            }
-          }
-        } finally {
-          row.delete();
-          recordStore.addStatistic("Insert", record);
-        }
-      });
-    } catch (final ObjectException e) {
-      if (e.getObject() == record) {
-        throw e;
-      } else {
-        throw new ObjectException(record, e);
-      }
-    } catch (final Throwable e) {
-      throw new ObjectException(record, e);
-    }
+    final TableReference tableReference = getTableReference();
+    tableReference.validateRequired(record);
+    tableReference.insertRecord(record);
   }
 
   default boolean isClosed() {
@@ -134,25 +86,23 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
 
   default FileGdbEnumRowsIterator search(final String fields, final String whereClause,
     final boolean recycling) {
+    EnumRows rows = null;
     final TableReference tableReference = getTableReference();
-    final EnumRows rows = tableReference.valueFunctionSync(table -> {
-      try {
-        return table.search(fields, whereClause, recycling);
-      } catch (final Throwable e) {
-        if (!isClosed()) {
-          final StringBuilder logQuery = new StringBuilder("ERROR executing query SELECT ");
-          logQuery.append(fields);
-          logQuery.append(" FROM ");
-          logQuery.append(tableReference.getCatalogPath());
-          if (Property.hasValue(whereClause)) {
-            logQuery.append(" WHERE ");
-            logQuery.append(whereClause);
-          }
-          throw Exceptions.wrap(logQuery.toString(), e);
+    try {
+      rows = tableReference.search(fields, whereClause, recycling);
+    } catch (final Throwable e) {
+      if (!isClosed()) {
+        final StringBuilder logQuery = new StringBuilder("ERROR executing query SELECT ");
+        logQuery.append(fields);
+        logQuery.append(" FROM ");
+        logQuery.append(tableReference.getCatalogPath());
+        if (Property.hasValue(whereClause)) {
+          logQuery.append(" WHERE ");
+          logQuery.append(whereClause);
         }
+        throw Exceptions.wrap(logQuery.toString(), e);
       }
-      return null;
-    });
+    }
     return new FileGdbEnumRowsIterator(this, rows);
   }
 
@@ -161,32 +111,29 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
     EnumRows rows = null;
     if (!boundingBox.IsEmpty()) {
       final TableReference tableReference = getTableReference();
-      rows = tableReference.valueFunctionSync(table -> {
-        try {
-          return table.search(fields, whereClause, boundingBox, recycling);
-        } catch (final Throwable e) {
-          if (!isClosed()) {
-            final StringBuilder logQuery = new StringBuilder("ERROR executing query SELECT ");
-            logQuery.append(fields);
-            logQuery.append(" FROM ");
-            logQuery.append(tableReference.getCatalogPath());
-            logQuery.append(" WHERE ");
-            if (Property.hasValue(whereClause)) {
-              logQuery.append(whereClause);
-              logQuery.append(" AND");
-            }
-            logQuery.append("GEOMETRY intersects ");
-            logQuery.append(BoundingBox.bboxToWkt(//
-              boundingBox.getXMin(), //
-              boundingBox.getYMin(), //
-              boundingBox.getXMax(), //
-              boundingBox.getYMax()//
-            ));
-            throw Exceptions.wrap(logQuery.toString(), e);
+      try {
+        rows = tableReference.search(fields, whereClause, boundingBox, recycling);
+      } catch (final Throwable e) {
+        if (!isClosed()) {
+          final StringBuilder logQuery = new StringBuilder("ERROR executing query SELECT ");
+          logQuery.append(fields);
+          logQuery.append(" FROM ");
+          logQuery.append(tableReference.getCatalogPath());
+          logQuery.append(" WHERE ");
+          if (Property.hasValue(whereClause)) {
+            logQuery.append(whereClause);
+            logQuery.append(" AND");
           }
+          logQuery.append("GEOMETRY intersects ");
+          logQuery.append(BoundingBox.bboxToWkt(//
+            boundingBox.getXMin(), //
+            boundingBox.getYMin(), //
+            boundingBox.getXMax(), //
+            boundingBox.getYMax()//
+          ));
+          throw Exceptions.wrap(logQuery.toString(), e);
         }
-        return null;
-      });
+      }
     }
     return new FileGdbEnumRowsIterator(this, rows);
   }
@@ -207,18 +154,15 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
   }
 
   default void withTableLock(final Runnable action) {
-    try (
-      BaseCloseable lock = writeLock()) {
-      final TableReference tableReference = getTableReference();
-      tableReference.valueConsumeSync(table -> action.run());
-    }
+    final TableReference tableReference = getTableReference();
+    tableReference.withTableLock(action);
   }
 
   default <V> V withTableLock(final Supplier<V> action) {
     try (
       BaseCloseable lock = writeLock()) {
       final TableReference tableReference = getTableReference();
-      return tableReference.valueFunctionSync(table -> action.get());
+      return tableReference.withTableLock(action);
     }
   }
 
