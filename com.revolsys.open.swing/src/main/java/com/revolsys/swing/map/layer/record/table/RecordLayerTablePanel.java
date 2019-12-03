@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
@@ -44,6 +46,7 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.form.FieldNamesSetPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
+import com.revolsys.swing.map.layer.record.EditRecordMenu;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.map.layer.record.component.FieldCalculator;
@@ -313,6 +316,7 @@ public class RecordLayerTablePanel extends TablePanel
       toolBar.addButtonTitleIcon("menu", "Layer Menu", "menu",
         () -> layerMenuFactory.showMenu(this.layer, this, 10, 10));
     }
+    newToolBarEditRecordMenu(toolBar);
 
     if (hasGeometry) {
       final EnableCheck hasSelectedRecords = new ObjectPropertyEnableCheck(this.layer,
@@ -394,6 +398,23 @@ public class RecordLayerTablePanel extends TablePanel
       addGeometryFilterToggleButton(toolBar, -1, "Show Records on Map", "map_filter", "boundingBox",
         new ObjectPropertyEnableCheck(this.tableModel, "filterByBoundingBoxSupported"));
     }
+  }
+
+  private void newToolBarEditRecordMenu(final ToolBar toolBar) {
+    final Supplier<AbstractRecordLayer> layerSupplier = () -> this.layer;
+    final Function<AbstractRecordLayer, Integer> recordCountFunction = (layer) -> {
+      return getTableModel().getRowCount();
+    };
+    final Function<AbstractRecordLayer, Consumer<Consumer<LayerRecord>>> forEachRecordFunction = (
+      layer) -> (action) -> {
+        final RecordLayerTableModel tableModel = getTableModel();
+        tableModel.forEachRecord(action);
+      };
+    final EditRecordMenu editRecordMenu = new EditRecordMenu("Record Operations", layerSupplier,
+      recordCountFunction, forEachRecordFunction);
+
+    toolBar.addButtonTitleIcon("menu", "Record Operations", "table:go",
+      () -> editRecordMenu.showMenu(this.layer, this, 10, 10));
   }
 
   @Override

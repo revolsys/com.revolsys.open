@@ -3,7 +3,6 @@ package com.revolsys.record.query;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -16,6 +15,7 @@ import java.util.function.Predicate;
 
 import org.jeometry.common.io.PathName;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.predicate.Predicates;
@@ -156,7 +156,7 @@ public class Query extends BaseObjectWithProperties
 
   private RecordFactory<Record> recordFactory;
 
-  private List<String> fieldNames = Collections.emptyList();
+  private List<String> fieldNames = new ArrayList<>();
 
   private String fromClause;
 
@@ -210,6 +210,14 @@ public class Query extends BaseObjectWithProperties
 
   public Query(final String typePath, final Condition whereCondition) {
     this(PathName.newPathName(typePath), whereCondition);
+  }
+
+  public Query addFieldName(final String fieldName) {
+    if (this.fieldNames == null) {
+      this.fieldNames = new ArrayList<>();
+    }
+    this.fieldNames.add(fieldName);
+    return this;
   }
 
   public Query addOrderBy(final CharSequence field) {
@@ -440,7 +448,7 @@ public class Query extends BaseObjectWithProperties
   }
 
   public Query setFieldNames(final List<String> fieldNames) {
-    this.fieldNames = fieldNames;
+    this.fieldNames = Lists.toArray(fieldNames);
     return this;
   }
 

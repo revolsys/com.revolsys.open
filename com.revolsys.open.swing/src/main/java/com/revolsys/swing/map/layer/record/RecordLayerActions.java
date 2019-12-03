@@ -2,7 +2,6 @@ package com.revolsys.swing.map.layer.record;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.util.List;
 import java.util.function.Consumer;
 
 import javax.swing.JLabel;
@@ -19,16 +18,12 @@ import com.revolsys.swing.field.NumberTextField;
 
 public class RecordLayerActions {
 
-  public static void generalize(final AbstractRecordLayer layer, final List<LayerRecord> records) {
+  public static void generalize(final AbstractRecordLayer layer, final Integer recordCount,
+    final Consumer<Consumer<LayerRecord>> forEachRecord) {
     final Double distanceTolerance = generalizeGetDistance(layer);
-    generalize(layer, records, distanceTolerance);
-  }
-
-  public static void generalize(final AbstractRecordLayer layer, final List<LayerRecord> records,
-    final Double distanceTolerance) {
     if (distanceTolerance != null) {
       final Consumer<LayerRecord> action = record -> generalizeRecord(record, distanceTolerance);
-      layer.processTasks("Generalize", records, action);
+      layer.processTasks("Generalize", recordCount, forEachRecord, action);
     }
   }
 
@@ -59,6 +54,11 @@ public class RecordLayerActions {
       final Geometry newGeometry = DouglasPeuckerSimplifier.simplify(geometry, distanceTolerance,
         true);
       record.setGeometryValue(newGeometry);
+    }
+    if (record instanceof LayerRecord) {
+      final LayerRecord layerRecord = (LayerRecord)record;
+      final AbstractRecordLayer layer = layerRecord.getLayer();
+      layer.postProcess(layerRecord);
     }
   }
 

@@ -353,7 +353,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       menu.addMenuItem("edit", -1, "Add New Record", "table_row_insert", canAdd,
         AbstractRecordLayer::addNewRecord, false);
 
-      menu.addComponentFactory("edit", new EditRecordMenu(false));
+      menu.addComponentFactory("edit", EditRecordMenu.newSelectedRecords());
 
       menu.addMenuItem("edit", -1, "Delete Selected Records", "table_row_delete",
         hasSelectedRecords.and(AbstractRecordLayer::isCanDeleteRecords), layer -> {
@@ -1692,8 +1692,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  protected void initEditRecordsMenu(final EditRecordMenu editMenu,
-    final List<LayerRecord> records) {
+  protected void initEditRecordsMenu(final EditRecordMenu editMenu) {
     final RecordDefinition recordDefinition = getRecordDefinition();
 
     if (recordDefinition.hasGeometryField()) {
@@ -1786,7 +1785,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             mapPanel.panToRecord(record);
           }
         });
-        menu.addComponentFactory("record", new EditRecordMenu(true));
+        final EditRecordMenu editRecordMenu = EditRecordMenu.newSingleRecord();
+        menu.addComponentFactory("record", editRecordMenu);
       }
       menu.addMenuItem("record", "Delete Record", "table_row_delete", LayerRecord::isDeletable,
         this::deleteRecordWithConfirm);
@@ -2419,6 +2419,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     });
   }
 
+  protected void postProcess(final LayerRecord layerRecord) {
+  }
+
   protected void postSaveChanges(final RecordState originalState, final LayerRecord record) {
     postSaveDeletedRecord(record);
     postSaveModifiedRecord(record);
@@ -2496,6 +2499,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final int recordCount = records.size();
     final Consumer<Consumer<A>> forEachAction = records::forEach;
     processTasks(title, recordCount, forEachAction, action, afterAction, doneTask);
+  }
+
+  public <A extends B, B> void processTasks(final CharSequence title, final int taskCount,
+    final Consumer<Consumer<A>> forEachAction, final Consumer<B> action) {
+    processTasks(title, taskCount, forEachAction, action, null, null);
   }
 
   public <A extends B, B> void processTasks(final CharSequence title, final int taskCount,

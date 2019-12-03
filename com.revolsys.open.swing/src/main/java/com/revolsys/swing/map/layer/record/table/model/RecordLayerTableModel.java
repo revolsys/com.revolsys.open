@@ -134,6 +134,12 @@ public class RecordLayerTableModel extends RecordRowTableModel
     this.tableRecordsModeByKey.put(key, tableRecordsMode);
   }
 
+  protected void addIdFieldNames(final Query query) {
+    for (final String fieldName : getRecordDefinition().getIdFieldNames()) {
+      query.addFieldName(fieldName);
+    }
+  }
+
   @Override
   public void dispose() {
     getTable().setSelectionModel(null);
@@ -173,7 +179,8 @@ public class RecordLayerTableModel extends RecordRowTableModel
     final TableRecordsMode tableRecordsMode = getTableRecordsMode();
     if (tableRecordsMode != null && fieldName != null) {
       final Query query = getFilterQuery();
-      query.setFieldNames(fieldName);
+      addIdFieldNames(query);
+      query.addFieldName(fieldName);
       try (
         BaseCloseable eventsDisabled = this.layer.eventsDisabled()) {
         query.setCancellable(cancellable);
