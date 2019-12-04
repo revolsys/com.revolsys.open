@@ -16,8 +16,6 @@ import com.revolsys.record.schema.RecordDefinition;
 public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
   private static final Map<String, Object> EMPTY_ORIGINAL_VALUES = Collections.emptyMap();
 
-  private static final long serialVersionUID = 1L;
-
   private Identifier identifier;
 
   private final AbstractRecordLayer layer;

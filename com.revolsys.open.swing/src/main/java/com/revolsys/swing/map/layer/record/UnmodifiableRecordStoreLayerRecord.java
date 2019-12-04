@@ -7,8 +7,6 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class UnmodifiableRecordStoreLayerRecord extends RecordStoreLayerRecord {
-  private static final long serialVersionUID = 1L;
-
   public UnmodifiableRecordStoreLayerRecord(final RecordStoreLayer layer,
     final RecordDefinition recordDefinition) {
     super(layer, recordDefinition);

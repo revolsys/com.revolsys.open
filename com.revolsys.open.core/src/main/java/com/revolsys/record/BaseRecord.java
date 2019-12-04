@@ -1,13 +1,8 @@
 package com.revolsys.record;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-
 import com.revolsys.record.schema.RecordDefinition;
 
-public abstract class BaseRecord extends AbstractRecord implements Serializable {
-  private static final long serialVersionUID = 1L;
+public abstract class BaseRecord extends AbstractRecord {
 
   private transient RecordDefinition recordDefinition;
 
@@ -27,6 +22,10 @@ public abstract class BaseRecord extends AbstractRecord implements Serializable 
     return this.state;
   }
 
+  public boolean isInitializing() {
+    return this.state == RecordState.INITIALIZING;
+  }
+
   @Override
   public boolean isState(final RecordState state) {
     return this.state == state;
@@ -39,8 +38,4 @@ public abstract class BaseRecord extends AbstractRecord implements Serializable 
     return oldState;
   }
 
-  private void writeObject(final ObjectOutputStream oos) throws IOException {
-    // oos.writeInt(this.recordDefinition.getInstanceId());
-    oos.defaultWriteObject();
-  }
 }

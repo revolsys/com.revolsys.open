@@ -52,14 +52,11 @@ public class ModeAllPaged extends ModeAbstractCached {
     );
     final RecordLayerTableModel model = getTableModel();
     for (final String propertyName : new String[] {
-      "filter", AbstractRecordLayer.RECORDS_CHANGED
+      "filter"
     }) {
       addListeners( //
         Property.addListenerRunnable(layer, propertyName, this::refresh));
     }
-    addListeners( //
-      Property.addListenerRunnable(model, "filter", this::refresh) //
-    );
     super.activate();
   }
 

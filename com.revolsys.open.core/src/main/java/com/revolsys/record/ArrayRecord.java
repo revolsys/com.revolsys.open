@@ -17,9 +17,6 @@ import com.revolsys.util.Property;
 public class ArrayRecord extends BaseRecord {
   public static final RecordFactory<ArrayRecord> FACTORY = ArrayRecord::newRecord;
 
-  /** Serialization version */
-  private static final long serialVersionUID = 1L;
-
   /**
    * Construct a new ArrayRecord using the record definition
    *
@@ -158,7 +155,7 @@ public class ArrayRecord extends BaseRecord {
     final Object newValue = fieldDefinition.toFieldValue(value);
     final int index = fieldDefinition.getIndex();
     final Object oldValue = this.values[index];
-    if (!fieldDefinition.equals(oldValue, newValue)) {
+    if (!isInitializing() && !fieldDefinition.equals(oldValue, newValue)) {
       updated = true;
       updateState();
     }

@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 
 import com.revolsys.collection.list.ListByIndexIterator;
 import com.revolsys.collection.list.Lists;
@@ -60,6 +61,12 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
       Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORD_UPDATED,
         this::recordUpdated), //
       recordFieldListener);
+    for (final String propertyName : new String[] {
+      AbstractRecordLayer.RECORDS_CHANGED
+    }) {
+      addListeners( //
+        Property.addListenerRunnable(layer, propertyName, this::refresh));
+    }
   }
 
   protected void addCachedRecord(final LayerRecord record) {
@@ -70,7 +77,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
 
   protected void addCachedRecords(final Iterable<? extends LayerRecord> records) {
     if (records != null) {
-      Invoke.later(() -> {
+      if (SwingUtilities.isEventDispatchThread()) {
         final int fromIndex = this.records.size();
         int addCount = 0;
         for (final LayerRecord record : records) {
@@ -83,10 +90,13 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
         }
         if (addCount > 0) {
           clearCurrentRecord();
-          setRecordCount(this.recordCount + addCount);
+          setRecordCount(this.records.size());
           this.model.fireTableRowsInserted(fromIndex, fromIndex + addCount - 1);
         }
-      });
+        repaint();
+      } else {
+        Invoke.later(() -> addCachedRecords(records));
+      }
     }
   }
 
@@ -269,14 +279,16 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
   }
 
   protected void recordsDeleted(final List<LayerRecord> records) {
-    Invoke.later(() -> {
+    if (SwingUtilities.isEventDispatchThread()) {
       for (final LayerRecord record : records) {
         if (record.getLayer().isDeleted(record)) {
           removeCachedRecord(record);
         }
       }
       repaint();
-    });
+    } else {
+      Invoke.later(() -> recordsDeleted(records));
+    }
   }
 
   protected void recordUpdated(final LayerRecord record) {
@@ -285,11 +297,13 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
 
   @Override
   public void refresh() {
-    Invoke.later(() -> {
+    if (SwingUtilities.isEventDispatchThread()) {
       final long refreshIndex = getRefreshIndexNext();
       clearCurrentRecord();
       refresh(refreshIndex);
-    });
+    } else {
+      Invoke.later(this::refresh);
+    }
   }
 
   public void refresh(final long refreshIndex) {
@@ -308,19 +322,21 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
   }
 
   protected void removeCachedRecord(final LayerRecord record) {
-    Invoke.later(() -> {
+    if (SwingUtilities.isEventDispatchThread()) {
       for (int recordIndex = 0; recordIndex < this.recordCount;) {
         final LayerRecord record2 = this.records.get(recordIndex);
         if (record2.getState() == RecordState.DELETED || record2.isSame(record)) {
           this.records.remove(recordIndex);
           clearCurrentRecord();
-          setRecordCount(this.recordCount - 1);
+          setRecordCount(this.records.size());
           this.model.fireTableRowsDeleted(recordIndex, recordIndex);
         } else {
           recordIndex++;
         }
       }
-    });
+    } else {
+      Invoke.later(() -> removeCachedRecord(record));
+    }
   }
 
   protected void removeCachedRecords(final Iterable<? extends LayerRecord> records) {

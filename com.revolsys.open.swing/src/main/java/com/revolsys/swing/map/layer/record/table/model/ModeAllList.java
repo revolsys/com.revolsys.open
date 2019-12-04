@@ -27,7 +27,7 @@ public class ModeAllList extends ModeAbstractCached {
     );
 
     for (final String propertyName : new String[] {
-      "filter", AbstractRecordLayer.RECORDS_CHANGED
+      "filter"
     }) {
       addListeners( //
         Property.addListenerRunnable(layer, propertyName, this::refresh));
