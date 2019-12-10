@@ -108,7 +108,9 @@ public interface Paths {
               } catch (final NoSuchFileException e) {
                 // Ignore as we want it to not exist
               } catch (final IOException e) {
-                errors.removeLast();
+                if (!errors.isEmpty()) {
+                  errors.removeLast();
+                }
                 errors.addLast(Boolean.TRUE);
                 if (firstException.isEmpty()) {
                   firstException.setValue(e);

@@ -15,7 +15,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
 public class CsvRecordWriter extends AbstractRecordWriter {
-  private final boolean ewkt;
+  private boolean ewkt;
 
   private final char fieldSeparator;
 
@@ -118,6 +118,10 @@ public class CsvRecordWriter extends AbstractRecordWriter {
         this.out = null;
       }
     }
+  }
+
+  public void setEwkt(final boolean ewkt) {
+    this.ewkt = ewkt;
   }
 
   public void setUseQuotes(final boolean useQuotes) {

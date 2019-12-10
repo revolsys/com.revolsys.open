@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.record.table;
 
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
@@ -21,6 +22,7 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
+import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.FontHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.event.TableColumnModelExtListener;
@@ -29,6 +31,8 @@ import org.jdesktop.swingx.table.TableColumnModelExt;
 import org.jeometry.common.awt.WebColors;
 
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.Query;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -94,6 +98,7 @@ public class RecordLayerTable extends RecordRowTable {
 
     final TableColumnModelExt columnModel = (TableColumnModelExt)getColumnModel();
     columnModel.addColumnModelListener(new ColumnWidthListener());
+    addNotQuerydRecordHighlighter();
   }
 
   @Override
@@ -148,6 +153,39 @@ public class RecordLayerTable extends RecordRowTable {
         return false;
       }
     }, WebColors.LightSkyBlue, WebColors.CornflowerBlue);
+  }
+
+  private void addNotQuerydRecordHighlighter() {
+    final RecordLayerTableModel model = getModel();
+    final HighlightPredicate predicate = newPredicateModelRowColumn((rowIndex, columnIndex) -> {
+      try {
+        final Query filterQuery = getModel().getFilterQuery();
+        final LayerRecord record = model.getRecord(rowIndex);
+        final Condition whereCondition = filterQuery.getWhereCondition();
+        return !whereCondition.test(record);
+      } catch (final Throwable e) {
+        return false;
+      }
+    });
+
+    final Font tableFont = getFont();
+    final Map<TextAttribute, Object> fontAttributes = (Map)tableFont.getAttributes();
+    fontAttributes.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
+    final Font font = new Font(fontAttributes);
+    final OddEvenColorHighlighter highlighter = new OddEvenColorHighlighter(predicate,
+      WebColors.LemonChiffon, WebColors.Gold) {
+
+      @Override
+      protected Component doHighlight(final Component component, final ComponentAdapter adapter) {
+        super.doHighlight(component, adapter);
+        component.setFont(font);
+        return component;
+      }
+    } //
+    // .setForeground(WebColors.Gold)//
+    // .setForegroundSelected(WebColors.LightYellow)
+    ;
+    addHighlighter(highlighter);
   }
 
   @Override

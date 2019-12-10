@@ -114,6 +114,8 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   private boolean useRecordMenu = true;
 
+  private Query filterQuery;
+
   public RecordLayerTableModel(final AbstractRecordLayer layer,
     final Collection<String> fieldNames) {
     super(layer.getRecordDefinition());
@@ -138,6 +140,10 @@ public class RecordLayerTableModel extends RecordRowTableModel
     for (final String fieldName : getRecordDefinition().getIdFieldNames()) {
       query.addFieldName(fieldName);
     }
+  }
+
+  private synchronized void clearFilterQuery() {
+    this.filterQuery = null;
   }
 
   @Override
@@ -216,21 +222,24 @@ public class RecordLayerTableModel extends RecordRowTableModel
     return this.filterHistory;
   }
 
-  protected Query getFilterQuery() {
-    final Query query = this.layer.getQuery();
-    final Condition filter = getFilter();
-    query.and(filter);
-    query.setOrderBy(this.orderBy);
-    if (this.filterByBoundingBox) {
-      final Project project = this.layer.getProject();
-      final BoundingBox viewBoundingBox = project.getViewBoundingBox();
-      final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
-      final FieldDefinition geometryField = recordDefinition.getGeometryField();
-      if (geometryField != null) {
-        query.and(F.envelopeIntersects(geometryField, viewBoundingBox));
+  public synchronized Query getFilterQuery() {
+    if (this.filterQuery == null) {
+      final Query query = this.layer.getQuery();
+      final Condition filter = getFilter();
+      query.and(filter);
+      query.setOrderBy(this.orderBy);
+      if (this.filterByBoundingBox) {
+        final Project project = this.layer.getProject();
+        final BoundingBox viewBoundingBox = project.getViewBoundingBox();
+        final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
+        final FieldDefinition geometryField = recordDefinition.getGeometryField();
+        if (geometryField != null) {
+          query.and(F.envelopeIntersects(geometryField, viewBoundingBox));
+        }
       }
+      this.filterQuery = query;
     }
-    return query;
+    return this.filterQuery;
   }
 
   public String getGeometryFilterMode() {
@@ -432,6 +441,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   public void refresh() {
+    clearFilterQuery();
     final TableRecordsMode tableRecordsMode = getTableRecordsMode();
     if (tableRecordsMode != null) {
       tableRecordsMode.refresh();
@@ -473,6 +483,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
       if (!DataType.equal(filter, this.filter)) {
         final Object oldValue = this.filter;
         this.filter = filter;
+        clearFilterQuery();
         if (Property.isEmpty(filter)) {
           this.rowFilterCondition = null;
         } else {
