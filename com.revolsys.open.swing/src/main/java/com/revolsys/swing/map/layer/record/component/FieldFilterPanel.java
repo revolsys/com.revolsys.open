@@ -199,7 +199,9 @@ public class FieldFilterPanel extends JComponent implements PropertyChangeListen
     this(tablePanel, tableModel);
 
     if (!this.fieldNames.isEmpty()) {
-      setSearchFieldName((String)config.get("searchField"));
+      String searchField = this.layer.getProperty("searchField");
+      searchField = (String)config.getOrDefault("searchField", searchField);
+      setSearchFieldName(searchField);
       final Predicate<Record> filter = AbstractRecordLayerRenderer.getFilter(this.layer, config);
       if (filter instanceof RecordDefinitionSqlFilter) {
         final RecordDefinitionSqlFilter sqlFilter = (RecordDefinitionSqlFilter)filter;

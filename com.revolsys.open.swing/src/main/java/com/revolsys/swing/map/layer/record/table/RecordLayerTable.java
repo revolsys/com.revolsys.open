@@ -98,7 +98,7 @@ public class RecordLayerTable extends RecordRowTable {
 
     final TableColumnModelExt columnModel = (TableColumnModelExt)getColumnModel();
     columnModel.addColumnModelListener(new ColumnWidthListener());
-    addNotQuerydRecordHighlighter();
+    addNotQueryRecordHighlighter();
   }
 
   @Override
@@ -155,14 +155,19 @@ public class RecordLayerTable extends RecordRowTable {
     }, WebColors.LightSkyBlue, WebColors.CornflowerBlue);
   }
 
-  private void addNotQuerydRecordHighlighter() {
+  private void addNotQueryRecordHighlighter() {
     final RecordLayerTableModel model = getModel();
     final HighlightPredicate predicate = newPredicateModelRowColumn((rowIndex, columnIndex) -> {
       try {
         final Query filterQuery = getModel().getFilterQuery();
         final LayerRecord record = model.getRecord(rowIndex);
         final Condition whereCondition = filterQuery.getWhereCondition();
-        return !whereCondition.test(record);
+        if (whereCondition.test(record)) {
+          return false;
+        } else {
+          whereCondition.test(record);
+          return true;
+        }
       } catch (final Throwable e) {
         return false;
       }

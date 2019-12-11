@@ -85,16 +85,6 @@ public class ModeAllPaged extends ModeAbstractCached {
     layer.exportRecords(query, fieldNames, target);
   }
 
-  protected boolean filterTestModified(final Condition filter, final LayerRecord modifiedRecord) {
-    boolean accept = false;
-    if (filter.test(modifiedRecord)) {
-      if (!filter.test(modifiedRecord.getOriginalRecord())) {
-        accept = true;
-      }
-    }
-    return accept;
-  }
-
   @Override
   public void forEachRecord(final Query query, final Consumer<? super LayerRecord> action) {
     final AbstractRecordLayer layer = getLayer();
@@ -208,7 +198,7 @@ public class ModeAllPaged extends ModeAbstractCached {
     if (!filter.isEmpty()) {
       Predicates.retain(records, filter);
       for (final LayerRecord modifiedRecord : layer.getRecordsModified()) {
-        if (filterTestModified(filter, modifiedRecord)) {
+        if (layer.filterTestModified(filter, modifiedRecord)) {
           records.add(modifiedRecord);
         }
       }
@@ -306,7 +296,7 @@ public class ModeAllPaged extends ModeAbstractCached {
         }
       } else if (!filter.isEmpty()) {
         if (layer.isModified(record)) {
-          if (filterTestModified(filter, record)) {
+          if (layer.filterTestModified(filter, record)) {
             addCachedRecord(record);
           } else {
             removeCachedRecord(record);

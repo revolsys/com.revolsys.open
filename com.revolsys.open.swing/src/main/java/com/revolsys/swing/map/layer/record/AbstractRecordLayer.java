@@ -3473,4 +3473,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final BoundingBox selectedBoundingBox = getSelectedBoundingBox();
     zoomToBoundingBox(selectedBoundingBox);
   }
+
+  public boolean filterTestModified(final Condition filter, final LayerRecord modifiedRecord) {
+    boolean accept = false;
+    if (filter.test(modifiedRecord)) {
+      if (!filter.test(modifiedRecord.getOriginalRecord())) {
+        accept = true;
+      }
+    }
+    return accept;
+  }
 }

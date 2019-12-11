@@ -10,6 +10,11 @@ public class Upper extends UnaryFunction {
     super("UPPER", parameter);
   }
 
+  @Override
+  public String getStringValue(final Record record) {
+    return getValue();
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <V> V getValue(final Record record) {
