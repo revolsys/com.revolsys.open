@@ -207,6 +207,7 @@ public class UrlResource extends AbstractResource {
             ? (HttpURLConnection)con
             : null;
           if (httpCon != null) {
+            setAuthorization(this.url, httpCon);
             final int code = httpCon.getResponseCode();
             if (code == HttpURLConnection.HTTP_OK) {
               return true;
