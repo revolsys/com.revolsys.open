@@ -10,10 +10,14 @@ public class Lower extends UnaryFunction {
     super("LOWER", parameter);
   }
 
+  @Override
+  public String getStringValue(final Record record) {
+    return getValue(record);
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <V> V getValue(final Record record) {
-
     final QueryValue parameter = getParameter();
     final String stringValue = parameter.getStringValue(record);
     if (Property.hasValue(stringValue)) {
