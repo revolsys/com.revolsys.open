@@ -51,7 +51,6 @@ import com.revolsys.swing.map.layer.record.style.marker.MarkerRenderer;
 import com.revolsys.swing.map.layer.record.style.marker.SvgMarker;
 import com.revolsys.swing.map.layer.record.style.marker.TextMarker;
 import com.revolsys.util.Cancellable;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
 
@@ -199,8 +198,6 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
             if (this.polygonsAdd) {
               this.polygons.add(polygon);
             }
-          } else {
-            Debug.noOp();
           }
         }
       } catch (final TopologyException e) {

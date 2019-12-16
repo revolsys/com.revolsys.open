@@ -699,6 +699,12 @@ public interface LineString extends Lineal {
     return false;
   }
 
+  default boolean equalsVertex2d(final int vertexIndex, final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return equalsVertex2d(vertexIndex, x, y);
+  }
+
   @Override
   default Pair<GeometryComponent, Double> findClosestGeometryComponent(final double x,
     final double y) {
@@ -988,6 +994,16 @@ public interface LineString extends Lineal {
   @Override
   default int getDimension() {
     return 1;
+  }
+
+  default End getEnd(final Point point) {
+    if (equalsVertex2d(0, point)) {
+      return End.FROM;
+    } else if (equalsVertex2d(getLastVertexIndex(), point)) {
+      return End.TO;
+    } else {
+      return null;
+    }
   }
 
   default Point getFromPoint() {

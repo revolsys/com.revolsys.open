@@ -15,7 +15,7 @@ import com.revolsys.swing.component.ComponentFactory;
 
 public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
 
-  private final AbstractAction action;
+  private AbstractAction action;
 
   private EnableCheck checkBoxSelectedCheck;
 
@@ -38,7 +38,9 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
   @Override
   public ActionMainMenuItemFactory clone() {
     try {
-      return (ActionMainMenuItemFactory)super.clone();
+      final ActionMainMenuItemFactory clone = (ActionMainMenuItemFactory)super.clone();
+      this.action = this.action.clone();
+      return clone;
     } catch (final CloneNotSupportedException e) {
       return Exceptions.throwUncheckedException(e);
     }
@@ -47,6 +49,10 @@ public class ActionMainMenuItemFactory implements ComponentFactory<JMenuItem> {
   @Override
   public void close(final Component component) {
 
+  }
+
+  public AbstractAction getAction() {
+    return this.action;
   }
 
   @Override

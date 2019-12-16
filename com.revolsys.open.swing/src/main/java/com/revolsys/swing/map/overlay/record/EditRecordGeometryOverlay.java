@@ -47,6 +47,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.events.KeyEvents;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
@@ -599,7 +600,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         }
         clearMouseOverLocations();
       }
-    } else if (keyCode == KeyEvent.VK_F2 || keyCode == KeyEvent.VK_F) {
+    } else if (keyCode == KeyEvent.VK_F2 || KeyEvents.altKey(e, KeyEvent.VK_F)) {
       clearMouseOverLocations();
       modeMoveGeometryClear();
       if (this.addCompleteAction != null) {

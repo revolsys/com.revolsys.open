@@ -17,6 +17,7 @@ import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.graph.Edge;
+import com.revolsys.geometry.model.End;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -229,16 +230,15 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
 
   public boolean canMerge(final Point point, final Record record1, final Record record2,
     final Collection<String> equalExcludeFieldNames) {
-    final boolean[] forwardsIndicators = getForwardsIndicators(point, record1, record2);
+    final End[] lineEnds = getLineEndsAtPoint(point, record1, record2);
 
-    if (forwardsIndicators != null) {
+    if (lineEnds != null) {
       final RecordDefinition recordDefinition = getRecordDefinition();
       final EqualIgnoreFieldNames equalIgnore = EqualIgnoreFieldNames.getProperty(recordDefinition);
       for (final String fieldName : recordDefinition.getFieldNames()) {
         if (!record1.isFieldExcluded(equalExcludeFieldNames, fieldName)
           && !equalIgnore.isFieldIgnored(fieldName)) {
-          if (!canMerge(fieldName, point, record1, record2, equalExcludeFieldNames,
-            forwardsIndicators)) {
+          if (!canMerge(fieldName, point, record1, record2, equalExcludeFieldNames, lineEnds)) {
             return false;
           }
         }
@@ -250,21 +250,20 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
   }
 
   public boolean canMerge(final String fieldName, final Point point, final Record record1,
-    final Record record2, final Collection<String> equalExcludeFieldNames,
-    final boolean[] forwardsIndicators) {
+    final Record record2, final Collection<String> equalExcludeFieldNames, final End[] lineEnds) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (fieldName.equals(recordDefinition.getGeometryFieldName())) {
       final LineString line1 = record1.getGeometry();
       final LineString line2 = record2.getGeometry();
       return !line1.equals(line2);
     }
-    if (forwardsIndicators == null) {
+    if (lineEnds == null) {
       return false;
     } else {
-      final boolean line1Forwards = forwardsIndicators[0];
-      final boolean line2Forwards = forwardsIndicators[1];
+      final End line1End = lineEnds[0];
+      final End line2End = lineEnds[1];
       if (hasDirectionalFieldValues(fieldName)) {
-        if (line1Forwards != line2Forwards) {
+        if (line1End != line2End) {
           final Object value1 = record1.getValue(fieldName);
           final Object value2 = getDirectionalFieldValue(record2, fieldName);
           if (DataType.equal(value1, value2, equalExcludeFieldNames)) {
@@ -274,13 +273,13 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
           }
         }
       } else if (isFromField(fieldName)) {
-        return canMergeFromField(fieldName, record1, line1Forwards, record2, line2Forwards,
+        return canMergeFromField(fieldName, record1, line1End, record2, line2End,
           equalExcludeFieldNames);
       } else if (isToField(fieldName)) {
-        return canMergeToField(fieldName, record1, line1Forwards, record2, line2Forwards,
+        return canMergeToField(fieldName, record1, line1End, record2, line2End,
           equalExcludeFieldNames);
       } else if (isSideField(fieldName)) {
-        if (line1Forwards != line2Forwards) {
+        if (line1End == line2End) {
           final String oppositeFieldName = getSideFieldName(fieldName);
           if (oppositeFieldName == null) { // only check the pair once
             return true;
@@ -294,46 +293,46 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
   }
 
   protected boolean canMergeFromField(final String startFieldName, final Record record1,
-    final boolean line1Forwards, final Record record2, final boolean line2Forwards,
+    final End line1End, final Record record2, final End line2End,
     final Collection<String> equalExcludeFieldNames) {
     final String endFieldName = this.endFieldNamePairs.get(startFieldName);
-    if (line1Forwards) {
-      if (line2Forwards) {
-        // -->*--> true true
+    if (line1End.isTo()) {
+      if (line2End.isFrom()) {
+        // -->*-->
         return isNull(record1, endFieldName, record2, startFieldName, equalExcludeFieldNames);
       } else {
-        // -->*<-- true false
+        // -->*<--
         return true;
       }
     } else {
-      if (line2Forwards) {
-        // <--*--> false true
+      if (line2End.isFrom()) {
+        // <--*-->
         return isNull(record1, startFieldName, record2, startFieldName, equalExcludeFieldNames);
       } else {
-        // <--*<-- false false
+        // <--*<--
         return isNull(record1, startFieldName, record2, endFieldName, equalExcludeFieldNames);
       }
     }
   }
 
   protected boolean canMergeToField(final String endFieldName, final Record record1,
-    final boolean line1Forwards, final Record record2, final boolean line2Forwards,
+    final End line1End, final Record record2, final End line2End,
     final Collection<String> equalExcludeFieldNames) {
     final String startFieldName = this.endFieldNamePairs.get(endFieldName);
-    if (line1Forwards) {
-      if (line2Forwards) {
-        // -->*--> true true
+    if (line1End.isTo()) {
+      if (line2End.isFrom()) {
+        // -->*-->
         return isNull(record1, endFieldName, record2, startFieldName, equalExcludeFieldNames);
       } else {
-        // -->*<-- true false
+        // -->*<--
         return isNull(record1, endFieldName, record2, endFieldName, equalExcludeFieldNames);
       }
     } else {
-      if (line2Forwards) {
-        // <--*--> false true
+      if (line2End.isFrom()) {
+        // <--*-->
         return true;
       } else {
-        // <--*<-- false false
+        // <--*<--
         return isNull(record1, startFieldName, record2, endFieldName, equalExcludeFieldNames);
       }
     }
@@ -425,14 +424,13 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
   public Set<String> getCantMergeFieldNames(final Point point, final Record record1,
     final Record record2, final Collection<String> equalExcludeFieldNames) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final boolean[] forwardsIndicators = getForwardsIndicators(point, record1, record2);
-    if (forwardsIndicators != null) {
+    final End[] lineEnds = getLineEndsAtPoint(point, record1, record2);
+    if (lineEnds != null) {
       final Set<String> fieldNames = new LinkedHashSet<>();
       final EqualIgnoreFieldNames equalIgnore = EqualIgnoreFieldNames.getProperty(recordDefinition);
       for (final String fieldName : recordDefinition.getFieldNames()) {
         if (!equalExcludeFieldNames.contains(fieldName) && !equalIgnore.isFieldIgnored(fieldName)) {
-          if (!canMerge(fieldName, point, record1, record2, equalExcludeFieldNames,
-            forwardsIndicators)) {
+          if (!canMerge(fieldName, point, record1, record2, equalExcludeFieldNames, lineEnds)) {
             fieldNames.add(fieldName);
           }
         }
@@ -470,42 +468,28 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     return this.endFieldNamePairs;
   }
 
-  protected boolean[] getForwardsIndicators(final Point point, final Record record1,
+  public Set<String> getFromFieldNames() {
+    return this.fromFieldNames;
+  }
+
+  protected End getLineEnd(final Record record, final Point point) {
+    final LineString line = record.getGeometry();
+    return line.getEnd(point);
+  }
+
+  protected End[] getLineEndsAtPoint(final Point point, final Record record1,
     final Record record2) {
     final LineString line1 = record1.getGeometry();
     final LineString line2 = record2.getGeometry();
 
-    final boolean[] forwards = new boolean[2];
-    final int vertexCount1 = line1.getVertexCount();
-    final int vertexCount2 = line2.getVertexCount();
-    final int lastPointIndex1 = vertexCount1 - 1;
-    if (line1.equalsVertex(2, 0, line2, 0) && line1.equalsVertex(2, 0, point)) {
-      // <--*--> false true
-      forwards[0] = false;
-      forwards[1] = true;
-    } else if (line1.equalsVertex(2, vertexCount1 - 1, line2, vertexCount2 - 1)
-      && line1.equalsVertex(2, lastPointIndex1, point)) {
-      // -->*<-- true false
-      forwards[0] = true;
-      forwards[1] = false;
-    } else if (line1.equalsVertex(2, vertexCount1 - 1, line2, 0)
-      && line1.equalsVertex(2, lastPointIndex1, point)) {
-      // -->*--> true true
-      forwards[0] = true;
-      forwards[1] = true;
-    } else if (line1.equalsVertex(2, 0, line2, vertexCount2 - 1)
-      && line1.equalsVertex(2, 0, point)) {
-      // <--*<-- false false
-      forwards[0] = false;
-      forwards[1] = false;
-    } else {
-      return null;
+    final End end1 = line1.getEnd(point);
+    final End end2 = line2.getEnd(point);
+    if (end1 != null && end2 != null) {
+      return new End[] {
+        end1, end2
+      };
     }
-    return forwards;
-  }
-
-  public Set<String> getFromFieldNames() {
-    return this.fromFieldNames;
+    return null;
   }
 
   public Map<String, Object> getMergedMap(final Point point, final Record record1, Record record2) {

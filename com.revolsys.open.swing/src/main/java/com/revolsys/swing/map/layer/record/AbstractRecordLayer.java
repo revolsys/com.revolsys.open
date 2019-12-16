@@ -973,6 +973,16 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
+  public boolean filterTestModified(final Condition filter, final LayerRecord modifiedRecord) {
+    boolean accept = false;
+    if (filter.test(modifiedRecord)) {
+      if (!filter.test(modifiedRecord.getOriginalRecord())) {
+        accept = true;
+      }
+    }
+    return accept;
+  }
+
   public void fireHasChangedRecords() {
     final boolean hasChangedRecords = isHasChangedRecords();
     firePropertyChange("hasChangedRecords", !hasChangedRecords, hasChangedRecords);
@@ -1749,8 +1759,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   @Override
-  protected EvaluationContext initializeMenusContext() {
-    final EvaluationContext context = super.initializeMenusContext();
+  protected EvaluationContext initializeMenusContext(final MenuFactory layerMenu) {
+    final EvaluationContext context = super.initializeMenusContext(layerMenu);
     context.setVariable("recordMenu", this.recordMenu);
     context.setVariable("recordDefinition", this.recordDefinition);
     return context;
@@ -3472,15 +3482,5 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   public void zoomToSelected() {
     final BoundingBox selectedBoundingBox = getSelectedBoundingBox();
     zoomToBoundingBox(selectedBoundingBox);
-  }
-
-  public boolean filterTestModified(final Condition filter, final LayerRecord modifiedRecord) {
-    boolean accept = false;
-    if (filter.test(modifiedRecord)) {
-      if (!filter.test(modifiedRecord.getOriginalRecord())) {
-        accept = true;
-      }
-    }
-    return accept;
   }
 }

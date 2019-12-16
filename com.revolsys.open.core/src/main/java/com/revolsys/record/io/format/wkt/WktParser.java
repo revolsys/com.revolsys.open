@@ -267,7 +267,7 @@ public class WktParser {
   }
 
   private LineStringEditor parseCoordinatesLineString(final GeometryFactory geometryFactory,
-    final PushbackReader reader, final int axisCount) throws IOException {
+    final PushbackReader reader, int axisCount) throws IOException {
     final LineStringEditor line = geometryFactory.newLineStringEditor();
     skipWhitespace(reader);
     int character = reader.read();
@@ -294,11 +294,13 @@ public class WktParser {
           if (character == ',') {
             skipWhitespace(reader);
           }
-          if (axisIndex < axisCount) {
-            line.setCoordinate(vertexIndex, axisIndex, number);
-            axisIndex = 0;
-            vertexIndex++;
+          if (axisIndex >= axisCount) {
+            axisCount = axisIndex + 1;
+            line.setAxisCount(axisCount);
           }
+          line.setCoordinate(vertexIndex, axisIndex, number);
+          axisIndex = 0;
+          vertexIndex++;
           if (character == ')') {
             return line;
           }
@@ -307,7 +309,11 @@ public class WktParser {
           if (axisIndex == 0) {
             line.appendVertex(number, Double.NaN);
             axisIndex++;
-          } else if (axisIndex < axisCount) {
+          } else {
+            if (axisIndex >= axisCount) {
+              axisCount = axisIndex + 1;
+              line.setAxisCount(axisCount);
+            }
             line.setCoordinate(vertexIndex, axisIndex, number);
             axisIndex++;
           }

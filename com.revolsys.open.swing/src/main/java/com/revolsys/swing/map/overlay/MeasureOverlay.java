@@ -39,11 +39,16 @@ import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.AbstractAction;
+import com.revolsys.swing.action.RunnableAction;
+import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
+import com.revolsys.swing.events.KeyEvents;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.overlay.record.SelectedRecordsVertexRenderer;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
+import com.revolsys.swing.menu.MenuFactory;
 
 import tec.uom.se.quantity.Quantities;
 import tec.uom.se.unit.Units;
@@ -214,15 +219,32 @@ public class MeasureOverlay extends AbstractOverlay {
     return null;
   }
 
+  public void initMenuTools(final MenuFactory tools) {
+    final AbstractAction measureLengthAction = new RunnableAction("Measure Length",
+      Icons.getIcon("ruler_line"), () -> toggleMeasureMode(GeometryDataTypes.LINE_STRING))
+        .setAcceleratorAltKey(KeyEvent.VK_M);
+    tools.addCheckboxMenuItem("map", measureLengthAction,
+      new ObjectPropertyEnableCheck(this, "measureDataType", GeometryDataTypes.LINE_STRING));
+
+    final AbstractAction measureAreaAction = new RunnableAction("Measure Area",
+      Icons.getIcon("ruler_polygon"), () -> toggleMeasureMode(GeometryDataTypes.POLYGON))
+        .setAcceleratorAltKey(KeyEvent.VK_E);
+    tools.addCheckboxMenuItem("map", measureAreaAction,
+      new ObjectPropertyEnableCheck(this, "measureDataType", GeometryDataTypes.POLYGON));
+  }
+
   @Override
   public void keyPressed(final KeyEvent event) {
     final int keyCode = event.getKeyCode();
-    if (keyCode == KeyEvent.VK_M) {
-      if (isOverlayAction(MEASURE)) {
-        setMeasureGeometry(EMPTY_GEOMETRY);
-      } else {
-        setOverlayAction(MEASURE);
-      }
+    if (KeyEvents.altKey(event, KeyEvent.VK_M)) {
+      // if (isOverlayAction(MEASURE)) {
+      // setMeasureGeometry(EMPTY_GEOMETRY);
+      // } else {
+      // if (this.measureDataType == null) {
+      // this.measureDataType = GeometryDataTypes.LINE_STRING;
+      // }
+      // setOverlayAction(MEASURE);
+      // }
     } else if (keyCode == KeyEvent.VK_ESCAPE) {
       if (isOverlayAction(MEASURE) && !this.dragged) {
         cancel();

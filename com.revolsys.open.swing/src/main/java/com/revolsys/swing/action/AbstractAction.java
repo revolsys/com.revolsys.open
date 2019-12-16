@@ -9,6 +9,8 @@ import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.i18n.I18nCharSequence;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
@@ -49,6 +51,15 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
           putValue(NAME, name.toString());
         }
       });
+    }
+  }
+
+  @Override
+  public AbstractAction clone() {
+    try {
+      return (AbstractAction)super.clone();
+    } catch (final CloneNotSupportedException e) {
+      return Exceptions.throwUncheckedException(e);
     }
   }
 
@@ -121,30 +132,39 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
     return button;
   }
 
-  public void setAcceleratorControlKey(final int keyCode) {
+  public AbstractAction setAcceleratorAltKey(final int keyCode) {
+    return setAcceleratorKey(keyCode, InputEvent.ALT_DOWN_MASK);
+  }
+
+  public AbstractAction setAcceleratorControlKey(final int keyCode) {
     int modifiers;
     if (OS.isMac()) {
       modifiers = InputEvent.META_DOWN_MASK;
     } else {
       modifiers = InputEvent.CTRL_DOWN_MASK;
     }
+    return setAcceleratorKey(keyCode, modifiers);
+  }
+
+  public AbstractAction setAcceleratorKey(final int keyCode, final int modifiers) {
     final KeyStroke keyStroke = KeyStroke.getKeyStroke(keyCode, modifiers);
     setAcceleratorKey(keyStroke);
-    // setMnemonicKey(keyCode);
+    return this;
   }
 
-  public void setAcceleratorKey(final KeyStroke keyStroke) {
+  public AbstractAction setAcceleratorKey(final KeyStroke keyStroke) {
     putValue(ACCELERATOR_KEY, keyStroke);
+    return this;
   }
 
-  public void setAcceleratorShiftControlKey(final int keyCode) {
+  public AbstractAction setAcceleratorShiftControlKey(final int keyCode) {
     int modifiers = InputEvent.SHIFT_DOWN_MASK;
     if (OS.isMac()) {
       modifiers |= InputEvent.META_DOWN_MASK;
     } else {
       modifiers |= InputEvent.CTRL_DOWN_MASK;
     }
-    setAcceleratorKey(KeyStroke.getKeyStroke(keyCode, modifiers));
+    return setAcceleratorKey(keyCode, modifiers);
   }
 
   protected void setCheckBox(final boolean checkBox) {

@@ -64,7 +64,6 @@ import com.revolsys.swing.map.layer.record.style.marker.SvgMarker;
 import com.revolsys.swing.map.layer.record.style.marker.TextMarker;
 import com.revolsys.swing.map.view.TextStyleViewRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Property;
 
 import tec.uom.se.quantity.Quantities;
@@ -803,7 +802,6 @@ public class Graphics2DViewRenderer extends ViewRenderer {
             shape.setGeometry(polygon);
             graphics.fill(shape);
           } catch (final TopologyException e) {
-            Debug.noOp();
           }
         }
       } finally {

@@ -520,7 +520,37 @@ public interface Strings {
   }
 
   static String toString(final String separator, final Object... values) {
-    return toString(separator, Arrays.asList(values));
+    if (values == null) {
+      return null;
+    } else {
+      StringBuilder stringBuilder = null;
+      String string = null;
+      for (final Object value : values) {
+        if (value != null) {
+          final String newString = DataTypes.toString(value);
+          if (Property.hasValue(newString)) {
+            if (stringBuilder == null) {
+              if (string == null) {
+                string = newString;
+              } else {
+                stringBuilder = new StringBuilder(string);
+                stringBuilder.append(separator);
+                stringBuilder.append("newString");
+              }
+            } else {
+              stringBuilder.append(separator);
+              stringBuilder.append("newString");
+            }
+
+          }
+        }
+      }
+      if (stringBuilder == null) {
+        return string;
+      } else {
+        return stringBuilder.toString();
+      }
+    }
   }
 
   static String toString(final String separator, final String... values) {

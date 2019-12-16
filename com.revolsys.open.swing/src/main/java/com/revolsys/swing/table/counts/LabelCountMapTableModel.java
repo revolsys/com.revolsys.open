@@ -26,7 +26,6 @@ import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.BaseTableColumnModelListener;
 import com.revolsys.util.Counter;
-import com.revolsys.util.Debug;
 import com.revolsys.util.count.CategoryLabelCountMap;
 import com.revolsys.util.count.LabelCounters;
 import com.revolsys.util.count.TotalLabelCounters;
@@ -247,7 +246,6 @@ public class LabelCountMapTableModel extends AbstractTableModel {
 
       @Override
       public void columnAdded(final TableColumnModelEvent e) {
-        Debug.noOp();
         // e.get
         // final TableColumn column = new TableColumnExt(columnIndex);
         // setColumnWidth(columnIndex, column);

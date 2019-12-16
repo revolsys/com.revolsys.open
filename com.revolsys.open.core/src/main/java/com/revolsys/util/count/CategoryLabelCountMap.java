@@ -141,7 +141,10 @@ public class CategoryLabelCountMap implements Emptyable {
     if (category == null) {
       return null;
     } else {
-      final String categoryString = Strings.toString(" ", this.prefix, category);
+      String categoryString = category.toString();
+      if (this.prefix != null) {
+        categoryString = this.prefix + " " + category;
+      }
       LabelCounters labelCountMap = this.labelCountMapByCategory.get(categoryString);
       if (labelCountMap == null) {
         labelCountMap = new LabelCountMap(categoryString);

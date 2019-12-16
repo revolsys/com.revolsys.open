@@ -35,6 +35,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.record.Record;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.events.KeyEvents;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -47,7 +48,6 @@ import com.revolsys.swing.map.layer.record.style.marker.MarkerRenderer;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.swing.parallel.Invoke;
-import com.revolsys.util.Debug;
 
 public class ShortestPathOverlay extends AbstractOverlay {
 
@@ -85,7 +85,8 @@ public class ShortestPathOverlay extends AbstractOverlay {
           final ShortestPathOverlay routingOverlay = getOverlay(layer);
           final int updateIndex = routingOverlay.setRecord1Index.incrementAndGet();
           routingOverlay.setRecord1(record, updateIndex);
-        });
+        })//
+        .setAcceleratorAltKey(KeyEvent.VK_1);
 
       final Predicate<LayerRecord> pathMode = record -> {
         final ShortestPathOverlay routingOverlay = getOverlay(layer);
@@ -97,7 +98,8 @@ public class ShortestPathOverlay extends AbstractOverlay {
           final ShortestPathOverlay routingOverlay = getOverlay(layer);
           final int updateIndex = routingOverlay.setRecord2Index.incrementAndGet();
           routingOverlay.setRecord2(record, updateIndex);
-        });
+        })//
+        .setAcceleratorAltKey(KeyEvent.VK_2);
     }
   }
 
@@ -264,12 +266,12 @@ public class ShortestPathOverlay extends AbstractOverlay {
         cancel();
       }
 
-    } else if (keyCode == KeyEvent.VK_1 && event.isAltDown()) {
+    } else if (KeyEvents.altKey(event, KeyEvent.VK_1)) {
       final int updateIndex = this.setRecord1Index.incrementAndGet();
       Invoke.background("Set Record 1", this::getCloseRecord,
         record -> setRecord1(record, updateIndex));
 
-    } else if (keyCode == KeyEvent.VK_2 && event.isAltDown()) {
+    } else if (KeyEvents.altKey(event, KeyEvent.VK_2)) {
       if (this.layer == null) {
         SwingUtil.beep();
       } else {
@@ -277,12 +279,12 @@ public class ShortestPathOverlay extends AbstractOverlay {
         Invoke.background("Set Record 2", this::getCloseRecord,
           record -> setRecord2(record, updateIndex));
       }
-    } else if (!this.records.isEmpty() && event.isAltDown()) {
-      if (keyCode == KeyEvent.VK_A) {
+    } else if (!this.records.isEmpty()) {
+      if (KeyEvents.altKey(event, KeyEvent.VK_A)) {
         actionAddToSelectRecords();
-      } else if (keyCode == KeyEvent.VK_S) {
+      } else if (KeyEvents.altKey(event, KeyEvent.VK_S)) {
         actionSelectRecords();
-      } else if (keyCode == KeyEvent.VK_Z) {
+      } else if (KeyEvents.altKey(event, KeyEvent.VK_Z)) {
         actionZoomToRecords();
       }
     }
@@ -290,9 +292,6 @@ public class ShortestPathOverlay extends AbstractOverlay {
 
   private void modeClear() {
     clearOverlayAction(SHORTEST_PATH);
-    if (this.record1 != null) {
-      Debug.noOp();
-    }
     this.layer = null;
     this.record1 = null;
     this.record2 = null;

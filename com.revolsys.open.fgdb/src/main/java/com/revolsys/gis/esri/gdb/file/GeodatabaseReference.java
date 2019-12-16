@@ -10,7 +10,6 @@ import com.revolsys.esri.filegdb.jni.VectorOfWString;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Domain;
 import com.revolsys.record.io.format.esri.gdb.xml.model.EsriGdbXmlSerializer;
-import com.revolsys.util.Debug;
 
 public class GeodatabaseReference {
 
@@ -138,8 +137,6 @@ public class GeodatabaseReference {
           this.referenceCount = 0;
           if (wasOpen) {
             closeGeodatabase();
-          } else {
-            Debug.noOp();
           }
         }
       }

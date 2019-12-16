@@ -33,7 +33,7 @@ public class GeometryFieldDefinition extends FieldDefinition {
       geometry = (Geometry)value;
       geometry = geometry.convertGeometry(this.geometryFactory);
     } else {
-      geometry = this.geometryFactory.geometry(value.toString());
+      geometry = this.geometryFactory.geometry(value.toString(), false);
     }
     return getDataType().toObject(geometry);
   }

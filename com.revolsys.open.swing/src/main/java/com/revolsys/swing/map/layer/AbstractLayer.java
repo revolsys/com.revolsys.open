@@ -563,7 +563,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     final List<String> menuInitializerExpressions = new ArrayList<>();
     initializeMenuExpressions(menuInitializerExpressions);
 
-    final EvaluationContext context = initializeMenusContext();
+    final MenuFactory layerMenu = getMenu();
+    final EvaluationContext context = initializeMenusContext(layerMenu);
 
     for (final String menuFactoryExpression : menuInitializerExpressions) {
       try {
@@ -577,9 +578,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     }
   }
 
-  protected EvaluationContext initializeMenusContext() {
+  protected EvaluationContext initializeMenusContext(final MenuFactory layerMenu) {
     final EvaluationContext context = new StandardEvaluationContext(this);
-    final MenuFactory layerMenu = getMenu();
     context.setVariable("layerMenu", layerMenu);
     return context;
   }

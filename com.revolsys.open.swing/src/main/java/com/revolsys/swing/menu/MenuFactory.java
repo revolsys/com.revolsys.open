@@ -523,6 +523,27 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return count;
   }
 
+  @SuppressWarnings("unchecked")
+  public <A extends AbstractAction> A getMenuByName(final String name) {
+    for (final List<ComponentFactory<?>> menuItems : this.groups.values()) {
+      for (final ComponentFactory<?> menuItem : menuItems) {
+        AbstractAction action = null;
+        if (menuItem instanceof ActionMainMenuItemFactory) {
+          final ActionMainMenuItemFactory itemFactory = (ActionMainMenuItemFactory)menuItem;
+          action = itemFactory.getAction();
+        } else if (menuItem instanceof AbstractAction) {
+          action = (AbstractAction)menuItem;
+        }
+        if (action != null) {
+          if (name.equals(action.getName())) {
+            return (A)action;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
   @Override
   public String getName() {
     return this.name;

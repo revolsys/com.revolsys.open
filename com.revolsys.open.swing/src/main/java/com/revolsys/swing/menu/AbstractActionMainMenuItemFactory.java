@@ -5,8 +5,6 @@ import java.awt.Component;
 import javax.swing.Icon;
 import javax.swing.JMenuItem;
 
-import org.jeometry.common.exception.Exceptions;
-
 import com.revolsys.swing.action.AbstractAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentFactory;
@@ -31,11 +29,7 @@ public abstract class AbstractActionMainMenuItemFactory extends AbstractAction
 
   @Override
   public AbstractActionMainMenuItemFactory clone() {
-    try {
-      return (AbstractActionMainMenuItemFactory)super.clone();
-    } catch (final CloneNotSupportedException e) {
-      return Exceptions.throwUncheckedException(e);
-    }
+    return (AbstractActionMainMenuItemFactory)super.clone();
   }
 
   @Override

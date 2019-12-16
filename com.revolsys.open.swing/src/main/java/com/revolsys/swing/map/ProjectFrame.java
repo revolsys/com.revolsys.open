@@ -49,7 +49,6 @@ import com.revolsys.collection.set.Sets;
 import com.revolsys.connection.file.FileConnectionManager;
 import com.revolsys.connection.file.FolderConnectionRegistry;
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.FileUtil;
@@ -66,7 +65,6 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.TabbedPane;
 import com.revolsys.swing.action.RunnableAction;
-import com.revolsys.swing.action.enablecheck.ObjectPropertyEnableCheck;
 import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.component.DnDTabbedPane;
 import com.revolsys.swing.component.TabClosableTitle;
@@ -795,18 +793,9 @@ public class ProjectFrame extends BaseFrame {
   protected MenuFactory newMenuTools() {
     final MenuFactory tools = new MenuFactory("Tools");
     final MapPanel map = getMapPanel();
+
     final MeasureOverlay measureOverlay = map.getMapOverlay(MeasureOverlay.class);
-
-    tools.addCheckboxMenuItem("map",
-      new RunnableAction("Measure Length", Icons.getIcon("ruler_line"),
-        () -> measureOverlay.toggleMeasureMode(GeometryDataTypes.LINE_STRING)),
-      new ObjectPropertyEnableCheck(measureOverlay, "measureDataType",
-        GeometryDataTypes.LINE_STRING));
-
-    tools.addCheckboxMenuItem("map",
-      new RunnableAction("Measure Area", Icons.getIcon("ruler_polygon"),
-        () -> measureOverlay.toggleMeasureMode(GeometryDataTypes.POLYGON)),
-      new ObjectPropertyEnableCheck(measureOverlay, "measureDataType", GeometryDataTypes.POLYGON));
+    measureOverlay.initMenuTools(tools);
 
     tools.addMenuItem("script", "Run Script...", "script_go", this::actionRunScript);
     return tools;
