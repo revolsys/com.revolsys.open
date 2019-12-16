@@ -12,7 +12,7 @@ public class Upper extends UnaryFunction {
 
   @Override
   public String getStringValue(final Record record) {
-    return getValue();
+    return getValue().getStringValue(record);
   }
 
   @SuppressWarnings("unchecked")
