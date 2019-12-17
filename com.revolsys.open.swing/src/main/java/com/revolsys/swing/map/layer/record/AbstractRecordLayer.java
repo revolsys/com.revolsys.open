@@ -1366,36 +1366,41 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public Map<String, Object> getPasteNewValues(final Record sourceRecord) {
+  public MapEx getPasteNewValues(final Record sourceRecord) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     final Set<String> ignoreFieldNames = getIgnorePasteFieldNames();
-    final Map<String, Object> newValues = new LinkedHashMap<>();
-    for (final String fieldName : recordDefinition.getFieldNames()) {
+    final MapEx newValues = new LinkedHashMapEx();
+    for (final FieldDefinition field : recordDefinition.getFields()) {
+      final String fieldName = field.getName();
       if (!ignoreFieldNames.contains(fieldName)) {
         final Object value = sourceRecord.getValue(fieldName);
         if (value != null) {
-          newValues.put(fieldName, value);
+          final Object newValue = field.toFieldValue(value);
+
+          newValues.put(fieldName, newValue);
         }
       }
     }
-    final FieldDefinition geometryFieldDefinition = recordDefinition.getGeometryField();
-    if (geometryFieldDefinition != null) {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      Geometry sourceGeometry = sourceRecord.getGeometry();
-      final String geometryFieldName = geometryFieldDefinition.getName();
-      if (sourceGeometry == null) {
-        final Object value = sourceRecord.getValue(geometryFieldName);
-        sourceGeometry = geometryFieldDefinition.toFieldValue(value);
-      }
-      Geometry geometry = geometryFieldDefinition.toFieldValue(sourceGeometry);
-      if (geometry == null) {
-        if (sourceGeometry != null) {
-          newValues.put(geometryFieldName, sourceGeometry);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    boolean first = true;
+    for (final FieldDefinition geometryField : recordDefinition.getGeometryFields()) {
+      final String name = geometryField.getName();
+      final Object value = newValues.get(name);
+      if (value == null) {
+        if (first) {
+          Geometry geometry = sourceRecord.getGeometry();
+          geometry = geometryField.toFieldValue(geometry);
+          if (geometry != null) {
+            geometry = geometry.convertGeometry(geometryFactory);
+            newValues.put(name, geometry);
+          }
         }
-      } else {
+      } else if (value instanceof Geometry) {
+        Geometry geometry = (Geometry)value;
         geometry = geometry.convertGeometry(geometryFactory);
-        newValues.put(geometryFieldName, geometry);
+        newValues.put(name, geometry);
       }
+      first = false;
     }
     return newValues;
   }
