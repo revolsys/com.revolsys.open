@@ -190,7 +190,7 @@ public class XbaseRecordReader extends AbstractIterator<Record> implements Recor
         final int readCount = Buffers.readAll(this.in, this.recordBuffer);
         if (readCount == -1) {
           throw new NoSuchElementException();
-        } else if (readCount == 1) {
+        } else if (readCount == 1 && readCount != this.recordSize) {
           throw new NoSuchElementException();
         } else if (readCount != this.recordSize) {
           throw new IllegalStateException("Unexpected end of mappedFile");

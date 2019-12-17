@@ -136,6 +136,7 @@ public class GeodatabaseReference {
         if (this.referenceCount <= 0) {
           this.referenceCount = 0;
           if (wasOpen) {
+            // System.out.println("CL\tg\t" + this);
             closeGeodatabase();
           }
         }
@@ -195,6 +196,7 @@ public class GeodatabaseReference {
       this.referenceCount++;
       if (this.geodatabase == null && this.fileName != null) {
         try {
+          // System.out.println("OP\tg\t" + this);
           this.geodatabase = EsriFileGdb.openGeodatabase(this.fileName);
         } catch (final FileGdbException e) {
           final String message = e.getMessage();
@@ -316,6 +318,11 @@ public class GeodatabaseReference {
 
   public void setFileName(final String fileName) {
     this.fileName = fileName;
+  }
+
+  @Override
+  public String toString() {
+    return this.fileName;
   }
 
 }

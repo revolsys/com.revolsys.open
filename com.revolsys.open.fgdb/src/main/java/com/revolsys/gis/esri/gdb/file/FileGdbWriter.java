@@ -29,7 +29,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
 
   FileGdbWriter(final FileGdbRecordStore recordStore) {
     this.recordStore = recordStore;
-    this.loadOnlyMode = true;
+    this.loadOnlyMode = false;
   }
 
   FileGdbWriter(final FileGdbRecordStore recordStore, final RecordDefinition recordDefinition,

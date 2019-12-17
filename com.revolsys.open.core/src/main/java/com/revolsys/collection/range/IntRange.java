@@ -3,6 +3,15 @@ package com.revolsys.collection.range;
 import org.jeometry.common.number.Integers;
 
 public class IntRange extends AbstractNumberRange<Integer> {
+  public static boolean contains(int from, int to, final int number) {
+    if (from > to) {
+      final int n = from;
+      from = to;
+      to = n;
+    }
+    return from <= number && number <= to;
+  }
+
   private int from;
 
   private int to;
@@ -22,6 +31,10 @@ public class IntRange extends AbstractNumberRange<Integer> {
       this.from = to;
       this.to = from;
     }
+  }
+
+  public boolean contains(final int number) {
+    return this.from <= number && number <= this.to;
   }
 
   @Override

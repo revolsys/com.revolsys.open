@@ -1,5 +1,6 @@
 package com.revolsys.record.schema;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -172,6 +173,15 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
    * @return The geometry names.
    */
   List<String> getGeometryFieldNames();
+
+  default List<FieldDefinition> getGeometryFields() {
+    final List<FieldDefinition> fields = new ArrayList<>();
+    for (final int fieldIndex : getGeometryFieldIndexes()) {
+      final FieldDefinition field = getField(fieldIndex);
+      fields.add(field);
+    }
+    return fields;
+  }
 
   FieldDefinition getIdField();
 

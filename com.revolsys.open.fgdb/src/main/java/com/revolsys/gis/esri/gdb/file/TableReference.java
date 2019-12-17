@@ -21,7 +21,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.CloseableValueHolder;
 import com.revolsys.util.ValueHolder;
 
-public class TableReference extends CloseableValueHolder<Table> {
+class TableReference extends CloseableValueHolder<Table> {
   private class EsriFileGdbTableConnection implements TableWrapper {
 
     @Override
@@ -106,15 +106,6 @@ public class TableReference extends CloseableValueHolder<Table> {
     this.tableName = JdbcUtils.getQualifiedTableName(this.recordDefinition.getPath());
   }
 
-  @Override
-  public void closeAfter() {
-    final BaseCloseable geodatabaseClosable = this.geodatabaseClosable;
-    this.geodatabaseClosable = null;
-    if (geodatabaseClosable != null) {
-      geodatabaseClosable.close();
-    }
-  }
-
   void closeRowsDo(final EnumRows rows) {
     if (rows != null) {
       try {
@@ -153,7 +144,7 @@ public class TableReference extends CloseableValueHolder<Table> {
     return this.catalogPath;
   }
 
-  public synchronized Row getNext(final EnumRows rows) {
+  synchronized Row getNext(final EnumRows rows) {
     if (rows != null) {
       final Table table = getValue();
       if (table != null) {
@@ -191,7 +182,7 @@ public class TableReference extends CloseableValueHolder<Table> {
     return this.recordStore;
   }
 
-  public void insertRecord(final Record record) {
+  void insertRecord(final Record record) {
     final FileGdbRecordStore recordStore = getRecordStore();
     final RecordDefinition sourceRecordDefinition = record.getRecordDefinition();
     final RecordDefinition recordDefinition = recordStore
@@ -263,11 +254,11 @@ public class TableReference extends CloseableValueHolder<Table> {
     return new EsriFileGdbTableConnection();
   }
 
-  public synchronized EnumRows query(final String sql, final boolean recycling) {
+  synchronized EnumRows query(final String sql, final boolean recycling) {
     return this.geodatabase.query(sql, recycling);
   }
 
-  public synchronized EnumRows search(final String subfields, final String whereClause,
+  synchronized EnumRows search(final String subfields, final String whereClause,
     final boolean recycling) {
     final Table table = getValue();
     if (table != null) {
@@ -280,7 +271,7 @@ public class TableReference extends CloseableValueHolder<Table> {
     return null;
   }
 
-  public synchronized EnumRows search(final String subfields, final String whereClause,
+  synchronized EnumRows search(final String subfields, final String whereClause,
     final Envelope boundingBox, final boolean recycling) {
     final Table table = getValue();
     if (table != null) {
@@ -326,7 +317,9 @@ public class TableReference extends CloseableValueHolder<Table> {
                     throw new ObjectPropertyException(record, name, e);
                   }
                 }
-                table.updateRow(row);
+                synchronized (table) {
+                  table.updateRow(row);
+                }
                 record.setState(RecordState.PERSISTED);
               } catch (final ObjectException e) {
                 if (e.getObject() == record) {
@@ -355,7 +348,7 @@ public class TableReference extends CloseableValueHolder<Table> {
     return false;
   }
 
-  void validateRequired(final Record record) {
+  private void validateRequired(final Record record) {
     for (final FieldDefinition field : this.recordDefinition.getFields()) {
       final String name = field.getName();
       if (field.isRequired()) {
@@ -369,16 +362,28 @@ public class TableReference extends CloseableValueHolder<Table> {
 
   @Override
   protected void valueClose(final Table table) {
-    this.geodatabase.closeTable(table, this.catalogPath);
+    try {
+      // System.out.println("CL\tt\t" + this);
+      this.geodatabase.closeTable(table, this.catalogPath);
+    } finally {
+      final BaseCloseable geodatabaseClosable = this.geodatabaseClosable;
+      this.geodatabaseClosable = null;
+      if (geodatabaseClosable != null) {
+        // System.out.println("DI\tg\t" + this.geodatabase);
+        geodatabaseClosable.close();
+      }
+    }
   }
 
   @Override
   protected Table valueNew() {
+    // System.out.println("CO\tg\t" + this.geodatabase);
     this.geodatabaseClosable = this.geodatabase.connect();
+    // System.out.println("OP\tt\t" + this);
     return this.geodatabase.openTable(this.catalogPath);
   }
 
-  public void withTableLock(final Runnable action) {
+  void withTableLock(final Runnable action) {
     try (
       BaseCloseable lock = writeLock(false)) {
 
@@ -393,7 +398,7 @@ public class TableReference extends CloseableValueHolder<Table> {
     }
   }
 
-  public <V> V withTableLock(final Supplier<V> action) {
+  <V> V withTableLock(final Supplier<V> action) {
     try (
       BaseCloseable lock = writeLock(false)) {
 

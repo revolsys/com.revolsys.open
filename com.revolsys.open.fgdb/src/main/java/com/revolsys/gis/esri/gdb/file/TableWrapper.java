@@ -64,7 +64,6 @@ public interface TableWrapper extends ValueHolderWrapper<Table>, BaseCloseable {
 
   default void insertRecord(final Record record) {
     final TableReference tableReference = getTableReference();
-    tableReference.validateRequired(record);
     tableReference.insertRecord(record);
   }
 
