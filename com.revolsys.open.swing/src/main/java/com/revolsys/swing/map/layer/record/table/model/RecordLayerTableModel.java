@@ -158,12 +158,11 @@ public class RecordLayerTableModel extends RecordRowTableModel
     super.dispose();
   }
 
-  public void exportRecords(final Object target) {
+  public void exportRecords(final Object target, final boolean tableColumnsOnly) {
     final TableRecordsMode tableRecordsMode = getTableRecordsMode();
     if (tableRecordsMode != null) {
       final Query query = getFilterQuery();
-      final List<String> fieldNames = getFieldNames();
-      tableRecordsMode.exportRecords(query, fieldNames, target);
+      tableRecordsMode.exportRecords(query, target, tableColumnsOnly);
     }
   }
 

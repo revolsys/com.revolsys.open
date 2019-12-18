@@ -258,7 +258,7 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
         dialog.setVisible(false);
         cancelAction.accept(this);
       });
-      toolBar.addButtonTitleIcon("default", "Save valid records", "table_save", () -> {
+      toolBar.addButtonTitleIcon("default", "Save valid records", "table:save", () -> {
         dialog.setVisible(false);
         validateRecords(this.invalidRecords, true);
         successAction.accept(this);

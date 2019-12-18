@@ -114,7 +114,7 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
       final int length = calculateValueFieldLength();
       this.valueFieldLength = length;
     }
-    return 0;
+    return this.valueFieldLength;
   }
 
   public boolean isCapitalizeWords() {

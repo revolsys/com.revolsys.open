@@ -1,7 +1,6 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
 import java.awt.Color;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
@@ -76,13 +75,6 @@ public class ModeAllPaged extends ModeAbstractCached {
   public void deactivate() {
     clear();
     super.deactivate();
-  }
-
-  @Override
-  public void exportRecords(final Query query, final Collection<String> fieldNames,
-    final Object target) {
-    final AbstractRecordLayer layer = getLayer();
-    layer.exportRecords(query, fieldNames, target);
   }
 
   @Override

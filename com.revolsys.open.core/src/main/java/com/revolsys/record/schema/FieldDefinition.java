@@ -94,6 +94,7 @@ public class FieldDefinition extends BaseObjectWithProperties
     this.scale = field.getScale();
     setTitle(field.getTitle());
     this.type = field.getDataType();
+    this.codeTable = field.getCodeTable();
 
     final Map<String, Object> properties = field.getProperties();
     setProperties(properties);

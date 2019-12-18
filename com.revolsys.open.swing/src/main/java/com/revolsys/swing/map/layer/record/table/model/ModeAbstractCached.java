@@ -4,7 +4,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -17,9 +16,15 @@ import javax.swing.SwingUtilities;
 
 import com.revolsys.collection.list.ListByIndexIterator;
 import com.revolsys.collection.list.Lists;
+import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionBuilder;
+import com.revolsys.spring.resource.PathResource;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.parallel.Invoke;
@@ -137,13 +142,50 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
   }
 
   @Override
-  public void exportRecords(final Query query, final Collection<String> fieldNames,
-    final Object target) {
-    final Condition filter = query.getWhereCondition();
-    final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
+  public void exportRecords(final Query query, final Object target,
+    final boolean tableColumnsOnly) {
     final AbstractRecordLayer layer = getLayer();
-    final Iterable<LayerRecord> records = new ListByIndexIterator<>(this.records);
-    layer.exportRecords(records, filter, fieldNames, orderBy, target);
+    final List<String> fieldNames;
+    if (tableColumnsOnly) {
+      fieldNames = this.model.getFieldNames();
+    } else {
+      fieldNames = layer.getFieldNames();
+    }
+    final RecordDefinition layerRecordDefinition = layer.getRecordDefinition();
+    if (target != null && layerRecordDefinition != null && getRecordCount() > 0) {
+      final Resource resource = Resource.getResource(target);
+      if (resource instanceof PathResource) {
+        final PathResource pathResource = (PathResource)resource;
+        pathResource.deleteDirectory();
+      }
+      final RecordDefinitionBuilder recordDefinitionBuilder = new RecordDefinitionBuilder(
+        layerRecordDefinition, fieldNames);
+
+      final boolean showCodeValues = this.model.isShowCodeValues();
+      if (showCodeValues) {
+        recordDefinitionBuilder.changeCodeFieldsToValues();
+      }
+      final RecordDefinition recordDefinition = recordDefinitionBuilder.getRecordDefinition();
+      try (
+        RecordWriter writer = RecordWriter.newRecordWriter(recordDefinition, resource)) {
+        if (writer == null) {
+          throw new IllegalArgumentException("Unable to create writer " + target);
+        } else {
+          forEachRecord(query, record -> {
+            final Record writeRecord = writer.newRecord();
+            if (showCodeValues) {
+              for (final String fieldName : recordDefinition.getFieldNames()) {
+                final Object value = record.getCodeValue(fieldName);
+                writeRecord.setValue(fieldName, value);
+              }
+            } else {
+              writeRecord.setValues(record);
+            }
+            writer.write(writeRecord);
+          });
+        }
+      }
+    }
   }
 
   protected void fireRecordUpdated(final int index) {

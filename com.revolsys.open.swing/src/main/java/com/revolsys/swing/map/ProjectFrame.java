@@ -766,10 +766,10 @@ public class ProjectFrame extends BaseFrame {
     updateRecentMenu();
 
     addMenuItemAndToolBarButton(file, this.leftToolBar, "projectSave", "Save Project",
-      "layout_save", this::actionProjectSave, KeyEvent.VK_S);
+      "layout:save", this::actionProjectSave, KeyEvent.VK_S);
 
     file
-      .addMenuItemTitleIcon("projectSave", "Save Project As...", "layout_save",
+      .addMenuItemTitleIcon("projectSave", "Save Project As...", "layout:save",
         this::actionProjectSaveAs)
       .setAcceleratorShiftControlKey(KeyEvent.VK_S);
 

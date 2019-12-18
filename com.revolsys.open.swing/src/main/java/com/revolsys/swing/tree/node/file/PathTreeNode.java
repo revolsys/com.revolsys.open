@@ -67,7 +67,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
     addRefreshMenuItem(MENU);
 
     TreeNodes
-      .addMenuItem(MENU, "record", "Export Records", "table_save",
+      .addMenuItem(MENU, "record", "Export Records", "table:save",
         PathTreeNode::actionExportRecords) //
       .setVisibleCheck(TreeNodes.enableCheck(PathTreeNode::isRecordFileLayer));
 

@@ -344,7 +344,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       menu.addCheckboxMenuItem("edit", "Editable", "pencil", notReadOnly,
         AbstractRecordLayer::toggleEditable, AbstractRecordLayer::isEditable, false);
 
-      menu.addMenuItem("edit", -1, "Save Changes", "table_save", AbstractLayer::isHasChanges,
+      menu.addMenuItem("edit", -1, "Save Changes", "table:save", AbstractLayer::isHasChanges,
         AbstractLayer::saveChanges, true);
 
       menu.addMenuItem("edit", -1, "Cancel Changes", "table_cancel", AbstractLayer::isHasChanges,
@@ -1789,7 +1789,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         menu.addComponentFactory("default", 0, new WrappedMenuFactory("Layer", this::getMenu));
       }
 
-      menu.addMenuItem("record", "View/Edit Record", "table_edit", notDeleted, this::showForm);
+      menu.addMenuItem("record", "View/Edit Record", "table:edit", notDeleted, this::showForm);
 
       if (hasGeometry) {
         menu.addMenuItem("record", "Zoom to Record", "magnifier_zoom_selected", notDeleted,

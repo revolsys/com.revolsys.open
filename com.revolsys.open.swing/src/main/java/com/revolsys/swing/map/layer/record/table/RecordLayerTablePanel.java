@@ -188,7 +188,8 @@ public class RecordLayerTablePanel extends TablePanel
         } else {
           content = Strings.toString(separator, values);
         }
-        final StringTransferable transferable = new StringTransferable(DataFlavor.stringFlavor, content);
+        final StringTransferable transferable = new StringTransferable(DataFlavor.stringFlavor,
+          content);
         ClipboardUtil.setContents(transferable);
       }
     };
@@ -196,11 +197,12 @@ public class RecordLayerTablePanel extends TablePanel
     ProgressMonitor.background("Copy Values", action, rowCount);
   }
 
-  private void actionExportRecords() {
+  private void actionExportRecords(final boolean tableColumnsOnly) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     final String title = this.layer.getName();
     final boolean hasGeometryField = recordDefinition.hasGeometryField();
-    AbstractRecordLayer.exportRecords(title, hasGeometryField, this.tableModel::exportRecords);
+    AbstractRecordLayer.exportRecords(title, hasGeometryField,
+      file -> this.tableModel.exportRecords(file, tableColumnsOnly));
   }
 
   private void actionShowFieldSetsMenu() {
@@ -351,9 +353,13 @@ public class RecordLayerTablePanel extends TablePanel
 
     toolBar.addButtonTitleIcon("table", "Refresh", "table_refresh", this.layer::refresh);
 
-    toolBar.addButtonTitleIcon("table", "Export Records", "table_save",
-      new ObjectPropertyEnableCheck(tableRowCount, "rowCount", 0, true),
-      () -> actionExportRecords());
+    final ObjectPropertyEnableCheck hasRows = new ObjectPropertyEnableCheck(tableRowCount,
+      "rowCount", 0, true);
+    toolBar.addButtonTitleIcon("table", "Export Table", "table_plain:save", hasRows,
+      () -> actionExportRecords(true));
+
+    toolBar.addButtonTitleIcon("table", "Export Records", "table:save", hasRows,
+      () -> actionExportRecords(false));
 
     this.fieldSetsButton = toolBar.addButtonTitleIcon("table", "Field Sets", "fields_filter",
       () -> actionShowFieldSetsMenu());
@@ -367,7 +373,7 @@ public class RecordLayerTablePanel extends TablePanel
 
       final EnableCheck hasFilter = new ObjectPropertyEnableCheck(this.tableModel, "hasFilter");
 
-      toolBar.addButton("search", "Clear Search", "filter_delete", hasFilter,
+      toolBar.addButton("search", "Clear Search", "filter:delete", hasFilter,
         this.fieldFilterPanel::clear);
 
       final EnableCheck hasFilterHistory = new ObjectPropertyEnableCheck(this.tableModel,

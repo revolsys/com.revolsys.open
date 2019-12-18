@@ -42,7 +42,7 @@ public class RecordStoreConnectionTrees extends ConnectionManagerTrees {
 
     // RecordStoreConnection
     MenuFactory.addMenuInitializer(RecordStoreConnection.class, (menu) -> {
-      TreeNodes.addMenuItemNodeValue(menu, "default", 0, "Edit Connection", "database_edit",
+      TreeNodes.addMenuItemNodeValue(menu, "default", 0, "Edit Connection", "database:edit",
         RecordStoreConnection::isEditable, RecordStoreConnectionTrees::editConnection);
 
       TreeNodes.<RecordStoreConnection> addMenuItemNodeValue(menu, "default", 1,
