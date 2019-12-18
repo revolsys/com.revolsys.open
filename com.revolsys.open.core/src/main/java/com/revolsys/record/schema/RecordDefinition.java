@@ -83,6 +83,8 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
    */
   int getFieldLength(int index);
 
+  int getFieldLength(String valueFieldName);
+
   /**
    * Get the name of the field at the specified index.
    *

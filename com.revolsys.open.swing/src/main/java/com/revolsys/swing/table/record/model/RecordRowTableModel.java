@@ -302,7 +302,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     return records;
   }
 
-  protected Object getRecordValue(int columnIndex, final Record record, final String name) {
+  protected Object getRecordValue(final int columnIndex, final Record record, final String name) {
     return record.getValue(name);
   }
 
@@ -401,6 +401,11 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
       }
     }
     return false;
+  }
+
+  @Override
+  public boolean isShowCodeValues() {
+    return getTable().isShowDisplayValues();
   }
 
   public boolean isSorted(final int columnIndex) {

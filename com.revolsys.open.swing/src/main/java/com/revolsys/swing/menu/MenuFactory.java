@@ -364,7 +364,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   public RunnableAction addMenuItem(final String groupName, final String title,
     final String iconName, final Runnable runnable) {
     final Icon icon = Icons.getIcon(iconName);
-    final RunnableAction menuItem = newMenuItem(title, title, icon, null, runnable);
+    final RunnableAction menuItem = newMenuItem(title, null, icon, null, runnable);
     addComponentFactory(groupName, menuItem);
     return menuItem;
   }
@@ -639,16 +639,19 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
     return menu;
   }
 
-  public void setEnableCheck(final EnableCheck enableCheck) {
+  public MenuFactory setEnableCheck(final EnableCheck enableCheck) {
     this.enableCheck = enableCheck;
+    return this;
   }
 
-  public void setIconName(final String iconName) {
+  public MenuFactory setIconName(final String iconName) {
     this.iconName = iconName;
+    return this;
   }
 
-  public void setName(final String name) {
+  public MenuFactory setName(final String name) {
     this.name = name;
+    return this;
   }
 
   public BaseJPopupMenu showMenu(final Object source, final Component component, final int x,

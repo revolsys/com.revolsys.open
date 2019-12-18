@@ -50,6 +50,8 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
 
   private RecordTableCellEditor tableCellEditor;
 
+  private boolean showDisplayValues = true;
+
   public RecordRowTable(final RecordRowTableModel model) {
     this(model, new RecordRowTableCellRenderer());
   }
@@ -166,6 +168,10 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
     }
   }
 
+  public boolean isShowDisplayValues() {
+    return this.showDisplayValues;
+  }
+
   @Override
   public void mouseClicked(final MouseEvent e) {
     final Object source = e.getSource();
@@ -202,6 +208,13 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
         }
       }
     }
+  }
+
+  public void setShowDisplayValues(final boolean showDisplayValues) {
+    final boolean oldValue = showDisplayValues;
+    this.showDisplayValues = showDisplayValues;
+    firePropertyChange("showDisplayValues", oldValue, showDisplayValues);
+    repaint();
   }
 
   @Override

@@ -16,6 +16,7 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.menu.Button;
 import com.revolsys.swing.menu.CheckBoxMenuItem;
+import com.revolsys.swing.menu.RadioButton;
 import com.revolsys.swing.menu.ToggleButton;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
@@ -125,6 +126,11 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
     final boolean enabled = isEnabled();
     menuItem.setEnabled(enabled);
     return menuItem;
+  }
+
+  public RadioButton newRadioButton() {
+    final RadioButton button = new RadioButton(this);
+    return button;
   }
 
   public ToggleButton newToggleButton() {

@@ -3,9 +3,11 @@ package com.revolsys.record.schema;
 import java.util.Collection;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.record.code.CodeTable;
 
 public class RecordDefinitionBuilder {
 
@@ -95,6 +97,21 @@ public class RecordDefinitionBuilder {
     return this;
   }
 
+  public RecordDefinitionBuilder changeCodeFieldsToValues() {
+    for (final FieldDefinition field : this.recordDefinition.getFields()) {
+      final String fieldName = field.getName();
+      final CodeTable codeTable = field.getCodeTable();
+      if (codeTable != null) {
+        final int length = codeTable.getValueFieldLength();
+        final boolean required = field.isRequired();
+        final FieldDefinition newField = new FieldDefinition(fieldName, DataTypes.STRING, length,
+          required);
+        this.recordDefinition.replaceField(field, newField);
+      }
+    }
+    return this;
+  }
+
   public PathName getPathName() {
     return this.recordDefinition.getPathName();
   }
@@ -126,5 +143,4 @@ public class RecordDefinitionBuilder {
     this.recordDefinition.setPathName(path);
     return this;
   }
-
 }

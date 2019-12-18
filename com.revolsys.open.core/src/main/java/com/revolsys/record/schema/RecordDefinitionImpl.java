@@ -501,6 +501,16 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   @Override
+  public int getFieldLength(final String name) {
+    final FieldDefinition field = getField(name);
+    if (field == null) {
+      return 0;
+    } else {
+      return field.getLength();
+    }
+  }
+
+  @Override
   public String getFieldName(final int i) {
     if (this.fields != null && i >= 0 && i < this.fields.size()) {
       final FieldDefinition field = this.fields.get(i);

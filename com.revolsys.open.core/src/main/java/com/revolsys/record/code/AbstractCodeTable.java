@@ -27,6 +27,8 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
 
   protected Map<String, Identifier> stringIdMap = new HashMap<>();
 
+  protected int valueFieldLength = -1;
+
   private JComponent swingEditor;
 
   public AbstractCodeTable() {
@@ -41,6 +43,8 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
     }
     this.stringIdMap.put(lowerId, id);
   }
+
+  protected abstract int calculateValueFieldLength();
 
   @Override
   public AbstractCodeTable clone() {
@@ -102,6 +106,15 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
   @Override
   public JComponent getSwingEditor() {
     return this.swingEditor;
+  }
+
+  @Override
+  public int getValueFieldLength() {
+    if (this.valueFieldLength == -1) {
+      final int length = calculateValueFieldLength();
+      this.valueFieldLength = length;
+    }
+    return 0;
   }
 
   public boolean isCapitalizeWords() {

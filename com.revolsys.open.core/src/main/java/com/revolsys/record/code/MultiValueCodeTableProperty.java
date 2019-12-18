@@ -114,6 +114,15 @@ public class MultiValueCodeTableProperty extends AbstractMultiValueCodeTable
   }
 
   @Override
+  protected int calculateValueFieldLength() {
+    int length = this.valueFieldNames.size();
+    for (final String fieldName : this.valueFieldNames) {
+      length += this.recordDefinition.getFieldLength(fieldName);
+    }
+    return length;
+  }
+
+  @Override
   public MultiValueCodeTableProperty clone() {
     final MultiValueCodeTableProperty clone = (MultiValueCodeTableProperty)super.clone();
     clone.recordDefinition = null;

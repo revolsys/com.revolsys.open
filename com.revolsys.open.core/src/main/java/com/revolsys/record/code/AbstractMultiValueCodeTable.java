@@ -60,6 +60,18 @@ public abstract class AbstractMultiValueCodeTable extends AbstractCodeTable {
   }
 
   @Override
+  protected int calculateValueFieldLength() {
+    int length = 0;
+    for (final Object value : this.idValueCache.values()) {
+      final int valueLength = value.toString().length();
+      if (valueLength > length) {
+        length = valueLength;
+      }
+    }
+    return length;
+  }
+
+  @Override
   public AbstractMultiValueCodeTable clone() {
     final AbstractMultiValueCodeTable clone = (AbstractMultiValueCodeTable)super.clone();
     clone.identifiers = new ArrayList<>(this.identifiers);

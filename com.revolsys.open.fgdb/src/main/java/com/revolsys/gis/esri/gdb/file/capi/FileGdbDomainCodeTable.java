@@ -11,10 +11,11 @@ import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
-import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.code.AbstractCodeTable;
+import com.revolsys.record.io.format.esri.gdb.xml.model.CodedValue;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Domain;
 
-public class FileGdbDomainCodeTable implements CodeTable {
+public class FileGdbDomainCodeTable extends AbstractCodeTable {
   private final Domain domain;
 
   private final String name;
@@ -30,12 +31,21 @@ public class FileGdbDomainCodeTable implements CodeTable {
   }
 
   @Override
-  public FileGdbDomainCodeTable clone() {
-    try {
-      return (FileGdbDomainCodeTable)super.clone();
-    } catch (final CloneNotSupportedException e) {
-      throw new RuntimeException(e);
+  protected int calculateValueFieldLength() {
+    int length = 0;
+    for (final CodedValue codedValue : this.domain.getCodedValues()) {
+      final String name = codedValue.getName();
+      final int valueLength = name.length();
+      if (valueLength > length) {
+        length = valueLength;
+      }
     }
+    return length;
+  }
+
+  @Override
+  public FileGdbDomainCodeTable clone() {
+    return (FileGdbDomainCodeTable)super.clone();
   }
 
   @Override
@@ -156,6 +166,7 @@ public class FileGdbDomainCodeTable implements CodeTable {
   public void refresh() {
   }
 
+  @Override
   public void setSwingEditor(final JComponent swingEditor) {
     this.swingEditor = swingEditor;
   }

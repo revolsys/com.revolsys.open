@@ -174,6 +174,9 @@ public class RecordLayerTable extends RecordRowTable {
     });
 
     final Font tableFont = getFont();
+    @SuppressWarnings({
+      "rawtypes", "unchecked"
+    })
     final Map<TextAttribute, Object> fontAttributes = (Map)tableFont.getAttributes();
     fontAttributes.put(TextAttribute.STRIKETHROUGH, TextAttribute.STRIKETHROUGH_ON);
     final Font font = new Font(fontAttributes);

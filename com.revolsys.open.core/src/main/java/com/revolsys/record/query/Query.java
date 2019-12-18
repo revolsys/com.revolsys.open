@@ -216,7 +216,9 @@ public class Query extends BaseObjectWithProperties
     if (this.fieldNames == null) {
       this.fieldNames = new ArrayList<>();
     }
-    this.fieldNames.add(fieldName);
+    if (!this.fieldNames.contains(fieldName)) {
+      this.fieldNames.add(fieldName);
+    }
     return this;
   }
 

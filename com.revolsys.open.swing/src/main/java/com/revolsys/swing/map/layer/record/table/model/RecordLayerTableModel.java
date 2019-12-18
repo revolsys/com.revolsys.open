@@ -184,7 +184,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
     final String fieldName = getColumnFieldName(columnIndex);
     final TableRecordsMode tableRecordsMode = getTableRecordsMode();
     if (tableRecordsMode != null && fieldName != null) {
-      final Query query = getFilterQuery();
+      final Query query = getFilterQuery().clone();
       addIdFieldNames(query);
       query.addFieldName(fieldName);
       try (

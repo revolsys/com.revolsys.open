@@ -54,6 +54,18 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
   }
 
   @Override
+  protected int calculateValueFieldLength() {
+    int length = 0;
+    for (final Object value : this.idValueCache.values()) {
+      final int valueLength = value.toString().length();
+      if (valueLength > length) {
+        length = valueLength;
+      }
+    }
+    return length;
+  }
+
+  @Override
   public AbstractSingleValueCodeTable clone() {
     final AbstractSingleValueCodeTable clone = (AbstractSingleValueCodeTable)super.clone();
     clone.identifiers = new ArrayList<>(this.identifiers);
@@ -241,6 +253,7 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
 
   @Override
   public synchronized void refresh() {
+    this.valueFieldLength = -1;
     super.refresh();
     this.identifiers.clear();
     this.idValueCache.clear();

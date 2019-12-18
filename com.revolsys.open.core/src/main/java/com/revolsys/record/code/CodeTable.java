@@ -150,6 +150,8 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
     return null;
   }
 
+  int getValueFieldLength();
+
   default List<String> getValueFieldNames() {
     return Arrays.asList("VALUE");
   }

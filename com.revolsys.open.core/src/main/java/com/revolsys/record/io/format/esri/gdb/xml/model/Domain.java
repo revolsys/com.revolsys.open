@@ -12,12 +12,12 @@ import javax.swing.JComponent;
 import org.jeometry.common.compare.CompareUtil;
 import org.jeometry.common.data.identifier.Identifier;
 
-import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.code.AbstractCodeTable;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.MergePolicyType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.SplitPolicyType;
 
-public class Domain implements CodeTable, Cloneable {
+public class Domain extends AbstractCodeTable implements Cloneable {
   private List<CodedValue> codedValues = new ArrayList<>();
 
   private Map<Identifier, List<Object>> idValueMap = new HashMap<>();
@@ -74,20 +74,28 @@ public class Domain implements CodeTable, Cloneable {
   }
 
   @Override
-  public Domain clone() {
-    try {
-      final Domain clone = (Domain)super.clone();
-      clone.idValueMap = new HashMap<>();
-      clone.stringIdMap = new HashMap<>();
-      clone.valueIdMap = new HashMap<>();
-      clone.codedValues = new ArrayList<>();
-      for (final CodedValue codedValue : this.codedValues) {
-        clone.addCodedValue(codedValue.getCode(), codedValue.getName());
+  protected int calculateValueFieldLength() {
+    int length = 0;
+    for (final String value : this.valueIdMap.keySet()) {
+      final int valueLength = value.length();
+      if (valueLength > length) {
+        length = valueLength;
       }
-      return clone;
-    } catch (final CloneNotSupportedException e) {
-      throw new RuntimeException(e);
     }
+    return length;
+  }
+
+  @Override
+  public Domain clone() {
+    final Domain clone = (Domain)super.clone();
+    clone.idValueMap = new HashMap<>();
+    clone.stringIdMap = new HashMap<>();
+    clone.valueIdMap = new HashMap<>();
+    clone.codedValues = new ArrayList<>();
+    for (final CodedValue codedValue : this.codedValues) {
+      clone.addCodedValue(codedValue.getCode(), codedValue.getName());
+    }
+    return clone;
   }
 
   @Override
@@ -306,6 +314,7 @@ public class Domain implements CodeTable, Cloneable {
     this.splitPolicy = splitPolicy;
   }
 
+  @Override
   public void setSwingEditor(final JComponent swingEditor) {
     this.swingEditor = swingEditor;
   }

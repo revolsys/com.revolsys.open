@@ -1,7 +1,9 @@
 package com.revolsys.swing.toolbar;
 
 import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.util.List;
+import java.util.function.Consumer;
 
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
@@ -10,6 +12,7 @@ import javax.swing.JToolBar;
 
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.AbstractAction;
+import com.revolsys.swing.action.ConsumerAction;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.component.ComponentGroup;
@@ -129,6 +132,32 @@ public class ToolBar extends JToolBar {
 
   public void addGroup(final String groupName) {
     this.groups.addGroup(groupName);
+  }
+
+  public ToggleButton addRadioButton(final String groupName, final int index, final String name,
+    final String title, final Icon icon, final EnableCheck enableCheck,
+    final Consumer<ActionEvent> handler) {
+    final ConsumerAction action = new ConsumerAction(name, title, icon, enableCheck, false,
+      handler);
+
+    final ToggleButton button = action.newToggleButton();
+    button.setBorderPainted(true);
+    this.groups.addComponent(this, groupName, index, button);
+    return button;
+  }
+
+  public ToggleButton addToggleButton(final String groupName, final int index, final String name,
+    final String title, final Icon icon, final EnableCheck enableCheck,
+    final Consumer<ActionEvent> handler) {
+    final ConsumerAction action = new ConsumerAction(name, title, icon, enableCheck, false,
+      handler);
+
+    final ToggleButton button = action.newToggleButton();
+    button.setBorderPainted(true);
+    this.groups.addComponent(this, groupName, index, button);
+    final ButtonGroup buttonGroup = getButtonGroup(groupName);
+    buttonGroup.add(button);
+    return button;
   }
 
   public ToggleButton addToggleButton(final String groupName, final int index, final String name,

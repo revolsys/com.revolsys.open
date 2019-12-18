@@ -7,10 +7,12 @@ import java.awt.datatransfer.DataFlavor;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -28,9 +30,11 @@ import javax.swing.table.TableCellEditor;
 
 import org.jeometry.common.data.type.DataTypes;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
+import com.revolsys.comparator.StringNumberComparator;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -104,12 +108,21 @@ public class RecordLayerTablePanel extends TablePanel
       final MenuFactory headerMenu = getHeaderMenu();
       SetRecordsFieldValue.addMenuItem(headerMenu);
       FieldCalculator.addMenuItem(headerMenu);
-      headerMenu.addMenuItem("field", "Copy Raw Values", "page_white_copy",
-        () -> actionCopyColumnValues(false, false));
-      headerMenu.addMenuItem("field", "Copy Display Values", "page_white_copy",
-        () -> actionCopyColumnValues(true, false));
-      headerMenu.addMenuItem("field", "Copy Unique Display Values", "page_white_copy",
-        () -> actionCopyColumnValues(true, true));
+
+      for (final boolean comma : new boolean[] {
+        false, true
+      }) {
+        String label;
+        if (comma) {
+          label = "Comma";
+        } else {
+          label = "Lines";
+        }
+        headerMenu.addMenuItem("dnd", "Copy Values (" + label + ")", "page_copy",
+          () -> actionCopyColumnValues(false, comma));
+        headerMenu.addMenuItem("dnd", "Copy Unique Values (" + label + ")", "page_copy",
+          () -> actionCopyColumnValues(true, comma));
+      }
 
       final LayerRecordMenu menu = this.layer.getRecordMenu();
       final RecordTableCellEditor tableCellEditor = table.getTableCellEditor();
@@ -132,45 +145,51 @@ public class RecordLayerTablePanel extends TablePanel
     this.tableModel.refresh();
   }
 
-  private void actionCopyColumnValues(final boolean showDisplayValues, final boolean unique) {
+  private void actionCopyColumnValues(final boolean unique, final boolean comma) {
     final Consumer<ProgressMonitor> action = monitor -> {
       final int columnIndex = TablePanel.getEventColumn();
-      final Consumer<String> valueAction;
-      StringBuilder stringBuilder;
-      Set<String> values = null;
-      if (unique) {
-        stringBuilder = null;
-        values = new TreeSet<>();
-        valueAction = values::add;
+      String separator;
+      if (comma) {
+        separator = ", ";
       } else {
-        stringBuilder = new StringBuilder();
-        valueAction = value -> {
-          stringBuilder.append(value);
-          stringBuilder.append('\n');
-          monitor.addProgress();
-        };
+        separator = "\n";
       }
-      if (showDisplayValues) {
-        this.tableModel.forEachColumnDisplayValue(monitor, columnIndex, valueAction);
+      Collection<String> values;
+      if (unique) {
+        values = new HashSet<>();
+      } else {
+        values = new ArrayList<>();
+      }
+      final RecordLayerTable table = getTable();
+      if (table.isShowDisplayValues()) {
+        this.tableModel.forEachColumnDisplayValue(monitor, columnIndex, value -> {
+          values.add(value);
+          monitor.addProgress();
+        });
       } else {
         this.tableModel.forEachColumnValue(monitor, columnIndex, value -> {
+          String string;
           if (value == null) {
-            valueAction.accept("");
+            string = "";
           } else {
-            final String string = DataTypes.toString(value);
-            valueAction.accept(string);
+            string = DataTypes.toString(value);
           }
+          values.add(string);
+          monitor.addProgress();
         });
       }
 
       if (!monitor.isCancelled()) {
-        String content;
+        final String content;
         if (unique) {
-          content = Strings.toString("\n", values);
+          final List<String> uniqueValues = Lists.toArray(values);
+          uniqueValues.sort(new StringNumberComparator());
+          content = Strings.toString(separator, values);
         } else {
-          content = stringBuilder.toString();
+          content = Strings.toString(separator, values);
         }
-        ClipboardUtil.setContents(new StringTransferable(DataFlavor.stringFlavor, content));
+        final StringTransferable transferable = new StringTransferable(DataFlavor.stringFlavor, content);
+        ClipboardUtil.setContents(transferable);
       }
     };
     final int rowCount = this.tableModel.getRowCount();
@@ -368,8 +387,18 @@ public class RecordLayerTablePanel extends TablePanel
           menu.showMenu(component, 0, 20);
         }));
     }
-    // Filter buttons
 
+    final ToggleButton showCodeValues = toolBar.addRadioButton("view", -1, null, "Show Code Values",
+      Icons.getIcon("field_code"), null, (event) -> {
+        final JToggleButton toggleButton = (JToggleButton)event.getSource();
+        final boolean showDisplayValues = toggleButton.isSelected();
+        table.setShowDisplayValues(showDisplayValues);
+      });
+    showCodeValues.setSelectedIcon(Icons.getIcon("field_value"));
+    Property.addListenerNewValue(table, "showDisplayValues", showCodeValues::setSelected);
+    showCodeValues.setSelected(table.isShowDisplayValues());
+
+    // Filter buttons
     boolean first = true;
     for (final TableRecordsMode tableRecordsMode : this.tableModel.getFieldFilterModes()) {
       final String key = tableRecordsMode.getKey();

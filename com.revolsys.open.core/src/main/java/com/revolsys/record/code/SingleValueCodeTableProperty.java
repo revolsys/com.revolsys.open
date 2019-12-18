@@ -108,6 +108,11 @@ public class SingleValueCodeTableProperty extends AbstractSingleValueCodeTable
   }
 
   @Override
+  protected int calculateValueFieldLength() {
+    return this.recordDefinition.getFieldLength(this.valueFieldName);
+  }
+
+  @Override
   public SingleValueCodeTableProperty clone() {
     final SingleValueCodeTableProperty clone = (SingleValueCodeTableProperty)super.clone();
     clone.recordDefinition = null;

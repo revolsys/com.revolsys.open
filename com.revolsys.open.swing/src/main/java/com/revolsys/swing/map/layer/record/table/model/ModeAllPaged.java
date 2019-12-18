@@ -268,10 +268,11 @@ public class ModeAllPaged extends ModeAbstractCached {
   private List<LayerRecord> loadPage(final int pageNumber) {
     final RecordLayerTableModel model = getTableModel();
     try {
-      final Query query = model.getFilterQuery();
+      Query query = model.getFilterQuery();
       if (query == null) {
         return Collections.emptyList();
       } else {
+        query = query.clone();
         query.setOffset(this.pageSize * pageNumber);
         query.setLimit(this.pageSize);
         return getRecordsLayer(query);
