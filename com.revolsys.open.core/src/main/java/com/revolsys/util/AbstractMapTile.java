@@ -13,6 +13,8 @@ public abstract class AbstractMapTile<D> implements BoundingBoxProxy {
 
   private D data;
 
+  private boolean loading = false;
+
   public AbstractMapTile(final BoundingBox boundingBox, final int width, final int height) {
     this.boundingBox = boundingBox;
     this.widthPixels = width;
@@ -56,8 +58,28 @@ public abstract class AbstractMapTile<D> implements BoundingBoxProxy {
   }
 
   public final D loadData() {
-    final D data = loadDataDo();
-    this.data = data;
+    D data;
+    synchronized (this) {
+      data = this.data;
+      if (data == null) {
+        if (this.loading) {
+          return data;
+        } else {
+          this.loading = true;
+        }
+      } else {
+        return data;
+      }
+
+    }
+    try {
+      data = loadDataDo();
+    } finally {
+      synchronized (this) {
+        this.loading = false;
+        this.data = data;
+      }
+    }
     return data;
   }
 

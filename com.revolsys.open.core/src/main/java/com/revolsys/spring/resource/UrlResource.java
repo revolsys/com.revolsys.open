@@ -365,20 +365,16 @@ public class UrlResource extends AbstractResource {
           }
         } else {
           con = this.url.openConnection();
-          con.addRequestProperty("User-Agent",
-            "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0a2) Gecko/20110613 Firefox/6.0a2");
           if (con instanceof HttpURLConnection) {
             final HttpURLConnection httpUrlConnection = (HttpURLConnection)con;
             setAuthorization(this.url, httpUrlConnection);
           }
         }
-        // ResourceUtils.useCachesIfNecessary(con);
         try {
           return con.getInputStream();
         } catch (final FileNotFoundException e) {
           throw Exceptions.wrap("Error opening file: " + toString(), e);
         } catch (final IOException e) {
-          // Close the HTTP connection (if applicable).
           if (con instanceof HttpURLConnection) {
             final HttpURLConnection httpUrlConnection = (HttpURLConnection)con;
             httpUrlConnection.disconnect();

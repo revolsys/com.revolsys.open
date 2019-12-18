@@ -43,4 +43,8 @@ public class TileLoadTask<D, T extends AbstractMapTile<D>> implements Runnable {
     }
   }
 
+  @Override
+  public String toString() {
+    return this.mapTile.toString();
+  }
 }
