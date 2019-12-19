@@ -29,6 +29,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.Records;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -142,8 +143,41 @@ public class RecordLayerTableModel extends RecordRowTableModel
     }
   }
 
-  private synchronized void clearFilterQuery() {
-    this.filterQuery = null;
+  private synchronized void updateFilterQuery() {
+    final Query oldValue = this.filterQuery;
+    final AbstractRecordLayer layer = this.layer;
+    final Query layerQuery = layer.getQuery();
+    Query query = layerQuery;
+    final Condition filter = getFilter();
+    if (!filter.isEmpty()) {
+      query = query //
+        .clone() //
+        .and(filter);
+    }
+    if (this.filterByBoundingBox) {
+      final FieldDefinition geometryField = layer.getGeometryField();
+      if (geometryField != null) {
+        final Project project = layer.getProject();
+        final BoundingBox viewBoundingBox = project.getViewBoundingBox();
+        if (!viewBoundingBox.isEmpty()) {
+          final EnvelopeIntersects envelopeIntersects = F.envelopeIntersects(geometryField,
+            viewBoundingBox);
+          if (query == layerQuery) {
+            query = query.clone();
+          }
+          query.and(envelopeIntersects);
+        }
+      }
+    }
+    if (!this.orderBy.isEmpty()) {
+      if (query == layerQuery) {
+        query = query.clone();
+      }
+      query.setOrderBy(this.orderBy);
+    }
+
+    this.filterQuery = query;
+    firePropertyChange("query", oldValue, query);
   }
 
   @Override
@@ -222,22 +256,6 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   public synchronized Query getFilterQuery() {
-    if (this.filterQuery == null) {
-      final Query query = this.layer.getQuery();
-      final Condition filter = getFilter();
-      query.and(filter);
-      query.setOrderBy(this.orderBy);
-      if (this.filterByBoundingBox) {
-        final Project project = this.layer.getProject();
-        final BoundingBox viewBoundingBox = project.getViewBoundingBox();
-        final RecordDefinition recordDefinition = this.layer.getRecordDefinition();
-        final FieldDefinition geometryField = recordDefinition.getGeometryField();
-        if (geometryField != null) {
-          query.and(F.envelopeIntersects(geometryField, viewBoundingBox));
-        }
-      }
-      this.filterQuery = query;
-    }
     return this.filterQuery;
   }
 
@@ -440,7 +458,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   public void refresh() {
-    clearFilterQuery();
+    updateFilterQuery();
     final TableRecordsMode tableRecordsMode = getTableRecordsMode();
     if (tableRecordsMode != null) {
       tableRecordsMode.refresh();
@@ -482,7 +500,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
       if (!DataType.equal(filter, this.filter)) {
         final Object oldValue = this.filter;
         this.filter = filter;
-        clearFilterQuery();
+        updateFilterQuery();
         if (Property.isEmpty(filter)) {
           this.rowFilterCondition = null;
         } else {

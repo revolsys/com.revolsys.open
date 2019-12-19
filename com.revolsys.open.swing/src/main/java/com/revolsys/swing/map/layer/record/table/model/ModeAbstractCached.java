@@ -43,6 +43,8 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
 
   private final List<PropertyChangeListener> listeners = new ArrayList<>();
 
+  private Query query;
+
   private long lastRefreshIndex = Long.MIN_VALUE;
 
   private LayerRecord currentRecord;
@@ -51,21 +53,29 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
 
   private ListSelectionModel selectionModel;
 
+  protected Object querySync = new Object();
+
   public ModeAbstractCached(final String key, final RecordLayerTableModel model) {
     this.key = key;
     this.model = model;
+    this.query = model.getFilterQuery();
   }
 
   @Override
   public void activate() {
-    this.selectionModel = newSelectionModel(this.model);
+    final RecordLayerTableModel model = this.model;
+    this.selectionModel = newSelectionModel(model);
     final AbstractRecordLayer layer = getLayer();
     final PropertyChangeListener recordFieldListener = this::recordFieldChanged;
     layer.addPropertyChangeListener(recordFieldListener);
     addListeners( //
       Property.addListenerNewValueSource(layer, AbstractRecordLayer.RECORD_UPDATED,
         this::recordUpdated), //
-      recordFieldListener);
+      recordFieldListener, //
+      Property.addListenerNewValue(model, "query", this::setQuery));
+    final Query query = model.getFilterQuery();
+    setQuery(query);
+
     for (final String propertyName : new String[] {
       AbstractRecordLayer.RECORDS_CHANGED
     }) {
@@ -208,11 +218,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
   }
 
   protected Condition getFilter() {
-    return this.model.getFilter();
-  }
-
-  protected Query getFilterQuery() {
-    return this.model.getFilterQuery();
+    return this.query.getWhereCondition();
   }
 
   @Override
@@ -222,6 +228,10 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
 
   public AbstractRecordLayer getLayer() {
     return this.model.getLayer();
+  }
+
+  protected Query getQuery() {
+    return this.query;
   }
 
   @Override
@@ -295,6 +305,9 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
 
   protected ListSelectionModel newSelectionModel(final RecordLayerTableModel tableModel) {
     return new RecordLayerListSelectionModel(tableModel);
+  }
+
+  protected void queryChanged(final Query query) {
   }
 
   private void recordFieldChanged(final LayerRecord record, final String fieldName,
@@ -389,6 +402,15 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
 
   public void repaint() {
     this.model.repaint();
+  }
+
+  public void setQuery(final Query query) {
+    synchronized (this.querySync) {
+      if (query != this.query) {
+        this.query = query;
+        queryChanged(query);
+      }
+    }
   }
 
   protected void setRecordCount(final int recordCount) {

@@ -96,6 +96,15 @@ public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, Geo
     }
   }
 
+  default FieldDefinition getGeometryField() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return recordDefinition.getGeometryField();
+    }
+  }
+
   default String getGeometryFieldName() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition == null) {

@@ -1,7 +1,6 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
 import java.awt.Color;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -49,13 +48,6 @@ public class ModeAllPaged extends ModeAbstractCached {
         this::addCachedRecords), //
       newRecordsDeletedListener(layer)//
     );
-    final RecordLayerTableModel model = getTableModel();
-    for (final String propertyName : new String[] {
-      "filter"
-    }) {
-      addListeners( //
-        Property.addListenerRunnable(layer, propertyName, this::refresh));
-    }
     super.activate();
   }
 
@@ -65,9 +57,11 @@ public class ModeAllPaged extends ModeAbstractCached {
         this.recordCountWorker.cancel(true);
         this.recordCountWorker = null;
       }
-      this.loadingPageNumbers.clear();
-      this.pageCache.clear();
-      this.persistedRecordCount = -1;
+      synchronized (this.querySync) {
+        this.loadingPageNumbers.clear();
+        this.pageCache.clear();
+        this.persistedRecordCount = -1;
+      }
     }
   }
 
@@ -119,7 +113,7 @@ public class ModeAllPaged extends ModeAbstractCached {
   }
 
   protected int getRecordCountPersisted() {
-    final Query query = getFilterQuery();
+    final Query query = getQuery();
     try {
       final AbstractRecordLayer layer = getLayer();
       if (query == null) {
@@ -155,21 +149,26 @@ public class ModeAllPaged extends ModeAbstractCached {
 
   protected LayerRecord getRecordPagePersisted(final int pageNumber, final int recordIndex) {
     synchronized (this) {
-      final List<LayerRecord> page = this.pageCache.get(pageNumber);
+      final List<LayerRecord> page;
+      synchronized (this.querySync) {
+        page = this.pageCache.get(pageNumber);
+      }
       if (page == null) {
-        boolean load = false;
-        synchronized (this.loadingPageNumbers) {
-          if (!this.loadingPageNumbers.contains(pageNumber)) {
+        Query query;
+        synchronized (this.querySync) {
+          if (this.loadingPageNumbers.contains(pageNumber)) {
+            return null;
+          } else {
             this.loadingPageNumbers.add(pageNumber);
-            load = true;
+            query = getQuery();
           }
         }
-        if (load) {
+        if (query != null) {
           final long refreshIndex = getRefreshIndex();
           Invoke.background("loadPage" + getTypeName(), 2, "Loading records " + getTypeName(),
-            () -> loadPage(pageNumber), //
+            () -> loadPage(query, pageNumber), //
             (records) -> {
-              setRecords(refreshIndex, pageNumber, records);
+              setRecords(query, refreshIndex, pageNumber, records);
             });
         }
       } else {
@@ -257,23 +256,26 @@ public class ModeAllPaged extends ModeAbstractCached {
     return false;
   }
 
-  private List<LayerRecord> loadPage(final int pageNumber) {
-    final RecordLayerTableModel model = getTableModel();
+  private List<LayerRecord> loadPage(final Query query, final int pageNumber) {
     try {
-      Query query = model.getFilterQuery();
-      if (query == null) {
-        return Collections.emptyList();
-      } else {
-        query = query.clone();
-        query.setOffset(this.pageSize * pageNumber);
-        query.setLimit(this.pageSize);
-        return getRecordsLayer(query);
-      }
+      final Query pageQuery = query//
+        .clone()//
+        .setOffset(this.pageSize * pageNumber)//
+        .setLimit(this.pageSize) //
+      ;
+      return getRecordsLayer(pageQuery);
     } finally {
-      synchronized (this.loadingPageNumbers) {
-        this.loadingPageNumbers.remove(pageNumber);
+      synchronized (this.querySync) {
+        if (query == getQuery()) {
+          this.loadingPageNumbers.remove(pageNumber);
+        }
       }
     }
+  }
+
+  @Override
+  protected void queryChanged(final Query query) {
+    refresh();
   }
 
   @Override
@@ -306,15 +308,20 @@ public class ModeAllPaged extends ModeAbstractCached {
     super.refresh(refreshIndex);
   }
 
-  protected void setRecords(final long refreshIndex, final int pageNumber,
+  protected void setRecords(final Query query, final long refreshIndex, final int pageNumber,
     final List<LayerRecord> records) {
-    synchronized (this) {
-      if (canRefreshFinish(refreshIndex)) {
+    boolean updated = false;
+    synchronized (this.querySync) {
+      if (query == getQuery() && canRefreshFinish(refreshIndex)) {
         this.pageCache.put(pageNumber, records);
-        final RecordLayerTableModel model = getTableModel();
-        model.fireTableRowsUpdated(pageNumber * this.pageSize,
-          Math.min(getRecordCount(), (pageNumber + 1) * this.pageSize - 1));
+        updated = true;
       }
+    }
+    if (updated) {
+      final RecordLayerTableModel model = getTableModel();
+      model.fireTableRowsUpdated(pageNumber * this.pageSize,
+        Math.min(getRecordCount(), (pageNumber + 1) * this.pageSize - 1));
+
     }
   }
 }

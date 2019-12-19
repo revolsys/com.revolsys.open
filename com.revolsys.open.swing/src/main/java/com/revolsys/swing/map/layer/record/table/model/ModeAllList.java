@@ -7,6 +7,7 @@ import javax.swing.Icon;
 
 import org.jeometry.common.awt.WebColors;
 
+import com.revolsys.record.query.Query;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -26,12 +27,6 @@ public class ModeAllList extends ModeAbstractCached {
       newRecordsDeletedListener(layer) //
     );
 
-    for (final String propertyName : new String[] {
-      "filter"
-    }) {
-      addListeners( //
-        Property.addListenerRunnable(layer, propertyName, this::refresh));
-    }
     super.activate();
   }
 
@@ -59,5 +54,10 @@ public class ModeAllList extends ModeAbstractCached {
   @Override
   public boolean isFilterByBoundingBoxSupported() {
     return true;
+  }
+
+  @Override
+  protected void queryChanged(final Query query) {
+    refresh();
   }
 }
