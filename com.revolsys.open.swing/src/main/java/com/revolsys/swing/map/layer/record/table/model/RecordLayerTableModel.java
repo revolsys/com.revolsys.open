@@ -143,43 +143,6 @@ public class RecordLayerTableModel extends RecordRowTableModel
     }
   }
 
-  private synchronized void updateFilterQuery() {
-    final Query oldValue = this.filterQuery;
-    final AbstractRecordLayer layer = this.layer;
-    final Query layerQuery = layer.getQuery();
-    Query query = layerQuery;
-    final Condition filter = getFilter();
-    if (!filter.isEmpty()) {
-      query = query //
-        .clone() //
-        .and(filter);
-    }
-    if (this.filterByBoundingBox) {
-      final FieldDefinition geometryField = layer.getGeometryField();
-      if (geometryField != null) {
-        final Project project = layer.getProject();
-        final BoundingBox viewBoundingBox = project.getViewBoundingBox();
-        if (!viewBoundingBox.isEmpty()) {
-          final EnvelopeIntersects envelopeIntersects = F.envelopeIntersects(geometryField,
-            viewBoundingBox);
-          if (query == layerQuery) {
-            query = query.clone();
-          }
-          query.and(envelopeIntersects);
-        }
-      }
-    }
-    if (!this.orderBy.isEmpty()) {
-      if (query == layerQuery) {
-        query = query.clone();
-      }
-      query.setOrderBy(this.orderBy);
-    }
-
-    this.filterQuery = query;
-    firePropertyChange("query", oldValue, query);
-  }
-
   @Override
   public void dispose() {
     getTable().setSelectionModel(null);
@@ -710,5 +673,42 @@ public class RecordLayerTableModel extends RecordRowTableModel
       }
     }
     return super.toDisplayValueInternal(rowIndex, fieldIndex, objectValue);
+  }
+
+  private synchronized void updateFilterQuery() {
+    final Query oldValue = this.filterQuery;
+    final AbstractRecordLayer layer = this.layer;
+    final Query layerQuery = layer.getQuery();
+    Query query = layerQuery;
+    final Condition filter = getFilter();
+    if (!filter.isEmpty()) {
+      query = query //
+        .clone() //
+        .and(filter);
+    }
+    if (this.filterByBoundingBox) {
+      final FieldDefinition geometryField = layer.getGeometryField();
+      if (geometryField != null) {
+        final Project project = layer.getProject();
+        final BoundingBox viewBoundingBox = project.getViewBoundingBox();
+        if (!viewBoundingBox.isEmpty()) {
+          final EnvelopeIntersects envelopeIntersects = F.envelopeIntersects(geometryField,
+            viewBoundingBox);
+          if (query == layerQuery) {
+            query = query.clone();
+          }
+          query.and(envelopeIntersects);
+        }
+      }
+    }
+    if (this.orderBy != null && !this.orderBy.isEmpty()) {
+      if (query == layerQuery) {
+        query = query.clone();
+      }
+      query.setOrderBy(this.orderBy);
+    }
+
+    this.filterQuery = query;
+    firePropertyChange("query", oldValue, query);
   }
 }

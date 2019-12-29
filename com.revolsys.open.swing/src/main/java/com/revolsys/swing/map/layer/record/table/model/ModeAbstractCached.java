@@ -16,6 +16,7 @@ import javax.swing.SwingUtilities;
 
 import com.revolsys.collection.list.ListByIndexIterator;
 import com.revolsys.collection.list.Lists;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.io.RecordWriter;
@@ -184,6 +185,8 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
           forEachRecord(query, record -> {
             final Record writeRecord = writer.newRecord();
             if (showCodeValues) {
+              Geometry geometry = record.getGeometry();
+              writeRecord.setGeometryValue(geometry);
               for (final String fieldName : recordDefinition.getFieldNames()) {
                 final Object value = record.getCodeValue(fieldName);
                 writeRecord.setValue(fieldName, value);

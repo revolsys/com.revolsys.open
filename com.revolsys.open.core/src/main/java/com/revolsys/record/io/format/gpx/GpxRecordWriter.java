@@ -16,8 +16,9 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.xml.XmlWriter;
+import com.revolsys.record.schema.RecordDefinition;
 
-public class GpxWriter extends AbstractRecordWriter implements GpxAttributes, GpxElements {
+public class GpxRecordWriter extends AbstractRecordWriter implements GpxAttributes, GpxElements {
 
   private String commentAttribute = "comment";
 
@@ -31,12 +32,12 @@ public class GpxWriter extends AbstractRecordWriter implements GpxAttributes, Gp
 
   private final XmlWriter out;
 
-  public GpxWriter(final File file) throws IOException {
+  public GpxRecordWriter(final File file) throws IOException {
     this(new FileWriter(file));
     this.file = file;
   }
 
-  public GpxWriter(final Writer writer) {
+  public GpxRecordWriter(final Writer writer) {
     this.out = new XmlWriter(new BufferedWriter(writer));
     this.out.setIndent(false);
     this.out.startDocument("UTF-8", "1.0");
@@ -71,6 +72,11 @@ public class GpxWriter extends AbstractRecordWriter implements GpxAttributes, Gp
 
   public String getNameAttribute() {
     return this.nameAttribute;
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    return GpxIterator.GPX_TYPE;
   }
 
   public String getSymAttribute() {

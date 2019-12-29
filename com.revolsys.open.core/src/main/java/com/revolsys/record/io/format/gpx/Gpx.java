@@ -63,6 +63,6 @@ public class Gpx extends AbstractRecordIoFactory implements RecordWriterFactory 
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.newUtf8Writer(outputStream);
-    return new GpxWriter(writer);
+    return new GpxRecordWriter(writer);
   }
 }

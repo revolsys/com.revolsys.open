@@ -49,6 +49,7 @@ public class GeoJsonGeometryReader extends AbstractIterator<Geometry> implements
 
   @Override
   public GeometryFactory getGeometryFactory() {
+    init();
     return this.geometryFactory;
   }
 

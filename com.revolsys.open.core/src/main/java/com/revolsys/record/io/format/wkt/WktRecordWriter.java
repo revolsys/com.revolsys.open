@@ -11,7 +11,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.IoConstants;
 import com.revolsys.record.Record;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
@@ -25,6 +24,8 @@ public class WktRecordWriter extends AbstractRecordWriter {
 
   private final RecordDefinition recordDefinition;
 
+  private GeometryFactory geometryFactory;
+
   public WktRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
     this.recordDefinition = recordDefinition;
     this.out = new BufferedWriter(out);
@@ -32,9 +33,8 @@ public class WktRecordWriter extends AbstractRecordWriter {
     if (geometryField != null) {
       final GeometryFactory geometryFactory = geometryField
         .getProperty(FieldProperties.GEOMETRY_FACTORY);
-      setProperty(IoConstants.GEOMETRY_FACTORY, geometryFactory);
+      this.geometryFactory = geometryFactory;
     }
-
   }
 
   @Override
@@ -50,9 +50,17 @@ public class WktRecordWriter extends AbstractRecordWriter {
     }
   }
 
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
+  }
+
   @Override
   public ClockDirection getPolygonRingDirection() {
     return ClockDirection.COUNTER_CLOCKWISE;
+  }
+
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 
   @Override
@@ -66,7 +74,8 @@ public class WktRecordWriter extends AbstractRecordWriter {
       if (!this.open) {
         this.open = true;
       }
-      final Geometry geometry = record.getGeometry();
+      Geometry geometry = record.getGeometry();
+      geometry = this.geometryFactory.convertGeometry(geometry);
       final int srid = geometry.getHorizontalCoordinateSystemId();
       if (srid > 0) {
         this.out.write("SRID=");
