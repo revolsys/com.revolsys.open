@@ -7,7 +7,6 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.measure.Quantity;
@@ -361,70 +360,72 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
 
   public long getZoomInScale(final double scale, final int steps) {
     final List<Long> values = this.scales;
-    final long scaleCeil = Math.round(scale);
-    for (int i = 0; i < values.size(); i++) {
-      long nextScale = values.get(i);
-      if (nextScale < scaleCeil) {
+    final long currentValue = Math.round(scale);
+    long previousValue = values.get(0) * 2;
+    for (int i = 0; i < values.size() - 1; i++) {
+      long value = values.get(i);
+      final long testValue = Math.round(value + (previousValue - value) * 0.2);
+      if (testValue < currentValue) {
         for (int j = 1; j < steps && i + j < values.size(); j++) {
-          nextScale = values.get(i + j);
+          value = values.get(i + j);
         }
-        return nextScale;
+        return value;
       }
+      previousValue = value;
     }
     return values.get(values.size() - 1);
   }
 
   public double getZoomInUnitsPerPixel(final double unitsPerPixel, final int steps) {
     final List<Double> values = this.unitsPerPixelList;
-    for (int i = 0; i < values.size(); i++) {
-      double nextValue = values.get(i);
-      if (nextValue < unitsPerPixel) {
+    final double currentValue = unitsPerPixel;
+    double previousValue = values.get(0) * 2;
+    for (int i = 0; i < values.size() - 1; i++) {
+      double value = values.get(i);
+      final double testValue = value + (previousValue - value) * 0.2;
+      if (testValue < currentValue) {
         for (int j = 1; j < steps && i + j < values.size(); j++) {
-          nextValue = values.get(i + j);
+          value = values.get(i + j);
         }
-        return nextValue;
+        return value;
       }
+      previousValue = value;
     }
     return this.minUnitsPerPixel;
   }
 
-  public double getZoomOutScale(final double scale) {
-    final long scaleCeil = (long)Math.floor(scale);
-    final List<Long> scales = new ArrayList<>(this.scales);
-    Collections.reverse(scales);
-    for (final double nextScale : scales) {
-      final long newScale = (long)Math.floor(nextScale);
-      if (newScale >= scaleCeil) {
-        return nextScale;
-      }
-    }
-    return scales.get(0);
-  }
-
   public long getZoomOutScale(final double scale, final int steps) {
-    final long scaleCeil = Math.round(scale);
-    for (int i = this.scales.size() - 1; i >= 0; i--) {
-      long nextScale = this.scales.get(i);
-      if (nextScale > scaleCeil) {
+    final long currentValue = Math.round(scale);
+    final List<Long> values = this.scales;
+    long previousValue = 0;
+    for (int i = values.size() - 1; i >= 0; i--) {
+      long value = values.get(i);
+      final long testValue = Math.round(previousValue + (value - previousValue) * 0.8);
+      if (testValue > currentValue) {
         for (int j = 1; j < steps && i - j >= 0; j++) {
-          nextScale = this.scales.get(i - j);
+          value = values.get(i - j);
         }
-        return nextScale;
+        return value;
       }
+      previousValue = value;
     }
-    return this.scales.get(0);
+    return values.get(0);
   }
 
   public double getZoomOutUnitsPerPixel(final double unitsPerPixel, final int steps) {
     final List<Double> values = this.unitsPerPixelList;
+    final double currentValue = unitsPerPixel;
+    double previousValue = 0;
     for (int i = values.size() - 1; i >= 0; i--) {
-      double nextValue = values.get(i);
-      if (nextValue > unitsPerPixel) {
+      double value = values.get(i);
+      final double testValue = previousValue + (value - previousValue) * 0.8;
+      if (testValue > currentValue) {
         for (int j = 1; j < steps && i - j >= 0; j++) {
-          nextValue = values.get(i - j);
+          value = values.get(i - j);
         }
-        return nextValue;
+        return value;
       }
+      previousValue = value;
     }
     return this.maxUnitsPerPixel;
   }
