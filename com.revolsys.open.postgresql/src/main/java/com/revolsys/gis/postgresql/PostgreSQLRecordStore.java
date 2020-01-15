@@ -271,6 +271,8 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   protected void initSettings() {
     setIteratorFactory(
       new RecordStoreIteratorFactory(PostgreSQLRecordStore::newPostgreSQLIterator));
+    setExcludeTablePaths("/PUBLIC/GEOMETRY_COLUMNS", "/PUBLIC/GEOGRAPHY_COLUMNS",
+      "/PUBLIC/PG_BUFFER_CACHE", "/PUBLIC/PG_STAT_STATEMENTS", "/PUBLIC/SPATIAL_REF_SYS");
   }
 
   @Override
