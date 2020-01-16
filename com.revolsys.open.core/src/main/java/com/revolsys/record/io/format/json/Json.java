@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.data.type.FunctionDataType;
+import org.jeometry.common.data.type.ListDataType;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
@@ -75,6 +76,8 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
       }
 
     }, FunctionDataType.MAP_EQUALS, FunctionDataType.MAP_EQUALS_EXCLUDES);
+
+  public static DataType JSON_LIST = new ListDataType("JsonList", JsonList.class, DataTypes.OBJECT);
 
   static {
     DataTypes.registerDataTypes(Json.class);
