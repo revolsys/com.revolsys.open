@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.revolsys.collection.map.MapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.map.view.ViewRenderer;
 
 public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
@@ -28,8 +28,8 @@ public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
   }
 
   @Override
-  public MapEx toMap() {
-    return MapEx.EMPTY;
+  public JsonObject toMap() {
+    return JsonObject.EMPTY;
   }
 
 }

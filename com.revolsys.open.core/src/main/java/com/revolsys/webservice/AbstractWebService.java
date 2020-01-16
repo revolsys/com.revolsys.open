@@ -5,6 +5,7 @@ import java.util.Map;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.PasswordUtil;
 import com.revolsys.util.Property;
@@ -125,8 +126,8 @@ public abstract class AbstractWebService<V> extends BaseObjectWithProperties
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = newTypeMap(getWebServiceTypeName());
+  public JsonObject toMap() {
+    final JsonObject map = newTypeMap(getWebServiceTypeName());
     final String name = getName();
     addToMap(map, "name", name);
     map.put("serviceUrl", this.serviceUrl);

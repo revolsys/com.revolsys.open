@@ -11,6 +11,7 @@ import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
@@ -318,8 +319,8 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     final List<AbstractRecordLayerRenderer> renderers = getRenderers();
     if (!renderers.isEmpty()) {
       final List<Map<String, Object>> rendererMaps = new ArrayList<>();

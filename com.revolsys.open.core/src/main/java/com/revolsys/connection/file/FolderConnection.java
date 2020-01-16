@@ -10,6 +10,7 @@ import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.connection.AbstractConnection;
 import com.revolsys.io.file.Paths;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.util.Property;
 
 public class FolderConnection extends AbstractConnection<FolderConnection, FolderConnectionRegistry>
@@ -65,8 +66,8 @@ public class FolderConnection extends AbstractConnection<FolderConnection, Folde
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     addTypeToMap(map, "folderConnection");
     map.put("name", getName());
     map.put("file", this.path.toAbsolutePath().toString());

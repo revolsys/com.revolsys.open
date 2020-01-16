@@ -3,16 +3,16 @@ package com.revolsys.util;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.ObjectWithProperties;
+import com.revolsys.record.io.format.json.JsonObject;
 
 public class SupplierWithProperties<T> implements ObjectWithProperties, Supplier<T>, MapSerializer {
   private final Supplier<T> supplier;
 
-  private final MapEx properties = new LinkedHashMapEx();
+  private final JsonObject properties = new JsonObject();
 
   public SupplierWithProperties(final Supplier<T> supplier,
     final Map<String, ? extends Object> properties) {
@@ -32,7 +32,7 @@ public class SupplierWithProperties<T> implements ObjectWithProperties, Supplier
   }
 
   @Override
-  public MapEx toMap() {
+  public JsonObject toMap() {
     return this.properties;
   }
 

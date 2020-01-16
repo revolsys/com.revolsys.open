@@ -3,11 +3,11 @@ package com.revolsys.swing.map.layer.raster;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageMapTile;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayer;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
@@ -67,7 +67,7 @@ public class TiledGeoreferencedImageLayerRenderer<T extends GeoreferencedImageMa
   }
 
   @Override
-  public MapEx toMap() {
-    return MapEx.EMPTY;
+  public JsonObject toMap() {
+    return JsonObject.EMPTY;
   }
 }

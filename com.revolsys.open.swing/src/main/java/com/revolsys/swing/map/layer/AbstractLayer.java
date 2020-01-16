@@ -45,7 +45,6 @@ import com.revolsys.beans.KeyedPropertyChangeEvent;
 import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.EmptyReference;
-import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.MapSerializerMap;
 import com.revolsys.geometry.model.BoundingBox;
@@ -56,6 +55,7 @@ import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.Icons;
@@ -1265,8 +1265,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   @SuppressWarnings("unchecked")
   @Override
-  public MapEx toMap() {
-    final MapEx map = new LinkedHashMapEx();
+  public JsonObject toMap() {
+    final JsonObject map = new JsonObject();
     addTypeToMap(map, this.type);
     addToMap(map, "name", this.name);
     addToMap(map, "visible", this.visible);

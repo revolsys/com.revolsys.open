@@ -7,6 +7,7 @@ import org.jeometry.common.awt.WebColors;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
+import com.revolsys.record.io.format.json.JsonObject;
 
 public class ColorGriddedElevationModelRasterizer extends AbstractGriddedElevationModelRasterizer {
 
@@ -85,8 +86,8 @@ public class ColorGriddedElevationModelRasterizer extends AbstractGriddedElevati
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     addToMap(map, "minColour", this.minColour);
     addToMap(map, "maxColour", this.maxColour);
     if (Double.isFinite(this.minZ)) {

@@ -4,27 +4,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.map.MapReader;
 
-public class JsonMapReader extends AbstractReader<MapEx> implements MapReader {
+public class JsonObjectReader extends AbstractReader<JsonObject> {
   private final java.io.Reader in;
 
   private Iterator<JsonObject> iterator;
 
   private boolean single = false;
 
-  public JsonMapReader(final InputStream in) {
+  public JsonObjectReader(final InputStream in) {
     this.in = FileUtil.newUtf8Reader(in);
   }
 
-  public JsonMapReader(final java.io.Reader in) {
+  public JsonObjectReader(final java.io.Reader in) {
     this.in = in;
   }
 
-  public JsonMapReader(final java.io.Reader in, final boolean single) {
+  public JsonObjectReader(final java.io.Reader in, final boolean single) {
     this.in = in;
     this.single = single;
   }
@@ -34,11 +32,8 @@ public class JsonMapReader extends AbstractReader<MapEx> implements MapReader {
     FileUtil.closeSilent(this.in);
   }
 
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
   @Override
-  public Iterator<MapEx> iterator() {
+  public Iterator<JsonObject> iterator() {
     if (this.iterator == null) {
       try {
         this.iterator = new JsonMapIterator(this.in, this.single);
@@ -46,7 +41,7 @@ public class JsonMapReader extends AbstractReader<MapEx> implements MapReader {
         throw new IllegalArgumentException("Unable to create Iterator:" + e.getMessage(), e);
       }
     }
-    return (Iterator)this.iterator;
+    return this.iterator;
   }
 
   @Override

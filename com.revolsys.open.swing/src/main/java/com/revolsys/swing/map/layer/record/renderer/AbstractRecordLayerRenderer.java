@@ -18,6 +18,7 @@ import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.filter.MultipleAttributeValuesFilter;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -279,8 +280,8 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     if (!(this.filter == Predicates.<Record> all())) {
       addToMap(map, "filter", this.filter);
     }

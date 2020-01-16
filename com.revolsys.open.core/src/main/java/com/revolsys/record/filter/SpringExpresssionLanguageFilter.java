@@ -9,10 +9,9 @@ import org.springframework.expression.spel.SpelParserConfiguration;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.format.json.JsonObject;
 
 public class SpringExpresssionLanguageFilter implements Predicate<Record>, MapSerializer {
   private static SpelParserConfiguration EXPRESSION_CONFIGURATION = new SpelParserConfiguration(
@@ -52,8 +51,8 @@ public class SpringExpresssionLanguageFilter implements Predicate<Record>, MapSe
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = new LinkedHashMapEx();
+  public JsonObject toMap() {
+    final JsonObject map = new JsonObject();
     addTypeToMap(map, "queryFilter");
     map.put("query", this.query);
     return map;

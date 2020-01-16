@@ -11,12 +11,12 @@ import org.jeometry.common.exception.WrappedException;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.map.MapService;
 import com.revolsys.record.io.format.esri.rest.map.TileInfo;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
@@ -321,8 +321,8 @@ public class ArcGisRestServerTileCacheLayer
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     if (Property.hasValue(this.connectionName)) {
       addToMap(map, "connectionName", this.connectionName);
       addToMap(map, "servicePath", this.servicePath);

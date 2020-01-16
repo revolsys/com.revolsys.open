@@ -13,6 +13,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.raster.BufferedGeoreferencedImage;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
@@ -198,8 +199,8 @@ public class TriangulatedIrregularNetworkLayer extends AbstractLayer
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     map.remove("querySupported");
     map.remove("selectSupported");
     map.remove("editable");

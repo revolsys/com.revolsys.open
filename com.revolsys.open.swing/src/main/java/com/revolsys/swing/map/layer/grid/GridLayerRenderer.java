@@ -20,6 +20,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapTile;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
@@ -198,8 +199,8 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     addToMap(map, "geometryStyle", this.geometryStyle);
     addToMap(map, "textStyle", this.textStyle);
     return map;

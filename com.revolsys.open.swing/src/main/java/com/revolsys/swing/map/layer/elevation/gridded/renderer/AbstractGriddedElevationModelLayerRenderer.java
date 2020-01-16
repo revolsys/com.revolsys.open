@@ -7,6 +7,7 @@ import javax.swing.Icon;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.raster.BufferedGeoreferencedImage;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
 import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
@@ -91,8 +92,8 @@ public abstract class AbstractGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     return map;
   }
 }

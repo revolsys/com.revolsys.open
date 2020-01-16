@@ -6,8 +6,7 @@ import java.util.Map;
 
 import org.jeometry.common.exception.Exceptions;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 
 public class InvokeConstructorMapObjectFactory extends AbstractMapObjectFactory
   implements MapSerializer {
@@ -41,8 +40,8 @@ public class InvokeConstructorMapObjectFactory extends AbstractMapObjectFactory
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = new LinkedHashMapEx();
+  public JsonObject toMap() {
+    final JsonObject map = new JsonObject();
     map.put("typeName", getTypeName());
     map.put("description", getDescription());
     map.put("typeClass", this.typeClass);

@@ -20,8 +20,6 @@ import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.list.Lists;
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.geometry.model.ClockDirection;
@@ -33,6 +31,7 @@ import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.property.RecordDefinitionProperty;
 import com.revolsys.record.property.ValueRecordDefinitionProperty;
@@ -910,8 +909,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = new LinkedHashMapEx();
+  public JsonObject toMap() {
+    final JsonObject map = new JsonObject();
     addTypeToMap(map, "recordDefinition");
     final String path = getPath();
     map.put("path", path);

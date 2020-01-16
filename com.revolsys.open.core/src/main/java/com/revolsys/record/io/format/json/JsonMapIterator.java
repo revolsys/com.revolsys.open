@@ -6,12 +6,11 @@ import java.io.Reader;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.json.JsonParser.EventType;
 
-public class JsonMapIterator implements Iterator<MapEx>, Closeable {
+public class JsonMapIterator implements Iterator<JsonObject>, Closeable {
   /** The current record. */
-  private MapEx currentObject;
+  private JsonObject currentObject;
 
   /** Flag indicating if there are more records to be read. */
   private boolean hasNext = false;
@@ -79,11 +78,11 @@ public class JsonMapIterator implements Iterator<MapEx>, Closeable {
    * @return The record
    */
   @Override
-  public MapEx next() {
+  public JsonObject next() {
     if (!this.hasNext) {
       throw new NoSuchElementException("No more elements");
     } else {
-      final MapEx object = this.currentObject;
+      final JsonObject object = this.currentObject;
       readNextRecord();
       return object;
     }
@@ -96,7 +95,7 @@ public class JsonMapIterator implements Iterator<MapEx>, Closeable {
    *         entry.
    * @throws IOException if bad things happen during the read
    */
-  private MapEx readNextRecord() {
+  private JsonObject readNextRecord() {
     if (this.hasNext && this.parser.hasNext()) {
       final EventType event = this.parser.next();
       if (event == EventType.endArray || event == EventType.endDocument) {

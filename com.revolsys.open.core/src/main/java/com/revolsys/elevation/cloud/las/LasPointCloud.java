@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
@@ -33,6 +32,7 @@ import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.io.format.html.HtmlWriter;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.HtmlAttr;
 import com.revolsys.util.HtmlElem;
@@ -387,8 +387,8 @@ public class LasPointCloud extends BaseObjectWithProperties
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = new LinkedHashMapEx();
+  public JsonObject toMap() {
+    final JsonObject map = new JsonObject();
     addToMap(map, "url", this.resource.getUri());
     addToMap(map, "header", this.header);
     return map;

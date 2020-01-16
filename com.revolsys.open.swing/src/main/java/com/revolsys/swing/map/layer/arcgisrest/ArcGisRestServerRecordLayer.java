@@ -21,6 +21,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.map.FeatureLayer;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -484,8 +485,8 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     addToMap(map, "url", this.url);
     addToMap(map, "username", this.username);
     addToMap(map, "password", PasswordUtil.encrypt(this.password));

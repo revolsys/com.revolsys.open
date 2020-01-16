@@ -9,6 +9,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.parallel.ExecutorServiceFactory;
 import com.revolsys.raster.GeoreferencedImage;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.BaseMapLayer;
 import com.revolsys.swing.map.layer.raster.ViewFunctionImageLayerRenderer;
@@ -105,8 +106,8 @@ public class BingLayer extends AbstractLayer implements BaseMapLayer {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     addToMap(map, "imagerySet", this.imagerySet);
     addToMap(map, "mapLayer", this.mapLayer);
     return map;

@@ -8,6 +8,7 @@ import org.jeometry.common.awt.WebColors;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.record.io.format.json.JsonObject;
 
 public class GradientStop extends BaseObjectWithProperties
   implements Cloneable, MapSerializer, Comparable<GradientStop> {
@@ -159,8 +160,8 @@ public class GradientStop extends BaseObjectWithProperties
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = newTypeMap("gradientStop");
+  public JsonObject toMap() {
+    final JsonObject map = newTypeMap("gradientStop");
     addToMap(map, "color", this.color);
     if (Double.isFinite(this.value)) {
       map.add("value", this.value);

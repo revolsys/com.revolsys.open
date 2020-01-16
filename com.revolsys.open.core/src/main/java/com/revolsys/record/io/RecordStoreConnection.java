@@ -11,6 +11,7 @@ import com.revolsys.collection.Parent;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.connection.AbstractConnection;
 import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
@@ -110,8 +111,8 @@ public class RecordStoreConnection
 
   @SuppressWarnings("unchecked")
   @Override
-  public MapEx toMap() {
-    final MapEx map = toMapInternal();
+  public JsonObject toMap() {
+    final JsonObject map = toMapInternal();
     if (!isSavePassword()) {
       final Map<String, Object> connection = (Map<String, Object>)map.get("connection");
       connection.remove("password");
@@ -119,8 +120,8 @@ public class RecordStoreConnection
     return map;
   }
 
-  protected MapEx toMapInternal() {
-    final MapEx map = newTypeMap("recordStore");
+  protected JsonObject toMapInternal() {
+    final JsonObject map = newTypeMap("recordStore");
     addAllToMap(map, getProperties());
     final String name = getName();
     map.put("name", name);

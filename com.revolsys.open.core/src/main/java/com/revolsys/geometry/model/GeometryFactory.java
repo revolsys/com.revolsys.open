@@ -76,8 +76,6 @@ import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
 import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.map.IntHashMap;
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
@@ -108,6 +106,7 @@ import com.revolsys.io.StringWriter;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
@@ -2607,8 +2606,8 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = new LinkedHashMapEx();
+  public JsonObject toMap() {
+    final JsonObject map = new JsonObject();
     addTypeToMap(map, "geometryFactory");
     map.put("srid", getCoordinateSystemId());
     map.put("axisCount", this.axisCount);

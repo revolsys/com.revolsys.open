@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.BaseMapLayer;
 import com.revolsys.swing.map.view.ViewRenderer;
@@ -45,8 +46,8 @@ public abstract class AbstractTiledLayer<D, T extends AbstractMapTile<D>> extend
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     map.keySet().removeAll(Arrays.asList("readOnly", "querySupported", "selectSupported"));
     return map;
   }

@@ -29,11 +29,10 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.util.Property;
@@ -559,8 +558,8 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = new LinkedHashMapEx();
+  public JsonObject toMap() {
+    final JsonObject map = new JsonObject();
     for (final String name : PROPERTY_NAMES) {
       Object value = Property.get(this, name);
       if (value instanceof Color) {

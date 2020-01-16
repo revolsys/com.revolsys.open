@@ -4,8 +4,8 @@ import java.util.function.Function;
 
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.raster.GeoreferencedImage;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
@@ -48,7 +48,7 @@ public class ViewFunctionImageLayerRenderer<L extends AbstractLayer>
   }
 
   @Override
-  public MapEx toMap() {
-    return MapEx.EMPTY;
+  public JsonObject toMap() {
+    return new JsonObject();
   }
 }

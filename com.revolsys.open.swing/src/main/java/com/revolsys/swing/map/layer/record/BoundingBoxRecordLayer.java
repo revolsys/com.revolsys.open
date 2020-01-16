@@ -13,6 +13,7 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.Property;
 
@@ -99,8 +100,8 @@ public class BoundingBoxRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     map.remove("style");
     return map;
   }

@@ -31,11 +31,10 @@ import javax.swing.table.TableCellEditor;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.comparator.StringNumberComparator;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
@@ -518,8 +517,8 @@ public class RecordLayerTablePanel extends TablePanel
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = new LinkedHashMapEx();
+  public JsonObject toMap() {
+    final JsonObject map = new JsonObject();
     addToMap(map, "orderBy", this.tableModel.getOrderBy());
     return map;
   }

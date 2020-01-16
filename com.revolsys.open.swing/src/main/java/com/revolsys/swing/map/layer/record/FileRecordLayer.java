@@ -13,6 +13,7 @@ import com.revolsys.io.IoFactory;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordReaderFactory;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Icons;
@@ -156,8 +157,8 @@ public class FileRecordLayer extends ListRecordLayer {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     addToMap(map, "url", this.url);
     return map;
   }

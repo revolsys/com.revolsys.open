@@ -21,6 +21,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
@@ -270,8 +271,8 @@ public class GeometryStyleRecordLayerRenderer extends AbstractGeometryRecordLaye
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     if (this.style != null) {
       final Map<String, Object> styleMap = this.style.toMap();
       map.putAll(styleMap);

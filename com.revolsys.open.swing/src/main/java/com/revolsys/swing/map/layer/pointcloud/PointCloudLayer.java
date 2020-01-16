@@ -23,6 +23,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.Paths;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.RsSwingServiceInitializer;
@@ -288,8 +289,8 @@ public class PointCloudLayer extends AbstractLayer {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     addToMap(map, "url", this.url);
     return map;
   }

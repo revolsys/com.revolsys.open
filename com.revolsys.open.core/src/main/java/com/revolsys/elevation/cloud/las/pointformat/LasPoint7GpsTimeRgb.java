@@ -4,6 +4,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.record.io.format.json.JsonObject;
 
 public class LasPoint7GpsTimeRgb extends LasPoint6GpsTime implements LasPointRgb {
   private static final long serialVersionUID = 1L;
@@ -77,8 +78,8 @@ public class LasPoint7GpsTimeRgb extends LasPoint6GpsTime implements LasPointRgb
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     addToMap(map, "red", this.red);
     addToMap(map, "green", this.green);
     addToMap(map, "blue", this.blue);

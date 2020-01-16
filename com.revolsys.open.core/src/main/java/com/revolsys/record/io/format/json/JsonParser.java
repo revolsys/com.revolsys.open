@@ -20,8 +20,6 @@ import org.jeometry.common.exception.WrappedException;
 import org.jeometry.common.number.Doubles;
 import org.jeometry.common.number.Integers;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
 
@@ -257,10 +255,10 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
     }
   }
 
-  public MapEx getMap() {
+  public JsonObject getMap() {
     if (getEvent() == EventType.startObject || hasNext() && next() == EventType.startObject) {
       EventType event = getEvent();
-      final MapEx map = new LinkedHashMapEx();
+      final JsonObject map = new JsonObject();
       do {
         if (hasNext() && next() == EventType.string) {
           final String key = getStringIntern();

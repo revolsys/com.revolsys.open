@@ -34,6 +34,7 @@ import com.revolsys.record.Records;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordStoreConnectionManager;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.In;
 import com.revolsys.record.query.Q;
@@ -975,8 +976,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     addToMap(map, "typePath", this.typePath);
     return map;
   }

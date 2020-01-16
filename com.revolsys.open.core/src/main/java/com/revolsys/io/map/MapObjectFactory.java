@@ -14,6 +14,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.io.format.json.Json;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -113,7 +114,7 @@ public interface MapObjectFactory {
     final Resource oldResource = Resource.setBaseResource(resource.getParent());
 
     try {
-      final MapEx properties = Json.toMap(resource);
+      final JsonObject properties = Json.toMap(resource);
       return toObject(properties);
     } catch (final Throwable t) {
       Logs.error(MapObjectFactoryRegistry.class, "Cannot load object from " + resource, t);
@@ -136,7 +137,7 @@ public interface MapObjectFactory {
     final Resource oldResource = Resource.setBaseResource(resource.getParent());
 
     try {
-      final MapEx resourceProperties = Json.toMap(resource);
+      final JsonObject resourceProperties = Json.toMap(resource);
       resourceProperties.putAll(properties);
       return toObject(resourceProperties);
     } catch (final Throwable t) {
@@ -161,7 +162,7 @@ public interface MapObjectFactory {
     final Resource oldResource = Resource.setBaseResource(resource.getParent());
 
     try {
-      final MapEx resourceProperties = Json.toMap(resource);
+      final JsonObject resourceProperties = Json.toMap(resource);
       resourceProperties.putAll(properties);
       return toObject(resourceProperties);
     } catch (final Throwable e) {

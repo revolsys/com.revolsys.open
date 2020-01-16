@@ -17,6 +17,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.raster.BufferedGeoreferencedImage;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
@@ -153,8 +154,8 @@ public class BoundingBoxGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     if (this.style != null) {
       final Map<String, Object> styleMap = this.style.toMap();
       map.putAll(styleMap);

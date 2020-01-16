@@ -14,6 +14,7 @@ import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGridFactory;
 import com.revolsys.gis.grid.RectangularMapTile;
 import com.revolsys.io.map.MapObjectFactory;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.component.TabbedValuePanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
@@ -118,8 +119,8 @@ public class GridLayer extends AbstractLayer {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     final String gridName = getGridName();
     if (Property.hasValue(gridName)) {
       addToMap(map, "gridName", gridName);

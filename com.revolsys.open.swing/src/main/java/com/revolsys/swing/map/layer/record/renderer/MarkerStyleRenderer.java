@@ -8,6 +8,7 @@ import javax.swing.Icon;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.layer.LayerRenderer;
@@ -134,8 +135,8 @@ public class MarkerStyleRenderer extends AbstractGeometryRecordLayerRenderer {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     if (this.style != null) {
       final Map<String, Object> styleMap = this.style.toMap();
       map.putAll(styleMap);

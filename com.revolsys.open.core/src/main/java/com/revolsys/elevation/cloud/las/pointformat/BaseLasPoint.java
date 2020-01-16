@@ -6,13 +6,12 @@ import org.jeometry.common.function.BiConsumerDouble;
 import org.jeometry.common.function.BiFunctionDouble;
 import org.jeometry.common.function.Consumer3Double;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.AbstractPoint;
 import com.revolsys.geometry.util.Points;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.util.Property;
 
 public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Serializable {
@@ -234,8 +233,8 @@ public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Se
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = new LinkedHashMapEx();
+  public JsonObject toMap() {
+    final JsonObject map = new JsonObject();
     addToMap(map, "x", getX());
     addToMap(map, "y", getY());
     addToMap(map, "z", getZ());

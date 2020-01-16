@@ -5,6 +5,7 @@ import java.util.Map;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.AbstractNameTitle;
+import com.revolsys.record.io.format.json.JsonObject;
 
 public abstract class AbstractMarkerGroupElement extends AbstractNameTitle
   implements MapSerializer {
@@ -46,9 +47,9 @@ public abstract class AbstractMarkerGroupElement extends AbstractNameTitle
   }
 
   @Override
-  public MapEx toMap() {
+  public JsonObject toMap() {
     final String typeName = getTypeName();
-    final MapEx map = newTypeMap(typeName);
+    final JsonObject map = newTypeMap(typeName);
     map.put("name", getName());
     map.put("title", getTitle());
     return map;

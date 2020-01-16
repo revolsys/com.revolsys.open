@@ -69,8 +69,10 @@ public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
       return null;
     } else if (value instanceof Clob) {
       return (V)value;
+    } else if (value instanceof String) {
+      return (V)value;
     } else {
-      return (V)value.toString();
+      return (V)getDataType().toString(value);
     }
   }
 }

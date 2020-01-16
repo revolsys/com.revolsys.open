@@ -10,12 +10,13 @@ import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.FileUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
 public abstract class AbstractConnection<C extends Connection, R extends ConnectionRegistry<C>>
   extends BaseObjectWithProperties implements Connection {
-  private MapEx config = new LinkedHashMapEx();
+  private JsonObject config = new JsonObject();
 
   private String name;
 
@@ -119,7 +120,7 @@ public abstract class AbstractConnection<C extends Connection, R extends Connect
   }
 
   @Override
-  public MapEx toMap() {
+  public JsonObject toMap() {
     return this.config;
   }
 

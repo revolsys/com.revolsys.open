@@ -8,12 +8,12 @@ import java.util.function.Predicate;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelRasterizer;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.raster.BufferedGeoreferencedImage;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.layer.Layer;
@@ -310,8 +310,8 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     final List<AbstractGriddedElevationModelLayerRenderer> renderers = getRenderers();
     if (!renderers.isEmpty()) {
       final List<Map<String, Object>> rendererMaps = new ArrayList<>();

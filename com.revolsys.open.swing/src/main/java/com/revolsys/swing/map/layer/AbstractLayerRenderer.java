@@ -8,9 +8,8 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.layer.record.style.panel.BaseStylePanel;
@@ -295,8 +294,8 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = new LinkedHashMapEx();
+  public JsonObject toMap() {
+    final JsonObject map = new JsonObject();
     addTypeToMap(map, this.type);
     addToMap(map, "name", this.name);
     addToMap(map, "visible", this.visible, true);

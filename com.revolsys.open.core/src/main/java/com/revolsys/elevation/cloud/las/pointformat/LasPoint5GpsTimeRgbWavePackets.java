@@ -4,6 +4,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.record.io.format.json.JsonObject;
 
 public class LasPoint5GpsTimeRgbWavePackets extends LasPoint3GpsTimeRgb
   implements LasPointWavePackets {
@@ -126,8 +127,8 @@ public class LasPoint5GpsTimeRgbWavePackets extends LasPoint3GpsTimeRgb
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     addToMap(map, "wavePacketDescriptorIndex", this.wavePacketDescriptorIndex);
     addToMap(map, "byteOffsetToWaveformData", this.byteOffsetToWaveformData);
     addToMap(map, "waveformPacketSizeInBytes", this.waveformPacketSizeInBytes);

@@ -4,6 +4,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.record.io.format.json.JsonObject;
 
 public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   private static final long serialVersionUID = 1L;
@@ -283,8 +284,8 @@ public class LasPoint6GpsTime extends BaseLasPoint implements LasPointExtended {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     addToMap(map, "intensity", this.intensity);
     addToMap(map, "returnNumber", getReturnNumber());
     addToMap(map, "numberOfReturns", getNumberOfReturns());

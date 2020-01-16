@@ -18,6 +18,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.raster.BufferedGeoreferencedImage;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
@@ -344,8 +345,8 @@ public class TiledGriddedElevationModelLayer
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     addToMap(map, "geometryFactory", getGeometryFactory());
     addToMap(map, "url", this.url);
     addToMap(map, "fileExtension", this.fileExtension);

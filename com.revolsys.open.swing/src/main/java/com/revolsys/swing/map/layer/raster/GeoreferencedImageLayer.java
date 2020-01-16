@@ -30,6 +30,7 @@ import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.raster.GeoreferencedImageWriterFactory;
 import com.revolsys.raster.MappedLocation;
 import com.revolsys.raster.TiledGeoreferencedImage;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.Dialogs;
@@ -512,8 +513,8 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     map.remove("querySupported");
     map.remove("selectSupported");
     map.remove("editable");

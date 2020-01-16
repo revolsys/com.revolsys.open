@@ -8,6 +8,7 @@ import org.jeometry.common.math.Angle;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.grid.Grid;
+import com.revolsys.record.io.format.json.JsonObject;
 
 public class HillShadeGriddedElevationModelRasterizer
   extends AbstractGriddedElevationModelRasterizer {
@@ -239,8 +240,8 @@ public class HillShadeGriddedElevationModelRasterizer
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     map.put("azimuthDegrees", this.azimuthDegrees);
     map.put("zenithDegrees", this.zenithDegrees);
     map.put("zFactor", this.zFactor);

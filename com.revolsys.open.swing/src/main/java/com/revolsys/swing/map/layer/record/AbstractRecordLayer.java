@@ -76,6 +76,7 @@ import com.revolsys.record.io.RecordIo;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.property.DirectionalFields;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Q;
@@ -3373,8 +3374,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     if (!super.isReadOnly()) {
       addToMap(map, "canAddRecords", this.canAddRecords);
       addToMap(map, "canDeleteRecords", this.canDeleteRecords);

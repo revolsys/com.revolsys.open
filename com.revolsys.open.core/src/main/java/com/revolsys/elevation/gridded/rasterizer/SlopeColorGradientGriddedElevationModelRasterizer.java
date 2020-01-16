@@ -8,6 +8,7 @@ import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.gradient.LinearGradient;
 import com.revolsys.elevation.gridded.rasterizer.gradient.MultiStopLinearGradient;
 import com.revolsys.grid.Grid;
+import com.revolsys.record.io.format.json.JsonObject;
 
 public class SlopeColorGradientGriddedElevationModelRasterizer
   extends AbstractGriddedElevationModelRasterizer {
@@ -166,8 +167,8 @@ public class SlopeColorGradientGriddedElevationModelRasterizer
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     addToMap(map, "gradient", this.gradient);
     return map;
   }

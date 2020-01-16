@@ -44,6 +44,7 @@ import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.format.json.Json;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Dialogs;
@@ -1105,8 +1106,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     map.remove("querySupported");
     map.remove("queryable");
     map.remove("editable");

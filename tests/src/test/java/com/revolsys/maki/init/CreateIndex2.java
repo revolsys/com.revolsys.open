@@ -6,6 +6,7 @@ import java.util.List;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.record.io.format.json.Json;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.swing.map.layer.record.style.marker.MarkerLibrary;
@@ -15,7 +16,7 @@ public class CreateIndex2 {
   public static void main(final String[] args) {
     MarkerLibrary.findMarker("maki/police");
     final Resource makiFile = new UrlResource("https://www.mapbox.com/maki/www/maki.json");
-    final List<MapEx> symbolList = Json.toMapList(makiFile);
+    final List<JsonObject> symbolList = Json.toMapList(makiFile);
 
     final MarkerLibrary library = new MarkerLibrary("maki", "Maki");
 

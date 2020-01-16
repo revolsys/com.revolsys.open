@@ -10,6 +10,7 @@ import org.jeometry.coordinatesystem.model.systems.EpsgId;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
@@ -137,8 +138,8 @@ public class WebMercatorTileCacheLayer
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     map.put("type", "webMercatorTileCacheLayer");
     addToMap(map, "url", this.url);
     return map;

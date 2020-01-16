@@ -29,13 +29,13 @@ import org.w3c.dom.NodeList;
 import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
 import com.revolsys.collection.PropertyChangeArrayList;
 import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.io.format.json.Json;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.xml.DomUtil;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
@@ -574,8 +574,8 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = new LinkedHashMapEx();
+  public JsonObject toMap() {
+    final JsonObject map = new JsonObject();
     addTypeToMap(map, "bufferedImage");
     final BoundingBox boundingBox = getBoundingBox();
     if (boundingBox != null) {

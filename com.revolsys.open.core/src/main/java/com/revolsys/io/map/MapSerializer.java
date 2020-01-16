@@ -12,9 +12,8 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.json.Json;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.util.Property;
 
 public interface MapSerializer {
@@ -72,8 +71,8 @@ public interface MapSerializer {
     MapObjectFactory.setType(map, type);
   }
 
-  default MapEx newTypeMap(final String type) {
-    final MapEx map = new LinkedHashMapEx();
+  default JsonObject newTypeMap(final String type) {
+    final JsonObject map = new JsonObject();
     addTypeToMap(map, type);
     return map;
   }
@@ -98,7 +97,7 @@ public interface MapSerializer {
    * </ul>
    * @return
    */
-  MapEx toMap();
+  JsonObject toMap();
 
   @SuppressWarnings("rawtypes")
   default Object toMapValue(final Object value) {
@@ -118,7 +117,7 @@ public interface MapSerializer {
         if (mapObject.isEmpty()) {
           return null;
         }
-        final MapEx map = new LinkedHashMapEx();
+        final JsonObject map = new JsonObject();
         for (final Entry<String, Object> entry : mapObject.entrySet()) {
           final CharSequence name = entry.getKey();
           final Object object = entry.getValue();
@@ -165,7 +164,7 @@ public interface MapSerializer {
 
   default void writeToFile(final Object target) {
     if (target != null) {
-      final MapEx map = toMap();
+      final JsonObject map = toMap();
       Json.writeMap(map, target, true);
     }
   }

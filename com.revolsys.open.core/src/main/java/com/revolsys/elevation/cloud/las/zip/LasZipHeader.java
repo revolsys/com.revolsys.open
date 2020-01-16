@@ -8,8 +8,6 @@ import java.nio.channels.Channels;
 
 import org.jeometry.common.exception.Exceptions;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.elevation.cloud.las.LasPointCloudHeader;
 import com.revolsys.elevation.cloud.las.LasVariableLengthRecord;
@@ -20,6 +18,7 @@ import com.revolsys.io.Buffers;
 import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.util.Pair;
 
 public class LasZipHeader implements MapSerializer {
@@ -416,8 +415,8 @@ public class LasZipHeader implements MapSerializer {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = new LinkedHashMapEx();
+  public JsonObject toMap() {
+    final JsonObject map = new JsonObject();
     addToMap(map, "compressor", this.compressor);
     addToMap(map, "coder", this.coder);
     addToMap(map, "version", this.version);

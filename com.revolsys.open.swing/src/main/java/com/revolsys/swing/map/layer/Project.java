@@ -36,6 +36,7 @@ import com.revolsys.io.file.Paths;
 import com.revolsys.io.filter.FileNameExtensionFilter;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.record.io.format.json.Json;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.Dialogs;
@@ -700,8 +701,8 @@ public class Project extends LayerGroup {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
 
     BoundingBox boundingBox = getViewBoundingBox();
     if (!RectangleUtil.isEmpty(boundingBox)) {

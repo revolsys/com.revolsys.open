@@ -15,6 +15,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.wms.WmsClient;
 import com.revolsys.gis.wms.capabilities.WmsLayerDefinition;
 import com.revolsys.raster.GeoreferencedImage;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.BaseMapLayer;
 import com.revolsys.swing.map.layer.raster.ViewFunctionImageLayerRenderer;
@@ -214,8 +215,8 @@ public class OgcWmsImageLayer extends AbstractLayer implements BaseMapLayer {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     map.keySet()
       .removeAll(Arrays.asList("readOnly", "querySupported", "selectSupported", "minimumScale",
         "maximumScale"));

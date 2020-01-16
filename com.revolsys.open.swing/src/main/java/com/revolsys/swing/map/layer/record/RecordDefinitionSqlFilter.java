@@ -7,10 +7,9 @@ import java.util.function.Predicate;
 
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordDefinition;
@@ -79,8 +78,8 @@ public class RecordDefinitionSqlFilter implements Predicate<Record>, MapSerializ
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = new LinkedHashMapEx();
+  public JsonObject toMap() {
+    final JsonObject map = new JsonObject();
     addTypeToMap(map, "sqlFilter");
     map.put("query", this.query);
     return map;

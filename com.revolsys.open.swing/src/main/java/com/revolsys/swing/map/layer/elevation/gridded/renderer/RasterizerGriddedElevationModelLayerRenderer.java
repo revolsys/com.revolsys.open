@@ -14,6 +14,7 @@ import com.revolsys.elevation.gridded.rasterizer.HillShadeGriddedElevationModelR
 import com.revolsys.elevation.gridded.rasterizer.SlopeColorGradientGriddedElevationModelRasterizer;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.raster.BufferedGeoreferencedImage;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
@@ -299,8 +300,8 @@ public class RasterizerGriddedElevationModelLayerRenderer
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     addToMap(map, "rasterizer", this.rasterizer);
     addToMap(map, "opacity", this.opacity);
     return map;

@@ -16,8 +16,6 @@ import org.jeometry.common.data.type.DataTypeProxy;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.beans.ObjectPropertyException;
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.operation.valid.IsValidOp;
@@ -25,6 +23,7 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -748,8 +747,8 @@ public class FieldDefinition extends BaseObjectWithProperties
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = new LinkedHashMapEx();
+  public JsonObject toMap() {
+    final JsonObject map = new JsonObject();
     addTypeToMap(map, "field");
     map.put("name", getName());
     map.put("title", getTitle());

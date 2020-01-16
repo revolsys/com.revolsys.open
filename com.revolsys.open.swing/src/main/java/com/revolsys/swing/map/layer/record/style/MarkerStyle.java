@@ -20,11 +20,10 @@ import org.jeometry.common.function.BiFunctionDouble;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.map.layer.record.style.marker.AbstractMarker;
 import com.revolsys.swing.map.layer.record.style.marker.GeometryMarker;
@@ -584,9 +583,9 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
   }
 
   @Override
-  public MapEx toMap() {
+  public JsonObject toMap() {
     final boolean geometryStyle = this instanceof GeometryStyle;
-    final MapEx map = new LinkedHashMapEx();
+    final JsonObject map = new JsonObject();
     for (final String name : PROPERTY_NAMES) {
       if (geometryStyle || name.startsWith("marker")) {
         final Object value = Property.get(this, name);

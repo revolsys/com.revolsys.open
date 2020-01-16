@@ -8,6 +8,7 @@ import java.util.TreeMap;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.util.CaseConverter;
 
 public class MarkerGroup extends AbstractMarkerGroupElement {
@@ -106,8 +107,8 @@ public class MarkerGroup extends AbstractMarkerGroupElement {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     addToMap(map, "groups", this.groups);
     addToMap(map, "markers", this.markers);
     return map;

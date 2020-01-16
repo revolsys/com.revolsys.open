@@ -12,6 +12,7 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.util.Property;
 
 public class MarkerLibrary extends MarkerGroup {
@@ -149,8 +150,8 @@ public class MarkerLibrary extends MarkerGroup {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     return map;
   }
 }

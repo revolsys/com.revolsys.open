@@ -38,11 +38,10 @@ import java.util.List;
 
 import org.springframework.util.StringUtils;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.core.test.geometry.test.geomop.GeometryOperation;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.util.Property;
 
 import junit.framework.Assert;
@@ -244,8 +243,8 @@ public class GeometryOperationTest extends junit.framework.TestCase implements M
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = new LinkedHashMapEx();
+  public JsonObject toMap() {
+    final JsonObject map = new JsonObject();
     map.put("type", "test");
     addToMap(map, "description", this.testDescription);
 

@@ -9,6 +9,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.menu.MenuFactory;
 
@@ -71,8 +72,8 @@ public class ScratchRecordLayer extends ListRecordLayer {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     final GeometryFactory geometryFactory = getGeometryFactory();
     addToMap(map, "geometryFactory", geometryFactory);
     addToMap(map, "geometryTypeName", this.geometryType.getName());

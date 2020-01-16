@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 
 public class GeometryFactoryWithOffsets extends GeometryFactoryFixed {
 
@@ -159,8 +160,8 @@ public class GeometryFactoryWithOffsets extends GeometryFactoryFixed {
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = super.toMap();
+  public JsonObject toMap() {
+    final JsonObject map = super.toMap();
     addToMap(map, "offsetX", this.offsetX, 0.0);
     addToMap(map, "offsetY", this.offsetY, 0.0);
     addToMap(map, "offsetZ", this.offsetZ, 0.0);

@@ -3,8 +3,6 @@ package com.revolsys.gis.grid;
 import java.nio.file.Path;
 import java.util.List;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -12,6 +10,7 @@ import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
@@ -128,7 +127,7 @@ public interface RectangularMapGrid extends GeometryFactoryProxy, MapSerializer 
   double getTileWidth();
 
   @Override
-  default MapEx toMap() {
-    return new LinkedHashMapEx();
+  default JsonObject toMap() {
+    return new JsonObject();
   }
 }

@@ -1,9 +1,9 @@
 package com.revolsys.elevation.gridded.rasterizer;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
+import com.revolsys.record.io.format.json.JsonObject;
 
 public abstract class AbstractGriddedElevationModelRasterizer
   extends BaseObjectWithPropertiesAndChange implements GriddedElevationModelRasterizer {
@@ -100,8 +100,8 @@ public abstract class AbstractGriddedElevationModelRasterizer
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = newTypeMap(this.type);
+  public JsonObject toMap() {
+    final JsonObject map = newTypeMap(this.type);
     return map;
   }
 

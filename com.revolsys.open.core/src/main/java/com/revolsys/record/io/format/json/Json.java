@@ -18,10 +18,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.data.type.FunctionDataType;
 import org.jeometry.common.exception.Exceptions;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
@@ -45,49 +46,83 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
 
   public static final String MIME_TYPE = "application/json";
 
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  public static final DataType JSON_OBJECT = new FunctionDataType("JsonObject", JsonObject.class,
+    true, value -> {
+      if (value instanceof JsonObject) {
+        return (JsonObject)value;
+      } else if (value instanceof Map) {
+        return new JsonObject((Map)value);
+      } else if (value instanceof String) {
+        final JsonObject map = Json.toObjectMap((String)value);
+        if (map == null) {
+          return null;
+        } else {
+          return new JsonObject(map);
+        }
+      } else {
+        return value;
+      }
+    }, (value) -> {
+      if (value instanceof Map) {
+        return Json.toString((Map)value);
+      } else if (value == null) {
+        return null;
+      } else {
+        return value.toString();
+      }
+
+    }, FunctionDataType.MAP_EQUALS, FunctionDataType.MAP_EQUALS_EXCLUDES);
+
+  static {
+    DataTypes.registerDataTypes(Json.class);
+  }
+
   public static Map<String, Object> getMap(final Map<String, Object> record,
     final String fieldName) {
     final String value = (String)record.get(fieldName);
     return toObjectMap(value);
   }
 
-  public static MapEx toMap(final File directory, final String path) {
+  public static JsonObject toMap(final File directory, final String path) {
     if (directory == null || path == null) {
-      return new LinkedHashMapEx();
+      return new JsonObject();
     } else {
       final File file = FileUtil.getFile(directory, path);
       if (file.exists() && !file.isDirectory()) {
         final PathResource resource = new PathResource(file);
         return toMap(resource);
       } else {
-        return new LinkedHashMapEx();
+        return new JsonObject();
       }
     }
   }
 
-  public static MapEx toMap(final Object source) {
+  public static JsonObject toMap(final Object source) {
     final Resource resource = Resource.getResource(source);
     return toMap(resource);
   }
 
-  public static MapEx toMap(final Path directory, final String path) {
+  public static JsonObject toMap(final Path directory, final String path) {
     if (directory == null || path == null) {
-      return new LinkedHashMapEx();
+      return new JsonObject();
     } else {
       final Path file = directory.resolve(path);
       if (Paths.exists(file) && !Files.isDirectory(file)) {
         final PathResource resource = new PathResource(file);
         return toMap(resource);
       } else {
-        return new LinkedHashMapEx();
+        return new JsonObject();
       }
     }
   }
 
-  public static MapEx toMap(final Reader reader) {
+  public static JsonObject toMap(final Reader in) {
     try (
-      Reader reader2 = reader;
-      final JsonMapIterator iterator = new JsonMapIterator(reader2, true)) {
+      Reader inClosable = in;
+      final JsonMapIterator iterator = new JsonMapIterator(in, true)) {
       if (iterator.hasNext()) {
         return iterator.next();
       } else {
@@ -98,16 +133,16 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
     }
   }
 
-  public static final MapEx toMap(final Resource resource) {
+  public static final JsonObject toMap(final Resource resource) {
     if (resource != null && (!(resource instanceof PathResource) || resource.exists())) {
       final Reader reader = resource.newBufferedReader();
       return toMap(reader);
     }
-    return new LinkedHashMapEx();
+    return new JsonObject();
   }
 
   public static Map<String, String> toMap(final String string) {
-    final MapEx map = toObjectMap(string);
+    final JsonObject map = toObjectMap(string);
     if (map.isEmpty()) {
       return new LinkedHashMap<>();
     } else {
@@ -125,12 +160,12 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
     }
   }
 
-  public static final List<MapEx> toMapList(final Object source) {
+  public static final List<JsonObject> toMapList(final Object source) {
     final Resource resource = Resource.getResource(source);
     if (resource != null && (!(resource instanceof PathResource) || resource.exists())) {
       try (
-        final BufferedReader reader = resource.newBufferedReader();
-        final JsonMapReader jsonReader = new JsonMapReader(reader)) {
+        final BufferedReader in = resource.newBufferedReader();
+        final JsonObjectReader jsonReader = new JsonObjectReader(in)) {
         return jsonReader.toList();
       } catch (final IOException e) {
         Exceptions.throwUncheckedException(e);
@@ -139,25 +174,25 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
     return new ArrayList<>();
   }
 
-  public static List<MapEx> toMapList(final String string) {
+  public static List<JsonObject> toMapList(final String string) {
     final StringReader in = new StringReader(string);
     try (
-      final JsonMapReader reader = new JsonMapReader(in)) {
+      final JsonObjectReader reader = new JsonObjectReader(in)) {
       return reader.toList();
     }
   }
 
-  public static MapEx toObjectMap(final String string) {
+  public static JsonObject toObjectMap(final String string) {
     if (Property.hasValue(string)) {
-      final StringReader reader = new StringReader(string);
+      final StringReader in = new StringReader(string);
       try (
-        final MapReader mapReader = new JsonMapReader(reader, true)) {
-        for (final MapEx map : mapReader) {
-          return map;
+        final JsonObjectReader reader = new JsonObjectReader(in, true)) {
+        for (final JsonObject object : reader) {
+          return object;
         }
       }
     }
-    return new LinkedHashMapEx();
+    return new JsonObject();
   }
 
   public static final Record toRecord(final RecordDefinition recordDefinition,

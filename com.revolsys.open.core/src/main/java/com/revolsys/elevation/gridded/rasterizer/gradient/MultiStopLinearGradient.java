@@ -13,6 +13,7 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.Resource;
 
 // http://soliton.vm.bytemark.co.uk/pub/cpt-city/
@@ -126,8 +127,8 @@ public class MultiStopLinearGradient extends BaseObjectWithProperties
   }
 
   @Override
-  public MapEx toMap() {
-    final MapEx map = newTypeMap("multiStopLinearGradient");
+  public JsonObject toMap() {
+    final JsonObject map = newTypeMap("multiStopLinearGradient");
     addToMap(map, "stops", this.stops);
     return map;
   }
