@@ -50,7 +50,7 @@ public class SetRecordsFieldValue extends AbstractUpdateField {
     final JPanel fieldPanel = new JPanel();
     final String fieldName = fieldDefinition.getName();
     final AbstractRecordLayer layer = getLayer();
-    this.editField = RecordLayerFields.newFormField(layer, fieldName, true);
+    this.editField = layer.newFormField(fieldName, true);
     Property.addListenerNewValue(this.editField, fieldName, (newValue) -> {
       validateField(this.editField, fieldDefinition);
     });

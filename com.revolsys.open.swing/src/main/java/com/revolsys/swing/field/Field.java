@@ -66,7 +66,10 @@ public interface Field extends Cloneable {
     return Property.hasValue(fieldValue) && fieldSupport.isFieldValid();
   }
 
-  void setEditable(boolean editable);
+  default void setEditable(final boolean editable) {
+    final FieldSupport fieldSupport = getFieldSupport();
+    fieldSupport.setEditable(editable);
+  }
 
   default void setFieldBackgroundColor(Color color) {
     if (color == null) {

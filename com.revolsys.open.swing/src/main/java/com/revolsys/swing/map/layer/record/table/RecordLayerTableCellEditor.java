@@ -3,7 +3,6 @@ package com.revolsys.swing.map.layer.record.table;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
-import com.revolsys.swing.map.layer.record.component.RecordLayerFields;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 
@@ -28,6 +27,6 @@ public class RecordLayerTableCellEditor extends RecordTableCellEditor {
 
   @Override
   protected Field newField(final String fieldName) {
-    return RecordLayerFields.newCompactField(this.layer, fieldName, true);
+    return this.layer.newCompactField(fieldName, true);
   }
 }

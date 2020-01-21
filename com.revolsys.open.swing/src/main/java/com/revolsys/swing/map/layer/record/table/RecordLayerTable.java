@@ -19,6 +19,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
@@ -40,6 +41,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.table.TablePanel;
+import com.revolsys.swing.table.editor.BaseTableCellEditor;
 import com.revolsys.swing.table.highlighter.OddEvenColorHighlighter;
 import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
@@ -277,6 +279,26 @@ public class RecordLayerTable extends RecordRowTable {
     } else {
       return selectionModel;
     }
+  }
+
+  @Override
+  protected TableCellEditor getTableCellEditor(final int columnIndex) {
+    final RecordLayerTableModel tableModel = getTableModel();
+    final String fieldName = tableModel.getColumnFieldName(columnIndex);
+    if (fieldName != null) {
+      final AbstractRecordLayer layer = getLayer();
+      final TableCellEditor editor = layer.newTableCellEditor(fieldName);
+      if (editor != null) {
+        if (editor instanceof BaseTableCellEditor) {
+          final BaseTableCellEditor baseEditor = (BaseTableCellEditor)editor;
+          baseEditor.setTable(this);
+        }
+        return editor;
+      }
+
+    }
+    return super.getTableCellEditor();
+
   }
 
   @Override

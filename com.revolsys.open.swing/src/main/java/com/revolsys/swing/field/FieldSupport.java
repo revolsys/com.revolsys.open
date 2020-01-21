@@ -16,6 +16,8 @@ import com.revolsys.util.Property;
 public class FieldSupport {
   private final JComponent component;
 
+  private boolean editable = true;
+
   private String errorMessage;
 
   private final Field field;
@@ -102,8 +104,16 @@ public class FieldSupport {
     return Property.hasValue(this.errorMessage);
   }
 
+  public boolean isEditable() {
+    return this.editable;
+  }
+
   public boolean isFieldValid() {
     return this.fieldValid;
+  }
+
+  public void setEditable(final boolean editable) {
+    this.editable = editable;
   }
 
   public void setFieldInvalid(final String message, final Color foregroundColor,
@@ -191,5 +201,10 @@ public class FieldSupport {
       SetFieldValueUndoableEdit.newUndoableEdit(parent, this.field, oldValue, value);
       return true;
     }
+  }
+
+  @Override
+  public String toString() {
+    return this.name + "=" + this.value;
   }
 }

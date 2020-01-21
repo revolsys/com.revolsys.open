@@ -938,6 +938,38 @@ public interface SwingUtil {
     setLocationCentre(bounds, window);
   }
 
+  static void setLocationCentreAtEvent(final Window window, final MouseEvent mouseEvent) {
+    int x = mouseEvent.getXOnScreen();
+    int y = mouseEvent.getYOnScreen();
+    final Rectangle screenBounds = getScreenBounds(x, y);
+    int width = window.getWidth();
+    int height = window.getHeight();
+    final int screenWidth = screenBounds.width;
+    if (width > screenWidth) {
+      width = screenWidth;
+    }
+    final int screenHeight = screenBounds.height;
+    if (height > screenHeight) {
+      height = screenHeight;
+    }
+    window.setSize(width, height);
+    x -= width / 2;
+    y -= height / 2;
+    final int screenX = screenBounds.x;
+    if (x < screenX) {
+      x = screenX;
+    } else if (x + width > screenX + screenWidth) {
+      x = screenX + screenWidth - width;
+    }
+    final int screenY = screenBounds.y;
+    if (y < screenY) {
+      y = screenY;
+    } else if (y + height > screenY + screenHeight) {
+      y = screenY + screenHeight - height;
+    }
+    window.setLocation(x, y);
+  }
+
   /**
    * Set the location of the window in relation to the top left of the screen the current window is on
    *

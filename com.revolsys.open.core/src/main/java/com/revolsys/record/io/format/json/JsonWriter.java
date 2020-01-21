@@ -237,7 +237,7 @@ public final class JsonWriter implements BaseCloseable {
           this.out.write(Doubles.toString(doubleValue));
         }
       } else if (value instanceof MapSerializer) {
-        final Map<String, ? extends Object> map = ((MapSerializer)value).toMap();
+        final JsonObject map = ((MapSerializer)value).toMap();
         write(map);
       } else if (value instanceof Collection) {
         final Collection<? extends Object> list = (Collection<? extends Object>)value;

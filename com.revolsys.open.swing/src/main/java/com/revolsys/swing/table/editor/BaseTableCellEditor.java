@@ -1,6 +1,7 @@
 package com.revolsys.swing.table.editor;
 
 import java.awt.Component;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -15,14 +16,15 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.event.CellEditorListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
 
-import org.jdesktop.swingx.JXTable;
 import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
@@ -32,30 +34,82 @@ import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJTable;
 
 public class BaseTableCellEditor extends AbstractCellEditor
-  implements TableCellEditor, KeyListener, TableModelListener {
+  implements TableCellEditor, TableModelListener {
 
   private static final long serialVersionUID = 1L;
 
-  private int columnIndex;
+  protected int columnIndex;
 
-  private DataType dataType;
+  protected DataType dataType = DataTypes.OBJECT;
 
-  private JComponent editorComponent;
+  protected JComponent editorComponent;
 
-  private final MouseListeners mouseListeners = new MouseListenersBase();
+  protected final MouseListeners mouseListeners = new MouseListenersBase();
 
-  private int rowIndex;
+  protected int rowIndex;
 
-  private final BaseJTable table;
+  private BaseJTable table;
+
+  private boolean editing = false;
+
+  protected KeyListener keyListener = new KeyAdapter() {
+    @Override
+    public void keyPressed(final KeyEvent event) {
+      if (isEditing()) {
+        final int keyCode = event.getKeyCode();
+        if (keyCode == KeyEvent.VK_ENTER) {
+          stopCellEditing();
+
+          if (SwingUtil.isShiftDown(event)) {
+            editCellRelative(-1, 0);
+          } else {
+            editCellRelative(1, 0);
+          }
+          event.consume();
+        } else if (keyCode == KeyEvent.VK_TAB) {
+          stopCellEditing();
+          if (SwingUtil.isShiftDown(event)) {
+            editCellRelative(0, -1);
+          } else {
+            editCellRelative(0, 1);
+          }
+          event.consume();
+        }
+      }
+    }
+
+  };
+
+  public BaseTableCellEditor() {
+  }
 
   public BaseTableCellEditor(final BaseJTable table) {
-    this.table = table;
-    final TableModel model = table.getModel();
-    model.addTableModelListener(this);
+    setTable(table);
   }
 
   public synchronized void addMouseListener(final MouseListener listener) {
     this.mouseListeners.addMouseListener(listener);
+  }
+
+  public void close() {
+    this.editorComponent = null;
+    this.mouseListeners.clearMouseListeners();
+    // this.popupMenuFactory = null;
+    // this.popupMenuListener = null;
+    this.table = null;
+    for (final CellEditorListener listener : getCellEditorListeners()) {
+      removeCellEditorListener(listener);
+    }
+  }
+
+  private void editCellRelative(final int rowDelta, final int columnDelta) {
+    final int rowIndex = this.table.convertRowIndexToView(this.rowIndex) + rowDelta;
+    if (rowIndex >= 0 && rowIndex <= this.table.getRowCount()) {
+      final int columnIndex = this.table.convertColumnIndexToView(this.columnIndex) + columnDelta;
+      if (columnIndex >= 0 && columnIndex < this.table.getColumnCount()) {
+        this.table.editCell(rowIndex, columnIndex);
+      }
+    }
   }
 
   @Override
@@ -64,19 +118,19 @@ public class BaseTableCellEditor extends AbstractCellEditor
     return value;
   }
 
+  public JComponent getEditorComponent() {
+    return this.editorComponent;
+  }
+
   @SuppressWarnings("rawtypes")
   @Override
   public Component getTableCellEditorComponent(final JTable table, final Object value,
-    final boolean isSelected, int rowIndex, int columnIndex) {
+    final boolean isSelected, final int rowIndex, final int columnIndex) {
+    startEditing(rowIndex, columnIndex);
 
-    if (table instanceof JXTable) {
-      final JXTable jxTable = (JXTable)table;
-      rowIndex = jxTable.convertRowIndexToModel(rowIndex);
-      columnIndex = jxTable.convertColumnIndexToModel(columnIndex);
-    }
     final AbstractTableModel model = (AbstractTableModel)table.getModel();
 
-    this.editorComponent = model.getEditorField(rowIndex, columnIndex, value);
+    this.editorComponent = model.getEditorField(this.rowIndex, this.columnIndex, value);
     if (this.editorComponent instanceof JTextField) {
       final JTextField textField = (JTextField)this.editorComponent;
       textField.setBorder(
@@ -86,18 +140,20 @@ public class BaseTableCellEditor extends AbstractCellEditor
     this.editorComponent.setOpaque(false);
     SwingUtil.setFieldValue(this.editorComponent, value);
 
-    this.rowIndex = rowIndex;
-    this.columnIndex = columnIndex;
-    this.editorComponent.addKeyListener(this);
+    this.editorComponent.addKeyListener(this.keyListener);
     this.editorComponent.addMouseListener(this.mouseListeners);
     if (this.editorComponent instanceof JComboBox) {
       final JComboBox comboBox = (JComboBox)this.editorComponent;
       final ComboBoxEditor editor = comboBox.getEditor();
       final Component comboEditorComponent = editor.getEditorComponent();
-      comboEditorComponent.addKeyListener(this);
+      comboEditorComponent.addKeyListener(this.keyListener);
       comboEditorComponent.addMouseListener(this.mouseListeners);
     }
     return this.editorComponent;
+  }
+
+  protected TableModel getTableModel() {
+    return this.table.getModel();
   }
 
   @Override
@@ -115,77 +171,73 @@ public class BaseTableCellEditor extends AbstractCellEditor
     return false;
   }
 
-  @Override
-  public void keyPressed(final KeyEvent event) {
-    final int keyCode = event.getKeyCode();
-    if (keyCode == KeyEvent.VK_ENTER) {
-      if (SwingUtil.isShiftDown(event)) {
-        this.table.editCell(this.rowIndex - 1, this.columnIndex);
-      } else {
-        this.table.editCell(this.rowIndex + 1, this.columnIndex);
-      }
-      event.consume();
-    } else if (keyCode == KeyEvent.VK_TAB) {
-      if (SwingUtil.isShiftDown(event)) {
-        this.table.editCell(this.rowIndex, this.columnIndex - 1);
-      } else {
-        this.table.editCell(this.rowIndex, this.columnIndex + 1);
-      }
-      event.consume();
-    }
-  }
-
-  @Override
-  public void keyReleased(final KeyEvent e) {
-  }
-
-  @Override
-  public void keyTyped(final KeyEvent e) {
+  public boolean isEditing() {
+    return this.editing;
   }
 
   public synchronized void removeMouseListener(final MouseListener listener) {
     this.mouseListeners.removeMouseListener(listener);
   }
 
+  public void setTable(final BaseJTable table) {
+    this.table = table;
+    final TableModel model = table.getModel();
+    model.addTableModelListener(this);
+  }
+
+  protected void startEditing(final int rowIndex, final int columnIndex) {
+    this.editing = true;
+    this.rowIndex = this.table.convertRowIndexToModel(rowIndex);
+    ;
+    this.columnIndex = this.table.convertColumnIndexToModel(columnIndex);
+  }
+
   @Override
   public boolean stopCellEditing() {
-    boolean stopped = false;
-    try {
-      if (this.editorComponent instanceof Field) {
-        final Field field = (Field)this.editorComponent;
-        field.updateFieldValue();
-      }
-      stopped = super.stopCellEditing();
-    } catch (final IndexOutOfBoundsException e) {
-      return true;
-    } catch (final Throwable t) {
-      final int result = JOptionPane.showConfirmDialog(this.editorComponent,
-        "<html><p><b>'" + getCellEditorValue() + "' is not a valid "
-          + this.dataType.getValidationName()
-          + ".</b></p><p>Discard changes (Yes) or edit field (No).</p></html>",
-        "Invalid value", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
-      if (result == JOptionPane.YES_OPTION) {
-        cancelCellEditing();
+    if (isEditing()) {
+      boolean stopped = false;
+      try {
+        if (this.editorComponent instanceof Field) {
+          final Field field = (Field)this.editorComponent;
+          field.updateFieldValue();
+        }
+        stopped = super.stopCellEditing();
+      } catch (final IndexOutOfBoundsException e) {
         return true;
-      } else {
-        return false;
-      }
-    } finally {
-      if (stopped) {
-        if (this.editorComponent != null) {
-          this.editorComponent.removeMouseListener(this.mouseListeners);
-          this.editorComponent.removeKeyListener(this);
-          if (this.editorComponent instanceof JComboBox) {
-            final JComboBox<?> comboBox = (JComboBox<?>)this.editorComponent;
-            final ComboBoxEditor editor = comboBox.getEditor();
-            final Component comboEditorComponent = editor.getEditorComponent();
-            comboEditorComponent.removeKeyListener(this);
-            comboEditorComponent.removeMouseListener(this.mouseListeners);
+      } catch (final Throwable t) {
+        final int result = JOptionPane.showConfirmDialog(this.editorComponent,
+          "<html><p><b>'" + getCellEditorValue() + "' is not a valid "
+            + this.dataType.getValidationName()
+            + ".</b></p><p>Discard changes (Yes) or edit field (No).</p></html>",
+          "Invalid value", JOptionPane.YES_NO_OPTION, JOptionPane.ERROR_MESSAGE);
+        if (result == JOptionPane.YES_OPTION) {
+          cancelCellEditing();
+          return true;
+        } else {
+          return false;
+        }
+      } finally {
+        if (stopped) {
+          if (this.editorComponent != null) {
+            this.editorComponent.removeMouseListener(this.mouseListeners);
+            this.editorComponent.removeKeyListener(this.keyListener);
+            if (this.editorComponent instanceof JComboBox) {
+              final JComboBox<?> comboBox = (JComboBox<?>)this.editorComponent;
+              final ComboBoxEditor editor = comboBox.getEditor();
+              final Component comboEditorComponent = editor.getEditorComponent();
+              comboEditorComponent.removeKeyListener(this.keyListener);
+              comboEditorComponent.removeMouseListener(this.mouseListeners);
+            }
           }
         }
       }
+      if (stopped) {
+        this.editing = false;
+      }
+      return stopped;
+    } else {
+      return false;
     }
-    return stopped;
   }
 
   @Override

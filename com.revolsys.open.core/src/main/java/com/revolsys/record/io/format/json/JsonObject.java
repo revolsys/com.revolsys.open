@@ -1,5 +1,6 @@
 package com.revolsys.record.io.format.json;
 
+import java.util.List;
 import java.util.Map;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
@@ -32,6 +33,10 @@ public class JsonObject extends LinkedHashMapEx {
       throw new UnsupportedOperationException("Read only");
     }
   };
+
+  public static JsonObject newItems(final List<?> items) {
+    return new JsonObject("items", items);
+  }
 
   public JsonObject() {
     super();

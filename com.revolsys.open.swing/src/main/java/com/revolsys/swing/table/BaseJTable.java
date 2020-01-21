@@ -7,6 +7,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.Arrays;
+import java.util.EventObject;
 
 import javax.swing.BorderFactory;
 import javax.swing.InputMap;
@@ -19,6 +20,7 @@ import javax.swing.RowSorter;
 import javax.swing.event.RowSorterListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
@@ -47,6 +49,8 @@ public class BaseJTable extends JXTable {
   private static final long serialVersionUID = 1L;
 
   private boolean initializingColumnWidths = false;
+
+  private EventObject editEvent;
 
   public BaseJTable() {
   }
@@ -124,6 +128,13 @@ public class BaseJTable extends JXTable {
   protected void adjustComponentOrientation(final Component stamp) {
     if (stamp != null) {
       super.adjustComponentOrientation(stamp);
+    }
+  }
+
+  public void cancelCellEditing() {
+    final TableCellEditor editor = getCellEditor();
+    if (editor != null) {
+      editor.cancelCellEditing();
     }
   }
 
@@ -236,12 +247,26 @@ public class BaseJTable extends JXTable {
     }
   }
 
+  @Override
+  public boolean editCellAt(final int row, final int column, final EventObject e) {
+    this.editEvent = e;
+    try {
+      return super.editCellAt(row, column, e);
+    } finally {
+      this.editEvent = null;
+    }
+  }
+
   public void editRelativeCell(final int rowDelta, final int columnDelta) {
     final int selectedRow = getSelectedRow();
     final int selectedColumn = getSelectedColumn();
     final int rowIndex = selectedRow + rowDelta;
     final int columnIndex = selectedColumn + columnDelta;
     editCell(rowIndex, columnIndex);
+  }
+
+  public EventObject getEditEvent() {
+    return this.editEvent;
   }
 
   public int getPreferedSize(TableCellRenderer renderer, final Class<?> columnClass,
@@ -476,5 +501,13 @@ public class BaseJTable extends JXTable {
     } else {
       setRowSorter(null);
     }
+  }
+
+  public boolean stopCellEditing() {
+    final TableCellEditor editor = getCellEditor();
+    if (editor != null) {
+      return editor.stopCellEditing();
+    }
+    return true;
   }
 }

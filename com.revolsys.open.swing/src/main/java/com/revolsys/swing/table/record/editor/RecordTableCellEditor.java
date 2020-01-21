@@ -1,14 +1,10 @@
 package com.revolsys.swing.table.record.editor;
 
 import java.awt.Component;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.EventObject;
 import java.util.concurrent.Callable;
 
-import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.ComboBoxEditor;
 import javax.swing.JComboBox;
@@ -16,87 +12,40 @@ import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableModel;
 
 import org.jeometry.common.awt.WebColors;
-import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.AbstractRecordQueryField;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.TextField;
-import com.revolsys.swing.listener.MouseListeners;
-import com.revolsys.swing.listener.MouseListenersBase;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.ShowMenuMouseListener;
 import com.revolsys.swing.table.BaseJTable;
+import com.revolsys.swing.table.editor.BaseTableCellEditor;
 import com.revolsys.swing.table.record.model.AbstractRecordTableModel;
 
-public class RecordTableCellEditor extends AbstractCellEditor
-  implements TableCellEditor, KeyListener, TableModelListener {
+public class RecordTableCellEditor extends BaseTableCellEditor {
 
   private static final long serialVersionUID = 1L;
 
-  private int columnIndex;
-
-  private DataType dataType;
-
-  private JComponent editorComponent;
-
   private String fieldName;
 
-  private final MouseListeners mouseListeners = new MouseListenersBase();
-
-  private Object oldValue;
-
   private Callable<BaseJPopupMenu> popupMenuFactory = null;
-
-  private int rowIndex;
-
-  private BaseJTable table;
 
   private ShowMenuMouseListener popupMenuListener;
 
   public RecordTableCellEditor(final BaseJTable table) {
-    this.table = table;
-    final TableModel model = table.getModel();
-    model.addTableModelListener(this);
-  }
-
-  public synchronized void addMouseListener(final MouseListener l) {
-    this.mouseListeners.addMouseListener(l);
-  }
-
-  public void close() {
-    this.editorComponent = null;
-    this.mouseListeners.clearMouseListeners();
-    this.popupMenuFactory = null;
-    this.popupMenuListener = null;
-    this.table = null;
-    for (final CellEditorListener listener : getCellEditorListeners()) {
-      removeCellEditorListener(listener);
-    }
-  }
-
-  private void editCellRelative(final int rowDelta, final int columnDelta) {
-    final int rowIndex = this.table.convertRowIndexToView(this.rowIndex) + rowDelta;
-    if (rowIndex >= 0 && rowIndex <= this.table.getRowCount()) {
-      final int columnIndex = this.table.convertColumnIndexToView(this.columnIndex) + columnDelta;
-      if (columnIndex >= 0 && columnIndex < this.table.getColumnCount()) {
-        this.table.editCell(rowIndex, columnIndex);
-      }
-    }
+    super(table);
   }
 
   @Override
-  public Object getCellEditorValue() {
-    final Object value = SwingUtil.getValue(this.editorComponent);
-    return value;
+  public void close() {
+    super.close();
+    this.popupMenuFactory = null;
+    this.popupMenuListener = null;
+
   }
 
   protected String getColumnFieldName(final int rowIndex, final int columnIndex) {
@@ -104,16 +53,8 @@ public class RecordTableCellEditor extends AbstractCellEditor
     return model.getColumnFieldName(rowIndex, columnIndex);
   }
 
-  public JComponent getEditorComponent() {
-    return this.editorComponent;
-  }
-
   public String getFieldName() {
     return this.fieldName;
-  }
-
-  public Object getOldValue() {
-    return this.oldValue;
   }
 
   protected RecordDefinition getRecordDefinition() {
@@ -123,11 +64,9 @@ public class RecordTableCellEditor extends AbstractCellEditor
 
   @Override
   public Component getTableCellEditorComponent(final JTable table, final Object value,
-    final boolean isSelected, int rowIndex, int columnIndex) {
-    rowIndex = table.convertRowIndexToModel(rowIndex);
-    columnIndex = table.convertColumnIndexToModel(columnIndex);
-    this.oldValue = value;
-    this.fieldName = getColumnFieldName(rowIndex, columnIndex);
+    final boolean isSelected, final int rowIndex, final int columnIndex) {
+    startEditing(rowIndex, columnIndex);
+    this.fieldName = getColumnFieldName(this.rowIndex, this.columnIndex);
     final RecordDefinition recordDefinition = getRecordDefinition();
     this.dataType = recordDefinition.getFieldType(this.fieldName);
     final Field field = newField(this.fieldName);
@@ -146,29 +85,23 @@ public class RecordTableCellEditor extends AbstractCellEditor
     this.editorComponent.setOpaque(false);
     SwingUtil.setFieldValue(this.editorComponent, value);
 
-    this.rowIndex = rowIndex;
-    this.columnIndex = columnIndex;
-    this.editorComponent.addKeyListener(this);
+    this.editorComponent.addKeyListener(this.keyListener);
     this.editorComponent.addMouseListener(this.mouseListeners);
     if (this.editorComponent instanceof JComboBox) {
       final JComboBox<?> comboBox = (JComboBox<?>)this.editorComponent;
       final ComboBoxEditor editor = comboBox.getEditor();
       final Component comboEditorComponent = editor.getEditorComponent();
-      comboEditorComponent.addKeyListener(this);
+      comboEditorComponent.addKeyListener(this.keyListener);
       comboEditorComponent.addMouseListener(this.mouseListeners);
     } else if (this.editorComponent instanceof AbstractRecordQueryField) {
       final AbstractRecordQueryField queryField = (AbstractRecordQueryField)this.editorComponent;
       final TextField searchField = queryField.getSearchField();
-      searchField.addKeyListener(this);
+      searchField.addKeyListener(this.keyListener);
       searchField.addMouseListener(this.mouseListeners);
     }
     this.popupMenuListener = ShowMenuMouseListener.addListener(this.editorComponent,
       this.popupMenuFactory);
     return this.editorComponent;
-  }
-
-  protected TableModel getTableModel() {
-    return this.table.getModel();
   }
 
   @Override
@@ -186,44 +119,9 @@ public class RecordTableCellEditor extends AbstractCellEditor
     return false;
   }
 
-  @Override
-  public void keyPressed(final KeyEvent event) {
-    final int keyCode = event.getKeyCode();
-    if (keyCode == KeyEvent.VK_ENTER) {
-      stopCellEditing();
-
-      if (SwingUtil.isShiftDown(event)) {
-        editCellRelative(-1, 0);
-      } else {
-        editCellRelative(1, 0);
-      }
-      event.consume();
-    } else if (keyCode == KeyEvent.VK_TAB) {
-      stopCellEditing();
-      if (SwingUtil.isShiftDown(event)) {
-        editCellRelative(0, -1);
-      } else {
-        editCellRelative(0, 1);
-      }
-      event.consume();
-    }
-  }
-
-  @Override
-  public void keyReleased(final KeyEvent e) {
-  }
-
-  @Override
-  public void keyTyped(final KeyEvent e) {
-  }
-
   protected Field newField(final String fieldName) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return SwingUtil.newField(recordDefinition, fieldName, true);
-  }
-
-  public synchronized void removeMouseListener(final MouseListener listener) {
-    this.mouseListeners.removeMouseListener(listener);
   }
 
   public void setPopupMenu(final Callable<BaseJPopupMenu> popupMenuFactory) {
@@ -257,17 +155,17 @@ public class RecordTableCellEditor extends AbstractCellEditor
       if (stopped) {
         if (this.editorComponent != null) {
           this.editorComponent.removeMouseListener(this.mouseListeners);
-          this.editorComponent.removeKeyListener(this);
+          this.editorComponent.removeKeyListener(this.keyListener);
           if (this.editorComponent instanceof JComboBox) {
             final JComboBox<?> comboBox = (JComboBox<?>)this.editorComponent;
             final ComboBoxEditor editor = comboBox.getEditor();
             final Component comboEditorComponent = editor.getEditorComponent();
-            comboEditorComponent.removeKeyListener(this);
+            comboEditorComponent.removeKeyListener(this.keyListener);
             comboEditorComponent.removeMouseListener(this.mouseListeners);
           } else if (this.editorComponent instanceof AbstractRecordQueryField) {
             final AbstractRecordQueryField queryField = (AbstractRecordQueryField)this.editorComponent;
             final TextField searchField = queryField.getSearchField();
-            searchField.removeKeyListener(this);
+            searchField.removeKeyListener(this.keyListener);
             searchField.removeMouseListener(this.mouseListeners);
           }
           if (this.popupMenuListener != null) {
@@ -280,12 +178,4 @@ public class RecordTableCellEditor extends AbstractCellEditor
     return stopped;
   }
 
-  @Override
-  public void tableChanged(final TableModelEvent e) {
-    if (e.getFirstRow() <= this.rowIndex && this.rowIndex <= e.getLastRow()) {
-      if (e.getColumn() == TableModelEvent.ALL_COLUMNS) {
-        cancelCellEditing();
-      }
-    }
-  }
 }

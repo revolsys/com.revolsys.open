@@ -84,7 +84,6 @@ import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.component.RecordLayerFields;
 import com.revolsys.swing.map.layer.record.table.model.LayerRecordTableModel;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.menu.MenuFactory;
@@ -773,7 +772,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
       if (field == null) {
         final boolean editable = !this.readOnlyFieldNames.contains(fieldName);
         try {
-          field = RecordLayerFields.newFormField(this.layer, fieldName, editable);
+          field = this.layer.newFormField(fieldName, editable);
           addField(fieldName, field);
         } catch (final IllegalArgumentException e) {
         }
@@ -1149,7 +1148,9 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
             final String fieldName = field.getFieldName();
             final Object fieldValue = field.getFieldValue();
             final Object recordValue = this.record.getValue(fieldName);
-            if (!DataType.equal(recordValue, fieldValue)) {
+            if (DataType.equal(recordValue, fieldValue)) {
+              record.fireRecordUpdated();
+            } else {
               boolean equal = false;
               if (fieldValue instanceof String) {
                 final String string = (String)fieldValue;
@@ -1491,7 +1492,9 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
   }
 
   protected final void updateErrors() {
-    Invoke.later(() -> updateErrorsDo());
+    if (Invoke.swingThread(this::updateErrors)) {
+      updateErrorsDo();
+    }
   }
 
   protected void updateErrorsDo() {

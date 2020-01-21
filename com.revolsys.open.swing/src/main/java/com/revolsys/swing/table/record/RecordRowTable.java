@@ -8,6 +8,7 @@ import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -66,19 +67,9 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
 
     final JTableHeader tableHeader = getTableHeader();
 
-    final TableColumnModel columnModel = getColumnModel();
     this.tableCellEditor = newTableCellEditor();
     this.tableCellEditor.addCellEditorListener(model);
-    for (int columnIndex = 0; columnIndex < columnModel.getColumnCount(); columnIndex++) {
-      try {
-        final TableColumn column = columnModel.getColumn(columnIndex);
-        if (columnIndex >= model.getColumnFieldsOffset()) {
-          column.setCellEditor(this.tableCellEditor);
-        }
-        column.setCellRenderer(cellRenderer);
-      } catch (final ArrayIndexOutOfBoundsException e) {
-      }
-    }
+    refreshColumnModel();
     tableHeader.addMouseListener(this);
 
     addNewRecordHighlighter();
@@ -149,6 +140,10 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
     return this.tableCellEditor;
   }
 
+  protected TableCellEditor getTableCellEditor(final int columnIndex) {
+    return this.tableCellEditor;
+  }
+
   @Override
   protected void initializeColumnPreferredWidth(final TableColumn column) {
     super.initializeColumnPreferredWidth(column);
@@ -191,6 +186,23 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
     return new RecordTableCellEditor(this);
   }
 
+  protected void refreshColumnModel() {
+    final RecordRowTableModel model = getModel();
+    final int columnFieldsOffset = model.getColumnFieldsOffset();
+    final TableColumnModel columnModel = getColumnModel();
+    for (int columnIndex = 0; columnIndex < columnModel.getColumnCount(); columnIndex++) {
+      try {
+        final TableColumn column = columnModel.getColumn(columnIndex);
+        if (columnIndex >= columnFieldsOffset) {
+          final TableCellEditor cellEditor = getTableCellEditor(columnIndex);
+          column.setCellEditor(cellEditor);
+        }
+        column.setCellRenderer(this.cellRenderer);
+      } catch (final ArrayIndexOutOfBoundsException e) {
+      }
+    }
+  }
+
   @Override
   public void setRowSorter(final RowSorter<? extends TableModel> sorter) {
     super.setRowSorter(sorter);
@@ -220,9 +232,6 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
   @Override
   public void tableChanged(final TableModelEvent event) {
     Invoke.later(() -> {
-      final RecordRowTableModel model = getModel();
-      final int fieldsOffset = model.getColumnFieldsOffset();
-
       tableChangedDo(event);
       final int type = event.getType();
       final int eventColumn = event.getColumn();
@@ -230,14 +239,7 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
       if (type == TableModelEvent.UPDATE && eventColumn == TableModelEvent.ALL_COLUMNS
         && row == TableModelEvent.HEADER_ROW) {
         createDefaultColumnsFromModel();
-        final TableColumnModel columnModel = getColumnModel();
-        for (int columnIndex = 0; columnIndex < model.getColumnCount(); columnIndex++) {
-          final TableColumn column = columnModel.getColumn(columnIndex);
-          if (columnIndex >= fieldsOffset) {
-            column.setCellEditor(this.tableCellEditor);
-          }
-          column.setCellRenderer(this.cellRenderer);
-        }
+        refreshColumnModel();
         initializeColumnWidths();
       }
       if (this.tableHeader != null) {

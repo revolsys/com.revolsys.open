@@ -37,7 +37,7 @@ import com.revolsys.util.Strings;
  * @see RecordDefinition
  */
 public class FieldDefinition extends BaseObjectWithProperties
-  implements CharSequence, Cloneable, MapSerializer, DataTypeProxy {
+  implements CharSequence, Cloneable, MapSerializer, RecordDefinitionProxy, DataTypeProxy {
   public static FieldDefinition newFieldDefinition(final Map<String, ? extends Object> config) {
     return new FieldDefinition(config);
   }
@@ -441,6 +441,7 @@ public class FieldDefinition extends BaseObjectWithProperties
     return this.name;
   }
 
+  @Override
   public RecordDefinition getRecordDefinition() {
     if (this.recordDefinition == null) {
       return null;

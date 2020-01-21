@@ -377,9 +377,10 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
   public boolean isCurrentCellHasValue() {
     final int eventRow = getEventRow();
     final int eventColumn = getEventColumn();
+    final BaseJTable eventTable = getEventTable();
     if (isEditingCurrentCell()) {
       return true;
-    } else if (eventRow > -1 && eventColumn > -1) {
+    } else if (eventRow > -1 && eventColumn > -1 && eventTable == this.table) {
       final TableModel tableModel = getTableModel();
       final Object value = tableModel.getValueAt(eventRow, eventColumn);
       return Property.hasValue(value);

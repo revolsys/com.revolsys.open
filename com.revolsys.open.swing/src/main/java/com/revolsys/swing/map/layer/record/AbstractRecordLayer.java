@@ -84,7 +84,6 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.ByteArrayResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
@@ -114,7 +113,7 @@ import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
-import com.revolsys.swing.map.layer.record.component.RecordLayerFields;
+import com.revolsys.swing.map.layer.record.component.RecordLayerFieldUiFactory;
 import com.revolsys.swing.map.layer.record.component.recordmerge.MergeRecordsDialog;
 import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
@@ -148,7 +147,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.ShortCounter;
 
 public abstract class AbstractRecordLayer extends AbstractLayer
-  implements AddGeometryCompleteAction, RecordDefinitionProxy {
+  implements AddGeometryCompleteAction, RecordLayerProxy, RecordLayerFieldUiFactory {
   private class RecordCacheIndex extends RecordCacheDelegating {
     private RecordSpatialIndex<LayerRecord> index;
 
@@ -1528,6 +1527,12 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return (RecordFactory<R>)this.recordFactory;
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <L extends AbstractRecordLayer> L getRecordLayer() {
+    return (L)this;
+  }
+
   public LayerRecordMenu getRecordMenu() {
     return this.recordMenu;
   }
@@ -2000,6 +2005,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return internalIsDeleted(record);
   }
 
+  public boolean isFieldEditable(final String fieldName) {
+    return !this.userReadOnlyFieldNames.contains(fieldName);
+  }
+
   public boolean isFieldUserReadOnly(final String fieldName) {
     return getUserReadOnlyFieldNames().contains(fieldName);
   }
@@ -2304,7 +2313,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       return new TextField(20);
     } else {
       final String fieldName = fieldDefinition.getName();
-      return RecordLayerFields.newCompactField(this, fieldName, true);
+      return newCompactField(fieldName, true);
     }
   }
 
