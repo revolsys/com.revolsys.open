@@ -3,7 +3,6 @@ package com.revolsys.swing.table.record.editor;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.util.EventObject;
-import java.util.concurrent.Callable;
 
 import javax.swing.BorderFactory;
 import javax.swing.ComboBoxEditor;
@@ -20,7 +19,6 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.AbstractRecordQueryField;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.field.TextField;
-import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.ShowMenuMouseListener;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.editor.BaseTableCellEditor;
@@ -32,20 +30,8 @@ public class RecordTableCellEditor extends BaseTableCellEditor {
 
   private String fieldName;
 
-  private Callable<BaseJPopupMenu> popupMenuFactory = null;
-
-  private ShowMenuMouseListener popupMenuListener;
-
   public RecordTableCellEditor(final BaseJTable table) {
     super(table);
-  }
-
-  @Override
-  public void close() {
-    super.close();
-    this.popupMenuFactory = null;
-    this.popupMenuListener = null;
-
   }
 
   protected String getColumnFieldName(final int rowIndex, final int columnIndex) {
@@ -122,10 +108,6 @@ public class RecordTableCellEditor extends BaseTableCellEditor {
   protected Field newField(final String fieldName) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return SwingUtil.newField(recordDefinition, fieldName, true);
-  }
-
-  public void setPopupMenu(final Callable<BaseJPopupMenu> popupMenuFactory) {
-    this.popupMenuFactory = popupMenuFactory;
   }
 
   @Override

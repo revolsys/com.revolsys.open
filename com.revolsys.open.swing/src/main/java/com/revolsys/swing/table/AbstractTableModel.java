@@ -10,6 +10,8 @@ import javax.annotation.PreDestroy;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.TableColumnModel;
 
@@ -26,11 +28,12 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.table.editor.BaseTableCellEditor;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.UndoManager;
 
 public abstract class AbstractTableModel extends javax.swing.table.AbstractTableModel
-  implements PropertyChangeSupportProxy {
+  implements PropertyChangeSupportProxy, CellEditorListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -157,6 +160,14 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
   }
 
   @Override
+  public void editingCanceled(final ChangeEvent event) {
+  }
+
+  @Override
+  public void editingStopped(final ChangeEvent event) {
+  }
+
+  @Override
   public void fireTableChanged(final TableModelEvent e) {
     Invoke.later(() -> {
       try {
@@ -199,6 +210,14 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
 
   public BaseJTable getTable() {
     return this.table;
+  }
+
+  public BaseTableCellEditor getCellEditor(final int columnIndex) {
+    return null;
+  }
+
+  public BaseTableCellEditor getCellEditor(final int rowIndex, final int columnIndex) {
+    return null;
   }
 
   public UndoManager getUndoManager() {

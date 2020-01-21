@@ -45,6 +45,7 @@ import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.SortableTableModel;
+import com.revolsys.swing.table.editor.BaseTableCellEditor;
 import com.revolsys.swing.table.record.filter.RecordRowPredicateRowFilter;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
 import com.revolsys.util.Cancellable;
@@ -327,6 +328,20 @@ public class RecordLayerTableModel extends RecordRowTableModel
   @Override
   public RecordLayerTable getTable() {
     return (RecordLayerTable)super.getTable();
+  }
+
+  @Override
+  public BaseTableCellEditor getCellEditor(final int columnIndex) {
+    final String fieldName = getColumnFieldName(columnIndex);
+    if (fieldName != null) {
+      final AbstractRecordLayer layer = getLayer();
+      final RecordLayerTable table = getTable();
+      final BaseTableCellEditor editor = layer.newTableCellEditor(table, fieldName);
+      if (editor != null) {
+        return editor;
+      }
+    }
+    return null;
   }
 
   public TableRecordsMode getTableRecordsMode() {

@@ -11,8 +11,6 @@ import java.util.function.Predicate;
 
 import javax.annotation.PreDestroy;
 import javax.swing.SortOrder;
-import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
@@ -34,7 +32,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
 public abstract class RecordRowTableModel extends AbstractRecordTableModel
-  implements SortableTableModel, CellEditorListener {
+  implements SortableTableModel {
   public static final String LOADING_VALUE = "\u2026";
 
   private static final long serialVersionUID = 1L;
@@ -103,14 +101,6 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
   public void dispose() {
     super.dispose();
     this.sortedColumns = null;
-  }
-
-  @Override
-  public void editingCanceled(final ChangeEvent event) {
-  }
-
-  @Override
-  public void editingStopped(final ChangeEvent event) {
   }
 
   @Override

@@ -12,7 +12,6 @@ import org.jeometry.common.data.identifier.Code;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
@@ -22,8 +21,7 @@ import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
-public abstract class AbstractRecordTableModel extends AbstractTableModel
-  implements PropertyChangeSupportProxy {
+public abstract class AbstractRecordTableModel extends AbstractTableModel {
 
   private static final long serialVersionUID = 1L;
 

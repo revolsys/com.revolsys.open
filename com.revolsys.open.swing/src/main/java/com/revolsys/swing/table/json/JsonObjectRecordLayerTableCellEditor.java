@@ -24,12 +24,16 @@ import com.revolsys.swing.table.editor.BaseTableCellEditor;
 import com.revolsys.swing.toolbar.ToolBar;
 
 public class JsonObjectRecordLayerTableCellEditor extends BaseTableCellEditor {
-  final JDialog dialog = new JDialog();
+  private final JDialog dialog;
 
-  final JsonObjectTableField field;
+  private final JsonObjectTableField field;
 
-  public JsonObjectRecordLayerTableCellEditor(final FieldDefinition fieldDefinition,
-    final List<FieldDefinition> extendedFields) {
+  private JsonObject cellEditorValue;
+
+  public JsonObjectRecordLayerTableCellEditor(final BaseJTable table,
+    final FieldDefinition fieldDefinition, final List<FieldDefinition> extendedFields) {
+    super(table);
+    this.dialog = new JDialog(SwingUtil.getWindowAncestor(table));
     this.field = new JsonObjectTableField("x", extendedFields);
     this.field.setPreferredSize(new Dimension(400, 150));
 
@@ -50,14 +54,14 @@ public class JsonObjectRecordLayerTableCellEditor extends BaseTableCellEditor {
 
       @Override
       public void windowLostFocus(final WindowEvent e) {
-        fireEditingStopped();
-        JsonObjectRecordLayerTableCellEditor.this.dialog.setVisible(false);
+        stopCellEditing();
       }
     });
   }
 
   @Override
   public void cancelCellEditing() {
+    this.table.setTerminateEditOnFocusLost(true);
     this.field.cancelCellEditing();
     super.cancelCellEditing();
     this.dialog.setVisible(false);
@@ -65,40 +69,33 @@ public class JsonObjectRecordLayerTableCellEditor extends BaseTableCellEditor {
 
   @Override
   public Object getCellEditorValue() {
-    final JsonObject object = this.field.getFieldValue();
-    if (object == null) {
-      return null;
-    } else {
-      return object.clone();
-    }
+    return this.cellEditorValue;
   }
 
   @Override
   public Component getTableCellEditorComponent(final JTable table, final Object value,
     final boolean isSelected, final int rowIndex, final int columnIndex) {
+    this.table.setTerminateEditOnFocusLost(false);
+    this.cellEditorValue = (JsonObject)value;
     startEditing(rowIndex, columnIndex);
     final EventObject event = ((BaseJTable)table).getEditEvent();
     if (event instanceof MouseEvent) {
       final MouseEvent mouseEvent = (MouseEvent)event;
       SwingUtil.setLocationCentreAtEvent(this.dialog, mouseEvent);
     }
-    JsonObject object = (JsonObject)value;
-    if (object != null) {
-      object = object.clone();
-    }
-    this.field.setFieldValue(object);
+
+    this.field.setFieldValue(value);
     this.dialog.setVisible(true);
     return new JLabel();
   }
 
   @Override
   public boolean stopCellEditing() {
+    this.table.setTerminateEditOnFocusLost(true);
     this.field.stopCellEditing();
-    if (super.stopCellEditing()) {
-      this.dialog.setVisible(false);
-      return true;
-    } else {
-      return false;
-    }
+    this.cellEditorValue = this.field.getFieldValue();
+    this.field.setFieldValue(null);
+    this.dialog.setVisible(false);
+    return super.stopCellEditing();
   }
 }

@@ -31,6 +31,7 @@ import com.revolsys.swing.map.layer.record.table.predicate.FormAllFieldsErrorPre
 import com.revolsys.swing.map.layer.record.table.predicate.FormAllFieldsModifiedPredicate;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.TablePanel;
+import com.revolsys.swing.table.editor.BaseTableCellEditor;
 import com.revolsys.swing.table.record.model.AbstractSingleRecordTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
@@ -82,6 +83,18 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
   public void dispose() {
     super.dispose();
     Property.removeListener(this.layer, this);
+  }
+
+  @Override
+  public BaseTableCellEditor getCellEditor(final int rowIndex, final int columnIndex) {
+    if (columnIndex == 2) {
+      final String fieldName = getColumnFieldName(columnIndex);
+      if (fieldName != null) {
+        final BaseJTable table = getTable();
+        return this.layer.newTableCellEditor(table, fieldName);
+      }
+    }
+    return null;
   }
 
   @Override
