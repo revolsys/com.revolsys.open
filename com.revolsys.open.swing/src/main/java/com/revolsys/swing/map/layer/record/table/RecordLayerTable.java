@@ -19,7 +19,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
@@ -201,7 +200,7 @@ public class RecordLayerTable extends RecordRowTable {
   @Override
   public void copyFieldValue() {
     if (isEditingCurrentCell()) {
-      final RecordTableCellEditor tableCellEditor = getTableCellEditor();
+      final BaseTableCellEditor tableCellEditor = getTableCellEditor();
       final JComponent editorComponent = tableCellEditor.getEditorComponent();
       SwingUtil.dndCopy(editorComponent);
     } else {
@@ -236,7 +235,7 @@ public class RecordLayerTable extends RecordRowTable {
   @Override
   public void cutFieldValue() {
     if (isEditingCurrentCell()) {
-      final RecordTableCellEditor tableCellEditor = getTableCellEditor();
+      final BaseTableCellEditor tableCellEditor = getTableCellEditor();
       final JComponent editorComponent = tableCellEditor.getEditorComponent();
       SwingUtil.dndCut(editorComponent);
     } else {
@@ -282,26 +281,6 @@ public class RecordLayerTable extends RecordRowTable {
   }
 
   @Override
-  protected TableCellEditor getTableCellEditor(final int columnIndex) {
-    final RecordLayerTableModel tableModel = getTableModel();
-    final String fieldName = tableModel.getColumnFieldName(columnIndex);
-    if (fieldName != null) {
-      final AbstractRecordLayer layer = getLayer();
-      final TableCellEditor editor = layer.newTableCellEditor(fieldName);
-      if (editor != null) {
-        if (editor instanceof BaseTableCellEditor) {
-          final BaseTableCellEditor baseEditor = (BaseTableCellEditor)editor;
-          baseEditor.setTable(this);
-        }
-        return editor;
-      }
-
-    }
-    return super.getTableCellEditor();
-
-  }
-
-  @Override
   protected void initializeColumnPreferredWidth(final TableColumn column) {
     final int columnIndex = column.getModelIndex();
     final String fieldName = getColumnFieldName(columnIndex);
@@ -325,7 +304,7 @@ public class RecordLayerTable extends RecordRowTable {
   @Override
   public void pasteFieldValue() {
     if (isEditingCurrentCell()) {
-      final RecordTableCellEditor tableCellEditor = getTableCellEditor();
+      final BaseTableCellEditor tableCellEditor = getTableCellEditor();
       final JComponent editorComponent = tableCellEditor.getEditorComponent();
       SwingUtil.dndPaste(editorComponent);
     } else {

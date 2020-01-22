@@ -41,6 +41,7 @@ import org.jeometry.common.function.BiFunctionInt;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.parallel.Invoke;
+import com.revolsys.swing.table.editor.BaseTableCellEditor;
 import com.revolsys.swing.table.highlighter.OddEvenColorHighlighter;
 import com.revolsys.swing.table.highlighter.TableModelHighlighter;
 import com.revolsys.util.Property;
@@ -52,11 +53,16 @@ public class BaseJTable extends JXTable {
 
   private EventObject editEvent;
 
+  private BaseTableCellEditor tableCellEditor;
+
   public BaseJTable() {
   }
 
   public BaseJTable(final AbstractTableModel model) {
     super(model, model.newTableColumnModel(), model.newListSelectionModel());
+    this.tableCellEditor = newTableCellEditor();
+    this.tableCellEditor.addCellEditorListener(model);
+
     setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     setGridColor(new Color(191, 191, 191));
     setShowGrid(false, true);
@@ -228,6 +234,7 @@ public class BaseJTable extends JXTable {
   }
 
   public void dispose() {
+    this.tableCellEditor = null;
     for (final Highlighter highlighter : getHighlighters()) {
       removeHighlighter(highlighter);
     }
@@ -240,20 +247,32 @@ public class BaseJTable extends JXTable {
       requestFocusInWindow();
       changeSelection(rowIndex, columnIndex, false, false);
       editCellAt(rowIndex, columnIndex);
-      final Component editor = getEditorComponent();
-      if (editor != null) {
-        editor.requestFocusInWindow();
-      }
+
     }
   }
 
   @Override
-  public boolean editCellAt(final int row, final int column, final EventObject e) {
-    this.editEvent = e;
-    try {
-      return super.editCellAt(row, column, e);
-    } finally {
-      this.editEvent = null;
+  public boolean editCellAt(final int rowIndex, final int columnIndex, final EventObject e) {
+    if (rowIndex >= 0 && rowIndex < getRowCount() && columnIndex >= 0
+      && columnIndex < getColumnCount()) {
+      // requestFocusInWindow();
+      changeSelection(rowIndex, columnIndex, false, false);
+      this.editEvent = e;
+      try {
+        if (super.editCellAt(rowIndex, columnIndex, e)) {
+          // final Component editor = getEditorComponent();
+          // if (editor != null) {
+          // editor.requestFocusInWindow();
+          // }
+          return true;
+        } else {
+          return false;
+        }
+      } finally {
+        this.editEvent = null;
+      }
+    } else {
+      return false;
     }
   }
 
@@ -262,7 +281,28 @@ public class BaseJTable extends JXTable {
     final int selectedColumn = getSelectedColumn();
     final int rowIndex = selectedRow + rowDelta;
     final int columnIndex = selectedColumn + columnDelta;
-    editCell(rowIndex, columnIndex);
+    editCellAt(rowIndex, columnIndex);
+  }
+
+  public BaseTableCellEditor getCellEditor(final int columnIndex) {
+    final AbstractTableModel tableModel = getTableModel();
+    final BaseTableCellEditor editor = tableModel.getCellEditor(columnIndex);
+    if (editor == null) {
+      return this.tableCellEditor;
+    } else {
+      return editor;
+    }
+  }
+
+  @Override
+  public TableCellEditor getCellEditor(final int rowIndex, final int columnIndex) {
+    final AbstractTableModel tableModel = getTableModel();
+    final TableCellEditor editor = tableModel.getCellEditor(rowIndex, columnIndex);
+    if (editor == null) {
+      return super.getCellEditor(rowIndex, columnIndex);
+    } else {
+      return editor;
+    }
   }
 
   public EventObject getEditEvent() {
@@ -312,6 +352,10 @@ public class BaseJTable extends JXTable {
     }
     Arrays.sort(selectedRows);
     return selectedRows;
+  }
+
+  public BaseTableCellEditor getTableCellEditor() {
+    return this.tableCellEditor;
   }
 
   @SuppressWarnings("unchecked")
@@ -365,6 +409,10 @@ public class BaseJTable extends JXTable {
       }
       return false;
     };
+  }
+
+  protected BaseTableCellEditor newTableCellEditor() {
+    return new BaseTableCellEditor(this);
   }
 
   public void pasteFieldValue() {

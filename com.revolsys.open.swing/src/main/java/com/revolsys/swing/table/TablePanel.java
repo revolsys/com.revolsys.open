@@ -368,7 +368,8 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
   public boolean isCurrentCellEditable() {
     final int eventRow = getEventRow();
     final int eventColumn = getEventColumn();
-    if (eventRow > -1 && eventColumn > -1) {
+    final BaseJTable eventTable = getEventTable();
+    if (eventTable == this.table && eventRow > -1 && eventColumn > -1) {
       return getTableModel().isCellEditable(eventRow, eventColumn);
     }
     return false;

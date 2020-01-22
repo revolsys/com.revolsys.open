@@ -63,7 +63,7 @@ import com.revolsys.swing.menu.MenuSourceHolder;
 import com.revolsys.swing.menu.ToggleButton;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.TableRowCount;
-import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
+import com.revolsys.swing.table.editor.BaseTableCellEditor;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
@@ -124,7 +124,7 @@ public class RecordLayerTablePanel extends TablePanel
       }
 
       final LayerRecordMenu menu = this.layer.getRecordMenu();
-      final RecordTableCellEditor tableCellEditor = table.getTableCellEditor();
+      final BaseTableCellEditor tableCellEditor = table.getTableCellEditor();
       tableCellEditor.setPopupMenu(menu::newJPopupMenu);
     }
 
@@ -243,7 +243,7 @@ public class RecordLayerTablePanel extends TablePanel
   public void close() {
     final RecordLayerTable table = getTable();
     if (table != null) {
-      final RecordTableCellEditor tableCellEditor = table.getTableCellEditor();
+      final BaseTableCellEditor tableCellEditor = table.getTableCellEditor();
       tableCellEditor.close();
       table.dispose();
     }

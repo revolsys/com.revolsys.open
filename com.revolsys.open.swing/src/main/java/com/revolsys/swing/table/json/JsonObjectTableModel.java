@@ -159,8 +159,8 @@ public class JsonObjectTableModel extends AbstractTableModel implements Property
     this.propertyNames.clear();
     if (this.object != null) {
       this.propertyNames.addAll(this.object.keySet());
-      fireTableDataChanged();
     }
+    fireTableDataChanged();
   }
 
   private void removeRow(final int rowIndex, final int columnIndex) {

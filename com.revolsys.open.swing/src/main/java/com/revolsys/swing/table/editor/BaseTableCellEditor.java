@@ -7,6 +7,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.EventObject;
+import java.util.concurrent.Callable;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
@@ -30,6 +31,8 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.listener.MouseListeners;
 import com.revolsys.swing.listener.MouseListenersBase;
+import com.revolsys.swing.menu.BaseJPopupMenu;
+import com.revolsys.swing.menu.ShowMenuMouseListener;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.swing.table.BaseJTable;
 
@@ -42,15 +45,9 @@ public class BaseTableCellEditor extends AbstractCellEditor
 
   protected DataType dataType = DataTypes.OBJECT;
 
-  protected JComponent editorComponent;
-
-  protected final MouseListeners mouseListeners = new MouseListenersBase();
-
-  protected int rowIndex;
-
-  private BaseJTable table;
-
   private boolean editing = false;
+
+  protected JComponent editorComponent;
 
   protected KeyListener keyListener = new KeyAdapter() {
     @Override
@@ -80,6 +77,16 @@ public class BaseTableCellEditor extends AbstractCellEditor
 
   };
 
+  protected final MouseListeners mouseListeners = new MouseListenersBase();
+
+  protected Callable<BaseJPopupMenu> popupMenuFactory;
+
+  protected ShowMenuMouseListener popupMenuListener;
+
+  protected int rowIndex;
+
+  protected BaseJTable table;
+
   public BaseTableCellEditor() {
   }
 
@@ -94,8 +101,8 @@ public class BaseTableCellEditor extends AbstractCellEditor
   public void close() {
     this.editorComponent = null;
     this.mouseListeners.clearMouseListeners();
-    // this.popupMenuFactory = null;
-    // this.popupMenuListener = null;
+    this.popupMenuFactory = null;
+    this.popupMenuListener = null;
     this.table = null;
     for (final CellEditorListener listener : getCellEditorListeners()) {
       removeCellEditorListener(listener);
@@ -107,7 +114,7 @@ public class BaseTableCellEditor extends AbstractCellEditor
     if (rowIndex >= 0 && rowIndex <= this.table.getRowCount()) {
       final int columnIndex = this.table.convertColumnIndexToView(this.columnIndex) + columnDelta;
       if (columnIndex >= 0 && columnIndex < this.table.getColumnCount()) {
-        this.table.editCell(rowIndex, columnIndex);
+        this.table.editCellAt(rowIndex, columnIndex);
       }
     }
   }
@@ -177,6 +184,10 @@ public class BaseTableCellEditor extends AbstractCellEditor
 
   public synchronized void removeMouseListener(final MouseListener listener) {
     this.mouseListeners.removeMouseListener(listener);
+  }
+
+  public void setPopupMenu(final Callable<BaseJPopupMenu> popupMenuFactory) {
+    this.popupMenuFactory = popupMenuFactory;
   }
 
   public void setTable(final BaseJTable table) {

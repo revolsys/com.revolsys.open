@@ -9,6 +9,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,6 +40,7 @@ import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class Json extends AbstractIoFactoryWithCoordinateSystem
@@ -81,6 +83,62 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
 
   static {
     DataTypes.registerDataTypes(Json.class);
+  }
+
+  public static JsonObject clone(final JsonObject object) {
+    if (object == null) {
+      return null;
+    } else {
+      final JsonObject clone = new JsonObject();
+      for (final Entry<String, Object> entry : object.entrySet()) {
+        final String key = entry.getKey();
+        final Object originalValue = entry.getValue();
+        final Object cloneValue = clone(originalValue);
+        clone.put(key, cloneValue);
+      }
+      return clone;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <V> V clone(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof JsonObject) {
+      return (V)clone((JsonObject)value);
+    } else if (value instanceof Map) {
+      final Map<Object, Object> originalMap = (Map<Object, Object>)value;
+      final JsonObject clone = new JsonObject();
+      for (final Entry<Object, Object> entry : originalMap.entrySet()) {
+        final String key = entry.getKey().toString();
+        final Object originalValue = entry.getValue();
+        final Object cloneValue = clone(originalValue);
+        clone.put(key, cloneValue);
+      }
+      return (V)clone;
+    } else if (value instanceof List) {
+      final List<?> list = (List<?>)value;
+      final JsonList clone = new JsonList();
+      for (final Object object : list) {
+        final Object cloneValue = clone(object);
+        clone.add(cloneValue);
+      }
+      return (V)clone;
+    } else if (value instanceof Cloneable) {
+      try {
+        final Class<? extends Object> valueClass = value.getClass();
+        final Method method = valueClass.getMethod("clone", JavaBeanUtil.ARRAY_CLASS_0);
+        if (method == null) {
+          return (V)value;
+        } else {
+          return (V)method.invoke(value, JavaBeanUtil.ARRAY_OBJECT_0);
+        }
+      } catch (final Throwable e) {
+        return Exceptions.throwUncheckedException(e);
+      }
+    } else {
+      return (V)value;
+    }
   }
 
   public static Map<String, Object> getMap(final Map<String, Object> record,

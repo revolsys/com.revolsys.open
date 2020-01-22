@@ -13,6 +13,7 @@ import javax.swing.event.TableModelEvent;
 import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.data.type.DataType;
 
+import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.swing.component.ValueField;
@@ -157,9 +158,10 @@ public class JsonObjectTableField extends ValueField {
 
   @Override
   public boolean setFieldValue(final Object value) {
-    this.model.setObject((JsonObject)value);
-    if (!DataType.equal(value, getFieldValue())) {
-      return super.setFieldValue(value);
+    if (value != getFieldValue()) {
+      final JsonObject clone = Json.clone(value);
+      this.model.setObject(clone);
+      return super.setFieldValue(clone);
     }
     refresh();
     return false;
@@ -172,7 +174,7 @@ public class JsonObjectTableField extends ValueField {
   private void tableChanged(final TableModelEvent e) {
     if (e.getType() == TableModelEvent.UPDATE) {
       final String fieldName = getFieldName();
-      final Object fieldValue = getFieldValue();
+      final Object fieldValue = Json.clone(getFieldValue());
       firePropertyChange(fieldName, JsonObject.EMPTY, fieldValue);
 
     }

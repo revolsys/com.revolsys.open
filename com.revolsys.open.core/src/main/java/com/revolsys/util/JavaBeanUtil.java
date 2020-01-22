@@ -42,9 +42,9 @@ import org.jeometry.common.logging.Logs;
  * @author Paul Austin
  */
 public final class JavaBeanUtil {
-  private static final Class<?>[] ARRAY_CLASS_0 = new Class[0];
+  public static final Class<?>[] ARRAY_CLASS_0 = new Class[0];
 
-  private static final Object[] ARRAY_OBJECT_0 = new Object[0];
+  public static final Object[] ARRAY_OBJECT_0 = new Object[0];
 
   /**
    * Clone the value if it has a clone method.
@@ -54,7 +54,9 @@ public final class JavaBeanUtil {
    */
   @SuppressWarnings("unchecked")
   public static <V> V clone(final V value) {
-    if (value instanceof Map) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof Map) {
       final Map<Object, Object> sourceMap = (Map<Object, Object>)value;
       final Map<Object, Object> map = new LinkedHashMap<>(sourceMap);
       for (final Entry<Object, Object> entry : sourceMap.entrySet()) {

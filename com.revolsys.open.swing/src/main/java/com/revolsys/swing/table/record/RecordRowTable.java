@@ -8,7 +8,6 @@ import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.JTableHeader;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
@@ -28,6 +27,7 @@ import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseColumnFactory;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.TablePanel;
+import com.revolsys.swing.table.editor.BaseTableCellEditor;
 import com.revolsys.swing.table.record.editor.RecordTableCellEditor;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
 import com.revolsys.swing.table.record.renderer.RecordRowTableCellRenderer;
@@ -49,8 +49,6 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
 
   private TableCellRenderer cellRenderer;
 
-  private RecordTableCellEditor tableCellEditor;
-
   private boolean showDisplayValues = true;
 
   public RecordRowTable(final RecordRowTableModel model) {
@@ -67,8 +65,6 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
 
     final JTableHeader tableHeader = getTableHeader();
 
-    this.tableCellEditor = newTableCellEditor();
-    this.tableCellEditor.addCellEditorListener(model);
     refreshColumnModel();
     tableHeader.addMouseListener(this);
 
@@ -92,7 +88,6 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
   @Override
   public void dispose() {
     super.dispose();
-    this.tableCellEditor = null;
     this.cellRenderer = null;
   }
 
@@ -136,14 +131,6 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
     }
   }
 
-  public RecordTableCellEditor getTableCellEditor() {
-    return this.tableCellEditor;
-  }
-
-  protected TableCellEditor getTableCellEditor(final int columnIndex) {
-    return this.tableCellEditor;
-  }
-
   @Override
   protected void initializeColumnPreferredWidth(final TableColumn column) {
     super.initializeColumnPreferredWidth(column);
@@ -182,7 +169,8 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
     }
   }
 
-  protected RecordTableCellEditor newTableCellEditor() {
+  @Override
+  protected BaseTableCellEditor newTableCellEditor() {
     return new RecordTableCellEditor(this);
   }
 
@@ -194,7 +182,7 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
       try {
         final TableColumn column = columnModel.getColumn(columnIndex);
         if (columnIndex >= columnFieldsOffset) {
-          final TableCellEditor cellEditor = getTableCellEditor(columnIndex);
+          final BaseTableCellEditor cellEditor = getCellEditor(columnIndex);
           column.setCellEditor(cellEditor);
         }
         column.setCellRenderer(this.cellRenderer);
