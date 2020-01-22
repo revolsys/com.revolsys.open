@@ -15,8 +15,8 @@ import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.view.ViewRenderer;
 
-import tec.uom.se.ComparableQuantity;
-import tec.uom.se.quantity.Quantities;
+import tech.units.indriya.ComparableQuantity;
+import tech.units.indriya.quantity.Quantities;
 
 public interface Marker extends MapSerializer {
   default Icon getIcon() {

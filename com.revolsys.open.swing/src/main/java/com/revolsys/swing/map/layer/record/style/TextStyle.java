@@ -39,7 +39,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
 import com.revolsys.util.Strings;
 
-import tec.uom.se.quantity.Quantities;
+import tech.units.indriya.quantity.Quantities;
 
 public class TextStyle extends BaseObjectWithPropertiesAndChange
   implements MapSerializer, Cloneable {

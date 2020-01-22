@@ -13,7 +13,7 @@ import com.revolsys.swing.map.overlay.record.SelectedRecordsVertexRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Property;
 
-import tec.uom.se.quantity.Quantities;
+import tech.units.indriya.quantity.Quantities;
 
 public class VertexStyleRenderer {
   private final MarkerStyle fromVertexStyle;

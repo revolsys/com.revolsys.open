@@ -35,7 +35,7 @@ import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
-import tec.uom.se.quantity.Quantities;
+import tech.units.indriya.quantity.Quantities;
 
 public class MarkerStyle extends BaseObjectWithPropertiesAndChange
   implements Cloneable, MapSerializer {

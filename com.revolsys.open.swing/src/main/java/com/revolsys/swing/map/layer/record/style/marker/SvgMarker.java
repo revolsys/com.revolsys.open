@@ -10,7 +10,6 @@ import org.apache.batik.transcoder.TranscoderException;
 import org.jeometry.common.logging.Logs;
 import org.w3c.dom.Document;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.ClassPathResource;
 import com.revolsys.spring.resource.Resource;

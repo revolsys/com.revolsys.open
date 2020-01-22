@@ -11,7 +11,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.JXTable;
-import org.jeometry.common.number.BigDecimals;
 import org.jeometry.common.number.Numbers;
 
 import com.revolsys.record.schema.RecordDefinition;

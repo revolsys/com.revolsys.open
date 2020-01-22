@@ -13,7 +13,6 @@ import javax.swing.ImageIcon;
 import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.data.type.DataType;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.raster.BufferedGeoreferencedImage;

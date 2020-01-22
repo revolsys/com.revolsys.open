@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReaderFactory;
 import com.revolsys.geometry.model.BoundingBox;

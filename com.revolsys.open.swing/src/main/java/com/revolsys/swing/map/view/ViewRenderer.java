@@ -54,7 +54,7 @@ import com.revolsys.util.Cancellable;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
 
-import tec.uom.se.unit.Units;
+import tech.units.indriya.unit.Units;
 
 public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
   private static final Pattern PATTERN_INDEX_FROM_END = Pattern

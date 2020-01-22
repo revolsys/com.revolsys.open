@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.record.io.format.json.JsonObject;

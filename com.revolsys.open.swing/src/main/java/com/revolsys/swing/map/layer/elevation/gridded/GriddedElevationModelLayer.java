@@ -10,7 +10,6 @@ import java.util.function.Predicate;
 
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;

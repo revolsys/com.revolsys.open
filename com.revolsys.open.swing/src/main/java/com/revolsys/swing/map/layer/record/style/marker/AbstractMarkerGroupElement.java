@@ -2,7 +2,6 @@ package com.revolsys.swing.map.layer.record.style.marker;
 
 import java.util.Map;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.AbstractNameTitle;
 import com.revolsys.record.io.format.json.JsonObject;

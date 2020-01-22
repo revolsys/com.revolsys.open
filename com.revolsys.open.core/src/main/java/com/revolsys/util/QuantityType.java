@@ -6,7 +6,7 @@ import javax.measure.Unit;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
-import tec.uom.se.quantity.Quantities;
+import tech.units.indriya.quantity.Quantities;
 
 public interface QuantityType {
   static <Q extends Quantity<Q>> double convertValue(final Unit<Q> fromUnit, final double value,

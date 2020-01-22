@@ -4,7 +4,6 @@ import java.awt.image.BufferedImage;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelImage;
 import com.revolsys.elevation.gridded.rasterizer.ColorGradientGriddedElevationModelRasterizer;

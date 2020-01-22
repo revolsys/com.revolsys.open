@@ -10,7 +10,6 @@ import java.util.function.Predicate;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerRenderer;

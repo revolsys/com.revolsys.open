@@ -21,9 +21,8 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.listener.EventQueueRunnableListener;
 import com.revolsys.swing.listener.WeakFocusListener;
 
-import systems.uom.common.USCustomary;
-import tec.uom.se.quantity.Quantities;
-import tec.uom.se.unit.Units;
+import tech.units.indriya.quantity.Quantities;
+import tech.units.indriya.unit.Units;
 
 public class LengthMeasureTextField extends ValueField implements ItemListener {
 
@@ -35,8 +34,8 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
     UNITS.put(CustomUnits.PIXEL, "Pixel");
     UNITS.put(Units.METRE, "Metre");
     UNITS.put(CustomUnits.KILOMETRE, "Kilometre");
-    UNITS.put(USCustomary.FOOT, "Foot");
-    UNITS.put(USCustomary.MILE, "Mile");
+    UNITS.put(CustomUnits.FOOT, "Foot");
+    UNITS.put(CustomUnits.MILE, "Mile");
   }
 
   private Number number;

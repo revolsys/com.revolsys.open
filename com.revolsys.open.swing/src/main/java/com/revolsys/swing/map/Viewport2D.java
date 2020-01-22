@@ -28,7 +28,7 @@ import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
 
-import tec.uom.se.unit.Units;
+import tech.units.indriya.unit.Units;
 
 public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChangeSupportProxy {
 

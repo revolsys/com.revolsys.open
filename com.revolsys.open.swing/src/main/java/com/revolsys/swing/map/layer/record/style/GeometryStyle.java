@@ -22,7 +22,7 @@ import com.revolsys.geometry.model.LineJoin;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Property;
 
-import tec.uom.se.quantity.Quantities;
+import tech.units.indriya.quantity.Quantities;
 
 public class GeometryStyle extends MarkerStyle {
 

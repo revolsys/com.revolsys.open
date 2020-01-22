@@ -6,7 +6,6 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.Icons;

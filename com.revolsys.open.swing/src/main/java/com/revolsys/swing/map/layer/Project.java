@@ -23,7 +23,6 @@ import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Integers;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.connection.file.FolderConnectionRegistry;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;

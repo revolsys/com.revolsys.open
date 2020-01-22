@@ -10,7 +10,6 @@ import javax.swing.Icon;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.impl.PointDoubleXYOrientation;

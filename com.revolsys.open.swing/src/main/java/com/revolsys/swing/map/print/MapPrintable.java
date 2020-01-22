@@ -20,8 +20,7 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.QuantityType;
 
-import systems.uom.common.USCustomary;
-import tec.uom.se.quantity.Quantities;
+import tech.units.indriya.quantity.Quantities;
 
 public class MapPrintable implements Printable {
   private final BoundingBox boundingBox;
@@ -37,7 +36,7 @@ public class MapPrintable implements Printable {
   private final Project map;
 
   private double millimetre = QuantityType
-    .doubleValue(Quantities.getQuantity(1, CustomUnits.MILLIMETRE), USCustomary.INCH.divide(72));
+    .doubleValue(Quantities.getQuantity(1, CustomUnits.MILLIMETRE), CustomUnits.INCH.divide(72));
 
   private double minorDivisions = 200;
 
@@ -58,7 +57,7 @@ public class MapPrintable implements Printable {
     this.dpi = dpi;
     this.rulerSizePixels = rulerSizePixels;
     this.millimetre = QuantityType.doubleValue(Quantities.getQuantity(1, CustomUnits.MILLIMETRE),
-      USCustomary.INCH.divide(dpi));
+      CustomUnits.INCH.divide(dpi));
     this.minorDivisions = minorDivisions;
     this.majorDivisions = minorDivisions * 5;
     this.scale = scale;

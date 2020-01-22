@@ -29,8 +29,8 @@ import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.testapi.GeometryAssert;
 import com.revolsys.util.QuantityType;
 
-import tec.uom.se.quantity.Quantities;
-import tec.uom.se.unit.Units;
+import tech.units.indriya.quantity.Quantities;
+import tech.units.indriya.unit.Units;
 
 // TODO
 //clipToCoordinateSystem()

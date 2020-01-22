@@ -7,7 +7,6 @@ import java.util.Map;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.io.format.json.JsonObject;

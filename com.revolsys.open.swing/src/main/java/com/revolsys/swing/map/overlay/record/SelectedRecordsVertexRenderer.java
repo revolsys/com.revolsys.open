@@ -16,7 +16,7 @@ import com.revolsys.swing.map.layer.record.style.marker.GeometryMarker;
 import com.revolsys.swing.map.layer.record.style.marker.MarkerRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
 
-import tec.uom.se.quantity.Quantities;
+import tech.units.indriya.quantity.Quantities;
 
 public class SelectedRecordsVertexRenderer {
 

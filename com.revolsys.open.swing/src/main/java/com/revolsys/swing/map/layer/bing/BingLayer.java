@@ -4,7 +4,6 @@ import java.util.Map;
 
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.parallel.ExecutorServiceFactory;

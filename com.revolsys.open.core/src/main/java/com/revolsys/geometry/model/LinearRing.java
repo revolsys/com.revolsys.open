@@ -49,7 +49,7 @@ import com.revolsys.geometry.model.prep.PreparedLinearRing;
 import com.revolsys.geometry.model.vertex.LinearRingVertex;
 import com.revolsys.util.QuantityType;
 
-import tec.uom.se.quantity.Quantities;
+import tech.units.indriya.quantity.Quantities;
 
 /**
  * Models an OGC SFS <code>LinearRing</code>.

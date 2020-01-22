@@ -85,8 +85,8 @@ import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 import com.revolsys.util.QuantityType;
 
-import tec.uom.se.quantity.Quantities;
-import tec.uom.se.unit.Units;
+import tech.units.indriya.quantity.Quantities;
+import tech.units.indriya.unit.Units;
 
 /**
  * Models an OGC-style <code>LineString</code>. A LineString consists of a

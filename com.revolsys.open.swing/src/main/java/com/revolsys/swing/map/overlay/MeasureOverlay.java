@@ -50,8 +50,8 @@ import com.revolsys.swing.map.overlay.record.SelectedRecordsVertexRenderer;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 
-import tec.uom.se.quantity.Quantities;
-import tec.uom.se.unit.Units;
+import tech.units.indriya.quantity.Quantities;
+import tech.units.indriya.unit.Units;
 
 public class MeasureOverlay extends AbstractOverlay {
 

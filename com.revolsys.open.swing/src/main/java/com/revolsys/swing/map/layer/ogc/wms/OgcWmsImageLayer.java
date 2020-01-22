@@ -9,7 +9,6 @@ import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.exception.WrappedException;
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.wms.WmsClient;

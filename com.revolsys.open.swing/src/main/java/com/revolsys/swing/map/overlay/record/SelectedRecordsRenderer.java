@@ -15,8 +15,8 @@ import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.util.Property;
 
-import tec.uom.se.ComparableQuantity;
-import tec.uom.se.quantity.Quantities;
+import tech.units.indriya.ComparableQuantity;
+import tech.units.indriya.quantity.Quantities;
 
 public class SelectedRecordsRenderer {
 

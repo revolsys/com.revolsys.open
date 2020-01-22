@@ -3,7 +3,6 @@ package com.revolsys.swing.map.layer.tile;
 import java.util.Arrays;
 import java.util.List;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.BaseMapLayer;

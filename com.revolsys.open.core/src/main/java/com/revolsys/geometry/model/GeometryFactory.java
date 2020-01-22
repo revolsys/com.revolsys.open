@@ -111,7 +111,7 @@ import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
-import tec.uom.se.unit.Units;
+import tech.units.indriya.unit.Units;
 
 /**
  * Supplies a set of utility methods for building Geometry objects from lists

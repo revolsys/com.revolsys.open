@@ -27,7 +27,7 @@ import com.revolsys.swing.map.layer.record.style.TextStyle;
 import com.revolsys.swing.map.view.TextStyleViewRenderer;
 import com.revolsys.util.Property;
 
-import tec.uom.se.quantity.Quantities;
+import tech.units.indriya.quantity.Quantities;
 
 public class Graphics2DTextStyleRenderer extends TextStyleViewRenderer {
 

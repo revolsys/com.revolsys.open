@@ -65,7 +65,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0-M2</version>
+        <version>3.0.0-M3</version>
         <executions>
           <execution>
             <id>enforce-maven</id>
@@ -94,7 +94,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
+        <version>3.8.1</version>
         <configuration>
           <release>11</release>
           <debug>true</debug>
@@ -107,7 +107,7 @@
       <plugin>
         <groupId>pl.project13.maven</groupId>
         <artifactId>git-commit-id-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>4.0.0</version>
         <executions>
           <execution>
             <id>get-the-git-infos</id>
@@ -125,7 +125,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.1.2</version>
+        <version>3.2.0</version>
         <configuration>
           <archive>
             <manifestEntries>
@@ -143,7 +143,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.1</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -178,7 +178,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <version>3.2.2</version>
+        <version>3.2.3</version>
         <configuration>
           <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
@@ -229,7 +229,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M3</version>
+        <version>3.0.0-M4</version>
         <configuration>
           <argLine>
             --illegal-access=permit
@@ -348,7 +348,7 @@
       <dependency>
         <groupId>org.docx4j</groupId>
         <artifactId>docx4j-JAXB-MOXy</artifactId>
-        <version>8.1.1</version>
+        <version>8.1.4</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -509,7 +509,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.12</version>
+        <version>4.13</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -547,13 +547,13 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <org.apache.log4j.version>2.12.0</org.apache.log4j.version>
+    <org.apache.log4j.version>2.13.0</org.apache.log4j.version>
     <org.gdal.version>2.4.0</org.gdal.version>
     <org.jeometry.version>TRUNK-SNAPSHOT</org.jeometry.version>
-    <org.slf4j.version>1.7.26</org.slf4j.version>
-    <org.springframework.version>5.1.6.RELEASE</org.springframework.version>
-    <org.springframework.security.version>5.1.5.RELEASE</org.springframework.security.version>
-    <org.apache.xmlgraphics.batik.version>1.11</org.apache.xmlgraphics.batik.version>
+    <org.slf4j.version>1.7.30</org.slf4j.version>
+    <org.springframework.version>5.2.3.RELEASE</org.springframework.version>
+    <org.springframework.security.version>5.2.1.RELEASE</org.springframework.security.version>
+    <org.apache.xmlgraphics.batik.version>1.12</org.apache.xmlgraphics.batik.version>
     <gpg.skip>true</gpg.skip>
     <github.global.server>github</github.global.server>
     <gitHubUser>revolsys</gitHubUser>

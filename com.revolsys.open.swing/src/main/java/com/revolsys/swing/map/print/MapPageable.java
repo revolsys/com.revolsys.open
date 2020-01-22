@@ -14,9 +14,8 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.util.QuantityType;
 
-import systems.uom.common.USCustomary;
-import tec.uom.se.quantity.Quantities;
-import tec.uom.se.unit.Units;
+import tech.units.indriya.quantity.Quantities;
+import tech.units.indriya.unit.Units;
 
 public class MapPageable implements Pageable {
   private final Rectangle2D.Double contentRect;
@@ -56,7 +55,7 @@ public class MapPageable implements Pageable {
     this.scale = scale;
     this.dpi = dpi;
     this.modelGridSizeMetres = gridSizeMetres;
-    final Unit<Length> pixelSize = USCustomary.INCH.divide(dpi);
+    final Unit<Length> pixelSize = CustomUnits.INCH.divide(dpi);
 
     this.mapBoundingBox = boundingBox;
 

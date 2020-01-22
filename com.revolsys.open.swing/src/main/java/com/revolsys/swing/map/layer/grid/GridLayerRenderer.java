@@ -16,7 +16,6 @@ import javax.swing.ImageIcon;
 import org.jeometry.common.awt.WebColors;
 import org.jeometry.coordinatesystem.model.unit.CustomUnits;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapTile;
@@ -30,7 +29,7 @@ import com.revolsys.swing.map.view.TextStyleViewRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
 
-import tec.uom.se.quantity.Quantities;
+import tech.units.indriya.quantity.Quantities;
 
 public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
 

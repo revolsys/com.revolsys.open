@@ -29,7 +29,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.util.Property;
 
-import tec.uom.se.quantity.Quantities;
+import tech.units.indriya.quantity.Quantities;
 
 public class MapRulerBorder extends AbstractBorder {
 

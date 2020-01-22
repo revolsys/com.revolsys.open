@@ -8,7 +8,6 @@ import java.util.Map;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
 import com.revolsys.elevation.gridded.scaledint.ScaledIntegerGriddedDigitalElevation;
