@@ -80,8 +80,12 @@ public class Column implements QueryValue {
   @Override
   @SuppressWarnings("unchecked")
   public <V> V getValue(final Record record) {
-    final String name = getName();
-    return (V)record.getValue(name);
+    if (record == null) {
+      return null;
+    } else {
+      final String name = getName();
+      return (V)record.getValue(name);
+    }
   }
 
   @Override

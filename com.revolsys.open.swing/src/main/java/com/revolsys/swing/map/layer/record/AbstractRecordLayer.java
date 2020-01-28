@@ -509,6 +509,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   private String where;
 
+  private Map<String, Condition> deleteRecordsBlockFilterByFieldName;
+
   protected AbstractRecordLayer(final String type) {
     super(type);
     setReadOnly(false);
@@ -536,6 +538,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final Map<String, Object> parameters = new HashMap<>();
       parameters.put(geometryFieldName, geometry);
       showAddForm(parameters);
+    }
+  }
+
+  public void addDeleteRecordsBlockFilterByFieldName(final String fieldName, final String filter) {
+    if (this.recordDefinition.hasField(fieldName)) {
+      final String conditionSql = fieldName + " " + filter;
+      final Condition condition = QueryValue.parseWhere(this.recordDefinition, conditionSql);
+      final Map<String, Condition> conditionsByFieldName = getDeleteRecordsBlockFilterByFieldName();
+      conditionsByFieldName.put(fieldName, condition);
     }
   }
 
@@ -751,17 +762,18 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected <LR extends LayerRecord> boolean confirmDeleteRecords(final String suffix,
     final Collection<LR> records, final Consumer<Collection<LR>> deleteAction) {
-    final Collection<String> blockNotEqualFieldNames = getProperty(
-      "mergeRecordsBlockNotEqualFieldNames");
-    if (blockNotEqualFieldNames != null) {
+
+    final Map<String, Condition> confiditionsByFieldName = getDeleteRecordsBlockFilterByFieldName();
+    if (!confiditionsByFieldName.isEmpty()) {
       List<LR> blockedRecords = null;
       List<LR> otherRecords = null;
       int i = 0;
       for (final LR record : records) {
         boolean blocked = false;
         if (checkBlockDeleteRecord(record)) {
-          for (final String fieldName : blockNotEqualFieldNames) {
-            if (record.hasValue(fieldName)) {
+          for (final String fieldName : confiditionsByFieldName.keySet()) {
+            final boolean fieldBlocked = isDeletedRecordFieldBlocked(record, fieldName);
+            if (fieldBlocked) {
               blocked = true;
               if (blockedRecords == null) {
                 blockedRecords = new ArrayList<>();
@@ -1079,6 +1091,28 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     } else {
       final Class<?> typeClass = field.getTypeClass();
       return CompareUtil.getComparator(typeClass);
+    }
+  }
+
+  public Set<String> getDeleteRecordsBlockFieldNames() {
+    final Map<String, Condition> conditionsByFieldName = getDeleteRecordsBlockFilterByFieldName();
+    return conditionsByFieldName.keySet();
+  }
+
+  public Map<String, Condition> getDeleteRecordsBlockFilterByFieldName() {
+    synchronized (getSync()) {
+
+      if (this.deleteRecordsBlockFilterByFieldName == null) {
+        this.deleteRecordsBlockFilterByFieldName = new LinkedHashMap<>();
+        final Map<String, String> filterByFieldName = getProperty("deleteRecordsBlockFieldFilters");
+        if (filterByFieldName != null) {
+          for (final String fieldName : filterByFieldName.keySet()) {
+            final String filter = filterByFieldName.get(fieldName);
+            addDeleteRecordsBlockFilterByFieldName(fieldName, filter);
+          }
+        }
+      }
+      return this.deleteRecordsBlockFilterByFieldName;
     }
   }
 
@@ -2003,6 +2037,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public boolean isDeleted(final LayerRecord record) {
     return internalIsDeleted(record);
+  }
+
+  public <LR extends LayerRecord> boolean isDeletedRecordFieldBlocked(final Record record,
+    final String fieldName) {
+    final Map<String, Condition> conditionsByFieldName = getDeleteRecordsBlockFilterByFieldName();
+    final Condition condition = conditionsByFieldName.get(fieldName);
+    final boolean fieldBlocked = condition.test(record);
+    return fieldBlocked;
   }
 
   public boolean isFieldEditable(final String fieldName) {

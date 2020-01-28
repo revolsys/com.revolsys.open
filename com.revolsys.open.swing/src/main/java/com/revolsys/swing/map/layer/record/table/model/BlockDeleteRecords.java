@@ -32,14 +32,13 @@ public class BlockDeleteRecords {
     final List<LR> blockedRecords, final List<LR> otherRecords,
     final Consumer<Collection<LR>> deleteAction) {
     Invoke.later(() -> {
-      @SuppressWarnings("unchecked")
-      final List<String> blockNotEqualFieldNames = Lists
-        .toArray((Collection<String>)layer.getProperty("mergeRecordsBlockNotEqualFieldNames"));
+      final List<String> deleteRecordsBlockFieldNames = Lists
+        .toArray(layer.getDeleteRecordsBlockFieldNames());
 
-      final List<String> fieldNames = Lists.toArray(blockNotEqualFieldNames);
+      final List<String> fieldNames = Lists.toArray(deleteRecordsBlockFieldNames);
 
       for (final String fieldName : layer.getFieldNames()) {
-        if (!blockNotEqualFieldNames.contains(fieldName)) {
+        if (!deleteRecordsBlockFieldNames.contains(fieldName)) {
           fieldNames.add(fieldName);
         }
 
@@ -48,7 +47,7 @@ public class BlockDeleteRecords {
         blockedRecords, fieldNames);
 
       final List<Integer> blockedFieldIndexes = new ArrayList<>();
-      for (final String fieldName : blockNotEqualFieldNames) {
+      for (final String fieldName : deleteRecordsBlockFieldNames) {
         final int fieldIndex = fieldNames.indexOf(fieldName);
         blockedFieldIndexes.add(fieldIndex);
       }
@@ -60,10 +59,10 @@ public class BlockDeleteRecords {
       table.resizeColumnsToContent();
 
       table.addColorHighlighter((row, col) -> {
-        if (col < blockNotEqualFieldNames.size()) {
-          final String fieldName = blockNotEqualFieldNames.get(col);
+        if (col < deleteRecordsBlockFieldNames.size()) {
+          final String fieldName = deleteRecordsBlockFieldNames.get(col);
           final LayerRecord record = blockedRecords.get(row);
-          return record.hasValue(fieldName);
+          return layer.isDeletedRecordFieldBlocked(record, fieldName);
 
         }
         return false;
@@ -71,8 +70,8 @@ public class BlockDeleteRecords {
 
       final TablePanel tablePanel = new TablePanel(table);
 
-      String message = "<p><b style=\"color:red\">The following records cannot be deleted because they have values in the fields highlighted in red.</b></p>"
-        + "<p>Edit those records to remove the values from those fields if you are sure you want to delete them.</p>";
+      String message = "<p><b style=\"color:red\">The following records cannot be deleted. Blocked field values are shown in red.</b></p>"
+        + "<p>Edit those records to change those fields (e.g. clear value, or set to No) if you are sure you want to delete them.</p>";
       final int otherCount = otherRecords.size();
       if (otherCount > 0) {
         message = message + "<p style=\"color:red\">There are " + otherCount
