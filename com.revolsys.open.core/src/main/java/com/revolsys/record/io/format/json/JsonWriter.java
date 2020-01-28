@@ -112,6 +112,11 @@ public final class JsonWriter implements BaseCloseable {
     }
   }
 
+  public void labelValue(final String key, final Object value) {
+    label(key);
+    value(value);
+  }
+
   public void list(final Object... values) throws IOException {
     startList();
     final int size = values.length;
