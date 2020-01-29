@@ -3,7 +3,6 @@ package com.revolsys.record.io.format.geojson;
 import java.io.BufferedWriter;
 import java.io.Writer;
 
-import org.jeometry.common.math.Angle;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
 import com.revolsys.geometry.model.ClockDirection;
@@ -17,11 +16,9 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.geometry.util.Points;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.IoConstants;
 import com.revolsys.record.Record;
-import com.revolsys.record.io.format.cogojson.CogoJson;
 import com.revolsys.record.io.format.json.JsonWriter;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -29,8 +26,6 @@ import com.revolsys.record.schema.RecordDefinition;
 public class GeoJsonRecordWriter extends AbstractRecordWriter {
 
   private static final GeometryFactory WGS84 = GeometryFactory.wgs84();
-
-  private final boolean cogo;
 
   boolean initialized = false;
 
@@ -47,14 +42,13 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
 
   private GeometryFactory geometryFactory;
 
-  public GeoJsonRecordWriter(final Writer out, final boolean cogo) {
+  public GeoJsonRecordWriter(final Writer out) {
     this.out = new JsonWriter(new BufferedWriter(out));
     this.out.setIndent(true);
-    this.cogo = cogo;
   }
 
   public GeoJsonRecordWriter(final Writer out, final RecordDefinition recordDefinition) {
-    this(out, false);
+    this(out);
     this.recordDefinition = recordDefinition;
     if (recordDefinition != null) {
       this.geometryFactory = recordDefinition.getGeometryFactory();
@@ -99,16 +93,8 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
         this.out.endAttribute();
         this.out.indent();
       }
-      double x = line.getX(i);
-      double y = line.getY(i);
-
-      if (this.cogo && i > 0) {
-        final double currentX = x;
-        final double previousX = line.getX(i - 1);
-        final double previousY = line.getY(i - 1);
-        x = Points.distance(previousX, previousY, currentX, y);
-        y = Angle.angleNorthDegrees(previousX, previousY, currentX, y);
-      }
+      final double x = line.getX(i);
+      final double y = line.getY(i);
 
       this.out.print('[');
       this.out.value(x);
@@ -215,16 +201,8 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     return this.allowCustomCoordinateSystem;
   }
 
-  public boolean isCogo() {
-    return this.cogo;
-  }
-
   private void line(final LineString line) {
-    if (this.cogo) {
-      type(CogoJson.COGO_LINE_STRING);
-    } else {
-      type(GeoJson.LINE_STRING);
-    }
+    type(GeoJson.LINE_STRING);
     this.out.endAttribute();
     this.out.label(GeoJson.COORDINATES);
     if (line.isEmpty()) {
@@ -236,11 +214,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
   }
 
   private void multiLineString(final Lineal lineal) {
-    if (this.cogo) {
-      type(CogoJson.COGO_LINE_STRING);
-    } else {
-      type(GeoJson.MULTI_LINE_STRING);
-    }
+    type(GeoJson.MULTI_LINE_STRING);
 
     this.out.endAttribute();
     this.out.label(GeoJson.COORDINATES);
@@ -280,11 +254,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
   }
 
   private void multiPolygon(final Polygonal polygonal) {
-    if (this.cogo) {
-      type(CogoJson.COGO_MULTI_POLYGON);
-    } else {
-      type(GeoJson.MULTI_POLYGON);
-    }
+    type(GeoJson.MULTI_POLYGON);
 
     this.out.endAttribute();
     this.out.label(GeoJson.COORDINATES);
@@ -316,11 +286,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
   }
 
   private void polygon(final Polygon polygon) {
-    if (this.cogo) {
-      type(CogoJson.COGO_POLYGON);
-    } else {
-      type(GeoJson.POLYGON);
-    }
+    type(GeoJson.POLYGON);
 
     this.out.endAttribute();
     this.out.label(GeoJson.COORDINATES);

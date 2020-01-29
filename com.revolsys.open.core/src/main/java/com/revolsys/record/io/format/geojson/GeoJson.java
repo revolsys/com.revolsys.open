@@ -4,9 +4,13 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
+
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryReader;
@@ -14,7 +18,6 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.record.io.GeometryRecordReaderFactory;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
-import com.revolsys.record.io.format.cogojson.CogoJson;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
@@ -58,10 +61,11 @@ public class GeoJson extends GeometryRecordReaderFactory implements RecordWriter
 
   public static final String URN_OGC_DEF_CRS_EPSG = "urn:ogc:def:crs:EPSG::";
 
-  public static final Set<String> GEOMETRY_TYPE_NAMES = new LinkedHashSet<>(
-    Arrays.asList(POINT, LINE_STRING, POLYGON, MULTI_POINT, MULTI_LINE_STRING, MULTI_POLYGON,
-      GEOMETRY_COLLECTION, CogoJson.COGO_LINE_STRING, CogoJson.COGO_MULTI_LINE_STRING,
-      CogoJson.COGO_POLYGON, CogoJson.COGO_MULTI_POLYGON));
+  public static final Set<CoordinateSystem> COORDINATE_SYSTEMS = Collections
+    .singleton(EpsgCoordinateSystems.wgs84());
+
+  public static final Set<String> GEOMETRY_TYPE_NAMES = new LinkedHashSet<>(Arrays.asList(POINT,
+    LINE_STRING, POLYGON, MULTI_POINT, MULTI_LINE_STRING, MULTI_POLYGON, GEOMETRY_COLLECTION));
 
   public static final Set<String> OBJECT_TYPE_NAMES = new TreeSet<>(
     Arrays.asList(FEATURE, FEATURE_COLLECTION, POINT, LINE_STRING, POLYGON, MULTI_POINT,
@@ -71,6 +75,11 @@ public class GeoJson extends GeometryRecordReaderFactory implements RecordWriter
     super("GeoJSON");
     addMediaTypeAndFileExtension("application/vnd.geo+json", "geojson");
     addMediaType("application/x-geo+json");
+  }
+
+  @Override
+  public Set<CoordinateSystem> getCoordinateSystems() {
+    return COORDINATE_SYSTEMS;
   }
 
   @Override
