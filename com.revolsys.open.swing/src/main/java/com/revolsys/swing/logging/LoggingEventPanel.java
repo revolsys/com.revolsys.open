@@ -1,7 +1,6 @@
 package com.revolsys.swing.logging;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.io.PrintWriter;
@@ -26,6 +25,7 @@ import org.jdesktop.swingx.plaf.basic.core.BasicTransferable;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.swing.Dialogs;
+import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.layout.GroupLayouts;
@@ -177,8 +177,7 @@ public class LoggingEventPanel extends JPanel {
     }));
     buttons.add(RunnableAction.newButton("OK", () -> dialog.setVisible(false)));
     dialog.add(buttons, BorderLayout.SOUTH);
-    dialog.setMaximumSize(new Dimension(1000, 700));
-    dialog.pack();
+    SwingUtil.autoAdjustSize(dialog);
     dialog.setVisible(true);
   }
 }
