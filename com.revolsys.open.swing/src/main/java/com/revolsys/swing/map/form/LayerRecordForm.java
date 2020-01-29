@@ -1185,6 +1185,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
               final Object value = event.getNewValue();
               final RecordDefinition recordDefinition = getRecordDefinition();
               if ("qaMessagesUpdated".equals(propertyName)) {
+                setValues(record, false);
                 updateErrors();
               } else if (recordDefinition.hasField(propertyName)) {
                 setFieldValue(propertyName, value, isFieldValidationEnabled());
@@ -1449,8 +1450,12 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
   }
 
   public final void setValues(final Map<String, Object> values) {
+    setValues(values, true);
+  }
+
+  public final void setValues(final Map<String, Object> values, final boolean validate) {
     if (values != null) {
-      Invoke.later(() -> {
+      if (SwingUtilities.isEventDispatchThread()) {
         final Set<String> fieldNames = values.keySet();
         try (
           final BaseCloseable c = setFieldValidationEnabled(false)) {
@@ -1463,8 +1468,12 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
             }
           }
         }
-        validateFields(fieldNames);
-      });
+        if (validate) {
+          validateFields(fieldNames);
+        }
+      } else {
+        Invoke.later(() -> setValues(values, validate));
+      }
     }
 
   }

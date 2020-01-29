@@ -880,7 +880,7 @@ public interface SwingUtil {
   }
 
   static void setFieldValue(final JComponent field, final Object value) {
-    Invoke.later(() -> {
+    if (SwingUtilities.isEventDispatchThread()) {
       if (field instanceof Field) {
         final Field fieldObject = (Field)field;
         fieldObject.setFieldValue(value);
@@ -920,7 +920,9 @@ public interface SwingUtil {
         }
         field.revalidate();
       }
-    });
+    } else {
+      Invoke.later(() -> setFieldValue(field, value));
+    }
   }
 
   static void setLocationCentre(final Rectangle bounds, final Window window) {
