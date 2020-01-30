@@ -11,12 +11,13 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.FileUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
 public abstract class AbstractConnection<C extends Connection, R extends ConnectionRegistry<C>>
   extends BaseObjectWithProperties implements Connection {
-  private JsonObject config = new JsonObject();
+  private JsonObject config = new JsonObjectHash();
 
   private String name;
 

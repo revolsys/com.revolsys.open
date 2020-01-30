@@ -33,6 +33,7 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.io.format.html.HtmlWriter;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.HtmlAttr;
 import com.revolsys.util.HtmlElem;
@@ -388,7 +389,7 @@ public class LasPointCloud extends BaseObjectWithProperties
 
   @Override
   public JsonObject toMap() {
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     addToMap(map, "url", this.resource.getUri());
     addToMap(map, "header", this.header);
     return map;

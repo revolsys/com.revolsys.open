@@ -10,6 +10,7 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordDefinition;
@@ -79,7 +80,7 @@ public class RecordDefinitionSqlFilter implements Predicate<Record>, MapSerializ
 
   @Override
   public JsonObject toMap() {
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     addTypeToMap(map, "sqlFilter");
     map.put("query", this.query);
     return map;

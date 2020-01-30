@@ -2,7 +2,6 @@ package com.revolsys.elevation.gridded.rasterizer;
 
 import java.util.Map;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.gradient.GradientLibrary;
 import com.revolsys.elevation.gridded.rasterizer.gradient.LinearGradient;

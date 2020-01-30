@@ -185,7 +185,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
           forEachRecord(query, record -> {
             final Record writeRecord = writer.newRecord();
             if (showCodeValues) {
-              Geometry geometry = record.getGeometry();
+              final Geometry geometry = record.getGeometry();
               writeRecord.setGeometryValue(geometry);
               for (final String fieldName : recordDefinition.getFieldNames()) {
                 final Object value = record.getCodeValue(fieldName);

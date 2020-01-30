@@ -42,6 +42,7 @@ import com.revolsys.core.test.geometry.test.geomop.GeometryOperation;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.util.Property;
 
 import junit.framework.Assert;
@@ -244,7 +245,7 @@ public class GeometryOperationTest extends junit.framework.TestCase implements M
 
   @Override
   public JsonObject toMap() {
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     map.put("type", "test");
     addToMap(map, "description", this.testDescription);
 

@@ -11,11 +11,6 @@ import com.revolsys.record.schema.RecordDefinition;
 
 public class GeometryRecord extends BaseRecord {
 
-  /**
-   *
-   */
-  private static final long serialVersionUID = 1L;
-
   private Geometry geometry;
 
   public GeometryRecord(final RecordDefinition recordDefinition, final Geometry geometry) {

@@ -172,6 +172,12 @@ public abstract class AbstractRecordQueryField extends ValueField
     search();
   }
 
+  private void clear() {
+    setSelectedRecord(null);
+    this.listModel.clear();
+    this.menu.setVisible(false);
+  }
+
   @Override
   public void contentsChanged(final ListDataEvent e) {
     intervalAdded(e);
@@ -508,12 +514,6 @@ public abstract class AbstractRecordQueryField extends ValueField
       this.oldValueItem.setText(originalText);
     }
     return true;
-  }
-
-  private void clear() {
-    setSelectedRecord(null);
-    this.listModel.clear();
-    this.menu.setVisible(false);
   }
 
   public void setMaxResults(final int maxResults) {

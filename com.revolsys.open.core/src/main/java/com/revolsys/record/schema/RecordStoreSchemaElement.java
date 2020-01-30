@@ -15,6 +15,10 @@ public interface RecordStoreSchemaElement extends GeometryFactoryProxy, ObjectWi
     return getPathName().equals(path);
   }
 
+  default boolean equalsRecordStore(final RecordStore recordStore) {
+    return getRecordStore() == recordStore;
+  }
+
   /**
    * Get the path of the object type. Names are described using a path (e.g.
    * /SCHEMA/TABLE).
@@ -34,10 +38,6 @@ public interface RecordStoreSchemaElement extends GeometryFactoryProxy, ObjectWi
     } else {
       return false;
     }
-  }
-
-  default boolean equalsRecordStore(final RecordStore recordStore) {
-    return getRecordStore() == recordStore;
   }
 
 }

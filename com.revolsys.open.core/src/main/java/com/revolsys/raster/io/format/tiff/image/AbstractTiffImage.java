@@ -392,26 +392,6 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
 
   protected abstract BufferedImage newBufferedImage(int imageWidth, int imageHeight);
 
-  private BufferedImage newBufferedImageStrip(final ChannelReader in, final int stripIndex) {
-    if (stripIndex >= 0 && stripIndex < this.stripCount) {
-      final int imageWidth = getImageWidth();
-      final int imageHeight = getImageHeight();
-      final int imageY = stripIndex * this.rowsPerStrip;
-      final int index = stripIndex;
-      int stripHeight = this.rowsPerStrip;
-      if (stripIndex == this.stripCount - 1) {
-        stripHeight = imageHeight - imageY;
-      }
-      final BufferedImage bufferedImage = newBufferedImage(imageWidth, stripHeight);
-      readImagePart(in, bufferedImage, this.stripOffsets, this.stripByteCounts, index, 0, 0,
-        imageWidth, stripHeight, imageWidth);
-      return bufferedImage;
-    } else {
-      throw new IllegalArgumentException(
-        "Strip not found " + stripIndex + " not in 0.." + (this.stripCount - 1));
-    }
-  }
-
   private BufferedImage newBufferedImageStrips(final ChannelReader in) {
     final BufferedImage bufferedImage = newBufferedImage();
     final int imageWidth = getImageWidth();

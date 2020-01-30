@@ -367,11 +367,6 @@ public final class TiffCCITTFaxDecoderStream extends FilterInputStream {
 
   private boolean optionG32D = false;
 
-  @SuppressWarnings("unused") // Leading zeros for aligning EOL
-  private boolean optionG3Fill = false;
-
-  private boolean optionUncompressed = false;
-
   private boolean optionByteAligned = false;
 
   int buffer = -1;
@@ -396,14 +391,11 @@ public final class TiffCCITTFaxDecoderStream extends FilterInputStream {
       case CIIT_GROUP_3_FAX: {
         final long options = directory.getLong(TiffExtensionTag.T4Options);
         this.optionG32D = (options & 0b1) != 0;
-        this.optionUncompressed = (options & 0b010) != 0;
-        this.optionG3Fill = (options & 0b100) != 0;
         this.optionByteAligned = (options & 0b1000) != 0;
       }
       break;
       case CIIT_GROUP_4_FAX: {
         final long options = directory.getLong(TiffExtensionTag.T6Options);
-        this.optionUncompressed = (options & 0b10) != 0;
         this.optionByteAligned = (options & 0b100) != 0;
       }
       break;
@@ -569,13 +561,6 @@ public final class TiffCCITTFaxDecoderStream extends FilterInputStream {
     }
 
     this.decodedLength = (index + 7) / 8;
-  }
-
-  private void decodeRowType2() throws IOException {
-    if (this.optionByteAligned) {
-      resetBuffer();
-    }
-    decode1D();
   }
 
   private void decodeRowType4() throws IOException {

@@ -110,6 +110,11 @@ public class MergeRecordsDialog extends BaseDialog {
         final MultipleUndo multipleUndo = new MultipleUndo();
         multipleUndo.addEdit(new AbstractUndoableEdit() {
 
+          /**
+           *
+           */
+          private static final long serialVersionUID = 1L;
+
           @Override
           protected void undoDo() {
             MergeRecordsDialog.this.layer.fireRecordsChanged();
@@ -124,6 +129,11 @@ public class MergeRecordsDialog extends BaseDialog {
           multipleUndo.addEdit(deleteRecordUndo);
         }
         multipleUndo.addEdit(new AbstractUndoableEdit() {
+          /**
+           *
+           */
+          private static final long serialVersionUID = 1L;
+
           @Override
           protected void redoDo() {
             MergeRecordsDialog.this.layer.fireRecordsChanged();
@@ -253,6 +263,11 @@ public class MergeRecordsDialog extends BaseDialog {
         }
       } //
         .setCellEditor(table -> new RecordLayerTableCellEditor(table, this.layer) {
+          /**
+           *
+           */
+          private static final long serialVersionUID = 1L;
+
           @Override
           protected String getColumnFieldName(final int rowIndex, final int columnIndex) {
             return recordDefinition.getFieldName(rowIndex);

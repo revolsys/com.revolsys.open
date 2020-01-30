@@ -10,6 +10,7 @@ import javax.swing.Icon;
 
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.layer.record.style.panel.BaseStylePanel;
@@ -295,7 +296,7 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   @Override
   public JsonObject toMap() {
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     addTypeToMap(map, this.type);
     addToMap(map, "name", this.name);
     addToMap(map, "visible", this.visible, true);

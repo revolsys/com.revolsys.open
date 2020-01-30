@@ -53,8 +53,7 @@ public class TiffDirectoryEntryDoubleArray extends AbstractTiffDirectoryEntry<do
 
   @Override
   public void writeValueDo(final ChannelWriter out) {
-    for (int i = 0; i < this.value.length; i++) {
-      final double number = this.value[i];
+    for (final double number : this.value) {
       out.putDouble(number);
     }
   }

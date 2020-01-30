@@ -19,6 +19,7 @@ import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.util.Pair;
 
 public class LasZipHeader implements MapSerializer {
@@ -416,7 +417,7 @@ public class LasZipHeader implements MapSerializer {
 
   @Override
   public JsonObject toMap() {
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     addToMap(map, "compressor", this.compressor);
     addToMap(map, "coder", this.coder);
     addToMap(map, "version", this.version);

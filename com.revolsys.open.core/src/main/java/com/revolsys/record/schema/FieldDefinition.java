@@ -24,6 +24,7 @@ import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -749,7 +750,7 @@ public class FieldDefinition extends BaseObjectWithProperties
 
   @Override
   public JsonObject toMap() {
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     addTypeToMap(map, "field");
     map.put("name", getName());
     map.put("title", getTitle());

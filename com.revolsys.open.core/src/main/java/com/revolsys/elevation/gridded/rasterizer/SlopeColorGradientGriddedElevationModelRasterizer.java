@@ -3,7 +3,6 @@ package com.revolsys.elevation.gridded.rasterizer;
 import java.awt.Color;
 import java.util.Map;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.gridded.rasterizer.gradient.LinearGradient;
 import com.revolsys.elevation.gridded.rasterizer.gradient.MultiStopLinearGradient;

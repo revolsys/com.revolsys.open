@@ -351,6 +351,7 @@ public class Query extends BaseObjectWithProperties
     return this.fromClause;
   }
 
+  @Override
   public FieldDefinition getGeometryField() {
     return getRecordDefinition().getGeometryField();
   }

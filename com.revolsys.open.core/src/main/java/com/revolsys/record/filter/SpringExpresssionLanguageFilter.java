@@ -12,6 +12,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 
 public class SpringExpresssionLanguageFilter implements Predicate<Record>, MapSerializer {
   private static SpelParserConfiguration EXPRESSION_CONFIGURATION = new SpelParserConfiguration(
@@ -52,7 +53,7 @@ public class SpringExpresssionLanguageFilter implements Predicate<Record>, MapSe
 
   @Override
   public JsonObject toMap() {
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     addTypeToMap(map, "queryFilter");
     map.put("query", this.query);
     return map;

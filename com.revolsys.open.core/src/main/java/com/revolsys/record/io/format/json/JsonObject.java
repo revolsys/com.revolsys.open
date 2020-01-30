@@ -1,62 +1,50 @@
 package com.revolsys.record.io.format.json;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 
-public class JsonObject extends LinkedHashMapEx {
+public interface JsonObject extends MapEx, JsonType {
 
   public static final JsonObject EMPTY = new JsonObject() {
     @Override
-    public void clear() {
-      throw new UnsupportedOperationException("Read only");
+    public JsonObject clone() {
+      return this;
     }
 
     @Override
-    public Object put(final String key, final Object value) {
-      throw new UnsupportedOperationException("Read only");
+    public Set<Entry<String, Object>> entrySet() {
+      return MapEx.EMPTY.entrySet();
     }
 
     @Override
-    public void putAll(final Map<? extends String, ? extends Object> m) {
-      throw new UnsupportedOperationException("Read only");
+    public boolean equals(final Object object) {
+      if (object instanceof Map<?, ?>) {
+        final Map<?, ?> map = (Map<?, ?>)object;
+        return map.isEmpty();
+      } else {
+        return false;
+      }
     }
 
     @Override
-    public boolean remove(final Object key, final Object value) {
-      throw new UnsupportedOperationException("Read only");
-    }
-
-    @Override
-    public boolean replace(final String key, final Object oldValue, final Object newValue) {
-      throw new UnsupportedOperationException("Read only");
+    public boolean equals(final Object object,
+      final Collection<? extends CharSequence> excludeFieldNames) {
+      return equals(object);
     }
   };
 
   public static JsonObject newItems(final List<?> items) {
-    return new JsonObject("items", items);
-  }
-
-  public JsonObject() {
-    super();
-  }
-
-  public JsonObject(final Map<? extends String, ? extends Object> m) {
-    super(m);
-  }
-
-  public JsonObject(final String key, final Object value) {
-    add(key, value);
+    return new JsonObjectHash("items", items);
   }
 
   @Override
-  public JsonObject clone() {
-    return new JsonObject(this);
+  default JsonObject add(final String key, final Object value) {
+    MapEx.super.add(key, value);
+    return this;
   }
 
-  @Override
-  public String toString() {
-    return Json.toString(this);
-  }
 }

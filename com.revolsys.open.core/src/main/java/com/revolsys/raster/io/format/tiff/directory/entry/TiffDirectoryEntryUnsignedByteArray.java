@@ -48,8 +48,8 @@ public class TiffDirectoryEntryUnsignedByteArray extends AbstractTiffDirectoryEn
 
   @Override
   public void writeValueDo(final ChannelWriter out) {
-    for (int i = 0; i < this.value.length; i++) {
-      final byte number = (byte)this.value[i];
+    for (final short element : this.value) {
+      final byte number = (byte)element;
       out.putByte(number);
     }
   }

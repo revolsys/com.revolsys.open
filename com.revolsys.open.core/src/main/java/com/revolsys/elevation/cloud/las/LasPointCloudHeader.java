@@ -29,6 +29,7 @@ import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.html.HtmlWriter;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Pair;
@@ -531,7 +532,7 @@ public class LasPointCloudHeader
 
   @Override
   public JsonObject toMap() {
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     addToMap(map, "version", this.version);
     addToMap(map, "fileSourceId", this.fileSourceId, 0);
     addToMap(map, "systemIdentifier", this.systemIdentifier);

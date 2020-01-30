@@ -11,6 +11,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
@@ -128,6 +129,6 @@ public interface RectangularMapGrid extends GeometryFactoryProxy, MapSerializer 
 
   @Override
   default JsonObject toMap() {
-    return new JsonObject();
+    return new JsonObjectHash();
   }
 }

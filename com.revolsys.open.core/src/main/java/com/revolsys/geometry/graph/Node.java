@@ -19,6 +19,7 @@ import java.util.function.Predicate;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.graph.attribute.NodeProperties;
+import com.revolsys.geometry.model.End;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -550,15 +551,18 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
             final LineString line = edge.getLineString();
             LineString newLine;
             final int vertexCount = line.getVertexCount();
-            if (edge.getEnd(this).isFrom()) {
+            final End end = edge.getEnd(this);
+            if (end.isFrom()) {
               if (line.equalsVertex(vertexCount - 1, getX(), getY())) {
                 // LOOPS
                 newLine = line.subLine(newNode, 1, vertexCount - 2, newNode);
               } else {
                 newLine = line.subLine(newNode, 1, vertexCount - 1, null);
               }
-            } else {
+            } else if (end.isTo()) {
               newLine = line.subLine(null, 0, vertexCount - 1, newNode);
+            } else {
+              return false;
             }
             this.graph.replaceEdge(edge, newLine);
           }

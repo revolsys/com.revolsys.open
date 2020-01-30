@@ -48,8 +48,7 @@ public class TiffDirectoryEntryFloatArray extends AbstractTiffDirectoryEntry<flo
 
   @Override
   public void writeValueDo(final ChannelWriter out) {
-    for (int i = 0; i < this.value.length; i++) {
-      final float number = this.value[i];
+    for (final float number : this.value) {
       out.putFloat(number);
     }
   }

@@ -374,6 +374,7 @@ public class Edge<T> implements DelegatingLineString, ObjectWithProperties, Exte
    * @param node The node to test the direction from.
    * @return True if the node is at the start of the edge.
    */
+  @Override
   public End getEnd(final Point point) {
     if (Property.hasValue(point)) {
       if (point.equals(getFromNode())) {
@@ -382,7 +383,7 @@ public class Edge<T> implements DelegatingLineString, ObjectWithProperties, Exte
         return End.TO;
       }
     }
-    return null;
+    return End.NONE;
   }
 
   public double getFromAngle() {

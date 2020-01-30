@@ -35,6 +35,7 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.comparator.StringNumberComparator;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
@@ -518,7 +519,7 @@ public class RecordLayerTablePanel extends TablePanel
 
   @Override
   public JsonObject toMap() {
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     addToMap(map, "orderBy", this.tableModel.getOrderBy());
     return map;
   }

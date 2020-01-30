@@ -14,6 +14,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +23,6 @@ import java.util.Map.Entry;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.data.type.FunctionDataType;
-import org.jeometry.common.data.type.ListDataType;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
@@ -57,16 +57,16 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
       if (value instanceof JsonObject) {
         return (JsonObject)value;
       } else if (value instanceof Map) {
-        return new JsonObject((Map)value);
+        return new JsonObjectHash((Map)value);
       } else if (value instanceof String) {
         final JsonObject map = Json.toObjectMap((String)value);
         if (map == null) {
           return null;
         } else {
-          return new JsonObject(map);
+          return new JsonObjectHash(map);
         }
       } else {
-        return value;
+        return JsonParser.read(value);
       }
     }, (value) -> {
       if (value instanceof Map) {
@@ -79,7 +79,53 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
 
     }, FunctionDataType.MAP_EQUALS, FunctionDataType.MAP_EQUALS_EXCLUDES);
 
-  public static DataType JSON_LIST = new ListDataType("JsonList", JsonList.class, DataTypes.OBJECT);
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  public static final DataType JSON_TYPE = new FunctionDataType("JsonType", JsonType.class, true,
+    value -> {
+      if (value instanceof JsonType) {
+        return (JsonType)value;
+      } else if (value instanceof Map) {
+        return new JsonObjectHash((Map)value);
+      } else if (value instanceof List) {
+        return JsonList.array((List)value);
+      } else if (value instanceof String) {
+        final Object read = JsonParser.read((String)value);
+        if (read instanceof JsonType) {
+          return (JsonType)read;
+        } else {
+          return value;
+        }
+      } else {
+        return value;
+      }
+    }, (value) -> Json.toString(value), DataType::equal, DataType::equal);
+
+  public static DataType JSON_LIST = new FunctionDataType("JsonList", JsonList.class, true,
+    (value) -> {
+      if (value instanceof JsonList) {
+        return (JsonList)value;
+      } else if (value instanceof Collection<?>) {
+        return JsonList.array((Collection<?>)value);
+      } else {
+        final Object json = JsonParser.read(value);
+        if (json instanceof JsonList) {
+          return (JsonList)json;
+        } else {
+          return JsonList.array(json);
+        }
+      }
+    }, (value) -> {
+      if (value instanceof List<?>) {
+        return Json.toString(value);
+      } else if (value == null) {
+        return null;
+      } else {
+        return value.toString();
+      }
+
+    }, (o1, o2) -> o1.equals(o2), DataType::equal);
 
   static {
     DataTypes.registerDataTypes(Json.class);
@@ -89,7 +135,7 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
     if (object == null) {
       return null;
     } else {
-      final JsonObject clone = new JsonObject();
+      final JsonObject clone = new JsonObjectHash();
       for (final Entry<String, Object> entry : object.entrySet()) {
         final String key = entry.getKey();
         final Object originalValue = entry.getValue();
@@ -108,7 +154,7 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
       return (V)clone((JsonObject)value);
     } else if (value instanceof Map) {
       final Map<Object, Object> originalMap = (Map<Object, Object>)value;
-      final JsonObject clone = new JsonObject();
+      final JsonObject clone = new JsonObjectHash();
       for (final Entry<Object, Object> entry : originalMap.entrySet()) {
         final String key = entry.getKey().toString();
         final Object originalValue = entry.getValue();
@@ -118,7 +164,7 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
       return (V)clone;
     } else if (value instanceof List) {
       final List<?> list = (List<?>)value;
-      final JsonList clone = new JsonList();
+      final JsonList clone = JsonList.array();
       for (final Object object : list) {
         final Object cloneValue = clone(object);
         clone.add(cloneValue);
@@ -149,14 +195,14 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
 
   public static JsonObject toMap(final File directory, final String path) {
     if (directory == null || path == null) {
-      return new JsonObject();
+      return new JsonObjectHash();
     } else {
       final File file = FileUtil.getFile(directory, path);
       if (file.exists() && !file.isDirectory()) {
         final PathResource resource = new PathResource(file);
         return toMap(resource);
       } else {
-        return new JsonObject();
+        return new JsonObjectHash();
       }
     }
   }
@@ -168,14 +214,14 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
 
   public static JsonObject toMap(final Path directory, final String path) {
     if (directory == null || path == null) {
-      return new JsonObject();
+      return new JsonObjectHash();
     } else {
       final Path file = directory.resolve(path);
       if (Paths.exists(file) && !Files.isDirectory(file)) {
         final PathResource resource = new PathResource(file);
         return toMap(resource);
       } else {
-        return new JsonObject();
+        return new JsonObjectHash();
       }
     }
   }
@@ -199,7 +245,7 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
       final Reader reader = resource.newBufferedReader();
       return toMap(reader);
     }
-    return new JsonObject();
+    return new JsonObjectHash();
   }
 
   public static Map<String, String> toMap(final String string) {
@@ -253,7 +299,7 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
         }
       }
     }
-    return new JsonObject();
+    return new JsonObjectHash();
   }
 
   public static final Record toRecord(final RecordDefinition recordDefinition,

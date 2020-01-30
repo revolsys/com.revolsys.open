@@ -9,6 +9,7 @@ import org.jeometry.common.exception.Exceptions;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 
 class ImgEntry implements MapEx, MapSerializer {
 
@@ -186,7 +187,7 @@ class ImgEntry implements MapEx, MapSerializer {
 
   @Override
   public JsonObject toMap() {
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     map.add("name", this.name);
     map.add("fieldType", this.typeName);
     final MapEx values = getFieldValues();

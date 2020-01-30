@@ -28,7 +28,8 @@ import com.revolsys.raster.io.format.tiff.code.GeoTiffKey;
 import com.revolsys.raster.io.format.tiff.code.GeoTiffKeys;
 import com.revolsys.spring.resource.Resource;
 
-public class TiffCommonsImagingImage extends AbstractGeoreferencedImage implements GeoTiffConstants {
+public class TiffCommonsImagingImage extends AbstractGeoreferencedImage
+  implements GeoTiffConstants {
 
   public static final int TAG_X_RESOLUTION = 282;
 

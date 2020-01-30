@@ -38,7 +38,7 @@ public class TiffDirectory {
 
   private long nextOffset;
 
-  private WeakReference<TiffImage> imageReference = new WeakReference<TiffImage>(null);
+  private WeakReference<TiffImage> imageReference = new WeakReference<>(null);
 
   private final Resource resource;
 

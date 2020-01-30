@@ -14,6 +14,7 @@ import org.jeometry.common.data.type.DataTypes;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.util.Property;
 
 public interface MapSerializer {
@@ -72,7 +73,7 @@ public interface MapSerializer {
   }
 
   default JsonObject newTypeMap(final String type) {
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     addTypeToMap(map, type);
     return map;
   }
@@ -117,7 +118,7 @@ public interface MapSerializer {
         if (mapObject.isEmpty()) {
           return null;
         }
-        final JsonObject map = new JsonObject();
+        final JsonObject map = new JsonObjectHash();
         for (final Entry<String, Object> entry : mapObject.entrySet()) {
           final CharSequence name = entry.getKey();
           final Object object = entry.getValue();

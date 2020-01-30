@@ -15,6 +15,7 @@ import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.ComboBox;
@@ -24,6 +25,11 @@ import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.toolbar.ToolBar;
 
 public class JsonObjectTableField extends ValueField {
+
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
 
   private final JsonObjectTableModel model;
 
@@ -106,7 +112,7 @@ public class JsonObjectTableField extends ValueField {
   private void addRow() {
     JsonObject object = getFieldValue();
     if (object == null) {
-      object = new JsonObject();
+      object = new JsonObjectHash();
     }
     final String name;
     if (this.fieldNames.isEmpty()) {

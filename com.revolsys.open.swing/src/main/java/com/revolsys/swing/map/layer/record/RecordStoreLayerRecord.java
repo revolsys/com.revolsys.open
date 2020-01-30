@@ -9,8 +9,6 @@ import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class RecordStoreLayerRecord extends ArrayLayerRecord {
-  private static final long serialVersionUID = 1L;
-
   public RecordStoreLayerRecord(final RecordStoreLayer layer) {
     super(layer);
   }

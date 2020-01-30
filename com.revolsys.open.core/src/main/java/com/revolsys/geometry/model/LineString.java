@@ -1002,7 +1002,7 @@ public interface LineString extends Lineal {
     } else if (equalsVertex2d(getLastVertexIndex(), point)) {
       return End.TO;
     } else {
-      return null;
+      return End.NONE;
     }
   }
 

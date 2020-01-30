@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.json.JsonObject;
 
 public class GeometryFactoryWithOffsets extends GeometryFactoryFixed {

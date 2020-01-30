@@ -12,6 +12,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.AbstractPoint;
 import com.revolsys.geometry.util.Points;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.util.Property;
 
 public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Serializable {
@@ -234,7 +235,7 @@ public abstract class BaseLasPoint extends AbstractPoint implements LasPoint, Se
 
   @Override
   public JsonObject toMap() {
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     addToMap(map, "x", getX());
     addToMap(map, "y", getY());
     addToMap(map, "z", getZ());

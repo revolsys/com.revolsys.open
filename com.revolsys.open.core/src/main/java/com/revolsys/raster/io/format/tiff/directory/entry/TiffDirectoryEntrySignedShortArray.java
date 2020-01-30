@@ -48,8 +48,7 @@ public class TiffDirectoryEntrySignedShortArray extends AbstractTiffDirectoryEnt
 
   @Override
   public void writeValueDo(final ChannelWriter out) {
-    for (int i = 0; i < this.value.length; i++) {
-      final short number = this.value[i];
+    for (final short number : this.value) {
       out.putShort(number);
     }
   }

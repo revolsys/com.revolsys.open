@@ -41,8 +41,6 @@ public class MapPointerElevation extends JLabel implements MouseMotionListener {
 
   private int lastY = -1;
 
-  private Thread thread;
-
   public MapPointerElevation(final MapPanel map) {
     this.project = map.getProject();
     this.viewport = map.getViewport();
@@ -94,7 +92,6 @@ public class MapPointerElevation extends JLabel implements MouseMotionListener {
     }, "map-get-elevation");
     thread.setDaemon(true);
     thread.start();
-    this.thread = thread;
   }
 
   private List<ElevationModelLayer> getLayers() {

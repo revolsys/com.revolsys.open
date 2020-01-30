@@ -323,6 +323,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return Q.equalId(idFieldNames, identifier);
   }
 
+  @Override
   public FieldDefinition getGeometryField() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition == null) {

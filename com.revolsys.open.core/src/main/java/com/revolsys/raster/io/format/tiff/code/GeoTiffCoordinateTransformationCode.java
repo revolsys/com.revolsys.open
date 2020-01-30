@@ -43,7 +43,8 @@ public enum GeoTiffCoordinateTransformationCode {
   private static Map<String, GeoTiffCoordinateTransformationCode> valueByName = new HashMap<>();
 
   static {
-    for (final GeoTiffCoordinateTransformationCode value : GeoTiffCoordinateTransformationCode.values()) {
+    for (final GeoTiffCoordinateTransformationCode value : GeoTiffCoordinateTransformationCode
+      .values()) {
       final int code = value.getCode();
       valueByCode.put(code, value);
       final String projectionName = value.getProjectionName();

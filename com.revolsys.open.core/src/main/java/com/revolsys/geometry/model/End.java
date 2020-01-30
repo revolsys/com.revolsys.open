@@ -6,9 +6,9 @@ import com.revolsys.collection.list.Lists;
 import com.revolsys.util.CaseConverter;
 
 public enum End {
-  FROM, TO;
+  FROM, TO, NONE;
 
-  public static List<End> VALUES = Lists.newArray(FROM, TO);
+  public static List<End> VALUES = Lists.newArray(FROM, TO, NONE);
 
   public static End getFrom(final Direction direction) {
     if (direction == null) {
@@ -22,6 +22,10 @@ public enum End {
 
   public static boolean isFrom(final End end) {
     return end == FROM;
+  }
+
+  public static boolean isNone(final End end) {
+    return end == NONE;
   }
 
   public static boolean isTo(final End end) {
@@ -41,7 +45,8 @@ public enum End {
   private final String title;
 
   private End() {
-    this.title = CaseConverter.captialize(name());
+    final String name = name();
+    this.title = CaseConverter.captialize(name);
   }
 
   public String getTitle() {
@@ -52,11 +57,19 @@ public enum End {
     return this == FROM;
   }
 
+  public boolean isNone() {
+    return this == NONE;
+  }
+
   public boolean isOpposite(final End end) {
-    if (end == null) {
-      return false;
-    } else {
-      return isFrom() != end.isFrom();
+    switch (this) {
+      case FROM:
+        return end == TO;
+      case TO:
+        return end == FROM;
+
+      default:
+        return false;
     }
   }
 
@@ -65,10 +78,14 @@ public enum End {
   }
 
   public End opposite() {
-    if (isFrom()) {
-      return TO;
-    } else {
-      return FROM;
+    switch (this) {
+      case FROM:
+        return TO;
+      case TO:
+        return FROM;
+
+      default:
+        return NONE;
     }
   }
 }

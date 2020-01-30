@@ -56,17 +56,21 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  public static <V> V read(final InputStream in) {
-    return (V)read(FileUtil.newUtf8Reader(in));
-  }
-
-  @SuppressWarnings("unchecked")
-  public static <V> V read(final Object source) {
+  public static JsonParser newParser(final Object source) {
+    Runnable closeAction = null;
     Reader reader;
     if (source instanceof Clob) {
       try {
-        reader = ((Clob)source).getCharacterStream();
+        final Clob clob = (Clob)source;
+        reader = clob.getCharacterStream();
+
+        closeAction = () -> {
+          try {
+            clob.free();
+          } catch (final SQLException e) {
+            throw new RuntimeException("Unable to free clob resources", e);
+          }
+        };
       } catch (final SQLException e) {
         throw new RuntimeException("Unable to read clob", e);
       }
@@ -82,18 +86,37 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
         reader = new StringReader(source.toString());
       }
     }
-    try {
-      final V value = (V)read(reader);
-      return value;
-    } finally {
-      if (source instanceof Clob) {
-        try {
-          final Clob clob = (Clob)source;
-          clob.free();
-        } catch (final SQLException e) {
-          throw new RuntimeException("Unable to free clob resources", e);
+    final JsonParser parser = new JsonParser(reader);
+    parser.closeAction = closeAction;
+    return parser;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <V> V read(final InputStream in) {
+    return (V)read(FileUtil.newUtf8Reader(in));
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <V> V read(final JsonParser parser) {
+    if (parser.hasNext()) {
+      final EventType event = parser.next();
+      if (event == EventType.startDocument) {
+        final V value = (V)parser.getValue();
+        if (parser.hasNext() && parser.next() != EventType.endDocument) {
+          throw new IllegalStateException("Extra content at end of file: " + parser);
         }
+        return value;
       }
+    }
+    return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <V> V read(final Object source) {
+    try (
+      final JsonParser parser = newParser(source)) {
+      final V value = (V)read(parser);
+      return value;
     }
   }
 
@@ -134,6 +157,8 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
 
   private final Reader reader;
 
+  private Runnable closeAction;
+
   public JsonParser(final InputStream in) {
     this(FileUtil.newUtf8Reader(in));
   }
@@ -154,12 +179,15 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   @Override
   public void close() {
     FileUtil.closeSilent(this.reader);
+    if (this.closeAction != null) {
+      this.closeAction.run();
+    }
   }
 
-  public List<Object> getArray() {
+  public JsonList getArray() {
     if (getEvent() == EventType.startArray || hasNext() && next() == EventType.startArray) {
       EventType event = getEvent();
-      final List<Object> list = new ArrayList<>();
+      final JsonList list = JsonList.array();
       do {
         final Object value = getValue();
         if (value instanceof EventType) {
@@ -258,7 +286,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   public JsonObject getMap() {
     if (getEvent() == EventType.startObject || hasNext() && next() == EventType.startObject) {
       EventType event = getEvent();
-      final JsonObject map = new JsonObject();
+      final JsonObject map = new JsonObjectHash();
       do {
         if (hasNext() && next() == EventType.string) {
           final String key = getStringIntern();

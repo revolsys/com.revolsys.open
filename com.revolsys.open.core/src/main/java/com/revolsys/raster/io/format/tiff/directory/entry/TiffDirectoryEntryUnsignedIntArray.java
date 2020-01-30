@@ -65,8 +65,8 @@ public class TiffDirectoryEntryUnsignedIntArray extends AbstractTiffDirectoryEnt
 
   @Override
   public void writeValueDo(final ChannelWriter out) {
-    for (int i = 0; i < this.value.length; i++) {
-      final int number = (int)this.value[i];
+    for (final long element : this.value) {
+      final int number = (int)element;
       out.putInt(number);
     }
   }

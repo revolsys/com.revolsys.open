@@ -10,8 +10,6 @@ import com.revolsys.record.schema.RecordDefinitionImpl;
 public class FixedValueRecord extends BaseRecord {
   private static final RecordDefinition RECORD_DEFINITION = new RecordDefinitionImpl();
 
-  private static final long serialVersionUID = 1L;
-
   private final Object value;
 
   public FixedValueRecord(final Object value) {

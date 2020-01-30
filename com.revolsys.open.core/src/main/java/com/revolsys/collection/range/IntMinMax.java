@@ -116,6 +116,7 @@ public class IntMinMax extends IntRange implements Cloneable, Emptyable {
     }
   }
 
+  @Override
   public boolean contains(final int number) {
     return number >= getMin() && number <= getMax();
   }

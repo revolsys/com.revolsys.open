@@ -24,6 +24,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.swing.map.layer.record.style.marker.AbstractMarker;
 import com.revolsys.swing.map.layer.record.style.marker.GeometryMarker;
@@ -585,7 +586,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
   @Override
   public JsonObject toMap() {
     final boolean geometryStyle = this instanceof GeometryStyle;
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     for (final String name : PROPERTY_NAMES) {
       if (geometryStyle || name.startsWith("marker")) {
         final Object value = Property.get(this, name);

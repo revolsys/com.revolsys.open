@@ -2,15 +2,18 @@ package com.revolsys.collection.map;
 
 import java.sql.Clob;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypedValue;
 import org.jeometry.common.data.type.DataTypes;
 
-public interface MapEx extends MapDefault<String, Object>, Cloneable {
+public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedValue {
   static final MapEx EMPTY = new MapEx() {
     @Override
     public MapEx clone() {
@@ -52,6 +55,25 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable {
   }
 
   MapEx clone();
+
+  @SuppressWarnings("unchecked")
+  default boolean equals(final Object object2,
+    final Collection<? extends CharSequence> excludeFieldNames) {
+    final Map<Object, Object> map2 = (Map<Object, Object>)object2;
+    final Set<Object> keys = new TreeSet<>();
+    keys.addAll(keySet());
+    keys.addAll(map2.keySet());
+    keys.removeAll(excludeFieldNames);
+
+    for (final Object key : keys) {
+      final Object value1 = get(key);
+      final Object value2 = map2.get(key);
+      if (!DataType.equal(value1, value2, excludeFieldNames)) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   default Boolean getBoolean(final CharSequence name) {
     return getValue(name, DataTypes.BOOLEAN);

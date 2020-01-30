@@ -178,6 +178,14 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
     });
   }
 
+  public BaseTableCellEditor getCellEditor(final int columnIndex) {
+    return null;
+  }
+
+  public BaseTableCellEditor getCellEditor(final int rowIndex, final int columnIndex) {
+    return null;
+  }
+
   public JComponent getEditorField(final int rowIndex, final int columnIndex, final Object value) {
     final Class<?> clazz = getColumnClass(columnIndex);
     return SwingUtil.newField(clazz, "field", value);
@@ -210,14 +218,6 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
 
   public BaseJTable getTable() {
     return this.table;
-  }
-
-  public BaseTableCellEditor getCellEditor(final int columnIndex) {
-    return null;
-  }
-
-  public BaseTableCellEditor getCellEditor(final int rowIndex, final int columnIndex) {
-    return null;
   }
 
   public UndoManager getUndoManager() {

@@ -53,8 +53,7 @@ public class TiffDirectoryEntrySignedLongArray extends AbstractTiffDirectoryEntr
 
   @Override
   public void writeValueDo(final ChannelWriter out) {
-    for (int i = 0; i < this.value.length; i++) {
-      final long number = this.value[i];
+    for (final long number : this.value) {
       out.putLong(number);
     }
   }

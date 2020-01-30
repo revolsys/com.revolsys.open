@@ -38,9 +38,9 @@ public class TiffYCbCrImage extends AbstractTiffImage {
   }
 
   @Override
-  protected void readImagePartDo(final BufferedImage bufferedImage, final TiffDecompressor decompressor,
-    final int imageX, final int imageY, final int dataWidth, final int dataHeight,
-    final int cropWidth) {
+  protected void readImagePartDo(final BufferedImage bufferedImage,
+    final TiffDecompressor decompressor, final int imageX, final int imageY, final int dataWidth,
+    final int dataHeight, final int cropWidth) {
     try {
       final double lumaRed = this.yCbCrCoefficients[0];
       final double lumaGreen = this.yCbCrCoefficients[1];

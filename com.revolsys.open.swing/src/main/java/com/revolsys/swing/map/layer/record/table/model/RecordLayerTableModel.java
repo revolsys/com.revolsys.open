@@ -207,6 +207,20 @@ public class RecordLayerTableModel extends RecordRowTableModel
     }
   }
 
+  @Override
+  public BaseTableCellEditor getCellEditor(final int columnIndex) {
+    final String fieldName = getColumnFieldName(columnIndex);
+    if (fieldName != null) {
+      final AbstractRecordLayer layer = getLayer();
+      final RecordLayerTable table = getTable();
+      final BaseTableCellEditor editor = layer.newTableCellEditor(table, fieldName);
+      if (editor != null) {
+        return editor;
+      }
+    }
+    return null;
+  }
+
   public List<TableRecordsMode> getFieldFilterModes() {
     return Lists.toArray(this.tableRecordsModeByKey.values());
   }
@@ -328,20 +342,6 @@ public class RecordLayerTableModel extends RecordRowTableModel
   @Override
   public RecordLayerTable getTable() {
     return (RecordLayerTable)super.getTable();
-  }
-
-  @Override
-  public BaseTableCellEditor getCellEditor(final int columnIndex) {
-    final String fieldName = getColumnFieldName(columnIndex);
-    if (fieldName != null) {
-      final AbstractRecordLayer layer = getLayer();
-      final RecordLayerTable table = getTable();
-      final BaseTableCellEditor editor = layer.newTableCellEditor(table, fieldName);
-      if (editor != null) {
-        return editor;
-      }
-    }
-    return null;
   }
 
   public TableRecordsMode getTableRecordsMode() {

@@ -33,7 +33,7 @@ public class TiffJpegImage extends AbstractTiffImage {
 
   private ImageReadParam JPEGParam;
 
-  private Reference<BufferedImage> partImageReference = new WeakReference<BufferedImage>(null);
+  private Reference<BufferedImage> partImageReference = new WeakReference<>(null);
 
   private int jpegTablesLength;
 

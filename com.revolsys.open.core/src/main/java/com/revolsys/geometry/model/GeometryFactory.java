@@ -107,6 +107,7 @@ import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.record.io.format.wkt.WktParser;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
@@ -2607,7 +2608,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
 
   @Override
   public JsonObject toMap() {
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     addTypeToMap(map, "geometryFactory");
     map.put("srid", getCoordinateSystemId());
     map.put("axisCount", this.axisCount);

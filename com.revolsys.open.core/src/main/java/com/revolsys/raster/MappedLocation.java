@@ -13,6 +13,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 
 public class MappedLocation extends AbstractPropertyChangeSupportProxy
   implements GeometryFactoryProxy, MapSerializer {
@@ -189,7 +190,7 @@ public class MappedLocation extends AbstractPropertyChangeSupportProxy
 
   @Override
   public JsonObject toMap() {
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     map.put("sourceX", this.sourcePixel.getX());
     map.put("sourceY", this.sourcePixel.getY());
     map.put("target", this.targetPoint.toEwkt());

@@ -7,11 +7,11 @@ public final class EndAndSide {
 
   public static final EndAndSide FROM_RIGHT = new EndAndSide(End.FROM, Side.RIGHT);
 
-  public static final EndAndSide LEFT = new EndAndSide(null, Side.LEFT);
+  public static final EndAndSide LEFT = new EndAndSide(End.FROM, Side.LEFT);
 
-  public static final EndAndSide NONE = new EndAndSide(null, null);
+  public static final EndAndSide NONE = new EndAndSide(End.FROM, null);
 
-  public static final EndAndSide RIGHT = new EndAndSide(null, Side.RIGHT);
+  public static final EndAndSide RIGHT = new EndAndSide(End.FROM, Side.RIGHT);
 
   public static final EndAndSide TO = new EndAndSide(End.FROM, null);
 

@@ -145,6 +145,7 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
     }
   }
 
+  @Override
   FieldDefinition getGeometryField();
 
   /**

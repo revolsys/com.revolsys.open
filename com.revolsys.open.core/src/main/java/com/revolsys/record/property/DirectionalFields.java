@@ -484,7 +484,7 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
 
     final End end1 = line1.getEnd(point);
     final End end2 = line2.getEnd(point);
-    if (end1 != null && end2 != null) {
+    if (end1 != End.NONE && end2 != End.NONE) {
       return new End[] {
         end1, end2
       };

@@ -6,6 +6,7 @@ import org.jeometry.common.logging.Logs;
 
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.AbstractLayerRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
@@ -49,6 +50,6 @@ public class ViewFunctionImageLayerRenderer<L extends AbstractLayer>
 
   @Override
   public JsonObject toMap() {
-    return new JsonObject();
+    return new JsonObjectHash();
   }
 }

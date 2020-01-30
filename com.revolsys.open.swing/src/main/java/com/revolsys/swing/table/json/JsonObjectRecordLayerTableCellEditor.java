@@ -24,6 +24,11 @@ import com.revolsys.swing.table.editor.BaseTableCellEditor;
 import com.revolsys.swing.toolbar.ToolBar;
 
 public class JsonObjectRecordLayerTableCellEditor extends BaseTableCellEditor {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final JDialog dialog;
 
   private final JsonObjectTableField field;

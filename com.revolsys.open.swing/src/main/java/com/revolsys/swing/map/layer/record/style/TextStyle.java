@@ -33,6 +33,7 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.util.Property;
@@ -559,7 +560,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
 
   @Override
   public JsonObject toMap() {
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     for (final String name : PROPERTY_NAMES) {
       Object value = Property.get(this, name);
       if (value instanceof Color) {

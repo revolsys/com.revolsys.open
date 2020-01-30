@@ -8,7 +8,6 @@ import java.util.function.Consumer;
 import org.jeometry.common.function.BiConsumerDouble;
 import org.jeometry.common.number.Doubles;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;

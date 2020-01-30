@@ -7,6 +7,7 @@ import java.util.Map;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 
 public class InvokeConstructorMapObjectFactory extends AbstractMapObjectFactory
   implements MapSerializer {
@@ -41,7 +42,7 @@ public class InvokeConstructorMapObjectFactory extends AbstractMapObjectFactory
 
   @Override
   public JsonObject toMap() {
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     map.put("typeName", getTypeName());
     map.put("description", getDescription());
     map.put("typeClass", this.typeClass);

@@ -53,8 +53,7 @@ public class TiffDirectoryEntrySignedByteArray extends AbstractTiffDirectoryEntr
 
   @Override
   public void writeValueDo(final ChannelWriter out) {
-    for (int i = 0; i < this.value.length; i++) {
-      final byte number = this.value[i];
+    for (final byte number : this.value) {
       out.putByte(number);
     }
   }

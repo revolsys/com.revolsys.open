@@ -36,6 +36,7 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.record.io.format.xml.DomUtil;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
@@ -575,7 +576,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
 
   @Override
   public JsonObject toMap() {
-    final JsonObject map = new JsonObject();
+    final JsonObject map = new JsonObjectHash();
     addTypeToMap(map, "bufferedImage");
     final BoundingBox boundingBox = getBoundingBox();
     if (boundingBox != null) {

@@ -23,6 +23,11 @@ import com.revolsys.swing.table.editor.BaseTableCellEditor;
 
 public class JsonObjectTableModel extends AbstractTableModel implements PropertyChangeSupportProxy {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private static final String[] COLUMN_NAMES = {
     "#", "Name", "Value"
   };

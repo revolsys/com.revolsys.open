@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.jeometry.common.awt.WebColors;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.io.format.json.JsonObject;
