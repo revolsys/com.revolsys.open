@@ -12,6 +12,8 @@ import java.util.NoSuchElementException;
 import javax.annotation.PreDestroy;
 
 import org.jeometry.common.io.PathName;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.UncategorizedSQLException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.io.FileUtil;
@@ -146,8 +148,25 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
         throw new NoSuchElementException();
       }
     } catch (final SQLException e) {
+      final boolean cancelled = this.query.isCancelled();
+      DataAccessException e2;
+      if (cancelled) {
+        e2 = null;
+      } else {
+        final JdbcConnection connection = this.connection;
+        final String sql = getErrorMessage();
+        if (connection == null) {
+          e2 = new UncategorizedSQLException("Get Next", sql, e);
+        } else {
+          e2 = connection.getException("Get Next", sql, e);
+        }
+      }
       close();
-      throw new RuntimeException(getErrorMessage(), e);
+      if (cancelled) {
+        throw new NoSuchElementException();
+      } else {
+        throw e2;
+      }
     } catch (final RuntimeException e) {
       close();
       throw e;
