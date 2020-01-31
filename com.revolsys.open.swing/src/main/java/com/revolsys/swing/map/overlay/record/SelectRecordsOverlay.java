@@ -554,9 +554,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   private void unSelectRecords(final LayerGroup group, final BoundingBox boundingBox) {
 
     final double scale = getViewportScale();
-    final List<Layer> layers = group.getLayers();
-    Collections.reverse(layers);
-    for (final Layer layer : layers) {
+   group.forEachReverse((layer)-> {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
         unSelectRecords(childGroup, boundingBox);
@@ -566,6 +564,6 @@ public class SelectRecordsOverlay extends AbstractOverlay {
           recordLayer.unSelectRecords(boundingBox);
         }
       }
-    }
+    });
   }
 }

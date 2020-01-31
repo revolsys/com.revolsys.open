@@ -2,9 +2,7 @@ package com.revolsys.record.query;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
-import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.record.Record;
@@ -74,14 +72,7 @@ public class In extends AbstractBinaryQueryValue implements Condition {
     final Object value = left.getValue(record);
 
     final CollectionValue right = getValues();
-    final List<Object> allowedValues = right.getValues();
-
-    for (final Object allowedValue : allowedValues) {
-      if (DataType.equal(value, allowedValue)) {
-        return true;
-      }
-    }
-    return false;
+    return right.containsValue(value);
   }
 
   @Override

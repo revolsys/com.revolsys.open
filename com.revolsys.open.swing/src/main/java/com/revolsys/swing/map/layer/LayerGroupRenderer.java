@@ -1,9 +1,5 @@
 package com.revolsys.swing.map.layer;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.map.view.ViewRenderer;
 
@@ -16,14 +12,11 @@ public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
   public void render(final ViewRenderer view, final LayerGroup layer) {
     final double scaleForVisible = view.getScaleForVisible();
     if (layer.isVisible(scaleForVisible)) {
-      final List<Layer> layers = new ArrayList<>(layer.getLayers());
-      Collections.reverse(layers);
-
-      for (final Layer childLayer : view.cancellable(layers)) {
+      layer.forEachReverse(view, (childLayer) -> {
         if (childLayer.isVisible(scaleForVisible)) {
           view.renderLayer(childLayer);
         }
-      }
+      });
     }
   }
 

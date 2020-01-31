@@ -225,9 +225,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   private void addRecords(final List<LayerRecord> results, final LayerGroup group,
     final Geometry boundingBox) {
     final double scale = getViewportScale();
-    final List<Layer> layers = group.getLayers();
-    Collections.reverse(layers);
-    for (final Layer layer : layers) {
+    group.forEachReverse((layer) -> {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
         addRecords(results, childGroup, boundingBox);
@@ -242,7 +240,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
           });
         }
       }
-    }
+    });
   }
 
   protected boolean addSnapLayers(final Set<AbstractRecordLayer> layers, final Project project,

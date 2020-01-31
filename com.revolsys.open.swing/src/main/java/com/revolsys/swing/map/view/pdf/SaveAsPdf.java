@@ -2,8 +2,6 @@ package com.revolsys.swing.map.view.pdf;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSDictionary;
@@ -80,12 +78,11 @@ public class SaveAsPdf {
     if (layer.isVisible(scaleForVisible)) {
       if (layer instanceof LayerGroup) {
         final LayerGroup layerGroup = (LayerGroup)layer;
-        final List<Layer> layers = new ArrayList<>(layerGroup.getLayers());
 
-        for (final Layer childLayer : layers) {
+        layerGroup.forEach((childLayer) -> {
           addOptionalContentGroups(view, scaleForVisible, optionalContentProperties, childLayer,
             basemap);
-        }
+        });
       } else {
         for (final Layer layerToAdd : layer.getPathList()) {
           if (layerToAdd instanceof Project) {

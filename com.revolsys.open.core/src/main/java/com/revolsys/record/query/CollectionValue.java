@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
@@ -13,7 +14,6 @@ import com.revolsys.jdbc.field.JdbcFieldDefinitions;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Strings;
 
@@ -21,6 +21,8 @@ public class CollectionValue extends AbstractMultiQueryValue {
   private FieldDefinition field;
 
   private JdbcFieldDefinition jdbcField;
+
+  private CodeTable codeTable;
 
   public CollectionValue(final Collection<? extends Object> values) {
     this(null, values);
@@ -94,6 +96,29 @@ public class CollectionValue extends AbstractMultiQueryValue {
     return clone;
   }
 
+  public boolean containsValue(final Object valueTest) {
+    final CodeTable codeTable = this.codeTable;
+    for (final QueryValue queryValue : getQueryValues()) {
+      Object value;
+      if (queryValue instanceof Value) {
+        final Value valueWrapper = (Value)queryValue;
+        value = valueWrapper.getValue();
+      } else {
+        value = queryValue;
+      }
+      if (value != null) {
+        if (codeTable != null) {
+          value = codeTable.getIdentifier(value);
+        }
+        value = Value.getValue(value);
+        if (DataType.equal(valueTest, value)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   @Override
   public boolean equals(final Object obj) {
     if (obj instanceof CollectionValue) {
@@ -120,12 +145,7 @@ public class CollectionValue extends AbstractMultiQueryValue {
   }
 
   public List<Object> getValues() {
-    CodeTable codeTable = null;
-    if (this.field != null) {
-      final RecordDefinition recordDefinition = this.field.getRecordDefinition();
-      final String fieldName = this.field.getName();
-      codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
-    }
+    final CodeTable codeTable = this.codeTable;
     final List<Object> values = new ArrayList<>();
     for (final QueryValue queryValue : getQueryValues()) {
       Object value;
@@ -152,6 +172,7 @@ public class CollectionValue extends AbstractMultiQueryValue {
     if (field == null) {
       this.jdbcField = null;
     } else {
+      this.codeTable = this.field.getCodeTable();
       if (field instanceof JdbcFieldDefinition) {
         this.jdbcField = (JdbcFieldDefinition)field;
       } else {

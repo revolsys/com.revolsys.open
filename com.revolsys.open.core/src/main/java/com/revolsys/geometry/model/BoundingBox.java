@@ -79,6 +79,13 @@ public interface BoundingBox
   }
 
   static BoundingBox bboxNew(final GeometryFactoryProxy geometryFactory,
+    final BoundingBoxProxy... boundingBoxes) {
+    return new BoundingBoxEditor(geometryFactory) //
+      .addAllBbox(boundingBoxes) //
+      .newBoundingBox();
+  }
+
+  static BoundingBox bboxNew(final GeometryFactoryProxy geometryFactory,
     final Iterable<? extends BoundingBoxProxy> boundingBoxes) {
     return new BoundingBoxEditor(geometryFactory) //
       .addAllBbox(boundingBoxes) //

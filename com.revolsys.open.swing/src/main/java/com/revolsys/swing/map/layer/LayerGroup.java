@@ -115,9 +115,13 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     });
   }
 
+  private static final Layer[] EMPTY_LAYER_ARRAY = new Layer[0];
+
+  private static final List<Layer> EMPTY_LAYER_LIST = Collections.emptyList();
+
   private static Layer getLayer(LayerGroup group, final String name) {
     for (final String path : PathUtil.getPathElements(PathUtil.getPath(name))) {
-      final Layer layer = getLayerByName(group, path);
+      final Layer layer = group.getLayerByName(path);
       if (layer instanceof LayerGroup) {
         group = (LayerGroup)layer;
       } else {
@@ -128,17 +132,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     if (group != null) {
       final String layerName = PathUtil.getName(name);
 
-      return getLayerByName(group, layerName);
-    }
-    return null;
-  }
-
-  private static Layer getLayerByName(final LayerGroup group, final String layerName) {
-    for (final Layer layer : group.getLayers()) {
-      if (layer.getName().equals(layerName)) {
-
-        return layer;
-      }
+      return group.getLayerByName(layerName);
     }
     return null;
   }
@@ -154,7 +148,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   private boolean deleted = false;
 
-  private List<Layer> layers = new ArrayList<>();
+  private Layer[] layers = EMPTY_LAYER_ARRAY;
 
   public LayerGroup() {
     this(null);
@@ -333,7 +327,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   protected int addLayerDo(final int index, final Layer layer) {
-    if (layer != null && !this.layers.contains(layer)) {
+    if (layer != null && !containsLayer(layer)) {
       final String name = layer.getName();
       String newName = name;
       int i = 1;
@@ -343,12 +337,17 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       }
       layer.setName(newName);
       int addIndex = index;
-      if (index >= 0 && index < this.layers.size()) {
-        this.layers.add(index, layer);
+      final Layer[] oldLayers = this.layers;
+      this.layers = new Layer[oldLayers.length + 1];
+      if (index >= 0 && index < oldLayers.length) {
+        System.arraycopy(oldLayers, 0, this.layers, 0, index);
+        System.arraycopy(oldLayers, index, this.layers, index + 1, oldLayers.length - index);
       } else {
-        addIndex = this.layers.size();
-        this.layers.add(layer);
+        addIndex = oldLayers.length;
+        System.arraycopy(oldLayers, 0, this.layers, 0, oldLayers.length);
       }
+      this.layers[addIndex] = layer;
+
       layer.setLayerGroup(this);
       initialize(layer);
       return addIndex;
@@ -442,33 +441,69 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   public void clear() {
-    for (final Layer layer : new ArrayList<>(this.layers)) {
-      layer.delete();
+    final Layer[] layers = this.layers;
+    this.layers = EMPTY_LAYER_ARRAY;
+    for (final Layer layer : layers) {
+      try {
+        layer.delete();
+      } catch (final Throwable e) {
+      }
+      layer.setLayerGroup(null);
+      Property.removeListener(layer, this);
     }
-    this.layers = new ArrayList<>();
 
   }
 
   public boolean containsLayer(final Layer layer) {
-    return this.layers.contains(layer);
+    for (final Layer layer1 : this.layers) {
+      if (layer1 == layer) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
   public void delete() {
     this.deleted = true;
     synchronized (this.layers) {
-      for (final Iterator<Layer> iterator = this.layers.iterator(); iterator.hasNext();) {
-        final Layer layer = iterator.next();
-        iterator.remove();
-        try {
-          layer.delete();
-        } catch (final Throwable e) {
-        }
-        layer.setLayerGroup(null);
-        Property.removeListener(layer, this);
-      }
+      clear();
       super.delete();
-      this.layers.clear();
+    }
+  }
+
+  public void forEach(final Cancellable cancellable, final Consumer<? super Layer> action) {
+    if (cancellable.isCancelled()) {
+      return;
+    }
+    for (final Layer layer : this.layers) {
+      action.accept(layer);
+    }
+  }
+
+  @Override
+  public void forEach(final Consumer<? super Layer> action) {
+    for (final Layer layer : this.layers) {
+      action.accept(layer);
+    }
+  }
+
+  public void forEachReverse(final Cancellable cancellable, final Consumer<? super Layer> action) {
+    final Layer[] layers = this.layers;
+    for (int i = layers.length - 1; i >= 0; i--) {
+      if (cancellable.isCancelled()) {
+        return;
+      }
+      final Layer layer = layers[i];
+      action.accept(layer);
+    }
+  }
+
+  public void forEachReverse(final Consumer<? super Layer> action) {
+    final Layer[] layers = this.layers;
+    for (int i = layers.length - 1; i >= 0; i--) {
+      final Layer layer = layers[i];
+      action.accept(layer);
     }
   }
 
@@ -538,8 +573,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   @SuppressWarnings("unchecked")
   public <V extends Layer> V getLayer(final int i) {
-    if (i < this.layers.size()) {
-      return (V)this.layers.get(i);
+    if (i < this.layers.length) {
+      return (V)this.layers[i];
     } else {
       return null;
     }
@@ -552,6 +587,16 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   @SuppressWarnings("unchecked")
   public <V extends Layer> V getLayer(final String name) {
     return (V)getLayer(this, name);
+  }
+
+  public Layer getLayerByName(final String layerName) {
+    for (final Layer layer : this.layers) {
+      if (layer.getName().equals(layerName)) {
+
+        return layer;
+      }
+    }
+    return null;
   }
 
   public Layer getLayerByPath(final List<String> path) {
@@ -577,7 +622,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   public int getLayerCount() {
-    return this.layers.size();
+    return this.layers.length;
   }
 
   public List<LayerGroup> getLayerGroups() {
@@ -592,7 +637,11 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   public List<Layer> getLayers() {
-    return new ArrayList<>(this.layers);
+    if (this.layers.length == 0) {
+      return EMPTY_LAYER_LIST;
+    } else {
+      return Arrays.asList(this.layers);
+    }
   }
 
   public <V extends Layer> List<V> getLayers(final Class<V> layerClass) {
@@ -708,7 +757,13 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   public int indexOf(final Layer layer) {
-    return this.layers.indexOf(layer);
+    final Layer[] layers = this.layers;
+    for (int i = 0; i < layers.length; i++) {
+      if (layers[i] == layer) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   public void initialize(final Layer layer) {
@@ -743,7 +798,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   public boolean isEmpty() {
-    return this.layers.isEmpty();
+    return this.layers.length == 0;
   }
 
   @Override
@@ -991,27 +1046,37 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   public Layer removeLayer(final int index) {
-    synchronized (this.layers) {
-      final Layer layer = this.layers.remove(index);
-      fireIndexedPropertyChange("layers", index, layer, null);
-      Property.removeListener(layer, this);
-      if (layer.getLayerGroup() == this) {
-        layer.setLayerGroup(null);
+    final Layer[] layers = this.layers;
+    synchronized (layers) {
+      if (index >= 0 && index < layers.length) {
+        final Layer layer = layers[index];
+        final Layer[] newLayers = new Layer[layers.length - 1];
+        System.arraycopy(layers, 0, newLayers, 0, index);
+        System.arraycopy(layers, index + 1, newLayers, index, layers.length - index - 1);
+        this.layers = newLayers;
+        fireIndexedPropertyChange("layers", index, layer, null);
+        Property.removeListener(layer, this);
+        if (layer.getLayerGroup() == this) {
+          layer.setLayerGroup(null);
+        }
+        return layer;
       }
-      return layer;
     }
+    return null;
   }
 
   public boolean removeLayer(final Object o) {
-    synchronized (this.layers) {
-      final int index = this.layers.indexOf(o);
-      if (index < 0) {
-        return false;
-      } else {
-        removeLayer(index);
-        return true;
+    if (o instanceof Layer) {
+      final Layer layer = (Layer)o;
+      synchronized (this.layers) {
+        final int index = indexOf(layer);
+        if (index > 0) {
+          removeLayer(index);
+          return true;
+        }
       }
     }
+    return false;
   }
 
   public Layer removeLayer(final String layerName) {
@@ -1083,8 +1148,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   public void setLayers(final List<Layer> layers) {
     final Object oldValue;
     synchronized (this.layers) {
-      oldValue = new ArrayList<>(this.layers);
-      this.layers.clear();
+      oldValue = getLayers();
+      this.layers = EMPTY_LAYER_ARRAY;
       int index = 0;
       for (final Object layer : layers) {
         if (layer instanceof Layer) {
@@ -1092,7 +1157,8 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
         }
       }
     }
-    firePropertyChange("layer", oldValue, layers);
+    final Object newValue = getLayers();
+    firePropertyChange("layer", oldValue, newValue);
   }
 
   public void setSingleLayerVisible(final boolean singleLayerVisible) {
@@ -1101,7 +1167,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   public void sort() {
     synchronized (this.layers) {
-      Collections.sort(this.layers);
+      Arrays.sort(this.layers);
     }
   }
 
@@ -1116,8 +1182,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     map.put("singleLayerVisible", isSingleLayerVisible());
 
     final List<String> layerFiles = new ArrayList<>();
-    final List<Layer> layers = getLayers();
-    for (final Layer layer : layers) {
+    forEach((layer) -> {
       final String layerName = layer.getName();
       String layerFileName = FileUtil.getSafeFileName(layerName);
       if (layer instanceof LayerGroup) {
@@ -1125,8 +1190,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
         layerFileName += ".rgobject";
       }
       layerFiles.add(layerFileName);
-
-    }
+    });
     addToMap(map, "layers", layerFiles);
     return map;
   }
@@ -1134,10 +1198,10 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   @SuppressWarnings("unchecked")
   public <L extends Layer> void walkLayers(final Cancellable cancellable, final Class<L> layerClass,
     final Consumer<L> action) {
-    for (int i = 0; i < this.layers.size() && !cancellable.isCancelled(); i++) {
+    for (int i = 0; i < this.layers.length && !cancellable.isCancelled(); i++) {
       Layer layer;
       try {
-        layer = this.layers.get(i);
+        layer = this.layers[i];
       } catch (final ArrayIndexOutOfBoundsException e) {
         return;
       }
@@ -1151,10 +1215,10 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   public void walkLayers(final Cancellable cancellable, final Consumer<Layer> action) {
-    for (int i = 0; i < this.layers.size() && !cancellable.isCancelled(); i++) {
+    for (int i = 0; i < this.layers.length && !cancellable.isCancelled(); i++) {
       Layer layer;
       try {
-        layer = this.layers.get(i);
+        layer = this.layers[i];
       } catch (final ArrayIndexOutOfBoundsException e) {
         return;
       }
