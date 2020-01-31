@@ -200,6 +200,10 @@ public class Invoke {
     }
   }
 
+  public static void laterQueue(final Runnable runnable) {
+    SwingUtilities.invokeLater(runnable);
+  }
+
   public static <V> boolean swingThread(final Consumer<V> action, final V arg) {
     if (SwingUtilities.isEventDispatchThread()) {
       return true;

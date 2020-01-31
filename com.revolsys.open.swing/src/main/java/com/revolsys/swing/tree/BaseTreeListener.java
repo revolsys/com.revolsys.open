@@ -138,7 +138,7 @@ public class BaseTreeListener
         final OpenStateTreeNode openState = (OpenStateTreeNode)child;
         if (openState.isOpen()) {
           final TreePath childTreePath = treePath.pathByAddingChild(child);
-          Invoke.background("", () -> this.tree.setExpandedState(childTreePath, true));
+          Invoke.laterQueue(() -> this.tree.setExpandedState(childTreePath, true));
         }
       }
     }

@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.swing.DropMode;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.DefaultTreeSelectionModel;
@@ -101,6 +102,22 @@ public class BaseTree extends JTree implements ObjectWithProperties {
     }
   }
 
+  public void expandOpenNode(final BaseTreeNode node) {
+    if (node.isOpen()) {
+      expandPath(node.getTreePath());
+      if (node.isAllowsChildren()) {
+        for (final BaseTreeNode child : node.getChildren()) {
+          expandOpenNode(child);
+        }
+      }
+    }
+  }
+
+  public void expandOpenNodes() {
+    final BaseTreeNode root = this.getRootNode();
+    expandOpenNode(root);
+  }
+
   public void expandPath(final List<?> items) {
     final TreePath path = getTreePath(items);
     expandPath(path);
@@ -173,7 +190,7 @@ public class BaseTree extends JTree implements ObjectWithProperties {
 
   @Override
   protected void setExpandedState(final TreePath path, final boolean state) {
-    Invoke.later(() -> {
+    if (SwingUtilities.isEventDispatchThread()) {
       super.setExpandedState(path, state);
       if (isExpanded(path) == state) {
         final Object node = path.getLastPathComponent();
@@ -196,7 +213,9 @@ public class BaseTree extends JTree implements ObjectWithProperties {
           }
         }
       }
-    });
+    } else {
+      Invoke.later(() -> setExpandedState(path, state));
+    }
   }
 
   public void setMenuEnabled(final boolean menuEnabled) {

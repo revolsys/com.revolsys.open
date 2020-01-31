@@ -262,9 +262,11 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   @Override
   public void setOpen(final boolean open) {
-    final boolean oldValue = this.open;
-    this.open = open;
-    firePropertyChange("open", oldValue, this.open);
+    if (this.open != open) {
+      final boolean oldValue = this.open;
+      this.open = open;
+      firePropertyChange("open", oldValue, this.open);
+    }
   }
 
   @SuppressWarnings("unchecked")

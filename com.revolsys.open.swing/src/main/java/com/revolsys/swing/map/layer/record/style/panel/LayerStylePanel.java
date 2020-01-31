@@ -102,7 +102,7 @@ public class LayerStylePanel extends ValueField implements PropertyChangeListene
         Property.addListener(newRenderer, this);
         final LayerRendererTreeNode newNode = new LayerRendererTreeNode(newRenderer);
         this.rootNode.addNode(newNode);
-        this.tree.expandAllNodes();
+        this.tree.expandOpenNodes();
 
         this.rootRenderer = newRenderer;
         // setVisible(newRenderer,true);
@@ -110,7 +110,7 @@ public class LayerStylePanel extends ValueField implements PropertyChangeListene
         setSelectedRenderer(newRenderer);
       }
     } else if ("renderers".equals(propertyName)) {
-      this.tree.expandAllNodes();
+      this.tree.expandOpenNodes();
     }
   }
 

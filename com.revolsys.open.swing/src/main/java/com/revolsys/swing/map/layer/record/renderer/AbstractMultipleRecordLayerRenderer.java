@@ -132,13 +132,15 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(layer, parent);
     newRenderer.setProperties(style);
     newRenderer.setRenderers(JavaBeanUtil.clone(renderers));
-    final String name = getName();
+    String name = getName();
     if (name.equals("Multiple Style")) {
-      newRenderer.setName("Filter Style");
+      name = "Filter Style";
     } else if (name.equals("Scale Style")) {
-      newRenderer.setName("Filter Style");
+      name = "Filter Style";
     }
     replace(layer, parent, newRenderer);
+    // Avoid having a 1 added to the name
+    newRenderer.setName(name);
     return newRenderer;
   }
 
@@ -152,13 +154,15 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     newRenderer.setProperties(style);
 
     newRenderer.setRenderers(JavaBeanUtil.clone(renderers));
-    final String name = getName();
+    String name = getName();
     if (name.equals("Filter Style")) {
-      newRenderer.setName("Multiple Style");
+      name = "Multiple Style";
     } else if (name.equals("Scale Style")) {
-      newRenderer.setName("Multiple Style");
+      name = "Multiple Style";
     }
     replace(layer, parent, newRenderer);
+    // Avoid having a 1 added to the name
+    newRenderer.setName(name);
     return newRenderer;
   }
 
@@ -171,13 +175,15 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(layer, parent);
     newRenderer.setProperties(style);
     newRenderer.setRenderers(JavaBeanUtil.clone(renderers));
-    final String name = getName();
+    String name = getName();
     if (name.equals("Filter Style")) {
-      newRenderer.setName("Scale Style");
+      name = "Scale Style";
     } else if (name.equals("Multiple Style")) {
-      newRenderer.setName("Scale Style");
+      name = "Scale Style";
     }
     replace(layer, parent, newRenderer);
+    // Avoid having a 1 added to the name
+    newRenderer.setName(name);
     return newRenderer;
   }
 
