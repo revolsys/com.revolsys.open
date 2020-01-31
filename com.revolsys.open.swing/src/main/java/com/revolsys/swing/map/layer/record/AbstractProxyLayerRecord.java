@@ -67,7 +67,11 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   @Override
   public <T> T getOriginalValue(final String name) {
     final LayerRecord layerRecord = getRecordProxied();
-    return layerRecord.getOriginalValue(name);
+    if (layerRecord == null) {
+      return null;
+    } else {
+      return layerRecord.getOriginalValue(name);
+    }
   }
 
   protected Record getRecord() {
@@ -130,7 +134,11 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
   @Override
   public boolean isModified() {
     final LayerRecord record = getRecordProxied();
-    return record.isModified();
+    if (record == null) {
+      return false;
+    } else {
+      return record.isModified();
+    }
   }
 
   @Override

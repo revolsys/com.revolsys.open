@@ -7,7 +7,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
@@ -19,10 +18,12 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.RecordLayerProxy;
+import com.revolsys.swing.scripting.ScriptEngines;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.editor.BaseTableCellEditor;
 
 public interface RecordLayerFieldUiFactory extends RecordLayerProxy {
+
   public static final String TABLE_CELL_EDITORS = "tableCellEditors";
 
   public static final String FORM_FIELD_FACTORIES = "formFieldFactories";
@@ -60,7 +61,7 @@ public interface RecordLayerFieldUiFactory extends RecordLayerProxy {
     if (factoryDef instanceof Function) {
       factory = (Function<O, F>)factoryDef;
     } else {
-      final ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+      final ScriptEngine engine = ScriptEngines.JS;
       final String script = factoryDef.toString();
       try {
         final SimpleBindings bindings = new SimpleBindings();
@@ -105,7 +106,7 @@ public interface RecordLayerFieldUiFactory extends RecordLayerProxy {
     if (factoryDef instanceof Supplier) {
       factory = (Supplier<F>)factoryDef;
     } else {
-      final ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+      final ScriptEngine engine = ScriptEngines.JS;
       final String script = factoryDef.toString();
       try {
         final SimpleBindings bindings = new SimpleBindings();

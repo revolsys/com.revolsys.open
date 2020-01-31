@@ -10,7 +10,6 @@ import javax.script.Bindings;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
@@ -38,6 +37,7 @@ import com.revolsys.swing.field.TextArea;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.swing.scripting.ScriptEngines;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.util.Property;
 
@@ -57,7 +57,7 @@ public class FieldCalculator extends AbstractUpdateField implements DocumentList
 
   private JTextArea expressionField;
 
-  private final ScriptEngine scriptEngine = new ScriptEngineManager().getEngineByName("nashorn");
+  private final ScriptEngine scriptEngine = ScriptEngines.JS;
 
   private final Compilable scriptEngineCompiler = (Compilable)this.scriptEngine;
 
