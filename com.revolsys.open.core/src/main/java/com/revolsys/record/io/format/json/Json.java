@@ -367,9 +367,13 @@ public class Json extends AbstractIoFactoryWithCoordinateSystem
   }
 
   public static String toString(final Object value) {
+    return toString(value, true);
+  }
+
+  public static String toString(final Object value, final boolean indent) {
     final StringWriter stringWriter = new StringWriter();
     try (
-      JsonWriter jsonWriter = new JsonWriter(stringWriter)) {
+      JsonWriter jsonWriter = new JsonWriter(stringWriter, indent)) {
       jsonWriter.value(value);
     }
     return stringWriter.toString();

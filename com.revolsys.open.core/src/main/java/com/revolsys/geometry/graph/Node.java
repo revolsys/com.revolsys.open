@@ -13,12 +13,15 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.graph.attribute.NodeProperties;
+import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.End;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -71,6 +74,8 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     return edges;
   }
 
+  // TODO broken as it doesn't deal with in/out edge directions correctly or
+  // with loops
   public static <V> Edge<V> getNextEdge(final List<Edge<V>> edges, final Edge<V> edge) {
     final int index = getEdgeIndex(edges, edge);
     final int nextIndex = (index + 1) % edges.size();
@@ -330,6 +335,20 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     return edges;
   }
 
+  public Map<Double, List<Edge<T>>> getEdgesByAngle() {
+    final Map<Double, List<Edge<T>>> edgesByAngle = new TreeMap<>();
+    forEachOutEdge((edge) -> {
+      final double angle = edge.getFromAngle();
+      Maps.addToList(edgesByAngle, angle, edge);
+    });
+    forEachInEdge((edge) -> {
+      final double angle = edge.getToAngle();
+      Maps.addToList(edgesByAngle, angle, edge);
+    });
+
+    return edgesByAngle;
+  }
+
   public Set<Edge<T>> getEdgesTo(final Node<T> node) {
     return getEdgesBetween(this, node);
   }
@@ -395,6 +414,20 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
   public Edge<T> getNextEdge(final Edge<T> edge) {
     final List<Edge<T>> edges = getEdges();
     return getNextEdge(edges, edge);
+  }
+
+  public Edge<T> getNextEdge(final Edge<T> edge, final ClockDirection direction) {
+    final List<Edge<T>> edges = getEdges();
+    // TODO verify edge angles
+    final int index = getEdgeIndex(edges, edge);
+    int step = 0;
+    if (direction.isCounterClockwise()) {
+      step = -1;
+    } else {
+      step = 1;
+    }
+    final int nextIndex = (index + step) % edges.size();
+    return edges.get(nextIndex);
   }
 
   public Edge<T> getNextInEdge(final Edge<T> edge) {

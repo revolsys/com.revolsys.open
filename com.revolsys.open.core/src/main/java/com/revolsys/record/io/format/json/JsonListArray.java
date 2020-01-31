@@ -69,6 +69,6 @@ public class JsonListArray extends ArrayList<Object> implements JsonList {
 
   @Override
   public String toString() {
-    return Json.toString(this);
+    return Json.toString(this, false);
   }
 }

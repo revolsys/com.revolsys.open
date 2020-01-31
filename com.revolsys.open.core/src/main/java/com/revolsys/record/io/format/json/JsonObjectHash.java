@@ -25,6 +25,6 @@ public class JsonObjectHash extends LinkedHashMapEx implements JsonObject {
 
   @Override
   public String toString() {
-    return Json.toString(this);
+    return Json.toString(this, false);
   }
 }
