@@ -231,7 +231,7 @@ public class ShortestPathOverlay extends AbstractOverlay {
   private LayerRecord getRecord(final LayerGroup layerGroup, final BoundingBox boundingBox) {
     final double scale = getViewportScale();
     if (layerGroup.isVisible(scale)) {
-      for (final Layer layer : layerGroup.getLayers()) {
+      for (final Layer layer : layerGroup) {
         if (layer.isVisible(scale)) {
           if (layer instanceof LayerGroup) {
             final LayerGroup childGroup = (LayerGroup)layer;

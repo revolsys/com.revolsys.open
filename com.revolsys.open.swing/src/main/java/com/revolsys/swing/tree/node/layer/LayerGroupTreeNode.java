@@ -109,10 +109,10 @@ public class LayerGroupTreeNode extends AbstractLayerTreeNode implements MouseLi
   protected List<BaseTreeNode> loadChildrenDo() {
     final List<BaseTreeNode> children = new ArrayList<>();
     final LayerGroup group = getGroup();
-    for (final Layer child : group) {
+    group.forEach((child) -> {
       final BaseTreeNode childNode = newTreeNode(child);
       children.add(childNode);
-    }
+    });
     return children;
   }
 

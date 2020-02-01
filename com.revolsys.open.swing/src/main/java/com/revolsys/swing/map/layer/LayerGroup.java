@@ -741,9 +741,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   protected void importProjectLayers(final Project importProject, final boolean createGroup) {
-
-    final List<Layer> importLayers = importProject.getLayers();
-    if (!importLayers.isEmpty()) {
+    if (!importProject.isEmpty()) {
       LayerGroup targetGroup;
       if (createGroup) {
         final String projectName = importProject.getName();
@@ -752,7 +750,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       } else {
         targetGroup = this;
       }
-      targetGroup.addLayers(importLayers);
+      importProject.forEach(targetGroup::addLayer);
     }
   }
 
@@ -771,9 +769,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       LayerInitializer.initialize(layer);
       if (layer instanceof LayerGroup) {
         final LayerGroup layerGroup = (LayerGroup)layer;
-        for (final Layer child : layerGroup) {
-          initialize(child);
-        }
+        layerGroup.forEach(this::initialize);
       }
     }
   }
@@ -803,7 +799,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   @Override
   public boolean isHasSelectedRecords() {
-    for (final Layer layer : getLayers()) {
+    for (final Layer layer : this.layers) {
       if (layer.isHasSelectedRecords()) {
         return true;
       }
@@ -812,7 +808,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   }
 
   public boolean isHasVisibleLayer() {
-    for (final Layer layer : getLayers()) {
+    for (final Layer layer : this.layers) {
       if (layer.isVisible()) {
         return true;
       }
@@ -1017,11 +1013,11 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       if (isSingleLayerVisible()) {
         final boolean visible = (Boolean)event.getNewValue();
         if (visible) {
-          for (final Layer layer : getLayers()) {
+          forEach((layer) -> {
             if (layer != source) {
               layer.setVisible(false);
             }
-          }
+          });
         }
       }
     }
@@ -1148,7 +1144,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
   public void setLayers(final List<Layer> layers) {
     final Object oldValue;
     synchronized (this.layers) {
-      oldValue = getLayers();
+      oldValue = Arrays.asList(layers);
       this.layers = EMPTY_LAYER_ARRAY;
       int index = 0;
       for (final Object layer : layers) {
@@ -1157,7 +1153,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
         }
       }
     }
-    final Object newValue = getLayers();
+    final Object newValue = Arrays.asList(layers);
     firePropertyChange("layer", oldValue, newValue);
   }
 

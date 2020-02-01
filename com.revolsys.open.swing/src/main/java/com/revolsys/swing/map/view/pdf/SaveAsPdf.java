@@ -38,7 +38,7 @@ public class SaveAsPdf {
       boolean hasLayer = false;
       layerList.add(new COSString(title));
       layerList.add(contentGroup);
-      for (final Layer childLayer : layerGroup.getLayers()) {
+      for (final Layer childLayer : layerGroup) {
         if (childLayer instanceof LayerGroup) {
           final LayerGroup childGroup = (LayerGroup)childLayer;
           final String childGroupName = childGroup.getName();

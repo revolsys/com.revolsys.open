@@ -35,10 +35,10 @@ public class FilterMultipleRenderer extends AbstractMultipleRecordLayerRenderer 
     setProperties(properties);
   }
 
-  private void addRecord(final List<AbstractRecordLayerRenderer> renderers,
-    final List<List<LayerRecord>> rendererRecordsLists, final LayerRecord record) {
+  private void addRecord(final List<List<LayerRecord>> rendererRecordsLists,
+    final LayerRecord record) {
     int i = 0;
-    for (final AbstractRecordLayerRenderer renderer : renderers) {
+    for (final AbstractRecordLayerRenderer renderer : this.renderers) {
       if (renderer.isFilterAccept(record)) {
         final List<LayerRecord> rendererRecords = rendererRecordsLists.get(i);
         if (rendererRecords != null) {
@@ -54,9 +54,8 @@ public class FilterMultipleRenderer extends AbstractMultipleRecordLayerRenderer 
     final List<LayerRecord> records,
     final BiConsumer<AbstractRecordLayerRenderer, List<LayerRecord>> action) {
     final double scaleForVisible = view.getScaleForVisible();
-    final List<AbstractRecordLayerRenderer> renderers = getRenderers();
     final List<List<LayerRecord>> rendererRecordsLists = new ArrayList<>();
-    for (final AbstractRecordLayerRenderer renderer : renderers) {
+    for (final AbstractRecordLayerRenderer renderer : this.renderers) {
       if (renderer.isVisible(scaleForVisible)) {
         rendererRecordsLists.add(new ArrayList<>());
       } else {
@@ -64,10 +63,10 @@ public class FilterMultipleRenderer extends AbstractMultipleRecordLayerRenderer 
       }
     }
     for (final LayerRecord record : view.cancellable(records)) {
-      addRecord(renderers, rendererRecordsLists, record);
+      addRecord(rendererRecordsLists, record);
     }
     int i = 0;
-    for (final AbstractRecordLayerRenderer renderer : renderers) {
+    for (final AbstractRecordLayerRenderer renderer : this.renderers) {
       final List<LayerRecord> rendererRecords = rendererRecordsLists.get(i);
       if (rendererRecords != null && !rendererRecords.isEmpty()) {
         action.accept(renderer, rendererRecords);

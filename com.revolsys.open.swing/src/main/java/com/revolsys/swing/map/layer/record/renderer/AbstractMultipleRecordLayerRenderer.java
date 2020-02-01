@@ -1,6 +1,8 @@
 package com.revolsys.swing.map.layer.record.renderer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -42,6 +44,10 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     });
   }
 
+  private static final AbstractRecordLayerRenderer[] EMPTY_ARRAY = new AbstractRecordLayerRenderer[0];
+
+  private static final List<AbstractRecordLayerRenderer> EMPTY_LIST = Collections.emptyList();
+
   protected static void addAddMenuItem(final MenuFactory menu, final String type,
     final BiFunction<AbstractRecordLayer, AbstractMultipleRecordLayerRenderer, AbstractRecordLayerRenderer> rendererFactory) {
     final String iconName = ("style_" + type + ":add").toLowerCase();
@@ -66,7 +72,7 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     menu.addMenuItem("convert", -1, name, iconName, enabledFilter, consumer, false);
   }
 
-  protected List<AbstractRecordLayerRenderer> renderers = new ArrayList<>();
+  protected AbstractRecordLayerRenderer[] renderers = EMPTY_ARRAY;
 
   public AbstractMultipleRecordLayerRenderer(final String type, final AbstractRecordLayer layer,
     final LayerRenderer<?> parent) {
@@ -97,11 +103,17 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
       }
       renderer.setName(name);
       renderer.setParent(this);
+      final AbstractRecordLayerRenderer[] oldRenderers = this.renderers;
       synchronized (this.renderers) {
-        if (index < 0) {
-          index = this.renderers.size();
+        this.renderers = new AbstractRecordLayerRenderer[oldRenderers.length + 1];
+        if (index < 0 || index > oldRenderers.length) {
+          index = oldRenderers.length;
         }
-        this.renderers.add(index, renderer);
+        System.arraycopy(oldRenderers, 0, this.renderers, 0, index);
+        System.arraycopy(oldRenderers, index, this.renderers, index + 1,
+          oldRenderers.length - index);
+        this.renderers[index] = renderer;
+
       }
       firePropertyChange("renderers", index, null, renderer);
       return index;
@@ -123,15 +135,25 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     return clone;
   }
 
+  protected void cloneRenderers(final AbstractMultipleRecordLayerRenderer original) {
+    final AbstractRecordLayerRenderer[] oldRenderers = original.renderers;
+    if (oldRenderers.length > 0) {
+      final AbstractRecordLayerRenderer[] renderers = new AbstractRecordLayerRenderer[oldRenderers.length];
+      for (int i = 0; i < oldRenderers.length; i++) {
+        final AbstractRecordLayerRenderer oldRenderer = oldRenderers[i];
+        renderers[i] = oldRenderer.clone();
+      }
+    }
+  }
+
   public FilterMultipleRenderer convertToFilterStyle() {
     final AbstractRecordLayer layer = getLayer();
-    final List<AbstractRecordLayerRenderer> renderers = getRenderers();
     final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
     final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(layer, parent);
     newRenderer.setProperties(style);
-    newRenderer.setRenderers(JavaBeanUtil.clone(renderers));
+    newRenderer.cloneRenderers(this);
     String name = getName();
     if (name.equals("Multiple Style")) {
       name = "Filter Style";
@@ -146,14 +168,12 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
 
   public MultipleRecordRenderer convertToMultipleStyle() {
     final AbstractRecordLayer layer = getLayer();
-    final List<AbstractRecordLayerRenderer> renderers = getRenderers();
     final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
     final MultipleRecordRenderer newRenderer = new MultipleRecordRenderer(layer, parent);
     newRenderer.setProperties(style);
-
-    newRenderer.setRenderers(JavaBeanUtil.clone(renderers));
+    newRenderer.cloneRenderers(this);
     String name = getName();
     if (name.equals("Filter Style")) {
       name = "Multiple Style";
@@ -168,13 +188,12 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
 
   public ScaleMultipleRenderer convertToScaleStyle() {
     final AbstractRecordLayer layer = getLayer();
-    final List<AbstractRecordLayerRenderer> renderers = getRenderers();
     final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
     final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(layer, parent);
     newRenderer.setProperties(style);
-    newRenderer.setRenderers(JavaBeanUtil.clone(renderers));
+    newRenderer.cloneRenderers(this);
     String name = getName();
     if (name.equals("Filter Style")) {
       name = "Scale Style";
@@ -195,18 +214,31 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
   }
 
   public int getRendererCount() {
-    return this.renderers.size();
+    return this.renderers.length;
   }
 
   @Override
   public List<AbstractRecordLayerRenderer> getRenderers() {
-    synchronized (this.renderers) {
-      return new ArrayList<>(this.renderers);
+    final AbstractRecordLayerRenderer[] renderers = this.renderers;
+    if (renderers.length == 0) {
+      return EMPTY_LIST;
+    } else {
+      return Arrays.asList(renderers);
     }
   }
 
+  public int indexOf(final AbstractRecordLayerRenderer renderer) {
+    final AbstractRecordLayerRenderer[] renderers = this.renderers;
+    for (int i = 0; i < renderers.length; i++) {
+      if (renderers[i] == renderer) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   public boolean isEmpty() {
-    return this.renderers.isEmpty();
+    return this.renderers.length == 0;
   }
 
   @Override
@@ -217,13 +249,7 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
   @Override
   public boolean isVisible(final LayerRecord record) {
     if (super.isVisible() && super.isVisible(record)) {
-      for (int i = 0; i < this.renderers.size(); i++) {
-        final AbstractRecordLayerRenderer renderer;
-        try {
-          renderer = this.renderers.get(i);
-        } catch (final ArrayIndexOutOfBoundsException e) {
-          return false;
-        }
+      for (final AbstractRecordLayerRenderer renderer : this.renderers) {
         if (renderer.isVisible(record)) {
           return true;
         }
@@ -243,20 +269,27 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
 
   @Override
   public int removeRenderer(final AbstractRecordLayerRenderer renderer) {
+    final int index;
     boolean removed = false;
     synchronized (this.renderers) {
-      final int index = this.renderers.indexOf(renderer);
+      index = indexOf(renderer);
       if (index != -1) {
         if (renderer.getParent() == this) {
           renderer.setParent(null);
         }
-        removed = this.renderers.remove(renderer);
+        final AbstractRecordLayerRenderer[] oldRenderers = this.renderers;
+        this.renderers = new AbstractRecordLayerRenderer[oldRenderers.length + 1];
+        System.arraycopy(oldRenderers, 0, this.renderers, 0, index);
+        System.arraycopy(oldRenderers, index + 1, this.renderers, index,
+          oldRenderers.length - index - 1);
+
+        removed = true;
       }
-      if (removed) {
-        firePropertyChange("renderers", index, renderer, null);
-      }
-      return index;
     }
+    if (removed) {
+      firePropertyChange("renderers", index, renderer, null);
+    }
+    return index;
   }
 
   protected abstract void renderMultipleRecords(final ViewRenderer view,
@@ -293,16 +326,17 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
   public void setRenderers(final List<? extends AbstractRecordLayerRenderer> renderers) {
     List<AbstractRecordLayerRenderer> oldValue;
     synchronized (this.renderers) {
-      oldValue = Lists.toArray(this.renderers);
+      oldValue = Arrays.asList(this.renderers);
       for (final AbstractRecordLayerRenderer renderer : this.renderers) {
         renderer.setParent(null);
       }
-      if (renderers == null) {
-        this.renderers.clear();
-      }
-      this.renderers = new ArrayList<>(renderers);
-      for (final AbstractRecordLayerRenderer renderer : this.renderers) {
-        renderer.setParent(this);
+      if (renderers == null || renderers.isEmpty()) {
+        this.renderers = EMPTY_ARRAY;
+      } else {
+        this.renderers = renderers.toArray(new AbstractRecordLayerRenderer[renderers.size()]);
+        for (final AbstractRecordLayerRenderer renderer : this.renderers) {
+          renderer.setParent(this);
+        }
       }
     }
     firePropertyChange("renderers", oldValue, this.renderers);
@@ -326,8 +360,8 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
   @Override
   public JsonObject toMap() {
     final JsonObject map = super.toMap();
-    final List<AbstractRecordLayerRenderer> renderers = getRenderers();
-    if (!renderers.isEmpty()) {
+    final AbstractRecordLayerRenderer[] renderers = this.renderers;
+    if (renderers.length > 0) {
       final List<Map<String, Object>> rendererMaps = new ArrayList<>();
       for (final AbstractRecordLayerRenderer renderer : renderers) {
         rendererMaps.add(renderer.toMap());

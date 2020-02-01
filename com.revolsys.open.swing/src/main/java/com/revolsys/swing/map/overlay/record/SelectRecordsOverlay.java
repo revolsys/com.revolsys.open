@@ -13,7 +13,6 @@ import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -452,8 +451,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     final BiFunction<AbstractRecordLayer, BoundingBox, Boolean> selectAction) {
     AbstractRecordLayer selectedLayer = null;
     final double scale = getViewportScale();
-    final List<Layer> layers = group.getLayers();
-    for (final Layer layer : layers) {
+    for (final Layer layer : group) {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
         final AbstractRecordLayer childSelectedLayer = selectRecords(childGroup, boundingBox,
@@ -554,7 +552,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   private void unSelectRecords(final LayerGroup group, final BoundingBox boundingBox) {
 
     final double scale = getViewportScale();
-   group.forEachReverse((layer)-> {
+    group.forEachReverse((layer) -> {
       if (layer instanceof LayerGroup) {
         final LayerGroup childGroup = (LayerGroup)layer;
         unSelectRecords(childGroup, boundingBox);

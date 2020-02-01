@@ -51,7 +51,7 @@ public class ScaleMultipleRenderer extends AbstractMultipleRecordLayerRenderer {
       }
     } else {
       this.lastScale = scaleForVisible;
-      for (final AbstractRecordLayerRenderer renderer : getRenderers()) {
+      for (final AbstractRecordLayerRenderer renderer : this.renderers) {
         if (renderer.isVisible(scaleForVisible)) {
           this.renderer = renderer;
           return renderer;

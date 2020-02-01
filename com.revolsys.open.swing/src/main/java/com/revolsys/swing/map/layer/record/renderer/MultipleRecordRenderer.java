@@ -57,11 +57,8 @@ public class MultipleRecordRenderer extends AbstractMultipleRecordLayerRenderer 
   @Override
   protected void renderMultipleRecords(final ViewRenderer view, final AbstractRecordLayer layer,
     final List<LayerRecord> records) {
-    for (int i = 0; i < this.renderers.size() && !view.isCancelled(); i++) {
-      AbstractRecordLayerRenderer renderer;
-      try {
-        renderer = this.renderers.get(i);
-      } catch (final ArrayIndexOutOfBoundsException e) {
+    for (final AbstractRecordLayerRenderer renderer : this.renderers) {
+      if (view.isCancelled()) {
         return;
       }
       renderer.renderRecords(view, layer, records);
@@ -71,11 +68,8 @@ public class MultipleRecordRenderer extends AbstractMultipleRecordLayerRenderer 
   @Override
   protected void renderMultipleSelectedRecords(final ViewRenderer view,
     final AbstractRecordLayer layer, final List<LayerRecord> records) {
-    for (int i = 0; i < this.renderers.size() && !view.isCancelled(); i++) {
-      AbstractRecordLayerRenderer renderer;
-      try {
-        renderer = this.renderers.get(i);
-      } catch (final ArrayIndexOutOfBoundsException e) {
+    for (final AbstractRecordLayerRenderer renderer : this.renderers) {
+      if (view.isCancelled()) {
         return;
       }
       renderer.renderSelectedRecords(view, layer, records);
