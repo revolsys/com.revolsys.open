@@ -35,7 +35,10 @@ public abstract class AbstractGeometryRecordLayerRenderer extends AbstractRecord
 
   protected void renderRecordsDo(final ViewRenderer view, final AbstractRecordLayer layer,
     final List<LayerRecord> records) {
-    for (final LayerRecord record : view.cancellable(records)) {
+    for (final LayerRecord record : records) {
+      if (view.isCancelled()) {
+        return;
+      }
       if (isFilterAccept(record)) {
         try {
           final Geometry geometry = record.getGeometry();

@@ -20,7 +20,6 @@ import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecordLayerRenderer
@@ -128,10 +127,7 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
   @Override
   public AbstractMultipleRecordLayerRenderer clone() {
     final AbstractMultipleRecordLayerRenderer clone = (AbstractMultipleRecordLayerRenderer)super.clone();
-    clone.renderers = JavaBeanUtil.clone(this.renderers);
-    for (final AbstractRecordLayerRenderer renderer : clone.renderers) {
-      renderer.setParent(clone);
-    }
+    clone.cloneRenderers(this);
     return clone;
   }
 
@@ -141,9 +137,15 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
       final AbstractRecordLayerRenderer[] renderers = new AbstractRecordLayerRenderer[oldRenderers.length];
       for (int i = 0; i < oldRenderers.length; i++) {
         final AbstractRecordLayerRenderer oldRenderer = oldRenderers[i];
-        renderers[i] = oldRenderer.clone();
+        final AbstractRecordLayerRenderer newRenderer = oldRenderer.clone();
+        newRenderer.setParent(this);
+        renderers[i] = newRenderer;
       }
+      this.renderers = renderers;
+    } else {
+      this.renderers = EMPTY_ARRAY;
     }
+
   }
 
   public FilterMultipleRenderer convertToFilterStyle() {
@@ -207,7 +209,7 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
   }
 
   private List<LayerRecord> filterRecords(final ViewRenderer view, List<LayerRecord> records) {
-    if (isHasFilter()) {
+    if (isHasFilter() && !records.isEmpty()) {
       records = Lists.filter(view.cancellable(records), this::isFilterAccept);
     }
     return records;

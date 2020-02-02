@@ -12,10 +12,12 @@ import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.swing.component.Form;
 import com.revolsys.swing.map.view.ViewRenderer;
+import com.revolsys.util.BaseCloneable;
 
 public interface LayerRenderer<T extends Layer> extends ObjectWithProperties,
-  PropertyChangeListener, PropertyChangeSupportProxy, MapSerializer, Cloneable {
+  PropertyChangeListener, PropertyChangeSupportProxy, MapSerializer, BaseCloneable {
 
+  @Override
   LayerRenderer<T> clone();
 
   Icon getIcon();

@@ -74,6 +74,8 @@ public final class JavaBeanUtil {
         cloneList.add(clonedObject);
       }
       return (V)cloneList;
+    } else if (value instanceof BaseCloneable) {
+      return (V)((BaseCloneable)value).clone();
     } else if (value instanceof Cloneable) {
       try {
         final Class<? extends Object> valueClass = value.getClass();

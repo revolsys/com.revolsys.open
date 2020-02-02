@@ -207,7 +207,10 @@ public class GeometryStyleRecordLayerRenderer extends AbstractGeometryRecordLaye
       try (
         BaseCloseable geometryListCloseable = view.drawGeometriesCloseable(this.style, true, draw,
           fill)) {
-        for (final LayerRecord record : view.cancellable(records)) {
+        for (final LayerRecord record : records) {
+          if (view.isCancelled()) {
+            return;
+          }
           if (isVisible(record)) {
             final Geometry geometry = record.getGeometry();
             view.addGeometry(geometry);
