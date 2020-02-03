@@ -68,6 +68,19 @@ public interface QueryValue extends Cloneable {
     return clonedValues;
   }
 
+  static QueryValue[] cloneQueryValues(final QueryValue[] oldValues) {
+    if (oldValues == null || oldValues.length == 0) {
+      return oldValues;
+    } else {
+      final QueryValue[] clonedValues = new QueryValue[oldValues.length];
+      for (int i = 0; i < oldValues.length; i++) {
+        final QueryValue value = oldValues[i];
+        clonedValues[i] = value.clone();
+      }
+      return clonedValues;
+    }
+  }
+
   static BoundingBox getBoundingBox(final Query query) {
     final Condition whereCondition = query.getWhereCondition();
     return getBoundingBox(whereCondition);

@@ -5,7 +5,7 @@ import java.awt.geom.PathIterator;
 import com.revolsys.geometry.model.LineString;
 
 public class LineStringPathIterator implements PathIterator {
-  protected final LineString line;
+  protected LineString line;
 
   private boolean done;
 
@@ -13,16 +13,17 @@ public class LineStringPathIterator implements PathIterator {
 
   protected int awtType = SEG_MOVETO;
 
-  private final int vertexCount;
+  private int vertexCount;
 
   /** Shared buffer for coordinate transforms. */
   protected final double[] currentCoordinates = new double[2];
 
-  public LineStringPathIterator(final LineString line) {
-    this.line = line;
-    this.vertexCount = line.getVertexCount();
-    this.done = this.vertexCount == 0;
+  public LineStringPathIterator() {
+    this.done = true;
+  }
 
+  public LineStringPathIterator(final LineString line) {
+    reset(line);
   }
 
   @Override
@@ -60,5 +61,14 @@ public class LineStringPathIterator implements PathIterator {
     if (this.vertexIndex >= this.vertexCount) {
       this.done = true;
     }
+  }
+
+  public LineStringPathIterator reset(final LineString line) {
+    this.line = line;
+    this.vertexIndex = 0;
+    this.vertexCount = line.getVertexCount();
+    this.awtType = SEG_MOVETO;
+    this.done = this.vertexCount == 0;
+    return this;
   }
 }

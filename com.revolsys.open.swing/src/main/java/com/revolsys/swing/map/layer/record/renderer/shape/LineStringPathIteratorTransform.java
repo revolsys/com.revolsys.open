@@ -5,11 +5,13 @@ import java.awt.geom.AffineTransform;
 import com.revolsys.geometry.model.LineString;
 
 public class LineStringPathIteratorTransform extends LineStringPathIterator {
-  private final AffineTransform transform;
+  private AffineTransform transform;
+
+  public LineStringPathIteratorTransform() {
+  }
 
   public LineStringPathIteratorTransform(final LineString line, final AffineTransform transform) {
-    super(line);
-    this.transform = transform;
+    reset(line, transform);
   }
 
   @Override
@@ -30,6 +32,13 @@ public class LineStringPathIteratorTransform extends LineStringPathIterator {
     line.copyPoint(vertexIndex, 2, currentCoordinates);
     this.transform.transform(currentCoordinates, 0, coordinates, 0, 1);
     return this.awtType;
+  }
+
+  public LineStringPathIteratorTransform reset(final LineString line,
+    final AffineTransform transform) {
+    reset(line);
+    this.transform = transform;
+    return this;
   }
 
 }

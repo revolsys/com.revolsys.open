@@ -6,6 +6,10 @@ import java.awt.geom.PathIterator;
 import com.revolsys.geometry.model.LineString;
 
 public class LineStringShape extends AbstractGeometryShape<LineString> {
+  private final LineStringPathIteratorTransform iteratorTransform = new LineStringPathIteratorTransform();
+
+  private final LineStringPathIterator iterator = new LineStringPathIterator();
+
   public LineStringShape() {
   }
 
@@ -16,9 +20,9 @@ public class LineStringShape extends AbstractGeometryShape<LineString> {
   @Override
   public PathIterator getPathIterator(final AffineTransform at) {
     if (at == null) {
-      return new LineStringPathIterator(this.geometry);
+      return this.iterator.reset(this.geometry);
     } else {
-      return new LineStringPathIteratorTransform(this.geometry, at);
+      return this.iteratorTransform.reset(this.geometry, at);
     }
   }
 

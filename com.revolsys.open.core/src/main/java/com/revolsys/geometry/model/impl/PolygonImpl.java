@@ -32,6 +32,7 @@
  */
 package com.revolsys.geometry.model.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -226,6 +227,22 @@ public class PolygonImpl extends AbstractPolygon {
     } else {
       return Double.NaN;
     }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <V extends Geometry> List<V> getGeometryComponents(final Class<V> geometryClass) {
+    final List<V> geometries = new ArrayList<>();
+    if (geometryClass.isAssignableFrom(getClass())) {
+      geometries.add((V)this);
+    }
+    for (final LinearRing ring : this.rings) {
+      if (ring != null) {
+        final List<V> ringGeometries = ring.getGeometries(geometryClass);
+        geometries.addAll(ringGeometries);
+      }
+    }
+    return geometries;
   }
 
   @Override

@@ -35,7 +35,7 @@ public abstract class AbstractMultiCondition extends AbstractMultiQueryValue imp
     buffer.append("(");
     boolean first = true;
 
-    for (final QueryValue value : getQueryValues()) {
+    for (final QueryValue value : this.values) {
       if (first) {
         first = false;
       } else {
@@ -54,7 +54,7 @@ public abstract class AbstractMultiCondition extends AbstractMultiQueryValue imp
 
   @Override
   public int appendParameters(int index, final PreparedStatement statement) {
-    for (final QueryValue value : getQueryValues()) {
+    for (final QueryValue value : this.values) {
       if (value != null) {
         index = value.appendParameters(index, statement);
       }
@@ -87,7 +87,7 @@ public abstract class AbstractMultiCondition extends AbstractMultiQueryValue imp
   public String toString() {
     final StringBuilder string = new StringBuilder();
     boolean first = true;
-    for (final QueryValue value : getQueryValues()) {
+    for (final QueryValue value : this.values) {
       if (first) {
         first = false;
       } else {

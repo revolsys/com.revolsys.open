@@ -215,12 +215,16 @@ public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, Geo
     }
   }
 
+  default boolean isIdField(final CharSequence fieldName) {
+    return isIdField(fieldName.toString());
+  }
+
   default boolean isIdField(final int fieldIndex) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition == null) {
       return false;
     } else {
-      return recordDefinition.getIdFieldIndexes().contains(fieldIndex);
+      return recordDefinition.isIdField(fieldIndex);
     }
   }
 
@@ -229,7 +233,7 @@ public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, Geo
     if (fieldName == null || recordDefinition == null) {
       return false;
     } else {
-      return recordDefinition.getIdFieldNames().contains(fieldName);
+      return recordDefinition.isIdField(fieldName);
     }
   }
 

@@ -375,7 +375,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     final String fieldName = getColumnFieldName(columnIndex);
     if (fieldName != null) {
       final RecordDefinition recordDefinition = getRecordDefinition();
-      return recordDefinition.getIdFieldNames().contains(fieldName);
+      return recordDefinition.isIdField(fieldName);
     }
     return false;
   }

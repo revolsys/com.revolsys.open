@@ -109,10 +109,10 @@ public class RStarTree<T> implements SpatialIndex<T> {
     final BoundingBoxProxy boundProxy) {
     final BoundingBox bound = boundProxy.getBoundingBox();
     // If the child pointers in N point to leaves
-    if (((RStarBranch<?>)node.items.get(0)).isHasLeaves()) {
+    if (((RStarBranch<?>)node.getItem(0)).isHasLeaves()) {
       // determine the minimum overlap cost
       if (this.nodeMaxItemCount > RTREE_CHOOSE_SUBTREE_P * 2 / 3
-        && node.items.size() > RTREE_CHOOSE_SUBTREE_P) {
+        && node.getItemCount() > RTREE_CHOOSE_SUBTREE_P) {
         // alternative algorithm:
         // Sort the rectangles in N in increasing order of
         // then area enlargement needed to include the new
@@ -210,7 +210,7 @@ public class RStarTree<T> implements SpatialIndex<T> {
     // CS2: If we're at a leaf, then use that level
     if (node.hasLeaves) {
       // I2: If N has less than M items, accommodate E in N
-      node.items.add(leaf);
+      node.addItem(leaf);
     } else {
       // I1: Invoke ChooseSubtree. with the level as a parameter,
       // to find an appropriate node N, m which to place the
@@ -225,10 +225,10 @@ public class RStarTree<T> implements SpatialIndex<T> {
       }
 
       // this gets joined to the list of items at this level
-      node.items.add(tmp_node);
+      node.addItem(tmp_node);
     }
 
-    if (node.items.size() > this.nodeMaxItemCount) {
+    if (node.getItemCount() > this.nodeMaxItemCount) {
       if (node != this.root && firstInsert) {
         reinsert(node);
         return null;
@@ -274,8 +274,7 @@ public class RStarTree<T> implements SpatialIndex<T> {
   @SuppressWarnings("unchecked")
   private void reinsert(final RStarBranch<T> node) {
 
-    final List<RStarNode<T>> items = node.items;
-    final int itemCount = items.size();
+    final int itemCount = node.getItemCount();
     int keePItemCount = (int)(itemCount * RTREE_REINSERT_P);
     if (keePItemCount <= 0) {
       keePItemCount = 1;
@@ -285,7 +284,7 @@ public class RStarTree<T> implements SpatialIndex<T> {
 
     final List<RStarNode<T>> removedItems = new ArrayList<>();
     for (int i = keePItemCount; i < itemCount; i++) {
-      removedItems.add(items.get(i));
+      removedItems.add(node.getItem(i));
     }
     node.setSize(keePItemCount);
 
@@ -381,7 +380,7 @@ public class RStarTree<T> implements SpatialIndex<T> {
   // passed node's parent
   private RStarBranch<T> split(final RStarBranch<T> node) {
 
-    final int n_items = node.items.size();
+    final int n_items = node.getItemCount();
     final int distribution_count = n_items - 2 * this.nodeMinItemCount + 1;
 
     int splitAxis = 2 + 1;
@@ -432,7 +431,11 @@ public class RStarTree<T> implements SpatialIndex<T> {
           final BoundingBoxEditor R2 = new BoundingBoxEditor();
 
           int i = 0;
-          for (final BoundingBoxProxy boundable : node.items) {
+
+          final int itemCount = node.getItemCount();
+          final RStarNode<T>[] items = node.items;
+          for (int itemIndex = 0; itemIndex < itemCount; itemIndex++) {
+            final BoundingBoxProxy boundable = items[itemIndex];
             if (i <= this.nodeMinItemCount + k) {
               R1.addBbox(boundable);
             } else {

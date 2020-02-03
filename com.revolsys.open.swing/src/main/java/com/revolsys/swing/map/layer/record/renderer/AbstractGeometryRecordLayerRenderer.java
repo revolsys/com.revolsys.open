@@ -39,7 +39,7 @@ public abstract class AbstractGeometryRecordLayerRenderer extends AbstractRecord
       if (view.isCancelled()) {
         return;
       }
-      if (isFilterAccept(record)) {
+      if (this.filterNoException.test(record)) {
         try {
           final Geometry geometry = record.getGeometry();
           renderRecord(view, layer, record, geometry);

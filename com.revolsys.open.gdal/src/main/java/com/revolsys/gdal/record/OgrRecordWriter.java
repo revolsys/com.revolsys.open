@@ -85,10 +85,9 @@ public class OgrRecordWriter extends AbstractRecordWriter {
       .getRecordDefinition(sourceRecordDefinition);
     final String typePath = sourceRecordDefinition.getPath();
     final List<FieldDefinition> attributes = recordDefinition.getFields();
-    final List<String> idFieldNames = recordDefinition.getIdFieldNames();
     for (final FieldDefinition attribute : attributes) {
       final String name = attribute.getName();
-      if (!idFieldNames.contains(name)) {
+      if (!recordDefinition.isIdField(name)) {
         if (attribute.isRequired()) {
           final Object value = record.getValue(name);
           if (value == null) {

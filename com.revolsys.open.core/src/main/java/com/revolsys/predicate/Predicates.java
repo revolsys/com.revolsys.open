@@ -100,6 +100,16 @@ public interface Predicates {
     }
   }
 
+  static <T> Predicate<T> noException(final Predicate<T> filter) {
+    return (v) -> {
+      try {
+        return filter.test(v);
+      } catch (final Exception e) {
+        return false;
+      }
+    };
+  }
+
   static <T> Predicate<T> none() {
     return (t) -> {
       return false;

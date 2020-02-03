@@ -318,6 +318,13 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     }
   }
 
+  protected void setBoundingBox(final BoundingBox boundingBox) {
+    this.minX = boundingBox.getMinX();
+    this.minY = boundingBox.getMinY();
+    this.maxX = boundingBox.getMaxX();
+    this.maxY = boundingBox.getMaxY();
+  }
+
   protected void setMaxX(final double maxX) {
     this.maxX = maxX;
   }

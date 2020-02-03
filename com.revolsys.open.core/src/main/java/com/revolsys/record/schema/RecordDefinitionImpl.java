@@ -76,18 +76,33 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   private final List<Integer> geometryFieldDefinitionIndexes = new ArrayList<>();
 
+  private final List<Integer> geometryFieldDefinitionIndexesUnmod = Collections
+    .unmodifiableList(this.geometryFieldDefinitionIndexes);
+
   private final List<String> geometryFieldDefinitionNames = new ArrayList<>();
+
+  private final List<String> geometryFieldDefinitionNamesUnmod = Collections
+    .unmodifiableList(this.geometryFieldDefinitionNames);
 
   /** The index of the ID field. */
   private int idFieldDefinitionIndex = -1;
 
   private final List<Integer> idFieldDefinitionIndexes = new ArrayList<>();
 
+  private final List<Integer> idFieldDefinitionIndexesUnmod = Collections
+    .unmodifiableList(this.idFieldDefinitionIndexes);
+
   private final List<String> idFieldDefinitionNames = new ArrayList<>();
 
   private final List<FieldDefinition> idFieldDefinitions = new ArrayList<>();
 
+  private final List<FieldDefinition> idFieldDefinitionsUnmod = Collections
+    .unmodifiableList(this.idFieldDefinitions);
+
   private final List<String> internalFieldNames = new ArrayList<>();
+
+  private final List<String> idFieldDefinitionNamesUnmod = Collections
+    .unmodifiableList(this.idFieldDefinitionNames);
 
   private final List<FieldDefinition> internalFields = new ArrayList<>();
 
@@ -597,7 +612,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   @Override
   public List<Integer> getGeometryFieldIndexes() {
-    return Collections.unmodifiableList(this.geometryFieldDefinitionIndexes);
+    return this.geometryFieldDefinitionIndexesUnmod;
   }
 
   @Override
@@ -607,7 +622,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   @Override
   public List<String> getGeometryFieldNames() {
-    return Collections.unmodifiableList(this.geometryFieldDefinitionNames);
+    return this.geometryFieldDefinitionNamesUnmod;
   }
 
   @Override
@@ -641,7 +656,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   @Override
   public List<Integer> getIdFieldIndexes() {
-    return Collections.unmodifiableList(this.idFieldDefinitionIndexes);
+    return this.idFieldDefinitionIndexesUnmod;
   }
 
   @Override
@@ -651,12 +666,12 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   @Override
   public List<String> getIdFieldNames() {
-    return Collections.unmodifiableList(this.idFieldDefinitionNames);
+    return this.idFieldDefinitionNamesUnmod;
   }
 
   @Override
   public List<FieldDefinition> getIdFields() {
-    return Collections.unmodifiableList(this.idFieldDefinitions);
+    return this.idFieldDefinitionsUnmod;
   }
 
   @Override
@@ -724,6 +739,16 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   public boolean isFieldRequired(final int i) {
     final FieldDefinition field = getField(i);
     return field.isRequired();
+  }
+
+  @Override
+  public boolean isIdField(final int fieldIndex) {
+    return this.idFieldDefinitionIndexes.contains(fieldIndex);
+  }
+
+  @Override
+  public boolean isIdField(final String fieldName) {
+    return this.idFieldDefinitionNames.contains(fieldName);
   }
 
   @Override

@@ -734,7 +734,7 @@ public interface SwingUtil {
       final boolean required = fieldDefinition.isRequired();
       final int length = fieldDefinition.getLength();
       CodeTable codeTable;
-      if (recordDefinition.getIdFieldNames().contains(fieldName)) {
+      if (recordDefinition.isIdField(fieldName)) {
         codeTable = null;
       } else {
         codeTable = recordDefinition.getCodeTableByFieldName(fieldName);

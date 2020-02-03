@@ -159,7 +159,7 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
           return false;
         } else {
           final String fieldName = getColumnFieldName(rowIndex);
-          if (recordDefinition.getIdFieldNames().contains(fieldName)) {
+          if (recordDefinition.isIdField(fieldName)) {
             return false;
           } else if (recordDefinition.getGeometryFieldNames().contains(fieldName)) {
             return false;

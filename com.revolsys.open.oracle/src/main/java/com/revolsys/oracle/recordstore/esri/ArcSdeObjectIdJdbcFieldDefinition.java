@@ -29,8 +29,7 @@ public class ArcSdeObjectIdJdbcFieldDefinition extends JdbcFieldDefinition {
       newObjectIdAttribute.setRecordDefinition(recordDefinition);
       final RecordDefinitionImpl recordDefinitionImpl = (RecordDefinitionImpl)recordDefinition;
       recordDefinitionImpl.replaceField(objectIdAttribute, newObjectIdAttribute);
-      if (recordDefinition.getIdFieldName() == null
-        && recordDefinition.getIdFieldNames().isEmpty()) {
+      if (recordDefinition.getIdFieldName() == null && recordDefinition.hasIdField()) {
         recordDefinitionImpl.setIdFieldName(name);
       }
     }

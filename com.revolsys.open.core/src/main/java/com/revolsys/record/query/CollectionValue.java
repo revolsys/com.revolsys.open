@@ -46,14 +46,14 @@ public class CollectionValue extends AbstractMultiQueryValue {
     final StringBuilder buffer) {
     buffer.append('(');
 
-    final List<QueryValue> values = getQueryValues();
-    final int valueCount = values.size();
+    final QueryValue[] values = this.values;
+    final int valueCount = values.length;
     for (int i = 0; i < valueCount; i++) {
       if (i > 0) {
         buffer.append(", ");
       }
 
-      final QueryValue queryValue = getQueryValues().get(i);
+      final QueryValue queryValue = values[i];
       if (queryValue instanceof Value) {
         if (this.jdbcField == null) {
           queryValue.appendSql(query, recordStore, buffer);
@@ -70,7 +70,7 @@ public class CollectionValue extends AbstractMultiQueryValue {
 
   @Override
   public int appendParameters(int index, final PreparedStatement statement) {
-    for (final QueryValue queryValue : getQueryValues()) {
+    for (final QueryValue queryValue : this.values) {
       JdbcFieldDefinition jdbcField = this.jdbcField;
       if (queryValue instanceof Value) {
         final Value valueWrapper = (Value)queryValue;
@@ -98,7 +98,7 @@ public class CollectionValue extends AbstractMultiQueryValue {
 
   public boolean containsValue(final Object valueTest) {
     final CodeTable codeTable = this.codeTable;
-    for (final QueryValue queryValue : getQueryValues()) {
+    for (final QueryValue queryValue : this.values) {
       Object value;
       if (queryValue instanceof Value) {
         final Value valueWrapper = (Value)queryValue;
@@ -137,7 +137,7 @@ public class CollectionValue extends AbstractMultiQueryValue {
   @Override
   public <V> V getValue(final Record record) {
     final List<Object> values = new ArrayList<>();
-    for (final QueryValue queryValue : getQueryValues()) {
+    for (final QueryValue queryValue : this.values) {
       final Object value = queryValue.getValue(record);
       values.add(value);
     }
@@ -147,7 +147,7 @@ public class CollectionValue extends AbstractMultiQueryValue {
   public List<Object> getValues() {
     final CodeTable codeTable = this.codeTable;
     final List<Object> values = new ArrayList<>();
-    for (final QueryValue queryValue : getQueryValues()) {
+    for (final QueryValue queryValue : this.values) {
       Object value;
       if (queryValue instanceof Value) {
         final Value valueWrapper = (Value)queryValue;
@@ -178,7 +178,7 @@ public class CollectionValue extends AbstractMultiQueryValue {
       } else {
         this.jdbcField = null;
       }
-      for (final QueryValue queryValue : getQueryValues()) {
+      for (final QueryValue queryValue : this.values) {
         if (queryValue instanceof Value) {
           final Value value = (Value)queryValue;
           value.setFieldDefinition(field);

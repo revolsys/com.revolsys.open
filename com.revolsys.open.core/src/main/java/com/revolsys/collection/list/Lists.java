@@ -19,6 +19,7 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.record.io.format.json.JsonParser;
+import com.revolsys.util.Cancellable;
 import com.revolsys.util.Property;
 
 public interface Lists {
@@ -231,6 +232,36 @@ public interface Lists {
     return () -> {
       return new LinkedList<>();
     };
+  }
+
+  static <V> List<V> filter(final Cancellable cancellable, final List<V> list,
+    final Predicate<? super V> filter) {
+    if (list != null && !list.isEmpty()) {
+      List<V> newList = null;
+      int i = 0;
+      for (final V value : list) {
+        if (cancellable.isCancelled()) {
+          return Collections.emptyList();
+        }
+        if (filter.test(value)) {
+          if (newList != null) {
+            newList.add(value);
+          }
+        } else if (newList == null) {
+          newList = new ArrayList<>(list.size() - i);
+          for (int j = 0; j < i; j++) {
+            newList.add(list.get(j));
+          }
+        }
+        i++;
+      }
+      if (newList == null) {
+        return list;
+      } else {
+        return newList;
+      }
+    }
+    return Collections.emptyList();
   }
 
   static <V> List<V> filter(final Iterable<V> list, final Predicate<? super V> filter) {

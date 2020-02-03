@@ -1,67 +1,86 @@
 package com.revolsys.geometry.index.rstartree;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 
 public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
-  final List<RStarNode<T>> items;
+  RStarNode<T>[] items;
+
+  int itemCount;
 
   boolean hasLeaves;
 
   private double area = Double.NaN;
 
+  @SuppressWarnings("unchecked")
+  private RStarBranch(final int capacity) {
+    this.items = (RStarNode<T>[])new RStarNode<?>[capacity];
+  }
+
   public RStarBranch(final int capacity, final RStarBranch<T> item1, final RStarBranch<T> item2) {
-    this.items = new ArrayList<>(capacity);
+    this(capacity);
+    this.itemCount = 2;
+    this.items[0] = item1;
+    this.items[1] = item2;
     this.hasLeaves = false;
-    this.items.add(item1);
-    this.items.add(item2);
     recalculateBoundingBox();
   }
 
   public RStarBranch(final int capacity, final RStarLeaf<T> item) {
-    super(item.getBoundingBox());
-    this.items = new ArrayList<>(capacity);
-    this.items.add(item);
+    this(capacity);
+    setBoundingBox(item.getBoundingBox());
+    this.itemCount = 1;
+    this.items[0] = item;
     this.hasLeaves = true;
     recalculateBoundingBox();
   }
 
   public RStarBranch(final RStarBranch<T> node, final int startIndex) {
+    this(node.itemCount - startIndex);
     this.hasLeaves = node.hasLeaves;
-    final int nodeItemCount = node.items.size();
-    this.items = new ArrayList<>(nodeItemCount - startIndex);
-    for (int i = startIndex; i < nodeItemCount; i++) {
-      final RStarNode<T> item = node.items.get(i);
-      this.items.add(item);
-    }
+    this.itemCount = this.items.length;
+    System.arraycopy(node.items, startIndex, this.items, 0, this.itemCount);
     recalculateBoundingBox();
   }
 
-  @SuppressWarnings("unchecked")
-  private void addItemsToList(final List<RStarLeaf<T>> items) {
+  void addItem(final RStarNode<T> item) {
+    if (this.itemCount < this.items.length) {
+      this.items[this.itemCount] = item;
+    } else {
+      final RStarNode<T>[] oldItems = this.items;
+      @SuppressWarnings("unchecked")
+      final RStarNode<T>[] newItems = (RStarNode<T>[])new RStarNode<?>[oldItems.length
+        + (oldItems.length >> 1)];
+      System.arraycopy(oldItems, 0, newItems, 0, oldItems.length);
+      newItems[oldItems.length] = item;
+      this.items = newItems;
+    }
+    this.itemCount++;
 
+  }
+
+  private void addItemsToList(final List<RStarLeaf<T>> itemList) {
     if (this.hasLeaves) {
-      for (final BoundingBoxProxy item : this.items) {
-        final RStarLeaf<T> leaf = (RStarLeaf<T>)item;
-        items.add(leaf);
+      final int itemCount = this.itemCount;
+      final RStarNode<T>[] items = this.items;
+      for (int i = 0; i < itemCount; i++) {
+        final RStarLeaf<T> leaf = (RStarLeaf<T>)items[i];
+        itemList.add(leaf);
       }
     } else {
-      for (final BoundingBoxProxy item : this.items) {
-        final RStarBranch<T> node = (RStarBranch<T>)item;
-        node.addItemsToList(items);
+      final int itemCount = this.itemCount;
+      final RStarNode<T>[] items = this.items;
+      for (int i = 0; i < itemCount; i++) {
+        final RStarBranch<T> branch = (RStarBranch<T>)items[i];
+        branch.addItemsToList(itemList);
       }
     }
   }
@@ -73,7 +92,10 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
 
   @Override
   public void forEach(final Consumer<? super T> action) {
-    for (final RStarNode<T> item : this.items) {
+    final int itemCount = this.itemCount;
+    final RStarNode<T>[] items = this.items;
+    for (int i = 0; i < itemCount; i++) {
+      final RStarNode<T> item = items[i];
       item.forEach(action);
     }
   }
@@ -81,7 +103,10 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
   @Override
   public void forEach(final double x, final double y, final Consumer<? super T> action) {
     if (bboxCovers(x, y)) {
-      for (final RStarNode<T> item : this.items) {
+      final int itemCount = this.itemCount;
+      final RStarNode<T>[] items = this.items;
+      for (int i = 0; i < itemCount; i++) {
+        final RStarNode<T> item = items[i];
         item.forEach(x, y, action);
       }
     }
@@ -91,27 +116,33 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
   public void forEach(final double minX, final double minY, final double maxX, final double maxY,
     final Consumer<? super T> action) {
     if (bboxIntersects(minX, minY, maxX, maxY)) {
-      for (final RStarNode<T> item : this.items) {
+      final int itemCount = this.itemCount;
+      final RStarNode<T>[] items = this.items;
+      for (int i = 0; i < itemCount; i++) {
+        final RStarNode<T> item = items[i];
         item.forEach(minX, minY, maxX, maxY, action);
       }
     }
   }
 
-  @SuppressWarnings("unchecked")
   public void forEach(final Predicate<RStarBranch<T>> nodeFilter,
     final Predicate<RStarLeaf<T>> leafFilter, final Consumer<RStarLeaf<T>> action) {
     if (this.hasLeaves) {
-      for (final BoundingBoxProxy item : this.items) {
-        final RStarLeaf<T> leaf = (RStarLeaf<T>)item;
+      final int itemCount = this.itemCount;
+      final RStarNode<T>[] items = this.items;
+      for (int i = 0; i < itemCount; i++) {
+        final RStarLeaf<T> leaf = (RStarLeaf<T>)items[i];
         if (leafFilter.test(leaf)) {
           action.accept(leaf);
         }
       }
     } else {
-      for (final BoundingBoxProxy item : this.items) {
-        final RStarBranch<T> node = (RStarBranch<T>)item;
-        if (nodeFilter.test(node)) {
-          node.forEach(nodeFilter, leafFilter, action);
+      final int itemCount = this.itemCount;
+      final RStarNode<T>[] items = this.items;
+      for (int i = 0; i < itemCount; i++) {
+        final RStarBranch<T> branch = (RStarBranch<T>)items[i];
+        if (nodeFilter.test(branch)) {
+          branch.forEach(nodeFilter, leafFilter, action);
         }
       }
     }
@@ -125,15 +156,24 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
     return this.area;
   }
 
+  public RStarNode<T> getItem(final int index) {
+    return this.items[index];
+  }
+
+  public int getItemCount() {
+    return this.itemCount;
+  }
+
   public RStarBranch<T> getMinimum(final Comparator<RStarNode<T>> comparator) {
     RStarBranch<T> minItem = null;
-    for (final BoundingBoxProxy boundable : this.items) {
-      @SuppressWarnings("unchecked")
-      final RStarBranch<T> item = (RStarBranch<T>)boundable;
+    final int itemCount = this.itemCount;
+    final RStarNode<T>[] items = this.items;
+    for (int i = 0; i < itemCount; i++) {
+      final RStarBranch<T> branch = (RStarBranch<T>)items[i];
       if (minItem == null) {
-        minItem = item;
-      } else if (comparator.compare(minItem, item) > 0) {
-        minItem = item;
+        minItem = branch;
+      } else if (comparator.compare(minItem, branch) > 0) {
+        minItem = branch;
       }
 
     }
@@ -143,16 +183,17 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
   public RStarBranch<T> getMinimum(final Comparator<RStarNode<T>> comparator, final int maxCount) {
     RStarBranch<T> minItem = null;
     int count = 0;
-    for (final BoundingBoxProxy boundable : this.items) {
+    final int itemCount = this.itemCount;
+    final RStarNode<T>[] items = this.items;
+    for (int i = 0; i < itemCount; i++) {
       if (count > maxCount) {
         return minItem;
       }
-      @SuppressWarnings("unchecked")
-      final RStarBranch<T> item = (RStarBranch<T>)boundable;
+      final RStarBranch<T> branch = (RStarBranch<T>)items[i];
       if (minItem == null) {
-        minItem = item;
-      } else if (comparator.compare(minItem, item) > 0) {
-        minItem = item;
+        minItem = branch;
+      } else if (comparator.compare(minItem, branch) > 0) {
+        minItem = branch;
       }
       count++;
     }
@@ -165,7 +206,12 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
 
   public void recalculateBoundingBox() {
     clear();
-    this.items.forEach(this::expandBbox);
+    final int itemCount = this.itemCount;
+    final RStarNode<T>[] items = this.items;
+    for (int i = 0; i < itemCount; i++) {
+      final RStarNode<T> item = items[i];
+      expandBbox(item);
+    }
   }
 
   public boolean remove(final RStarTree<T> tree, final BoundingBox boundingBox,
@@ -174,22 +220,21 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
 
     if (bboxIntersects(boundingBox)) {
       boolean removed = false;
-      // this is the easy part: remove nodes if they need to be removed
-
-      for (final Iterator<RStarNode<T>> iterator = this.items.iterator(); iterator.hasNext();) {
-        final RStarNode<T> item = iterator.next();
+      final RStarNode<T>[] items = this.items;
+      for (int i = 0; i < this.itemCount; i++) {
+        final RStarNode<T> item = items[i];
         if (boundingBox.bboxIntersects(boundingBox)) {
           if (this.hasLeaves) {
             final RStarLeaf<T> leaf = (RStarLeaf<T>)item;
             if (leafRemoveFilter.test(leaf)) {
-              iterator.remove();
+              removeItem(i);
               tree.size--;
               removed = true;
             }
           } else {
-            final RStarBranch<T> node = (RStarBranch<T>)item;
-            if (node.remove(tree, boundingBox, leafRemoveFilter, itemsToReinsert, false)) {
-              iterator.remove();
+            final RStarBranch<T> branch = (RStarBranch<T>)item;
+            if (branch.remove(tree, boundingBox, leafRemoveFilter, itemsToReinsert, false)) {
+              removeItem(i);
               removed = true;
             }
           }
@@ -208,19 +253,23 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
 
     // this is the easy part: remove nodes if they need to be removed
     if (this.hasLeaves) {
-      for (final Iterator<RStarNode<T>> iterator = this.items.iterator(); iterator.hasNext();) {
-        final RStarLeaf<T> leaf = (RStarLeaf<T>)iterator.next();
+      final int itemCount = this.itemCount;
+      final RStarNode<T>[] items = this.items;
+      for (int i = 0; i < itemCount; i++) {
+        final RStarLeaf<T> leaf = (RStarLeaf<T>)items[i];
         if (leafRemoveFilter.test(leaf)) {
-          iterator.remove();
+          removeItem(i);
           tree.size--;
         }
 
       }
     } else {
-      for (final Iterator<RStarNode<T>> iterator = this.items.iterator(); iterator.hasNext();) {
-        final RStarBranch<T> node = (RStarBranch<T>)iterator.next();
+      final int itemCount = this.itemCount;
+      final RStarNode<T>[] items = this.items;
+      for (int i = 0; i < itemCount; i++) {
+        final RStarBranch<T> node = (RStarBranch<T>)items[i];
         if (node.remove(tree, leafRemoveFilter, itemsToReinsert, false)) {
-          iterator.remove();
+          removeItem(i);
         }
 
       }
@@ -232,15 +281,15 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
   protected boolean removeIfEmpty(final RStarTree<T> tree, final boolean isRoot,
     final List<RStarLeaf<T>> itemsToReinsert) {
     if (isRoot) {
-      if (this.items.isEmpty()) {
+      if (this.itemCount == 0) {
         this.hasLeaves = true;
         clear();
       }
       return false;
     } else {
-      if (this.items.isEmpty()) {
+      if (this.itemCount == 0) {
         return true;
-      } else if (this.items.size() < tree.getNodeMinItemCount()) {
+      } else if (this.itemCount < tree.getNodeMinItemCount()) {
         addItemsToList(itemsToReinsert);
         return true;
       } else {
@@ -249,16 +298,21 @@ public class RStarBranch<T> extends BoundingBoxDoubleXY implements RStarNode<T> 
     }
   }
 
+  public void removeItem(final int index) {
+    final RStarNode<T>[] items = this.items;
+    System.arraycopy(items, 0, items, 0, index);
+    System.arraycopy(items, index + 1, items, index, this.itemCount - index - 1);
+    this.itemCount--;
+    items[this.itemCount] = null;
+  }
+
   public void setSize(final int size) {
-    int itemCount = this.items.size();
-    while (itemCount > size) {
-      itemCount--;
-      this.items.remove(itemCount);
-    }
+    this.itemCount = size;
+    Arrays.fill(this.items, size, this.items.length, null);
     recalculateBoundingBox();
   }
 
   public void sortItems(final Comparator<RStarNode<T>> comparator) {
-    this.items.sort(comparator);
+    Arrays.sort(this.items, 0, this.itemCount, comparator);
   }
 }

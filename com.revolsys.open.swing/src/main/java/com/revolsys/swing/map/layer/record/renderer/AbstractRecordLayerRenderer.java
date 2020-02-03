@@ -109,6 +109,8 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
 
   private Predicate<Record> filter = DEFAULT_FILTER;
 
+  protected Predicate<Record> filterNoException = DEFAULT_FILTER;
+
   public AbstractRecordLayerRenderer(final String type, final String name) {
     super(type, name);
   }
@@ -121,7 +123,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   @Override
   public AbstractRecordLayerRenderer clone() {
     final AbstractRecordLayerRenderer clone = (AbstractRecordLayerRenderer)super.clone();
-    clone.filter = JavaBeanUtil.clone(this.filter);
+    clone.setFilter(JavaBeanUtil.clone(this.filter));
     return clone;
   }
 
@@ -133,9 +135,14 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     }
   }
 
+  public Predicate<Record> getFilter() {
+    return this.filter;
+  }
+
   public String getQueryFilter() {
-    if (this.filter instanceof RecordDefinitionSqlFilter) {
-      final RecordDefinitionSqlFilter layerFilter = (RecordDefinitionSqlFilter)this.filter;
+    final Predicate<Record> filter = getFilter();
+    if (filter instanceof RecordDefinitionSqlFilter) {
+      final RecordDefinitionSqlFilter layerFilter = (RecordDefinitionSqlFilter)filter;
       return layerFilter.getQuery();
     } else {
       return null;
@@ -153,15 +160,11 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   }
 
   protected boolean isFilterAccept(final LayerRecord record) {
-    try {
-      return this.filter.test(record);
-    } catch (final Throwable e) {
-      return false;
-    }
+    return this.filterNoException.test(record);
   }
 
   public boolean isHasFilter() {
-    return this.filter != DEFAULT_FILTER;
+    return this.filter != Predicates.<Record> all();
   }
 
   @Override
@@ -171,8 +174,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
 
   public boolean isVisible(final LayerRecord record) {
     if (isVisible() && !record.isDeleted()) {
-      final boolean filterAccept = isFilterAccept(record);
-      return filterAccept;
+      return this.filterNoException.test(record);
     } else {
       return false;
     }
@@ -202,7 +204,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
         final Predicate<LayerRecord> filter = record -> {
           return !layer.isHidden(record);
         };
-        records = Lists.filter(view.cancellable(records), filter);
+        records = Lists.filter(view, records, filter);
       }
       renderRecords(view, layer, records);
     }
@@ -214,7 +216,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   public final void renderSelectedRecords(final ViewRenderer view, final AbstractRecordLayer layer,
     List<LayerRecord> records) {
     if (layer.hasGeometryField()) {
-      records = Lists.filter(view.cancellable(records), record -> {
+      records = Lists.filter(view, records, record -> {
         return !layer.isDeleted(record);
       });
       renderSelectedRecordsDo(view, layer, records);
@@ -243,6 +245,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   protected void setFilter(final Predicate<Record> filter) {
     final Object oldValue = this.filter;
     this.filter = filter;
+    this.filterNoException = Predicates.noException(filter);
     firePropertyChange("filter", oldValue, filter);
   }
 
@@ -263,7 +266,8 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   @Override
   public void setProperties(final Map<String, ? extends Object> properties) {
     super.setProperties(properties);
-    this.filter = getFilter(this, properties);
+    final Predicate<Record> filter = getFilter(this, properties);
+    setFilter(filter);
   }
 
   public void setQueryFilter(final String query) {
@@ -281,7 +285,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   @Override
   public JsonObject toMap() {
     final JsonObject map = super.toMap();
-    if (!(this.filter == Predicates.<Record> all())) {
+    if (isHasFilter()) {
       addToMap(map, "filter", this.filter);
     }
     return map;

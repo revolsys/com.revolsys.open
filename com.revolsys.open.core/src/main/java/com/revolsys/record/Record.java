@@ -1027,7 +1027,7 @@ public interface Record
     if (excludeFieldNames.contains(fieldName)) {
       return true;
     } else if (excludeFieldNames.contains(Record.EXCLUDE_ID)
-      && ("OBJECTID".equals(fieldName) || recordDefinition.getIdFieldNames().contains(fieldName))) {
+      && ("OBJECTID".equals(fieldName) || recordDefinition.isIdField(fieldName))) {
       return true;
     } else if (excludeFieldNames.contains(Record.EXCLUDE_GEOMETRY) && ("OBJECTID".equals(fieldName)
       || recordDefinition.getGeometryFieldNames().contains(fieldName))) {

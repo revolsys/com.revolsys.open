@@ -1,7 +1,6 @@
 package com.revolsys.record.query;
 
 import java.util.Arrays;
-import java.util.List;
 
 import com.revolsys.record.Record;
 import com.revolsys.util.Property;
@@ -38,13 +37,14 @@ public class Or extends AbstractMultiCondition {
   }
 
   @Override
-  public boolean test(final Record object) {
-    final List<Condition> conditions = (List)getQueryValues();
-    if (conditions.isEmpty()) {
+  public boolean test(final Record record) {
+    final QueryValue[] values = this.values;
+    if (values.length == 0) {
       return true;
     } else {
-      for (final Condition condition : conditions) {
-        if (condition.test(object)) {
+      for (final QueryValue value : values) {
+        final Condition condition = (Condition)value;
+        if (condition.test(record)) {
           return true;
         }
       }

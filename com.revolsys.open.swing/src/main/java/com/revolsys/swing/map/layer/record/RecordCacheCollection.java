@@ -32,7 +32,11 @@ public class RecordCacheCollection extends AbstractRecordCache<AbstractRecordLay
   @Override
   public boolean containsRecordDo(final LayerRecord record) {
     synchronized (this.records) {
-      return record.contains(this.records);
+      if (this.records.isEmpty()) {
+        return false;
+      } else {
+        return record.contains(this.records);
+      }
     }
   }
 

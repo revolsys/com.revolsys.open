@@ -210,7 +210,7 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
 
   private List<LayerRecord> filterRecords(final ViewRenderer view, List<LayerRecord> records) {
     if (isHasFilter() && !records.isEmpty()) {
-      records = Lists.filter(view.cancellable(records), this::isFilterAccept);
+      records = Lists.filter(view, records, this.filterNoException);
     }
     return records;
   }
