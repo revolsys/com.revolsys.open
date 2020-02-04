@@ -280,7 +280,7 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
           renderer.setParent(null);
         }
         final AbstractRecordLayerRenderer[] oldRenderers = this.renderers;
-        this.renderers = new AbstractRecordLayerRenderer[oldRenderers.length + 1];
+        this.renderers = new AbstractRecordLayerRenderer[oldRenderers.length - 1];
         System.arraycopy(oldRenderers, 0, this.renderers, 0, index);
         System.arraycopy(oldRenderers, index + 1, this.renderers, index,
           oldRenderers.length - index - 1);
