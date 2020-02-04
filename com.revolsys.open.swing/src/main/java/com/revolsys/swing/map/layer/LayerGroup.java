@@ -338,15 +338,18 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       layer.setName(newName);
       int addIndex = index;
       final Layer[] oldLayers = this.layers;
-      this.layers = new Layer[oldLayers.length + 1];
-      if (index >= 0 && index < oldLayers.length) {
-        System.arraycopy(oldLayers, 0, this.layers, 0, index);
-        System.arraycopy(oldLayers, index, this.layers, index + 1, oldLayers.length - index);
+      final Layer[] newLayers = new Layer[oldLayers.length + 1];
+      if (addIndex == 0) {
+        System.arraycopy(oldLayers, 0, newLayers, 1, oldLayers.length);
+      } else if (addIndex > 0 && addIndex < oldLayers.length) {
+        System.arraycopy(oldLayers, 0, newLayers, 0, index);
+        System.arraycopy(oldLayers, addIndex, newLayers, index + 1, oldLayers.length - index);
       } else {
         addIndex = oldLayers.length;
-        System.arraycopy(oldLayers, 0, this.layers, 0, oldLayers.length);
+        System.arraycopy(oldLayers, 0, newLayers, 0, oldLayers.length);
       }
-      this.layers[addIndex] = layer;
+      newLayers[addIndex] = layer;
+      this.layers = newLayers;
 
       layer.setLayerGroup(this);
       initialize(layer);
@@ -1066,7 +1069,7 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       final Layer layer = (Layer)o;
       synchronized (this.layers) {
         final int index = indexOf(layer);
-        if (index > 0) {
+        if (index >= 0) {
           removeLayer(index);
           return true;
         }

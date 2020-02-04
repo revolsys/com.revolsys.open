@@ -58,12 +58,12 @@ public class MonotoneChainEdge {
 
   // the lists of start/end indexes of the monotone chains.
   // Includes the end point of the edge as a sentinel
-  private final int[] startIndex;
+  final int[] startIndexes;
 
   public MonotoneChainEdge(final Edge edge) {
     this.edge = edge;
     final MonotoneChainIndexer mcb = new MonotoneChainIndexer();
-    this.startIndex = mcb.getChainStartIndices(edge);
+    this.startIndexes = mcb.getChainStartIndices(edge);
   }
 
   private void computeIntersections(final LineString line1, final int fromIndex1,
@@ -149,19 +149,19 @@ public class MonotoneChainEdge {
     final int chainIndex2, final SegmentIntersector si) {
     final Edge edge1 = this.edge;
     final LineString line1 = edge1.getLineString();
-    final int fromIndex1 = this.startIndex[chainIndex1];
+    final int fromIndex1 = this.startIndexes[chainIndex1];
     final double fromX1 = line1.getX(fromIndex1);
     final double fromY1 = line1.getY(fromIndex1);
-    final int toIndex1 = this.startIndex[chainIndex1 + 1];
+    final int toIndex1 = this.startIndexes[chainIndex1 + 1];
     final double toX1 = line1.getX(toIndex1);
     final double toY1 = line1.getY(toIndex1);
 
     final Edge edge2 = mce.edge;
     final LineString line2 = edge2.getLineString();
-    final int fromIndex2 = mce.startIndex[chainIndex2];
+    final int fromIndex2 = mce.startIndexes[chainIndex2];
     final double fromX2 = line2.getX(fromIndex2);
     final double fromY2 = line2.getY(fromIndex2);
-    final int toIndex2 = mce.startIndex[chainIndex2 + 1];
+    final int toIndex2 = mce.startIndexes[chainIndex2 + 1];
     final double toX2 = line2.getX(toIndex2);
     final double toY2 = line2.getY(toIndex2);
 
@@ -169,15 +169,4 @@ public class MonotoneChainEdge {
       fromIndex2, fromX2, fromY2, toIndex2, toX2, toY2, si);
   }
 
-  public Edge getEdge() {
-    return this.edge;
-  }
-
-  public int getStartIndexCount() {
-    return this.startIndex.length;
-  }
-
-  public int[] getStartIndexes() {
-    return this.startIndex;
-  }
 }

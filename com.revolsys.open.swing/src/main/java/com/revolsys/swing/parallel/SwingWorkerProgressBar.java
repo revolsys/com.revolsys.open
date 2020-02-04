@@ -29,7 +29,7 @@ public class SwingWorkerProgressBar extends JPanel implements PropertyChangeList
   public void propertyChange(final PropertyChangeEvent event) {
     Invoke.later(() -> {
       final boolean visible = Invoke.hasWorker();
-      this.busyLabel.setBusy(visible);
+      // this.busyLabel.setBusy(visible);
       setVisible(visible);
     });
   }
