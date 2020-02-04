@@ -12,7 +12,6 @@ import java.util.HashSet;
 import javax.swing.JComponent;
 
 import org.jeometry.common.awt.WebColors;
-import org.jeometry.common.date.Dates;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.geometry.model.BoundingBox;
@@ -157,7 +156,6 @@ public class LayerRendererOverlay extends JComponent
   private GeoreferencedImage refreshImage(final Cancellable cancellable) {
     final Viewport2D viewport = this.viewport;
     if (this.layer != null && viewport.isViewValid()) {
-      final long startTime = System.currentTimeMillis();
       try (
         final ImageViewport imageViewport = new ImageViewport(viewport)) {
         final ViewRenderer view = imageViewport.newViewRenderer();
@@ -182,8 +180,6 @@ public class LayerRendererOverlay extends JComponent
         if (!cancellable.isCancelled()) {
           Logs.error(this, "Unable to paint", t);
         }
-      } finally {
-        Dates.printEllapsedTime(startTime);
       }
     }
     return EMPTY_IMAGE;

@@ -6,6 +6,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import org.jdesktop.swingx.JXBusyLabel;
 
@@ -27,16 +28,22 @@ public class SwingWorkerProgressBar extends JPanel implements PropertyChangeList
 
   @Override
   public void propertyChange(final PropertyChangeEvent event) {
-    Invoke.later(() -> {
-      final boolean visible = Invoke.hasWorker();
-      // this.busyLabel.setBusy(visible);
-      setVisible(visible);
-    });
+    updateVisible();
   }
 
   @Override
   public void removeNotify() {
     super.removeNotify();
     Invoke.getPropertyChangeSupport().removePropertyChangeListener("workers", this);
+  }
+
+  private void updateVisible() {
+    if (SwingUtilities.isEventDispatchThread()) {
+      final boolean visible = Invoke.hasWorker();
+      this.busyLabel.setBusy(visible);
+      setVisible(visible);
+    } else {
+      Invoke.laterQueue(this::updateVisible);
+    }
   }
 }
