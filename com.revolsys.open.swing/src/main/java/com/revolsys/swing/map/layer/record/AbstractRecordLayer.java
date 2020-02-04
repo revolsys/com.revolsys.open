@@ -2710,7 +2710,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   void removeProxiedRecordIdentifier(final Identifier identifier) {
-    ShortCounter.deccrement(this.proxiedRecordIdentifiers, identifier);
+    ShortCounter.decrement(this.proxiedRecordIdentifiers, identifier);
   }
 
   protected boolean removeRecordFromCache(final LayerRecord record) {

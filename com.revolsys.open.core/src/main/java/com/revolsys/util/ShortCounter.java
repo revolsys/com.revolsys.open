@@ -11,7 +11,7 @@ public final class ShortCounter extends Number {
 
   private static final long serialVersionUID = 1L;
 
-  public static <K> short deccrement(final Map<K, ShortCounter> counts, final K key) {
+  public static <K> short decrement(final Map<K, ShortCounter> counts, final K key) {
     if (key == null) {
       return ZERO;
     } else {

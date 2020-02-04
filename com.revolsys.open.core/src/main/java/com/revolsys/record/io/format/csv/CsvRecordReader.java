@@ -194,6 +194,8 @@ public class CsvRecordReader extends AbstractRecordReader {
               }
             }
           break;
+          case 65279: // Byte Order Mark
+          break;
           default:
             if (character == fieldSeparator) {
               if (inQuotes) {
@@ -208,6 +210,15 @@ public class CsvRecordReader extends AbstractRecordReader {
           break;
         }
       }
+    }
+  }
+
+  @Override
+  public String toString() {
+    if (this.resource == null) {
+      return super.toString();
+    } else {
+      return this.resource.toString();
     }
   }
 }
