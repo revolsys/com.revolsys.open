@@ -28,6 +28,8 @@ import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 
+import com.revolsys.util.Debug;
+
 public class JdbcConnection implements Connection {
   private Connection connection;
 
@@ -79,6 +81,14 @@ public class JdbcConnection implements Connection {
   @Override
   public void close() {
     if (this.connection != null) {
+      try {
+        if (isClosed()) {
+          Debug.noOp();
+        }
+      } catch (final SQLException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
       JdbcUtils.release(this.connection, this.dataSource);
       this.connection = null;
       this.dataSource = null;
@@ -217,7 +227,8 @@ public class JdbcConnection implements Connection {
 
   @Override
   public boolean isClosed() throws SQLException {
-    return getConnection() == null || getConnection().isClosed();
+    final Connection connection = this.connection;
+    return connection == null || connection.isClosed();
   }
 
   @Override

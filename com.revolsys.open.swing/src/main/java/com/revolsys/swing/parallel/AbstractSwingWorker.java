@@ -13,9 +13,10 @@ import org.jeometry.common.date.Dates;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.util.Cancellable;
 
 public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V>
-  implements BackgroundTask {
+  implements BackgroundTask, Cancellable {
   private static final Cursor WAIT_CURSOR = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
 
   private boolean logTimes = false;

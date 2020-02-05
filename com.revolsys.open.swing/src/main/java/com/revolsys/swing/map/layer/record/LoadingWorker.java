@@ -32,12 +32,12 @@ public class LoadingWorker extends AbstractSwingWorker<List<LayerRecord>, Void> 
   protected List<LayerRecord> handleBackground() {
     try {
       final Query query = this.layer.newBoundingBoxQuery(this.viewportBoundingBox);
-      // TODO cancellable
+      query.setCancellable(this);
       final List<LayerRecord> records = this.layer.getRecords(query);
       this.layer.setIndexRecords(this.viewportBoundingBox, records);
       return records;
     } catch (final Exception e) {
-      if (this.layer.isDeleted()) {
+      if (this.layer.isDeleted() || isCancelled()) {
         return null;
       } else {
         throw e;

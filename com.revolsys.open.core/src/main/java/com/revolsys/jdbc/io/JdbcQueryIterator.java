@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import javax.annotation.PreDestroy;
-
 import org.jeometry.common.io.PathName;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.UncategorizedSQLException;
@@ -109,8 +107,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
   }
 
   @Override
-  @PreDestroy
-  public void closeDo() {
+  public synchronized void closeDo() {
     JdbcUtils.close(this.statement, this.resultSet);
     FileUtil.closeSilent(this.connection);
     this.fields = null;
@@ -136,7 +133,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
   @Override
   protected Record getNext() throws NoSuchElementException {
     try {
-      if (this.resultSet != null && this.resultSet.next() && !this.query.isCancelled()) {
+      if (this.resultSet != null && !this.query.isCancelled() && this.resultSet.next()) {
         final Record record = getNextRecord(this.recordStore, this.recordDefinition, this.fields,
           this.recordFactory, this.resultSet, this.internStrings);
         if (this.labelCountMap != null) {

@@ -215,8 +215,10 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         }
       } catch (final CancellationException e) {
       } catch (final RuntimeException e) {
-        Logs.error(this, "Error executing query: " + query, e);
-        throw e;
+        if (!query.isCancelled()) {
+          Logs.error(this, "Error executing query: " + query, e);
+          throw e;
+        }
       }
     }
   }
