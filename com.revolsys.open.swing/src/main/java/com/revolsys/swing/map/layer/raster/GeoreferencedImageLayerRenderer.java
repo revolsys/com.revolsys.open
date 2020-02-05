@@ -12,7 +12,8 @@ public class GeoreferencedImageLayerRenderer
   extends AbstractLayerRenderer<GeoreferencedImageLayer> {
 
   public GeoreferencedImageLayerRenderer(final GeoreferencedImageLayer layer) {
-    super("raster", layer);
+    super("raster", "Raster", null);
+    setLayer(layer);
   }
 
   @Override

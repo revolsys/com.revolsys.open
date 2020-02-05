@@ -47,7 +47,7 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
   private TextStyle textStyle;
 
   private GridLayerRenderer() {
-    super("gridLayerRenderer", "Grid Style");
+    super("gridLayerRenderer", "Grid Style", ICON);
     this.geometryStyle = GeometryStyle.line(WebColors.LightGray);
     this.geometryStyle.setPolygonFillOpacity(0);
 
@@ -57,8 +57,6 @@ public class GridLayerRenderer extends AbstractLayerRenderer<GridLayer> {
     this.textStyle.setTextPlacementType("auto");
     this.textStyle.setTextHorizontalAlignment("center");
     this.textStyle.setTextVerticalAlignment("middle");
-
-    setIcon(ICON);
   }
 
   public GridLayerRenderer(final GridLayer layer) {

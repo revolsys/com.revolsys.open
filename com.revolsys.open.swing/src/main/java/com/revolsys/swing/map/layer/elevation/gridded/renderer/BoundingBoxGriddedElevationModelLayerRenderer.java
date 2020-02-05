@@ -36,9 +36,14 @@ public class BoundingBoxGriddedElevationModelLayerRenderer
 
   private GeometryStyle style = new GeometryStyle();
 
+  private BoundingBoxGriddedElevationModelLayerRenderer() {
+    super("boundingBoxGriddedElevationModelLayerRenderer", "Outline", ICON);
+
+  }
+
   public BoundingBoxGriddedElevationModelLayerRenderer(final ElevationModelLayer layer,
     final MultipleLayerRenderer<ElevationModelLayer, AbstractGriddedElevationModelLayerRenderer> parent) {
-    super("boundingBoxGriddedElevationModelLayerRenderer", "Outline");
+    this();
     setParent((LayerRenderer<?>)parent);
     setLayer(layer);
     setStyle(DEFAULT_STYLE.clone());
@@ -46,8 +51,7 @@ public class BoundingBoxGriddedElevationModelLayerRenderer
 
   public BoundingBoxGriddedElevationModelLayerRenderer(
     final Map<String, ? extends Object> properties) {
-    super("boundingBoxGriddedElevationModelLayerRenderer", "Outline");
-    setIcon(ICON);
+    this();
     setProperties(properties);
   }
 

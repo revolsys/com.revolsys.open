@@ -22,14 +22,17 @@ public class ScaleMultipleRenderer extends AbstractMultipleRecordLayerRenderer {
 
   private transient AbstractRecordLayerRenderer renderer;
 
-  public ScaleMultipleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
-    super("scaleStyle", layer, parent);
-    setIcon(ICON);
+  private ScaleMultipleRenderer() {
+    super("scaleStyle", "Scale Styles", ICON);
+  }
+
+  public ScaleMultipleRenderer(final LayerRenderer<?> parent) {
+    this();
+    setParent(parent);
   }
 
   public ScaleMultipleRenderer(final Map<String, ? extends Object> properties) {
-    super("scaleStyle", "Scale Styles");
-    setIcon(ICON);
+    this();
     setProperties(properties);
   }
 

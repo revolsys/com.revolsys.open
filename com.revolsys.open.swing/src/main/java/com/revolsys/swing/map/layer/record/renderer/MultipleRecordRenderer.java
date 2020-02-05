@@ -20,37 +20,40 @@ import com.revolsys.swing.map.view.ViewRenderer;
 public class MultipleRecordRenderer extends AbstractMultipleRecordLayerRenderer {
   private static final Icon ICON = Icons.getIcon("style_multiple");
 
-  public MultipleRecordRenderer(final AbstractRecordLayer layer) {
-    super("multipleStyle", "Multiple Styles");
-    setIcon(ICON);
-  }
-
-  public MultipleRecordRenderer(final AbstractRecordLayer layer,
+  public static MultipleRecordRenderer create(final AbstractRecordLayer layer,
     final AbstractRecordLayerRenderer... renderers) {
-    this(layer, Arrays.asList(renderers));
+    return new MultipleRecordRenderer(layer, Arrays.asList(renderers));
   }
 
-  public MultipleRecordRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
-    super("multipleStyle", layer, parent);
-    setIcon(ICON);
+  public MultipleRecordRenderer() {
+    super("multipleStyle", "Multiple Styles", ICON);
+  }
+
+  public MultipleRecordRenderer(final AbstractRecordLayer layer) {
+    this();
+    setLayer(layer);
   }
 
   public MultipleRecordRenderer(final AbstractRecordLayer layer,
     final List<? extends AbstractRecordLayerRenderer> renderers) {
-    super("multipleStyle", "Multiple Styles");
-    setIcon(ICON);
+    this();
+    setLayer(layer);
     setRenderers(renderers);
   }
 
+  public MultipleRecordRenderer(final LayerRenderer<?> parent) {
+    this();
+    setParent(parent);
+  }
+
   public MultipleRecordRenderer(final Map<String, ? extends Object> properties) {
-    super("multipleStyle", "Multiple Styles");
-    setIcon(ICON);
+    this();
     setProperties(properties);
   }
 
   public void addStyle(final GeometryStyle style) {
-    final GeometryStyleRecordLayerRenderer renderer = new GeometryStyleRecordLayerRenderer(
-      getLayer(), this, style);
+    final GeometryStyleRecordLayerRenderer renderer = new GeometryStyleRecordLayerRenderer(this,
+      style);
     addRenderer(renderer);
   }
 

@@ -5,16 +5,17 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
+
+import javax.swing.Icon;
 
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.swing.map.layer.Layer;
-import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.MultipleLayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -48,14 +49,12 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
   private static final List<AbstractRecordLayerRenderer> EMPTY_LIST = Collections.emptyList();
 
   protected static void addAddMenuItem(final MenuFactory menu, final String type,
-    final BiFunction<AbstractRecordLayer, AbstractMultipleRecordLayerRenderer, AbstractRecordLayerRenderer> rendererFactory) {
+    final Function<AbstractMultipleRecordLayerRenderer, AbstractRecordLayerRenderer> rendererFactory) {
     final String iconName = ("style_" + type + ":add").toLowerCase();
     final String name = "Add " + type + " Style";
     menu.addMenuItem("add", name, iconName,
       (final AbstractMultipleRecordLayerRenderer parentRenderer) -> {
-        final AbstractRecordLayer layer = parentRenderer.getLayer();
-        final AbstractRecordLayerRenderer newRenderer = rendererFactory.apply(layer,
-          parentRenderer);
+        final AbstractRecordLayerRenderer newRenderer = rendererFactory.apply(parentRenderer);
         parentRenderer.addRendererEdit(newRenderer);
       }, false);
   }
@@ -73,14 +72,9 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
 
   protected AbstractRecordLayerRenderer[] renderers = EMPTY_ARRAY;
 
-  public AbstractMultipleRecordLayerRenderer(final String type, final AbstractRecordLayer layer,
-    final LayerRenderer<?> parent) {
-    super(type, "Styles", layer, parent);
-
-  }
-
-  public AbstractMultipleRecordLayerRenderer(final String type, final String name) {
-    super(type, name);
+  public AbstractMultipleRecordLayerRenderer(final String type, final String name,
+    final Icon icon) {
+    super(type, name, icon);
   }
 
   @Override
@@ -153,7 +147,7 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
-    final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(layer, parent);
+    final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(parent);
     newRenderer.setProperties(style);
     newRenderer.cloneRenderers(this);
     String name = getName();
@@ -173,7 +167,7 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
-    final MultipleRecordRenderer newRenderer = new MultipleRecordRenderer(layer, parent);
+    final MultipleRecordRenderer newRenderer = new MultipleRecordRenderer(parent);
     newRenderer.setProperties(style);
     newRenderer.cloneRenderers(this);
     String name = getName();
@@ -193,7 +187,7 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
     final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
     final Map<String, Object> style = toMap();
     style.remove("styles");
-    final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(layer, parent);
+    final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(parent);
     newRenderer.setProperties(style);
     newRenderer.cloneRenderers(this);
     String name = getName();
@@ -322,6 +316,11 @@ public abstract class AbstractMultipleRecordLayerRenderer extends AbstractRecord
   @Override
   public void setLayer(final AbstractRecordLayer layer) {
     super.setLayer(layer);
+    synchronized (this.renderers) {
+      for (final AbstractRecordLayerRenderer renderer : this.renderers) {
+        renderer.setLayer(layer);
+      }
+    }
     refreshIcon();
   }
 

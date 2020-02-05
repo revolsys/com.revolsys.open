@@ -43,25 +43,10 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
 
   private boolean open = false;
 
-  public AbstractLayerRenderer(final String type) {
-    this(type, (String)null);
-  }
-
-  public AbstractLayerRenderer(final String type, final String name) {
+  public AbstractLayerRenderer(final String type, final String name, final Icon icon) {
     this.type = type;
     setName(name);
-  }
-
-  public AbstractLayerRenderer(final String type, final String name, final T layer,
-    final LayerRenderer<?> parent) {
-    this(type, name);
-    setLayer(layer);
-    setParent(parent);
-  }
-
-  public AbstractLayerRenderer(final String type, final T layer) {
-    this(type);
-    setLayer(layer);
+    setIcon(icon);
   }
 
   @SuppressWarnings("unchecked")
@@ -78,15 +63,9 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
     return this.icon;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public T getLayer() {
-    final LayerRenderer<?> parent = getParent();
-    if (parent == null) {
-      return this.layer;
-    } else {
-      return (T)parent.getLayer();
-    }
+    return this.layer;
   }
 
   public long getMaximumScale() {
@@ -275,10 +254,13 @@ public abstract class AbstractLayerRenderer<T extends Layer> extends
     final LayerRenderer<?> oldValue = this.parent;
     Property.removeListener(this, oldValue);
     this.parent = parent;
-    if (parent != null) {
-      setLayer((T)parent.getLayer());
+    if (parent == null) {
+      setLayer(null);
+    } else {
+      final T layer = (T)parent.getLayer();
+      setLayer(layer);
+      Property.addListener(this, parent);
     }
-    Property.addListener(this, parent);
     firePropertyChange("parent", oldValue, parent);
   }
 

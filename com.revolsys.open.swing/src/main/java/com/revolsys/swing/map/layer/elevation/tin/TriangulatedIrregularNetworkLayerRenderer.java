@@ -17,7 +17,8 @@ public class TriangulatedIrregularNetworkLayerRenderer
     WebColors.newAlpha(WebColors.Aqua, 50));
 
   public TriangulatedIrregularNetworkLayerRenderer(final TriangulatedIrregularNetworkLayer layer) {
-    super("raster", layer);
+    super("raster", "Raster", null);
+    setLayer(layer);
   }
 
   @Override

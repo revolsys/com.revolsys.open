@@ -5,7 +5,8 @@ import com.revolsys.swing.map.view.ViewRenderer;
 
 public class LayerGroupRenderer extends AbstractLayerRenderer<LayerGroup> {
   public LayerGroupRenderer(final LayerGroup layer) {
-    super("group", layer);
+    super("group", "Group", null);
+    setLayer(layer);
   }
 
   @Override

@@ -20,7 +20,8 @@ public class ViewFunctionImageLayerRenderer<L extends AbstractLayer>
 
   public ViewFunctionImageLayerRenderer(final L layer,
     final Function<ViewRenderer, GeoreferencedImage> newImageFunction) {
-    super(layer.getType() + "Renderer", layer);
+    super(layer.getType() + "Renderer", layer.getType() + " Renderer", null);
+    setLayer(layer);
     this.newImageFunction = newImageFunction;
     layer.addPropertyChangeListener("refresh", e -> this.hasError = false);
   }

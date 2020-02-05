@@ -2,24 +2,21 @@ package com.revolsys.swing.map.layer.record.renderer;
 
 import java.util.List;
 
+import javax.swing.Icon;
+
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.TopologyException;
-import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.view.ViewRenderer;
 
 public abstract class AbstractGeometryRecordLayerRenderer extends AbstractRecordLayerRenderer {
 
-  public AbstractGeometryRecordLayerRenderer(final String type, final String name) {
-    super(type, name);
-  }
-
   public AbstractGeometryRecordLayerRenderer(final String type, final String name,
-    final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
-    super(type, name, layer, parent);
+    final Icon icon) {
+    super(type, name, icon);
   }
 
   protected abstract void renderRecord(final ViewRenderer view, final AbstractRecordLayer layer,

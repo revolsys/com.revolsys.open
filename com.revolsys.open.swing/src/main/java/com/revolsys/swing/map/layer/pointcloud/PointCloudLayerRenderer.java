@@ -13,7 +13,8 @@ public class PointCloudLayerRenderer extends AbstractLayerRenderer<PointCloudLay
   private static final GeometryStyle STYLE_BOUNDING_BOX = GeometryStyle.line(WebColors.Green, 1);
 
   public PointCloudLayerRenderer(final PointCloudLayer layer) {
-    super("raster", layer);
+    super("raster", "Raster", null);
+    setLayer(layer);
   }
 
   @Override

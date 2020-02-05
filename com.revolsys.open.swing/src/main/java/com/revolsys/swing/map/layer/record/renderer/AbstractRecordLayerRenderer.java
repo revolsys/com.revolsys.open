@@ -111,13 +111,8 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
 
   protected Predicate<Record> filterNoException = DEFAULT_FILTER;
 
-  public AbstractRecordLayerRenderer(final String type, final String name) {
-    super(type, name);
-  }
-
-  public AbstractRecordLayerRenderer(final String type, final String name,
-    final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
-    super(type, name, layer, parent);
+  public AbstractRecordLayerRenderer(final String type, final String name, final Icon icon) {
+    super(type, name, icon);
   }
 
   @Override
@@ -300,7 +295,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   public FilterMultipleRenderer wrapWithFilterStyle() {
     final AbstractRecordLayer layer = getLayer();
     final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
-    final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(layer, parent);
+    final FilterMultipleRenderer newRenderer = new FilterMultipleRenderer(parent);
     wrap(layer, parent, newRenderer);
     return newRenderer;
   }
@@ -308,7 +303,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   public MultipleRecordRenderer wrapWithMultipleStyle() {
     final AbstractRecordLayer layer = getLayer();
     final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
-    final MultipleRecordRenderer newRenderer = new MultipleRecordRenderer(layer, parent);
+    final MultipleRecordRenderer newRenderer = new MultipleRecordRenderer(parent);
     wrap(layer, parent, newRenderer);
     return newRenderer;
   }
@@ -316,7 +311,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   public ScaleMultipleRenderer wrapWithScaleStyle() {
     final AbstractRecordLayer layer = getLayer();
     final AbstractMultipleRecordLayerRenderer parent = (AbstractMultipleRecordLayerRenderer)getParent();
-    final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(layer, parent);
+    final ScaleMultipleRenderer newRenderer = new ScaleMultipleRenderer(parent);
     wrap(layer, parent, newRenderer);
     return newRenderer;
   }

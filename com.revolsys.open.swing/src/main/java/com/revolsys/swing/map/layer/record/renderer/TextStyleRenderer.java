@@ -26,19 +26,23 @@ public class TextStyleRenderer extends AbstractGeometryRecordLayerRenderer {
 
   private TextStyle style = new TextStyle();
 
-  public TextStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
-    super("textStyle", "Text Style", layer, parent);
-    setIcon(newIcon());
+  public TextStyleRenderer() {
+    super("textStyle", "Text Style", ICON);
   }
 
   public TextStyleRenderer(final AbstractRecordLayer layer, final TextStyle textStyle) {
-    super("textStyle", "Text Style");
+    this();
     setStyle(textStyle);
   }
 
+  public TextStyleRenderer(final LayerRenderer<?> parent) {
+    this();
+    setParent(parent);
+    setIcon(newIcon());
+  }
+
   public TextStyleRenderer(final Map<String, ? extends Object> properties) {
-    super("textStyle", "Text Style");
-    setIcon(ICON);
+    this();
     setProperties(properties);
   }
 

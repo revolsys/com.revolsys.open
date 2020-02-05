@@ -22,7 +22,6 @@ import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
@@ -63,31 +62,35 @@ public class GeometryStyleRecordLayerRenderer extends AbstractGeometryRecordLaye
 
   private GeometryStyle style = new GeometryStyle();
 
+  public GeometryStyleRecordLayerRenderer() {
+    super("geometryStyle", "Geometry Style", ICON);
+  }
+
   public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer) {
     this(layer, new GeometryStyle());
   }
 
   public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer,
     final GeometryStyle style) {
-    this(layer, null, style);
-  }
-
-  public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer,
-    final LayerRenderer<?> parent) {
-    super("geometryStyle", "Geometry Style", layer, parent);
-    setIcon(ICON);
-  }
-
-  public GeometryStyleRecordLayerRenderer(final AbstractRecordLayer layer,
-    final LayerRenderer<?> parent, final GeometryStyle style) {
-    super("geometryStyle", "Geometry Style", layer, parent);
+    this();
+    setLayer(layer);
     setStyle(style);
-    setIcon(ICON);
+  }
+
+  public GeometryStyleRecordLayerRenderer(final LayerRenderer<?> parent) {
+    this();
+    setParent(parent);
+  }
+
+  public GeometryStyleRecordLayerRenderer(final LayerRenderer<?> parent,
+    final GeometryStyle style) {
+    this();
+    setParent(parent);
+    setStyle(style);
   }
 
   public GeometryStyleRecordLayerRenderer(final Map<String, ? extends Object> properties) {
-    super("geometryStyle", "Geometry Style");
-    setIcon(ICON);
+    this();
     setProperties(properties);
   }
 
@@ -102,10 +105,7 @@ public class GeometryStyleRecordLayerRenderer extends AbstractGeometryRecordLaye
 
   @Override
   public DataType getGeometryType() {
-    final AbstractRecordLayer layer = getLayer();
-    final RecordDefinition recordDefinition = layer.getRecordDefinition();
-    final FieldDefinition geometryField = recordDefinition.getGeometryField();
-
+    final FieldDefinition geometryField = getGeometryField();
     if (geometryField != null) {
       final DataType geometryDataType = geometryField.getDataType();
       if (GeometryDataTypes.GEOMETRY_COLLECTION.equals(geometryDataType)) {

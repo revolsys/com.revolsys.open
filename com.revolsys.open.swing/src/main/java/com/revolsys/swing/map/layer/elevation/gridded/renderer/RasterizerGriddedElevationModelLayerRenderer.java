@@ -109,7 +109,7 @@ public class RasterizerGriddedElevationModelLayerRenderer
   private GriddedElevationModelImageRasterizer joclRasterizer;
 
   private RasterizerGriddedElevationModelLayerRenderer() {
-    super("rasterizerGriddedElevationModelLayerRenderer", "DEM Style");
+    super("rasterizerGriddedElevationModelLayerRenderer", "DEM Style", null);
   }
 
   public RasterizerGriddedElevationModelLayerRenderer(final ElevationModelLayer layer,

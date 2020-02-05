@@ -37,8 +37,9 @@ public abstract class AbstractGriddedElevationModelLayerRenderer
 
   private GriddedElevationModel elevationModel;
 
-  public AbstractGriddedElevationModelLayerRenderer(final String type, final String name) {
-    super(type, name);
+  public AbstractGriddedElevationModelLayerRenderer(final String type, final String name,
+    final Icon icon) {
+    super(type, name, icon);
   }
 
   @Override

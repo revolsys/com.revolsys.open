@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.Icon;
+
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
@@ -25,6 +27,8 @@ public class MultipleGriddedElevationModelLayerRenderer
   extends AbstractGriddedElevationModelLayerRenderer
   implements IMultipleGriddedElevationModelLayerRenderer {
 
+  private static final Icon ICON = Icons.getIcon("folder:palette");
+
   static {
     MenuFactory.addMenuInitializer(MultipleGriddedElevationModelLayerRenderer.class, menu -> {
       RasterizerGriddedElevationModelLayerRenderer.initMenus(menu);
@@ -34,8 +38,7 @@ public class MultipleGriddedElevationModelLayerRenderer
   private List<AbstractGriddedElevationModelLayerRenderer> renderers = new ArrayList<>();
 
   private MultipleGriddedElevationModelLayerRenderer() {
-    super("multipleGriddedElevationModelLayerRenderer", "Styles");
-    setIcon(Icons.getIcon("folder:palette"));
+    super("multipleGriddedElevationModelLayerRenderer", "Styles", ICON);
   }
 
   public MultipleGriddedElevationModelLayerRenderer(final GriddedElevationModelLayer layer) {
@@ -199,6 +202,11 @@ public class MultipleGriddedElevationModelLayerRenderer
   @Override
   public void setLayer(final ElevationModelLayer layer) {
     super.setLayer(layer);
+    synchronized (this.renderers) {
+      for (final AbstractGriddedElevationModelLayerRenderer renderer : this.renderers) {
+        renderer.setLayer(layer);
+      }
+    }
     refreshIcon();
   }
 

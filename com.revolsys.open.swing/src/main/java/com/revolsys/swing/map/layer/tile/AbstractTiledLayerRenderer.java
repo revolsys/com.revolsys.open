@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import javax.swing.Icon;
+
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.geometry.model.BoundingBox;
@@ -45,13 +47,8 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
 
   private final Object errorSync = new Object();
 
-  public AbstractTiledLayerRenderer(final String type, final AbstractTiledLayer<D, T> layer) {
-    super(type, layer);
-    Property.addListener(layer, this);
-  }
-
-  public AbstractTiledLayerRenderer(final String type, final String name) {
-    super(type, name);
+  public AbstractTiledLayerRenderer(final String type, final String name, final Icon icon) {
+    super(type, name, icon);
   }
 
   protected void clearCachedTiles() {
@@ -163,6 +160,7 @@ public abstract class AbstractTiledLayerRenderer<D, T extends AbstractMapTile<D>
   public void setLayer(final AbstractTiledLayer<D, T> layer) {
     super.setLayer(layer);
     if (layer != null) {
+      Property.addListener(layer, this);
       layer.addPropertyChangeListener("refresh", e -> {
         synchronized (this.errorSync) {
           this.hasError = false;

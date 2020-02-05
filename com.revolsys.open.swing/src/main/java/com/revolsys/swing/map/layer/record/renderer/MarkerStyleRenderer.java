@@ -23,24 +23,23 @@ public class MarkerStyleRenderer extends AbstractGeometryRecordLayerRenderer {
 
   private MarkerStyle style = new MarkerStyle();
 
-  public MarkerStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent) {
-    super("markerStyle", "Marker Style", layer, parent);
-    setIcon(ICON);
-  }
-
-  public MarkerStyleRenderer(final AbstractRecordLayer layer, final LayerRenderer<?> parent,
-    final MarkerStyle style) {
-    super("markerStyle", "Marker Style", layer, parent);
-    setStyle(style);
+  public MarkerStyleRenderer() {
+    super("markerStyle", "Marker Style", ICON);
   }
 
   public MarkerStyleRenderer(final AbstractRecordLayer layer, final MarkerStyle style) {
-    this(layer, null, style);
+    this();
+    setLayer(layer);
+    setStyle(style);
+  }
+
+  public MarkerStyleRenderer(final LayerRenderer<?> parent) {
+    this();
+    setParent(parent);
   }
 
   public MarkerStyleRenderer(final Map<String, ? extends Object> properties) {
-    super("markerStyle", "Marker Style");
-    setIcon(ICON);
+    this();
     setProperties(properties);
   }
 

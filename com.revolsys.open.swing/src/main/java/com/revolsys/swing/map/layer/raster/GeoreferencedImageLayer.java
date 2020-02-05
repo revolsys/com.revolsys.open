@@ -75,7 +75,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
 
     private AbstractLayerRenderer<GeoreferencedImageLayer> newLayerRenderer() {
       final AbstractLayerRenderer<AbstractTiledGeoreferencedImageLayer<GeoreferencedImageMapTile>> tiledRenderer = getRenderer();
-      return new AbstractLayerRenderer<>("") {
+      return new AbstractLayerRenderer<>("", "", null) {
         @Override
         public void render(final ViewRenderer view, final GeoreferencedImageLayer layer) {
           tiledRenderer.render(view, TiledLayer.this);

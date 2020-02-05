@@ -20,11 +20,8 @@ public class TiledGeoreferencedImageLayerRenderer<T extends GeoreferencedImageMa
   extends AbstractTiledLayerRenderer<GeoreferencedImage, T> implements PropertyChangeListener {
 
   public TiledGeoreferencedImageLayerRenderer(final AbstractTiledGeoreferencedImageLayer<T> layer) {
-    super("tiledImage", layer);
-  }
-
-  public TiledGeoreferencedImageLayerRenderer(final String type, final String name) {
-    super(type, name);
+    super("tiledImage", "Tiles", null);
+    setLayer(layer);
   }
 
   @Override

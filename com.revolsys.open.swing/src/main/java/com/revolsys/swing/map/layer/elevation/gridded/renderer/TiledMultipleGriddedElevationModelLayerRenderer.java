@@ -62,8 +62,8 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
   private double maxZ = 3500;
 
   private TiledMultipleGriddedElevationModelLayerRenderer() {
-    super("tiledMultipleGriddedElevationModelLayerRenderer", "Styles");
-    setIcon(Icons.getIcon("folder:palette"));
+    super("tiledMultipleGriddedElevationModelLayerRenderer", "Styles",
+      Icons.getIcon("folder:palette"));
   }
 
   public TiledMultipleGriddedElevationModelLayerRenderer(
