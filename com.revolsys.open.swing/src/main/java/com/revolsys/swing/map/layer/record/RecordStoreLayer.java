@@ -183,6 +183,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             final BaseCloseable booleanValueCloseable = eventsDisabled();
             Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW);
             final RecordReader reader = newRecordStoreRecordReader(query);) {
+            transaction.setRollbackOnly();
             for (LayerRecord record : reader.<LayerRecord> i()) {
               boolean write = true;
               final Identifier identifier = record.getIdentifier();
@@ -230,6 +231,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
           final BaseCloseable booleanValueCloseable = eventsDisabled();
           Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW);
           final RecordReader reader = newRecordStoreRecordReader(query);) {
+          transaction.setRollbackOnly();
           final LabelCountMap labelCountMap = query.getProperty("statistics");
           for (final LayerRecord record : reader.<LayerRecord> i()) {
             final Identifier identifier = record.getIdentifier();
@@ -282,6 +284,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             try (
               Transaction transaction = recordStore.newTransaction(Propagation.REQUIRED);
               RecordReader reader = newRecordStoreRecordReader(query)) {
+              transaction.setRollbackOnly();
               record = reader.getFirst();
               if (record != null) {
                 addCachedRecord(identifier, record);
