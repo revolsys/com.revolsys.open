@@ -12,6 +12,7 @@ import java.io.Closeable;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableModel;
@@ -41,21 +42,21 @@ public class TablePanel extends JPanel implements MouseListener, Closeable {
 
     protected TablePanelEventSource(final MouseEvent event, final Object source) {
       super(source, event);
-      if (event.getSource() == TablePanel.this.table) {
-        final Point point = event.getPoint();
-        this.row = TablePanel.this.table.rowAtPoint(point);
-        if (this.row > -1) {
-          this.row = TablePanel.this.table.convertRowIndexToModel(this.row);
-        }
-        this.column = TablePanel.this.table.columnAtPoint(point);
-        if (this.column > -1) {
+      final BaseJTable table = TablePanel.this.table;
+      final Point point = event.getLocationOnScreen();
+      SwingUtilities.convertPointFromScreen(point, table);
+      this.row = table.rowAtPoint(point);
+      if (this.row > -1) {
+        this.row = table.convertRowIndexToModel(this.row);
+      }
+      this.column = table.columnAtPoint(point);
+      if (this.column > -1) {
 
-          this.column = TablePanel.this.table.convertColumnIndexToModel(this.column);
-        }
-        if (event.getButton() == MouseEvent.BUTTON3) {
-          if (TablePanel.this.table.isEditing()) {
-            TablePanel.this.table.getCellEditor().stopCellEditing();
-          }
+        this.column = table.convertColumnIndexToModel(this.column);
+      }
+      if (event.getButton() == MouseEvent.BUTTON3) {
+        if (table.isEditing()) {
+          table.getCellEditor().stopCellEditing();
         }
       }
     }
