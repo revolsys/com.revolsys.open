@@ -67,7 +67,7 @@ public class ErrorPredicate implements HighlightPredicate {
           }
         }
       }
-    } catch (final IndexOutOfBoundsException e) {
+    } catch (final Exception e) {
     }
     return false;
   }
