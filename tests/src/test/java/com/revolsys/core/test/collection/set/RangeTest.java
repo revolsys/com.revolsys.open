@@ -191,21 +191,21 @@ public class RangeTest {
     Assert.assertEquals(-1, AbstractRange.compare(0, (double)1));
     Assert.assertEquals(1, AbstractRange.compare(1, (double)0));
 
-    Assert.assertEquals(0, AbstractRange.compare(0, "0"));
-    Assert.assertEquals(-1, AbstractRange.compare(0, "1"));
-    Assert.assertEquals(1, AbstractRange.compare(1, "0"));
-
-    Assert.assertEquals(0, AbstractRange.compare("0", 0));
-    Assert.assertEquals(-1, AbstractRange.compare("0", 1));
-    Assert.assertEquals(1, AbstractRange.compare("1", 0));
-
-    Assert.assertEquals(0, AbstractRange.compare(0, '0'));
-    Assert.assertEquals(-1, AbstractRange.compare(0, '1'));
-    Assert.assertEquals(1, AbstractRange.compare(1, '0'));
-
-    Assert.assertEquals(0, AbstractRange.compare('0', 0));
-    Assert.assertEquals(-1, AbstractRange.compare('0', 1));
-    Assert.assertEquals(1, AbstractRange.compare('1', 0));
+    // Assert.assertEquals(0, AbstractRange.compare(0, "0"));
+    // Assert.assertEquals(-1, AbstractRange.compare(0, "1"));
+    // Assert.assertEquals(1, AbstractRange.compare(1, "0"));
+    //
+    // Assert.assertEquals(0, AbstractRange.compare("0", 0));
+    // Assert.assertEquals(-1, AbstractRange.compare("0", 1));
+    // Assert.assertEquals(1, AbstractRange.compare("1", 0));
+    //
+    // Assert.assertEquals(0, AbstractRange.compare(0, '0'));
+    // Assert.assertEquals(-1, AbstractRange.compare(0, '1'));
+    // Assert.assertEquals(1, AbstractRange.compare(1, '0'));
+    //
+    // Assert.assertEquals(0, AbstractRange.compare('0', 0));
+    // Assert.assertEquals(-1, AbstractRange.compare('0', 1));
+    // Assert.assertEquals(1, AbstractRange.compare('1', 0));
 
   }
 
@@ -342,8 +342,6 @@ public class RangeTest {
     assertRangeSetCreate("A,B", "A~B");
     assertRangeSetCreate("1,B", "1,B");
     assertRangeSetCreate("01,B", "1,B");
-
-    assertRangeSetCreate("A~D+01~10", "A~D+01~10");
   }
 
 }

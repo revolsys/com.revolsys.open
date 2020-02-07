@@ -27,11 +27,11 @@ public abstract class AbstractRange<V>
           final Number number2 = (Number)value2;
           return Long.compare(number1.longValue(), number2.longValue());
         } else {
-          return 1;
+          return -1;
         }
       } else {
         if (value2 instanceof Number) {
-          return -1;
+          return 1;
         } else {
           return value1.toString().compareTo(value2.toString());
         }

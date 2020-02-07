@@ -29,13 +29,13 @@ public abstract class AbstractNumberRange<V extends Number> extends AbstractRang
     } else if (from < rangeFrom) {
       if (to > rangeTo) {
         return this;
-      } else if (to - 1 >= rangeFrom) {
+      } else if (rangeFrom <= to + 1) {
         return newNumberRange(from, rangeTo);
       }
     } else if (from > rangeFrom) {
       if (to < rangeTo) {
         return range;
-      } else if (from - 1 <= rangeTo) {
+      } else if (from <= rangeTo + 1) {
         return newNumberRange(rangeFrom, to);
       }
     }

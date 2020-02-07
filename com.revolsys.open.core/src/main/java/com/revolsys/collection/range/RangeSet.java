@@ -131,7 +131,7 @@ public class RangeSet extends AbstractSet<Object>
         if (range == newRange) {
           return false;
         } else if (newRange != null) {
-          this.size++;
+          // this.size++;
           if (iterator.hasNext()) {
             final int nextIndex = iterator.nextIndex();
             final AbstractRange<?> nextRange = this.ranges.get(nextIndex);
