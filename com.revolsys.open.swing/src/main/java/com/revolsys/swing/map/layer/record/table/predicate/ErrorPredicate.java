@@ -22,19 +22,23 @@ public class ErrorPredicate implements HighlightPredicate {
     // final Highlighter highlighter = getHighlighter(model);
     // table.addHighlighter(highlighter);
     table.addColorHighlighter((rowIndex, columnIndex) -> {
-      final Record record = model.getRecord(rowIndex);
-      if (record != null) {
-        final Class<?> columnClass = model.getColumnClass(columnIndex);
-        if (Geometry.class.isAssignableFrom(columnClass)) {
-          return false;
-        } else {
-          final String fieldName = model.getColumnFieldName(columnIndex);
-          if (!record.isValid(fieldName)) {
-            return true;
+      try {
+        final Record record = model.getRecord(rowIndex);
+        if (record != null) {
+          final Class<?> columnClass = model.getColumnClass(columnIndex);
+          if (Geometry.class.isAssignableFrom(columnClass)) {
+            return false;
+          } else {
+            final String fieldName = model.getColumnFieldName(columnIndex);
+            if (!record.isValid(fieldName)) {
+              return true;
+            }
           }
         }
+        return true;
+      } catch (final Exception e) {
+        return false;
       }
-      return false;
     }, WebColors.Pink, WebColors.Red);
   }
 
