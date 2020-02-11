@@ -48,6 +48,7 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.layout.GroupLayouts;
+import com.revolsys.swing.map.ViewportCacheBoundingBox;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerErrors;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.transaction.Propagation;
@@ -58,11 +59,9 @@ import com.revolsys.util.count.LabelCountMap;
 public class RecordStoreLayer extends AbstractRecordLayer {
   private List<Set<Identifier>> cacheIdentifiers;
 
-  private BoundingBox loadedBoundingBox = BoundingBox.empty();
-
-  private BoundingBox loadingBoundingBox = BoundingBox.empty();
-
   private SwingWorker<List<LayerRecord>, Void> loadingWorker;
+
+  private BoundingBox loadedBoundingBox = BoundingBox.empty();
 
   /** Cache of records from {@link Record#getIdentifier()} to {@link Record}. */
   private Map<Identifier, RecordStoreLayerRecord> recordsByIdentifier = new HashMap<>();
@@ -110,12 +109,10 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
   }
 
-  protected void cancelLoading(final BoundingBox loadedBoundingBox) {
+  protected void cancelLoading(final LoadingWorker loadingWorker) {
     synchronized (getSync()) {
-      if (loadedBoundingBox == this.loadingBoundingBox) {
+      if (loadingWorker == this.loadingWorker) {
         firePropertyChange("loaded", false, true);
-        this.loadedBoundingBox = BoundingBox.empty();
-        this.loadingBoundingBox = BoundingBox.empty();
         this.loadingWorker = null;
       }
     }
@@ -142,8 +139,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       this.recordStore = null;
     }
     final SwingWorker<List<LayerRecord>, Void> loadingWorker = this.loadingWorker;
-    this.loadedBoundingBox = BoundingBox.empty();
-    this.loadingBoundingBox = BoundingBox.empty();
     this.loadingWorker = null;
     this.recordsByIdentifier.clear();
     if (loadingWorker != null) {
@@ -350,10 +345,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return getRecordDefinition();
   }
 
-  public BoundingBox getLoadingBoundingBox() {
-    return this.loadingBoundingBox;
-  }
-
   @Override
   public PathName getPathName() {
     return this.typePath;
@@ -486,23 +477,12 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public List<LayerRecord> getRecordsBackground(BoundingBox boundingBox) {
+  public List<LayerRecord> getRecordsBackground(final ViewportCacheBoundingBox cache,
+    BoundingBox boundingBox) {
     if (hasGeometryField()) {
       boundingBox = convertBoundingBox(boundingBox);
       if (Property.hasValue(boundingBox)) {
-        synchronized (getSync()) {
-          final BoundingBox loadBoundingBox = boundingBox
-            .bboxEdit(editor -> editor.expandPercent(0.2));
-          if (!this.loadedBoundingBox.bboxCovers(boundingBox)
-            && !this.loadingBoundingBox.bboxCovers(boundingBox)) {
-            if (this.loadingWorker != null) {
-              this.loadingWorker.cancel(true);
-            }
-            this.loadingBoundingBox = loadBoundingBox;
-            this.loadingWorker = newLoadingWorker(loadBoundingBox);
-            Invoke.worker(this.loadingWorker);
-          }
-        }
+        initViewBoundingBoxCache(cache);
         final List<LayerRecord> records = getRecordsIndex(boundingBox);
         return records;
       }
@@ -583,6 +563,23 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return super.initializeDo();
   }
 
+  private void initViewBoundingBoxCache(final ViewportCacheBoundingBox cache) {
+    if (hasGeometryField() && !cache.isBboxEmpty()) {
+      synchronized (getSync()) {
+        final Boolean loaded = cache.getCachedItem(this, "viewportCacheBoundingBoxLoad");
+        if (Boolean.TRUE != loaded) {
+          cache.setCachedItem(this, "viewportCacheBoundingBoxLoad", Boolean.TRUE);
+          if (this.loadingWorker != null) {
+            this.loadingWorker.cancel(true);
+          }
+          this.loadingWorker = newLoadingWorker(cache);
+          Invoke.worker(this.loadingWorker);
+        }
+      }
+    }
+
+  }
+
   public boolean isIdentifierCached(final Identifier identifier) {
     for (final Set<Identifier> identifiers : this.cacheIdentifiers) {
       if (identifiers.contains(identifier)) {
@@ -651,8 +648,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
   }
 
-  protected LoadingWorker newLoadingWorker(final BoundingBox boundingBox) {
-    return new LoadingWorker(this, boundingBox);
+  protected LoadingWorker newLoadingWorker(final ViewportCacheBoundingBox cache) {
+    return new LoadingWorker(this, cache);
   }
 
   @Override
@@ -793,11 +790,12 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   @Override
   protected void refreshDo() {
     synchronized (getSync()) {
-      if (this.loadingWorker != null) {
-        this.loadingWorker.cancel(true);
+      final SwingWorker<List<LayerRecord>, Void> loadingWorker = this.loadingWorker;
+      if (loadingWorker != null) {
+        this.loadingWorker = null;
+        loadingWorker.cancel(true);
       }
       this.loadedBoundingBox = BoundingBox.empty();
-      this.loadingBoundingBox = this.loadedBoundingBox;
       super.refreshDo();
     }
     final RecordStore recordStore = getRecordStore();
@@ -922,18 +920,17 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
   }
 
-  protected void setIndexRecords(final BoundingBox loadedBoundingBox,
+  protected void setIndexRecords(final LoadingWorker loadingWorker,
     final List<LayerRecord> records) {
     synchronized (getSync()) {
-      if (loadedBoundingBox == this.loadingBoundingBox) {
-        setIndexRecords(records);
-        firePropertyChange("loaded", false, true);
-        this.loadedBoundingBox = this.loadingBoundingBox;
-        this.loadingBoundingBox = BoundingBox.empty();
+      if (this.loadingWorker == loadingWorker) {
         this.loadingWorker = null;
+        setIndexRecords(records);
+        this.loadedBoundingBox = loadingWorker.getBoundingBox();
+        firePropertyChange("loaded", false, true);
       }
     }
-    firePropertyChange("refresh", false, true);
+    firePropertyChange("repaint", false, true);
   }
 
   @Override

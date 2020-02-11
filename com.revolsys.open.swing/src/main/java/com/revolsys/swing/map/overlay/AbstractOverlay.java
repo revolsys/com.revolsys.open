@@ -514,7 +514,8 @@ public abstract class AbstractOverlay extends JComponent
     final Map<Point, Set<CloseLocation>> snapLocations = new HashMap<>();
     final List<AbstractRecordLayer> layers = getSnapLayers();
     for (final AbstractRecordLayer layer : layers) {
-      final List<LayerRecord> records = layer.getRecordsBackground(boundingBox);
+      final List<LayerRecord> records = layer
+        .getRecordsBackground(this.viewport.getCacheBoundingBox(), boundingBox);
       for (final LayerRecord record : records) {
         if (layer.isVisible(record)) {
           final Geometry recordGeometry = record.getGeometry();

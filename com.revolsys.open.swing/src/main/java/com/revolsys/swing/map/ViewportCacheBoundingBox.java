@@ -268,6 +268,15 @@ public class ViewportCacheBoundingBox implements BoundingBoxProxy, Cancellable {
       && this.viewHeightPixels == (int)Math.ceil(viewHeightPixels);
   }
 
+  public void setCachedItem(final Layer layer, final Object key, final Object item) {
+    if (hasDimension()) {
+      final Map<Object, Object> cachedItems = getCachedItems(layer);
+      synchronized (cachedItems) {
+        cachedItems.put(key, item);
+      }
+    }
+  }
+
   @Override
   public String toString() {
     return getBoundingBox() + " " + this.viewWidthPixels + "x" + this.viewHeightPixels;

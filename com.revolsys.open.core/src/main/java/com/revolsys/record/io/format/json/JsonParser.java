@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 import org.jeometry.common.exception.WrappedException;
+import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Doubles;
 import org.jeometry.common.number.Integers;
 
@@ -286,32 +287,37 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
   public JsonObject getMap() {
     if (getEvent() == EventType.startObject || hasNext() && next() == EventType.startObject) {
       EventType event = getEvent();
-      final JsonObject map = new JsonObjectHash();
-      do {
-        if (hasNext() && next() == EventType.string) {
-          final String key = getStringIntern();
-          if (hasNext()) {
-            if (next() == EventType.colon) {
-              if (hasNext()) {
-                final Object value = getValue();
-                if (value instanceof EventType) {
-                  throw new IllegalStateException("Exepecting a value, not: " + key + "=" + value);
-                }
-                if (key != null) {
-                  map.put(key, value);
+      final JsonObject object = new JsonObjectHash();
+      try {
+        do {
+          if (hasNext() && next() == EventType.string) {
+            final String key = getStringIntern();
+            if (hasNext()) {
+              if (next() == EventType.colon) {
+                if (hasNext()) {
+                  final Object value = getValue();
+                  if (value instanceof EventType) {
+                    throw new IllegalStateException(
+                      "Exepecting a value, not: " + key + "=" + value);
+                  }
+                  if (key != null) {
+                    object.put(key, value);
+                  }
                 }
               }
             }
+            event = next();
+          } else {
+            event = getEvent();
           }
-          event = next();
-        } else {
-          event = getEvent();
+        } while (event == EventType.comma);
+        if (event != EventType.endObject) {
+          throw new IllegalStateException("Exepecting end object, not:" + event);
         }
-      } while (event == EventType.comma);
-      if (event != EventType.endObject) {
-        throw new IllegalStateException("Exepecting end object, not:" + event);
+      } catch (final NoSuchElementException e) {
+        Logs.warn(this, "Unexpected end of JSON" + object, e);
       }
-      return map;
+      return object;
     } else {
       throw new IllegalStateException("Exepecting end object, not:" + getEvent());
     }
@@ -468,7 +474,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
       moveNext();
       return this.currentEvent;
     } else {
-      throw new NoSuchElementException();
+      throw new NoSuchElementException("End of JSON");
     }
   }
 

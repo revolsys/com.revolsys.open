@@ -194,7 +194,8 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   public final void render(final ViewRenderer view, final AbstractRecordLayer layer) {
     if (layer.hasGeometryField()) {
       final BoundingBox boundingBox = view.getBoundingBox();
-      List<LayerRecord> records = layer.getRecordsBackground(boundingBox);
+      List<LayerRecord> records = layer.getRecordsBackground(view.getCacheBoundingBox(),
+        boundingBox);
       if (!view.isShowHiddenRecords()) {
         final Predicate<LayerRecord> filter = record -> {
           return !layer.isHidden(record);

@@ -295,6 +295,10 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
     return this.boundingBox;
   }
 
+  public ViewportCacheBoundingBox getCacheBoundingBox() {
+    return this.cacheBoundingBox;
+  }
+
   public <V> V getCachedItem(final Layer layer, final Object key) {
     return this.cacheBoundingBox.getCachedItem(layer, key);
   }

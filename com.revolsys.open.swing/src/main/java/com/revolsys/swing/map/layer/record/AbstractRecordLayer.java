@@ -105,6 +105,7 @@ import com.revolsys.swing.io.SwingIo;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.logging.LoggingEventPanel;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.ViewportCacheBoundingBox;
 import com.revolsys.swing.map.form.FieldNamesSetPanel;
 import com.revolsys.swing.map.form.LayerRecordForm;
 import com.revolsys.swing.map.form.SnapLayersPanel;
@@ -1611,7 +1612,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return records;
   }
 
-  public List<LayerRecord> getRecordsBackground(final BoundingBox boundingBox) {
+  public List<LayerRecord> getRecordsBackground(final ViewportCacheBoundingBox cache,
+    final BoundingBox boundingBox) {
     return getRecords(boundingBox);
   }
 
