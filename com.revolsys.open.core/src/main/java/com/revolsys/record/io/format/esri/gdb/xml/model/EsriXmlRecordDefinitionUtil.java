@@ -36,9 +36,9 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
 
   public static final EsriGeodatabaseXmlFieldTypeRegistry FIELD_TYPES = EsriGeodatabaseXmlFieldTypeRegistry.INSTANCE;
 
-  private static Field addField(final DETable table, final FieldDefinition attribute) {
-    final String fieldName = attribute.getName();
-    final DataType dataType = attribute.getDataType();
+  private static Field addField(final DETable table, final FieldDefinition fieldDefinition) {
+    final String fieldName = fieldDefinition.getName();
+    final DataType dataType = fieldDefinition.getDataType();
     final EsriGeodatabaseXmlFieldType fieldType = FIELD_TYPES.getFieldType(dataType);
     if (fieldType == null) {
       throw new RuntimeException(
@@ -47,21 +47,21 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
       final Field field = new Field();
       field.setName(fieldName);
       field.setType(fieldType.getEsriFieldType());
-      field.setIsNullable(!attribute.isRequired());
-      field.setRequired(attribute.isRequired());
+      field.setIsNullable(!fieldDefinition.isRequired());
+      field.setRequired(fieldDefinition.isRequired());
       int length = fieldType.getFixedLength();
       if (length < 0) {
-        length = attribute.getLength();
+        length = fieldDefinition.getLength();
       }
       field.setLength(length);
       final int precision;
       if (fieldType.isUsePrecision()) {
-        precision = attribute.getLength();
+        precision = fieldDefinition.getLength();
       } else {
         precision = 0;
       }
       field.setPrecision(precision);
-      final int scale = attribute.getScale();
+      final int scale = fieldDefinition.getScale();
       field.setScale(scale);
       table.addField(field);
       return field;

@@ -30,7 +30,9 @@ public class MenuSourceAction extends AbstractActionMainMenuItemFactory {
       final BaseTreeNode node = (BaseTreeNode)item;
       item = node.getUserObject();
     }
-    this.action.accept(item);
+    if (this.action != null && item != null) {
+      this.action.accept(item);
+    }
   }
 
   @Override

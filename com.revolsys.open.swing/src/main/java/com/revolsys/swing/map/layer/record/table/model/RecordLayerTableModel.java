@@ -452,12 +452,13 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   @Override
   public void setFieldNames(final Collection<String> fieldNames) {
+    super.setFieldNames(fieldNames);
     final List<String> fieldTitles = new ArrayList<>();
     for (final String fieldName : fieldNames) {
       final String fieldTitle = this.layer.getFieldTitle(fieldName);
       fieldTitles.add(fieldTitle);
     }
-    super.setFieldNamesAndTitles(fieldNames, fieldTitles);
+    setFieldTitles(fieldTitles);
   }
 
   public void setFieldNames(final String... fieldNames) {
@@ -577,25 +578,29 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   @Override
   public SortOrder setSortOrder(final int columnIndex) {
-    final SortOrder sortOrder = super.setSortOrder(columnIndex);
-    final FieldDefinition fieldName = getColumnFieldDefinition(columnIndex);
-    if (Property.hasValue(fieldName)) {
-      Map<FieldDefinition, Boolean> orderBy;
-      if (sortOrder == SortOrder.ASCENDING) {
-        orderBy = Collections.singletonMap(fieldName, true);
-      } else if (sortOrder == SortOrder.DESCENDING) {
-        orderBy = Collections.singletonMap(fieldName, false);
-      } else {
-        orderBy = Collections.singletonMap(fieldName, true);
+    if (isColumnSortable(columnIndex)) {
+      final SortOrder sortOrder = super.setSortOrder(columnIndex);
+      if (sortOrder != SortOrder.UNSORTED) {
+        final FieldDefinition fieldName = getColumnFieldDefinition(columnIndex);
+        if (Property.hasValue(fieldName)) {
+          Map<FieldDefinition, Boolean> orderBy = null;
+          if (sortOrder == SortOrder.ASCENDING) {
+            orderBy = Collections.singletonMap(fieldName, true);
+          } else if (sortOrder == SortOrder.DESCENDING) {
+            orderBy = Collections.singletonMap(fieldName, false);
+          }
+          if (this.sync == null) {
+            setOrderByInternal(orderBy);
+          } else {
+            setOrderByInternal(orderBy);
+            refresh();
+          }
+        }
       }
-      if (this.sync == null) {
-        setOrderByInternal(orderBy);
-      } else {
-        setOrderByInternal(orderBy);
-        refresh();
-      }
+      return sortOrder;
+    } else {
+      return SortOrder.UNSORTED;
     }
-    return sortOrder;
   }
 
   @Override

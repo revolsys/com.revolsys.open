@@ -19,8 +19,8 @@ import oracle.jdbc.OracleClob;
 
 public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
   public OracleJdbcClobFieldDefinition(final String dbName, final String name, final int sqlType,
-    final int length, final boolean required, final String description) {
-    super(dbName, name, DataTypes.CLOB, sqlType, length, 0, required, description,
+    final boolean required, final String description) {
+    super(dbName, name, DataTypes.CLOB, sqlType, 0, 0, required, description,
       Collections.<String, Object> emptyMap());
   }
 
@@ -71,10 +71,8 @@ public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
       return null;
     } else if (value instanceof Clob) {
       return (V)value;
-    } else if (value instanceof String) {
-      return (V)value;
     } else {
-      return (V)getDataType().toString(value);
+      return DataTypes.CLOB.toObject(value);
     }
   }
 }

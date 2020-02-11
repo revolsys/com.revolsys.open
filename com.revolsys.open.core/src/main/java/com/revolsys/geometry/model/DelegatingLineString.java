@@ -100,7 +100,11 @@ public interface DelegatingLineString extends LineString {
   @Override
   default double getLength() {
     final LineString line = getLineString();
-    return line.getLength();
+    if (line == null) {
+      return 0;
+    } else {
+      return line.getLength();
+    }
   }
 
   LineString getLineString();

@@ -4,9 +4,7 @@ import java.util.Comparator;
 
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.code.CodeTable;
-import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
@@ -42,13 +40,7 @@ public class RecordLayerTableRowSorter extends BaseRowSorter {
   @Override
   public boolean isSortable(final int columnIndex) {
     final RecordLayerTableModel model = (RecordLayerTableModel)getModel();
-    final FieldDefinition fieldDefinition = model.getColumnFieldDefinition(columnIndex);
-    if (fieldDefinition == null) {
-      return true;
-    } else {
-      final Class<?> fieldClass = fieldDefinition.getTypeClass();
-      return !Geometry.class.isAssignableFrom(fieldClass);
-    }
+    return model.isColumnSortable(columnIndex);
   }
 
   @Override

@@ -35,9 +35,9 @@ public class ErrorPredicate implements HighlightPredicate {
             }
           }
         }
-        return true;
-      } catch (final Exception e) {
         return false;
+      } catch (final Exception e) {
+        return true;
       }
     }, WebColors.Pink, WebColors.Red);
   }

@@ -22,9 +22,16 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements EsriGeodatabaseXmlCo
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeOID, DataTypes.INT, false));
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeGlobalID, DataTypes.STRING, false));
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeGUID, DataTypes.STRING, false));
+    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeBlob, DataTypes.BASE64_BINARY, false));
+    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeBlob, DataTypes.BLOB, false));
+
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeString, DataTypes.ANY_URI, false));
-    addFieldType(new SimpleFieldType(null, DataTypes.BASE64_BINARY, false));
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeString, DataTypes.BOOLEAN, false));
+    addFieldType(
+      new SimpleFieldType(FieldType.esriFieldTypeString, DataTypes.QNAME, "xs:string", true, -1));
+    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeString, DataTypes.CLOB, false));
+    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeString, DataTypes.STRING, false));
+
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeSmallInteger, DataTypes.BYTE,
       "xs:short", false, 2));
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeDate, DataTypes.DATE, false, 8));
@@ -43,10 +50,8 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements EsriGeodatabaseXmlCo
     addFieldType(
       new SimpleFieldType(FieldType.esriFieldTypeInteger, DataTypes.BIG_INTEGER, false, 4));
     addFieldType(
-      new SimpleFieldType(FieldType.esriFieldTypeString, DataTypes.QNAME, "xs:string", true, -1));
-    addFieldType(
       new SimpleFieldType(FieldType.esriFieldTypeSmallInteger, DataTypes.SHORT, false, 2));
-    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeString, DataTypes.STRING, false));
+
     addFieldType(
       new XmlGeometryFieldType(FieldType.esriFieldTypeGeometry, GeometryDataTypes.POINT));
     addFieldType(

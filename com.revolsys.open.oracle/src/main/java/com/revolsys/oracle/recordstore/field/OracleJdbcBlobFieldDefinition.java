@@ -18,8 +18,8 @@ import com.revolsys.spring.resource.Resource;
 
 public class OracleJdbcBlobFieldDefinition extends JdbcFieldDefinition {
   public OracleJdbcBlobFieldDefinition(final String dbName, final String name, final int sqlType,
-    final int length, final boolean required, final String description) {
-    super(dbName, name, DataTypes.BLOB, sqlType, length, 0, required, description,
+    final boolean required, final String description) {
+    super(dbName, name, DataTypes.BLOB, sqlType, 0, 0, required, description,
       Collections.<String, Object> emptyMap());
   }
 

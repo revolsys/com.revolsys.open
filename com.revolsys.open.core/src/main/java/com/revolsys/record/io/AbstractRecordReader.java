@@ -170,7 +170,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
           isGeometryField = true;
         } else {
           type = DataTypes.STRING;
-          length = 4000;
+          length = 0;
         }
         final FieldDefinition field;
         if (isGeometryField) {

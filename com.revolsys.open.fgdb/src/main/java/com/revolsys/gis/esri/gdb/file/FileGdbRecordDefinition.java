@@ -1,8 +1,8 @@
 package com.revolsys.gis.esri.gdb.file;
 
-import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
@@ -37,37 +37,28 @@ import com.revolsys.record.io.format.xml.XmlProcessor;
 import com.revolsys.record.property.LengthFieldName;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.JavaBeanUtil;
 
 public class FileGdbRecordDefinition extends RecordDefinitionImpl {
-  private static final Map<FieldType, Constructor<? extends AbstractFileGdbFieldDefinition>> ESRI_FIELD_TYPE_FIELD_DEFINITION_MAP = new HashMap<>();
+  private static final Map<FieldType, BiFunction<Integer, Field, AbstractFileGdbFieldDefinition>> ESRI_FIELD_TYPE_FIELD_DEFINITION_MAP = new HashMap<>();
 
   static {
-    addFieldTypeConstructor(FieldType.esriFieldTypeInteger, IntegerFieldDefinition.class);
-    addFieldTypeConstructor(FieldType.esriFieldTypeSmallInteger, ShortFieldDefinition.class);
-    addFieldTypeConstructor(FieldType.esriFieldTypeDouble, DoubleFieldDefinition.class);
-    addFieldTypeConstructor(FieldType.esriFieldTypeSingle, FloatFieldDefinition.class);
-    addFieldTypeConstructor(FieldType.esriFieldTypeString, StringFieldDefinition.class);
-    addFieldTypeConstructor(FieldType.esriFieldTypeDate, DateFieldDefinition.class);
-    addFieldTypeConstructor(FieldType.esriFieldTypeGeometry, GeometryFieldDefinition.class);
-    addFieldTypeConstructor(FieldType.esriFieldTypeOID, OidFieldDefinition.class);
-    addFieldTypeConstructor(FieldType.esriFieldTypeBlob, BinaryFieldDefinition.class);
-    addFieldTypeConstructor(FieldType.esriFieldTypeGlobalID, GlobalIdFieldDefinition.class);
-    addFieldTypeConstructor(FieldType.esriFieldTypeGUID, GuidFieldDefinition.class);
-    addFieldTypeConstructor(FieldType.esriFieldTypeXML, XmlFieldDefinition.class);
+    addFieldTypeConstructor(FieldType.esriFieldTypeInteger, IntegerFieldDefinition::new);
+    addFieldTypeConstructor(FieldType.esriFieldTypeSmallInteger, ShortFieldDefinition::new);
+    addFieldTypeConstructor(FieldType.esriFieldTypeDouble, DoubleFieldDefinition::new);
+    addFieldTypeConstructor(FieldType.esriFieldTypeSingle, FloatFieldDefinition::new);
+    addFieldTypeConstructor(FieldType.esriFieldTypeString, StringFieldDefinition::new);
+    addFieldTypeConstructor(FieldType.esriFieldTypeDate, DateFieldDefinition::new);
+    addFieldTypeConstructor(FieldType.esriFieldTypeGeometry, GeometryFieldDefinition::new);
+    addFieldTypeConstructor(FieldType.esriFieldTypeOID, OidFieldDefinition::new);
+    addFieldTypeConstructor(FieldType.esriFieldTypeBlob, BinaryFieldDefinition::new);
+    addFieldTypeConstructor(FieldType.esriFieldTypeGlobalID, GlobalIdFieldDefinition::new);
+    addFieldTypeConstructor(FieldType.esriFieldTypeGUID, GuidFieldDefinition::new);
+    addFieldTypeConstructor(FieldType.esriFieldTypeXML, XmlFieldDefinition::new);
   }
 
   private static void addFieldTypeConstructor(final FieldType fieldType,
-    final Class<? extends AbstractFileGdbFieldDefinition> fieldClass) {
-    try {
-      final Constructor<? extends AbstractFileGdbFieldDefinition> constructor = fieldClass
-        .getConstructor(int.class, Field.class);
-      ESRI_FIELD_TYPE_FIELD_DEFINITION_MAP.put(fieldType, constructor);
-    } catch (final SecurityException e) {
-      Logs.error(FileGdbRecordStore.class, "No public constructor for ESRI type " + fieldType, e);
-    } catch (final NoSuchMethodException e) {
-      Logs.error(FileGdbRecordStore.class, "No public constructor for ESRI type " + fieldType, e);
-    }
+    final BiFunction<Integer, Field, AbstractFileGdbFieldDefinition> constructor) {
+    ESRI_FIELD_TYPE_FIELD_DEFINITION_MAP.put(fieldType, constructor);
 
   }
 
@@ -121,11 +112,11 @@ public class FileGdbRecordDefinition extends RecordDefinitionImpl {
         fieldDefinition = new AreaFieldDefinition(fieldNumber, field);
       } else {
         final FieldType type = field.getType();
-        final Constructor<? extends AbstractFileGdbFieldDefinition> fieldConstructor = ESRI_FIELD_TYPE_FIELD_DEFINITION_MAP
+        final BiFunction<Integer, Field, AbstractFileGdbFieldDefinition> fieldConstructor = ESRI_FIELD_TYPE_FIELD_DEFINITION_MAP
           .get(type);
         if (fieldConstructor != null) {
           try {
-            fieldDefinition = JavaBeanUtil.invokeConstructor(fieldConstructor, fieldNumber, field);
+            fieldDefinition = fieldConstructor.apply(fieldNumber, field);
           } catch (final Throwable e) {
             Logs.error(this, tableDefinition);
             throw new RuntimeException("Error creating field for " + typePath + "."

@@ -58,6 +58,7 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
     }
     for (int i = 0; i < columnCount; i++) {
       final TableColumnExt column = table.getColumnExt(i);
+      column.setSortable(model.isColumnSortable(i));
       column.setCellRenderer(cellRenderer);
       if (i == 0) {
         column.setMinWidth(40);

@@ -42,7 +42,9 @@ public class BaseColumnFactory extends ColumnFactory {
     int columnIndex = tableColumn.getModelIndex();
     final BaseJTable table = tableModel.getTable();
     columnIndex = table.convertColumnIndexToModel(columnIndex);
+    tableColumn.setSortable(tableModel.isColumnSortable(columnIndex));
     final Object prototypeValue = tableModel.getPrototypeValue(columnIndex);
     tableColumn.setPrototypeValue(prototypeValue);
   }
+
 }

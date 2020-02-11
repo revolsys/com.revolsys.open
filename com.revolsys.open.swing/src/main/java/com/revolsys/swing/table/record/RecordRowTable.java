@@ -1,6 +1,7 @@
 package com.revolsys.swing.table.record;
 
 import java.awt.event.MouseEvent;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.swing.RowSorter;
@@ -199,7 +200,8 @@ public class RecordRowTable extends BaseJTable implements BaseMouseListener {
       if (sortController != null) {
         final RecordRowTableModel model = getTableModel();
         sortController.resetSortOrders();
-        for (final Entry<Integer, SortOrder> entry : model.getSortedColumns().entrySet()) {
+        final Map<Integer, SortOrder> sortedColumns = model.getSortedColumns();
+        for (final Entry<Integer, SortOrder> entry : sortedColumns.entrySet()) {
           final int index = entry.getKey();
           if (index < model.getColumnCount()) {
             final SortOrder sortOrder = entry.getValue();

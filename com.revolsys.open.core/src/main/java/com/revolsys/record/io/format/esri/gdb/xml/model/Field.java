@@ -58,6 +58,12 @@ public class Field {
   }
 
   public int getLength() {
+    if (this.length == 0) {
+      if (this.type == FieldType.esriFieldTypeString || this.type == FieldType.esriFieldTypeBlob
+        || this.type == FieldType.esriFieldTypeXML) {
+        return Integer.MAX_VALUE;
+      }
+    }
     return this.length;
   }
 
@@ -118,7 +124,11 @@ public class Field {
   }
 
   public void setLength(final int length) {
-    this.length = length;
+    if (length < 0) {
+      this.length = 0;
+    } else {
+      this.length = length;
+    }
   }
 
   public void setModelName(final String modelName) {

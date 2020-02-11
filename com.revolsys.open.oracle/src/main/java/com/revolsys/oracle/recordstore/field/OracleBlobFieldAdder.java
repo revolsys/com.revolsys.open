@@ -15,7 +15,7 @@ public class OracleBlobFieldAdder extends JdbcFieldAdder {
     final JdbcRecordDefinition recordDefinition, final String dbName, final String name,
     final String dbDataType, final int sqlType, final int length, final int scale,
     final boolean required, final String description) {
-    return new OracleJdbcBlobFieldDefinition(dbName, name, sqlType, length, required, description);
+    return new OracleJdbcBlobFieldDefinition(dbName, name, sqlType, required, description);
   }
 
 }

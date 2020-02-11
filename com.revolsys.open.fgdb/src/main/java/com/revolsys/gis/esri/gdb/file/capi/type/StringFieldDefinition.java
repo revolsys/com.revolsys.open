@@ -31,9 +31,10 @@ public class StringFieldDefinition extends AbstractFileGdbFieldDefinition {
       setNull(row);
     } else {
       String string = value.toString();
-      if (string.length() > getLength()) {
+      final int length = getLength();
+      if (length > 0 && string.length() > length) {
         Logs.warn(this, "Value is to long for: " + this + ":" + string);
-        string = string.substring(0, getLength());
+        string = string.substring(0, length);
       }
       row.setString(this.fieldNumber, string);
     }

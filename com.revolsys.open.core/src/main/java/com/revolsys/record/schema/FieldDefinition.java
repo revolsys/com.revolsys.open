@@ -86,7 +86,7 @@ public class FieldDefinition extends BaseObjectWithProperties
     this.allowedValues.putAll(field.getAllowedValues());
     this.defaultValue = field.getDefaultValue();
     this.description = field.getDescription();
-    this.length = field.getLength();
+    setLength(field.getLength());
     this.maxValue = field.getMaxValue();
     this.minValue = field.getMinValue();
     this.name = field.getName();
@@ -111,7 +111,7 @@ public class FieldDefinition extends BaseObjectWithProperties
     this.description = Maps.getString(properties, "description");
     this.type = DataTypes.getDataType(Maps.getString(properties, "dataType"));
     this.required = Maps.getBool(properties, "required");
-    this.length = Maps.getInteger(properties, "length", 0);
+    setLength(Maps.getInteger(properties, "length", 0));
     this.scale = Maps.getInteger(properties, "scale", 0);
     this.minValue = properties.get("minValue");
     final DataType dataType = this.type;
@@ -144,7 +144,6 @@ public class FieldDefinition extends BaseObjectWithProperties
    *
    * @param name The name of the field.
    * @param type The data type of the field value.
-   * @param length The maximum length of an field value, 0 for no maximum.
    * @param required The flag indicating if a value is required for the
    *          field.
    * @param properties The meta data properties about the field.
@@ -245,7 +244,7 @@ public class FieldDefinition extends BaseObjectWithProperties
       this.required = required;
     }
     if (length != null) {
-      this.length = length;
+      setLength(length);
     }
     if (scale != null) {
       this.scale = scale;
@@ -278,7 +277,7 @@ public class FieldDefinition extends BaseObjectWithProperties
       this.required = required;
     }
     if (length != null) {
-      this.length = length;
+      setLength(length);
     }
     if (scale != null) {
       this.scale = scale;
@@ -595,7 +594,11 @@ public class FieldDefinition extends BaseObjectWithProperties
   }
 
   public FieldDefinition setLength(final int length) {
-    this.length = length;
+    if (length == 0 || length == Integer.MAX_VALUE) {
+      this.length = 0;
+    } else {
+      this.length = length;
+    }
     return this;
   }
 

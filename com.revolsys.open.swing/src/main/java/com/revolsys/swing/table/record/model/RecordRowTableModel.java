@@ -37,7 +37,9 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
 
   private static final long serialVersionUID = 1L;
 
-  private List<String> fieldNames = new ArrayList<>();
+  private List<String> fieldNames = Collections.emptyList();
+
+  private List<FieldDefinition> fields = Collections.emptyList();
 
   /** The columnIndex that the fields start. Allows for extra columns in subclasses.*/
   private int fieldsOffset;
@@ -120,13 +122,13 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
   }
 
   public FieldDefinition getColumnFieldDefinition(final int columnIndex) {
-    if (columnIndex < this.fieldsOffset) {
-      return null;
-    } else {
-      final String fieldName = getColumnFieldName(columnIndex);
-      final RecordDefinition recordDefinition = getRecordDefinition();
-      return recordDefinition.getField(fieldName);
+    if (columnIndex >= this.fieldsOffset) {
+      final int fieldIndex = columnIndex - this.fieldsOffset;
+      if (fieldIndex < this.fields.size()) {
+        return this.fields.get(fieldIndex);
+      }
     }
+    return null;
   }
 
   public int getColumnFieldIndex(final String fieldName) {
@@ -144,8 +146,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
         if (fieldName == null) {
           return null;
         } else {
-          // TODO pre-calculate
-          if (getRecordDefinition().hasField(fieldName)) {
+          if (this.fields.get(fieldIndex) == null) {
             return fieldName;
           } else {
             final int index = fieldName.indexOf('.');
@@ -404,33 +405,36 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     }
   }
 
-  public void setFieldNames(final Collection<String> fieldNames) {
+  public void setFieldNames(Collection<String> fieldNames) {
     if (fieldNames == null || fieldNames.isEmpty()) {
       final RecordDefinition recordDefinition = getRecordDefinition();
-      this.fieldNames = new ArrayList<>(recordDefinition.getFieldNames());
-    } else {
-      this.fieldNames = new ArrayList<>(fieldNames);
+      fieldNames = recordDefinition.getFieldNames();
     }
+    final List<String> fieldNamesNew = new ArrayList<>();
+    final List<FieldDefinition> fields = new ArrayList<>();
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    for (final String fieldName : fieldNames) {
+      final FieldDefinition fieldDefinition = recordDefinition.getField(fieldName);
+      fieldNamesNew.add(fieldName);
+      fields.add(fieldDefinition);
+    }
+    this.fieldNames = fieldNamesNew;
+    this.fields = fields;
     fireTableStructureChanged();
   }
 
   public void setFieldNamesAndTitles(final Collection<String> fieldNames,
     final List<String> fieldTitles) {
-    if (fieldNames == null || fieldNames.isEmpty()) {
-      final RecordDefinition recordDefinition = getRecordDefinition();
-      this.fieldNames = new ArrayList<>(recordDefinition.getFieldNames());
-    } else {
-      this.fieldNames = new ArrayList<>(fieldNames);
-    }
+    setFieldNames(fieldNames);
     this.fieldTitles.clear();
+
     for (int i = 0; i < this.fieldNames.size(); i++) {
+      final FieldDefinition fieldDefinition = this.fields.get(i);
+      this.fields.add(fieldDefinition);
       String title;
       if (i < fieldTitles.size()) {
         title = fieldTitles.get(i);
       } else {
-        final String fieldName = getColumnFieldName(i);
-        final RecordDefinition recordDefinition = getRecordDefinition();
-        final FieldDefinition fieldDefinition = recordDefinition.getField(fieldName);
         title = fieldDefinition.getTitle();
       }
       this.fieldTitles.add(title);
@@ -444,14 +448,13 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
 
   public void setFieldTitles(final List<String> fieldTitles) {
     this.fieldTitles.clear();
-    for (int i = 0; i < this.fieldNames.size(); i++) {
+    final List<FieldDefinition> fields = this.fields;
+    for (int i = 0; i < fields.size(); i++) {
       String title;
       if (i < fieldTitles.size()) {
         title = fieldTitles.get(i);
       } else {
-        final String fieldName = getColumnFieldName(i);
-        final RecordDefinition recordDefinition = getRecordDefinition();
-        final FieldDefinition fieldDefinition = recordDefinition.getField(fieldName);
+        final FieldDefinition fieldDefinition = fields.get(i);
         title = fieldDefinition.getTitle();
       }
       this.fieldTitles.add(title);
@@ -479,28 +482,36 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
 
   @Override
   public SortOrder setSortOrder(final int columnIndex) {
-    synchronized (this.sortedColumns) {
-      SortOrder sortOrder = this.sortedColumns.get(columnIndex);
-      this.sortedColumns.clear();
-      if (sortOrder == SortOrder.ASCENDING) {
-        sortOrder = SortOrder.DESCENDING;
-      } else {
-        sortOrder = SortOrder.ASCENDING;
-      }
-      this.sortedColumns.put(columnIndex, sortOrder);
+    if (isColumnSortable(columnIndex)) {
+      synchronized (this.sortedColumns) {
+        SortOrder sortOrder = this.sortedColumns.get(columnIndex);
+        this.sortedColumns.clear();
+        if (sortOrder == SortOrder.ASCENDING) {
+          sortOrder = SortOrder.DESCENDING;
+        } else {
+          sortOrder = SortOrder.ASCENDING;
+        }
+        this.sortedColumns.put(columnIndex, sortOrder);
 
-      fireTableDataChanged();
-      return sortOrder;
+        fireTableDataChanged();
+        return sortOrder;
+      }
+    } else {
+      return SortOrder.UNSORTED;
     }
   }
 
   public SortOrder setSortOrder(final int columnIndex, final SortOrder sortOrder) {
-    synchronized (this.sortedColumns) {
-      this.sortedColumns.clear();
-      this.sortedColumns.put(columnIndex, sortOrder);
+    if (isColumnSortable(columnIndex)) {
+      synchronized (this.sortedColumns) {
+        this.sortedColumns.clear();
+        this.sortedColumns.put(columnIndex, sortOrder);
 
-      fireTableDataChanged();
-      return sortOrder;
+        fireTableDataChanged();
+        return sortOrder;
+      }
+    } else {
+      return SortOrder.UNSORTED;
     }
   }
 

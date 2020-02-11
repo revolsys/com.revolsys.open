@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.jdbc.ByteArrayBlob;
 
 import com.revolsys.jdbc.LocalBlob;
 import com.revolsys.record.Record;
@@ -46,11 +47,11 @@ public class JdbcBlobFieldDefinition extends JdbcFieldDefinition {
         blob = (Blob)value;
       } else if (value instanceof byte[]) {
         final byte[] bytes = (byte[])value;
-        blob = new LocalBlob(bytes);
+        blob = new ByteArrayBlob(bytes);
       } else if (value instanceof CharSequence) {
         final String string = ((CharSequence)value).toString();
         final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
-        blob = new LocalBlob(bytes);
+        blob = new ByteArrayBlob(bytes);
       } else {
         try {
           final Resource resource = Resource.getResource(value);

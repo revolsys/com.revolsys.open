@@ -1,6 +1,8 @@
 package com.revolsys.swing.table;
 
 import java.io.Writer;
+import java.sql.Blob;
+import java.sql.Clob;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -22,6 +24,8 @@ import org.jeometry.common.logging.Logs;
 
 import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.record.io.format.json.JsonType;
 import com.revolsys.record.io.format.tsv.Tsv;
 import com.revolsys.record.io.format.tsv.TsvWriter;
 import com.revolsys.swing.SwingUtil;
@@ -222,6 +226,21 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
 
   public UndoManager getUndoManager() {
     return this.undoManager;
+  }
+
+  public boolean isColumnSortable(final int columnIndex) {
+    final Class<?> columnClass = getColumnClass(columnIndex);
+    if (Geometry.class.isAssignableFrom(columnClass)) {
+      return false;
+    } else if (Clob.class.isAssignableFrom(columnClass)) {
+      return false;
+    } else if (Blob.class.isAssignableFrom(columnClass)) {
+      return false;
+    } else if (JsonType.class.isAssignableFrom(columnClass)) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   public boolean isEmpty() {
