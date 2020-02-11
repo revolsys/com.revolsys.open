@@ -150,11 +150,32 @@ public interface JsonList extends List<Object>, JsonType {
   }
 
   default boolean addIfNotContains(final Object value) {
-    final boolean contains = contains(value);
-    if (!contains) {
+    final boolean notContains = !contains(value);
+    if (notContains) {
       add(value);
     }
-    return !contains;
+    return notContains;
+  }
+
+  default boolean addIfNotContains(final Object value,
+    final Collection<? extends CharSequence> excludeFieldNames) {
+    final boolean notContains = !contains(value, excludeFieldNames);
+    if (notContains) {
+      add(value);
+    }
+    return notContains;
+  }
+
+  default boolean contains(final Object value,
+    final Collection<? extends CharSequence> excludeFieldNames) {
+    final int size = size();
+    for (int i = 0; i < size; i++) {
+      final Object listValue = get(i);
+      if (DataType.equal(value, listValue, excludeFieldNames)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   default boolean equals(final Object value1, final Object value2,

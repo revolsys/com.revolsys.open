@@ -173,13 +173,6 @@ public class WKBReader {
     } else {
       throw new ParseException("Unknown geometry byte order (not NDR or XDR): " + byteOrderWKB);
     }
-    // if not strict and not XDR or NDR, then we just use the dis default set at
-    // the
-    // start of the geometry (if a multi-geometry). This allows WBKReader to
-    // work
-    // with Spatialite native BLOB WKB, as well as other WKB variants that might
-    // just
-    // specify endian-ness at the start of the multigeometry.
 
     final int typeInt = this.dis.readInt();
     final int geometryType = typeInt & 0xff;

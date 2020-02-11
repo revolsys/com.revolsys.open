@@ -1,5 +1,6 @@
 package com.revolsys.util;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -266,6 +267,35 @@ public interface Strings {
     } else {
       return text.matches(regex);
     }
+  }
+
+  static void print(final PrintStream out, final char separator, final Object... values) {
+    if (values != null) {
+      boolean first = true;
+      for (final Object value : values) {
+        if (first) {
+          first = false;
+        } else {
+          out.print(separator);
+        }
+        if (value == null) {
+        } else {
+          final String string = DataTypes.toString(value);
+          if (Property.hasValue(string)) {
+            out.print(string);
+          }
+        }
+      }
+    }
+    out.println();
+  }
+
+  static void printErr(final char separator, final Object... values) {
+    print(System.err, separator, values);
+  }
+
+  static void printOut(final char separator, final Object... values) {
+    print(System.out, separator, values);
   }
 
   static String removeFromEnd(String fullAddress, final int len) {
@@ -535,11 +565,11 @@ public interface Strings {
               } else {
                 stringBuilder = new StringBuilder(string);
                 stringBuilder.append(separator);
-                stringBuilder.append("newString");
+                stringBuilder.append(newString);
               }
             } else {
               stringBuilder.append(separator);
-              stringBuilder.append("newString");
+              stringBuilder.append(newString);
             }
 
           }

@@ -13,6 +13,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.Record;
 import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.swing.table.record.model.RecordRowTableModel;
+import com.revolsys.util.Debug;
 
 public class ErrorPredicate implements HighlightPredicate {
 
@@ -68,6 +69,7 @@ public class ErrorPredicate implements HighlightPredicate {
         }
       }
     } catch (final Exception e) {
+      Debug.noOp();
     }
     return false;
   }

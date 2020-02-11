@@ -76,6 +76,10 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   private int batchSize;
 
+  private boolean blobAsString = false;
+
+  private boolean clobAsString = false;
+
   private JdbcDatabaseFactory databaseFactory;
 
   private DataSource dataSource;
@@ -89,6 +93,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   private final Map<String, JdbcFieldAdder> fieldDefinitionAdders = new HashMap<>();
 
   private boolean flushBetweenTypes;
+
+  private boolean lobAsString = false;
 
   private String primaryKeySql;
 
@@ -106,9 +112,9 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   private DataSourceTransactionManager transactionManager;
 
-  private final Object writerKey = new Object();
-
   private boolean usesSchema = true;
+
+  private final Object writerKey = new Object();
 
   public AbstractJdbcRecordStore() {
     this(ArrayRecord.FACTORY);
@@ -477,6 +483,14 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     return autoCommit;
   }
 
+  public boolean isBlobAsString() {
+    return this.blobAsString;
+  }
+
+  public boolean isClobAsString() {
+    return this.clobAsString;
+  }
+
   @Override
   public boolean isEditable(final PathName typePath) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
@@ -509,6 +523,10 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   @Override
   public boolean isIdFieldRowid(final RecordDefinition recordDefinition) {
     return false;
+  }
+
+  public boolean isLobAsString() {
+    return this.lobAsString;
   }
 
   public abstract boolean isSchemaExcluded(String schemaName);
@@ -843,6 +861,14 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     this.batchSize = batchSize;
   }
 
+  public void setBlobAsString(final boolean blobAsString) {
+    this.blobAsString = blobAsString;
+  }
+
+  public void setClobAsString(final boolean clobAsString) {
+    this.clobAsString = clobAsString;
+  }
+
   public void setCodeTables(final List<AbstractMultiValueCodeTable> codeTables) {
     for (final AbstractMultiValueCodeTable codeTable : codeTables) {
       addCodeTable(codeTable);
@@ -867,6 +893,10 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   public void setFlushBetweenTypes(final boolean flushBetweenTypes) {
     this.flushBetweenTypes = flushBetweenTypes;
+  }
+
+  public void setLobAsString(final boolean lobAsString) {
+    this.lobAsString = lobAsString;
   }
 
   public void setPrimaryKeySql(final String primaryKeySql) {

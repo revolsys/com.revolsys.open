@@ -19,6 +19,7 @@ import com.revolsys.jdbc.field.JdbcBlobFieldDefinition;
 import com.revolsys.spring.resource.Resource;
 
 public class PostgreSQLJdbcBlobFieldDefinition extends JdbcBlobFieldDefinition {
+
   public PostgreSQLJdbcBlobFieldDefinition(final String dbName, final String name,
     final String dataType, final int sqlType, final int length, final int scale,
     final boolean required, final String description, final Map<String, Object> properties) {

@@ -15,10 +15,12 @@ import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 
+import oracle.jdbc.OracleClob;
+
 public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
   public OracleJdbcClobFieldDefinition(final String dbName, final String name, final int sqlType,
     final int length, final boolean required, final String description) {
-    super(dbName, name, DataTypes.STRING, sqlType, length, 0, required, description,
+    super(dbName, name, DataTypes.CLOB, sqlType, length, 0, required, description,
       Collections.<String, Object> emptyMap());
   }
 
@@ -35,8 +37,8 @@ public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
       final int sqlType = getSqlType();
       statement.setNull(parameterIndex, sqlType);
     } else {
-      if (value instanceof Clob) {
-        final Clob clob = (Clob)value;
+      if (value instanceof OracleClob) {
+        final OracleClob clob = (OracleClob)value;
         statement.setClob(parameterIndex, clob);
       } else {
         Reader in;

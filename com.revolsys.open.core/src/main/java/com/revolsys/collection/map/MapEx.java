@@ -56,6 +56,7 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
 
   MapEx clone();
 
+  @Override
   @SuppressWarnings("unchecked")
   default boolean equals(final Object object2,
     final Collection<? extends CharSequence> excludeFieldNames) {
@@ -73,6 +74,11 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
       }
     }
     return true;
+  }
+
+  default boolean equalValue(final CharSequence fieldName, final Object value) {
+    final Object fieldValue = getValue(fieldName);
+    return DataType.equal(fieldValue, value);
   }
 
   default Boolean getBoolean(final CharSequence name) {

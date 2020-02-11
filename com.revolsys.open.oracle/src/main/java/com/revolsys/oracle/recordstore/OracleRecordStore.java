@@ -336,20 +336,20 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   @PostConstruct
   public void initializeDo() {
     super.initializeDo();
-    final JdbcFieldAdder attributeAdder = new JdbcFieldAdder();
-    addFieldAdder("NUMBER", attributeAdder);
+    final JdbcFieldAdder fieldAdder = new JdbcFieldAdder();
+    addFieldAdder("NUMBER", fieldAdder);
 
-    addFieldAdder("CHAR", attributeAdder);
-    addFieldAdder("NCHAR", attributeAdder);
-    addFieldAdder("VARCHAR", attributeAdder);
-    addFieldAdder("VARCHAR2", attributeAdder);
+    addFieldAdder("CHAR", fieldAdder);
+    addFieldAdder("NCHAR", fieldAdder);
+    addFieldAdder("VARCHAR", fieldAdder);
+    addFieldAdder("VARCHAR2", fieldAdder);
     addFieldAdder("NVARCHAR2", new JdbcFieldAdder(DataTypes.STRING));
-    addFieldAdder("LONG", attributeAdder);
-    addFieldAdder("CLOB", attributeAdder);
-    addFieldAdder("NCLOB", attributeAdder);
+    addFieldAdder("LONG", fieldAdder);
+    addFieldAdder("CLOB", fieldAdder);
+    addFieldAdder("NCLOB", fieldAdder);
 
-    addFieldAdder("DATE", attributeAdder);
-    addFieldAdder("TIMESTAMP", attributeAdder);
+    addFieldAdder("DATE", fieldAdder);
+    addFieldAdder("TIMESTAMP", fieldAdder);
 
     final OracleSdoGeometryFieldAdder sdoGeometryAttributeAdder = new OracleSdoGeometryFieldAdder(
       this);
