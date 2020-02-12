@@ -160,7 +160,9 @@ public class LayerGroupTreeNode extends AbstractLayerTreeNode implements MouseLi
     if (source == layerGroup) {
       final String propertyName = e.getPropertyName();
 
-      if ("layers".equals(propertyName)) {
+      if ("reset".equals(propertyName)) {
+        refresh();
+      } else if ("layers".equals(propertyName)) {
         if (e instanceof IndexedPropertyChangeEvent) {
           final IndexedPropertyChangeEvent indexedEvent = (IndexedPropertyChangeEvent)e;
           final int index = indexedEvent.getIndex();
@@ -177,6 +179,7 @@ public class LayerGroupTreeNode extends AbstractLayerTreeNode implements MouseLi
           }
           setChildren(children);
         }
+        this.refresh();
       } else if ("visible".equals(propertyName)) {
         if (isChildrenInitialized()) {
           for (final BaseTreeNode childNode : getChildren()) {

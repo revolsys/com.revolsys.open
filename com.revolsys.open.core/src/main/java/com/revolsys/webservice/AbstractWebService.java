@@ -94,6 +94,17 @@ public abstract class AbstractWebService<V> extends BaseObjectWithProperties
     }
   }
 
+  public void setServiceUrl(final String serviceUrl) {
+
+    final UrlResource resource;
+    if (serviceUrl == null) {
+      resource = null;
+    } else {
+      resource = new UrlResource(serviceUrl);
+    }
+    setServiceUrl(resource);
+  }
+
   public void setServiceUrl(final UrlResource serviceUrl) {
     final String username = serviceUrl.getUsername();
     if (Property.hasValue(username)) {

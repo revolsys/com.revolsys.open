@@ -454,7 +454,6 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
       layer.setLayerGroup(null);
       Property.removeListener(layer, this);
     }
-
   }
 
   public boolean containsLayer(final Layer layer) {

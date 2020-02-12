@@ -504,7 +504,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   private boolean snapToAllLayers = true;
 
-  private boolean useFieldTitles = false;
+  private boolean useFieldTitles = true;
 
   private Set<String> userReadOnlyFieldNames = new LinkedHashSet<>();
 
@@ -3441,7 +3441,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     addToMap(map, "fieldNamesSetName", this.fieldNamesSetName, ALL);
     addToMap(map, "fieldNamesSets", getFieldNamesSets());
     addToMap(map, "fieldColumnWidths", getFieldColumnWidths());
-    addToMap(map, "useFieldTitles", this.useFieldTitles);
+    addToMap(map, "useFieldTitles", this.useFieldTitles, true);
     addToMap(map, "confirmDeleteRecords", this.confirmDeleteRecords);
     map.remove("filter");
     String where;
