@@ -21,6 +21,10 @@ import com.revolsys.geometry.simplify.DouglasPeuckerSimplifier;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 
+/**
+ * <p>A grid is a two dimensional array of values. The value could represent and double value and
+ * could be an elevation a DEM or shade of gray in an image.</p>
+ */
 public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
 
   String GEOMETRY_FACTORY = "geometryFactory";
