@@ -191,7 +191,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   }
 
   @Override
-  public final void render(final ViewRenderer view, final AbstractRecordLayer layer) {
+  public void render(final ViewRenderer view, final AbstractRecordLayer layer) {
     if (layer.hasGeometryField()) {
       final BoundingBox boundingBox = view.getBoundingBox();
       List<LayerRecord> records = layer.getRecordsBackground(view.getCacheBoundingBox(),

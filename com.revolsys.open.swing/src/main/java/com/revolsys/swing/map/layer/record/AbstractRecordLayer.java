@@ -1786,11 +1786,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   @Override
   protected void initializeMenuExpressions(final List<String> menuInitializerExpressions) {
-    for (final String menuInitializerExpression : this.recordDefinition
-      .getProperty("menuInitializerExpressions", Collections.<String> emptyList())) {
-      if (Property.hasValue(menuInitializerExpression)) {
-        if (!menuInitializerExpressions.contains(menuInitializerExpression)) {
-          menuInitializerExpressions.add(menuInitializerExpression);
+    if (this.recordDefinition != null) {
+      for (final String menuInitializerExpression : this.recordDefinition
+        .getProperty("menuInitializerExpressions", Collections.<String> emptyList())) {
+        if (Property.hasValue(menuInitializerExpression)) {
+          if (!menuInitializerExpressions.contains(menuInitializerExpression)) {
+            menuInitializerExpressions.add(menuInitializerExpression);
+          }
         }
       }
     }

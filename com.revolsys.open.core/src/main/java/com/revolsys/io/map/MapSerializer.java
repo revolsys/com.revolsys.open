@@ -18,8 +18,7 @@ import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.util.Property;
 
 public interface MapSerializer {
-  default void addAllToMap(final Map<String, Object> map,
-    final Map<String, ? extends Object> values) {
+  default void addAllToMap(final JsonObject map, final Map<String, ? extends Object> values) {
     if (map != null && values != null) {
       for (final Entry<String, ? extends Object> entry : values.entrySet()) {
         final String name = entry.getKey();
@@ -38,17 +37,16 @@ public interface MapSerializer {
    * @param name
    * @param value
    */
-  default void addToMap(final Map<String, Object> map, final CharSequence name,
-    final Object value) {
+  default void addToMap(final JsonObject map, final CharSequence name, final Object value) {
     final Object mapValue = toMapValue(value);
     if (Property.hasValue(mapValue)) {
       map.put(name.toString(), mapValue);
     } else {
-      map.remove(mapValue);
+      map.remove(name);
     }
   }
 
-  default void addToMap(final Map<String, Object> map, final String name, final Object value,
+  default void addToMap(final JsonObject map, final String name, final Object value,
     final Object defaultValue) {
     if (DataType.equal(value, defaultValue)) {
       map.remove(name);
@@ -62,14 +60,19 @@ public interface MapSerializer {
     }
   }
 
-  default void addToMap(final Map<String, Object> map, final String name,
-    final Supplier<Object> supplier) {
+  default void addToMap(final JsonObject map, final String name, final Supplier<Object> supplier) {
     final Object value = supplier.get();
     addToMap(map, name, value);
   }
 
-  default void addTypeToMap(final Map<String, Object> map, final String type) {
+  default void addTypeToMap(final JsonObject map, final String type) {
     MapObjectFactory.setType(map, type);
+  }
+
+  default JsonObject newMapTree(final String type) {
+    final JsonObject map = JsonObject.tree();
+    MapObjectFactory.setType(map, type);
+    return map;
   }
 
   default JsonObject newTypeMap(final String type) {

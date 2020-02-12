@@ -2,10 +2,10 @@ package com.revolsys.swing.map.layer.record.style;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,7 +47,7 @@ public class MarkerStyle extends BaseObjectWithPropertiesAndChange
 
   public static final Quantity<Length> ONE_PIXEL = Quantities.getQuantity(1, CustomUnits.PIXEL);
 
-  private static final Set<String> PROPERTY_NAMES = new HashSet<>();
+  private static final Set<String> PROPERTY_NAMES = new TreeSet<>();
 
   public static final Quantity<Length> TEN_PIXELS = Quantities.getQuantity(10, CustomUnits.PIXEL);
 

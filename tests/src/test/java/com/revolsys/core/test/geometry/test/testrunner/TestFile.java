@@ -36,7 +36,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -117,7 +116,7 @@ public class TestFile extends TestSuite implements MapSerializer {
   }
 
   public Map<String, Object> getProperties() {
-    final Map<String, Object> properties = new LinkedHashMap<>();
+    final JsonObject properties = JsonObject.hash();
     addToMap(properties, "geometryFactory", this.geometryFactory);
     return properties;
   }

@@ -14,7 +14,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.RectangleXY;
-import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.util.Property;
 
@@ -305,7 +304,7 @@ public class CustomRectangularMapGrid extends AbstractRectangularMapGrid {
   @Override
   public JsonObject toMap() {
     final JsonObject map = super.toMap();
-    map.put(MapObjectFactory.TYPE, "customRectangularMapGrid");
+    addTypeToMap(map, "customRectangularMapGrid");
     addToMap(map, "geometryFactory", getGeometryFactory());
     addToMap(map, "originX", getOriginX());
     addToMap(map, "originY", getOriginY());

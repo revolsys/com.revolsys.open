@@ -276,7 +276,7 @@ public class GeometryStyleRecordLayerRenderer extends AbstractGeometryRecordLaye
   public JsonObject toMap() {
     final JsonObject map = super.toMap();
     if (this.style != null) {
-      final Map<String, Object> styleMap = this.style.toMap();
+      final JsonObject styleMap = this.style.toMap();
       map.putAll(styleMap);
     }
     return map;

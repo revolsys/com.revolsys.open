@@ -56,7 +56,6 @@ import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.io.format.json.JsonObject;
-import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.swing.Borders;
 import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.Icons;
@@ -1272,8 +1271,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   @SuppressWarnings("unchecked")
   @Override
   public JsonObject toMap() {
-    final JsonObject map = new JsonObjectHash();
-    addTypeToMap(map, this.type);
+    final JsonObject map = newMapTree(this.type);
     addToMap(map, "name", this.name);
     addToMap(map, "visible", this.visible);
     addToMap(map, "open", this.open);
