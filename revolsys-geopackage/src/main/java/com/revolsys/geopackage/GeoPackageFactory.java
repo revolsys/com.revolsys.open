@@ -15,6 +15,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.io.FileRecordStoreFactory;
 import com.revolsys.record.schema.RecordStore;
+import com.revolsys.util.ServiceInitializer;
 
 public class GeoPackageFactory implements FileRecordStoreFactory {
 
@@ -29,6 +30,10 @@ public class GeoPackageFactory implements FileRecordStoreFactory {
   private static final List<Pattern> URL_PATTERNS = Arrays.asList(
     Pattern.compile("[^(file:)].*.gpkg/?"), Pattern.compile("file:(/(//)?)?.*.gpkg/?"),
     Pattern.compile("folderconnection:/(//)?.*.gpkg/?"));
+
+  static {
+    ServiceInitializer.initializeServices();
+  }
 
   public static GeoPackageRecordStore newRecordStore(final File file) {
     if (file == null) {
@@ -45,6 +50,14 @@ public class GeoPackageFactory implements FileRecordStoreFactory {
         }
         return recordStore;
       }
+    }
+  }
+
+  public static GeoPackageRecordStore newRecordStore(final Path path) {
+    if (path == null) {
+      return null;
+    } else {
+      return newRecordStore(path.toFile());
     }
   }
 

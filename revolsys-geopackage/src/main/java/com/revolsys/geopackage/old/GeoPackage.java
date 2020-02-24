@@ -4,9 +4,11 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
@@ -31,6 +33,22 @@ import com.revolsys.util.RsCoreDataTypes;
  * jdbc:sqlite:[file]
  */
 public class GeoPackage extends AbstractJdbcDatabaseFactory implements FileRecordStoreFactory {
+  private static final List<FieldDefinition> CONNECTION_FIELD_DEFINITIONS = Arrays.asList( //
+    new FieldDefinition("file", RsCoreDataTypes.FILE, 50, true) //
+  );
+
+  private static final Map<String, AtomicInteger> COUNTS = new HashMap<>();
+
+  private static final List<String> FILE_NAME_EXTENSIONS = Arrays.asList("gpkg");
+
+  public static final String JDBC_PREFIX = "jdbc:sqlite:";
+
+  private static final Map<String, GeoPackageRecordStore> RECORD_STORES = new HashMap<>();
+
+  private static final List<Pattern> URL_PATTERNS = Arrays.asList(Pattern.compile("jdbc:sqlite:.+"),
+    Pattern.compile("[^(file:)].+\\.gpkg"), Pattern.compile("file:(/(//)?)?.+\\.gpkg"),
+    Pattern.compile("folderconnection:/(//)?.*.gpkg"));
+
   static {
     try {
       SQLiteJDBCLoader.initialize();
@@ -40,17 +58,32 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory implements FileRecor
     }
   }
 
-  private static final List<String> FILE_NAME_EXTENSIONS = Arrays.asList("gpkg");
+  public static GeoPackageRecordStore newRecordStore(final File file) {
+    if (file == null) {
+      return null;
+    } else {
+      synchronized (COUNTS) {
+        final String fileName = FileUtil.getCanonicalPath(file);
+        final AtomicInteger count = Maps.get(COUNTS, fileName, new AtomicInteger());
+        count.incrementAndGet();
+        GeoPackageRecordStore recordStore = RECORD_STORES.get(fileName);
+        if (recordStore == null || recordStore.isClosed()) {
+          final MapEx properties = new LinkedHashMapEx().add("url", "jdbc:sqlite:" + fileName);
+          recordStore = new GeoPackage().newRecordStore(properties);
+          RECORD_STORES.put(fileName, recordStore);
+        }
+        return recordStore;
+      }
+    }
+  }
 
-  private static final List<Pattern> URL_PATTERNS = Arrays.asList(Pattern.compile("jdbc:sqlite:.+"),
-    Pattern.compile("[^(file:)].+\\.gpkg"), Pattern.compile("file:(/(//)?)?.+\\.gpkg"),
-    Pattern.compile("folderconnection:/(//)?.*.gpkg"));
-
-  public static final String JDBC_PREFIX = "jdbc:sqlite:";
-
-  private static final List<FieldDefinition> CONNECTION_FIELD_DEFINITIONS = Arrays.asList( //
-    new FieldDefinition("file", RsCoreDataTypes.FILE, 50, true) //
-  );
+  public static GeoPackageRecordStore newRecordStore(final Path path) {
+    if (path == null) {
+      return null;
+    } else {
+      return newRecordStore(path.toFile());
+    }
+  }
 
   @Override
   public boolean canOpenPath(final Path path) {
@@ -144,12 +177,13 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory implements FileRecor
   }
 
   @Override
-  public JdbcRecordStore newRecordStore(final DataSource dataSource) {
+  public GeoPackageRecordStore newRecordStore(final DataSource dataSource) {
     return new GeoPackageRecordStore(dataSource);
   }
 
   @Override
-  public JdbcRecordStore newRecordStore(final Map<String, ? extends Object> connectionProperties) {
+  public GeoPackageRecordStore newRecordStore(
+    final Map<String, ? extends Object> connectionProperties) {
     return new GeoPackageRecordStore(this, connectionProperties);
   }
 

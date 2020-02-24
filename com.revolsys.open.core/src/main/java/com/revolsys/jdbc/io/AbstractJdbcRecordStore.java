@@ -503,7 +503,12 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   protected boolean isExcluded(final String dbSchemaName, final String tableName) {
-    final String path = ("/" + dbSchemaName + "/" + tableName).toUpperCase().replaceAll("/+", "/");
+    String path = "/";
+    if (dbSchemaName != null) {
+      path += dbSchemaName.toUpperCase() + "/";
+    }
+    path += tableName.toUpperCase();
+    path = path.replaceAll("/+", "/");
     if (this.excludeTablePaths.contains(path)) {
       return true;
     } else {

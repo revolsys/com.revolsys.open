@@ -97,6 +97,11 @@ public class RecordDefinitionBuilder {
     return this;
   }
 
+  public RecordDefinitionBuilder addIdField(final FieldDefinition field) {
+    this.recordDefinition.addIdField(field.clone());
+    return this;
+  }
+
   public RecordDefinitionBuilder changeCodeFieldsToValues() {
     for (final FieldDefinition field : this.recordDefinition.getFields()) {
       final String fieldName = field.getName();

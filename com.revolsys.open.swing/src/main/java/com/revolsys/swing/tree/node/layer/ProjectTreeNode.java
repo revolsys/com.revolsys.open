@@ -29,8 +29,16 @@ public class ProjectTreeNode extends LayerGroupTreeNode {
 
     final Project project = getProject();
     final LayerGroup baseMapLayers = project.getBaseMapLayers();
-    final LayerGroupTreeNode baseMapLayersNode = new LayerGroupTreeNode(baseMapLayers);
-    children.add(baseMapLayersNode);
+    boolean containsChild = false;
+    for (final BaseTreeNode child : children) {
+      if (child.getUserData() == baseMapLayers) {
+        containsChild = true;
+      }
+    }
+    if (!containsChild) {
+      final LayerGroupTreeNode baseMapLayersNode = new LayerGroupTreeNode(baseMapLayers);
+      children.add(baseMapLayersNode);
+    }
     return children;
   }
 }

@@ -67,6 +67,8 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     super.initializeDo();
     setUsesSchema(false);
 
+    setExcludeTablePatterns("/TRIGGER_.*_FEATURE_COUNT.*");
+    setExcludeTablePaths("/OGR_EMPTY_TABLE");
     final String filter = "WHERE NOT (NAME LIKE 'GPKG%' OR NAME LIKE 'RTREE%' OR NAME LIKE 'SQLITE%')";
     setSchemaTablePermissionsSql(
       "select  '/' \"SCHEMA_NAME\", name \"TABLE_NAME\", 'ALL' \"PRIVILEGE\", '' \"REMARKS\"  from sqlite_master "
@@ -79,7 +81,7 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     addFieldAdder("SMALLINT", DataTypes.SHORT);
     addFieldAdder("MEDIUMINT", DataTypes.INT);
     addFieldAdder("INT", DataTypes.LONG);
-    addFieldAdder("BIG_INTEGER", DataTypes.LONG);
+    addFieldAdder("INTEGER", DataTypes.LONG);
     addFieldAdder("FLOAT", DataTypes.FLOAT);
     addFieldAdder("DOUBLE", DataTypes.DOUBLE);
     addFieldAdder("REAL", DataTypes.DOUBLE);
@@ -106,7 +108,7 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
       final DB db = sqliteConnection.getDatabase();
       db.enable_load_extension(true);
       try {
-        db._exec("select load_extension('libgpkg')");
+        // db._exec("select load_extension('libgpkg')");
       } finally {
         db.enable_load_extension(false);
       }

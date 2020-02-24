@@ -312,7 +312,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     }
   }
 
-  private void addIdField(final FieldDefinition fieldDefinition) {
+  protected void addIdField(final FieldDefinition fieldDefinition) {
     fieldDefinition.setIdField(true);
     final int index = fieldDefinition.getIndex();
     final String fieldName = fieldDefinition.getName();

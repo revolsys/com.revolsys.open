@@ -49,6 +49,15 @@ public class ListTreeNode extends BaseTreeNode {
     }
   }
 
+  public boolean containsChildUserData(final Object userData) {
+    for (final BaseTreeNode child : this.children) {
+      if (child.getUserData() == userData) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   @Override
   public List<BaseTreeNode> getChildren() {
     return this.publicChildren;

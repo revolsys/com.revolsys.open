@@ -172,14 +172,18 @@ public class LayerGroupTreeNode extends AbstractLayerTreeNode implements MouseLi
           if (newLayer == null) {
             if (oldLayer != null) {
               children.remove(index);
+              setChildren(children);
             }
           } else if (oldLayer == null) {
             final BaseTreeNode newTreeNode = newTreeNode(newLayer);
             children.add(index, newTreeNode);
+            setChildren(children);
+          } else {
+            this.refresh();
           }
-          setChildren(children);
+        } else {
+          this.refresh();
         }
-        this.refresh();
       } else if ("visible".equals(propertyName)) {
         if (isChildrenInitialized()) {
           for (final BaseTreeNode childNode : getChildren()) {

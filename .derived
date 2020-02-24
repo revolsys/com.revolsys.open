@@ -1,7 +1,7 @@
 com.revolsys.open.core
 com.revolsys.open.fgdb
 com.revolsys.open.gdal
-com.revolsys.open.geopackage
+revolsys-geopackage
 com.revolsys.open.maki
 com.revolsys.open.oracle
 com.revolsys.open.postgresql
