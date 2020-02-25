@@ -1,4 +1,4 @@
-package com.revolsys.geopackage;
+package com.revolsys.geopackage.mil;
 
 import com.revolsys.record.schema.RecordStoreSchema;
 

@@ -45,7 +45,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.saif.util.PathCache;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionFactory;
@@ -583,7 +582,7 @@ public class SaifReader extends AbstractReader<Record>
           .getRecordDefinitions()) {
           final FieldDefinition geometryField = recordDefinition.getGeometryField();
           if (geometryField != null) {
-            geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+            geometryField.setGeometryFactory(geometryFactory);
           }
         }
       } catch (final IOException e) {

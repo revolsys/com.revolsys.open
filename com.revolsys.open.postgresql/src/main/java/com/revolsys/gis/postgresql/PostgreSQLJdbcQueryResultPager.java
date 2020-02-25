@@ -51,8 +51,7 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
 
               try (
                 final PreparedStatement statement = connection.prepareStatement(sql);
-                final ResultSet resultSet = JdbcQueryIterator.getResultSet(statement,
-                  getQuery());) {
+                final ResultSet resultSet = recordStore.getResultSet(statement, getQuery());) {
                 if (resultSet.next()) {
                   int i = 0;
                   do {

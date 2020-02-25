@@ -9,7 +9,6 @@ import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
-import com.revolsys.record.property.FieldProperties;
 
 public class ArcSdeStGeometryFieldAdder extends JdbcFieldAdder {
   public ArcSdeStGeometryFieldAdder(final AbstractJdbcRecordStore recordStore) {
@@ -53,7 +52,7 @@ public class ArcSdeStGeometryFieldAdder extends JdbcFieldAdder {
 
     final ArcSdeStGeometryFieldDefinition field = new ArcSdeStGeometryFieldDefinition(dbName, name,
       dataType, required, description, null, spatialReference, axisCount);
-    field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+    field.setGeometryFactory(geometryFactory);
     return field;
   }
 

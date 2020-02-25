@@ -24,7 +24,6 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.GeometryDef;
 import com.revolsys.record.io.format.esri.gdb.xml.model.SpatialReference;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.GeometryType;
 import com.revolsys.record.io.format.shp.ShapefileGeometryHandler;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.util.Booleans;
 
 public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
@@ -46,8 +45,6 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
 
   private static final Integer MINUS1 = -1;
 
-  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
-
   private BiConsumer<EndianOutput, Geometry> writeFunction;
 
   private Function3<GeometryFactory, ByteBuffer, Integer, Geometry> readFunction;
@@ -67,8 +64,7 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
         final GeometryType geometryType = geometryDef.getGeometryType();
         final DataType dataType = GEOMETRY_TYPE_DATA_TYPE_MAP.get(geometryType);
         setType(dataType);
-        this.geometryFactory = spatialReference.getGeometryFactory();
-
+        GeometryFactory geometryFactory = spatialReference.getGeometryFactory();
         int axisCount = 2;
         final boolean hasZ = geometryDef.isHasZ();
         if (hasZ) {
@@ -78,12 +74,13 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
         if (hasM) {
           axisCount = 4;
         }
-        if (axisCount != this.geometryFactory.getAxisCount()) {
-          final int srid = this.geometryFactory.getHorizontalCoordinateSystemId();
-          final double[] scales = this.geometryFactory.newScales(axisCount);
-          this.geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
+        if (axisCount != geometryFactory.getAxisCount()) {
+          final int srid = geometryFactory.getHorizontalCoordinateSystemId();
+          final double[] scales = geometryFactory.newScales(axisCount);
+          geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
+
         }
-        setProperty(FieldProperties.GEOMETRY_FACTORY, this.geometryFactory);
+        setGeometryFactory(geometryFactory);
 
         final String geometryTypeKey = dataType.toString() + hasZ + hasM;
         this.readFunction = SHAPEFILE_GEOMETRY_HANDLER.getReadFunction(geometryTypeKey);
@@ -119,25 +116,26 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
     buffer.order(ByteOrder.LITTLE_ENDIAN);
 
     final int geometryType = buffer.getInt();
+    final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryType == 0) {
       final DataType dataType = getDataType();
       if (GeometryDataTypes.POINT.equals(dataType)) {
-        return this.geometryFactory.point();
+        return geometryFactory.point();
       } else if (GeometryDataTypes.MULTI_POINT.equals(dataType)) {
-        return this.geometryFactory.point();
+        return geometryFactory.point();
       } else if (GeometryDataTypes.LINE_STRING.equals(dataType)) {
-        return this.geometryFactory.lineString();
+        return geometryFactory.lineString();
       } else if (GeometryDataTypes.MULTI_LINE_STRING.equals(dataType)) {
-        return this.geometryFactory.lineString();
+        return geometryFactory.lineString();
       } else if (GeometryDataTypes.POLYGON.equals(dataType)) {
-        return this.geometryFactory.polygon();
+        return geometryFactory.polygon();
       } else if (GeometryDataTypes.MULTI_POLYGON.equals(dataType)) {
-        return this.geometryFactory.polygon();
+        return geometryFactory.polygon();
       } else {
         return null;
       }
     } else {
-      final Geometry geometry = this.readFunction.apply(this.geometryFactory, buffer, MINUS1);
+      final Geometry geometry = this.readFunction.apply(geometryFactory, buffer, MINUS1);
       return geometry;
     }
   }
@@ -148,7 +146,8 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
       setNull(row);
     } else if (value instanceof Geometry) {
       final Geometry geometry = (Geometry)value;
-      final Geometry projectedGeometry = geometry.convertGeometry(this.geometryFactory);
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      final Geometry projectedGeometry = geometry.convertGeometry(geometryFactory);
       if (projectedGeometry.isEmpty()) {
         setNull(row);
       } else {

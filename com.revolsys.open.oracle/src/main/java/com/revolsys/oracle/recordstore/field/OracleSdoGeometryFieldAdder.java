@@ -20,7 +20,6 @@ import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
 import com.revolsys.oracle.recordstore.OracleRecordStore;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.RecordStoreSchema;
 
 public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
@@ -217,7 +216,6 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
     final OracleSdoGeometryJdbcFieldDefinition field = new OracleSdoGeometryJdbcFieldDefinition(
       dbName, name, dataType, sqlType, required, description, null, geometryFactory, axisCount,
       oracleSrid);
-    field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
     return field;
   }
 }

@@ -1,4 +1,4 @@
-package com.revolsys.geopackage.old;
+package com.revolsys.geopackage;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -18,12 +18,9 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
-import com.revolsys.record.property.FieldProperties;
 
 public class GeoPackageGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   private final int axisCount;
-
-  private final GeometryFactory geometryFactory;
 
   private final int srid;
 
@@ -33,8 +30,7 @@ public class GeoPackageGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     final GeometryFactory geometryFactory) {
     super(dbName, name, dataType, -1, 0, 0, required, description, properties);
     this.srid = srid;
-    this.geometryFactory = geometryFactory;
-    setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+    setGeometryFactory(geometryFactory);
     this.axisCount = axisCount;
   }
 
@@ -42,7 +38,7 @@ public class GeoPackageGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   public JdbcFieldDefinition clone() {
     return new GeoPackageGeometryJdbcFieldDefinition(getDbName(), getName(), getDataType(),
       isRequired(), getDescription(), getProperties(), this.srid, this.axisCount,
-      this.geometryFactory);
+      getGeometryFactory());
   }
 
   public Object getInsertUpdateValue(final Object object) throws SQLException {
@@ -346,7 +342,7 @@ public class GeoPackageGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   public Object toJava(final Object object) throws SQLException {
     if (object instanceof byte[]) {
       final byte[] bytes = (byte[])object;
-      return parseWkb(this.geometryFactory, bytes);
+      return parseWkb(getGeometryFactory(), bytes);
     }
     return object;
   }
@@ -362,7 +358,7 @@ public class GeoPackageGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       }
     } else if (object instanceof BoundingBox) {
       BoundingBox boundingBox = (BoundingBox)object;
-      boundingBox = boundingBox.bboxToCs(this.geometryFactory);
+      boundingBox = boundingBox.bboxToCs(getGeometryFactory());
       // TODO
       return null;
     } else {

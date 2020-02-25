@@ -23,7 +23,6 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.enums.GeometryType;
 import com.revolsys.record.io.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldType;
 import com.revolsys.record.io.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTypeRegistry;
 import com.revolsys.record.property.AreaFieldName;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.property.LengthFieldName;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -210,7 +209,7 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
         axisCount, scales);
 
       final FieldDefinition geometryField = recordDefinition.getGeometryField();
-      geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+      geometryField.setGeometryFactory(geometryFactory);
     }
 
     return recordDefinition;

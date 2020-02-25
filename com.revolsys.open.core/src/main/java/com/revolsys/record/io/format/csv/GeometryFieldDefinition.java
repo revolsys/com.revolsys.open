@@ -8,12 +8,10 @@ import com.revolsys.record.schema.FieldDefinition;
 
 public class GeometryFieldDefinition extends FieldDefinition {
 
-  private final GeometryFactory geometryFactory;
-
   public GeometryFieldDefinition(final GeometryFactory geometryFactory, final String name,
     final DataType type, final boolean required) {
     super(name, type, required);
-    this.geometryFactory = geometryFactory;
+    setGeometryFactory(geometryFactory);
   }
 
   @Override
@@ -21,19 +19,21 @@ public class GeometryFieldDefinition extends FieldDefinition {
     final String name = getName();
     final DataType dataType = getDataType();
     final boolean required = isRequired();
-    return new GeometryFieldDefinition(this.geometryFactory, name, dataType, required);
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    return new GeometryFieldDefinition(geometryFactory, name, dataType, required);
   }
 
   @Override
   public <V> V toFieldValueException(final Object value) {
+    final GeometryFactory geometryFactory = getGeometryFactory();
     Geometry geometry;
     if (value == null) {
       return null;
     } else if (value instanceof Geometry) {
       geometry = (Geometry)value;
-      geometry = geometry.convertGeometry(this.geometryFactory);
+      geometry = geometry.convertGeometry(geometryFactory);
     } else {
-      geometry = this.geometryFactory.geometry(value.toString(), false);
+      geometry = geometryFactory.geometry(value.toString(), false);
     }
     return getDataType().toObject(geometry);
   }

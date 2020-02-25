@@ -14,7 +14,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.io.RecordReader;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -233,8 +232,7 @@ public class FileGdbQueryIterator extends AbstractIterator<Record> implements Re
       if (boundingBox != null) {
         final FieldDefinition geometryField = recordDefinition.getGeometryField();
         if (geometryField != null) {
-          final GeometryFactory geometryFactory = geometryField
-            .getProperty(FieldProperties.GEOMETRY_FACTORY);
+          final GeometryFactory geometryFactory = geometryField.getGeometryFactory();
           if (geometryFactory != null) {
             this.boundingBox = boundingBox.bboxToCs(geometryFactory);
           }

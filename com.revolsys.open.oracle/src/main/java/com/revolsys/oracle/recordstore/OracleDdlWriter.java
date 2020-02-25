@@ -15,7 +15,6 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDdlWriter;
 import com.revolsys.oracle.recordstore.field.OracleSdoGeometryFieldAdder;
 import com.revolsys.record.Record;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.property.ShortNameProperty;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -57,8 +56,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     final String tableName = PathUtil.getName(typePath);
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
     if (geometryField != null) {
-      final GeometryFactory geometryFactory = geometryField
-        .getProperty(FieldProperties.GEOMETRY_FACTORY);
+      final GeometryFactory geometryFactory = geometryField.getGeometryFactory();
       final String name = geometryField.getName();
       String geometryType = "GEOMETRY";
       final DataType dataType = geometryField.getDataType();
@@ -177,8 +175,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
     final String tableName = PathUtil.getName(typePath);
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
     if (geometryField != null) {
-      final GeometryFactory geometryFactory = geometryField
-        .getProperty(FieldProperties.GEOMETRY_FACTORY);
+      final GeometryFactory geometryFactory = geometryField.getGeometryFactory();
       final String name = geometryField.getName();
       final int axisCount = geometryFactory.getAxisCount();
       final DataType dataType = geometryField.getDataType();

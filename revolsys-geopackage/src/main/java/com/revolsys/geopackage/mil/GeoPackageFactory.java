@@ -1,4 +1,4 @@
-package com.revolsys.geopackage;
+package com.revolsys.geopackage.mil;
 
 import java.io.File;
 import java.nio.file.Path;

@@ -26,7 +26,6 @@ import com.revolsys.record.io.format.esri.gdb.xml.type.EsriGeodatabaseXmlFieldTy
 import com.revolsys.record.io.format.xml.XmlConstants;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.record.io.format.xml.XsiConstants;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 
@@ -210,8 +209,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
       this.out.element(FEATURE_TYPE, FEATURE_TYPE_SIMPLE);
       this.out.element(SHAPE_TYPE, this.geometryType);
       this.out.element(SHAPE_FIELD_NAME, geometryField.getName());
-      final GeometryFactory geometryFactory = geometryField
-        .getProperty(FieldProperties.GEOMETRY_FACTORY);
+      final GeometryFactory geometryFactory = geometryField.getGeometryFactory();
       this.out.element(HAS_M, false);
       this.out.element(HAS_Z, geometryFactory.hasZ());
       this.out.element(HAS_SPATIAL_INDEX, false);
@@ -243,12 +241,12 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     }
   }
 
-  private void writeField(final FieldDefinition attribute) {
-    final String fieldName = attribute.getName();
+  private void writeField(final FieldDefinition field) {
+    final String fieldName = field.getName();
     if (fieldName.equals("OBJECTID")) {
       writeOidField();
     } else {
-      final DataType dataType = attribute.getDataType();
+      final DataType dataType = field.getDataType();
       final EsriGeodatabaseXmlFieldType fieldType = this.fieldTypes.getFieldType(dataType);
       if (fieldType == null) {
         Logs.error(this, "Data type not supported " + dataType);
@@ -257,23 +255,22 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
         this.out.attribute(XsiConstants.TYPE, FIELD_TYPE);
         this.out.element(NAME, fieldName);
         this.out.element(TYPE, fieldType.getEsriFieldType());
-        this.out.element(IS_NULLABLE, !attribute.isRequired());
+        this.out.element(IS_NULLABLE, !field.isRequired());
         int length = fieldType.getFixedLength();
         if (length < 0) {
-          length = attribute.getLength();
+          length = field.getLength();
         }
         this.out.element(LENGTH, length);
         final int precision;
         if (fieldType.isUsePrecision()) {
-          precision = attribute.getLength();
+          precision = field.getLength();
         } else {
           precision = 0;
         }
         this.out.element(PRECISION, precision);
-        this.out.element(SCALE, attribute.getScale());
+        this.out.element(SCALE, field.getScale());
 
-        final GeometryFactory geometryFactory = attribute
-          .getProperty(FieldProperties.GEOMETRY_FACTORY);
+        final GeometryFactory geometryFactory = field.getGeometryFactory();
         if (geometryFactory != null) {
           this.out.startTag(GEOMETRY_DEF);
           this.out.attribute(XsiConstants.TYPE, GEOMETRY_DEF_TYPE);

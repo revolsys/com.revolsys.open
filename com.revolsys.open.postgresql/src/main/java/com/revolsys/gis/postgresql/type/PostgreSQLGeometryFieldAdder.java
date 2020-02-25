@@ -10,13 +10,11 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.gis.postgresql.PostgreSQLRecordStore;
-import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.util.Property;
 
 public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
@@ -57,8 +55,8 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
       int axisCount = 3;
       try {
         final String sql = "select SRID, TYPE, COORD_DIMENSION from GEOMETRY_COLUMNS where UPPER(F_TABLE_SCHEMA) = UPPER(?) AND UPPER(F_TABLE_NAME) = UPPER(?) AND UPPER(F_GEOMETRY_COLUMN) = UPPER(?)";
-        final Map<String, Object> values = JdbcUtils.selectMap(this.recordStore, sql, dbSchemaName,
-          tableName, columnName);
+        final Map<String, Object> values = this.recordStore.selectMap(sql, dbSchemaName, tableName,
+          columnName);
         srid = (Integer)values.get("srid");
         type = (String)values.get("type");
         axisCount = (Integer)values.get("coord_dimension");
@@ -78,7 +76,7 @@ public class PostgreSQLGeometryFieldAdder extends JdbcFieldAdder {
       final PostgreSQLGeometryJdbcFieldDefinition field = new PostgreSQLGeometryJdbcFieldDefinition(
         dbName, name, dataType, sqlType, required, description, null, srid, axisCount,
         geometryFactory);
-      field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+      field.setGeometryFactory(geometryFactory);
       return field;
     } catch (final Throwable e) {
       Logs.error(this, "Attribute not registered in GEOMETRY_COLUMN table " + dbSchemaName + "."

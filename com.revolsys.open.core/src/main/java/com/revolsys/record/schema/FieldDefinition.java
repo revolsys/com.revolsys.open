@@ -18,6 +18,7 @@ import org.jeometry.common.data.type.DataTypes;
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.operation.valid.IsValidOp;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
@@ -48,6 +49,8 @@ public class FieldDefinition extends BaseObjectWithProperties
   private CodeTable codeTable;
 
   private Object defaultValue;
+
+  private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
   /** The description of the field. */
   private String description;
@@ -393,6 +396,11 @@ public class FieldDefinition extends BaseObjectWithProperties
     return this.description;
   }
 
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
+  }
+
   public int getIndex() {
     return this.index;
   }
@@ -583,6 +591,10 @@ public class FieldDefinition extends BaseObjectWithProperties
   public FieldDefinition setDescription(final String description) {
     this.description = description;
     return this;
+  }
+
+  public void setGeometryFactory(final GeometryFactory geometryFactory) {
+    this.geometryFactory = geometryFactory;
   }
 
   public void setIdField(final boolean idField) {
