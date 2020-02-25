@@ -39,33 +39,31 @@ public class EsriXmlRecordDefinitionUtil implements EsriGeodatabaseXmlConstants 
   private static Field addField(final DETable table, final FieldDefinition fieldDefinition) {
     final String fieldName = fieldDefinition.getName();
     final DataType dataType = fieldDefinition.getDataType();
-    final EsriGeodatabaseXmlFieldType fieldType = FIELD_TYPES.getFieldType(dataType);
+    EsriGeodatabaseXmlFieldType fieldType = FIELD_TYPES.getFieldType(dataType);
     if (fieldType == null) {
-      throw new RuntimeException(
-        "Data type not supported " + dataType + " for " + table.getName() + "." + fieldName);
-    } else {
-      final Field field = new Field();
-      field.setName(fieldName);
-      field.setType(fieldType.getEsriFieldType());
-      field.setIsNullable(!fieldDefinition.isRequired());
-      field.setRequired(fieldDefinition.isRequired());
-      int length = fieldType.getFixedLength();
-      if (length < 0) {
-        length = fieldDefinition.getLength();
-      }
-      field.setLength(length);
-      final int precision;
-      if (fieldType.isUsePrecision()) {
-        precision = fieldDefinition.getLength();
-      } else {
-        precision = 0;
-      }
-      field.setPrecision(precision);
-      final int scale = fieldDefinition.getScale();
-      field.setScale(scale);
-      table.addField(field);
-      return field;
+      fieldType = FIELD_TYPES.getFieldType(DataTypes.STRING);
     }
+    final Field field = new Field();
+    field.setName(fieldName);
+    field.setType(fieldType.getEsriFieldType());
+    field.setIsNullable(!fieldDefinition.isRequired());
+    field.setRequired(fieldDefinition.isRequired());
+    int length = fieldType.getFixedLength();
+    if (length < 0) {
+      length = fieldDefinition.getLength();
+    }
+    field.setLength(length);
+    final int precision;
+    if (fieldType.isUsePrecision()) {
+      precision = fieldDefinition.getLength();
+    } else {
+      precision = 0;
+    }
+    field.setPrecision(precision);
+    final int scale = fieldDefinition.getScale();
+    field.setScale(scale);
+    table.addField(field);
+    return field;
   }
 
   private static void addField(final RecordDefinitionImpl recordDefinition, final DETable deTable,

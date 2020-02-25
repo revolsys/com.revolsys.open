@@ -355,10 +355,10 @@ public class RecordLayerTablePanel extends TablePanel
 
     final ObjectPropertyEnableCheck hasRows = new ObjectPropertyEnableCheck(tableRowCount,
       "rowCount", 0, true);
-    toolBar.addButtonTitleIcon("table", "Export Table", "table_plain:save", hasRows,
-      () -> actionExportRecords(true));
+    toolBar.addButtonTitleIcon("table", "Export field set columns", "table_visible_columns:save",
+      hasRows, () -> actionExportRecords(true));
 
-    toolBar.addButtonTitleIcon("table", "Export Records", "table:save", hasRows,
+    toolBar.addButtonTitleIcon("table", "Export all columns", "table_plain:save", hasRows,
       () -> actionExportRecords(false));
 
     this.fieldSetsButton = toolBar.addButtonTitleIcon("table", "Field Sets", "fields_filter",

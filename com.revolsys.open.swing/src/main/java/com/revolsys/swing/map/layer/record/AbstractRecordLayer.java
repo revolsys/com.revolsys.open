@@ -756,46 +756,32 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return MapObjectFactory.toObject(config);
   }
 
-  protected <LR extends LayerRecord> boolean confirmDeleteRecords(final Collection<LR> records,
+  protected <LR extends LayerRecord> boolean confirmDeleteRecords(final List<LR> records,
     final Consumer<Collection<LR>> deleteAction) {
     return confirmDeleteRecords("", records, deleteAction);
   }
 
   protected <LR extends LayerRecord> boolean confirmDeleteRecords(final String suffix,
-    final Collection<LR> records, final Consumer<Collection<LR>> deleteAction) {
+    final List<LR> records, final Consumer<Collection<LR>> deleteAction) {
 
-    final Map<String, Condition> confiditionsByFieldName = getDeleteRecordsBlockFilterByFieldName();
-    if (!confiditionsByFieldName.isEmpty()) {
+    final Map<String, Condition> deleteRecordsBlockFilterByFieldName = getDeleteRecordsBlockFilterByFieldName();
+    if (!deleteRecordsBlockFilterByFieldName.isEmpty()) {
       List<LR> blockedRecords = null;
       List<LR> otherRecords = null;
       int i = 0;
       for (final LR record : records) {
-        boolean blocked = false;
-        if (checkBlockDeleteRecord(record)) {
-          for (final String fieldName : confiditionsByFieldName.keySet()) {
-            final boolean fieldBlocked = isDeletedRecordFieldBlocked(record, fieldName);
-            if (fieldBlocked) {
-              blocked = true;
-              if (blockedRecords == null) {
-                blockedRecords = new ArrayList<>();
-                otherRecords = new ArrayList<>();
-                int j = 0;
-                for (final LR otherRecord : records) {
-                  if (j < i) {
-                    otherRecords.add(otherRecord);
-                    j++;
-                  } else {
-                    break;
-                  }
-                }
-              }
-              blockedRecords.add(record);
-              break;
+        if (isDeleteBlocked(suffix, record)) {
+          if (blockedRecords == null) {
+            blockedRecords = new ArrayList<>();
+            otherRecords = new ArrayList<>();
+
+            for (int j = 0; j < i; j++) {
+              final LR otherRecord = records.get(j);
+              otherRecords.add(otherRecord);
             }
           }
-
-        }
-        if (!blocked && otherRecords != null) {
+          blockedRecords.add(record);
+        } else if (otherRecords != null) {
           otherRecords.add(record);
         }
         i++;
@@ -930,7 +916,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  public boolean deleteRecordsWithConfirm(final Collection<? extends LayerRecord> records) {
+  public boolean deleteRecordsWithConfirm(final List<? extends LayerRecord> records) {
     return confirmDeleteRecords(records, this::deleteRecords);
   }
 
@@ -2037,6 +2023,21 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public boolean isConfirmDeleteRecords() {
     return this.confirmDeleteRecords;
+  }
+
+  protected boolean isDeleteBlocked(final String suffix, final LayerRecord record) {
+
+    if (checkBlockDeleteRecord(record)) {
+      final Map<String, Condition> deleteRecordsBlockFilterByFieldName = getDeleteRecordsBlockFilterByFieldName();
+      for (final String fieldName : deleteRecordsBlockFilterByFieldName.keySet()) {
+        final boolean fieldBlocked = isDeletedRecordFieldBlocked(record, fieldName);
+        if (fieldBlocked) {
+          return true;
+        }
+      }
+
+    }
+    return false;
   }
 
   public boolean isDeleted(final LayerRecord record) {

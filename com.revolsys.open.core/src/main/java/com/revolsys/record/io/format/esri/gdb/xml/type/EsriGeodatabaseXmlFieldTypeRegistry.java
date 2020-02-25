@@ -9,6 +9,7 @@ import org.jeometry.common.data.type.DataTypes;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.record.io.format.esri.gdb.xml.EsriGeodatabaseXmlConstants;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
+import com.revolsys.record.io.format.json.Json;
 
 public class EsriGeodatabaseXmlFieldTypeRegistry implements EsriGeodatabaseXmlConstants {
 
@@ -31,6 +32,9 @@ public class EsriGeodatabaseXmlFieldTypeRegistry implements EsriGeodatabaseXmlCo
       new SimpleFieldType(FieldType.esriFieldTypeString, DataTypes.QNAME, "xs:string", true, -1));
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeString, DataTypes.CLOB, false));
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeString, DataTypes.STRING, false));
+    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeString, Json.JSON_OBJECT, false));
+    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeString, Json.JSON_LIST, false));
+    addFieldType(new SimpleFieldType(FieldType.esriFieldTypeString, Json.JSON_TYPE, false));
 
     addFieldType(new SimpleFieldType(FieldType.esriFieldTypeSmallInteger, DataTypes.BYTE,
       "xs:short", false, 2));
