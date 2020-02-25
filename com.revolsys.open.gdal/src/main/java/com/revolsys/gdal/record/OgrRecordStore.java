@@ -37,7 +37,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordWriter;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.query.AbstractMultiCondition;
 import com.revolsys.record.query.BinaryCondition;
 import com.revolsys.record.query.CollectionValue;
@@ -699,7 +698,7 @@ public class OgrRecordStore extends AbstractRecordStore {
       final SpatialReference spatialReference = fieldDefinition.GetSpatialRef();
       final GeometryFactory geometryFactory = Gdal.getGeometryFactory(spatialReference, axisCount);
       final FieldDefinition field = new FieldDefinition(fieldName, geometryFieldDataType, false);
-      field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+      field.setGeometryFactory(geometryFactory);
       recordDefinition.addField(field);
     }
     return recordDefinition;

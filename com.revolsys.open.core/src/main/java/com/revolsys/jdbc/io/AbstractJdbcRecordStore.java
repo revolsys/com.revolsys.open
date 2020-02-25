@@ -260,7 +260,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
         JdbcConnection connection = getJdbcConnection(isAutoCommit());
         final PreparedStatement statement = connection.prepareStatement(sql)) {
 
-        JdbcUtils.setPreparedStatementParameters(statement, query);
+        setPreparedStatementParameters(statement, query);
         return statement.executeUpdate();
       } catch (final SQLException e) {
         transaction.setRollbackOnly();
@@ -380,7 +380,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
         JdbcConnection connection = getJdbcConnection()) {
         try (
           final PreparedStatement statement = connection.prepareStatement(sql)) {
-          JdbcUtils.setPreparedStatementParameters(statement, query);
+          setPreparedStatementParameters(statement, query);
           try (
             final ResultSet resultSet = statement.executeQuery()) {
             if (resultSet.next()) {

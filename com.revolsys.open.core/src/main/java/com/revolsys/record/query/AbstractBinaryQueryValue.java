@@ -100,6 +100,14 @@ public abstract class AbstractBinaryQueryValue implements QueryValue {
     return (V)this.right;
   }
 
+  public void setLeft(final QueryValue left) {
+    this.left = left;
+  }
+
+  public void setRight(final QueryValue right) {
+    this.right = right;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <QV extends QueryValue> QV updateQueryValues(

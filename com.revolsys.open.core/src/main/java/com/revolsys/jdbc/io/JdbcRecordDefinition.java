@@ -14,7 +14,13 @@ public class JdbcRecordDefinition extends RecordDefinitionImpl {
     final String dbTableName) {
     super(schema, pathName);
     this.dbTableName = dbTableName;
-    this.dbTableQualifiedName = schema.getDbName() + "." + dbTableName;
+
+    final String dbSchemaName = schema.getDbName();
+    if (dbSchemaName == null) {
+      this.dbTableQualifiedName = dbTableName;
+    } else {
+      this.dbTableQualifiedName = dbSchemaName + "." + dbTableName;
+    }
   }
 
   public String getDbSchemaName() {

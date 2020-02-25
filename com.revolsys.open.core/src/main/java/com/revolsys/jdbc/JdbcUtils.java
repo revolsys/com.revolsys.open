@@ -32,7 +32,6 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.exception.JdbcExceptionTranslator;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.field.JdbcFieldDefinitions;
-import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
@@ -40,8 +39,6 @@ import com.revolsys.record.schema.LockMode;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.transaction.Propagation;
-import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Property;
 
 public final class JdbcUtils {
@@ -216,19 +213,6 @@ public final class JdbcUtils {
     }
   }
 
-  public static int executeUpdate(final JdbcRecordStore recordStore, final String sql,
-    final Object... parameters) {
-    try (
-      Transaction transaction = recordStore.newTransaction(Propagation.REQUIRED);
-      final JdbcConnection connection = recordStore.getJdbcConnection()) {
-      try {
-        return executeUpdate(connection, sql, parameters);
-      } catch (final SQLException e) {
-        throw connection.getException("Update", sql, e);
-      }
-    }
-  }
-
   public static BigDecimal[] getBigDecimalArray(final ResultSet resultSet, final int index)
     throws SQLException {
     final Array array = resultSet.getArray(index);
@@ -370,21 +354,6 @@ public final class JdbcUtils {
     }
   }
 
-  public static void lockTable(final RecordStore recordStore, final String typePath) {
-    if (recordStore instanceof JdbcRecordStore) {
-      final JdbcRecordStore jdbcRecordStore = (JdbcRecordStore)recordStore;
-      try (
-        final JdbcConnection connection = jdbcRecordStore.getJdbcConnection()) {
-        final String tableName = getQualifiedTableName(typePath);
-        final String sql = "LOCK TABLE " + tableName + " IN SHARE MODE";
-        executeUpdate(connection, sql);
-      } catch (final SQLException e) {
-        throw new RuntimeException("Unable to lock table " + typePath, e);
-      }
-    }
-
-  }
-
   public static String newSelectSql(final RecordDefinition recordDefinition,
     final String tablePrefix, final boolean distinct, final String fromClause,
     final List<String> fieldNames, final Query query,
@@ -515,28 +484,6 @@ public final class JdbcUtils {
 
   }
 
-  public static int selectInt(final JdbcRecordStore recordStore, final String sql,
-    final Object... parameters) {
-    try (
-      JdbcConnection connection = recordStore.getJdbcConnection()) {
-      try (
-        final PreparedStatement statement = connection.prepareStatement(sql)) {
-        setParameters(statement, parameters);
-
-        try (
-          final ResultSet resultSet = statement.executeQuery()) {
-          if (resultSet.next()) {
-            return resultSet.getInt(1);
-          } else {
-            throw new IllegalArgumentException("Value not found");
-          }
-        }
-      } catch (final SQLException e) {
-        throw connection.getException("selectInt", sql, e);
-      }
-    }
-  }
-
   public static <T> List<T> selectList(final Connection connection, final String sql,
     final int columnIndex, final Object... parameters) throws SQLException {
     final List<T> results = new ArrayList<>();
@@ -598,28 +545,6 @@ public final class JdbcUtils {
     }
   }
 
-  public static long selectLong(final JdbcRecordStore recordStore, final String sql,
-    final Object... parameters) {
-    try (
-      JdbcConnection connection = recordStore.getJdbcConnection()) {
-      try (
-        final PreparedStatement statement = connection.prepareStatement(sql)) {
-        setParameters(statement, parameters);
-
-        try (
-          final ResultSet resultSet = statement.executeQuery()) {
-          if (resultSet.next()) {
-            return resultSet.getLong(1);
-          } else {
-            throw new IllegalArgumentException("Value not found");
-          }
-        }
-      } catch (final SQLException e) {
-        throw connection.getException("selectInt", sql, e);
-      }
-    }
-  }
-
   public static Map<String, Object> selectMap(final Connection connection, final String sql,
     final Object... parameters) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
@@ -648,29 +573,6 @@ public final class JdbcUtils {
       return selectMap(connection, sql, parameters);
     } finally {
       release(connection, dataSource);
-    }
-  }
-
-  public static MapEx selectMap(final JdbcRecordStore recordStore, final String sql,
-    final Object... parameters) {
-    try (
-      JdbcConnection connection = recordStore.getJdbcConnection()) {
-      try (
-        final PreparedStatement statement = connection.prepareStatement(sql)) {
-        setParameters(statement, parameters);
-
-        try (
-          final ResultSet resultSet = statement.executeQuery()) {
-          if (resultSet.next()) {
-            return readMap(resultSet);
-          } else {
-            throw new IllegalArgumentException(
-              "Value not found for " + sql + " " + Arrays.asList(parameters));
-          }
-        }
-      } catch (final SQLException e) {
-        throw connection.getException(null, sql, e);
-      }
     }
   }
 
@@ -709,36 +611,11 @@ public final class JdbcUtils {
     }
   }
 
-  public static String selectString(final JdbcRecordStore recordStore, final String sql,
-    final Object... parameters) throws SQLException {
-    try (
-      JdbcConnection connection = recordStore.getJdbcConnection()) {
-      return selectString(connection, sql, parameters);
-    }
-  }
-
   public static void setParameters(final PreparedStatement statement, final Object... parameters)
     throws SQLException {
     int index = 1;
     for (final Object parameter : parameters) {
       index = setValue(statement, index, parameter);
-    }
-  }
-
-  public static void setPreparedStatementParameters(final PreparedStatement statement,
-    final Query query) {
-    int index = 1;
-    for (final Object parameter : query.getParameters()) {
-      final JdbcFieldDefinition attribute = JdbcFieldDefinitions.newFieldDefinition(parameter);
-      try {
-        index = attribute.setPreparedStatementValue(statement, index, parameter);
-      } catch (final SQLException e) {
-        throw new RuntimeException("Error setting value:" + parameter, e);
-      }
-    }
-    final Condition where = query.getWhereCondition();
-    if (!where.isEmpty()) {
-      where.appendParameters(index, statement);
     }
   }
 

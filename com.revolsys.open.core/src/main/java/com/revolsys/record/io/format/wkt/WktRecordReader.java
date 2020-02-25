@@ -12,7 +12,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.Records;
 import com.revolsys.record.io.AbstractRecordReader;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
@@ -69,13 +68,13 @@ public class WktRecordReader extends AbstractRecordReader {
     if (geometryField == null) {
       geometryFactory = GeometryFactory.DEFAULT_3D;
     } else {
-      geometryFactory = geometryField.getProperty(FieldProperties.GEOMETRY_FACTORY);
+      geometryFactory = geometryField.getGeometryFactory();
       if (geometryFactory == null) {
         geometryFactory = getGeometryFactory();
         if (geometryFactory == null) {
           geometryFactory = GeometryFactory.DEFAULT_3D;
         }
-        geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+        geometryField.setGeometryFactory(geometryFactory);
       }
     }
     this.wktParser = new WktParser(geometryFactory);

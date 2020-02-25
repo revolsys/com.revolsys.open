@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.jeometry.common.data.type.DataType;
 
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
@@ -41,6 +42,8 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
   void deleteRecord(Record record);
 
   void destroy();
+
+  BoundingBox getBoundingBox();
 
   <CT extends CodeTable> CT getCodeTable();
 

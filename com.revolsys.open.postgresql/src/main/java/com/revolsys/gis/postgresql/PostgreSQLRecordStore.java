@@ -164,7 +164,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   @Override
   protected Identifier getNextPrimaryKey(final String sequenceName) {
     final String sql = "SELECT nextval(?)";
-    return Identifier.newIdentifier(JdbcUtils.selectLong(this, sql, sequenceName));
+    return Identifier.newIdentifier(selectLong(sql, sequenceName));
   }
 
   @Override

@@ -24,7 +24,6 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
@@ -199,8 +198,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
       Geometry geometry = record.getValue(name);
       if (geometry != null) {
         final FieldDefinition attribute = recordDefinition.getField(name);
-        final GeometryFactory geometryFactory = attribute
-          .getProperty(FieldProperties.GEOMETRY_FACTORY);
+        final GeometryFactory geometryFactory = attribute.getGeometryFactory();
         geometry = geometry.convertGeometry(geometryFactory);
         final int geometryType = fieldDefinition.GetFieldType();
         final int axisCount = geometryFactory.getAxisCount();

@@ -1,4 +1,4 @@
-package com.revolsys.geopackage.old;
+package com.revolsys.geopackage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,11 +10,9 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 
 public class GeoPackageGeometryFieldAdder extends JdbcFieldAdder {
@@ -47,7 +45,7 @@ public class GeoPackageGeometryFieldAdder extends JdbcFieldAdder {
       int axisCount = 2;
       try {
         final String sql = "select geometry_type_name, srs_id, Z, M from gpkg_geometry_columns where UPPER(TABLE_NAME) = UPPER(?) AND UPPER(COLUMN_NAME) = UPPER(?)";
-        final MapEx values = JdbcUtils.selectMap(recordStore, sql, tableName, columnName);
+        final MapEx values = recordStore.selectMap(sql, tableName, columnName);
         srid = values.getInteger("srs_id", 0);
         type = values.getString("geometry_type_name", "GEOMETRY");
         if (values.getInteger("z", 0) > 0) {
@@ -61,18 +59,17 @@ public class GeoPackageGeometryFieldAdder extends JdbcFieldAdder {
       }
 
       final DataType dataType = DATA_TYPE_MAP.get(type);
-      final GeometryFactory storeGeometryFactory = recordStore.getGeometryFactory();
+      final GeometryFactory recordDefinitionGeometryFactory = recordDefinition.getGeometryFactory();
       final GeometryFactory geometryFactory;
-      if (storeGeometryFactory == null) {
+      if (recordDefinitionGeometryFactory == null) {
         geometryFactory = GeometryFactory.floating(srid, axisCount);
       } else {
-        final double[] scales = storeGeometryFactory.newScales(axisCount);
+        final double[] scales = recordDefinitionGeometryFactory.newScales(axisCount);
         geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
       }
       final FieldDefinition field = new GeoPackageGeometryJdbcFieldDefinition(dbName, name,
         dataType, required, description, null, srid, axisCount, geometryFactory);
       recordDefinition.addField(field);
-      field.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
       return field;
     } catch (final Throwable e) {
       Logs.error(this,

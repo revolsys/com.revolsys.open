@@ -12,7 +12,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.Record;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 
@@ -31,9 +30,7 @@ public class WktRecordWriter extends AbstractRecordWriter {
     this.out = new BufferedWriter(out);
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
     if (geometryField != null) {
-      final GeometryFactory geometryFactory = geometryField
-        .getProperty(FieldProperties.GEOMETRY_FACTORY);
-      this.geometryFactory = geometryFactory;
+      this.geometryFactory = geometryField.getGeometryFactory();
     }
   }
 

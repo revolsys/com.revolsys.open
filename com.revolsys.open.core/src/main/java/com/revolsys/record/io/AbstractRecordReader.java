@@ -16,7 +16,6 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.format.csv.GeometryFieldDefinition;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
@@ -192,7 +191,7 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
       }
     }
     if (geometryField != null) {
-      geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY, this.geometryFactory);
+      geometryField.setGeometryFactory(this.geometryFactory);
     }
     final RecordStoreSchema schema = getProperty("schema");
     String typePath = getProperty("typePath");

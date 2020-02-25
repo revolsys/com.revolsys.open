@@ -26,7 +26,6 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
-import com.revolsys.record.property.FieldProperties;
 
 public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
 
@@ -67,8 +66,6 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
 
   private final int axisCount;
 
-  private final GeometryFactory geometryFactory;
-
   private final ArcSdeSpatialReference spatialReference;
 
   public ArcSdeStGeometryFieldDefinition(final String dbName, final String name,
@@ -84,12 +81,11 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
     final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
     if (axisCount >= 3) {
       final double[] scales = geometryFactory.newScales(axisCount);
-      this.geometryFactory = GeometryFactory.fixed(coordinateSystemId, axisCount, scales);
+      setGeometryFactory(GeometryFactory.fixed(coordinateSystemId, axisCount, scales));
     } else {
-      this.geometryFactory = GeometryFactory.fixed2d(coordinateSystemId, scaleX, scaleY);
+      setGeometryFactory(GeometryFactory.fixed2d(coordinateSystemId, scaleX, scaleY));
     }
     this.axisCount = axisCount;
-    setProperty(FieldProperties.GEOMETRY_FACTORY, this.geometryFactory);
   }
 
   @Override
@@ -133,7 +129,7 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
         final Double mScale = this.spatialReference.getMScale();
         final Double mOffset = this.spatialReference.getMOffset();
 
-        final GeometryFactory geometryFactory = this.geometryFactory;
+        final GeometryFactory geometryFactory = getGeometryFactory();
         final Geometry geometry = PackedCoordinateUtil.getGeometry(pointsIn, geometryFactory,
           geometryType, numPoints, xOffset, yOffset, xyScale, zOffset, zScale, mOffset, mScale);
         return geometry;
@@ -166,15 +162,16 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
   @Override
   public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
     Object value) throws SQLException {
+    final GeometryFactory geometryFactory = getGeometryFactory();
     int index = parameterIndex;
 
     if (value instanceof BoundingBox) {
       final BoundingBox boundingBox = (BoundingBox)value;
-      value = boundingBox.bboxToCs(this.geometryFactory).toPolygon(1);
+      value = boundingBox.bboxToCs(geometryFactory).toPolygon(1);
     }
     if (value instanceof Geometry) {
       Geometry geometry = (Geometry)value;
-      geometry = geometry.newGeometry(this.geometryFactory);
+      geometry = geometry.newGeometry(geometryFactory);
 
       final int sdeSrid = this.spatialReference.getEsriSrid();
       final Double xOffset = this.spatialReference.getXOffset();

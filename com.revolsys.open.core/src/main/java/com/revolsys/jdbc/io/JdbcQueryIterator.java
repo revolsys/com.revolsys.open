@@ -54,13 +54,6 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
     return record;
   }
 
-  public static ResultSet getResultSet(final PreparedStatement statement, final Query query)
-    throws SQLException {
-    JdbcUtils.setPreparedStatementParameters(statement, query);
-
-    return statement.executeQuery();
-  }
-
   private boolean internStrings;
 
   private JdbcConnection connection;
@@ -218,7 +211,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
       this.statement = this.connection.prepareStatement(sql);
       this.statement.setFetchSize(this.fetchSize);
 
-      this.resultSet = getResultSet(this.statement, this.query);
+      this.resultSet = this.recordStore.getResultSet(this.statement, this.query);
       final ResultSetMetaData resultSetMetaData = this.resultSet.getMetaData();
 
       if (this.recordDefinition == null) {

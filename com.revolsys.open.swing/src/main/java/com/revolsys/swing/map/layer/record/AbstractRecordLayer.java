@@ -3092,6 +3092,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         geometryFactory = recordDefinition.getGeometryFactory();
       }
       setGeometryFactory(geometryFactory);
+      setBoundingBox(recordDefinition.getBoundingBox());
       final String iconName = recordDefinition.getIconName();
       setIcon(iconName);
       this.fieldNames = recordDefinition.getFieldNames();

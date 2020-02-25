@@ -14,7 +14,6 @@ import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.io.JdbcDdlWriter;
 import com.revolsys.record.Record;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.property.ShortNameProperty;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -57,8 +56,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
     final String tableName = PathUtil.getName(typePath);
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
     if (geometryField != null) {
-      final GeometryFactory geometryFactory = geometryField
-        .getProperty(FieldProperties.GEOMETRY_FACTORY);
+      final GeometryFactory geometryFactory = geometryField.getGeometryFactory();
       final String name = geometryField.getName();
       String geometryType = "GEOMETRY";
       final DataType dataType = geometryField.getDataType();
@@ -181,8 +179,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
     final String tableName = PathUtil.getName(typePath);
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
     if (geometryField != null) {
-      final GeometryFactory geometryFactory = geometryField
-        .getProperty(FieldProperties.GEOMETRY_FACTORY);
+      final GeometryFactory geometryFactory = geometryField.getGeometryFactory();
       final String name = geometryField.getName();
       String geometryType = "GEOMETRY";
       final DataType dataType = geometryField.getDataType();

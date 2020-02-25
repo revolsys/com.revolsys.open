@@ -24,7 +24,6 @@ import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.jdbc.JdbcConnection;
-import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
@@ -258,7 +257,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     CoordinateSystem coordinateSystem = this.oracleCoordinateSystems.get(oracleSrid);
     if (coordinateSystem == null) {
       try {
-        final Map<String, Object> result = JdbcUtils.selectMap(this,
+        final Map<String, Object> result = selectMap(
           "SELECT * FROM MDSYS.SDO_CS_SRS WHERE SRID = ?", oracleSrid);
         if (result == null) {
           coordinateSystem = EpsgCoordinateSystems.getCoordinateSystem(oracleSrid);
@@ -298,7 +297,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   @Override
   public Identifier getNextPrimaryKey(final String sequenceName) {
     final String sql = "SELECT " + sequenceName + ".NEXTVAL FROM SYS.DUAL";
-    return Identifier.newIdentifier(JdbcUtils.selectLong(this, sql));
+    return Identifier.newIdentifier(selectLong(sql));
   }
 
   @Override

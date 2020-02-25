@@ -22,6 +22,7 @@ import com.revolsys.collection.CollectionUtil;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.set.Sets;
+import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataTypes;
@@ -33,7 +34,6 @@ import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonObjectHash;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.property.RecordDefinitionProperty;
 import com.revolsys.record.property.ValueRecordDefinitionProperty;
 
@@ -56,6 +56,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   private Map<String, CodeTable> codeTableByFieldNameMap = new HashMap<>();
 
   private Map<String, Object> defaultValues = new HashMap<>();
+
+  private BoundingBox boundingBox = BoundingBox.empty();
 
   private CodeTable codeTable;
 
@@ -257,10 +259,9 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
         this.geometryFieldDefinitionNames.add(name);
         if (this.geometryFieldDefinitionIndex == -1) {
           this.geometryFieldDefinitionIndex = index;
-          final GeometryFactory geometryFactory = field
-            .getProperty(FieldProperties.GEOMETRY_FACTORY);
+          final GeometryFactory geometryFactory = field.getGeometryFactory();
           if (geometryFactory == null && this.geometryFactory != null) {
-            field.setProperty(FieldProperties.GEOMETRY_FACTORY, this.geometryFactory);
+            field.setGeometryFactory(this.geometryFactory);
           }
         }
       }
@@ -389,6 +390,10 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     this.geometryFieldDefinitionNames.clear();
     this.restrictions.clear();
     this.superClasses.clear();
+  }
+
+  public BoundingBox getBoundingBox() {
+    return this.boundingBox;
   }
 
   @SuppressWarnings("unchecked")
@@ -586,8 +591,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     if (geometryFieldDefinition == null) {
       return null;
     } else {
-      final GeometryFactory geometryFactory = geometryFieldDefinition
-        .getProperty(FieldProperties.GEOMETRY_FACTORY);
+      final GeometryFactory geometryFactory = geometryFieldDefinition.getGeometryFactory();
       if (geometryFactory == null) {
         return this.geometryFactory;
       }
@@ -805,6 +809,10 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     }
   }
 
+  public void setBoundingBox(final BoundingBox boundingBox) {
+    this.boundingBox = boundingBox;
+  }
+
   public void setCodeTable(final CodeTable codeTable) {
     this.codeTable = codeTable;
   }
@@ -831,7 +839,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     if (geometryFieldDefinition == null) {
       this.geometryFactory = geometryFactory;
     } else {
-      geometryFieldDefinition.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+      geometryFieldDefinition.setGeometryFactory(geometryFactory);
     }
   }
 

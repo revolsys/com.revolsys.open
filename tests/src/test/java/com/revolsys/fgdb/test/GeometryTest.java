@@ -14,7 +14,6 @@ import com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
-import com.revolsys.record.property.FieldProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 
@@ -68,7 +67,7 @@ public class GeometryTest {
     recordDefinition.addField("ID", DataTypes.INT, true);
     final FieldDefinition geometryField = recordDefinition.addField("Geometry", geometryDataType,
       true);
-    geometryField.setProperty(FieldProperties.GEOMETRY_FACTORY, geometryFactory);
+    geometryField.setGeometryFactory(geometryFactory);
     recordDefinition.setIdFieldName("ID");
 
     final FileGdbRecordStore recordStore = FileGdbRecordStoreFactory.newRecordStore(file);
