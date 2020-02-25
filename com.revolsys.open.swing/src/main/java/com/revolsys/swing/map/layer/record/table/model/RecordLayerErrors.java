@@ -64,7 +64,7 @@ public class RecordLayerErrors {
       message = exception.getMessage();
     }
     if (!Property.hasValue(message)) {
-      message = "Null pointer";
+      message = exception.getClass().getSimpleName();
     }
     this.messages.add(message);
     this.exceptions.add(exception);

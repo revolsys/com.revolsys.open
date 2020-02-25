@@ -361,7 +361,7 @@ public class NumberTextField extends JXTextField implements Field, DocumentListe
           if (number.scale() < 0) {
             number = number.setScale(this.scale);
           }
-          if (number.scale() > this.scale) {
+          if (this.scale >= 0 && number.scale() > this.scale) {
             message = "Number of decimal places must be < " + this.scale;
           } else if (this.minimumValue != null && this.minimumValue.compareTo(number) > 0) {
             message = BigDecimals.toString(number) + " < " + BigDecimals.toString(this.minimumValue)

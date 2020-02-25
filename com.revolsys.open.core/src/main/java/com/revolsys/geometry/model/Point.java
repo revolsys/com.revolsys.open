@@ -42,6 +42,7 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.function.BiConsumerDouble;
 import org.jeometry.common.function.BiFunctionDouble;
 import org.jeometry.common.function.Consumer3Double;
+import org.jeometry.common.function.Consumer4Double;
 import org.jeometry.common.math.Angle;
 import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperation;
@@ -682,6 +683,16 @@ public interface Point extends Punctual, Serializable, BoundingBox {
       final double y = getY();
       final double z = getZ();
       action.accept(x, y, z);
+    }
+  }
+
+  default void forEachVertex(final Consumer4Double action) {
+    if (!isEmpty()) {
+      final double x = getX();
+      final double y = getY();
+      final double z = getZ();
+      final double m = getM();
+      action.accept(x, y, z, m);
     }
   }
 

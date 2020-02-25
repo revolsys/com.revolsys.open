@@ -824,6 +824,19 @@ public interface LineString extends Lineal {
     }
   }
 
+  default void forEachVertex(final Consumer4Double action) {
+    if (!isEmpty()) {
+      final int vertexCount = getVertexCount();
+      for (int i = 0; i < vertexCount; i++) {
+        final double x = getX(i);
+        final double y = getY(i);
+        final double z = getZ(i);
+        final double m = getM(i);
+        action.accept(x, y, z, m);
+      }
+    }
+  }
+
   @Override
   default void forEachVertex(final CoordinatesOperation coordinatesOperation,
     final CoordinatesOperationPoint point, final Consumer<CoordinatesOperationPoint> action) {
@@ -848,6 +861,42 @@ public interface LineString extends Lineal {
       final double z = getCoordinate(vertexIndex, 2);
       point.setPoint(x, y, z);
       action.accept(point);
+    }
+  }
+
+  default void forEachVertexReverse(final BiConsumerDouble action) {
+    if (!isEmpty()) {
+      final int vertexCount = getVertexCount();
+      for (int i = vertexCount - 1; i >= 0; i--) {
+        final double x = getX(i);
+        final double y = getY(i);
+        action.accept(x, y);
+      }
+    }
+  }
+
+  default void forEachVertexReverse(final Consumer3Double action) {
+    if (!isEmpty()) {
+      final int vertexCount = getVertexCount();
+      for (int i = vertexCount - 1; i >= 0; i--) {
+        final double x = getX(i);
+        final double y = getY(i);
+        final double z = getZ(i);
+        action.accept(x, y, z);
+      }
+    }
+  }
+
+  default void forEachVertexReverse(final Consumer4Double action) {
+    if (!isEmpty()) {
+      final int vertexCount = getVertexCount();
+      for (int i = vertexCount - 1; i >= 0; i--) {
+        final double x = getX(i);
+        final double y = getY(i);
+        final double z = getZ(i);
+        final double m = getM(i);
+        action.accept(x, y, z, m);
+      }
     }
   }
 

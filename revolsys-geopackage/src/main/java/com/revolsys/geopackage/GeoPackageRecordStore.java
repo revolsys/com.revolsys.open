@@ -25,7 +25,10 @@ import org.sqlite.core.DB;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geopackage.function.GeoPackageEnvelopeValueFunction;
+import com.revolsys.geopackage.function.GeoPackageIsEmptyFunction;
 import com.revolsys.jdbc.JdbcConnection;
+import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
@@ -47,6 +50,16 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
   public GeoPackageRecordStore(final GeoPackage geoPackage,
     final Map<String, ? extends Object> connectionProperties) {
     super(geoPackage, connectionProperties);
+  }
+
+  private void addFunctions(final JdbcConnection connection) {
+    try {
+      final SQLiteConnection dbConnection = connection.unwrap(SQLiteConnection.class);
+      GeoPackageIsEmptyFunction.add(dbConnection);
+      GeoPackageEnvelopeValueFunction.add(dbConnection);
+    } catch (final SQLException e) {
+      throw connection.getException("Add functions", "", e);
+    }
   }
 
   @Override
@@ -101,6 +114,11 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     return Collections.emptySet();
   }
 
+  @Override
+  public String getGeneratePrimaryKeySql(final JdbcRecordDefinition recordDefinition) {
+    return "null";
+  }
+
   private GeometryFactory getGeometryFactory(final Connection connection,
     final int coordinateSystemId) throws SQLException {
     if (coordinateSystemId <= 0) {
@@ -125,6 +143,20 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
       }
     }
     return GeometryFactory.DEFAULT_2D;
+  }
+
+  @Override
+  public JdbcConnection getJdbcConnection() {
+    final JdbcConnection connection = super.getJdbcConnection();
+    addFunctions(connection);
+    return connection;
+  }
+
+  @Override
+  public JdbcConnection getJdbcConnection(final boolean autoCommit) {
+    final JdbcConnection connection = super.getJdbcConnection(autoCommit);
+    addFunctions(connection);
+    return connection;
   }
 
   @Override
@@ -193,7 +225,14 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
   @Override
   public PreparedStatement insertStatementPrepareRowId(final JdbcConnection connection,
     final RecordDefinition recordDefinition, final String sql) throws SQLException {
-    throw new UnsupportedOperationException();
+    final List<FieldDefinition> idFields = recordDefinition.getIdFields();
+    final String[] idColumnNames = new String[idFields.size()];
+    for (int i = 0; i < idFields.size(); i++) {
+      final FieldDefinition idField = idFields.get(0);
+      final String columnName = ((JdbcFieldDefinition)idField).getDbName();
+      idColumnNames[i] = columnName;
+    }
+    return connection.prepareStatement(sql, idColumnNames);
   }
 
   @Override
