@@ -131,9 +131,6 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     setConnectionProperties(connectionProperties);
     final DataSource dataSource = databaseFactory.newDataSource(connectionProperties);
     setDataSource(dataSource);
-    try (
-      JdbcConnection jdbcConnection = getJdbcConnection()) {
-    }
   }
 
   public AbstractJdbcRecordStore(final JdbcDatabaseFactory databaseFactory,
@@ -462,6 +459,14 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     super.initializeDo();
     if (this.dataSource != null) {
       this.transactionManager = new DataSourceTransactionManager(this.dataSource);
+    }
+  }
+
+  @Override
+  protected void initializePost() {
+    try (
+      JdbcConnection connection = getJdbcConnection()) {
+      // Get a connection to test that the database works
     }
   }
 

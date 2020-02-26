@@ -178,7 +178,8 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory implements FileRecor
 
   @Override
   public GeoPackageRecordStore newRecordStore(final DataSource dataSource) {
-    return new GeoPackageRecordStore(dataSource);
+    throw new UnsupportedOperationException(
+      "GeoPackage record store cannot be created from a dataSource");
   }
 
   @Override

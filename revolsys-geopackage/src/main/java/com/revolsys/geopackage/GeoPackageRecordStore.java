@@ -1,5 +1,6 @@
 package com.revolsys.geopackage;
 
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,19 +15,17 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
 
-import org.apache.commons.dbcp2.DelegatingConnection;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 import org.sqlite.SQLiteConnection;
-import org.sqlite.core.DB;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geopackage.function.GeoPackageEnvelopeValueFunction;
 import com.revolsys.geopackage.function.GeoPackageIsEmptyFunction;
+import com.revolsys.io.file.Paths;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
@@ -41,15 +40,27 @@ import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
+import com.revolsys.spring.resource.Resource;
+import com.revolsys.spring.resource.UrlResource;
 
 public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
-  public GeoPackageRecordStore(final DataSource dataSource) {
-    super(dataSource);
-  }
+
+  private boolean createMissingRecordStore = false;
+
+  private boolean createMissingTables = false;
+
+  private Path file;
 
   public GeoPackageRecordStore(final GeoPackage geoPackage,
     final Map<String, ? extends Object> connectionProperties) {
     super(geoPackage, connectionProperties);
+    final String url = getUrl();
+    if (url.startsWith(GeoPackage.JDBC_PREFIX)) {
+      this.file = Path.of(url.substring(GeoPackage.JDBC_PREFIX.length()));
+    } else {
+      final UrlResource resource = new UrlResource(url);
+      this.file = resource.getPath();
+    }
   }
 
   private void addFunctions(final JdbcConnection connection) {
@@ -204,21 +215,30 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     addFieldAdder("MULTILINESTRING", geometryAdder);
     addFieldAdder("MULTIPOLYGON", geometryAdder);
 
-    super.initialize();
-    try (
-      JdbcConnection connection = getJdbcConnection(true)) {
-      final SQLiteConnection sqliteConnection = (SQLiteConnection)((DelegatingConnection<?>)connection
-        .getConnection()).getInnermostDelegate();
-      final DB db = sqliteConnection.getDatabase();
-      db.enable_load_extension(true);
-      try {
-        // db._exec("select load_extension('libgpkg')");
-      } finally {
-        db.enable_load_extension(false);
+    if (!Paths.exists(this.file)) {
+      if (this.createMissingRecordStore) {
+        try (
+          JdbcConnection connection = getJdbcConnection(true);) {
+          for (final String fileName : Arrays.asList("gpkg_contents.sql", "gpkg_data_columns.sql",
+            "gpkg_data_column_constraints.sql", "gpkg_extensions.sql", "gpkg_geometry_columns.sql",
+            "gpkg_metadata.sql", "gpkg_metadata_reference.sql", "gpkg_spatial_ref_sys.sql",
+            "gpkg_tile_matrix.sql", "gpkg_tile_matrix_set.sql", "geometry_columns.sql",
+            "spatial_ref_sys.sql", "st_geometry_columns.sql", "st_spatial_ref_sys.sql")) {
+            final String sql = Resource
+              .getResource("classpath:/com/revolsys/geopackage/" + fileName)
+              .contentsAsString();
+            try (
+              PreparedStatement statement = connection.prepareStatement(sql)) {
+              statement.execute();
+            } catch (final SQLException e) {
+              throw connection.getException(fileName, sql, e);
+            }
+          }
+
+        }
+      } else {
+        throw new IllegalArgumentException(this.file + " does not exist");
       }
-    } catch (final SQLException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
     }
   }
 
@@ -233,6 +253,14 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
       idColumnNames[i] = columnName;
     }
     return connection.prepareStatement(sql, idColumnNames);
+  }
+
+  public boolean isCreateMissingRecordStore() {
+    return this.createMissingRecordStore;
+  }
+
+  public boolean isCreateMissingTables() {
+    return this.createMissingTables;
   }
 
   @Override
@@ -314,6 +342,14 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     }
 
     return elementsByPath;
+  }
+
+  public void setCreateMissingRecordStore(final boolean createMissingRecordStore) {
+    this.createMissingRecordStore = createMissingRecordStore;
+  }
+
+  public void setCreateMissingTables(final boolean createMissingTables) {
+    this.createMissingTables = createMissingTables;
   }
 
 }

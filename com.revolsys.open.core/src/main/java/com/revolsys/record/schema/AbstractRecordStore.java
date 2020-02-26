@@ -257,6 +257,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
       if (!this.initialized) {
         this.initialized = true;
         initializeDo();
+        initializePost();
       }
     }
   }
@@ -266,6 +267,9 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     if (statistics != null) {
       statistics.connect();
     }
+  }
+
+  protected void initializePost() {
   }
 
   protected void initRecordDefinition(final RecordDefinition recordDefinition) {
