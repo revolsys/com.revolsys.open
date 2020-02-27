@@ -166,7 +166,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     }
   }
 
-  protected PathName createRecordDefinitionDo(final RecordDefinition recordDefinition) {
+  protected RecordDefinition createRecordDefinitionDo(final RecordDefinition recordDefinition) {
     throw new UnsupportedOperationException(
       "Creating new record definitions (tables) is not supported");
   }
@@ -230,13 +230,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     final RecordDefinition recordDefinition) {
     final RD rd = RecordStore.super.getRecordDefinition(recordDefinition);
     if (rd == null && recordDefinition != null && isCreateMissingTables()) {
-      final PathName path = createRecordDefinitionDo(recordDefinition);
-      if (path != null) {
-        final PathName parent = path.getParent();
-        final RecordStoreSchema schema = getSchema(parent);
-        schema.refresh();
-        return getRecordDefinition(path);
-      }
+      return (RD)createRecordDefinitionDo(recordDefinition);
     }
     return rd;
   }

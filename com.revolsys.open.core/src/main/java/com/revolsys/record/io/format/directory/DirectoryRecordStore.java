@@ -47,6 +47,8 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   public DirectoryRecordStore(final File directory, final Collection<String> fileExtensions) {
     this.directory = directory;
     this.fileExtensions = new ArrayList<>(fileExtensions);
+    setCreateMissingRecordStore(true);
+    setCreateMissingTables(true);
   }
 
   public DirectoryRecordStore(final File directory, final String... fileExtensions) {
@@ -77,6 +79,28 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   }
 
   @Override
+  protected RecordDefinition createRecordDefinitionDo(final RecordDefinition recordDefinition) {
+    final PathName typePath = recordDefinition.getPathName();
+    final PathName schemaPath = typePath.getParent();
+    RecordStoreSchema schema = getSchema(schemaPath);
+    if (schema == null && isCreateMissingTables()) {
+      final RecordStoreSchema rootSchema = getRootSchema();
+      schema = rootSchema.newSchema(schemaPath);
+    }
+    final File schemaDirectory = new File(this.directory, schemaPath.getPath());
+    if (!schemaDirectory.exists()) {
+      schemaDirectory.mkdirs();
+    }
+    final RecordDefinitionImpl newRecordDefinition = new RecordDefinitionImpl(schema, typePath);
+    for (final FieldDefinition field : recordDefinition.getFields()) {
+      final FieldDefinition newField = new FieldDefinition(field);
+      newRecordDefinition.addField(newField);
+    }
+    schema.addElement(newRecordDefinition);
+    return newRecordDefinition;
+  }
+
+  @Override
   public boolean deleteRecord(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final RecordStore recordStore = recordDefinition.getRecordStore();
@@ -102,32 +126,6 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   @Override
   public int getRecordCount(final Query query) {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public RecordDefinition getRecordDefinition(final RecordDefinition recordDefinition) {
-    final RecordDefinition storeRecordDefinition = super.getRecordDefinition(recordDefinition);
-    if (storeRecordDefinition == null && isCreateMissingTables()) {
-      final PathName typePath = recordDefinition.getPathName();
-      final PathName schemaPath = typePath.getParent();
-      RecordStoreSchema schema = getSchema(schemaPath);
-      if (schema == null && isCreateMissingTables()) {
-        final RecordStoreSchema rootSchema = getRootSchema();
-        schema = rootSchema.newSchema(schemaPath);
-      }
-      final File schemaDirectory = new File(this.directory, schemaPath.getPath());
-      if (!schemaDirectory.exists()) {
-        schemaDirectory.mkdirs();
-      }
-      final RecordDefinitionImpl newRecordDefinition = new RecordDefinitionImpl(schema, typePath);
-      for (final FieldDefinition field : recordDefinition.getFields()) {
-        final FieldDefinition newField = new FieldDefinition(field);
-        newRecordDefinition.addField(newField);
-      }
-      schema.addElement(newRecordDefinition);
-      return newRecordDefinition;
-    }
-    return storeRecordDefinition;
   }
 
   @Override
