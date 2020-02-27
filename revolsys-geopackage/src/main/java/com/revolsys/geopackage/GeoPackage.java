@@ -4,11 +4,9 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
@@ -25,6 +23,7 @@ import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.io.FileRecordStoreFactory;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
+import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;
 import com.revolsys.util.RsCoreDataTypes;
@@ -33,17 +32,17 @@ import com.revolsys.util.RsCoreDataTypes;
  * jdbc:sqlite:[file]
  */
 public class GeoPackage extends AbstractJdbcDatabaseFactory implements FileRecordStoreFactory {
+  public static final String FILE_EXTENSION = "gpkg";
+
+  public static final String DESCRIPTION = "GeoPackage Database";
+
   private static final List<FieldDefinition> CONNECTION_FIELD_DEFINITIONS = Arrays.asList( //
     new FieldDefinition("file", RsCoreDataTypes.FILE, 50, true) //
   );
 
-  private static final Map<String, AtomicInteger> COUNTS = new HashMap<>();
-
-  private static final List<String> FILE_NAME_EXTENSIONS = Arrays.asList("gpkg");
+  private static final List<String> FILE_NAME_EXTENSIONS = Arrays.asList(FILE_EXTENSION);
 
   public static final String JDBC_PREFIX = "jdbc:sqlite:";
-
-  private static final Map<String, GeoPackageRecordStore> RECORD_STORES = new HashMap<>();
 
   private static final List<Pattern> URL_PATTERNS = Arrays.asList(Pattern.compile("jdbc:sqlite:.+"),
     Pattern.compile("[^(file:)].+\\.gpkg"), Pattern.compile("file:(/(//)?)?.+\\.gpkg"),
@@ -56,32 +55,27 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory implements FileRecor
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
+    new GeoPackageReadWriteFactory();
   }
 
-  public static GeoPackageRecordStore newRecordStore(final File file) {
-    if (file == null) {
-      return null;
-    } else {
-      synchronized (COUNTS) {
-        final String fileName = FileUtil.getCanonicalPath(file);
-        final AtomicInteger count = Maps.get(COUNTS, fileName, new AtomicInteger());
-        count.incrementAndGet();
-        GeoPackageRecordStore recordStore = RECORD_STORES.get(fileName);
-        if (recordStore == null || recordStore.isClosed()) {
-          final MapEx properties = new LinkedHashMapEx().add("url", "jdbc:sqlite:" + fileName);
-          recordStore = new GeoPackage().newRecordStore(properties);
-          RECORD_STORES.put(fileName, recordStore);
-        }
-        return recordStore;
-      }
+  public static GeoPackageRecordStore createRecordStore(final Object source) {
+    final GeoPackageRecordStore recordStore = openRecordStore(source);
+    if (recordStore != null) {
+      recordStore.setCreateMissingRecordStore(true);
+      recordStore.setCreateMissingTables(true);
+      recordStore.initialize();
     }
+    return recordStore;
   }
 
-  public static GeoPackageRecordStore newRecordStore(final Path path) {
-    if (path == null) {
+  public static GeoPackageRecordStore openRecordStore(final Object source) {
+    if (source == null) {
       return null;
     } else {
-      return newRecordStore(path.toFile());
+      final Resource resource = Resource.getResource(source);
+      final String fileName = resource.getPath().toAbsolutePath().toString();
+      final MapEx properties = new LinkedHashMapEx().add("url", "jdbc:sqlite:" + fileName);
+      return new GeoPackage().newRecordStore(properties);
     }
   }
 
@@ -124,12 +118,12 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory implements FileRecor
 
   @Override
   public String getName() {
-    return "GeoPackageFactory Database";
+    return DESCRIPTION;
   }
 
   @Override
   public String getProductName() {
-    return "GeoPackageFactory";
+    return "GeoPackage";
   }
 
   @Override

@@ -74,6 +74,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   private final Set<String> allSchemaNames = new TreeSet<>();
 
+  private boolean quoteNames = false;
+
   private int batchSize;
 
   private boolean blobAsString = false;
@@ -539,6 +541,10 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     return this.lobAsString;
   }
 
+  public boolean isQuoteNames() {
+    return this.quoteNames;
+  }
+
   public abstract boolean isSchemaExcluded(String schemaName);
 
   protected synchronized Map<String, List<String>> loadIdFieldNames(final String dbSchemaName) {
@@ -915,6 +921,10 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   public void setPrimaryKeyTableCondition(final String primaryKeyTableCondition) {
     this.primaryKeyTableCondition = primaryKeyTableCondition;
+  }
+
+  public void setQuoteNames(final boolean quoteNames) {
+    this.quoteNames = quoteNames;
   }
 
   protected void setSchemaPermissionsSql(final String scehmaPermissionsSql) {

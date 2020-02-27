@@ -45,6 +45,10 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   private GeometryFactory geometryFactory;
 
+  private boolean createMissingRecordStore = false;
+
+  private boolean createMissingTables = false;
+
   private RecordStoreIteratorFactory iteratorFactory = new RecordStoreIteratorFactory();
 
   private String label;
@@ -162,6 +166,11 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     }
   }
 
+  protected PathName createRecordDefinitionDo(final RecordDefinition recordDefinition) {
+    throw new UnsupportedOperationException(
+      "Creating new record definitions (tables) is not supported");
+  }
+
   @Override
   public CodeTable getCodeTableByFieldName(final CharSequence fieldName) {
     if (fieldName == null) {
@@ -214,6 +223,22 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @Override
   public String getLabel() {
     return this.label;
+  }
+
+  @Override
+  public <RD extends RecordDefinition> RD getRecordDefinition(
+    final RecordDefinition recordDefinition) {
+    final RD rd = RecordStore.super.getRecordDefinition(recordDefinition);
+    if (rd == null && recordDefinition != null && isCreateMissingTables()) {
+      final PathName path = createRecordDefinitionDo(recordDefinition);
+      if (path != null) {
+        final PathName parent = path.getParent();
+        final RecordStoreSchema schema = getSchema(parent);
+        schema.refresh();
+        return getRecordDefinition(path);
+      }
+    }
+    return rd;
   }
 
   @Override
@@ -291,6 +316,14 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     return this.closed;
   }
 
+  public boolean isCreateMissingRecordStore() {
+    return this.createMissingRecordStore;
+  }
+
+  public boolean isCreateMissingTables() {
+    return this.createMissingTables;
+  }
+
   public boolean isInitialized() {
     return this.initialized;
   }
@@ -336,6 +369,14 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   protected void setConnectionProperties(final Map<String, ? extends Object> connectionProperties) {
     this.connectionProperties = Maps.newHash(connectionProperties);
+  }
+
+  public void setCreateMissingRecordStore(final boolean createMissingRecordStore) {
+    this.createMissingRecordStore = createMissingRecordStore;
+  }
+
+  public void setCreateMissingTables(final boolean createMissingTables) {
+    this.createMissingTables = createMissingTables;
   }
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {

@@ -28,7 +28,6 @@ import com.revolsys.record.RecordState;
 import com.revolsys.record.property.GlobalIdProperty;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.record.schema.RecordStore;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.count.CategoryLabelCountMap;
 
@@ -719,9 +718,8 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
   public synchronized void write(final Record record) {
     try {
       final JdbcRecordDefinition recordDefinition = getRecordDefinition(record);
-      final RecordStore recordStore = recordDefinition.getRecordStore();
       final RecordState state = record.getState();
-      if (recordStore != this.recordStore) {
+      if (record.getRecordStore() != this.recordStore) {
         if (state != RecordState.DELETED) {
           insert(recordDefinition, record);
         }

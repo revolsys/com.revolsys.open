@@ -20,6 +20,10 @@ import com.revolsys.util.Strings;
 public abstract class JdbcDdlWriter implements Cloneable {
   private PrintWriter out;
 
+  protected boolean primaryKeyOnColumn = false;
+
+  protected boolean quoteColumns = true;
+
   public JdbcDdlWriter() {
   }
 
@@ -140,7 +144,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
     this.out.println(");");
   }
 
-  public abstract void writeColumnDataType(final FieldDefinition attribute);
+  public abstract void writeColumnDataType(final FieldDefinition field);
 
   public void writeCreateSchema(final String schemaName) {
   }
@@ -159,30 +163,44 @@ public abstract class JdbcDdlWriter implements Cloneable {
 
   public void writeCreateTable(final RecordDefinition recordDefinition) {
     final String typePath = recordDefinition.getPath();
-    this.out.println();
-    this.out.print("CREATE TABLE ");
+    PrintWriter out = this.out;
+    out.println();
+    out.print("CREATE TABLE ");
     writeTableName(typePath);
-    this.out.println(" (");
+    out.println(" (");
     for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
-      final FieldDefinition attribute = recordDefinition.getField(i);
+      final FieldDefinition field = recordDefinition.getField(i);
       if (i > 0) {
-        this.out.println(",");
+        out.println(",");
       }
-      final String name = attribute.getName();
-      this.out.print("  ");
-      this.out.print(name);
+      final String name = field.getName();
+      out.print("  ");
+      if (this.quoteColumns) {
+        out.print('"');
+      }
+      out.print(name);
+      if (this.quoteColumns) {
+        out.print('"');
+      }
       for (int j = name.length(); j < 32; j++) {
-        this.out.print(' ');
+        out.print(' ');
       }
-      writeColumnDataType(attribute);
-      if (attribute.isRequired()) {
-        this.out.print(" NOT NULL");
+      writeColumnDataType(field);
+      if (field.isRequired()) {
+        out.print(" NOT NULL");
+      }
+      if (this.primaryKeyOnColumn) {
+        if (recordDefinition.isIdField(name)) {
+          writePrimaryKeyFieldContstaint(out);
+        }
       }
     }
-    this.out.println();
-    this.out.println(");");
+    out.println();
+    out.println(");");
 
-    writeAddPrimaryKeyConstraint(recordDefinition);
+    if (!this.primaryKeyOnColumn) {
+      writeAddPrimaryKeyConstraint(recordDefinition);
+    }
 
     writeGeometryRecordDefinition(recordDefinition);
 
@@ -192,6 +210,10 @@ public abstract class JdbcDdlWriter implements Cloneable {
         writeCreateSequence(recordDefinition);
       }
     }
+  }
+
+  protected void writePrimaryKeyFieldContstaint(PrintWriter out) {
+    out.print(" PRIMARY KEY");
   }
 
   public void writeCreateView(final String typePath, final String queryTypeName,

@@ -5,4 +5,4 @@ CREATE TABLE gpkg_extensions (
   definition TEXT NOT NULL,
   scope TEXT NOT NULL,
   CONSTRAINT ge_tce UNIQUE (table_name, column_name, extension_name)
-);
+)

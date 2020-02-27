@@ -110,10 +110,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     return path.getPath().replaceAll("/", "\\\\");
   }
 
-  private boolean createMissingRecordStore = true;
-
-  private boolean createMissingTables = true;
-
   private PathName defaultSchemaPath = PathName.ROOT;
 
   private Map<String, List<String>> domainFieldNames = new HashMap<>();
@@ -135,6 +131,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   FileGdbRecordStore(final File file) {
     this.fileName = FileUtil.getCanonicalPath(file);
     setConnectionProperties(Collections.singletonMap("url", FileUtil.toUrl(file).toString()));
+    setCreateMissingRecordStore(true);
+    setCreateMissingTables(true);
   }
 
   @Override
@@ -357,8 +355,8 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   public void deleteGeodatabase() {
-    this.createMissingRecordStore = false;
-    this.createMissingTables = false;
+    setCreateMissingRecordStore(false);
+    setCreateMissingTables(false);
     final String fileName = this.fileName;
     try {
       closeDo();
@@ -509,7 +507,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             final PathName name = pathName.getNamePath();
             recordDefinition = getRecordDefinition(name);
           }
-          if (this.createMissingTables && recordDefinition == null) {
+          if (isCreateMissingTables() && recordDefinition == null) {
             if (getGeometryFactory() == null) {
               setGeometryFactory(sourceRecordDefinition.getGeometryFactory());
             }
@@ -638,7 +636,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             throw new IllegalArgumentException(
               FileUtil.getCanonicalPath(file) + " ESRI File Geodatabase must be a directory");
           }
-        } else if (this.createMissingRecordStore) {
+        } else if (isCreateMissingRecordStore()) {
           geodatabase = EsriFileGdb.createGeodatabase(this.fileName);
           final FileGdbRecordStoreSchema rootSchema = getRootSchema();
           rootSchema.setInitialized(true);
@@ -688,14 +686,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   public boolean isCreateLengthField() {
     return this.createLengthField;
-  }
-
-  public boolean isCreateMissingRecordStore() {
-    return this.createMissingRecordStore;
-  }
-
-  public boolean isCreateMissingTables() {
-    return this.createMissingTables;
   }
 
   public boolean isExists() {
@@ -1066,14 +1056,6 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   public void setCreateLengthField(final boolean createLengthField) {
     this.createLengthField = createLengthField;
-  }
-
-  public void setCreateMissingRecordStore(final boolean createMissingRecordStore) {
-    this.createMissingRecordStore = createMissingRecordStore;
-  }
-
-  public void setCreateMissingTables(final boolean createMissingTables) {
-    this.createMissingTables = createMissingTables;
   }
 
   public void setDefaultSchema(final PathName defaultSchema) {

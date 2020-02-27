@@ -71,8 +71,6 @@ public class OgrRecordStore extends AbstractRecordStore {
 
   public static final String SQLITE = "SQLite";
 
-  private boolean createMissingTables = true;
-
   private DataSource dataSource;
 
   private String driverName;
@@ -90,6 +88,7 @@ public class OgrRecordStore extends AbstractRecordStore {
   protected OgrRecordStore(final String driverName, final File file) {
     this.driverName = driverName;
     this.file = file;
+    setCreateMissingTables(true);
   }
 
   synchronized void addLayerToClose(final Layer layer) {
@@ -452,7 +451,7 @@ public class OgrRecordStore extends AbstractRecordStore {
         setGeometryFactory(sourceRecordDefinition.getGeometryFactory());
       }
       RecordDefinition recordDefinition = super.getRecordDefinition(sourceRecordDefinition);
-      if (this.createMissingTables && recordDefinition == null) {
+      if (isCreateMissingTables() && recordDefinition == null) {
         recordDefinition = newLayerRecordDefinition(dataSource, sourceRecordDefinition);
       }
       return recordDefinition;
@@ -515,10 +514,6 @@ public class OgrRecordStore extends AbstractRecordStore {
       appendQueryValue(query, whereClause, whereCondition);
     }
     return whereClause;
-  }
-
-  public boolean isCreateMissingTables() {
-    return this.createMissingTables;
   }
 
   protected DataSource newDataSource(final boolean update) {
@@ -749,10 +744,6 @@ public class OgrRecordStore extends AbstractRecordStore {
         layer.delete();
       }
     }
-  }
-
-  public void setCreateMissingTables(final boolean createMissingTables) {
-    this.createMissingTables = createMissingTables;
   }
 
   @Override

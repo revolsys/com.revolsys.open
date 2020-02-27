@@ -1,10 +1,13 @@
 package com.revolsys.geopackage;
 
+import java.io.PrintWriter;
+import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,14 +20,17 @@ import java.util.TreeMap;
 import javax.annotation.PostConstruct;
 
 import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.sqlite.SQLiteConnection;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geopackage.function.GeoPackageEnvelopeValueFunction;
 import com.revolsys.geopackage.function.GeoPackageIsEmptyFunction;
+import com.revolsys.io.StringWriter;
 import com.revolsys.io.file.Paths;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
@@ -39,15 +45,14 @@ import com.revolsys.record.query.Value;
 import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionBuilder;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
 
 public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
 
-  private boolean createMissingRecordStore = false;
-
-  private boolean createMissingTables = false;
+  private static final int APPLICATION_ID = ByteBuffer.wrap("GPKG".getBytes()).asIntBuffer().get();
 
   private Path file;
 
@@ -61,6 +66,7 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
       final UrlResource resource = new UrlResource(url);
       this.file = resource.getPath();
     }
+    setQuoteNames(true);
   }
 
   private void addFunctions(final JdbcConnection connection) {
@@ -117,6 +123,114 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
       // }
     } else {
       super.appendQueryValue(query, sql, queryValue);
+    }
+  }
+
+  private String createIdFieldName(final RecordDefinition recordDefinition) {
+    for (final String fieldName : Arrays.asList("id", "fid", "gpkg_id", "objectid")) {
+      if (!recordDefinition.hasField(fieldName)) {
+        return fieldName;
+      }
+    }
+    for (int i = 1; i <= 100; i++) {
+      final String fieldName = "id" + i;
+      if (!recordDefinition.hasField(fieldName)) {
+        return fieldName;
+      }
+    }
+    throw new IllegalArgumentException("Gave up trying to find a name for the primary key column");
+  }
+
+  @Override
+  protected PathName createRecordDefinitionDo(final RecordDefinition oldRecordDefinition) {
+    final String tableName = oldRecordDefinition.getPathName().getName();
+
+    final RecordDefinitionBuilder newRdBuilder = new RecordDefinitionBuilder(tableName)
+      .setGeometryFactory(oldRecordDefinition.getGeometryFactory());
+
+    final String idFieldName;
+    if (isPrimaryKeyValid(oldRecordDefinition)) {
+      idFieldName = oldRecordDefinition.getIdFieldName();
+      newRdBuilder.addField(idFieldName, DataTypes.LONG, true);
+    } else {
+      idFieldName = createIdFieldName(oldRecordDefinition);
+      newRdBuilder.addField(idFieldName, DataTypes.LONG, true);
+    }
+    newRdBuilder.setIdFieldName(idFieldName);
+    for (final FieldDefinition field : oldRecordDefinition.getFields()) {
+      if (!field.getName().equals(idFieldName)) {
+        final FieldDefinition newField = field.clone();
+        newRdBuilder.addField(newField);
+      }
+    }
+
+    final RecordDefinition newRecordDefinition = newRdBuilder.getRecordDefinition();
+
+    final StringWriter out = new StringWriter();
+    final GeoPackageSqlDdlWriter ddlWriter = new GeoPackageSqlDdlWriter(new PrintWriter(out));
+    ddlWriter.writeCreateTable(newRecordDefinition);
+
+    final String createTable = out.toString();
+    executeSql("Create table", createTable);
+
+    final String gpkgContents = ddlWriter.insertGpkgContents(newRecordDefinition);
+    executeSql("gpkgContents", gpkgContents);
+
+    for (final FieldDefinition field : newRecordDefinition.getGeometryFields()) {
+      final CoordinateSystem coordinateSystem = field.getHorizontalCoordinateSystem();
+      if (coordinateSystem != null) {
+        final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
+        try {
+          selectInt("SELECT srs_id from gpkg_spatial_ref_sys where srs_id = ?", coordinateSystemId);
+        } catch (final IllegalArgumentException e) {
+          final String sql = "INSERT INTO gpkg_spatial_ref_sys (srs_name, srs_id, organization, organization_coordsys_id, definition, description) VALUES (?,?,?,?,?,?)";
+          final String coordinateSystemName = coordinateSystem.getCoordinateSystemName();
+          final String esriWktCs = coordinateSystem.toEsriWktCs();
+          executeUpdate(sql, coordinateSystemName, coordinateSystemId, "EPSG", coordinateSystemId,
+            esriWktCs, null);
+        }
+      }
+      final String gpkgGeometryColumns = ddlWriter.insertGpkgGeometryColumns(field);
+      executeSql("gpkgGeometryColumns", gpkgGeometryColumns);
+      final String fieldName = field.getName();
+      for (String sql : getSqlTemplates("rtree_tiggers.sql")) {
+        sql = sql.replace("<t>", tableName);
+        sql = sql.replace("<c>", fieldName);
+        sql = sql.replace("<i>", idFieldName);
+        executeSql("rtree", sql);
+      }
+    }
+
+    return newRecordDefinition.getPathName();
+  }
+
+  private void createRecordStore() {
+    executeSql("application_id", "PRAGMA application_id = " + APPLICATION_ID + ";");
+    executeSql("user_version", "PRAGMA user_version = 10201;");
+
+    for (final String fileName : Arrays.asList("gpkg_spatial_ref_sys.sql", "gpkg_contents.sql",
+      "gpkg_data_columns.sql", "gpkg_data_column_constraints.sql", "gpkg_extensions.sql",
+      "gpkg_geometry_columns.sql", "gpkg_metadata.sql", "gpkg_metadata_reference.sql"
+    // , "gpkg_tile_matrix.sql", "gpkg_tile_matrix_set.sql"
+    )) {
+      for (final String sql : getSqlTemplates(fileName)) {
+        executeSql(fileName, sql);
+      }
+
+    }
+  }
+
+  protected void executeSql(final String task, final String sql) {
+    try (
+      JdbcConnection connection = getJdbcConnection(true);) {
+      if (sql.trim().length() > 0) {
+        try (
+          Statement statement = connection.createStatement()) {
+          statement.execute(sql);
+        } catch (final SQLException e) {
+          throw connection.getException(task, sql, e);
+        }
+      }
     }
   }
 
@@ -185,6 +299,13 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     return null;
   }
 
+  private String[] getSqlTemplates(final String fileName) {
+    final String sqlStatements = Resource
+      .getResource("classpath:/com/revolsys/geopackage/" + fileName)
+      .contentsAsString();
+    return sqlStatements.split("-- END --");
+  }
+
   @Override
   @PostConstruct
   public void initializeDo() {
@@ -195,11 +316,15 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     addFieldAdder("TINYINT", DataTypes.BYTE);
     addFieldAdder("SMALLINT", DataTypes.SHORT);
     addFieldAdder("MEDIUMINT", DataTypes.INT);
-    addFieldAdder("INT", DataTypes.LONG);
+    addFieldAdder("INT", DataTypes.INT);
+    addFieldAdder("LONG", DataTypes.LONG);
+    addFieldAdder("BIGINT", DataTypes.LONG);
     addFieldAdder("INTEGER", DataTypes.LONG);
     addFieldAdder("FLOAT", DataTypes.FLOAT);
     addFieldAdder("DOUBLE", DataTypes.DOUBLE);
     addFieldAdder("REAL", DataTypes.DOUBLE);
+    addFieldAdder("STRING", DataTypes.STRING);
+    addFieldAdder("VARCHAR", DataTypes.STRING);
     addFieldAdder("TEXT", DataTypes.STRING);
     addFieldAdder("BLOB", DataTypes.BLOB);
     addFieldAdder("DATE", DataTypes.SQL_DATE);
@@ -216,26 +341,9 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     addFieldAdder("MULTIPOLYGON", geometryAdder);
 
     if (!Paths.exists(this.file)) {
-      if (this.createMissingRecordStore) {
-        try (
-          JdbcConnection connection = getJdbcConnection(true);) {
-          for (final String fileName : Arrays.asList("gpkg_contents.sql", "gpkg_data_columns.sql",
-            "gpkg_data_column_constraints.sql", "gpkg_extensions.sql", "gpkg_geometry_columns.sql",
-            "gpkg_metadata.sql", "gpkg_metadata_reference.sql", "gpkg_spatial_ref_sys.sql",
-            "gpkg_tile_matrix.sql", "gpkg_tile_matrix_set.sql", "geometry_columns.sql",
-            "spatial_ref_sys.sql", "st_geometry_columns.sql", "st_spatial_ref_sys.sql")) {
-            final String sql = Resource
-              .getResource("classpath:/com/revolsys/geopackage/" + fileName)
-              .contentsAsString();
-            try (
-              PreparedStatement statement = connection.prepareStatement(sql)) {
-              statement.execute();
-            } catch (final SQLException e) {
-              throw connection.getException(fileName, sql, e);
-            }
-          }
+      if (isCreateMissingRecordStore()) {
 
-        }
+        createRecordStore();
       } else {
         throw new IllegalArgumentException(this.file + " does not exist");
       }
@@ -255,12 +363,17 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     return connection.prepareStatement(sql, idColumnNames);
   }
 
-  public boolean isCreateMissingRecordStore() {
-    return this.createMissingRecordStore;
-  }
-
-  public boolean isCreateMissingTables() {
-    return this.createMissingTables;
+  private boolean isPrimaryKeyValid(final RecordDefinition recordDefinition) {
+    final List<FieldDefinition> idFields = recordDefinition.getIdFields();
+    if (idFields.size() == 1) {
+      final FieldDefinition idField = idFields.get(0);
+      if (Number.class.isAssignableFrom(idField.getTypeClass())) {
+        final DataType dataType = idField.getDataType();
+        return !(dataType == DataTypes.FLOAT || dataType == DataTypes.DOUBLE
+          || dataType == DataTypes.DECIMAL);
+      }
+    }
+    return false;
   }
 
   @Override
@@ -285,7 +398,7 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
           final String tableType = resultSet.getString("data_type");
 
           final String tableName = resultSet.getString("table_name");
-          final PathName pathName = PathName.newPathName(tableName.toUpperCase());
+          final PathName pathName = PathName.newPathName(tableName);
           final JdbcRecordDefinition recordDefinition = new JdbcRecordDefinition(schema, pathName,
             tableName);
 
@@ -312,7 +425,7 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
               final ResultSet columnsRs = columnStatement.executeQuery()) {
               while (columnsRs.next()) {
                 final String dbColumnName = columnsRs.getString("name");
-                final String fieldName = dbColumnName.toUpperCase();
+                final String fieldName = dbColumnName;
                 final int sqlType = Types.OTHER;
                 String dataType = columnsRs.getString("type");
                 int length = -1;
@@ -343,13 +456,4 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
 
     return elementsByPath;
   }
-
-  public void setCreateMissingRecordStore(final boolean createMissingRecordStore) {
-    this.createMissingRecordStore = createMissingRecordStore;
-  }
-
-  public void setCreateMissingTables(final boolean createMissingTables) {
-    this.createMissingTables = createMissingTables;
-  }
-
 }

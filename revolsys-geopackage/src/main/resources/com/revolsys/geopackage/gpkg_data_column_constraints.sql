@@ -8,4 +8,4 @@ CREATE TABLE gpkg_data_column_constraints (
   max_is_inclusive BOOLEAN, -- 0 = false, 1 = true
   description TEXT,
   CONSTRAINT gdcc_ntv UNIQUE (constraint_name, constraint_type, value)
-);
+)

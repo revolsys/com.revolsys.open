@@ -10,4 +10,4 @@ CREATE TABLE gpkg_contents (
   max_y DOUBLE,
   srs_id INTEGER,
   CONSTRAINT fk_gc_r_srs_id FOREIGN KEY (srs_id) REFERENCES gpkg_spatial_ref_sys(srs_id)
-);
+)

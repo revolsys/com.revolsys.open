@@ -160,6 +160,7 @@ public class JdbcFieldAdder {
     final boolean required, final String description) {
     final JdbcFieldDefinition field = newField(recordStore, recordDefinition, dbName, name,
       dataType, sqlType, length, scale, required, description);
+    field.setQuoteName(recordStore.isQuoteNames());
     recordDefinition.addField(field);
     return field;
   }

@@ -33,9 +33,6 @@ import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 
 public class DirectoryRecordStore extends AbstractRecordStore {
-  private boolean createMissingRecordStore = true;
-
-  private boolean createMissingTables = true;
 
   private File directory;
 
@@ -110,11 +107,11 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   @Override
   public RecordDefinition getRecordDefinition(final RecordDefinition recordDefinition) {
     final RecordDefinition storeRecordDefinition = super.getRecordDefinition(recordDefinition);
-    if (storeRecordDefinition == null && this.createMissingTables) {
+    if (storeRecordDefinition == null && isCreateMissingTables()) {
       final PathName typePath = recordDefinition.getPathName();
       final PathName schemaPath = typePath.getParent();
       RecordStoreSchema schema = getSchema(schemaPath);
-      if (schema == null && this.createMissingTables) {
+      if (schema == null && isCreateMissingTables()) {
         final RecordStoreSchema rootSchema = getRootSchema();
         schema = rootSchema.newSchema(schemaPath);
       }
@@ -201,14 +198,6 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     addStatistic("Insert", record);
   }
 
-  public boolean isCreateMissingRecordStore() {
-    return this.createMissingRecordStore;
-  }
-
-  public boolean isCreateMissingTables() {
-    return this.createMissingTables;
-  }
-
   protected RecordDefinition loadRecordDefinition(final RecordStoreSchema schema,
     final String schemaName, final Resource resource) {
     try (
@@ -284,14 +273,6 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       }
     }
     return elements;
-  }
-
-  public void setCreateMissingRecordStore(final boolean createMissingRecordStore) {
-    this.createMissingRecordStore = createMissingRecordStore;
-  }
-
-  public void setCreateMissingTables(final boolean createMissingTables) {
-    this.createMissingTables = createMissingTables;
   }
 
   public void setDirectory(final File directory) {

@@ -9,4 +9,4 @@ CREATE TABLE gpkg_geometry_columns (
   CONSTRAINT uk_gc_table_name UNIQUE (table_name),
   CONSTRAINT fk_gc_tn FOREIGN KEY (table_name) REFERENCES gpkg_contents(table_name),
   CONSTRAINT fk_gc_srs FOREIGN KEY (srs_id) REFERENCES gpkg_spatial_ref_sys (srs_id)
-);
+)

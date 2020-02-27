@@ -36,7 +36,6 @@ public class OgrRecordStoreFactory implements FileRecordStoreFactory {
         OgrRecordStore recordStore = DATA_STORES.get(fileName);
         if (recordStore == null) {
           recordStore = new OgrRecordStore(driverName, file);
-          // recordStore.setCreateMissingRecordStore(false);
           DATA_STORES.put(fileName, recordStore);
         }
         return recordStore;
