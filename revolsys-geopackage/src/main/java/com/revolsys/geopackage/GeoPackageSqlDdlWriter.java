@@ -159,7 +159,7 @@ public class GeoPackageSqlDdlWriter extends JdbcDdlWriter {
     } else if (dataType == DataTypes.SHORT) {
       out.print("SMALLINT");
     } else if (dataType == DataTypes.INT) {
-      out.print("INT");
+      out.print("MEDIUMINT");
     } else if (dataType == DataTypes.LONG) {
       out.print("INTEGER");
     } else if (dataType == DataTypes.FLOAT) {
@@ -171,24 +171,18 @@ public class GeoPackageSqlDdlWriter extends JdbcDdlWriter {
     } else if (dataType == DataTypes.DATE_TIME) {
       out.print("DATETIME");
     } else if (dataType == DataTypes.BIG_INTEGER) {
-      if (fieldLength > 0) {
-        out.print("NUMERIC(");
-        out.print(fieldLength);
-        out.print(')');
-      } else {
-        out.print("INTEGER");
-      }
+      out.print("INTEGER");
     } else if (dataType == DataTypes.DECIMAL) {
-      out.print("NUMERIC(");
-      out.print(fieldLength);
-      final int scale = field.getScale();
-      if (scale >= 0) {
-        out.print(',');
-        out.print(scale);
-      }
-      out.print(')');
+      out.print("DOUBLE");
     } else if (dataType == DataTypes.STRING) {
       out.print("TEXT");
+      if (fieldLength > 0) {
+        out.print('(');
+        out.print(fieldLength);
+        out.print(')');
+      }
+    } else if (dataType == DataTypes.BLOB) {
+      out.print("BLOB");
       if (fieldLength > 0) {
         out.print('(');
         out.print(fieldLength);

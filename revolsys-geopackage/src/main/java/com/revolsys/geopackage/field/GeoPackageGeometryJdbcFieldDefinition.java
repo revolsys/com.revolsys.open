@@ -1,4 +1,4 @@
-package com.revolsys.geopackage;
+package com.revolsys.geopackage.field;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;

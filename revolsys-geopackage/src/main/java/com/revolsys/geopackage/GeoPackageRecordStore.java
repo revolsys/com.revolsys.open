@@ -28,6 +28,8 @@ import org.sqlite.SQLiteConnection;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geopackage.field.GeoPackageGeometryFieldAdder;
+import com.revolsys.geopackage.field.GeoPackageJdbcFieldAdder;
 import com.revolsys.geopackage.function.GeoPackageEnvelopeValueFunction;
 import com.revolsys.geopackage.function.GeoPackageIsEmptyFunction;
 import com.revolsys.io.StringWriter;
@@ -46,6 +48,7 @@ import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionBuilder;
+import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
@@ -201,7 +204,9 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
       }
     }
 
-    return getRootSchema().getRecordDefinition(newRecordDefinition.getPathName());
+    final RecordStoreSchema rootSchema = getRootSchema();
+    rootSchema.refresh();
+    return rootSchema.getRecordDefinition(newRecordDefinition.getPathName());
   }
 
   private void createRecordStore() {
@@ -316,7 +321,7 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     addFieldAdder("TINYINT", DataTypes.BYTE);
     addFieldAdder("SMALLINT", DataTypes.SHORT);
     addFieldAdder("MEDIUMINT", DataTypes.INT);
-    addFieldAdder("INT", DataTypes.INT);
+    addFieldAdder("INT", DataTypes.LONG);
     addFieldAdder("LONG", DataTypes.LONG);
     addFieldAdder("BIGINT", DataTypes.LONG);
     addFieldAdder("INTEGER", DataTypes.LONG);
@@ -327,8 +332,11 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     addFieldAdder("VARCHAR", DataTypes.STRING);
     addFieldAdder("TEXT", DataTypes.STRING);
     addFieldAdder("BLOB", DataTypes.BLOB);
-    addFieldAdder("DATE", DataTypes.SQL_DATE);
-    addFieldAdder("DATETIME", DataTypes.DATE_TIME);
+
+    final GeoPackageJdbcFieldAdder dateAdder = new GeoPackageJdbcFieldAdder();
+
+    addFieldAdder("DATE", dateAdder);
+    addFieldAdder("DATETIME", dateAdder);
 
     final GeoPackageGeometryFieldAdder geometryAdder = new GeoPackageGeometryFieldAdder();
     addFieldAdder("GEOMETRY", geometryAdder);
@@ -455,5 +463,14 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     }
 
     return elementsByPath;
+  }
+
+  @Override
+  public String toString() {
+    if (this.file == null) {
+      return super.toString();
+    } else {
+      return this.file.toString();
+    }
   }
 }

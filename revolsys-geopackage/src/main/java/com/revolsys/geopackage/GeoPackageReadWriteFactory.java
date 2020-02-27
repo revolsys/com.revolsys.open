@@ -5,11 +5,9 @@ import java.nio.charset.Charset;
 
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.record.io.RecordStoreRecordAndGeometryWriterFactory;
-import com.revolsys.record.io.RecordStoreRecordWriter;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.format.OutputStreamRecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.Resource;
 
 public class GeoPackageReadWriteFactory extends RecordStoreRecordAndGeometryWriterFactory {
@@ -24,11 +22,11 @@ public class GeoPackageReadWriteFactory extends RecordStoreRecordAndGeometryWrit
   @Override
   public RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
     final Resource resource) {
-    final RecordStore recordStore = GeoPackage.createRecordStore(resource);
+    final GeoPackageRecordStore recordStore = GeoPackage.createRecordStore(resource);
     if (recordStore == null) {
       return null;
     } else {
-      return new RecordStoreRecordWriter(recordStore, recordDefinition);
+      return new GeoPackageRecordWriter(recordStore, recordDefinition);
     }
   }
 

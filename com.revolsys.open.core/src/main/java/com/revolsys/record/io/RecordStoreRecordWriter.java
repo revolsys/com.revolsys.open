@@ -45,6 +45,10 @@ public class RecordStoreRecordWriter extends AbstractRecordWriter {
     return this.recordDefinition;
   }
 
+  protected RecordWriter getWriter() {
+    return this.writer;
+  }
+
   @Override
   public Record newRecord() {
     final RecordDefinition recordDefinition = getRecordDefinition();

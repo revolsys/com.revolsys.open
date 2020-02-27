@@ -10,7 +10,7 @@ import org.sqlite.SQLiteConnection;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geopackage.GeoPackageGeometryJdbcFieldDefinition;
+import com.revolsys.geopackage.field.GeoPackageGeometryJdbcFieldDefinition;
 
 public class GeoPackageEnvelopeValueFunction extends Function {
   public static final GeoPackageEnvelopeValueFunction MIN_X = new GeoPackageEnvelopeValueFunction(
