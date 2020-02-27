@@ -25,12 +25,17 @@ public class OutputStreamRecordWriter extends DelegatingWriter<Record> implement
     try {
       this.tempFile = FileUtil.newTempFile(baseName, "." + fileExtension);
       this.tempFile.delete();
+    } catch (final Throwable e) {
+      throw new RuntimeException("Unable to create temporary file", e);
+    }
+    try {
       final Resource tempResource = new PathResource(this.tempFile);
       final RecordWriter recordWriter = RecordWriter.newRecordWriter(recordDefinition,
         tempResource);
       setWriter(recordWriter);
-    } catch (final Throwable e) {
-      throw new RuntimeException("Unable to create temporary file", e);
+    } catch (RuntimeException | Error e) {
+      this.tempFile.delete();
+      throw e;
     }
   }
 

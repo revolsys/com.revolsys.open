@@ -75,7 +75,7 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
       GeoPackageIsEmptyFunction.add(dbConnection);
       GeoPackageEnvelopeValueFunction.add(dbConnection);
     } catch (final SQLException e) {
-      throw connection.getException("Add functions", "", e);
+      // throw connection.getException("Add functions", "", e);
     }
   }
 

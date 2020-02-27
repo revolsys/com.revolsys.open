@@ -392,8 +392,13 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     this.superClasses.clear();
   }
 
+  @Override
   public BoundingBox getBoundingBox() {
-    return this.boundingBox;
+    if (this.boundingBox.isEmpty()) {
+      return this.geometryFactory.getAreaBoundingBox();
+    } else {
+      return this.boundingBox;
+    }
   }
 
   @SuppressWarnings("unchecked")
