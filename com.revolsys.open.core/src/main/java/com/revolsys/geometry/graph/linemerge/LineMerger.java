@@ -33,6 +33,15 @@ public class LineMerger {
     }
   }
 
+  public static Lineal mergeLineal(final Iterable<? extends Geometry> geometries) {
+    if (Property.hasValue(geometries)) {
+      final LineMerger lineMerger = new LineMerger(geometries);
+      return lineMerger.getLineal();
+    } else {
+      return GeometryFactory.DEFAULT_2D.lineString();
+    }
+  }
+
   private final LineStringsGraph graph = new LineStringsGraph();
 
   private boolean merged = true;
