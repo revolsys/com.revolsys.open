@@ -142,7 +142,7 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
-  protected PathName createRecordDefinitionDo(final RecordDefinition oldRecordDefinition) {
+  protected RecordDefinition createRecordDefinitionDo(final RecordDefinition oldRecordDefinition) {
     final String tableName = oldRecordDefinition.getPathName().getName();
 
     final RecordDefinitionBuilder newRdBuilder = new RecordDefinitionBuilder(tableName)
@@ -201,7 +201,7 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
       }
     }
 
-    return newRecordDefinition.getPathName();
+    return getRootSchema().getRecordDefinition(newRecordDefinition.getPathName());
   }
 
   private void createRecordStore() {
