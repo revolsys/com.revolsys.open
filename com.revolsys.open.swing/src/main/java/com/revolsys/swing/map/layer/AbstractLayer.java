@@ -973,7 +973,10 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   protected void setBoundingBox(final BoundingBox boundingBox) {
-    if (boundingBox.isHasHorizontalCoordinateSystem() || !this.isHasHorizontalCoordinateSystem()) {
+    if (boundingBox.isEmpty()) {
+      this.boundingBox = this.geometryFactory.getAreaBoundingBox();
+    } else if (boundingBox.isHasHorizontalCoordinateSystem()
+      || !isHasHorizontalCoordinateSystem()) {
       this.boundingBox = boundingBox;
     } else {
       this.boundingBox = getGeometryFactory().newBoundingBox(boundingBox);

@@ -28,24 +28,8 @@ public class RecordLayerActions {
   }
 
   public static Double generalizeGetDistance(final AbstractRecordLayer layer) {
-    final ValueField dialog = new ValueField(new BorderLayout());
-    dialog.setTitle("Generalize Vertices");
-
-    final NumberTextField distanceField = new NumberTextField(DataTypes.DOUBLE, 10, 2);
-    distanceField.setFieldValue(layer.getGeneralizeGeometryTolerance());
-    dialog.add(distanceField);
-    final String unit = layer.getHorizontalCoordinateSystem().getLengthUnit().toString();
-    final JLabel label = SwingUtil.newLabel("Distance Tolerance (" + unit + ")");
-    final BasePanel fieldPanel = new BasePanel(new FlowLayout(), label, distanceField);
-    dialog.add(fieldPanel, BorderLayout.CENTER);
-
-    dialog.showDialog();
-    if (dialog.isSaved()) {
-      return distanceField.getFieldValue();
-    } else {
-      return null;
-    }
-
+    final double defaultValue = layer.getGeneralizeGeometryTolerance();
+    return getDistanceTolerance(layer, "Generalize Vertices", defaultValue);
   }
 
   public static void generalizeRecord(final Record record, final double distanceTolerance) {
@@ -59,6 +43,27 @@ public class RecordLayerActions {
       final LayerRecord layerRecord = (LayerRecord)record;
       final AbstractRecordLayer layer = layerRecord.getLayer();
       layer.postProcess(layerRecord);
+    }
+  }
+
+  public static Double getDistanceTolerance(final AbstractRecordLayer layer, final String title,
+    final double defaultValue) {
+    final ValueField dialog = new ValueField(new BorderLayout());
+    dialog.setTitle(title);
+
+    final NumberTextField distanceField = new NumberTextField(DataTypes.DOUBLE, 10, 2);
+    distanceField.setFieldValue(defaultValue);
+    dialog.add(distanceField);
+    final String unit = layer.getHorizontalCoordinateSystem().getLengthUnit().toString();
+    final JLabel label = SwingUtil.newLabel("Distance Tolerance (" + unit + ")");
+    final BasePanel fieldPanel = new BasePanel(new FlowLayout(), label, distanceField);
+    dialog.add(fieldPanel, BorderLayout.CENTER);
+
+    dialog.showDialog();
+    if (dialog.isSaved()) {
+      return distanceField.getFieldValue();
+    } else {
+      return null;
     }
   }
 

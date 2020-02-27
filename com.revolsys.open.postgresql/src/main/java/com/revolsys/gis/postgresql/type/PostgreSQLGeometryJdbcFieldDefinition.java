@@ -25,8 +25,8 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
     final GeometryFactory geometryFactory) {
     super(dbName, name, dataType, sqlType, 0, 0, required, description, properties);
     this.srid = srid;
-    setGeometryFactory(geometryFactory.convertAxisCount(axisCount));
     this.axisCount = axisCount;
+    setGeometryFactory(geometryFactory.convertAxisCount(axisCount));
   }
 
   @Override
