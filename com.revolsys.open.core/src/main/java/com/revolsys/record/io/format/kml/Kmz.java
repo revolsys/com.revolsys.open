@@ -2,7 +2,6 @@ package com.revolsys.record.io.format.kml;
 
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.Set;
 
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 
@@ -25,13 +24,13 @@ public class Kmz extends GeometryRecordReaderFactory
   }
 
   @Override
-  public Set<CoordinateSystem> getCoordinateSystems() {
-    return Kml.COORDINATE_SYSTEMS;
+  public boolean isBinary() {
+    return true;
   }
 
   @Override
-  public boolean isBinary() {
-    return true;
+  public boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
+    return Kml.COORDINATE_SYSTEM.equals(coordinateSystem);
   }
 
   @Override

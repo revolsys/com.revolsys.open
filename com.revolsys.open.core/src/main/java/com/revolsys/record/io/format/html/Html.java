@@ -5,7 +5,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
@@ -15,7 +15,7 @@ import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.HtmlAttr;
 
-public class Html extends AbstractIoFactoryWithCoordinateSystem
+public class Html extends AbstractIoFactory
   implements MapWriterFactory, RecordWriterFactory {
   public static void href(final XmlWriter out, final String url) {
     out.attribute(HtmlAttr.HREF, url);

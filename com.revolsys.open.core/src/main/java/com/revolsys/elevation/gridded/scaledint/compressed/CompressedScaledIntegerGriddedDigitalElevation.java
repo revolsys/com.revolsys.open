@@ -6,11 +6,11 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriterFactory;
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.spring.resource.Resource;
 
 public class CompressedScaledIntegerGriddedDigitalElevation
-  extends AbstractIoFactoryWithCoordinateSystem
+  extends AbstractIoFactory
   implements GriddedElevationModelReaderFactory, GriddedElevationModelWriterFactory {
 
   public static final String MEDIA_TYPE = "image/x-revolsys-sigdemz";

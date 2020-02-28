@@ -8,13 +8,11 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryWriter;
 import com.revolsys.geometry.io.GeometryWriterFactory;
 import com.revolsys.io.FileIoFactory;
-import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.record.Records;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
-public interface RecordWriterFactory
-  extends FileIoFactory, GeometryWriterFactory, IoFactoryWithCoordinateSystem {
+public interface RecordWriterFactory extends FileIoFactory, GeometryWriterFactory {
 
   @Override
   default GeometryWriter newGeometryWriter(final Resource resource, final MapEx properties) {

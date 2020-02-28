@@ -6,10 +6,10 @@ import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
 import com.revolsys.geometry.io.PointReader;
 import com.revolsys.geometry.io.PointReaderFactory;
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.spring.resource.Resource;
 
-public class EsriFloatGridGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
+public class EsriFloatGridGriddedElevation extends AbstractIoFactory
   implements GriddedElevationModelReaderFactory, PointReaderFactory {
   public static final String FILE_EXTENSION = "flt";
 

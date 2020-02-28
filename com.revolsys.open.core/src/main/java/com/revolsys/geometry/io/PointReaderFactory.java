@@ -2,12 +2,10 @@ package com.revolsys.geometry.io;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.FileIoFactory;
-import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.io.ReadIoFactory;
 import com.revolsys.spring.resource.Resource;
 
-public interface PointReaderFactory
-  extends FileIoFactory, IoFactoryWithCoordinateSystem, ReadIoFactory {
+public interface PointReaderFactory extends FileIoFactory, ReadIoFactory {
   default PointReader newPointReader(final Object source) {
     final Resource resource = Resource.getResource(source);
     return newPointReader(resource);

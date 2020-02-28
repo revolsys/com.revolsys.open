@@ -20,10 +20,10 @@ import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.gis.grid.CustomRectangularMapGrid;
 import com.revolsys.gis.grid.RectangularMapGrid;
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.spring.resource.Resource;
 
-public class ScaledIntegerGriddedDigitalElevation extends AbstractIoFactoryWithCoordinateSystem
+public class ScaledIntegerGriddedDigitalElevation extends AbstractIoFactory
   implements GriddedElevationModelReaderFactory, GriddedElevationModelWriterFactory {
 
   public static final String MEDIA_TYPE = "image/x-revolsys-sigdem";

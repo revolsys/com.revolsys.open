@@ -6,7 +6,7 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.map.IteratorMapReader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.io.map.MapReaderFactory;
@@ -17,7 +17,7 @@ import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
-public class Xml extends AbstractIoFactoryWithCoordinateSystem
+public class Xml extends AbstractIoFactory
   implements RecordWriterFactory, MapReaderFactory, MapWriterFactory {
   public static MapEx toMap(final Resource resource) {
     final XmlMapIterator iterator = new XmlMapIterator(resource, true);

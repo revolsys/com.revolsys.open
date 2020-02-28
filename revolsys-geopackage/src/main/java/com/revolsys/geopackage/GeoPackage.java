@@ -1,12 +1,15 @@
 package com.revolsys.geopackage;
 
 import java.io.File;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
@@ -21,7 +24,11 @@ import com.revolsys.io.file.Paths;
 import com.revolsys.jdbc.io.AbstractJdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.io.FileRecordStoreFactory;
+import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.io.RecordWriterFactory;
+import com.revolsys.record.io.format.OutputStreamRecordWriter;
 import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
@@ -31,31 +38,36 @@ import com.revolsys.util.RsCoreDataTypes;
 /**
  * jdbc:sqlite:[file]
  */
-public class GeoPackage extends AbstractJdbcDatabaseFactory implements FileRecordStoreFactory {
-  public static final String FILE_EXTENSION = "gpkg";
-
-  public static final String DESCRIPTION = "GeoPackage Database";
+public class GeoPackage extends AbstractJdbcDatabaseFactory
+  implements RecordWriterFactory, FileRecordStoreFactory {
+  private static final boolean AVAILABLE;
 
   private static final List<FieldDefinition> CONNECTION_FIELD_DEFINITIONS = Arrays.asList( //
     new FieldDefinition("file", RsCoreDataTypes.FILE, 50, true) //
   );
 
-  private static final List<String> FILE_NAME_EXTENSIONS = Arrays.asList(FILE_EXTENSION);
+  public static final String DESCRIPTION = "GeoPackage Database";
+
+  public static final String FILE_EXTENSION = "gpkg";
+
+  private static final List<String> FILE_EXTENSIONS = Collections.singletonList(FILE_EXTENSION);
 
   public static final String JDBC_PREFIX = "jdbc:sqlite:";
+
+  public static final String MIME_TYPE = "application/geopackage+vnd.sqlite3";
 
   private static final List<Pattern> URL_PATTERNS = Arrays.asList(Pattern.compile("jdbc:sqlite:.+"),
     Pattern.compile("[^(file:)].+\\.gpkg"), Pattern.compile("file:(/(//)?)?.+\\.gpkg"),
     Pattern.compile("folderconnection:/(//)?.*.gpkg"));
 
   static {
+    boolean available = true;
     try {
       SQLiteJDBCLoader.initialize();
     } catch (final Throwable e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      available = false;
     }
-    new GeoPackageReadWriteFactory();
+    AVAILABLE = available;
   }
 
   public static GeoPackageRecordStore createRecordStore(final Object source) {
@@ -74,7 +86,7 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory implements FileRecor
     } else {
       final Resource resource = Resource.getResource(source);
       final String fileName = resource.getPath().toAbsolutePath().toString();
-      final MapEx properties = new LinkedHashMapEx().add("url", "jdbc:sqlite:" + fileName);
+      final MapEx properties = new LinkedHashMapEx().add("url", JDBC_PREFIX + fileName);
       return new GeoPackage().newRecordStore(properties);
     }
   }
@@ -117,6 +129,34 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory implements FileRecor
   }
 
   @Override
+  public String getFileExtension(final String mediaType) {
+    if (MIME_TYPE.equals(mediaType)) {
+      return FILE_EXTENSION;
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public List<String> getFileExtensions() {
+    return FILE_EXTENSIONS;
+  }
+
+  @Override
+  public String getMediaType(final String fileExtension) {
+    if (fileExtension.equals(fileExtension)) {
+      return MIME_TYPE;
+    } else {
+      return null;
+    }
+  }
+
+  @Override
+  public Set<String> getMediaTypes() {
+    return Collections.singleton(MIME_TYPE);
+  }
+
+  @Override
   public String getName() {
     return DESCRIPTION;
   }
@@ -128,7 +168,7 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory implements FileRecor
 
   @Override
   public List<String> getRecordStoreFileExtensions() {
-    return FILE_NAME_EXTENSIONS;
+    return FILE_EXTENSIONS;
   }
 
   @Override
@@ -145,6 +185,11 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory implements FileRecor
   @Override
   public String getVendorName() {
     return "sqlite";
+  }
+
+  @Override
+  public boolean isAvailable() {
+    return AVAILABLE;
   }
 
   @Override
@@ -180,6 +225,25 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory implements FileRecor
   public GeoPackageRecordStore newRecordStore(
     final Map<String, ? extends Object> connectionProperties) {
     return new GeoPackageRecordStore(this, connectionProperties);
+  }
+
+  @Override
+  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
+    final Resource resource) {
+    final GeoPackageRecordStore recordStore = GeoPackage.createRecordStore(resource);
+    if (recordStore == null) {
+      return null;
+    } else {
+      return new GeoPackageRecordWriter(recordStore, recordDefinition);
+    }
+  }
+
+  @Override
+  public RecordWriter newRecordWriter(final String baseName,
+    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final Charset charset) {
+    return new OutputStreamRecordWriter(recordDefinition, baseName, GeoPackage.FILE_EXTENSION,
+      outputStream);
   }
 
   @Override

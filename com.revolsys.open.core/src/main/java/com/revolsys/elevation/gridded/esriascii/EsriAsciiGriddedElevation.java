@@ -8,10 +8,10 @@ import com.revolsys.elevation.gridded.GriddedElevationModelWriter;
 import com.revolsys.elevation.gridded.GriddedElevationModelWriterFactory;
 import com.revolsys.geometry.io.PointReader;
 import com.revolsys.geometry.io.PointReaderFactory;
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.spring.resource.Resource;
 
-public class EsriAsciiGriddedElevation extends AbstractIoFactoryWithCoordinateSystem implements
+public class EsriAsciiGriddedElevation extends AbstractIoFactory implements
   GriddedElevationModelReaderFactory, GriddedElevationModelWriterFactory, PointReaderFactory {
   public static final String FILE_EXTENSION = "asc";
 

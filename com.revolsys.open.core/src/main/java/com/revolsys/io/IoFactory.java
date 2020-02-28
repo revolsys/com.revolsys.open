@@ -22,6 +22,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
@@ -352,6 +353,10 @@ public interface IoFactory extends Available {
   }
 
   default void init() {
+  }
+
+  default boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
+    return true;
   }
 
   default boolean isReadFromDirectorySupported() {

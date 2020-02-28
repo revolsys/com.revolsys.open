@@ -3,10 +3,10 @@ package com.revolsys.csformat.geoid.ngabgh;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.spring.resource.Resource;
 
-public class NgaBinary extends AbstractIoFactoryWithCoordinateSystem
+public class NgaBinary extends AbstractIoFactory
   implements GriddedElevationModelReaderFactory {
 
   public static final String FILE_EXTENSION = "dac";

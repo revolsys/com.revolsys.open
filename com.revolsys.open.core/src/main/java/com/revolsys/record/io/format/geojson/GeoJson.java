@@ -4,7 +4,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -61,8 +60,7 @@ public class GeoJson extends GeometryRecordReaderFactory implements RecordWriter
 
   public static final String URN_OGC_DEF_CRS_EPSG = "urn:ogc:def:crs:EPSG::";
 
-  public static final Set<CoordinateSystem> COORDINATE_SYSTEMS = Collections
-    .singleton(EpsgCoordinateSystems.wgs84());
+  public static final CoordinateSystem COORDINATE_SYSTEM = EpsgCoordinateSystems.wgs84();
 
   public static final Set<String> GEOMETRY_TYPE_NAMES = new LinkedHashSet<>(Arrays.asList(POINT,
     LINE_STRING, POLYGON, MULTI_POINT, MULTI_LINE_STRING, MULTI_POLYGON, GEOMETRY_COLLECTION));
@@ -78,8 +76,8 @@ public class GeoJson extends GeometryRecordReaderFactory implements RecordWriter
   }
 
   @Override
-  public Set<CoordinateSystem> getCoordinateSystems() {
-    return COORDINATE_SYSTEMS;
+  public boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
+    return COORDINATE_SYSTEM.equals(coordinateSystem);
   }
 
   @Override

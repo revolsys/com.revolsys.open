@@ -4,21 +4,17 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 
-import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
-import org.jeometry.coordinatesystem.model.systems.EpsgId;
-
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.schema.RecordDefinition;
 
-public class EsriGeodatabaseXmlRecordWriterFactory extends AbstractIoFactoryWithCoordinateSystem
+public class EsriGeodatabaseXmlRecordWriterFactory extends AbstractIoFactory
   implements RecordWriterFactory {
   public EsriGeodatabaseXmlRecordWriterFactory() {
     super(EsriGeodatabaseXmlConstants.FORMAT_DESCRIPTION);
     addMediaTypeAndFileExtension(EsriGeodatabaseXmlConstants.MEDIA_TYPE,
       EsriGeodatabaseXmlConstants.FILE_EXTENSION);
-    setCoordinateSystems(EpsgCoordinateSystems.getCoordinateSystem(EpsgId.WGS84));
   }
 
   @Override

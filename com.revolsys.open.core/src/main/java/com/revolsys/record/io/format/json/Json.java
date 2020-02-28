@@ -25,7 +25,7 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.data.type.FunctionDataType;
 import org.jeometry.common.exception.Exceptions;
 
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.file.Paths;
@@ -43,7 +43,7 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
-public class Json extends AbstractIoFactoryWithCoordinateSystem
+public class Json extends AbstractIoFactory
   implements MapReaderFactory, MapWriterFactory, RecordWriterFactory {
   public static final String FILE_EXTENSION = "json";
 

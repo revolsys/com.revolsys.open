@@ -3,11 +3,10 @@ package com.revolsys.record.io.format.kml;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.Set;
 
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.Ellipsoid;
+import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
 import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
 
 import com.revolsys.collection.map.MapEx;
@@ -25,8 +24,7 @@ import com.revolsys.spring.resource.Resource;
 public class Kml extends GeometryRecordReaderFactory
   implements RecordWriterFactory, MapWriterFactory {
 
-  public static final Set<CoordinateSystem> COORDINATE_SYSTEMS = Collections
-    .singleton(EpsgCoordinateSystems.wgs84());
+  public static final GeographicCoordinateSystem COORDINATE_SYSTEM = EpsgCoordinateSystems.wgs84();
 
   public static long getLookAtRange(final BoundingBox boundingBox) {
     if (boundingBox.isEmpty() || boundingBox.getWidth() == 0 && boundingBox.getHeight() == 0) {
@@ -75,8 +73,8 @@ public class Kml extends GeometryRecordReaderFactory
   }
 
   @Override
-  public Set<CoordinateSystem> getCoordinateSystems() {
-    return COORDINATE_SYSTEMS;
+  public boolean isCoordinateSystemSupported(final CoordinateSystem coordinateSystem) {
+    return COORDINATE_SYSTEM.equals(coordinateSystem);
   }
 
   @Override

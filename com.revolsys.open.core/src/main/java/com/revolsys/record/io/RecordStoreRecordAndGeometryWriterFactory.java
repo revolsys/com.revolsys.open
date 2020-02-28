@@ -5,12 +5,12 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.Resource;
 
-public class RecordStoreRecordAndGeometryWriterFactory extends AbstractIoFactoryWithCoordinateSystem
+public class RecordStoreRecordAndGeometryWriterFactory extends AbstractIoFactory
   implements RecordWriterFactory {
 
   public RecordStoreRecordAndGeometryWriterFactory(final String name, final String mediaType,

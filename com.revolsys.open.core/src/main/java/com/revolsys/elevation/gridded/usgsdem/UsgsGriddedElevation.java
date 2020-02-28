@@ -3,10 +3,10 @@ package com.revolsys.elevation.gridded.usgsdem;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.spring.resource.Resource;
 
-public class UsgsGriddedElevation extends AbstractIoFactoryWithCoordinateSystem
+public class UsgsGriddedElevation extends AbstractIoFactory
   implements GriddedElevationModelReaderFactory {
 
   public static final String FILE_EXTENSION = "dem";

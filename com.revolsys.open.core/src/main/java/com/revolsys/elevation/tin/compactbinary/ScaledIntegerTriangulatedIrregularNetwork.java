@@ -8,10 +8,10 @@ import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReaderFactory;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkWriter;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkWriterFactory;
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.spring.resource.Resource;
 
-public class ScaledIntegerTriangulatedIrregularNetwork extends AbstractIoFactoryWithCoordinateSystem
+public class ScaledIntegerTriangulatedIrregularNetwork extends AbstractIoFactory
   implements TriangulatedIrregularNetworkReaderFactory, TriangulatedIrregularNetworkWriterFactory {
 
   public static final String MEDIA_TYPE = "image/x-revolsys-sitin";

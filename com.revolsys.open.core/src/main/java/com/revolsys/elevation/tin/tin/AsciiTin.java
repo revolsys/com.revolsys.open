@@ -9,10 +9,10 @@ import com.revolsys.elevation.tin.TriangulatedIrregularNetworkReaderFactory;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkWriter;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetworkWriterFactory;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.spring.resource.Resource;
 
-public class AsciiTin extends AbstractIoFactoryWithCoordinateSystem
+public class AsciiTin extends AbstractIoFactory
   implements TriangulatedIrregularNetworkReaderFactory, TriangulatedIrregularNetworkWriterFactory {
   public AsciiTin() {
     super("ASCII TIN");

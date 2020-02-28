@@ -5,7 +5,7 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.io.AbstractIoFactoryWithCoordinateSystem;
+import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordReader;
@@ -16,7 +16,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.OutputStreamResource;
 import com.revolsys.spring.resource.Resource;
 
-public class XBase extends AbstractIoFactoryWithCoordinateSystem
+public class XBase extends AbstractIoFactory
   implements RecordReaderFactory, RecordWriterFactory {
   public XBase() {
     super("D-Base");

@@ -10,10 +10,9 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.io.FileIoFactory;
-import com.revolsys.io.IoFactoryWithCoordinateSystem;
 import com.revolsys.spring.resource.Resource;
 
-public interface GeometryWriterFactory extends FileIoFactory, IoFactoryWithCoordinateSystem {
+public interface GeometryWriterFactory extends FileIoFactory {
   static Set<DataType> ALL_GEOMETRY_TYPES = Sets.newLinkedHash(//
     GeometryDataTypes.GEOMETRY, //
     GeometryDataTypes.GEOMETRY_COLLECTION, //
