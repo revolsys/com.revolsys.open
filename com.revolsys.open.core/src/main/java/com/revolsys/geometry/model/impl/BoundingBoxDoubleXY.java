@@ -154,11 +154,12 @@ public class BoundingBoxDoubleXY extends BaseBoundingBox {
     return !(x1 > this.maxX || x2 < this.minX || y1 > this.maxY || y2 < this.minY);
   }
 
-  protected void clear() {
+  protected BoundingBoxDoubleXY clear() {
     this.minX = Double.POSITIVE_INFINITY;
     this.maxX = Double.NEGATIVE_INFINITY;
     this.maxY = Double.NEGATIVE_INFINITY;
     this.minY = Double.POSITIVE_INFINITY;
+    return this;
   }
 
   @Override

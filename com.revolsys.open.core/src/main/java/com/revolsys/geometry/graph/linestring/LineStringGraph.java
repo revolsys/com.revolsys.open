@@ -21,6 +21,7 @@ import com.revolsys.geometry.graph.Graph;
 import com.revolsys.geometry.graph.Node;
 import com.revolsys.geometry.graph.comparator.EdgeAttributeValueComparator;
 import com.revolsys.geometry.graph.comparator.NodeDistanceComparator;
+import com.revolsys.geometry.graph.filter.EdgeLineSegmentDistanceFilter;
 import com.revolsys.geometry.graph.filter.EdgeObjectFilter;
 import com.revolsys.geometry.graph.filter.NodeCoordinatesFilter;
 import com.revolsys.geometry.model.BoundingBox;
@@ -279,7 +280,7 @@ public class LineStringGraph extends Graph<LineSegment> {
       for (int i = 1; i < numPoints; i++) {
         final Point nextPoint = points.getPoint(i);
         final LineSegment line1 = new LineSegmentDoubleGF(previousPoint, nextPoint);
-        final List<Edge<LineSegment>> edges = EdgeLessThanDistance.getEdges(this, line1,
+        final List<Edge<LineSegment>> edges = EdgeLineSegmentDistanceFilter.getEdges(this, line1,
           maxDistance);
         for (final Edge<LineSegment> edge2 : edges) {
           final LineSegment line2 = edge2.getObject();

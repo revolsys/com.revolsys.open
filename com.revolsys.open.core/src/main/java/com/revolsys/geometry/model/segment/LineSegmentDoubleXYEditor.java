@@ -34,34 +34,43 @@ package com.revolsys.geometry.model.segment;
 
 import org.jeometry.common.function.BiConsumerDouble;
 
+import com.revolsys.geometry.model.End;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.PointDouble;
 
-public class LineSegmentDoubleXY extends AbstractLineSegment {
+public class LineSegmentDoubleXYEditor extends AbstractLineSegment {
   private static final long serialVersionUID = 1L;
 
-  protected final double x1;
+  protected double x1;
 
-  protected final double y1;
+  protected double y1;
 
-  protected final double x2;
+  protected double x2;
 
-  protected final double y2;
+  protected double y2;
 
-  public LineSegmentDoubleXY() {
+  public LineSegmentDoubleXYEditor() {
     this(Double.NaN, Double.NaN, Double.NaN, Double.NaN);
   }
 
-  public LineSegmentDoubleXY(final double x1, final double y1, final double x2, final double y2) {
+  public LineSegmentDoubleXYEditor(final double x1, final double y1, final double x2,
+    final double y2) {
     this.x1 = x1;
     this.y1 = y1;
     this.x2 = x2;
     this.y2 = y2;
   }
 
+  public LineSegmentDoubleXYEditor(final LineSegment segment) {
+    this.x1 = segment.getX(End.FROM);
+    this.y1 = segment.getY(End.TO);
+    this.x2 = segment.getX(End.FROM);
+    this.y2 = segment.getY(End.TO);
+  }
+
   @Override
-  public LineSegmentDoubleXY clone() {
-    return (LineSegmentDoubleXY)super.clone();
+  public LineSegmentDoubleXYEditor clone() {
+    return (LineSegmentDoubleXYEditor)super.clone();
   }
 
   @Override
@@ -157,13 +166,42 @@ public class LineSegmentDoubleXY extends AbstractLineSegment {
 
   @Override
   public LineSegment newLineSegment(final int axisCount, final double... coordinates) {
-    return new LineSegmentDoubleXY(coordinates[0], coordinates[1], coordinates[axisCount],
+    return new LineSegmentDoubleXYEditor(coordinates[0], coordinates[1], coordinates[axisCount],
       coordinates[axisCount + 1]);
   }
 
   @Override
   public Point newPoint(final double... coordinates) {
     return new PointDouble(coordinates);
+  }
+
+  public void setFrom(final double x, final double y) {
+    this.x1 = x;
+    this.y1 = y;
+  }
+
+  public void setFrom(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    setFrom(x, y);
+  }
+
+  public void setLineSegment(final double x1, final double y1, final double x2, final double y2) {
+    this.x1 = x1;
+    this.y1 = y1;
+    this.x2 = x2;
+    this.y2 = y2;
+  }
+
+  public void setTo(final double x, final double y) {
+    this.x2 = x;
+    this.y2 = y;
+  }
+
+  public void setTo(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    setTo(x, y);
   }
 
 }

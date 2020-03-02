@@ -12,13 +12,11 @@ import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
+import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 
 public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumerDouble {
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_2D;
@@ -170,6 +168,18 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
     if (y > this.maxY) {
       this.maxY = y;
     }
+    return this;
+  }
+
+  public BoundingBoxEditor addPoint(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return addPoint(x, y);
+  }
+
+  @Override
+  public BoundingBoxEditor clear() {
+    super.clear();
     return this;
   }
 
@@ -352,5 +362,19 @@ public class BoundingBoxEditor extends BoundingBoxDoubleXY implements BiConsumer
       this.geometryFactory = geometryFactory.getGeometryFactory();
     }
     return this;
+  }
+
+  public BoundingBoxEditor setPoint(final double x, final double y) {
+    this.minX = x;
+    this.maxX = x;
+    this.minY = y;
+    this.maxY = y;
+    return this;
+  }
+
+  public BoundingBoxEditor setPoint(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+    return setPoint(x, y);
   }
 }
