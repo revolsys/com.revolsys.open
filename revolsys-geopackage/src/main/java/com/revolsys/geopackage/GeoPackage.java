@@ -23,7 +23,11 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.file.Paths;
 import com.revolsys.jdbc.io.AbstractJdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
+import com.revolsys.record.Record;
+import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.FileRecordStoreFactory;
+import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.io.format.OutputStreamRecordWriter;
@@ -39,7 +43,7 @@ import com.revolsys.util.RsCoreDataTypes;
  * jdbc:sqlite:[file]
  */
 public class GeoPackage extends AbstractJdbcDatabaseFactory
-  implements RecordWriterFactory, FileRecordStoreFactory {
+  implements RecordReaderFactory, RecordWriterFactory, FileRecordStoreFactory {
   private static final boolean AVAILABLE;
 
   private static final List<FieldDefinition> CONNECTION_FIELD_DEFINITIONS = Arrays.asList( //
@@ -71,6 +75,11 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory
   }
 
   public static GeoPackageRecordStore createRecordStore(final Object source) {
+    return createRecordStore(source, MapEx.EMPTY);
+  }
+
+  public static GeoPackageRecordStore createRecordStore(final Object source,
+    final MapEx properties) {
     final GeoPackageRecordStore recordStore = openRecordStore(source);
     if (recordStore != null) {
       recordStore.setCreateMissingRecordStore(true);
@@ -81,13 +90,17 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory
   }
 
   public static GeoPackageRecordStore openRecordStore(final Object source) {
+    return openRecordStore(source, MapEx.EMPTY);
+  }
+
+  public static GeoPackageRecordStore openRecordStore(final Object source, final MapEx properties) {
     if (source == null) {
       return null;
     } else {
       final Resource resource = Resource.getResource(source);
-      final String fileName = resource.getPath().toAbsolutePath().toString();
-      final MapEx properties = new LinkedHashMapEx().add("url", JDBC_PREFIX + fileName);
-      return new GeoPackage().newRecordStore(properties);
+      final String fileName = resource.getOrDownloadFile().toPath().toAbsolutePath().toString();
+      final MapEx properties2 = new LinkedHashMapEx().add("url", JDBC_PREFIX + fileName);
+      return new GeoPackage().newRecordStore(properties2);
     }
   }
 
@@ -193,6 +206,11 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory
   }
 
   @Override
+  public boolean isBinary() {
+    return true;
+  }
+
+  @Override
   public boolean isDirectory() {
     return false;
   }
@@ -213,6 +231,12 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory
     }
     newConfig.put("enable_load_extension", true);
     return super.newDataSource(newConfig);
+  }
+
+  @Override
+  public RecordReader newRecordReader(final Resource resource,
+    final RecordFactory<? extends Record> factory, final MapEx properties) {
+    return new GeopackageFileRecordReader(resource, factory, properties);
   }
 
   @Override
