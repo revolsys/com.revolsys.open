@@ -147,7 +147,7 @@ public interface LinearRing extends LineString {
    * @return Dimension.FALSE
    */
   @Override
-  default int getBoundaryDimension() {
+  default Dimension getBoundaryDimension() {
     return Dimension.FALSE;
   }
 

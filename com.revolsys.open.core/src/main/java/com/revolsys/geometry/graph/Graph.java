@@ -119,6 +119,8 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
 
   private GeometryFactory precisionModel = GeometryFactory.DEFAULT_3D;
 
+  private final PointDoubleXY findPoint = new PointDoubleXY();
+
   public Graph() {
     this(true);
   }
@@ -310,6 +312,15 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
 
   protected void evict(final Node<T> node) {
     // TODO
+  }
+
+  public Node<T> findNode(final double x, final double y) {
+    synchronized (this.findPoint) {
+      this.findPoint.setX(x);
+      this.findPoint.setY(y);
+      return findNode(this.findPoint);
+    }
+
   }
 
   /**

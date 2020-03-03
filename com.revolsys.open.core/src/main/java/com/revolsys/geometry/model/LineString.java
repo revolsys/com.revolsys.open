@@ -913,11 +913,11 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  default int getBoundaryDimension() {
+  default Dimension getBoundaryDimension() {
     if (isClosed()) {
       return Dimension.FALSE;
     }
-    return 0;
+    return Dimension.P;
   }
 
   default ClockDirection getClockDirection() {
@@ -1041,8 +1041,8 @@ public interface LineString extends Lineal {
   }
 
   @Override
-  default int getDimension() {
-    return 1;
+  default Dimension getDimension() {
+    return Dimension.L;
   }
 
   default End getEnd(final Point point) {

@@ -33,6 +33,7 @@
 package com.revolsys.geometry.operation.distance3d;
 
 import com.revolsys.geometry.algorithm.CGAlgorithms3D;
+import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -539,19 +540,19 @@ public class Distance3DOp {
    * @return the index of the most polygonal geometry
    */
   private int mostPolygonalIndex() {
-    final int dim0 = this.geom[0].getDimension();
-    final int dim1 = this.geom[1].getDimension();
-    if (dim0 >= 2 && dim1 >= 2) {
+    final Dimension dim0 = this.geom[0].getDimension();
+    final Dimension dim1 = this.geom[1].getDimension();
+    if (dim0.isArea() && dim1.isArea()) {
       if (this.geom[0].getVertexCount() > this.geom[1].getVertexCount()) {
         return 0;
       }
       return 1;
     }
     // no more than one is dim 2
-    if (dim0 >= 2) {
+    if (dim0.isArea()) {
       return 0;
     }
-    if (dim1 >= 2) {
+    if (dim1.isArea()) {
       return 1;
     }
     // both dim <= 1 - don't flip

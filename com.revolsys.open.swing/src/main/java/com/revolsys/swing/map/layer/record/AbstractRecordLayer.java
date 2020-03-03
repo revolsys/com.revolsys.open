@@ -248,8 +248,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     @Override
     public boolean removeRecord(final LayerRecord record) {
       synchronized (getSync()) {
-        super.removeRecord(record);
-        this.index = null;
+        try {
+          super.removeRecord(record);
+        } finally {
+          clearIndex();
+        }
       }
       return true;
     }
@@ -257,11 +260,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     @Override
     public boolean replaceRecord(final LayerRecord record) {
       synchronized (getSync()) {
-        if (super.replaceRecord(record)) {
-          this.index = null;
-          return true;
-        } else {
-          return false;
+        try {
+          if (super.replaceRecord(record)) {
+            return true;
+          } else {
+            return false;
+          }
+        } finally {
+          clearIndex();
         }
       }
     }

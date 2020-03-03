@@ -34,6 +34,7 @@
 package com.revolsys.core.test.geometry.test.old.junit;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -133,10 +134,10 @@ public class MiscellaneousTest extends TestCase {
     assertTrue(this.geometryFactory.lineString().isEmpty());
     assertTrue(this.geometryFactory.polygon().isEmpty());
 
-    assertEquals(-1, this.geometryFactory.point((Point)null).getBoundaryDimension());
-    assertEquals(-1, this.geometryFactory.linearRing().getBoundaryDimension());
-    assertEquals(0, this.geometryFactory.lineString().getBoundaryDimension());
-    assertEquals(1, this.geometryFactory.polygon().getBoundaryDimension());
+    assertEquals(Dimension.FALSE, this.geometryFactory.point((Point)null).getBoundaryDimension());
+    assertEquals(Dimension.FALSE, this.geometryFactory.linearRing().getBoundaryDimension());
+    assertEquals(Dimension.P, this.geometryFactory.lineString().getBoundaryDimension());
+    assertEquals(Dimension.L, this.geometryFactory.polygon().getBoundaryDimension());
 
     assertEquals(0, this.geometryFactory.point().getVertexCount());
     assertEquals(0, this.geometryFactory.linearRing().getVertexCount());
@@ -151,14 +152,14 @@ public class MiscellaneousTest extends TestCase {
 
   public void testEmptyGeometryCollection() throws Exception {
     final Geometry g = this.geometryFactory.geometryCollection();
-    assertEquals(-1, g.getDimension());
+    assertEquals(Dimension.FALSE, g.getDimension());
     assertEquals(BoundingBox.empty(), g.getBoundingBox());
     assertTrue(g.isSimple());
   }
 
   public void testEmptyLinearRing() throws Exception {
     final LineString l = this.geometryFactory.linearRing();
-    assertEquals(1, l.getDimension());
+    assertEquals(Dimension.L, l.getDimension());
     assertEquals(BoundingBox.empty(), l.getBoundingBox());
     assertTrue(l.isSimple());
     assertEquals(null, l.getFromPoint());
@@ -169,7 +170,7 @@ public class MiscellaneousTest extends TestCase {
 
   public void testEmptyLineString() throws Exception {
     final LineString l = this.geometryFactory.lineString();
-    assertEquals(1, l.getDimension());
+    assertEquals(Dimension.L, l.getDimension());
     assertEquals(BoundingBox.empty(), l.getBoundingBox());
     /**
      * @todo Enable when #isSimple implemented
@@ -183,7 +184,7 @@ public class MiscellaneousTest extends TestCase {
 
   public void testEmptyPoint() throws Exception {
     final Point p = this.geometryFactory.point();
-    assertEquals(0, p.getDimension());
+    assertEquals(Dimension.P, p.getDimension());
     assertEquals(BoundingBox.empty(), p.getBoundingBox());
     assertTrue(p.isSimple());
 
@@ -193,7 +194,7 @@ public class MiscellaneousTest extends TestCase {
 
   public void testEmptyPolygon() throws Exception {
     final Polygon p = this.geometryFactory.polygon();
-    assertEquals(2, p.getDimension());
+    assertEquals(Dimension.A, p.getDimension());
     assertEquals(BoundingBox.empty(), p.getBoundingBox());
     assertTrue(p.isSimple());
   }

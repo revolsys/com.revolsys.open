@@ -34,6 +34,7 @@ package com.revolsys.core.test.geometry.test.geomop;
 
 import com.revolsys.core.test.geometry.test.testrunner.GeometryResult;
 import com.revolsys.core.test.geometry.test.testrunner.Result;
+import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.operation.buffer.validate.BufferResultValidator;
@@ -176,7 +177,8 @@ public class BufferValidatedGeometryOperation implements GeometryOperation {
   }
 
   private boolean isEmptyBufferExpected(final Geometry geom) {
-    final boolean isNegativeBufferOfNonAreal = geom.getDimension() < 2 && this.distance <= 0.0;
+    final boolean isNegativeBufferOfNonAreal = geom.getDimension().isLessThan(Dimension.A)
+      && this.distance <= 0.0;
     return isNegativeBufferOfNonAreal;
   }
 

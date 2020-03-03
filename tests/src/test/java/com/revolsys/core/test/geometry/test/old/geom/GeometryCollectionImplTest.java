@@ -33,6 +33,7 @@
 
 package com.revolsys.core.test.geometry.test.old.geom;
 
+import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 
@@ -54,7 +55,7 @@ public class GeometryCollectionImplTest extends TestCase {
   public void testGetDimension() throws Exception {
     final Geometry g = this.geometryFactory
       .geometry("GEOMETRYCOLLECTION (POINT (10 10), POINT (30 30), LINESTRING (15 15, 20 20))");
-    assertEquals(1, g.getDimension());
+    assertEquals(Dimension.L, g.getDimension());
   }
 
   public void testGetLength() throws Exception {

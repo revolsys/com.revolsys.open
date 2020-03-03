@@ -738,7 +738,7 @@ public interface Point extends Punctual, Serializable, BoundingBox {
   }
 
   @Override
-  default int getBoundaryDimension() {
+  default Dimension getBoundaryDimension() {
     return Dimension.FALSE;
   }
 
@@ -791,8 +791,8 @@ public interface Point extends Punctual, Serializable, BoundingBox {
   }
 
   @Override
-  default int getDimension() {
-    return 0;
+  default Dimension getDimension() {
+    return Dimension.P;
   }
 
   @Override

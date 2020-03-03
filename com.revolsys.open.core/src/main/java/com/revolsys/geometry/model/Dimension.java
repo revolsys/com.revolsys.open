@@ -32,6 +32,9 @@
  */
 package com.revolsys.geometry.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Provides constants representing the dimensions of a point, a curve and a surface.
  * Also provides constants representing the dimensions of the empty geometry and
@@ -40,94 +43,29 @@ package com.revolsys.geometry.model;
  *
  * @version 1.7
  */
-public class Dimension {
+public enum Dimension {
 
-  /**
-   *  Dimension value of a surface (2).
-   */
-  public final static int A = 2;
+  /** Dimension value of the empty geometry (-1). */
+  FALSE(-1, 'F'), //
+  /** Dimension value of non-empty geometries (= {P, L, A}) */
+  TRUE(-2, 'T'), //
+  /** Dimension value for any dimension (= {FALSE, TRUE}). */
+  DONTCARE(-3, '*'), //
+  /** Dimension value of a point (0). */
+  P(0, '0'), //
+  /** Dimension value of a curve (1). */
+  L(1, '1'), //
+  /** Dimension value of a surface (2). */
+  A(2, '2'),//
+  ;
 
-  /**
-   *  Dimension value for any dimension (= {FALSE, TRUE}).
-   */
-  public final static int DONTCARE = -3;
+  private static Map<Character, Dimension> DIMENSION_BY_SYMBOL = new HashMap<>();
 
-  /**
-   *  Dimension value of the empty geometry (-1).
-   */
-  public final static int FALSE = -1;
-
-  /**
-   *  Dimension value of a curve (1).
-   */
-  public final static int L = 1;
-
-  /**
-   *  Dimension value of a point (0).
-   */
-  public final static int P = 0;
-
-  /**
-   * Symbol for the A (dimension 2) pattern matrix entry
-   */
-  public final static char SYM_A = '2';
-
-  /**
-   * Symbol for the DONTCARE pattern matrix entry
-   */
-  public final static char SYM_DONTCARE = '*';
-
-  /**
-   * Symbol for the FALSE pattern matrix entry
-   */
-  public final static char SYM_FALSE = 'F';
-
-  /**
-   * Symbol for the L (dimension 1) pattern matrix entry
-   */
-  public final static char SYM_L = '1';
-
-  /**
-   * Symbol for the P (dimension 0) pattern matrix entry
-   */
-  public final static char SYM_P = '0';
-
-  /**
-   * Symbol for the TRUE pattern matrix entry
-   */
-  public final static char SYM_TRUE = 'T';
-
-  /**
-   *  Dimension value of non-empty geometries (= {P, L, A}).
-   */
-  public final static int TRUE = -2;
-
-  /**
-   *  Converts the dimension value to a dimension symbol, for example, <code>TRUE => 'T'</code>
-   *  .
-   *
-   *@param  dimensionValue  a number that can be stored in the <code>IntersectionMatrix</code>
-   *      . Possible values are <code>{TRUE, FALSE, DONTCARE, 0, 1, 2}</code>.
-   *@return                 a character for use in the string representation of
-   *      an <code>IntersectionMatrix</code>. Possible values are <code>{T, F, * , 0, 1, 2}</code>
-   *      .
-   */
-  public static char toDimensionSymbol(final int dimensionValue) {
-    switch (dimensionValue) {
-      case FALSE:
-        return SYM_FALSE;
-      case TRUE:
-        return SYM_TRUE;
-      case DONTCARE:
-        return SYM_DONTCARE;
-      case P:
-        return SYM_P;
-      case L:
-        return SYM_L;
-      case A:
-        return SYM_A;
+  static {
+    for (final Dimension dimension : values()) {
+      final char symbol = dimension.symbol;
+      DIMENSION_BY_SYMBOL.put(symbol, dimension);
     }
-    throw new IllegalArgumentException("Unknown dimension value: " + dimensionValue);
   }
 
   /**
@@ -140,21 +78,61 @@ public class Dimension {
    *@return a number that can be stored in the <code>IntersectionMatrix</code>
    *      . Possible values are <code>{TRUE, FALSE, DONTCARE, 0, 1, 2}</code>.
    */
-  public static int toDimensionValue(final char dimensionSymbol) {
-    switch (Character.toUpperCase(dimensionSymbol)) {
-      case SYM_FALSE:
-        return FALSE;
-      case SYM_TRUE:
-        return TRUE;
-      case SYM_DONTCARE:
-        return DONTCARE;
-      case SYM_P:
-        return P;
-      case SYM_L:
-        return L;
-      case SYM_A:
-        return A;
+  public static Dimension toDimensionValue(final char dimensionSymbol) {
+    final Dimension dimension = DIMENSION_BY_SYMBOL.get(dimensionSymbol);
+    if (dimension == null) {
+      throw new IllegalArgumentException("Unknown dimension symbol: " + dimensionSymbol);
+    } else {
+      return dimension;
     }
-    throw new IllegalArgumentException("Unknown dimension symbol: " + dimensionSymbol);
+  }
+
+  private int code;
+
+  private char symbol;
+
+  private boolean isTrue;
+
+  private Dimension(final int code, final char symbol) {
+    this.code = code;
+    this.symbol = symbol;
+    this.isTrue = code == -2 || code >= 0;
+  }
+
+  public int getCode() {
+    return this.code;
+  }
+
+  public char getSymbol() {
+    return this.symbol;
+  }
+
+  public boolean isArea() {
+    return this == A;
+  }
+
+  public boolean isGreaterThan(final Dimension dimension) {
+    return this.code > dimension.code;
+  }
+
+  public boolean isLessThan(final Dimension dimension) {
+    return this.code < dimension.code;
+  }
+
+  public boolean isLine() {
+    return this == L;
+  }
+
+  public boolean isPoint() {
+    return this == P;
+  }
+
+  public boolean isTrue() {
+    return this.isTrue;
+  }
+
+  @Override
+  public String toString() {
+    return Character.toString(this.symbol);
   }
 }

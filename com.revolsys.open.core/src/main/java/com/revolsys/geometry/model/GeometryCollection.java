@@ -276,19 +276,25 @@ public interface GeometryCollection extends Geometry {
   }
 
   @Override
-  default int getBoundaryDimension() {
-    int dimension = Dimension.FALSE;
+  default Dimension getBoundaryDimension() {
+    Dimension dimension = Dimension.FALSE;
     for (final Geometry geometry : geometries()) {
-      dimension = Math.max(dimension, geometry.getBoundaryDimension());
+      final Dimension geometryDimension = geometry.getBoundaryDimension();
+      if (geometryDimension.isGreaterThan(dimension)) {
+        dimension = geometryDimension;
+      }
     }
     return dimension;
   }
 
   @Override
-  default int getDimension() {
-    int dimension = Dimension.FALSE;
+  default Dimension getDimension() {
+    Dimension dimension = Dimension.FALSE;
     for (final Geometry geometry : geometries()) {
-      dimension = Math.max(dimension, geometry.getDimension());
+      final Dimension geometryDimension = geometry.getDimension();
+      if (geometryDimension.isGreaterThan(dimension)) {
+        dimension = geometryDimension;
+      }
     }
     return dimension;
   }

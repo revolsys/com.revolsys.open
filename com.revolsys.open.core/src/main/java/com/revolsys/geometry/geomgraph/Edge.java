@@ -37,6 +37,7 @@ import org.jeometry.common.exception.Exceptions;
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.geomgraph.index.MonotoneChainEdge;
 import com.revolsys.geometry.model.DelegatingLineString;
+import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.IntersectionMatrix;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
@@ -54,12 +55,13 @@ public class Edge extends GraphComponent implements DelegatingLineString {
    * Handles edges from both L and A geometries.
    */
   public static void updateIM(final Label label, final IntersectionMatrix im) {
-    im.setAtLeastIfValid(label.getLocation(0, Position.ON), label.getLocation(1, Position.ON), 1);
+    im.setAtLeastIfValid(label.getLocation(0, Position.ON), label.getLocation(1, Position.ON),
+      Dimension.L);
     if (label.isArea()) {
       im.setAtLeastIfValid(label.getLocation(0, Position.LEFT), label.getLocation(1, Position.LEFT),
-        2);
+        Dimension.A);
       im.setAtLeastIfValid(label.getLocation(0, Position.RIGHT),
-        label.getLocation(1, Position.RIGHT), 2);
+        label.getLocation(1, Position.RIGHT), Dimension.A);
     }
   }
 

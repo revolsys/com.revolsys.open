@@ -886,8 +886,8 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   default boolean crosses(final Geometry geometry) {
     if (bboxIntersects(geometry)) {
       final IntersectionMatrix matrix = relate(geometry);
-      final int dimension1 = getDimension();
-      final int dimension2 = geometry.getDimension();
+      final Dimension dimension1 = getDimension();
+      final Dimension dimension2 = geometry.getDimension();
       return matrix.isCrosses(dimension1, dimension2);
     } else {
       return false;
@@ -1199,8 +1199,8 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     // short-circuit test
     if (bboxEquals(geometry)) {
       final IntersectionMatrix relate = relate(geometry);
-      final int dimension1 = getDimension();
-      final int dimension2 = geometry.getDimension();
+      final Dimension dimension1 = getDimension();
+      final Dimension dimension2 = geometry.getDimension();
       return relate.isEquals(dimension1, dimension2);
     } else {
       return false;
@@ -1544,7 +1544,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    *      <code>Dimension.FALSE</code> if the boundary is the empty geometry.
    */
 
-  int getBoundaryDimension();
+  Dimension getBoundaryDimension();
 
   /**
    * Gets an {@link BoundingBox} containing
@@ -1608,7 +1608,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    *@return the topological dimension of this geometry.
    */
 
-  int getDimension();
+  Dimension getDimension();
 
   /**
    *  Gets a Geometry representing the boundingBox (bounding box) of
@@ -1729,8 +1729,8 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       return geometryFactory.point();
     } else {
       Point interiorPt = null;
-      final int dim = getDimension();
-      if (dim == 0) {
+      final Dimension dim = getDimension();
+      if (dim.isPoint()) {
         final Point centroid = getCentroid();
         final double centroidX = centroid.getX();
         final double centroidY = centroid.getY();
@@ -1744,7 +1744,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
           }
         }
         return interiorPoint;
-      } else if (dim == 1) {
+      } else if (dim.isLine()) {
         final InteriorPointLine intPt = new InteriorPointLine(this);
         interiorPt = intPt.getInteriorPoint();
       } else {
@@ -2229,8 +2229,8 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     // short-circuit test
     if (bboxIntersects(geometry)) {
       final IntersectionMatrix relate = relate(geometry);
-      final int dimension1 = getDimension();
-      final int dimension2 = geometry.getDimension();
+      final Dimension dimension1 = getDimension();
+      final Dimension dimension2 = geometry.getDimension();
       return relate.isOverlaps(dimension1, dimension2);
     } else {
       return false;
@@ -2409,8 +2409,8 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     // short-circuit test
     if (bboxIntersects(geometry)) {
       final IntersectionMatrix relate = relate(geometry);
-      final int dimension1 = getDimension();
-      final int dimension2 = geometry.getDimension();
+      final Dimension dimension1 = getDimension();
+      final Dimension dimension2 = geometry.getDimension();
       return relate.isTouches(dimension1, dimension2);
     } else {
       return false;

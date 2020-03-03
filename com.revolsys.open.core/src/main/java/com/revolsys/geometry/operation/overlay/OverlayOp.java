@@ -47,6 +47,7 @@ import com.revolsys.geometry.geomgraph.Label;
 import com.revolsys.geometry.geomgraph.Node;
 import com.revolsys.geometry.geomgraph.PlanarGraph;
 import com.revolsys.geometry.geomgraph.Position;
+import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -164,22 +165,18 @@ public class OverlayOp extends GeometryGraphOperation {
    */
   public static Geometry newEmptyResult(final int overlayOpCode, final Geometry a, final Geometry b,
     final GeometryFactory geomFact) {
-    Geometry result = null;
     switch (resultDimension(overlayOpCode, a, b)) {
-      case -1:
-        result = geomFact.geometryCollection();
-      break;
-      case 0:
-        result = geomFact.point();
-      break;
-      case 1:
-        result = geomFact.lineString();
-      break;
-      case 2:
-        result = geomFact.polygon();
-      break;
+      case FALSE:
+        return geomFact.geometryCollection();
+      case P:
+        return geomFact.point();
+      case L:
+        return geomFact.lineString();
+      case A:
+        return geomFact.polygon();
+      default:
+        return null;
     }
-    return result;
   }
 
   /**
@@ -198,21 +195,25 @@ public class OverlayOp extends GeometryGraphOperation {
     return geomOv;
   }
 
-  private static int resultDimension(final int opCode, final Geometry g0, final Geometry g1) {
-    final int dim0 = g0.getDimension();
-    final int dim1 = g1.getDimension();
+  private static Dimension resultDimension(final int opCode, final Geometry g0, final Geometry g1) {
+    final Dimension dim0 = g0.getDimension();
+    final Dimension dim1 = g1.getDimension();
 
-    int resultDimension = -1;
     switch (opCode) {
       case INTERSECTION:
-        resultDimension = Math.min(dim0, dim1);
-      break;
+        if (dim0.isLessThan(dim1)) { // min
+          return dim0;
+        } else {
+          return dim1;
+        }
       case UNION:
-        resultDimension = Math.max(dim0, dim1);
-      break;
+        if (dim0.isLessThan(dim1)) { // max
+          return dim1;
+        } else {
+          return dim0;
+        }
       case DIFFERENCE:
-        resultDimension = dim0;
-      break;
+        return dim0;
       case SYMDIFFERENCE:
         /**
          * This result is chosen because
@@ -221,10 +222,14 @@ public class OverlayOp extends GeometryGraphOperation {
          * </pre>
          * and Union has the dimension of the highest-dimension argument.
          */
-        resultDimension = Math.max(dim0, dim1);
-      break;
+        if (dim0.isLessThan(dim1)) { // max
+          return dim1;
+        } else {
+          return dim0;
+        }
+      default:
+        return Dimension.FALSE;
     }
-    return resultDimension;
   }
 
   private final EdgeList edgeList = new EdgeList();

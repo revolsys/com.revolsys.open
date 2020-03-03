@@ -50,6 +50,7 @@ import com.revolsys.geometry.geomgraph.Label;
 import com.revolsys.geometry.geomgraph.Node;
 import com.revolsys.geometry.geomgraph.NodeMap;
 import com.revolsys.geometry.geomgraph.index.SegmentIntersector;
+import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.IntersectionMatrix;
 import com.revolsys.geometry.model.Location;
@@ -107,7 +108,7 @@ public class RelateComputer {
     final IntersectionMatrix im = new IntersectionMatrix();
     // since Geometries are finite and embedded in a 2-D space, the EE element
     // must always be 2
-    im.set(Location.EXTERIOR, Location.EXTERIOR, 2);
+    im.set(Location.EXTERIOR, Location.EXTERIOR, Dimension.A);
 
     // if the Geometries don't overlap there is nothing to do
     if (!this.arg[0].getGeometry().bboxIntersects(this.arg[1].getGeometry())) {
@@ -207,8 +208,8 @@ public class RelateComputer {
   private void computeProperIntersectionIM(final SegmentIntersector intersector,
     final IntersectionMatrix im) {
     // If a proper intersection is found, we can set a lower bound on the IM.
-    final int dimA = this.arg[0].getGeometry().getDimension();
-    final int dimB = this.arg[1].getGeometry().getDimension();
+    final Dimension dimA = this.arg[0].getGeometry().getDimension();
+    final Dimension dimB = this.arg[1].getGeometry().getDimension();
     final boolean hasProper = intersector.hasProperIntersection();
     final boolean hasProperInterior = intersector.hasProperInteriorIntersection();
 
@@ -217,7 +218,7 @@ public class RelateComputer {
     /**
      * If edge segments of Areas properly intersect, the areas must properly overlap.
      */
-    if (dimA == 2 && dimB == 2) {
+    if (dimA.isArea() && dimB.isArea()) {
       if (hasProper) {
         im.setAtLeast("212101212");
       }
@@ -230,14 +231,14 @@ public class RelateComputer {
      * Note that it does not follow that the Interior of the Line intersects the Exterior
      * of the Area, since there may be another Area component which contains the rest of the Line.
      */
-    else if (dimA == 2 && dimB == 1) {
+    else if (dimA.isArea() && dimB.isLine()) {
       if (hasProper) {
         im.setAtLeast("FFF0FFFF2");
       }
       if (hasProperInterior) {
         im.setAtLeast("1FFFFF1FF");
       }
-    } else if (dimA == 1 && dimB == 2) {
+    } else if (dimA.isLine() && dimB.isArea()) {
       if (hasProper) {
         im.setAtLeast("F0FFFFFF2");
       }
@@ -255,7 +256,7 @@ public class RelateComputer {
      * a proper intersection on one segment that is also a boundary point of
      * another segment.
      */
-    else if (dimA == 1 && dimB == 1) {
+    else if (dimA.isLine() && dimB.isLine()) {
       if (hasProperInterior) {
         im.setAtLeast("0FFFFFFFF");
       }
@@ -294,7 +295,7 @@ public class RelateComputer {
    */
   private void labelIsolatedEdge(final Edge edge, final int targetIndex, final Geometry target) {
     // this won't work for GeometryCollections with both dim 2 and 1 geoms
-    if (target.getDimension() > 0) {
+    if (target.getDimension().isGreaterThan(Dimension.P)) {
       // since edge is not in boundary, may not need the full generality of
       // PointLocator?
       // Possibly should use ptInArea locator instead? We probably know here

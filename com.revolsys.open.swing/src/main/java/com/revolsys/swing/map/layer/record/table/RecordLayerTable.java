@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
+import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
 import java.beans.PropertyChangeEvent;
 import java.util.EventObject;
@@ -249,9 +250,14 @@ public class RecordLayerTable extends RecordRowTable {
 
   @Override
   public boolean editCellAt(final int row, final int column, final EventObject e) {
-    final LayerRecord record = getRecord(row);
-    LayerRecordMenu.setEventRecord(record);
-    return super.editCellAt(row, column, e);
+    if (e instanceof MouseEvent && !((MouseEvent)e).isShiftDown()) {
+      final LayerRecord record = getRecord(row);
+      LayerRecordMenu.setEventRecord(record);
+      return super.editCellAt(row, column, e);
+    } else {
+      return false;
+    }
+
   }
 
   @SuppressWarnings("unchecked")

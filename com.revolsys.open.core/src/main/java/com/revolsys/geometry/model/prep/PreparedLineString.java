@@ -34,6 +34,7 @@ package com.revolsys.geometry.model.prep;
 
 import java.util.List;
 
+import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Lineal;
@@ -93,15 +94,15 @@ public class PreparedLineString extends AbstractDelegatingLineString {
       /**
        * For L/L case we are done
        */
-      final int dimension = geometry.getDimension();
-      if (dimension == 1) {
+      final Dimension dimension = geometry.getDimension();
+      if (dimension.isLine()) {
         return false;
-      } else if (dimension == 2 && Geometry.isAnyTargetComponentInTest(this, geometry)) {
+      } else if (dimension.isArea() && Geometry.isAnyTargetComponentInTest(this, geometry)) {
         /**
          * For L/A case, need to check for proper inclusion of the target in the test
          */
         return true;
-      } else if (dimension == 0) {
+      } else if (dimension.isPoint()) {
         /**
          * For L/P case, need to check if any points lie on line(s)
          */

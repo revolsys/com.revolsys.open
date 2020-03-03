@@ -198,7 +198,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
     }
 
     @Override
-    public int getDimension() {
+    public Dimension getDimension() {
       return Dimension.FALSE;
     }
 

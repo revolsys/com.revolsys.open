@@ -114,8 +114,8 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   }
 
   @Override
-  default int getBoundaryDimension() {
-    return 1;
+  default Dimension getBoundaryDimension() {
+    return Dimension.L;
   }
 
   @Override
@@ -124,8 +124,8 @@ public interface MultiPolygon extends GeometryCollection, Polygonal {
   }
 
   @Override
-  default int getDimension() {
-    return 2;
+  default Dimension getDimension() {
+    return Dimension.A;
   }
 
   @Override

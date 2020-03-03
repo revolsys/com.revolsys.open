@@ -210,7 +210,7 @@ abstract class AbstractPreparedPolygonContains {
      * If not, all points are on the boundary of the area,
      * which implies not contained.
      */
-    if (this.requireSomePointInInterior && geometry.getDimension() == 0) {
+    if (this.requireSomePointInInterior && geometry.getDimension().isPoint()) {
       final boolean isAnyInTargetInterior = isAnyTestComponentInTargetInterior(getPointLocator(),
         geometry);
       return isAnyInTargetInterior;

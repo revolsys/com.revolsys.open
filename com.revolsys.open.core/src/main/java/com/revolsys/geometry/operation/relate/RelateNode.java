@@ -33,6 +33,7 @@
 package com.revolsys.geometry.operation.relate;
 
 import com.revolsys.geometry.geomgraph.Node;
+import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.IntersectionMatrix;
 
 /**
@@ -57,7 +58,7 @@ public class RelateNode extends Node {
    */
   @Override
   protected void computeIM(final IntersectionMatrix im) {
-    im.setAtLeastIfValid(this.label.getLocation(0), this.label.getLocation(1), 0);
+    im.setAtLeastIfValid(this.label.getLocation(0), this.label.getLocation(1), Dimension.P);
   }
 
   @Override

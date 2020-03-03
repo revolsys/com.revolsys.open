@@ -322,8 +322,8 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
-  default int getBoundaryDimension() {
-    return 1;
+  default Dimension getBoundaryDimension() {
+    return Dimension.L;
   }
 
   default double getCoordinate(final int ringIndex, final int vertexIndex, final int axisIndex) {
@@ -351,8 +351,8 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
-  default int getDimension() {
-    return 2;
+  default Dimension getDimension() {
+    return Dimension.A;
   }
 
   @Override

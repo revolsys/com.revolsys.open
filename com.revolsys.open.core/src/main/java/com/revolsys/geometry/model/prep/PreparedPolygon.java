@@ -224,7 +224,7 @@ public class PreparedPolygon extends PolygonImpl implements PreparedPolygonal {
          * If input contains only points, then at
          * this point it is known that none of them are contained in the target
          */
-        if (geometry.getDimension() == 0) {
+        if (geometry.getDimension().isPoint()) {
           return false;
         } else {
           /**
@@ -246,7 +246,7 @@ public class PreparedPolygon extends PolygonImpl implements PreparedPolygonal {
            * inclusion of the target. Since no segments intersect, it is sufficient to
            * test representative points.
            */
-          if (geometry.getDimension() == 2) {
+          if (geometry.getDimension().isArea()) {
             // TODO: generalize this to handle GeometryCollections
             final boolean isPrepGeomInArea = AbstractPreparedPolygonContains
               .isAnyTargetComponentInAreaTest(geometry, this);

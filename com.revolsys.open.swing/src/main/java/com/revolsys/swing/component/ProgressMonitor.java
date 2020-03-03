@@ -160,7 +160,6 @@ public class ProgressMonitor implements Cancellable {
             Logs.error(ProgressMonitor.class, exception);
             if (doneTask != null) {
               doneTask.accept(false);
-              ;
             }
           }
         };
@@ -265,6 +264,7 @@ public class ProgressMonitor implements Cancellable {
   private void setDone() {
     this.done = true;
     this.dialog.setVisible(false);
+    this.dialog.timer.stop();
 
     if (this.activeWindow != null) {
       if (!this.activeWindow.isActive()) {

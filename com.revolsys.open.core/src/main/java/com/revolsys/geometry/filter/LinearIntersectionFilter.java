@@ -3,6 +3,7 @@ package com.revolsys.geometry.filter;
 import java.util.function.Predicate;
 
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.IntersectionMatrix;
 import com.revolsys.geometry.model.LineString;
@@ -27,7 +28,8 @@ public class LinearIntersectionFilter implements Predicate<LineString> {
     if (envelope.bboxIntersects(this.envelope)) {
       if (this.preparedLine.intersects(line)) {
         final IntersectionMatrix relate = this.line.relate(line);
-        if (relate.isOverlaps(1, 1) || relate.isContains() || relate.isWithin()) {
+        if (relate.isOverlaps(Dimension.L, Dimension.L) || relate.isContains()
+          || relate.isWithin()) {
           return true;
         }
       }

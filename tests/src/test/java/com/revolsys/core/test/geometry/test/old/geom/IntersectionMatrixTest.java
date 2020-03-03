@@ -43,11 +43,11 @@ import junit.framework.TestCase;
  */
 public class IntersectionMatrixTest extends TestCase {
 
-  private static int A = Dimension.A;
+  private static Dimension A = Dimension.A;
 
-  private static int L = Dimension.L;
+  private static Dimension L = Dimension.L;
 
-  private static int P = Dimension.P;
+  private static Dimension P = Dimension.P;
 
   public IntersectionMatrixTest(final String name) {
     super(name);
