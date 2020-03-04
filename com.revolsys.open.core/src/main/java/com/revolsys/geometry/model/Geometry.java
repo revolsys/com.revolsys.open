@@ -2456,7 +2456,11 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    */
 
   default Geometry union() {
-    return UnaryUnionOp.union(this);
+    if (isEmpty()) {
+      return this;
+    } else {
+      return UnaryUnionOp.union(this);
+    }
   }
 
   /**

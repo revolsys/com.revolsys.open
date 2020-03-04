@@ -55,6 +55,7 @@ import com.revolsys.collection.set.Sets;
 import com.revolsys.geometry.index.RecordSpatialIndex;
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.index.rstartree.RStarTree;
+import com.revolsys.geometry.io.GeometryReader;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataTypes;
@@ -1440,6 +1441,38 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
+  public List<Geometry> getPasteWktGeometries() {
+    try {
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      final FieldDefinition geometryField = recordDefinition.getGeometryField();
+      if (geometryField != null) {
+        final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
+        if (Property.hasValue(string)) {
+          final Resource wktResource = new ByteArrayResource("t.wkt", string);
+          final GeometryFactory geometryFactory = getGeometryFactory();
+          try (
+            GeometryReader geometryReader = GeometryReader.newGeometryReader(wktResource,
+              geometryFactory)) {
+            final DataType geometryDataType = geometryField.getDataType();
+            final Class<?> layerGeometryClass = geometryDataType.getJavaClass();
+            final List<Geometry> geometries = new ArrayList<>();
+            for (Geometry geometry : geometryReader) {
+              geometry = geometryFactory.geometry(layerGeometryClass, geometry);
+              if (geometry != null && !geometry.isEmpty()) {
+                geometries.add(geometry);
+              }
+            }
+            return geometries;
+          } catch (final Exception e) {
+          }
+        }
+
+      }
+    } catch (final Throwable t) {
+    }
+    return Collections.emptyList();
+  }
+
   @Override
   public PathName getPathName() {
     final RecordDefinition recordDefinition = getRecordDefinition();
@@ -2433,24 +2466,23 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       RecordReader reader = ClipboardUtil
         .getContents(RecordReaderTransferable.RECORD_READER_FLAVOR);
       if (reader == null) {
-        final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
-        if (Property.hasValue(string)) {
-          if (string.contains("\n") || string.contains("\r")) {
-            if (string.contains("\t")) {
-              final Resource tsvResource = new ByteArrayResource("t.tsv", string);
-              reader = RecordReader.newRecordReader(tsvResource);
-            } else {
-              final Resource resource = new ByteArrayResource("t.csv", string);
-              reader = RecordReader.newRecordReader(resource);
+        final List<Geometry> geometries = getPasteWktGeometries();
+        if (geometries.isEmpty()) {
+          final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
+          if (Property.hasValue(string)) {
+            if (string.contains("\n") || string.contains("\r")) {
+              if (string.contains("\t")) {
+                final Resource tsvResource = new ByteArrayResource("t.tsv", string);
+                reader = RecordReader.newRecordReader(tsvResource);
+              } else {
+                final Resource resource = new ByteArrayResource("t.csv", string);
+                reader = RecordReader.newRecordReader(resource);
+              }
             }
           }
-        }
-      }
-      if (reader == null) {
-        final String geometryFieldName = getGeometryFieldName();
-        if (geometryFieldName != null) {
-          final Geometry geometry = getPasteGeometry(false);
-          if (geometry != null) {
+        } else {
+          final String geometryFieldName = getGeometryFieldName();
+          for (final Geometry geometry : geometries) {
             final Map<String, Object> values = Collections.singletonMap(geometryFieldName,
               geometry);
             final LayerRecord newRecord = newLayerRecord(values);
@@ -2459,7 +2491,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             }
           }
         }
-      } else {
+      }
+      if (reader != null) {
         for (final Record sourceRecord : reader) {
           final Map<String, Object> newValues = getPasteNewValues(sourceRecord);
 
