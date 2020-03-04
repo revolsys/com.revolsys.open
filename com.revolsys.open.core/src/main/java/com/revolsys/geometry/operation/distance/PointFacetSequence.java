@@ -88,7 +88,7 @@ public class PointFacetSequence extends AbstractPoint implements FacetSequence {
     final double x = getX(0);
     final double y = getY(0);
     if (isPointOther) {
-      return this.point.distance(x, y);
+      return this.point.distancePoint(x, y);
     } else {
       return computePointLineDistance(x, y, other);
     }

@@ -12,6 +12,12 @@ import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
 public interface DelegatingLineString extends LineString {
   @Override
+  default double distancePoint(final double x, final double y, final double terminateDistance) {
+    final LineString line = getLineString();
+    return line.distancePoint(x, y, terminateDistance);
+  }
+
+  @Override
   default boolean equalsVertex2d(final int vertexIndex, final double x, final double y) {
     final LineString line = getLineString();
     return line.equalsVertex2d(vertexIndex, x, y);

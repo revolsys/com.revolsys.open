@@ -192,17 +192,6 @@ public interface CoordinatesUtil {
     return getElevation(x1, y1, z1, x2, y2, z2, x, y);
   }
 
-  static Point getPrecise(final double scale, final Point point) {
-    if (scale <= 0) {
-      return point;
-    } else {
-      final double[] coordinates = point.getCoordinates();
-      coordinates[0] = Doubles.makePrecise(scale, coordinates[0]);
-      coordinates[1] = Doubles.makePrecise(scale, coordinates[1]);
-      return new PointDouble(coordinates);
-    }
-  }
-
   static boolean isAcute(final Point point1, final Point point2, final Point point3) {
     final double x1 = point1.getX();
     final double y1 = point1.getY();

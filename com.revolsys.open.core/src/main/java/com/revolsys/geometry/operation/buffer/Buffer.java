@@ -40,8 +40,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.jeometry.common.number.Doubles;
-
 import com.revolsys.geometry.algorithm.CGAlgorithms;
 import com.revolsys.geometry.algorithm.CGAlgorithmsDD;
 import com.revolsys.geometry.algorithm.LineIntersector;
@@ -72,6 +70,7 @@ import com.revolsys.geometry.noding.SegmentString;
 import com.revolsys.geometry.noding.snapround.MCIndexSnapRounder;
 import com.revolsys.geometry.operation.overlay.OverlayNodeFactory;
 import com.revolsys.geometry.operation.overlay.PolygonBuilder;
+import com.revolsys.geometry.operation.union.CascadedPolygonUnion;
 
 //import debug.*;
 
@@ -131,7 +130,7 @@ public class Buffer {
     final GeometryFactory geometryFactory = geometry.getGeometryFactory();
     try {
       final MCIndexNoder noder = new MCIndexNoder();
-      final LineIntersector li = new RobustLineIntersector(geometryFactory.getScaleXY());
+      final LineIntersector li = new RobustLineIntersector();
       noder.setSegmentIntersector(new IntersectionAdder(li));
       return (G)buffer(noder, geometryFactory, geometry, distance, parameters);
     } catch (final RuntimeException e) {
@@ -143,12 +142,11 @@ public class Buffer {
     }
   }
 
-  private static Geometry buffer(final Noder noder, final GeometryFactory precisionModel,
+  private static Geometry buffer(final Noder noder, final GeometryFactory geometryFactory,
     final Geometry geometry, final double distance, final BufferParameters parameters) {
-    final GeometryFactory geometryFactory = geometry.getGeometryFactory();
 
     final OffsetCurveSetBuilder curveSetBuilder = new OffsetCurveSetBuilder(geometry, distance,
-      precisionModel, parameters);
+      geometryFactory, parameters);
 
     final List<NodedSegmentString> curves = curveSetBuilder.getCurves();
     if (curves.size() == 0) {
@@ -166,20 +164,19 @@ public class Buffer {
       final List<Polygon> polygons = polyBuilder.getPolygons();
 
       if (polygons.size() == 0) {
-        return geometryFactory.polygon();
+        return geometryFactory.polygon().union();
       } else {
-        final Geometry resultGeom = geometryFactory.buildGeometry(polygons);
-        return resultGeom;
+        return CascadedPolygonUnion.union(polygons);
       }
     }
   }
 
-  private static Geometry bufferFixedPrecision(final GeometryFactory precisionModel,
+  private static Geometry bufferFixedPrecision(final GeometryFactory geometryFactory,
     final Geometry geometry, final double distance, final BufferParameters parameters) {
     final MCIndexSnapRounder rounder = new MCIndexSnapRounder(1.0);
-    final double scale = precisionModel.getScaleXY();
+    final double scale = geometryFactory.getScaleXY();
     final Noder noder = new ScaledNoder(rounder, scale);
-    return buffer(noder, precisionModel, geometry, distance, parameters);
+    return buffer(noder, geometryFactory, geometry, distance, parameters);
   }
 
   private static Geometry bufferReducedPrecision(final Geometry geometry, final double distance,
@@ -425,10 +422,21 @@ public class Buffer {
   private static double precisionScaleFactor(final Geometry geometry, final double distance,
     final int maxPrecisionDigits) {
     final BoundingBox boundingBox = geometry.getBoundingBox();
-    final double envMax = Doubles.max(Math.abs(boundingBox.getMaxX()),
-      Math.abs(boundingBox.getMaxY()), Math.abs(boundingBox.getMinX()),
-      Math.abs(boundingBox.getMinY()));
+    final double minX = Math.abs(boundingBox.getMinX());
+    final double maxX = Math.abs(boundingBox.getMaxX());
+    final double minY = Math.abs(boundingBox.getMinY());
+    final double maxY = Math.abs(boundingBox.getMaxY());
 
+    double envMax = minX;
+    if (maxX > envMax) {
+      envMax = maxX;
+    }
+    if (minY > envMax) {
+      envMax = minY;
+    }
+    if (maxY > envMax) {
+      envMax = maxY;
+    }
     final double expandByDistance = distance > 0.0 ? distance : 0.0;
     final double bufEnvMax = envMax + 2 * expandByDistance;
 

@@ -32,7 +32,6 @@
  */
 package com.revolsys.geometry.algorithm.locate;
 
-import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -40,7 +39,6 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
-import com.revolsys.util.Property;
 
 /**
  * Determines the {@link Location} of {@link Coordinates}s relative to
@@ -54,20 +52,6 @@ import com.revolsys.util.Property;
  *
  */
 public class IndexedPointInAreaLocator implements PointOnGeometryLocator {
-
-  private static final WeakKeyValueMap<Geometry, IndexedPointInAreaLocator> CACHE = new WeakKeyValueMap<>();
-
-  public static IndexedPointInAreaLocator get(final Geometry geometry) {
-    if (Property.hasValue(geometry)) {
-      IndexedPointInAreaLocator locator = CACHE.get(geometry);
-      if (locator == null) {
-        locator = new IndexedPointInAreaLocator(geometry);
-        CACHE.put(geometry, locator);
-      }
-      return locator;
-    }
-    return null;
-  }
 
   private final Geometry geometry;
 

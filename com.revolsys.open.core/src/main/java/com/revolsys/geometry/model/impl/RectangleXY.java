@@ -582,7 +582,7 @@ public class RectangleXY extends AbstractPolygon implements BoundingBox {
     if (bboxDistance > distance) {
       return false;
     } else {
-      final double geometryDistance = this.distance(geometry);
+      final double geometryDistance = this.distanceGeometry(geometry);
       return geometryDistance <= distance;
 
     }

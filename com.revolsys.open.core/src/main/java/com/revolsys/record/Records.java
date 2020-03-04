@@ -218,7 +218,7 @@ public interface Records {
       if (geometry1 == null || geometry2 == null) {
         return Double.MAX_VALUE;
       } else {
-        return geometry1.distance(geometry2);
+        return geometry1.distanceGeometry(geometry2);
       }
     }
   }
@@ -228,7 +228,7 @@ public interface Records {
     final List<D> results = new ArrayList<>();
     for (final D record : records) {
       final Geometry recordGeometry = record.getGeometry();
-      final double distance = recordGeometry.distance(geometry);
+      final double distance = recordGeometry.distanceGeometry(geometry);
       if (distance < maxDistance) {
         results.add(record);
       }
@@ -604,7 +604,7 @@ public interface Records {
       if (record != null) {
         final Geometry recordGeometry = record.getGeometry();
         if (recordGeometry != null) {
-          final double distance = recordGeometry.distance(geometry, maxDistance);
+          final double distance = recordGeometry.distanceGeometry(geometry, maxDistance);
           if (distance <= maxDistance) {
             return true;
           }

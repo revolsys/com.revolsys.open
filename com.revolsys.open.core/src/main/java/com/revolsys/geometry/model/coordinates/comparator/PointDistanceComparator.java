@@ -21,8 +21,8 @@ public class PointDistanceComparator implements Comparator<Point> {
   @Override
   public int compare(final Point point1, final Point point2) {
     int compare;
-    final double distance1 = point1.distance(this.x, this.y);
-    final double distance2 = point2.distance(this.x, this.y);
+    final double distance1 = point1.distancePoint(this.x, this.y);
+    final double distance2 = point2.distancePoint(this.x, this.y);
     if (distance1 == distance2) {
       compare = point1.compareTo(point2);
     } else if (distance1 < distance2) {

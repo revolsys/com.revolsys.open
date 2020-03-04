@@ -88,7 +88,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
   Lineal clone();
 
   @Override
-  default double distance(Geometry geometry, final double terminateDistance) {
+  default double distanceGeometry(Geometry geometry, final double terminateDistance) {
     if (isEmpty()) {
       return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(geometry)) {
@@ -98,7 +98,7 @@ public interface MultiLineString extends GeometryCollection, Lineal {
       geometry = geometry.convertGeometry(geometryFactory, 2);
       double minDistance = Double.MAX_VALUE;
       for (final LineString line : lineStrings()) {
-        final double distance = geometry.distance(line);
+        final double distance = geometry.distanceLine(line);
         if (distance < minDistance) {
           minDistance = distance;
           if (distance <= terminateDistance) {

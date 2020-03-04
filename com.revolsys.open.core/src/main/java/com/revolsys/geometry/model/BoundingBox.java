@@ -356,6 +356,19 @@ public interface BoundingBox
     return minX2 <= minX && maxX <= maxX2 && minY2 <= minY && maxY <= maxY2;
   }
 
+  @Override
+  default boolean bboxCovers(final Point point) {
+    if (point == null || point.isEmpty()) {
+      return false;
+    } else if (isSameCoordinateSystem(this)) {
+      final double x = point.getX();
+      final double y = point.getY();
+      return bboxCovers(x, y);
+    } else {
+      return BoundingBoxProxy.super.bboxCovers(point);
+    }
+  }
+
   default double bboxDistance(final double x, final double y) {
     if (bboxIntersects(x, y)) {
       return 0;
@@ -443,6 +456,36 @@ public interface BoundingBox
     }
   }
 
+  default boolean bboxEquals(final BoundingBox boundingBox) {
+    if (boundingBox == null || boundingBox.isEmpty()) {
+      return false;
+    } else if (isSameCoordinateSystem(this)) {
+      if (getMaxX() == boundingBox.getMaxX()) {
+        if (getMaxY() == boundingBox.getMaxY()) {
+          if (getMinX() == boundingBox.getMinX()) {
+            if (getMinY() == boundingBox.getMinY()) {
+              return true;
+            }
+          }
+        }
+      }
+      return false;
+    } else {
+      final BiFunction<BoundingBox, BoundingBox, Boolean> action = BoundingBox::equals;
+      return bboxWith(boundingBox, action, false);
+    }
+  }
+
+  @Override
+  default boolean bboxEquals(final BoundingBoxProxy boundingBox) {
+    if (boundingBox == null) {
+      return false;
+    } else {
+      final BoundingBox bbox = boundingBox.getBoundingBox();
+      return bboxEquals(bbox);
+    }
+  }
+
   /**
    * Computes the intersection of two {@link BoundingBox}s.
    *
@@ -478,6 +521,31 @@ public interface BoundingBox
       } else {
         return geometryFactory.bboxEmpty();
       }
+    }
+  }
+
+  default boolean bboxIntersects(final BoundingBox boundingBox) {
+    if (boundingBox == null || boundingBox.isEmpty()) {
+      return false;
+    } else if (isSameCoordinateSystem(this)) {
+      final double minX = boundingBox.getMinX();
+      final double minY = boundingBox.getMinY();
+      final double maxX = boundingBox.getMaxX();
+      final double maxY = boundingBox.getMaxY();
+      return bboxIntersects(minX, minY, maxX, maxY);
+    } else {
+      final BoundingBoxFunction<Boolean> action = BoundingBox::bboxIntersects;
+      return bboxWith(boundingBox, action, false);
+    }
+  }
+
+  @Override
+  default boolean bboxIntersects(final BoundingBoxProxy boundingBox) {
+    if (boundingBox == null) {
+      return false;
+    } else {
+      final BoundingBox bbox = boundingBox.getBoundingBox();
+      return bboxIntersects(bbox);
     }
   }
 

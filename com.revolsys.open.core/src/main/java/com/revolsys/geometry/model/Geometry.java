@@ -949,31 +949,6 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
   /**
    *  Returns the minimum distance between this <code>Geometry</code>
-   *  and another {@link Point}.
-   *
-   * @param  x the x coordinate from which to compute the distance
-   * @param  y the y coordinate from which to compute the distance
-   * @return the distance between the geometries or 0 if either input geometry is empty
-   * @throws IllegalArgumentException if g is null
-   */
-  default double distance(final double x, final double y) {
-    return distance(x, y, 0.0);
-  }
-
-  /**
-   *  Returns the minimum distance between this <code>Geometry</code>
-   *  and another {@link Point}.
-   *
-   * @param  x the x coordinate from which to compute the distance
-   * @param  y the y coordinate from which to compute the distance
-   * @return the distance between the geometries or 0 if either input geometry is empty
-   * @throws IllegalArgumentException if g is null
-   */
-
-  double distance(double x, double y, final double terminateDistance);
-
-  /**
-   *  Returns the minimum distance between this <code>Geometry</code>
    *  and another <code>Geometry</code>.
    *
    * @param  geometry the <code>Geometry</code> from which to compute the distance
@@ -981,27 +956,27 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * @throws IllegalArgumentException if g is null
    */
 
-  default double distance(final Geometry geometry) {
-    return distance(geometry, 0.0);
+  default double distanceGeometry(final Geometry geometry) {
+    return distanceGeometry(geometry, 0.0);
   }
 
   /**
-   *  Returns the minimum distance between this <code>Geometry</code>
-   *  and another <code>Geometry</code>.
-   *
-   * @param  geometry the <code>Geometry</code> from which to compute the distance
-   * @return the distance between the geometries or 0 if either input geometry is empty
-   * @throws IllegalArgumentException if g is null
-   */
+  *  Returns the minimum distance between this <code>Geometry</code>
+  *  and another <code>Geometry</code>.
+  *
+  * @param  geometry the <code>Geometry</code> from which to compute the distance
+  * @return the distance between the geometries or 0 if either input geometry is empty
+  * @throws IllegalArgumentException if g is null
+  */
 
-  default double distance(Geometry geometry, final double terminateDistance) {
+  default double distanceGeometry(Geometry geometry, final double terminateDistance) {
     if (isEmpty()) {
       return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(geometry)) {
       return Double.POSITIVE_INFINITY;
     } else if (geometry instanceof Point) {
       final Point point = (Point)geometry;
-      return distance(point, terminateDistance);
+      return distancePoint(point, terminateDistance);
     } else {
       geometry = geometry.as2d(this);
       final DistanceOp distOp = new DistanceOp(this, geometry, terminateDistance);
@@ -1010,28 +985,34 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     }
   }
 
+  default double distanceLine(final LineString line) {
+    return distanceGeometry(line, 0.0);
+  }
+
   /**
    *  Returns the minimum distance between this <code>Geometry</code>
    *  and another {@link Point}.
    *
-   * @param  point the point from which to compute the distance
+   * @param  x the x coordinate from which to compute the distance
+   * @param  y the y coordinate from which to compute the distance
+   * @return the distance between the geometries or 0 if either input geometry is empty
+   * @throws IllegalArgumentException if g is null
+   */
+  default double distancePoint(final double x, final double y) {
+    return distancePoint(x, y, 0.0);
+  }
+
+  /**
+   *  Returns the minimum distance between this <code>Geometry</code>
+   *  and another {@link Point}.
+   *
+   * @param  x the x coordinate from which to compute the distance
+   * @param  y the y coordinate from which to compute the distance
    * @return the distance between the geometries or 0 if either input geometry is empty
    * @throws IllegalArgumentException if g is null
    */
 
-  default double distance(Point point, final double terminateDistance) {
-    if (isEmpty()) {
-      return Double.POSITIVE_INFINITY;
-    } else if (Property.isEmpty(point)) {
-      return Double.POSITIVE_INFINITY;
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      point = point.convertPoint2d(geometryFactory);
-      final double x = point.getX();
-      final double y = point.getY();
-      return distance(x, y, terminateDistance);
-    }
-  }
+  double distancePoint(double x, double y, final double terminateDistance);
 
   /**
    *  Returns the minimum distance between this <code>Geometry</code>
@@ -1042,7 +1023,30 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * @throws IllegalArgumentException if g is null
    */
   default double distancePoint(final Point point) {
-    return distance(point, 0.0);
+    return distancePoint(point, 0.0);
+  }
+
+  /**
+   *  Returns the minimum distance between this <code>Geometry</code>
+   *  and another {@link Point}.
+   *
+   * @param  point the point from which to compute the distance
+   * @return the distance between the geometries or 0 if either input geometry is empty
+   * @throws IllegalArgumentException if g is null
+   */
+
+  default double distancePoint(Point point, final double terminateDistance) {
+    if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else if (Property.isEmpty(point)) {
+      return Double.POSITIVE_INFINITY;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      point = point.convertPoint2d(geometryFactory);
+      final double x = point.getX();
+      final double y = point.getY();
+      return distancePoint(x, y, terminateDistance);
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -1220,7 +1224,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
           if (from.equalsVertex(x, y)) {
             return new Pair<>(from, 0.0);
           } else {
-            final double fromDistance = from.distance(x, y);
+            final double fromDistance = from.distancePoint(x, y);
             if (fromDistance < closestDistance || //
               fromDistance == closestDistance && !(closestComponent instanceof Vertex)) {
               closestDistance = fromDistance;
@@ -1233,7 +1237,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
           if (to.equalsVertex(x, y)) {
             return new Pair<>(to, 0.0);
           } else {
-            final double toDistance = to.distance(x, y);
+            final double toDistance = to.distancePoint(x, y);
             if (toDistance < closestDistance || //
               toDistance == closestDistance && !(closestComponent instanceof Vertex)) {
               closestDistance = toDistance;
@@ -1242,7 +1246,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
           }
         }
         {
-          final double segmentDistance = segment.distance(x, y);
+          final double segmentDistance = segment.distancePoint(x, y);
           if (segmentDistance == 0) {
             return new Pair<>(segment, 0.0);
           } else if (segmentDistance < closestDistance || //
@@ -1274,7 +1278,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
           if (from.equalsVertex(x, y)) {
             return new Pair<>(from, 0.0);
           } else {
-            final double fromDistance = from.distance(x, y);
+            final double fromDistance = from.distancePoint(x, y);
             if (fromDistance <= maxDistance) {
               if (fromDistance < closestDistance || //
                 fromDistance == closestDistance && !(closestComponent instanceof Vertex)) {
@@ -1290,7 +1294,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
           if (to.equalsVertex(x, y)) {
             return new Pair<>(to, 0.0);
           } else {
-            final double toDistance = to.distance(x, y);
+            final double toDistance = to.distancePoint(x, y);
             if (toDistance <= maxDistance) {
               if (toDistance < closestDistance || //
                 toDistance == closestDistance && !(closestComponent instanceof Vertex)) {
@@ -1302,7 +1306,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
           }
         }
         if (!matched) {
-          final double segmentDistance = segment.distance(x, y);
+          final double segmentDistance = segment.distancePoint(x, y);
           if (segmentDistance == 0) {
             return new Pair<>(segment, 0.0);
           } else if (segmentDistance <= maxDistance) {
@@ -1358,7 +1362,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
         boolean matched = false;
         if (segment.isLineStart()) {
           final Vertex from = segment.getGeometryVertex(0);
-          final double fromDistance = from.distance(x, y);
+          final double fromDistance = from.distancePoint(x, y);
           if (fromDistance == 0) {
             return new Pair<>(from, 0.0);
           } else if (fromDistance < maxDistance) {
@@ -1373,7 +1377,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
 
         {
           final Vertex to = segment.getGeometryVertex(1);
-          final double toDistance = to.distance(x, y);
+          final double toDistance = to.distancePoint(x, y);
           if (toDistance == 0) {
             return new Pair<>(to, 0.0);
           } else if (toDistance < maxDistance) {
@@ -1386,7 +1390,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
           }
         }
         if (!matched && !(closestComponent instanceof Vertex)) {
-          final double segmentDistance = segment.distance(x, y);
+          final double segmentDistance = segment.distancePoint(x, y);
           if (segmentDistance == 0) {
             return new Pair<>(segment, 0.0);
           } else {
@@ -1737,7 +1741,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
         double minDistance = Double.MAX_VALUE;
         Point interiorPoint = null;
         for (final Point point : getGeometries(Point.class)) {
-          final double distance = point.distance(centroidX, centroidY);
+          final double distance = point.distancePoint(centroidX, centroidY);
           if (distance < minDistance) {
             interiorPoint = point;
             minDistance = distance;
@@ -2034,7 +2038,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     if (bboxDistance > distance) {
       return false;
     } else {
-      final double geometryDistance = this.distance(geometry);
+      final double geometryDistance = this.distanceGeometry(geometry);
       return geometryDistance < distance;
 
     }
@@ -2102,7 +2106,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
     if (bboxDistance > distance) {
       return false;
     } else {
-      final double geometryDistance = this.distance(geometry);
+      final double geometryDistance = this.distanceGeometry(geometry);
       return geometryDistance <= distance;
 
     }

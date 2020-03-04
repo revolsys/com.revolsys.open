@@ -123,7 +123,7 @@ public class WithinDistance implements Condition {
       if (acceptDistance == null || geometry1 == null || geometry2 == null) {
         return false;
       } else {
-        final double distance = geometry1.distance(geometry2);
+        final double distance = geometry1.distanceGeometry(geometry2);
         return distance <= acceptDistance.doubleValue();
       }
     }

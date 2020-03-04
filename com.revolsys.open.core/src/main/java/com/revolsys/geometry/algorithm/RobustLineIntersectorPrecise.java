@@ -45,12 +45,12 @@ import com.revolsys.geometry.util.RectangleUtil;
  * @version 1.7
  * @see RobustDeterminant
  */
-public class RobustLineIntersector extends LineIntersector {
+public class RobustLineIntersectorPrecise extends LineIntersector {
 
-  public RobustLineIntersector() {
+  public RobustLineIntersectorPrecise() {
   }
 
-  public RobustLineIntersector(final double scale) {
+  public RobustLineIntersectorPrecise(final double scale) {
     super(scale);
   }
 

@@ -16,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
 import javax.swing.UIManager;
@@ -96,7 +97,7 @@ public class ProgressMonitor implements Cancellable {
 
   public static <V> void background(final CharSequence title, final Collection<V> objects,
     final Consumer<? super V> action, final Consumer<ProgressMonitor> afterAction) {
-    background(title, null, monitor -> {
+    final Consumer<ProgressMonitor> task = monitor -> {
       try {
         for (final V object : monitor.cancellable(objects)) {
           action.accept(object);
@@ -107,7 +108,8 @@ public class ProgressMonitor implements Cancellable {
           afterAction.accept(monitor);
         }
       }
-    }, objects.size());
+    };
+    background(title, null, task, objects.size());
   }
 
   public static void background(final CharSequence title, final Consumer<ProgressMonitor> task,
@@ -123,7 +125,7 @@ public class ProgressMonitor implements Cancellable {
   public static void background(final CharSequence title, final String note,
     final Consumer<ProgressMonitor> task, final int max, final Consumer<Boolean> doneTask) {
     if (max > 0) {
-      Invoke.later(() -> {
+      if (SwingUtilities.isEventDispatchThread()) {
         final ProgressMonitor progressMonitor = new ProgressMonitor(title, note, true, max);
         final SwingWorker<Object, Object> worker = new AbstractSwingWorker<>() {
 
@@ -164,25 +166,30 @@ public class ProgressMonitor implements Cancellable {
           }
         };
         Invoke.worker(worker);
-        progressMonitor.show();
-      });
+        if (!worker.isDone()) {
+          progressMonitor.show();
+        }
+      } else {
+        Invoke.later(() -> background(title, note, task, max, doneTask));
+      }
     }
   }
 
   public static void background(final CharSequence title, final String note,
     final Consumer<ProgressMonitor> task, final int max, final Runnable doneTask) {
-    background(title, note, task, max, completed -> {
+    final Consumer<Boolean> doneConsumer = completed -> {
       if (doneTask != null) {
         doneTask.run();
       }
-    });
+    };
+    background(title, note, task, max, doneConsumer);
   }
 
   public static void ui(final CharSequence title, final String note, final boolean canCancel,
     final Consumer<ProgressMonitor> task) {
-    Invoke.later(() -> {
+    if (SwingUtilities.isEventDispatchThread()) {
       final ProgressMonitor progressMonitor = new ProgressMonitor(title, note, canCancel, 0);
-      Invoke.workerDone(title.toString(), () -> {
+      final Runnable doneTask = () -> {
         try {
           task.accept(progressMonitor);
         } catch (final Throwable e) {
@@ -190,9 +197,12 @@ public class ProgressMonitor implements Cancellable {
         } finally {
           progressMonitor.setDone();
         }
-      });
+      };
+      Invoke.workerDone(title.toString(), doneTask);
       progressMonitor.show();
-    });
+    } else {
+      Invoke.later(() -> ui(title, note, canCancel, task));
+    }
   }
 
   private Window activeWindow;

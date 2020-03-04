@@ -77,7 +77,7 @@ public interface LineSegment extends LineString {
       return addEndPointIntersection(coordinates, intersectionCount, axisCount, segment1,
         vertexIndex, segment2, 1);
     } else {
-      final double distance = segment2.distance(x, y);
+      final double distance = segment2.distancePoint(x, y);
       final double maxDistance = segment1.getGeometryFactory().getResolution(0);
       if (distance == 0 || distance < maxDistance) {
         final double x1 = segment2.getX(0);
@@ -233,6 +233,10 @@ public interface LineSegment extends LineString {
     final GeometryFactory factory = getGeometryFactory();
     if (geometryFactory == factory) {
       return (V)this;
+    } else if (geometryFactory.isSameCoordinateSystem(factory)) {
+      final int axisCount = geometryFactory.getAxisCount();
+      final double[] coordinates = getCoordinates(axisCount);
+      return (V)new LineSegmentDoubleGF(geometryFactory, axisCount, coordinates);
     } else {
       final Point point1 = getPoint(0).convertGeometry(geometryFactory);
       final Point point2 = getPoint(1).convertGeometry(geometryFactory);
@@ -241,7 +245,7 @@ public interface LineSegment extends LineString {
   }
 
   @Override
-  default double distance(final double x, final double y) {
+  default double distancePoint(final double x, final double y) {
     final double x1 = getX(0);
     final double y1 = getY(0);
     final double x2 = getX(1);
@@ -277,7 +281,7 @@ public interface LineSegment extends LineString {
    * @return the distance from this segment to the given point
    */
   @Override
-  default double distance(final double x, final double y, final double terminateDistance) {
+  default double distancePoint(final double x, final double y, final double terminateDistance) {
     final double x1 = getX(0);
     final double y1 = getY(0);
     final double x2 = getX(1);

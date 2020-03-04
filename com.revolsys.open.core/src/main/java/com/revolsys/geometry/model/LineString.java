@@ -334,104 +334,6 @@ public interface LineString extends Lineal {
     }
   }
 
-  @Override
-  default double distance(final double x, final double y) {
-    return distance(x, y, 0);
-  }
-
-  @Override
-  default double distance(final double x, final double y, final double terminateDistance) {
-    if (isEmpty()) {
-      return Double.POSITIVE_INFINITY;
-    } else {
-      double minDistance = Double.POSITIVE_INFINITY;
-      double x1 = getX(0);
-      double y1 = getY(0);
-      final int vertexCount = getVertexCount();
-      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
-        final double x2 = getX(vertexIndex);
-        final double y2 = getY(vertexIndex);
-        final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
-        if (distance < minDistance) {
-          minDistance = distance;
-          if (minDistance == terminateDistance) {
-            return minDistance;
-          }
-        }
-        x1 = x2;
-        y1 = y2;
-      }
-      return minDistance;
-    }
-  }
-
-  @Override
-  default double distance(final Geometry geometry, final double terminateDistance) {
-    if (geometry instanceof Point) {
-      final Point point = (Point)geometry;
-      return distance(point, terminateDistance);
-    } else if (geometry instanceof LineString) {
-      final LineString line = (LineString)geometry;
-      return distance(line, terminateDistance);
-    } else {
-      return geometry.distance(this, terminateDistance);
-    }
-  }
-
-  default double distance(final LineString line, final double terminateDistance) {
-    if (isEmpty()) {
-      return Double.POSITIVE_INFINITY;
-    } else if (Property.isEmpty(line)) {
-      return Double.POSITIVE_INFINITY;
-    } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      double minDistance = Double.POSITIVE_INFINITY;
-      final int vertexCount1 = getVertexCount();
-      final int vertexCount2 = line.getVertexCount();
-      final CoordinatesOperation coordinatesOperation = getGeometryFactory()
-        .getCoordinatesOperation(geometryFactory);
-      double line2x1 = line.getX(0);
-      double line2y1 = line.getY(0);
-      CoordinatesOperationPoint point = null;
-      if (coordinatesOperation != null) {
-        point = new CoordinatesOperationPoint(line2x1, line2y1);
-        coordinatesOperation.perform(point);
-        line2x1 = point.x;
-        line2y1 = point.y;
-      }
-      for (int vertexIndex2 = 1; vertexIndex2 < vertexCount2; vertexIndex2++) {
-        double line2x2 = line.getX(vertexIndex2);
-        double line2y2 = line.getY(vertexIndex2);
-        if (coordinatesOperation != null) {
-          point.setPoint(line2x2, line2y2);
-          coordinatesOperation.perform(point);
-          line2x2 = point.x;
-          line2y2 = point.y;
-        }
-        double line1x1 = getX(0);
-        double line1y1 = getY(0);
-        for (int vertexIndex1 = 1; vertexIndex1 < vertexCount1; vertexIndex1++) {
-          final double line1x2 = getX(vertexIndex1);
-          final double line1y2 = getY(vertexIndex1);
-
-          final double distance = LineSegmentUtil.distanceLineLine(line1x1, line1y1, line1x2,
-            line1y2, line2x1, line2y1, line2x2, line2y2);
-          if (distance < minDistance) {
-            minDistance = distance;
-            if (minDistance <= terminateDistance) {
-              return minDistance;
-            }
-          }
-          line1x1 = line1x2;
-          line1y1 = line1y2;
-        }
-        line2x1 = line2x2;
-        line2y1 = line2y2;
-      }
-      return minDistance;
-    }
-  }
-
   default double distanceAlong(final Point point) {
     if (isEmpty() && point.isEmpty()) {
       return Double.MAX_VALUE;
@@ -486,6 +388,137 @@ public interface LineString extends Lineal {
         }
       }
       return distanceAlong;
+    }
+  }
+
+  @Override
+  default double distanceGeometry(final Geometry geometry, final double terminateDistance) {
+    if (geometry instanceof Point) {
+      final Point point = (Point)geometry;
+      return distancePoint(point, terminateDistance);
+    } else if (geometry instanceof LineString) {
+      final LineString line = (LineString)geometry;
+      return distanceLine(line, terminateDistance);
+    } else {
+      return geometry.distanceGeometry(this, terminateDistance);
+    }
+  }
+
+  @Override
+  default double distanceLine(final LineString line) {
+    return distanceLine(line, 0);
+  }
+
+  default double distanceLine(final LineString line, final double terminateDistance) {
+    if (line == null || isEmpty() || line.isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else if (isSameCoordinateSystem(line)) {
+      double minDistance = Double.POSITIVE_INFINITY;
+      final int vertexCount1 = getVertexCount();
+      final int vertexCount2 = line.getVertexCount();
+      double line2x1 = line.getX(0);
+      double line2y1 = line.getY(0);
+      for (int vertexIndex2 = 1; vertexIndex2 < vertexCount2; vertexIndex2++) {
+        final double line2x2 = line.getX(vertexIndex2);
+        final double line2y2 = line.getY(vertexIndex2);
+        double line1x1 = getX(0);
+        double line1y1 = getY(0);
+        for (int vertexIndex1 = 1; vertexIndex1 < vertexCount1; vertexIndex1++) {
+          final double line1x2 = getX(vertexIndex1);
+          final double line1y2 = getY(vertexIndex1);
+
+          final double distance = LineSegmentUtil.distanceLineLine(line1x1, line1y1, line1x2,
+            line1y2, line2x1, line2y1, line2x2, line2y2);
+          if (distance < minDistance) {
+            minDistance = distance;
+            if (minDistance <= terminateDistance) {
+              return minDistance;
+            }
+          }
+          line1x1 = line1x2;
+          line1y1 = line1y2;
+        }
+        line2x1 = line2x2;
+        line2y1 = line2y2;
+      }
+      return minDistance;
+    } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      double minDistance = Double.POSITIVE_INFINITY;
+      final int vertexCount1 = getVertexCount();
+      final int vertexCount2 = line.getVertexCount();
+      final CoordinatesOperation coordinatesOperation = getGeometryFactory()
+        .getCoordinatesOperation(geometryFactory);
+      double line2x1 = line.getX(0);
+      double line2y1 = line.getY(0);
+      CoordinatesOperationPoint point = null;
+      if (coordinatesOperation != null) {
+        point = new CoordinatesOperationPoint(line2x1, line2y1);
+        coordinatesOperation.perform(point);
+        line2x1 = point.x;
+        line2y1 = point.y;
+      }
+      for (int vertexIndex2 = 1; vertexIndex2 < vertexCount2; vertexIndex2++) {
+        double line2x2 = line.getX(vertexIndex2);
+        double line2y2 = line.getY(vertexIndex2);
+        if (coordinatesOperation != null) {
+          point.setPoint(line2x2, line2y2);
+          coordinatesOperation.perform(point);
+          line2x2 = point.x;
+          line2y2 = point.y;
+        }
+        double line1x1 = getX(0);
+        double line1y1 = getY(0);
+        for (int vertexIndex1 = 1; vertexIndex1 < vertexCount1; vertexIndex1++) {
+          final double line1x2 = getX(vertexIndex1);
+          final double line1y2 = getY(vertexIndex1);
+
+          final double distance = LineSegmentUtil.distanceLineLine(line1x1, line1y1, line1x2,
+            line1y2, line2x1, line2y1, line2x2, line2y2);
+          if (distance < minDistance) {
+            minDistance = distance;
+            if (minDistance <= terminateDistance) {
+              return minDistance;
+            }
+          }
+          line1x1 = line1x2;
+          line1y1 = line1y2;
+        }
+        line2x1 = line2x2;
+        line2y1 = line2y2;
+      }
+      return minDistance;
+    }
+  }
+
+  @Override
+  default double distancePoint(final double x, final double y) {
+    return distancePoint(x, y, 0);
+  }
+
+  @Override
+  default double distancePoint(final double x, final double y, final double terminateDistance) {
+    if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else {
+      double minDistance = Double.POSITIVE_INFINITY;
+      double x1 = getX(0);
+      double y1 = getY(0);
+      final int vertexCount = getVertexCount();
+      for (int vertexIndex = 1; vertexIndex < vertexCount; vertexIndex++) {
+        final double x2 = getX(vertexIndex);
+        final double y2 = getY(vertexIndex);
+        final double distance = LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
+        if (distance < minDistance) {
+          minDistance = distance;
+          if (minDistance == terminateDistance) {
+            return minDistance;
+          }
+        }
+        x1 = x2;
+        y1 = y2;
+      }
+      return minDistance;
     }
   }
 
@@ -2337,10 +2370,9 @@ public interface LineString extends Lineal {
 
   default LineString subLine(final LineStringLocation fromLocation,
     final LineStringLocation toLocation) {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    final LineStringEditor lineBuilder = new LineStringEditor(geometryFactory);
 
     int vertexIndexFrom;
+    Point fromPoint = null;
     if (fromLocation == null || fromLocation.getLine() != this) {
       vertexIndexFrom = 0;
     } else {
@@ -2349,28 +2381,29 @@ public interface LineString extends Lineal {
         vertexIndexFrom += 1;
       }
       if (!fromLocation.isVertex()) {
-        final Point point = fromLocation.getPoint();
-        lineBuilder.appendVertex(point, false);
+        fromPoint = fromLocation.getPoint();
       }
     }
 
-    Point toPoint;
+    Point toPoint = null;
     int vertexIndexTo;
     if (toLocation == null) {
       vertexIndexTo = getVertexCount() - 1;
-      toPoint = null;
     } else {
       vertexIndexTo = toLocation.getSegmentIndex();
       if (toLocation.getSegmentFraction() >= 1.0) {
         vertexIndexTo += 1;
       }
-      if (toLocation.isVertex()) {
-        toPoint = null;
-      } else {
+      if (!toLocation.isVertex()) {
         toPoint = toLocation.getPoint();
       }
     }
+    final GeometryFactory geometryFactory = getGeometryFactory();
+    final LineStringEditor lineBuilder = new LineStringEditor(geometryFactory);
 
+    if (fromPoint != null) {
+      lineBuilder.appendVertex(fromPoint, false);
+    }
     for (int vertexIndex = vertexIndexFrom; vertexIndex <= vertexIndexTo; vertexIndex++) {
       final Point point = getPoint(vertexIndex);
       lineBuilder.appendVertex(point, false);

@@ -2,7 +2,6 @@ package com.revolsys.geometry.index.quadtree;
 
 import java.util.List;
 
-import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.Point;
@@ -14,16 +13,9 @@ public class GeometrySegmentQuadTree extends IdObjectQuadTree<Segment> {
 
   private static final long serialVersionUID = 1L;
 
-  private static final WeakKeyValueMap<Geometry, GeometrySegmentQuadTree> CACHE = new WeakKeyValueMap<>();
-
   public static GeometrySegmentQuadTree get(final Geometry geometry) {
     if (Property.hasValue(geometry)) {
-      GeometrySegmentQuadTree index = CACHE.get(geometry);
-      if (index == null) {
-        index = new GeometrySegmentQuadTree(geometry);
-        CACHE.put(geometry, index);
-      }
-      return index;
+      return new GeometrySegmentQuadTree(geometry);
     } else {
       return null;
     }

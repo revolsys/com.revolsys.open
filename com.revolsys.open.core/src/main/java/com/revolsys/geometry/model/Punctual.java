@@ -84,7 +84,7 @@ public interface Punctual extends Geometry {
         if (vertex.equalsVertex(x, y)) {
           return new Pair<>(vertex, 0.0);
         } else {
-          final double fromDistance = vertex.distance(x, y);
+          final double fromDistance = vertex.distancePoint(x, y);
           if (fromDistance <= maxDistance) {
             if (fromDistance < closestDistance) {
               closestDistance = fromDistance;
@@ -125,7 +125,7 @@ public interface Punctual extends Geometry {
       double minDistance = Double.MAX_VALUE;
       Point interiorPoint = null;
       for (final Point point : points()) {
-        final double distance = point.distance(centroidX, centroidY);
+        final double distance = point.distancePoint(centroidX, centroidY);
         if (distance < minDistance) {
           interiorPoint = point;
           minDistance = distance;

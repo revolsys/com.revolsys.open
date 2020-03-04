@@ -458,24 +458,54 @@ public class RectangleUtil {
 
   public static boolean intersectsMinMax(final double p1X, final double p1Y, final double p2X,
     final double p2Y, final double q1X, final double q1Y, final double q2X, final double q2Y) {
-    double minp = Math.min(p1X, p2X);
-    double maxq = Math.max(q1X, q2X);
-    if (minp > maxq) {
+    double minPX;
+    double maxPX;
+    if (p1X < p2X) {
+      minPX = p1X;
+      maxPX = p2X;
+    } else {
+      minPX = p2X;
+      maxPX = p1X;
+    }
+    double minQX;
+    double maxQX;
+    if (q1X < q2X) {
+      minQX = q1X;
+      maxQX = q2X;
+    } else {
+      minQX = q2X;
+      maxQX = q1X;
+    }
+
+    if (minPX > maxQX) {
       return false;
     } else {
-      double minq = Math.min(q1X, q2X);
-      double maxp = Math.max(p1X, p2X);
-      if (maxp < minq) {
+      if (maxPX < minQX) {
         return false;
       } else {
-        minp = Math.min(p1Y, p2Y);
-        maxq = Math.max(q1Y, q2Y);
-        if (minp > maxq) {
+        double minPY;
+        double maxPY;
+        if (p1Y < p2Y) {
+          minPY = p1Y;
+          maxPY = p2Y;
+        } else {
+          minPY = p2Y;
+          maxPY = p1Y;
+        }
+        double minQY;
+        double maxQY;
+        if (q1Y < q2Y) {
+          minQY = q1Y;
+          maxQY = q2Y;
+        } else {
+          minQY = q2Y;
+          maxQY = q1Y;
+        }
+
+        if (minPY > maxQY) {
           return false;
         } else {
-          minq = Math.min(q1Y, q2Y);
-          maxp = Math.max(p1Y, p2Y);
-          if (maxp < minq) {
+          if (maxPY < minQY) {
             return false;
           } else {
             return true;

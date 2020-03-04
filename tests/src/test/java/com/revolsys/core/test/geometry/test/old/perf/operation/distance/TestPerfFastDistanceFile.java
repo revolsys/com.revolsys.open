@@ -59,7 +59,7 @@ public class TestPerfFastDistanceFile {
       final Geometry g1 = (Geometry)geoms.get(i);
       final Geometry g2 = (Geometry)geoms.get(j);
 
-      final double dist = g1.distance(g2);
+      final double dist = g1.distanceGeometry(g2);
       // double dist = SortedBoundsFacetDistance.distance(g1, g2);
       // double dist = BranchAndBoundFacetDistance.distance(g1, g2);
     }

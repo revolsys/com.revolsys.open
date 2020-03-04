@@ -125,14 +125,14 @@ public class DistanceTest extends TestCase {
   public void testDisjointCollinearSegments() throws Exception {
     final Geometry g1 = this.geometryFactory.lineString(2, 0.0, 0.0, 9.9, 1.4);
     final Geometry g2 = this.geometryFactory.lineString(2, 11.88, 1.68, 21.78, 3.08);
-    final double distance = g1.distance(g2);
+    final double distance = g1.distanceGeometry(g2);
     assertEquals(1.9996999774966246, distance, 0.0001);
   }
 
   public void testEmpty() throws Exception {
     final Geometry g1 = this.geometryFactory.point(0, 0);
     final Geometry g2 = this.geometryFactory.polygon();
-    assertEquals(0.0, g1.distance(g2), Double.POSITIVE_INFINITY);
+    assertEquals(0.0, g1.distanceGeometry(g2), Double.POSITIVE_INFINITY);
   }
 
   public void testEverything() throws Exception {
@@ -140,16 +140,16 @@ public class DistanceTest extends TestCase {
       "POLYGON ((40 320,200 380,320 80,40 40,40 320), (180 280,80 280,100 100,220 140,180 280))");
     final Geometry g2 = this.geometryFactory
       .geometry("POLYGON ((160 240,120 240,120 160,160 140,160 240))");
-    final double distanceG1G2 = g1.distance(g2);
+    final double distanceG1G2 = g1.distanceGeometry(g2);
     assertEquals(18.97366596, distanceG1G2, 1E-5);
 
     final Geometry g3 = this.geometryFactory
       .geometry("POLYGON ((160 240,120 240,120 160,180 100,160 240))");
-    final double distanceG1G3 = g1.distance(g3);
+    final double distanceG1G3 = g1.distanceGeometry(g3);
     assertEquals(0.0, distanceG1G3, 1E-5);
 
     final LineString l1 = this.geometryFactory.lineString(2, 10.0, 10, 20, 20, 30, 40);
     final LineString l2 = this.geometryFactory.lineString(2, 10.0, 10, 20, 20, 30, 40);
-    assertEquals(0.0, l1.distance(l2), 1E-5);
+    assertEquals(0.0, l1.distanceLine(l2), 1E-5);
   }
 }

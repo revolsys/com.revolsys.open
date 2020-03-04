@@ -71,7 +71,7 @@ public class DistanceFunctions {
   }
 
   public static double distance(final Geometry a, final Geometry b) {
-    return a.distance(b);
+    return a.distanceGeometry(b);
   }
 
   public static boolean isWithinDistance(final Geometry a, final Geometry b, final double dist) {

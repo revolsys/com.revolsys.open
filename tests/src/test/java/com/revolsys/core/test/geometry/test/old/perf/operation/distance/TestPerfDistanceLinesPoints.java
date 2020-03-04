@@ -58,7 +58,7 @@ public class TestPerfDistanceLinesPoints {
         final double dist = bbd.getDistance(pt);
         // double dist = bbd.getDistanceWithin(pts[i].getCoordinate(), 100000);
       } else {
-        final double dist = geom.distance(pt);
+        final double dist = geom.distanceGeometry(pt);
       }
     }
   }

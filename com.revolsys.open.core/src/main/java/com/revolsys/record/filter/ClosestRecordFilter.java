@@ -75,7 +75,7 @@ public class ClosestRecordFilter implements Predicate<Record> {
             return false;
           }
         }
-        final double distance = geometry.distance(this.geometry);
+        final double distance = geometry.distanceGeometry(this.geometry);
         if (distance < this.closestDistance) {
           this.closestDistance = distance;
           this.closestRecord = record;

@@ -142,7 +142,7 @@ public abstract class EdgeRing implements BoundingBoxProxy {
    * Collect all the points from the DirectedEdges of this ring into a contiguous list
    */
   private void computePoints(final DirectedEdge start) {
-    final LineStringEditor points = new LineStringEditor(2, 10);
+    final LineStringEditor points = new LineStringEditor(this.geometryFactory, 10);
     this.startDe = start;
     DirectedEdge de = start;
     boolean isFirstEdge = true;

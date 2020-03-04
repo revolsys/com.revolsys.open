@@ -86,7 +86,7 @@ public class CoordinateTest extends TestCase {
   public void testDistance() {
     final Point coord1 = new PointDouble(0.0, 0.0, 0.0);
     final Point coord2 = new PointDouble(100.0, 200.0, 50.0);
-    final double distance = coord1.distance(coord2);
+    final double distance = coord1.distanceGeometry(coord2);
     assertEquals(distance, 223.60679774997897, 0.00001);
   }
 

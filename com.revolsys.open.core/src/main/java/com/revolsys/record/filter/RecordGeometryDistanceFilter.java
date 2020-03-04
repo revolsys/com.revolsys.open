@@ -66,7 +66,7 @@ public class RecordGeometryDistanceFilter implements Predicate<Record>, Comparat
 
   public double getDistance(final Record record) {
     final Geometry recordGeometry = record.getGeometry();
-    final double distance = recordGeometry.distance(this.geometry);
+    final double distance = recordGeometry.distanceGeometry(this.geometry);
     return distance;
   }
 
@@ -91,7 +91,7 @@ public class RecordGeometryDistanceFilter implements Predicate<Record>, Comparat
   @Override
   public boolean test(final Record record) {
     final Geometry recordGeometry = record.getGeometry();
-    final double distance = recordGeometry.distance(this.geometry, this.maxDistance);
+    final double distance = recordGeometry.distanceGeometry(this.geometry, this.maxDistance);
     if (distance <= this.maxDistance) {
       return true;
     } else {

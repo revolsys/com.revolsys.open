@@ -62,7 +62,7 @@ public class LessThanOrEqualDistanceFilter implements Predicate<Geometry> {
 
   @Override
   public boolean test(final Geometry geometry) {
-    final double distance = geometry.distance(this.geometry);
+    final double distance = geometry.distanceGeometry(this.geometry);
     if (distance <= this.maxDistance) {
       return true;
     } else {

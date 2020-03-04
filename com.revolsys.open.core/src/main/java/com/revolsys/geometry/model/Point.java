@@ -443,31 +443,17 @@ public interface Point extends Punctual, Serializable, BoundingBox {
   }
 
   @Override
-  default double distance(final double x, final double y) {
+  default double distancePoint(final double x, final double y) {
     final double x1 = this.getX();
     final double y1 = this.getY();
     return Points.distance(x1, y1, x, y);
   }
 
   @Override
-  default double distance(final double x, final double y, final double terminateDistance) {
+  default double distancePoint(final double x, final double y, final double terminateDistance) {
     final double x1 = this.getX();
     final double y1 = this.getY();
     return Points.distance(x1, y1, x, y);
-  }
-
-  @Override
-  default double distance(final Geometry geometry, final double terminateDistance) {
-    if (geometry instanceof Point) {
-      final Point point = (Point)geometry;
-      return distancePoint(point);
-    } else if (isEmpty()) {
-      return Double.POSITIVE_INFINITY;
-    } else if (Property.isEmpty(geometry)) {
-      return Double.POSITIVE_INFINITY;
-    } else {
-      return geometry.distance(this, terminateDistance);
-    }
   }
 
   /**
@@ -489,6 +475,20 @@ public interface Point extends Punctual, Serializable, BoundingBox {
     final double dy = y - y2;
     final double dz = z - z2;
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
+
+  @Override
+  default double distanceGeometry(final Geometry geometry, final double terminateDistance) {
+    if (geometry instanceof Point) {
+      final Point point = (Point)geometry;
+      return distancePoint(point);
+    } else if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else if (Property.isEmpty(geometry)) {
+      return Double.POSITIVE_INFINITY;
+    } else {
+      return geometry.distancePoint(this, terminateDistance);
+    }
   }
 
   default double distanceOrigin() {

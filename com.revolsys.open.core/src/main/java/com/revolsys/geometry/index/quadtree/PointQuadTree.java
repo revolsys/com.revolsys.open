@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
-import com.revolsys.collection.map.WeakKeyValueMap;
 import com.revolsys.geometry.index.AbstractPointSpatialIndex;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
@@ -19,22 +18,15 @@ import com.revolsys.util.ExitLoopException;
 import com.revolsys.util.Property;
 
 public class PointQuadTree<T> extends AbstractPointSpatialIndex<T> {
-
-  private static final WeakKeyValueMap<Geometry, PointQuadTree<int[]>> CACHE = new WeakKeyValueMap<>();
-
   public static PointQuadTree<int[]> get(final Geometry geometry) {
     if (Property.hasValue(geometry)) {
-      PointQuadTree<int[]> index = CACHE.get(geometry);
-      if (index == null) {
-        final GeometryFactory geometryFactory = geometry.getGeometryFactory();
-        index = new PointQuadTree<>(geometryFactory);
-        for (final Vertex vertex : geometry.vertices()) {
-          final double x = vertex.getX();
-          final double y = vertex.getY();
-          final int[] vertexId = vertex.getVertexId();
-          index.put(x, y, vertexId);
-        }
-        CACHE.put(geometry, index);
+      final GeometryFactory geometryFactory = geometry.getGeometryFactory();
+      final PointQuadTree<int[]> index = new PointQuadTree<>(geometryFactory);
+      for (final Vertex vertex : geometry.vertices()) {
+        final double x = vertex.getX();
+        final double y = vertex.getY();
+        final int[] vertexId = vertex.getVertexId();
+        index.put(x, y, vertexId);
       }
       return index;
     } else {

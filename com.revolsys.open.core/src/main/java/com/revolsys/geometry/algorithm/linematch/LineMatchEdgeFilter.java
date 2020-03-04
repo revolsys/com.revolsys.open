@@ -110,7 +110,7 @@ public class LineMatchEdgeFilter implements Predicate<Edge<LineSegmentMatch>> {
           return isEitherOppositeNodesWithinDistance(this.edge, edge2, fromNode2, this.tolerance);
         } else if (this.edge.hasNode(toNode2)) {
           return isEitherOppositeNodesWithinDistance(this.edge, edge2, toNode2, this.tolerance);
-        } else if (this.edge.distance(edge2) < this.tolerance) {
+        } else if (this.edge.distanceLine(edge2) < this.tolerance) {
           final double edge2FromNodeDistance = getDistance(edge2, this.fromNode, this.tolerance);
           final double edge2ToNodeDistance = getDistance(edge2, this.toNode, this.tolerance);
 

@@ -155,7 +155,7 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
-  default double distance(final double x, final double y, final double terminateDistance) {
+  default double distancePoint(final double x, final double y, final double terminateDistance) {
     if (isEmpty()) {
       return Double.POSITIVE_INFINITY;
     } else {
@@ -165,7 +165,7 @@ public interface Polygon extends Polygonal {
       } else {
         double minDistance = Double.MAX_VALUE;
         for (final LinearRing ring : rings()) {
-          final double distance = ring.distance(x, y, terminateDistance);
+          final double distance = ring.distancePoint(x, y, terminateDistance);
           if (distance < minDistance) {
             minDistance = distance;
             if (distance <= terminateDistance) {
@@ -179,20 +179,20 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
-  default double distance(final Geometry geometry, final double terminateDistance) {
+  default double distanceGeometry(final Geometry geometry, final double terminateDistance) {
     if (isEmpty()) {
       return Double.POSITIVE_INFINITY;
     } else if (Property.isEmpty(geometry)) {
       return Double.POSITIVE_INFINITY;
     } else if (geometry instanceof Point) {
       final Point point = (Point)geometry;
-      return distance(point, terminateDistance);
+      return distancePoint(point, terminateDistance);
     } else if (geometry instanceof LineString) {
-      return Polygonal.super.distance(geometry, terminateDistance);
+      return Polygonal.super.distanceGeometry(geometry, terminateDistance);
     } else if (geometry instanceof Polygon) {
-      return Polygonal.super.distance(geometry, terminateDistance);
+      return Polygonal.super.distanceGeometry(geometry, terminateDistance);
     } else {
-      return geometry.distance(this, terminateDistance);
+      return geometry.distanceGeometry(this, terminateDistance);
     }
   }
 

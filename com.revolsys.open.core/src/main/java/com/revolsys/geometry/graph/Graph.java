@@ -671,7 +671,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
         .expandDelta(maxDistance);
       final Predicate<Edge<T>> filter = (edge) -> {
         final LineString line = edge.getLineString();
-        final double distance = line.distance(geometry);
+        final double distance = line.distanceGeometry(geometry);
         if (distance <= maxDistance) {
           return true;
         } else {
@@ -716,7 +716,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
       final double y = point.getY();
       final Predicate<Edge<T>> filter = (edge) -> {
         final LineString line = edge.getLineString();
-        final double distance = line.distance(x, y);
+        final double distance = line.distancePoint(x, y);
         if (distance <= maxDistance) {
           return true;
         } else {
@@ -914,7 +914,7 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
       .bboxEditor() //
       .expandDelta(maxDistance);
     final Predicate<Node<T>> distanceFilter = (node) -> {
-      return filter.test(node) && node.distance(geometry) <= maxDistance;
+      return filter.test(node) && node.distanceGeometry(geometry) <= maxDistance;
     };
     return getNodes(boundingBox, distanceFilter, null);
   }

@@ -13,4 +13,13 @@ public class ValueHolder<R> implements ValueWrapper<R> {
   public synchronized R getValue() {
     return this.value;
   }
+
+  @Override
+  public String toString() {
+    if (this.value == null) {
+      return super.toString();
+    } else {
+      return this.value.toString();
+    }
+  }
 }

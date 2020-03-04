@@ -259,7 +259,7 @@ public interface Record
     if (Property.isEmpty(geometry) || Property.isEmpty(recordGeometry)) {
       return Double.NaN;
     } else {
-      final double distance = recordGeometry.distance(geometry);
+      final double distance = recordGeometry.distanceGeometry(geometry);
       return distance;
     }
   }

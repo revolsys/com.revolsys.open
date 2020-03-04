@@ -161,13 +161,13 @@ public interface GeometryCollection extends Geometry {
   }
 
   @Override
-  default double distance(final double x, final double y, final double terminateDistance) {
+  default double distancePoint(final double x, final double y, final double terminateDistance) {
     if (isEmpty()) {
       return Double.POSITIVE_INFINITY;
     } else {
       double minDistance = Double.MAX_VALUE;
       for (final Geometry geometry : geometries()) {
-        final double distance = geometry.distance(x, y);
+        final double distance = geometry.distancePoint(x, y);
         if (distance < minDistance) {
           minDistance = distance;
           if (distance <= terminateDistance) {

@@ -159,7 +159,12 @@ public interface GeometryFactoryProxy extends HorizontalCoordinateSystemProxy {
       return false;
     } else {
       final GeometryFactory geometryFactory = proxy.getGeometryFactory();
-      return isSameCoordinateSystem(geometryFactory);
+      final GeometryFactory geometryFactory2 = getGeometryFactory();
+      if (geometryFactory == null || geometryFactory2 == null) {
+        return false;
+      } else {
+        return geometryFactory.isSameCoordinateSystem(geometryFactory2);
+      }
     }
   }
 

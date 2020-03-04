@@ -302,7 +302,7 @@ class SnapTransformer extends GeometryTransformer {
       // if point is already equal to a src pt, don't snap
       if (snapPt.equalsVertex(x, y)) {
         return null;
-      } else if (snapPt.distance(x, y) < this.snapTolerance) {
+      } else if (snapPt.distancePoint(x, y) < this.snapTolerance) {
         return snapPt;
       }
     }
