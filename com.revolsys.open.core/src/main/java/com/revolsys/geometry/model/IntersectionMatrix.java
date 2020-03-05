@@ -141,6 +141,10 @@ public class IntersectionMatrix implements Cloneable {
    */
   private final Dimension[][] matrix;
 
+  private Dimension dimension1;
+
+  private Dimension dimension2;
+
   /**
    *  Creates an <code>IntersectionMatrix</code> with <code>FALSE</code>
    *  dimension values.
@@ -150,6 +154,12 @@ public class IntersectionMatrix implements Cloneable {
     setAll(Dimension.FALSE);
   }
 
+  public IntersectionMatrix(final Dimension dimension1, final Dimension dimension2) {
+    this();
+    this.dimension1 = dimension1;
+    this.dimension2 = dimension2;
+  }
+
   /**
    *  Creates an <code>IntersectionMatrix</code> with the same elements as
    *  <code>other</code>.
@@ -157,7 +167,7 @@ public class IntersectionMatrix implements Cloneable {
    *@param  other  an <code>IntersectionMatrix</code> to copy
    */
   public IntersectionMatrix(final IntersectionMatrix other) {
-    this();
+    this(other.dimension1, other.dimension2);
     this.matrix[INTERIOR][INTERIOR] = other.matrix[INTERIOR][INTERIOR];
     this.matrix[INTERIOR][BOUNDARY] = other.matrix[INTERIOR][BOUNDARY];
     this.matrix[INTERIOR][EXTERIOR] = other.matrix[INTERIOR][EXTERIOR];
@@ -284,6 +294,33 @@ public class IntersectionMatrix implements Cloneable {
    * JTS extends the definition to apply to L/P, A/P and A/L situations as well.
    * This makes the relation symmetric.
    *
+   *@return                       <code>true</code> if the two <code>Geometry</code>s
+   *      related by this <code>IntersectionMatrix</code> cross.
+   */
+  public boolean isCrosses() {
+    return isCrosses(this.dimension1, this.dimension2);
+  }
+
+  /**
+   * Tests whether this geometry crosses the
+   * specified geometry.
+   * <p>
+   * The <code>crosses</code> predicate has the following equivalent definitions:
+   * <ul>
+   * <li>The geometries have some but not all interior points in common.
+   * <li>The DE-9IM Intersection Matrix for the two geometries is
+   *   <ul>
+   *    <li>T*T****** (for P/L, P/A, and L/A situations)
+   *    <li>T*****T** (for L/P, L/A, and A/L situations)
+   *    <li>0******** (for L/L situations)
+   *   </ul>
+   * </ul>
+   * For any other combination of dimensions this predicate returns <code>false</code>.
+   * <p>
+   * The SFS defined this predicate only for P/L, P/A, L/L, and L/A situations.
+   * JTS extends the definition to apply to L/P, A/P and A/L situations as well.
+   * This makes the relation symmetric.
+   *
    *@param  dimensionOfGeometryA  the dimension of the first <code>Geometry</code>
    *@param  dimensionOfGeometryB  the dimension of the second <code>Geometry</code>
    *@return                       <code>true</code> if the two <code>Geometry</code>s
@@ -355,12 +392,6 @@ public class IntersectionMatrix implements Cloneable {
     return isEquals();
   }
 
-  public boolean isEquals(final Geometry geometry1, final Geometry geometry2) {
-    final Dimension dimension1 = geometry1.getDimension();
-    final Dimension dimension2 = geometry2.getDimension();
-    return isEquals(dimension1, dimension2);
-  }
-
   /**
    *  Returns <code>true</code> if <code>isDisjoint</code> returns false.
    *
@@ -369,6 +400,22 @@ public class IntersectionMatrix implements Cloneable {
    */
   public boolean isIntersects() {
     return !isDisjoint();
+  }
+
+  /**
+   *  Returns <code>true</code> if this <code>IntersectionMatrix</code> is
+   *  <UL>
+   *    <LI> T*T***T** (for two points or two surfaces)
+   *    <LI> 1*T***T** (for two curves)
+   *  </UL>.
+   *
+    *@return                       <code>true</code> if the two <code>Geometry</code>s
+   *      related by this <code>IntersectionMatrix</code> overlap. For this
+   *      function to return <code>true</code>, the <code>Geometry</code>s must
+   *      be two points, two curves or two surfaces.
+   */
+  public boolean isOverlaps() {
+    return isOverlaps(this.dimension1, this.dimension2);
   }
 
   /**
@@ -397,6 +444,18 @@ public class IntersectionMatrix implements Cloneable {
         && isTrue(this.matrix[EXTERIOR][INTERIOR]);
     }
     return false;
+  }
+
+  /**
+   *  Returns <code>true</code> if this <code>IntersectionMatrix</code> is
+   *  FT*******, F**T***** or F***T****.
+   *
+    *@return                       <code>true</code> if the two <code>Geometry</code>
+   *      s related by this <code>IntersectionMatrix</code> touch; Returns false
+   *      if both <code>Geometry</code>s are points.
+   */
+  public boolean isTouches() {
+    return isTouches(this.dimension1, this.dimension2);
   }
 
   /**

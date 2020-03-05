@@ -105,7 +105,9 @@ public class RelateComputer {
   }
 
   public IntersectionMatrix computeIM() {
-    final IntersectionMatrix im = new IntersectionMatrix();
+    final Dimension dimension1 = this.arg[0].getGeometryDimension();
+    final Dimension dimension2 = this.arg[1].getGeometryDimension();
+    final IntersectionMatrix im = new IntersectionMatrix(dimension1, dimension2);
     // since Geometries are finite and embedded in a 2-D space, the EE element
     // must always be 2
     im.set(Location.EXTERIOR, Location.EXTERIOR, Dimension.A);

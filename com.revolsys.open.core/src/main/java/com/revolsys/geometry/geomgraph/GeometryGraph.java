@@ -42,6 +42,7 @@ import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.geomgraph.index.EdgeSetIntersector;
 import com.revolsys.geometry.geomgraph.index.SegmentIntersector;
 import com.revolsys.geometry.geomgraph.index.SimpleMCSweepLineIntersector;
+import com.revolsys.geometry.model.Dimension;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
@@ -331,6 +332,10 @@ public class GeometryGraph extends PlanarGraph {
 
   public Geometry getGeometry() {
     return this.geometry;
+  }
+
+  public Dimension getGeometryDimension() {
+    return this.geometry.getDimension();
   }
 
   public Point getInvalidPoint() {

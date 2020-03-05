@@ -522,6 +522,22 @@ public interface LineString extends Lineal {
     }
   }
 
+  default double distanceVertex(final End end, final Point point) {
+    int index;
+    switch (end) {
+      case FROM:
+        index = 0;
+      break;
+      case TO:
+        index = getLastVertexIndex();
+      break;
+
+      default:
+        return Double.POSITIVE_INFINITY;
+    }
+    return distanceVertex(index, point);
+  }
+
   default double distanceVertex(final int index, final double x, final double y) {
     final double x1 = getX(index);
     final double y1 = getY(index);
@@ -1029,6 +1045,44 @@ public interface LineString extends Lineal {
       return ClockDirection.COUNTER_CLOCKWISE;
     } else {
       return ClockDirection.CLOCKWISE;
+    }
+  }
+
+  default End getClosestEnd(final Point point) {
+    final double x = point.getX();
+    final double y = point.getY();
+
+    final double distanceFrom = distanceVertex(0, x, y);
+    final int lastVertexIndex = getLastVertexIndex();
+    final double distanceTo = distanceVertex(lastVertexIndex, x, y);
+
+    if (distanceFrom <= distanceTo) {
+      return End.FROM;
+    } else {
+      return End.TO;
+    }
+  }
+
+  default End getClosestEnd(final Point point, final double maxDistance) {
+    final double x = point.getX();
+    final double y = point.getY();
+
+    final double distanceFrom = distanceVertex(0, x, y);
+    final int lastVertexIndex = getLastVertexIndex();
+    final double distanceTo = distanceVertex(lastVertexIndex, x, y);
+
+    if (distanceFrom <= distanceTo) {
+      if (distanceFrom <= maxDistance) {
+        return End.FROM;
+      } else {
+        return End.NONE;
+      }
+    } else {
+      if (distanceTo <= maxDistance) {
+        return End.TO;
+      } else {
+        return End.NONE;
+      }
     }
   }
 
@@ -2502,9 +2556,9 @@ public interface LineString extends Lineal {
   default End touchingEnd(final Point point) {
     if (isEmpty() || Property.isEmpty(point)) {
       return null;
-    } else if (equalsVertex(0, point)) {
+    } else if (equalsVertex2d(0, point)) {
       return End.FROM;
-    } else if (equalsVertex(getVertexCount() - 1, point)) {
+    } else if (equalsVertex2d(getLastVertexIndex(), point)) {
       return End.TO;
     } else {
       return null;
