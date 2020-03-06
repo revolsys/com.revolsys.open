@@ -186,7 +186,7 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
         try {
           selectInt("SELECT srs_id from gpkg_spatial_ref_sys where srs_id = ?", coordinateSystemId);
         } catch (final IllegalArgumentException e) {
-          final String sql = "INSERT INTO gpkg_spatial_ref_sys (srs_name, srs_id, organization, organization_coordsys_id, definition, description) VALUES (?,?,?,?,?,?)";
+          final String sql = "INSERT INTO gpkg_spatial_ref_sys (srs_name, srs_id, organization, organization_coordsys_id, definition, description) FROM_TO (?,?,?,?,?,?)";
           final String coordinateSystemName = coordinateSystem.getCoordinateSystemName();
           final String esriWktCs = coordinateSystem.toEsriWktCs();
           executeUpdate(sql, coordinateSystemName, coordinateSystemId, "EPSG", coordinateSystemId,

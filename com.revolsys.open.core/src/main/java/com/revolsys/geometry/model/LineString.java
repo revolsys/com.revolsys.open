@@ -2536,7 +2536,7 @@ public interface LineString extends Lineal {
     if (isEmpty() || Property.isEmpty(line)) {
       return null;
     } else {
-      for (final End end : End.VALUES) {
+      for (final End end : End.FROM_TO) {
         final Point point = line.getPoint(end);
         final End touchingEnd = touchingEnd(point);
         if (touchingEnd != null) {
@@ -2576,7 +2576,7 @@ public interface LineString extends Lineal {
     if (isEmpty() || Property.isEmpty(line)) {
       return null;
     } else {
-      for (final End end : End.VALUES) {
+      for (final End end : End.FROM_TO) {
         final Point point = line.getPoint(end);
         final End touchingEnd = touchingEnd(point);
         if (touchingEnd != null) {

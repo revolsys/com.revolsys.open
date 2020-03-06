@@ -271,7 +271,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
       }
       this.out.print(recordDefinition.getFieldName(i));
     }
-    this.out.print(" ) VALUES (");
+    this.out.print(" ) FROM_TO (");
     for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
       if (i > 0) {
         this.out.print(", ");

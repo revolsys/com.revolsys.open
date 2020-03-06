@@ -182,7 +182,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       final int srid = geometryFactory.getHorizontalCoordinateSystemId();
 
       out.print(
-        "INSERT INTO USER_SDO_GEOM_METADATA(TABLE_NAME, COLUMN_NAME, DIMINFO, SRID) VALUES('");
+        "INSERT INTO USER_SDO_GEOM_METADATA(TABLE_NAME, COLUMN_NAME, DIMINFO, SRID) FROM_TO('");
       out.print(tableName.toUpperCase());
       out.print("','");
       out.print(name.toUpperCase());
@@ -197,7 +197,7 @@ public class OracleDdlWriter extends JdbcDdlWriter {
 
       final int geometryType = OracleSdoGeometryFieldAdder.getGeometryTypeId(dataType, axisCount);
       out.print(
-        "INSERT INTO OGIS_GEOMETRY_COLUMNS(F_TABLE_SCHEMA,F_TABLE_NAME,F_GEOMETRY_COLUMN,G_TABLE_SCHEMA,G_TABLE_NAME,GEOMETRY_TYPE,COORD_DIMENSION,SRID) VALUES ('");
+        "INSERT INTO OGIS_GEOMETRY_COLUMNS(F_TABLE_SCHEMA,F_TABLE_NAME,F_GEOMETRY_COLUMN,G_TABLE_SCHEMA,G_TABLE_NAME,GEOMETRY_TYPE,COORD_DIMENSION,SRID) FROM_TO ('");
       out.print(schemaName.toUpperCase());
       out.print("', '");
       out.print(tableName.toUpperCase());
