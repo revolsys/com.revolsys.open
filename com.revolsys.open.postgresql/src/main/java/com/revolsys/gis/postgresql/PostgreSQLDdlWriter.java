@@ -197,7 +197,7 @@ public class PostgreSQLDdlWriter extends JdbcDdlWriter {
         geometryType = "MULTIPOLYGON";
       }
       out.print(
-        "INSERT INTO geometry_columns(f_table_catalog, f_table_schema, f_table_name, f_geometry_column, coord_dimension, srid, \"type\") FROM_TO ('','");
+        "INSERT INTO geometry_columns(f_table_catalog, f_table_schema, f_table_name, f_geometry_column, coord_dimension, srid, \"type\") VALUES ('','");
       out.print(schemaName.toLowerCase());
       out.print("', '");
       out.print(tableName.toLowerCase());

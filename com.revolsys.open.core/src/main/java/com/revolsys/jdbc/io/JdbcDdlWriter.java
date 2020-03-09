@@ -163,7 +163,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
 
   public void writeCreateTable(final RecordDefinition recordDefinition) {
     final String typePath = recordDefinition.getPath();
-    PrintWriter out = this.out;
+    final PrintWriter out = this.out;
     out.println();
     out.print("CREATE TABLE ");
     writeTableName(typePath);
@@ -210,10 +210,6 @@ public abstract class JdbcDdlWriter implements Cloneable {
         writeCreateSequence(recordDefinition);
       }
     }
-  }
-
-  protected void writePrimaryKeyFieldContstaint(PrintWriter out) {
-    out.print(" PRIMARY KEY");
   }
 
   public void writeCreateView(final String typePath, final String queryTypeName,
@@ -271,7 +267,7 @@ public abstract class JdbcDdlWriter implements Cloneable {
       }
       this.out.print(recordDefinition.getFieldName(i));
     }
-    this.out.print(" ) FROM_TO (");
+    this.out.print(" ) VALUES (");
     for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
       if (i > 0) {
         this.out.print(", ");
@@ -297,6 +293,10 @@ public abstract class JdbcDdlWriter implements Cloneable {
       writeInsert(row);
     }
 
+  }
+
+  protected void writePrimaryKeyFieldContstaint(final PrintWriter out) {
+    out.print(" PRIMARY KEY");
   }
 
   public void writeResetSequence(final RecordDefinition recordDefinition,

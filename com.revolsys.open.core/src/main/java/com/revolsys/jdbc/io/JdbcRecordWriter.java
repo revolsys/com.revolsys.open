@@ -358,7 +358,7 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
         }
       }
 
-      sqlBuffer.append(") FROM_TO (");
+      sqlBuffer.append(") VALUES (");
       first = true;
       for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
         final boolean idField = fieldDefinition.isIdField();

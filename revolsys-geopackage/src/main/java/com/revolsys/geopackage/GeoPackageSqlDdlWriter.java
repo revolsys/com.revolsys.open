@@ -57,7 +57,7 @@ public class GeoPackageSqlDdlWriter extends JdbcDdlWriter {
     }
 
     string.append(
-      "INSERT INTO gpkg_contents (table_name, data_type, identifier, description, last_change, min_x, min_y, max_x, max_y, srs_id) FROM_TO ('");
+      "INSERT INTO gpkg_contents (table_name, data_type, identifier, description, last_change, min_x, min_y, max_x, max_y, srs_id) VALUES ('");
     string.append(tableName);
     string.append("','");
     string.append(tableType);
@@ -130,7 +130,7 @@ public class GeoPackageSqlDdlWriter extends JdbcDdlWriter {
       geometryType = "MULTIPOLYGON";
     }
     string.append(
-      "INSERT INTO gpkg_geometry_columns (table_name, column_name, geometry_type_name, srs_id, z, m) FROM_TO ('");
+      "INSERT INTO gpkg_geometry_columns (table_name, column_name, geometry_type_name, srs_id, z, m) VALUES ('");
     string.append(tableName);
     string.append("','");
     string.append(fieldName);
