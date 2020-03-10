@@ -203,12 +203,12 @@ public class HotPixel extends PointDoubleXY {
     boolean intersectsLeft = false;
     boolean intersectsBottom = false;
 
-    this.li.computeIntersection(x1, y1, x2, y2, this.maxx, this.maxy, this.minx, this.maxy);
+    this.li.computeIntersectionLine(x1, y1, x2, y2, this.maxx, this.maxy, this.minx, this.maxy);
     if (this.li.isProper()) {
       return true;
     }
 
-    this.li.computeIntersection(x1, y1, x2, y2, this.minx, this.maxy, this.minx, this.miny);
+    this.li.computeIntersectionLine(x1, y1, x2, y2, this.minx, this.maxy, this.minx, this.miny);
     if (this.li.isProper()) {
       return true;
     }
@@ -216,7 +216,7 @@ public class HotPixel extends PointDoubleXY {
       intersectsLeft = true;
     }
 
-    this.li.computeIntersection(x1, y1, x2, y2, this.minx, this.miny, this.maxx, this.miny);
+    this.li.computeIntersectionLine(x1, y1, x2, y2, this.minx, this.miny, this.maxx, this.miny);
     if (this.li.isProper()) {
       return true;
     }
@@ -224,7 +224,7 @@ public class HotPixel extends PointDoubleXY {
       intersectsBottom = true;
     }
 
-    this.li.computeIntersection(x1, y1, x2, y2, this.maxx, this.miny, this.maxx, this.maxy);
+    this.li.computeIntersectionLine(x1, y1, x2, y2, this.maxx, this.miny, this.maxx, this.maxy);
     if (this.li.isProper()) {
       return true;
     }

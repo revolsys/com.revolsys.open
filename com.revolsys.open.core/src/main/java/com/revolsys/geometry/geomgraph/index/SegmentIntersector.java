@@ -94,7 +94,7 @@ public class SegmentIntersector {
       this.numTests++;
 
       final LineIntersector lineIntersector = this.lineIntersector;
-      lineIntersector.computeIntersection(fromX1, fromY1, toX1, toY1, fromX2, fromY2, toX2, toY2);
+      lineIntersector.computeIntersectionLine(fromX1, fromY1, toX1, toY1, fromX2, fromY2, toX2, toY2);
       /**
        *  Always record any non-proper intersections.
        *  If includeProper is true, record any proper intersections as well.
@@ -164,7 +164,7 @@ public class SegmentIntersector {
       final double line2y2 = line2.getY(segIndex1 + 1);
 
       final LineIntersector lineIntersector = this.lineIntersector;
-      lineIntersector.computeIntersection(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
+      lineIntersector.computeIntersectionLine(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
         line2x2, line2y2);
       /**
        *  Always record any non-proper intersections.

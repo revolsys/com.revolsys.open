@@ -32,14 +32,11 @@
  */
 package com.revolsys.geometry.noding;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.index.chain.MonotoneChain;
-import com.revolsys.geometry.index.chain.MonotoneChainBuilder;
-import com.revolsys.geometry.index.chain.MonotoneChainOverlapAction;
 import com.revolsys.geometry.index.strtree.StrTree;
 
 /**
@@ -52,28 +49,13 @@ import com.revolsys.geometry.index.strtree.StrTree;
  * @version 1.7
  */
 public class MCIndexNoder extends SinglePassNoder {
-  public class SegmentOverlapAction extends MonotoneChainOverlapAction {
-    private SegmentIntersector si = null;
-
-    public SegmentOverlapAction(final SegmentIntersector si) {
-      this.si = si;
-    }
-
-    @Override
-    public void overlap(final MonotoneChain mc1, final int start1, final MonotoneChain mc2,
-      final int start2) {
-      final SegmentString ss1 = (SegmentString)mc1.getContext();
-      final SegmentString ss2 = (SegmentString)mc2.getContext();
-      this.si.processIntersections(ss1, start1, ss2, start2);
-    }
-
-  }
+  private final MonotoneChain[] EMPTY = new MonotoneChain[0];
 
   private int idCounter = 0;
 
   private final MonotoneChainIndex index = new MonotoneChainIndex();
 
-  private final List<MonotoneChain> monoChains = new ArrayList<>();
+  public MonotoneChain[] monoChains = this.EMPTY;
 
   private Collection<NodedSegmentString> nodedSegStrings;
 
@@ -85,12 +67,18 @@ public class MCIndexNoder extends SinglePassNoder {
   }
 
   private void add(final SegmentString segStr) {
-    final List<MonotoneChain> segChains = MonotoneChainBuilder.getChains(segStr.getLineString(),
-      segStr);
-    for (final MonotoneChain chain : segChains) {
-      chain.setId(this.idCounter++);
-      this.index.insertItem(chain);
-      this.monoChains.add(chain);
+    final MonotoneChain[] addChains = MonotoneChain.getChainsArray(segStr.getLineString(), segStr);
+    final int addLength = addChains.length;
+    if (addLength > 0) {
+      final int oldLength = this.monoChains.length;
+      final MonotoneChain[] newChains = new MonotoneChain[oldLength + addLength];
+      System.arraycopy(this.monoChains, 0, newChains, 0, oldLength);
+      System.arraycopy(addChains, 0, newChains, oldLength, addLength);
+      this.monoChains = newChains;
+      for (final MonotoneChain chain : addChains) {
+        chain.setId(this.idCounter++);
+        this.index.insertItem(chain);
+      }
     }
   }
 
@@ -107,27 +95,21 @@ public class MCIndexNoder extends SinglePassNoder {
     return this.index;
   }
 
-  public List<MonotoneChain> getMonotoneChains() {
-    return this.monoChains;
-  }
-
   @Override
   public Collection<NodedSegmentString> getNodedSubstrings() {
     return NodedSegmentString.getNodedSubstrings(this.nodedSegStrings);
   }
 
   private void intersectChains() {
-    final MonotoneChainOverlapAction overlapAction = new SegmentOverlapAction(this.segInt);
-
     for (final MonotoneChain queryChain : this.monoChains) {
-      final List<MonotoneChain> overlapChains = this.index.getItems(queryChain.getEnvelope());
+      final List<MonotoneChain> overlapChains = this.index.getItems(queryChain);
       for (final MonotoneChain testChain : overlapChains) {
         /**
          * following test makes sure we only compare each pair of chains once
          * and that we don't compare a chain to itself
          */
         if (testChain.getId() > queryChain.getId()) {
-          queryChain.computeOverlaps(testChain, overlapAction);
+          queryChain.computeOverlaps(testChain, this.segInt);
         }
         // short-circuit if possible
         if (this.segInt.isDone()) {

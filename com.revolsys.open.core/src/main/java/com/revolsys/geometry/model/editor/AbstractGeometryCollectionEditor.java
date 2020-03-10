@@ -341,8 +341,7 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
         return true;
       }
     }
-    // TODO adding parts
-    return false;
+    return super.isModified();
   }
 
   @Override
@@ -386,6 +385,11 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
   }
 
   public abstract <NGE extends Geometry> NGE newGeometryEmpty();
+
+  public void removeGeometry(final int index) {
+    this.editors.remove(index);
+    setModified(true);
+  }
 
   @Override
   public void revertChanges() {

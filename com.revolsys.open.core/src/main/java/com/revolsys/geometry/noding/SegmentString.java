@@ -41,7 +41,21 @@ import com.revolsys.geometry.model.LineString;
  *
  * @version 1.7
  */
-public interface SegmentString extends LineString {
+public interface SegmentString {
+  default boolean equalsVertex2d(final int vertexIndex1, final int vertexIndex2) {
+    final LineString line = getLineString();
+    final double x1 = line.getX(vertexIndex1);
+    final double x2 = line.getX(vertexIndex2);
+    if (x1 == x2) {
+      final double y1 = line.getY(vertexIndex1);
+      final double y2 = line.getY(vertexIndex2);
+      if (y1 == y2) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
   * Gets the user-defined data for this segment string.
   *
@@ -50,6 +64,8 @@ public interface SegmentString extends LineString {
   Object getData();
 
   LineString getLineString();
+
+  boolean isClosed();
 
   /**
    * Sets the user-defined data for this segment string.

@@ -157,6 +157,11 @@ public interface Punctual extends Geometry {
     return getCoordinate(partIndex, Z);
   }
 
+  @Override
+  default boolean hasGeometryType(final GeometryDataType<?, ?> dataType) {
+    return GeometryDataTypes.POINT == dataType;
+  }
+
   default boolean hasPoint(final double x, final double y) {
     return false;
   }

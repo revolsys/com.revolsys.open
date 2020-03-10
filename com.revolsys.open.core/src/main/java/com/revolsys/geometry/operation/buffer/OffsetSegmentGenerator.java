@@ -184,7 +184,7 @@ class OffsetSegmentGenerator {
      * but the situation of exact collinearity should be fairly rare.
      */
 
-    this.li.computeIntersection(this.s0X, this.s0Y, this.s1X, this.s1Y, this.s1X, this.s1Y,
+    this.li.computeIntersectionLine(this.s0X, this.s0Y, this.s1X, this.s1Y, this.s1X, this.s1Y,
       this.s2X, this.s2Y);
     final int intersectionCount = this.li.getIntersectionCount();
     /**
@@ -297,7 +297,7 @@ class OffsetSegmentGenerator {
     /**
      * add intersection point of offset segments (if any)
      */
-    this.li.computeIntersection(x00, y00, x01, y01, x10, y10, x11, y11);
+    this.li.computeIntersectionLine(x00, y00, x01, y01, x10, y10, x11, y11);
     if (this.li.hasIntersection()) {
       final Point intersection = this.li.getIntersection(0);
       final double intersectionX = intersection.getX();

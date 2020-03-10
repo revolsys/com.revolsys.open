@@ -103,6 +103,10 @@ import tech.units.indriya.unit.Units;
  * @version 1.7
  */
 public interface LineString extends Lineal {
+  static LineString empty() {
+    return GeometryFactory.DEFAULT_2D.lineString();
+  }
+
   /**
    * Code taken from DRA FME scripts to calculate angles.
    *
@@ -1438,10 +1442,13 @@ public interface LineString extends Lineal {
   }
 
   default Point getPoint(final End lineEnd) {
-    if (End.isFrom(lineEnd)) {
-      return getFromPoint();
+    if (lineEnd == End.FROM) {
+      return getPoint(0);
+    } else if (lineEnd == End.TO) {
+      final int lastVertexIndex = getLastVertexIndex();
+      return getPoint(lastVertexIndex);
     } else {
-      return getToPoint();
+      return getGeometryFactory().point();
     }
   }
 
@@ -1672,6 +1679,25 @@ public interface LineString extends Lineal {
     return getCoordinate(vertexIndex, Z);
   }
 
+  default boolean hasDuplicatePoints() {
+    final int vertexCount = getVertexCount();
+    if (vertexCount > 1) {
+      double previousX = getX(0);
+      double previousY = getY(0);
+      for (int i = 1; i < vertexCount; i++) {
+        final double x = getX(i);
+        final double y = getY(i);
+        if (x == previousX && y == previousY) {
+          return true;
+        }
+        previousX = x;
+        previousY = y;
+      }
+
+    }
+    return false;
+  }
+
   @Override
   default boolean hasInvalidXyCoordinates() {
     final int vertexCount = getVertexCount();
@@ -1893,7 +1919,7 @@ public interface LineString extends Lineal {
     for (int i = 1; i < vertexCount; i++) {
       final double x2 = getX(i);
       final double y2 = getY(i);
-      if (lineIntersector.computeIntersection(x, y, x1, y1, x2, y2)) {
+      if (lineIntersector.computeIntersectionPoint(x1, y1, x2, y2, x, y)) {
         return true;
       } else {
         x1 = x2;
@@ -2229,36 +2255,33 @@ public interface LineString extends Lineal {
 
   @Override
   default LineString removeDuplicatePoints() {
-    if (isEmpty()) {
+    final int vertexCount = getVertexCount();
+    if (vertexCount < 2) {
       return this;
-    } else {
-      final int vertexCount = getVertexCount();
-      if (vertexCount < 2) {
-        return this;
-      } else {
-        final int axisCount = getAxisCount();
-        final double[] coordinates = new double[vertexCount * axisCount];
-        double previousX = getX(0);
-        double previousY = getY(0);
-        CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, this, 0);
-        int j = 1;
-        for (int i = 1; i < vertexCount; i++) {
-          final double x = getX(i);
-          final double y = getY(i);
-          if (x != previousX || y != previousY) {
-            CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++, this, i);
-          }
-          previousX = x;
-          previousY = y;
+    } else if (hasDuplicatePoints()) {
+      final int axisCount = getAxisCount();
+      final double[] coordinates = new double[vertexCount * axisCount];
+      double previousX = getX(0);
+      double previousY = getY(0);
+      CoordinatesListUtil.setCoordinates(coordinates, axisCount, 0, this, 0);
+      int j = 1;
+      for (int i = 1; i < vertexCount; i++) {
+        final double x = getX(i);
+        final double y = getY(i);
+        if (x != previousX || y != previousY) {
+          CoordinatesListUtil.setCoordinates(coordinates, axisCount, j++, this, i);
         }
+        previousX = x;
+        previousY = y;
+      }
 
-        if (j < 2) {
-          return newLineStringEmpty();
-        } else {
-          return newLineString(j, coordinates);
-        }
+      if (j < 2) {
+        return newLineStringEmpty();
+      } else {
+        return newLineString(j, coordinates);
       }
     }
+    return this;
   }
 
   /**

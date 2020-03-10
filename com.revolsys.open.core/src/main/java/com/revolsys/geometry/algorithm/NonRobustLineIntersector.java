@@ -206,8 +206,8 @@ public class NonRobustLineIntersector extends LineIntersector {
   }
 
   @Override
-  public boolean computeIntersection(final double x, final double y, final double x1,
-    final double y1, final double x2, final double y2) {
+  public boolean computeIntersectionPoint(final double x1, final double y1, final double x2,
+    final double y2, final double x, final double y) {
     this.isProper = false;
 
     /*
@@ -246,7 +246,7 @@ public class NonRobustLineIntersector extends LineIntersector {
   }
 
   @Override
-  public boolean computeIntersection(final double line1x1, final double line1y1,
+  public boolean computeIntersectionLine(final double line1x1, final double line1y1,
     final double line1x2, final double line1y2, final double line2x1, final double line2y1,
     final double line2x2, final double line2y2) {
     this.line1x1 = line1x1;

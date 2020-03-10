@@ -154,10 +154,10 @@ public abstract class LineIntersector {
    * The actual value of the intersection (if there is one)
    * is equal to the value of <code>p</code>.
    */
-  public abstract boolean computeIntersection(double x, double y, double x1, double y1, double x2,
-    double y2);
+  public abstract boolean computeIntersectionPoint(double x1, double y1, double x2, double y2, double x,
+    double y);
 
-  public abstract boolean computeIntersection(final double line1x1, final double line1y1,
+  public abstract boolean computeIntersectionLine(final double line1x1, final double line1y1,
     final double line1x2, final double line1y2, final double line2x1, final double line2y1,
     final double line2x2, final double line2y2);
 
@@ -176,7 +176,7 @@ public abstract class LineIntersector {
     final double y3 = p3.getY();
     final double x4 = p4.getX();
     final double y4 = p4.getY();
-    return computeIntersection(x1, y1, x2, y2, x3, y3, x4, y4);
+    return computeIntersectionLine(x1, y1, x2, y2, x3, y3, x4, y4);
   }
 
   public boolean equalsIntersection(final int intersectionIndex, final double x, final double y) {

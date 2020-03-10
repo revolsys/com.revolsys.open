@@ -291,6 +291,16 @@ public class GeometryCollectionImpl implements GeometryCollection {
     return segmentCount;
   }
 
+  @Override
+  public boolean hasGeometryType(final GeometryDataType<?, ?> dataType) {
+    for (final Geometry geometry : this.geometries) {
+      if (geometry.hasGeometryType(dataType)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * Gets a hash code for the Geometry.
    *

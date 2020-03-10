@@ -33,6 +33,7 @@
 package com.revolsys.geometry.noding;
 
 import com.revolsys.geometry.algorithm.LineIntersector;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 
 /**
@@ -170,16 +171,19 @@ public class IntersectionAdder implements SegmentIntersector {
       return;
     }
     this.numTests++;
-    final double line1x1 = e0.getX(segIndex0);
-    final double line1y1 = e0.getY(segIndex0);
-    final double line1x2 = e0.getX(segIndex0 + 1);
-    final double line1y2 = e0.getY(segIndex0 + 1);
-    final double line2x1 = e1.getX(segIndex1);
-    final double line2y1 = e1.getY(segIndex1);
-    final double line2x2 = e1.getX(segIndex1 + 1);
-    final double line2y2 = e1.getY(segIndex1 + 1);
+    final LineString line1 = e0.getLineString();
+    final double line1x1 = line1.getX(segIndex0);
+    final double line1y1 = line1.getY(segIndex0);
+    final double line1x2 = line1.getX(segIndex0 + 1);
+    final double line1y2 = line1.getY(segIndex0 + 1);
 
-    this.li.computeIntersection(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1, line2x2,
+    final LineString line2 = e1.getLineString();
+    final double line2x1 = line2.getX(segIndex1);
+    final double line2y1 = line2.getY(segIndex1);
+    final double line2x2 = line2.getX(segIndex1 + 1);
+    final double line2y2 = line2.getY(segIndex1 + 1);
+
+    this.li.computeIntersectionLine(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1, line2x2,
       line2y2);
     // if (li.hasIntersection() && li.isProper()) Debug.println(li);
     if (this.li.hasIntersection()) {

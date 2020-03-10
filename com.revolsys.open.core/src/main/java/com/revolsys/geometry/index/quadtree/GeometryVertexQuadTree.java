@@ -74,7 +74,7 @@ public class GeometryVertexQuadTree extends IdObjectQuadTree<Vertex> {
     } else {
       final double x = vertex.getX();
       final double y = vertex.getY();
-      return RectangleUtil.intersects(minX, minY, maxX, maxY, x, y);
+      return RectangleUtil.intersectsPoint(minX, minY, maxX, maxY, x, y);
     }
   }
 }

@@ -36,8 +36,8 @@ package com.revolsys.geometry.noding.snapround;
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.index.chain.MonotoneChain;
 import com.revolsys.geometry.index.chain.MonotoneChainSelectAction;
-import com.revolsys.geometry.index.strtree.StrTree;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.geometry.noding.MonotoneChainIndex;
 import com.revolsys.geometry.noding.NodedSegmentString;
 import com.revolsys.geometry.noding.SegmentString;
 
@@ -50,7 +50,7 @@ import com.revolsys.geometry.noding.SegmentString;
 public class MCIndexPointSnapper {
   // public static final int nSnaps = 0;
 
-  public class HotPixelSnapAction extends MonotoneChainSelectAction {
+  public class HotPixelSnapAction implements MonotoneChainSelectAction {
     private final HotPixel hotPixel;
 
     // is -1 if hotPixel is not a vertex
@@ -94,10 +94,10 @@ public class MCIndexPointSnapper {
 
   }
 
-  private final StrTree index;
+  private final MonotoneChainIndex index;
 
-  public MCIndexPointSnapper(final SpatialIndex index) {
-    this.index = (StrTree)index;
+  public MCIndexPointSnapper(final MonotoneChainIndex index) {
+    this.index = index;
   }
 
   public boolean snap(final HotPixel hotPixel) {
@@ -122,7 +122,7 @@ public class MCIndexPointSnapper {
       hotPixelVertexIndex);
 
     this.index.query(pixelEnv, (item) -> {
-      final MonotoneChain testChain = (MonotoneChain)item;
+      final MonotoneChain testChain = item;
       testChain.select(pixelEnv, hotPixelSnapAction);
     });
     return hotPixelSnapAction.isNodeAdded();

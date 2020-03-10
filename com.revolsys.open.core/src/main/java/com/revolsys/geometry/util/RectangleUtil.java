@@ -175,6 +175,11 @@ public class RectangleUtil {
     return minX1 <= minX2 && maxX2 <= maxX1 && minY1 <= minY2 && maxY2 <= maxY1;
   }
 
+  public static boolean coversPointMinMax(final double minX, final double minY, final double maxX,
+    final double maxY, final double x, final double y) {
+    return intersectsPointMinMax(minX, maxX, minY, maxY, x, y);
+  }
+
   public static void expand(final double[] bounds, final int axisCount,
     final BoundingBox boundingBox) {
     if (boundingBox != null) {
@@ -322,24 +327,6 @@ public class RectangleUtil {
     }
   }
 
-  /**
-   * Point intersects the bounding box of the line.
-   *
-   * @param lineStart
-   * @param lineEnd
-   * @param point
-   * @return
-   */
-  public static boolean intersects(final double p1X, final double p1Y, final double p2X,
-    final double p2Y, final double qX, final double qY) {
-    if (qX >= (p1X < p2X ? p1X : p2X) && qX <= (p1X > p2X ? p1X : p2X)
-      && qY >= (p1Y < p2Y ? p1Y : p2Y) && qY <= (p1Y > p2Y ? p1Y : p2Y)) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   public static boolean intersects(final double minX1, final double minY1, final double maxX1,
     final double maxY1, double x1, double y1, double x2, double y2) {
     if (x1 > x2) {
@@ -391,7 +378,7 @@ public class RectangleUtil {
 
     final double x = point.getX();
     final double y = point.getY();
-    return intersects(x1, y1, x2, y2, x, y);
+    return intersectsPoint(x1, y1, x2, y2, x, y);
   }
 
   /**
@@ -561,6 +548,38 @@ public class RectangleUtil {
         }
       }
     }
+  }
+
+  /**
+   * Point intersects the bounding box of the line.
+   *
+   */
+  public static boolean intersectsPoint(final double x1, final double y1, final double x2,
+    final double y2, final double x, final double y) {
+    double minX;
+    double maxX;
+    if (x1 <= x2) {
+      minX = x1;
+      maxX = x2;
+    } else {
+      minX = x2;
+      maxX = x1;
+    }
+    double minY;
+    double maxY;
+    if (y1 <= y2) {
+      minY = y1;
+      maxY = y2;
+    } else {
+      minY = y2;
+      maxY = y1;
+    }
+    return intersectsPointMinMax(minX, maxX, minY, maxY, x, y);
+  }
+
+  public static boolean intersectsPointMinMax(final double minX, final double maxX,
+    final double minY, final double maxY, final double x, final double y) {
+    return x >= minX && x <= maxX && y >= minY && y <= maxY;
   }
 
   public static boolean isEmpty(final BoundingBox boundingBox) {

@@ -114,6 +114,10 @@ public interface Point extends Punctual, Serializable, BoundingBox {
     return Angle.angleBetweenOriented(x1, y1, x, y, x2, y2);
   }
 
+  static Point empty() {
+    return GeometryFactory.DEFAULT_2D.point();
+  }
+
   static int hashCode(final Point point) {
     final double x = point.getX();
     final double y = point.getY();
@@ -442,20 +446,6 @@ public interface Point extends Punctual, Serializable, BoundingBox {
     return getX() * y2 - getY() * x2;
   }
 
-  @Override
-  default double distancePoint(final double x, final double y) {
-    final double x1 = this.getX();
-    final double y1 = this.getY();
-    return Points.distance(x1, y1, x, y);
-  }
-
-  @Override
-  default double distancePoint(final double x, final double y, final double terminateDistance) {
-    final double x1 = this.getX();
-    final double y1 = this.getY();
-    return Points.distance(x1, y1, x, y);
-  }
-
   /**
    * Computes the 3-dimensional Euclidean distance to another location.
    *
@@ -498,6 +488,20 @@ public interface Point extends Punctual, Serializable, BoundingBox {
 
   default double distanceOriginSquared() {
     return dot(this);
+  }
+
+  @Override
+  default double distancePoint(final double x, final double y) {
+    final double x1 = this.getX();
+    final double y1 = this.getY();
+    return Points.distance(x1, y1, x, y);
+  }
+
+  @Override
+  default double distancePoint(final double x, final double y, final double terminateDistance) {
+    final double x1 = this.getX();
+    final double y1 = this.getY();
+    return Points.distance(x1, y1, x, y);
   }
 
   @Override

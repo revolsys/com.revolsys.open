@@ -32,20 +32,17 @@
  */
 package com.revolsys.geometry.algorithm;
 
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.index.bintree.Bintree;
 import com.revolsys.geometry.index.bintree.Interval;
 import com.revolsys.geometry.index.chain.MonotoneChain;
-import com.revolsys.geometry.index.chain.MonotoneChainBuilder;
 import com.revolsys.geometry.index.chain.MonotoneChainSelectAction;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.model.segment.LineSegment;
 
 /**
  * Implements {@link PointInRing}
@@ -57,19 +54,6 @@ import com.revolsys.geometry.model.segment.LineSegment;
  * @see GeometryFactoryIndexedPointInAreaLocator for more general functionality
  */
 public class MCPointInRing implements PointInRing {
-
-  class MCSelecter extends MonotoneChainSelectAction {
-    Point p;
-
-    public MCSelecter(final Point p) {
-      this.p = p;
-    }
-
-    @Override
-    public void select(final LineSegment ls) {
-      testLineSegment(this.p, ls);
-    }
-  }
 
   private int crossings = 0; // number of segment/ray crossings
 
@@ -85,17 +69,14 @@ public class MCPointInRing implements PointInRing {
   }
 
   private void buildIndex() {
-    // BoundingBox env = ring.getEnvelopeInternal();
     this.tree = new Bintree();
 
     final LineString points = this.ring.removeDuplicatePoints();
-    final List<MonotoneChain> mcList = MonotoneChainBuilder.getChains(points);
+    final MonotoneChain[] mcList = MonotoneChain.getChainsArray(points, null);
 
-    for (int i = 0; i < mcList.size(); i++) {
-      final MonotoneChain mc = mcList.get(i);
-      final BoundingBox mcEnv = mc.getEnvelope();
-      this.interval.min = mcEnv.getMinY();
-      this.interval.max = mcEnv.getMaxY();
+    for (final MonotoneChain mc : mcList) {
+      this.interval.min = mc.getMinY();
+      this.interval.max = mc.getMaxY();
       this.tree.insert(this.interval, mc);
     }
   }
@@ -105,20 +86,41 @@ public class MCPointInRing implements PointInRing {
     this.crossings = 0;
 
     // test all segments intersected by ray from pt in positive x direction
+    final double x = pt.getX();
     final double y = pt.getY();
     final BoundingBox rayEnv = new BoundingBoxDoubleXY(-Double.MAX_VALUE, y, Double.MAX_VALUE, y);
 
     this.interval.min = y;
     this.interval.max = y;
-    final List segs = this.tree.query(this.interval);
-    // System.out.println("query size = " + segs.size());
+    final List<MonotoneChain> segs = this.tree.query(this.interval);
+    if (!segs.isEmpty()) {
+      /*
+       * Test if segment crosses ray from test point in positive x direction.
+       */
+      final MonotoneChainSelectAction mcSelecter = (chain, startIndex) -> {
+        final LineString line = chain.getLine();
+        final double x1 = line.getX(startIndex) - x;
+        final double y1 = line.getY(startIndex) - y;
+        final double x2 = line.getX(startIndex + 1) - x;
+        final double y2 = line.getY(startIndex + 1) - y;
 
-    final MCSelecter mcSelecter = new MCSelecter(pt);
-    for (final Iterator i = segs.iterator(); i.hasNext();) {
-      final MonotoneChain mc = (MonotoneChain)i.next();
-      testMonotoneChain(rayEnv, mcSelecter, mc);
+        if (y1 > 0 && y2 <= 0 || y2 > 0 && y1 <= 0) {
+          /*
+           * segment straddles x axis, so compute intersection.
+           */
+          final double xInt = RobustDeterminant.signOfDet2x2(x1, y1, x2, y2) / (y2 - y1);
+          /*
+           * crosses ray if strictly positive intersection.
+           */
+          if (0.0 < xInt) {
+            this.crossings++;
+          }
+        }
+      };
+      for (final MonotoneChain mc : segs) {
+        mc.select(rayEnv, mcSelecter);
+      }
     }
-
     /*
      * p is inside if number of crossings is odd.
      */
@@ -126,39 +128,6 @@ public class MCPointInRing implements PointInRing {
       return true;
     }
     return false;
-  }
-
-  private void testLineSegment(final Point p, final LineSegment seg) {
-    double xInt; // x intersection of segment with ray
-
-    /*
-     * Test if segment crosses ray from test point in positive x direction.
-     */
-    final double x = p.getX();
-    final double y = p.getY();
-    final double x1 = seg.getX(0) - x;
-    final double y1 = seg.getY(0) - y;
-    final double x2 = seg.getX(1) - x;
-    final double y2 = seg.getY(1) - y;
-
-    if (y1 > 0 && y2 <= 0 || y2 > 0 && y1 <= 0) {
-      /*
-       * segment straddles x axis, so compute intersection.
-       */
-      xInt = RobustDeterminant.signOfDet2x2(x1, y1, x2, y2) / (y2 - y1);
-      // xsave = xInt;
-      /*
-       * crosses ray if strictly positive intersection.
-       */
-      if (0.0 < xInt) {
-        this.crossings++;
-      }
-    }
-  }
-
-  private void testMonotoneChain(final BoundingBox rayEnv, final MCSelecter mcSelecter,
-    final MonotoneChain mc) {
-    mc.select(rayEnv, mcSelecter);
   }
 
 }

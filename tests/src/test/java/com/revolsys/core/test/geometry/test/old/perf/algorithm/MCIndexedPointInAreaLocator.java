@@ -32,13 +32,11 @@
  */
 package com.revolsys.core.test.geometry.test.old.perf.algorithm;
 
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.algorithm.RayCrossingCounter;
 import com.revolsys.geometry.algorithm.locate.PointOnGeometryLocator;
 import com.revolsys.geometry.index.chain.MonotoneChain;
-import com.revolsys.geometry.index.chain.MonotoneChainBuilder;
 import com.revolsys.geometry.index.chain.MonotoneChainSelectAction;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -47,7 +45,6 @@ import com.revolsys.geometry.model.Location;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.noding.BasicSegmentString;
 import com.revolsys.geometry.noding.MonotoneChainIndex;
 import com.revolsys.geometry.noding.SegmentString;
@@ -61,8 +58,7 @@ class MCIndexedGeometry {
 
   private void addLine(final LineString points) {
     final SegmentString segStr = new BasicSegmentString(points, null);
-    final List<MonotoneChain> chains = MonotoneChainBuilder.getChains(segStr.getLineString(),
-      segStr);
+    final MonotoneChain[] chains = MonotoneChain.getChainsArray(segStr.getLineString(), segStr);
     for (final MonotoneChain chain : chains) {
       this.index.insertItem(chain);
     }
@@ -76,8 +72,8 @@ class MCIndexedGeometry {
     }
   }
 
-  public List query(final BoundingBox searchEnv) {
-    return this.index.getItems(searchEnv);
+  public List<MonotoneChain> query(final BoundingBox boundingBox) {
+    return this.index.getItems(boundingBox);
   }
 }
 
@@ -91,57 +87,46 @@ class MCIndexedGeometry {
  *
  */
 public class MCIndexedPointInAreaLocator implements PointOnGeometryLocator {
-  static class MCSegmentCounter extends MonotoneChainSelectAction {
-    RayCrossingCounter rcc;
 
-    public MCSegmentCounter(final RayCrossingCounter rcc) {
-      this.rcc = rcc;
-    }
-
-    @Override
-    public void select(final LineSegment ls) {
-      this.rcc.countSegment(ls.getPoint(0), ls.getPoint(1));
-    }
-  }
-
-  private MCIndexedGeometry index;
+  private final MCIndexedGeometry index;
 
   private final double maxXExtent;
 
-  public MCIndexedPointInAreaLocator(final Geometry g) {
-    if (!(g instanceof Polygonal)) {
+  public MCIndexedPointInAreaLocator(final Geometry geometry) {
+    if (!(geometry instanceof Polygonal)) {
       throw new IllegalArgumentException("Argument must be Polygonal");
     }
-    buildIndex(g);
-    final BoundingBox env = g.getBoundingBox();
-    this.maxXExtent = env.getMaxX() + 1.0;
-  }
-
-  private void buildIndex(final Geometry g) {
-    this.index = new MCIndexedGeometry(g);
-  }
-
-  private void countSegs(final RayCrossingCounter rcc, final BoundingBox rayEnv,
-    final List monoChains, final MCSegmentCounter mcSegCounter) {
-    for (final Iterator i = monoChains.iterator(); i.hasNext();) {
-      final MonotoneChain mc = (MonotoneChain)i.next();
-      mc.select(rayEnv, mcSegCounter);
-      // short-circuit if possible
-      if (rcc.isOnSegment()) {
-        return;
-      }
-    }
+    this.index = new MCIndexedGeometry(geometry);
+    final BoundingBox boundingBox = geometry.getBoundingBox();
+    this.maxXExtent = boundingBox.getMaxX() + 1.0;
   }
 
   @Override
   public Location locate(final double x, final double y) {
-    final RayCrossingCounter rcc = new RayCrossingCounter(x, y);
-    final MCSegmentCounter mcSegCounter = new MCSegmentCounter(rcc);
-    final BoundingBox rayEnv = new BoundingBoxDoubleXY(x, y, this.maxXExtent, y);
-    final List mcs = this.index.query(rayEnv);
-    countSegs(rcc, rayEnv, mcs, mcSegCounter);
+    final BoundingBox boundingBox = new BoundingBoxDoubleXY(x, y, this.maxXExtent, y);
+    final List<MonotoneChain> mcs = this.index.query(boundingBox);
+    if (mcs.isEmpty()) {
+      return Location.EXTERIOR;
+    } else {
+      final RayCrossingCounter rcc = new RayCrossingCounter(x, y);
+      final MonotoneChainSelectAction action = (chain, startIndex) -> {
+        final LineString line = chain.getLine();
+        final double x1 = line.getX(startIndex);
+        final double y1 = line.getY(startIndex);
+        final double x2 = line.getX(startIndex + 1);
+        final double y2 = line.getY(startIndex + 1);
+        rcc.countSegment(x1, y1, x2, y2);
+      };
+      for (final MonotoneChain chain : mcs) {
+        chain.select(boundingBox, action);
+        // short-circuit if possible
+        if (rcc.isOnSegment()) {
+          return Location.BOUNDARY;
+        }
+      }
 
-    return rcc.getLocation();
+      return rcc.getLocation();
+    }
   }
 
   /**

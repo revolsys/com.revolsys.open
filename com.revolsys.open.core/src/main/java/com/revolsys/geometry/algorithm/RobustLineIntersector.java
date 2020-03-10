@@ -32,10 +32,8 @@
  */
 package com.revolsys.geometry.algorithm;
 
-import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.coordinates.LineSegmentUtil;
-import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.util.RectangleUtil;
 
@@ -47,6 +45,21 @@ import com.revolsys.geometry.util.RectangleUtil;
  */
 public class RobustLineIntersector extends LineIntersector {
 
+  public static boolean lineBboxCovers(double minX, double minY, double maxX, double maxY,
+    final double x, final double y) {
+    if (minX > maxX) {
+      final double t = minX;
+      minX = maxX;
+      maxX = t;
+    }
+    if (minY > maxY) {
+      final double t = minY;
+      minY = maxY;
+      maxY = t;
+    }
+    return x >= minX && x <= maxX && y >= minY && y <= maxY;
+  }
+
   public RobustLineIntersector() {
   }
 
@@ -57,13 +70,13 @@ public class RobustLineIntersector extends LineIntersector {
   private int computeCollinearIntersection(final double line1x1, final double line1y1,
     final double line1x2, final double line1y2, final double line2x1, final double line2y1,
     final double line2x2, final double line2y2) {
-    final boolean p1q1p2 = RectangleUtil.intersects(line1x1, line1y1, line1x2, line1y2, line2x1,
+    final boolean p1q1p2 = RectangleUtil.intersectsPoint(line1x1, line1y1, line1x2, line1y2, line2x1,
       line2y1);
-    final boolean p1q2p2 = RectangleUtil.intersects(line1x1, line1y1, line1x2, line1y2, line2x2,
+    final boolean p1q2p2 = RectangleUtil.intersectsPoint(line1x1, line1y1, line1x2, line1y2, line2x2,
       line2y2);
-    final boolean q1p1q2 = RectangleUtil.intersects(line2x1, line2y1, line2x2, line2y2, line1x1,
+    final boolean q1p1q2 = RectangleUtil.intersectsPoint(line2x1, line2y1, line2x2, line2y2, line1x1,
       line1y1);
-    final boolean q1p2q2 = RectangleUtil.intersects(line2x1, line2y1, line2x2, line2y2, line1x2,
+    final boolean q1p2q2 = RectangleUtil.intersectsPoint(line2x1, line2y1, line2x2, line2y2, line1x2,
       line1y2);
 
     if (p1q1p2 && p1q2p2) {
@@ -123,15 +136,25 @@ public class RobustLineIntersector extends LineIntersector {
     }
   }
 
-  private int computeIntersect(final double line1x1, final double line1y1, final double line1x2,
-    final double line1y2, final double line2x1, final double line2y1, final double line2x2,
-    final double line2y2) {
+  @Override
+  public boolean computeIntersectionLine(final double line1x1, final double line1y1,
+    final double line1x2, final double line1y2, final double line2x1, final double line2y1,
+    final double line2x2, final double line2y2) {
+    this.line1x1 = line1x1;
+    this.line1y1 = line1y1;
+    this.line1x2 = line1x2;
+    this.line1y2 = line1y2;
+    this.line2x1 = line2x1;
+    this.line2y1 = line2y1;
+    this.line2x2 = line2x2;
+    this.line2y2 = line2y2;
     this.isProper = false;
 
     // first try a fast test to see if the envelopes of the lines intersect
     if (!RectangleUtil.intersectsMinMax(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
       line2x2, line2y2)) {
-      return NO_INTERSECTION;
+      this.intersectionCount = NO_INTERSECTION;
+      return false;
     }
 
     // for each endpoint, compute which side of the other segment it lies
@@ -143,7 +166,8 @@ public class RobustLineIntersector extends LineIntersector {
       line2y2);
 
     if (Pq1 > 0 && Pq2 > 0 || Pq1 < 0 && Pq2 < 0) {
-      return NO_INTERSECTION;
+      this.intersectionCount = NO_INTERSECTION;
+      return false;
     }
 
     final int Qp1 = CGAlgorithmsDD.orientationIndex(line2x1, line2y1, line2x2, line2y2, line1x1,
@@ -152,13 +176,15 @@ public class RobustLineIntersector extends LineIntersector {
       line1y2);
 
     if (Qp1 > 0 && Qp2 > 0 || Qp1 < 0 && Qp2 < 0) {
-      return NO_INTERSECTION;
+      this.intersectionCount = NO_INTERSECTION;
+      return false;
     }
 
     final boolean collinear = Pq1 == 0 && Pq2 == 0 && Qp1 == 0 && Qp2 == 0;
     if (collinear) {
-      return computeCollinearIntersection(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
-        line2x2, line2y2);
+      this.intersectionCount = computeCollinearIntersection(line1x1, line1y1, line1x2, line1y2,
+        line2x1, line2y1, line2x2, line2y2);
+      return this.intersectionCount != NO_INTERSECTION;
     }
 
     /**
@@ -223,15 +249,16 @@ public class RobustLineIntersector extends LineIntersector {
       this.intersectionX1 = intersectionPoint.getX();
       this.intersectionY1 = intersectionPoint.getY();
     }
-    return POINT_INTERSECTION;
+    this.intersectionCount = POINT_INTERSECTION;
+    return true;
   }
 
   @Override
-  public boolean computeIntersection(final double x, final double y, final double x1,
-    final double y1, final double x2, final double y2) {
+  public boolean computeIntersectionPoint(final double x1, final double y1, final double x2,
+    final double y2, final double x, final double y) {
     this.isProper = false;
     // do between check first, since it is faster than the orientation test
-    if (RectangleUtil.intersects(x1, y1, x2, y2, x, y)) {
+    if (RectangleUtil.intersectsPoint(x1, y1, x2, y2, x, y)) {
       if (CGAlgorithmsDD.orientationIndex(x1, y1, x2, y2, x, y) == 0
         && CGAlgorithmsDD.orientationIndex(x2, y2, x1, y1, x, y) == 0) {
         this.isProper = true;
@@ -246,23 +273,6 @@ public class RobustLineIntersector extends LineIntersector {
     return false;
   }
 
-  @Override
-  public boolean computeIntersection(final double line1x1, final double line1y1,
-    final double line1x2, final double line1y2, final double line2x1, final double line2y1,
-    final double line2x2, final double line2y2) {
-    this.line1x1 = line1x1;
-    this.line1y1 = line1y1;
-    this.line1x2 = line1x2;
-    this.line1y2 = line1y2;
-    this.line2x1 = line2x1;
-    this.line2y1 = line2y1;
-    this.line2x2 = line2x2;
-    this.line2y2 = line2y2;
-    this.intersectionCount = computeIntersect(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1,
-      line2x2, line2y2);
-    return hasIntersection();
-  }
-
   /**
    * This method computes the actual value of the intersection point.
    * To obtain the maximum precision from the intersection calculation,
@@ -274,15 +284,75 @@ public class RobustLineIntersector extends LineIntersector {
   private Point intersection(final double line1x1, final double line1y1, final double line1x2,
     final double line1y2, final double line2x1, final double line2y1, final double line2x2,
     final double line2y2) {
-    final Point intPt = intersectionWithNormalization(line1x1, line1y1, line1x2, line1y2, line2x1,
-      line2y1, line2x2, line2y2);
+    double minX1;
+    double maxX1;
+    if (line1x1 <= line1x2) {
+      minX1 = line1x1;
+      maxX1 = line1x2;
+    } else {
+      minX1 = line1x2;
+      maxX1 = line1x1;
+    }
+    double minY1;
+    double maxY1;
+    if (line1y1 <= line1y2) {
+      minY1 = line1y1;
+      maxY1 = line1y2;
+    } else {
+      minY1 = line1y2;
+      maxY1 = line1y1;
+    }
 
-    /*
-     * // TESTING ONLY Point intPtDD = CGAlgorithmsDD.intersection(p1, p2, q1,
-     * q2); double dist = intPt.distance(intPtDD); System.out.println(intPt +
-     * " - " + intPtDD + " dist = " + dist); //intPt = intPtDD;
-     */
+    double minX2;
+    double maxX2;
+    if (line2x1 <= line2x2) {
+      minX2 = line2x1;
+      maxX2 = line2x2;
+    } else {
+      minX2 = line2x2;
+      maxX2 = line2x1;
+    }
+    double minY2;
+    double maxY2;
+    if (line2y1 <= line2y2) {
+      minY2 = line2y1;
+      maxY2 = line2y2;
+    } else {
+      minY2 = line2y2;
+      maxY2 = line2y1;
+    }
 
+    final double intMinX = minX1 > minX2 ? minX1 : minX2;
+    final double intMaxX = maxX1 < maxX2 ? maxX1 : maxX2;
+    final double intMinY = minY1 > minY2 ? minY1 : minY2;
+    final double intMaxY = maxY1 < maxY2 ? maxY1 : maxY2;
+
+    final double normX = (intMinX + intMaxX) / 2.0;
+    final double normY = (intMinY + intMaxY) / 2.0;
+    final double line1x11 = line1x1 - normX;
+    final double line1y11 = line1y1 - normY;
+    final double line1x21 = line1x2 - normX;
+    final double line1y21 = line1y2 - normY;
+    final double line2x11 = line2x1 - normX;
+    final double line2y11 = line2y1 - normY;
+    final double line2x21 = line2x2 - normX;
+    final double line2y21 = line2y2 - normY;
+    Point intersectionPoint;
+    try {
+      intersectionPoint = HCoordinate.intersection(line1x11, line1y11, line1x21, line1y21, line2x11,
+        line2y11, line2x21, line2y21);
+    } catch (final NotRepresentableException e) {
+      // compute an approximate result
+      intersectionPoint = CentralEndpointIntersector.getIntersection(line1x11, line1y11, line1x21,
+        line1y21, line2x11, line2y11, line2x21, line2y21);
+    }
+
+    final double x1 = intersectionPoint.getX() + normX;
+    final double y1 = intersectionPoint.getY() + normY;
+    final Point point = newPoint(x1, y1);
+
+    final double x = point.getX();
+    final double y = point.getY();
     /**
      * Due to rounding it can happen that the computed intersection is
      * outside the envelopes of the input segments.  Clearly this
@@ -297,62 +367,13 @@ public class RobustLineIntersector extends LineIntersector {
      *
      * MD - Dec 14 2006 - This does not seem to be a failure case any longer
      */
-    if (!isInSegmentEnvelopes(intPt)) {
+    final boolean inSegmentEnvelopes = x >= minX1 && x <= maxX1 && y >= minY1 && y <= maxY1
+      && x >= minX2 && x <= maxX2 && y >= minY2 && y <= maxY2;
+    if (!inSegmentEnvelopes) {
       return nearestEndpoint(line1x1, line1y1, line1x2, line1y2, line2x1, line2y1, line2x2,
         line2y2);
     }
-    return intPt;
-  }
-
-  private Point intersectionWithNormalization(final double line1x1, final double line1y1,
-    final double line1x2, final double line1y2, final double line2x1, final double line2y1,
-    final double line2x2, final double line2y2) {
-
-    final double minX0 = line1x1 < line1x2 ? line1x1 : line1x2;
-    final double minY0 = line1y1 < line1y2 ? line1y1 : line1y2;
-    final double maxX0 = line1x1 > line1x2 ? line1x1 : line1x2;
-    final double maxY0 = line1y1 > line1y2 ? line1y1 : line1y2;
-
-    final double minX1 = line2x1 < line2x2 ? line2x1 : line2x2;
-    final double minY1 = line2y1 < line2y2 ? line2y1 : line2y2;
-    final double maxX1 = line2x1 > line2x2 ? line2x1 : line2x2;
-    final double maxY1 = line2y1 > line2y2 ? line2y1 : line2y2;
-
-    final double intMinX = minX0 > minX1 ? minX0 : minX1;
-    final double intMaxX = maxX0 < maxX1 ? maxX0 : maxX1;
-    final double intMinY = minY0 > minY1 ? minY0 : minY1;
-    final double intMaxY = maxY0 < maxY1 ? maxY0 : maxY1;
-
-    final double normX = (intMinX + intMaxX) / 2.0;
-    final double normY = (intMinY + intMaxY) / 2.0;
-
-    final Point intPt = safeHCoordinatesIntersection(//
-      line1x1 - normX, line1y1 - normY, //
-      line1x2 - normX, line1y2 - normY, //
-      line2x1 - normX, line2y1 - normY, //
-      line2x2 - normX, line2y2 - normY);
-
-    final double x = intPt.getX() + normX;
-    final double y = intPt.getY() + normY;
-
-    return newPoint(x, y);
-  }
-
-  /**
-   * Tests whether a point lies in the envelopes of both input segments.
-   * A correctly computed intersection point should return <code>true</code>
-   * for this test.
-   * Since this test is for debugging purposes only, no attempt is
-   * made to optimize the envelope test.
-   *
-   * @return <code>true</code> if the input point lies within both input segment envelopes
-   */
-  private boolean isInSegmentEnvelopes(final Point intPt) {
-    final BoundingBox env0 = BoundingBoxDoubleXY.newBoundingBoxDoubleXY(this.line1x1, this.line1y1,
-      this.line1x2, this.line1y2);
-    final BoundingBox env1 = BoundingBoxDoubleXY.newBoundingBoxDoubleXY(this.line2x1, this.line2y1,
-      this.line2x2, this.line2y2);
-    return env0.bboxCovers(intPt) && env1.bboxCovers(intPt);
+    return point;
   }
 
   /**
@@ -411,32 +432,5 @@ public class RobustLineIntersector extends LineIntersector {
       y = Math.round(y * scale) / scale;
     }
     return new PointDoubleXY(x, y);
-  }
-
-  /**
-   * Computes a segment intersection using homogeneous coordinates. Round-off
-   * error can cause the raw computation to fail, (usually due to the segments
-   * being approximately parallel). If this happens, a reasonable approximation
-   * is computed instead.
-   *
-   * @param p1 a segment endpoint
-   * @param p2 a segment endpoint
-   * @param q1 a segment endpoint
-   * @param q2 a segment endpoint
-   * @return the computed intersection point
-   */
-  private Point safeHCoordinatesIntersection(final double line1x1, final double line1y1,
-    final double line1x2, final double line1y2, final double line2x1, final double line2y1,
-    final double line2x2, final double line2y2) {
-    Point intersectionPoint;
-    try {
-      intersectionPoint = HCoordinate.intersection(line1x1, line1y1, line1x2, line1y2, line2x1,
-        line2y1, line2x2, line2y2);
-    } catch (final NotRepresentableException e) {
-      // compute an approximate result
-      intersectionPoint = CentralEndpointIntersector.getIntersection(line1x1, line1y1, line1x2,
-        line1y2, line2x1, line2y1, line2x2, line2y2);
-    }
-    return intersectionPoint;
   }
 }

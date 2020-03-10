@@ -32,24 +32,13 @@
  */
 package com.revolsys.geometry.index.chain;
 
-import com.revolsys.geometry.model.segment.LineSegment;
-
 /**
  * The action for the internal iterator for performing
  * envelope select queries on a MonotoneChain
  *
  * @version 1.7
  */
-public class MonotoneChainSelectAction {
-
-  /**
-   * This is a convenience method which can be overridden to obtain the actual
-   * line segment which is selected.
-   *
-   * @param seg
-   */
-  public void select(final LineSegment seg) {
-  }
+public interface MonotoneChainSelectAction {
 
   /**
    * This method is overridden
@@ -59,9 +48,5 @@ public class MonotoneChainSelectAction {
    * @param mc the parent chain
    * @param startIndex the index of the start vertex of the segment being processed
    */
-  public void select(final MonotoneChain mc, final int startIndex) {
-    final LineSegment selectedSegment = mc.getLineSegment(startIndex);
-    // call this routine in case select(segmenet) was overridden
-    select(selectedSegment);
-  }
+  void select(final MonotoneChain mc, final int startIndex);
 }

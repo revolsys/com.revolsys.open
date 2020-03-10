@@ -6,4 +6,6 @@ public interface LinealEditor extends GeometryEditor<LineStringEditor>, Lineal {
   @Override
   Lineal newGeometry();
 
+  void removeGeometry(int index);
+
 }

@@ -143,6 +143,11 @@ public interface Polygonal extends Geometry {
     return getCoordinate(partIndex, ringIndex, vertexIndex, Z);
   }
 
+  @Override
+  default boolean hasGeometryType(final GeometryDataType<?, ?> dataType) {
+    return GeometryDataTypes.POLYGON == dataType;
+  }
+
   default Polygonal intersectionPolygonal(final Geometry geometry) {
     final Geometry intersection = intersection(geometry);
     if (intersection instanceof Polygonal) {

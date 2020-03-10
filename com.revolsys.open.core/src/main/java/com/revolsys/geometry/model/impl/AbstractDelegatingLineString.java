@@ -19,9 +19,6 @@ import com.revolsys.geometry.model.Point;
 public class AbstractDelegatingLineString extends AbstractLineString
   implements DelegatingLineString {
 
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   protected final LineString line;
@@ -145,6 +142,11 @@ public class AbstractDelegatingLineString extends AbstractLineString
   @Override
   public double getZ(final int vertexIndex) {
     return this.line.getZ(vertexIndex);
+  }
+
+  @Override
+  public boolean isClosed() {
+    return this.line.isClosed();
   }
 
   @Override

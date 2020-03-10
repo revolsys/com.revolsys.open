@@ -38,8 +38,6 @@ import java.util.List;
 
 import com.revolsys.geometry.index.SpatialIndex;
 import com.revolsys.geometry.index.chain.MonotoneChain;
-import com.revolsys.geometry.index.chain.MonotoneChainBuilder;
-import com.revolsys.geometry.index.chain.MonotoneChainOverlapAction;
 import com.revolsys.geometry.index.strtree.StrTree;
 
 /**
@@ -51,23 +49,6 @@ import com.revolsys.geometry.index.strtree.StrTree;
  * @version 1.7
  */
 public class MCIndexSegmentSetMutualIntersector implements SegmentSetMutualIntersector {
-  public class SegmentOverlapAction extends MonotoneChainOverlapAction {
-    private SegmentIntersector si = null;
-
-    public SegmentOverlapAction(final SegmentIntersector si) {
-      this.si = si;
-    }
-
-    @Override
-    public void overlap(final MonotoneChain mc1, final int start1, final MonotoneChain mc2,
-      final int start2) {
-      final SegmentString ss1 = (SegmentString)mc1.getContext();
-      final SegmentString ss2 = (SegmentString)mc2.getContext();
-      this.si.processIntersections(ss1, start1, ss2, start2);
-    }
-
-  }
-
   /**
    * The {@link SpatialIndex} used should be something that supports
    * envelope (range) queries efficiently (such as a
@@ -85,16 +66,14 @@ public class MCIndexSegmentSetMutualIntersector implements SegmentSetMutualInter
   }
 
   private void addToIndex(final SegmentString segStr) {
-    final List<MonotoneChain> chains = MonotoneChainBuilder.getChains(segStr.getLineString(),
-      segStr);
+    final MonotoneChain[] chains = MonotoneChain.getChainsArray(segStr.getLineString(), segStr);
     for (final MonotoneChain chain : chains) {
       this.index.insertItem(chain);
     }
   }
 
   private void addToMonoChains(final SegmentString segStr, final List<MonotoneChain> monoChains) {
-    final List<MonotoneChain> segChains = MonotoneChainBuilder.getChains(segStr.getLineString(),
-      segStr);
+    final MonotoneChain[] segChains = MonotoneChain.getChainsArray(segStr.getLineString(), segStr);
     for (final MonotoneChain mc : segChains) {
       monoChains.add(mc);
     }
@@ -121,12 +100,10 @@ public class MCIndexSegmentSetMutualIntersector implements SegmentSetMutualInter
 
   private void intersectChains(final List<MonotoneChain> monoChains,
     final SegmentIntersector segInt) {
-    final MonotoneChainOverlapAction overlapAction = new SegmentOverlapAction(segInt);
-
     for (final MonotoneChain queryChain : monoChains) {
-      final List<MonotoneChain> overlapChains = this.index.getItems(queryChain.getEnvelope());
+      final List<MonotoneChain> overlapChains = this.index.getItems(queryChain);
       for (final MonotoneChain testChain : overlapChains) {
-        queryChain.computeOverlaps(testChain, overlapAction);
+        queryChain.computeOverlaps(testChain, segInt);
         if (segInt.isDone()) {
           return;
         }

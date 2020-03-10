@@ -89,6 +89,10 @@ import com.revolsys.util.Property;
  *@version 1.7
  */
 public interface Polygon extends Polygonal {
+  static Polygon empty() {
+    return GeometryFactory.DEFAULT_2D.polygon();
+  }
+
   @SuppressWarnings("unchecked")
   static <G extends Geometry> G newPolygon(final Object value) {
     if (value == null) {
@@ -155,6 +159,24 @@ public interface Polygon extends Polygonal {
   }
 
   @Override
+  default double distanceGeometry(final Geometry geometry, final double terminateDistance) {
+    if (isEmpty()) {
+      return Double.POSITIVE_INFINITY;
+    } else if (Property.isEmpty(geometry)) {
+      return Double.POSITIVE_INFINITY;
+    } else if (geometry instanceof Point) {
+      final Point point = (Point)geometry;
+      return distancePoint(point, terminateDistance);
+    } else if (geometry instanceof LineString) {
+      return Polygonal.super.distanceGeometry(geometry, terminateDistance);
+    } else if (geometry instanceof Polygon) {
+      return Polygonal.super.distanceGeometry(geometry, terminateDistance);
+    } else {
+      return geometry.distanceGeometry(this, terminateDistance);
+    }
+  }
+
+  @Override
   default double distancePoint(final double x, final double y, final double terminateDistance) {
     if (isEmpty()) {
       return Double.POSITIVE_INFINITY;
@@ -175,24 +197,6 @@ public interface Polygon extends Polygonal {
         }
         return minDistance;
       }
-    }
-  }
-
-  @Override
-  default double distanceGeometry(final Geometry geometry, final double terminateDistance) {
-    if (isEmpty()) {
-      return Double.POSITIVE_INFINITY;
-    } else if (Property.isEmpty(geometry)) {
-      return Double.POSITIVE_INFINITY;
-    } else if (geometry instanceof Point) {
-      final Point point = (Point)geometry;
-      return distancePoint(point, terminateDistance);
-    } else if (geometry instanceof LineString) {
-      return Polygonal.super.distanceGeometry(geometry, terminateDistance);
-    } else if (geometry instanceof Polygon) {
-      return Polygonal.super.distanceGeometry(geometry, terminateDistance);
-    } else {
-      return geometry.distanceGeometry(this, terminateDistance);
     }
   }
 

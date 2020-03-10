@@ -152,11 +152,6 @@ public class NodedSegmentString extends AbstractDelegatingLineString
     }
   }
 
-  @Override
-  public SegmentString clone() {
-    return this;
-  }
-
   /**
    * Gets the user-defined data for this segment string.
    *

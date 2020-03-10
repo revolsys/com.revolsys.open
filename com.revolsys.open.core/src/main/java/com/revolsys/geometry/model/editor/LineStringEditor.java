@@ -917,6 +917,11 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   }
 
   @Override
+  public void removeGeometry(final int index) {
+    throw new UnsupportedOperationException("removeGeometry");
+  }
+
+  @Override
   public void revertChanges() {
     if (this.line == null) {
       this.coordinates = new double[0];

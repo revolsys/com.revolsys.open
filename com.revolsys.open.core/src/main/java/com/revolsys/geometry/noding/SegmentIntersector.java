@@ -32,6 +32,9 @@
  */
 package com.revolsys.geometry.noding;
 
+import com.revolsys.geometry.index.chain.MonotoneChain;
+import com.revolsys.geometry.index.chain.MonotoneChainOverlapAction;
+
 /**
  * Processes possible intersections detected by a {@link Noder}.
  * The {@link SegmentIntersector} is passed to a {@link Noder}.
@@ -45,7 +48,7 @@ package com.revolsys.geometry.noding;
  *
  * @version 1.7
  */
-public interface SegmentIntersector {
+public interface SegmentIntersector extends MonotoneChainOverlapAction {
   /**
    * Reports whether the client of this class
    * needs to continue testing all intersections in an arrangement.
@@ -54,10 +57,19 @@ public interface SegmentIntersector {
    */
   boolean isDone();
 
+  @Override
+  default void overlap(final MonotoneChain mc1, final int start1, final MonotoneChain mc2,
+    final int start2) {
+    final SegmentString ss1 = mc1.getContext();
+    final SegmentString ss2 = mc2.getContext();
+    processIntersections(ss1, start1, ss2, start2);
+  }
+
   /**
    * This method is called by clients
    * of the {@link SegmentIntersector} interface to process
    * intersections for two segments of the {@link SegmentString}s being intersected.
    */
   void processIntersections(SegmentString e0, int segIndex0, SegmentString e1, int segIndex1);
+
 }

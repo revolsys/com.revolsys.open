@@ -80,6 +80,7 @@ import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.graph.linemerge.LineMerger;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.geometry.model.editor.LineStringEditor;
+import com.revolsys.geometry.model.impl.AbstractLineString;
 import com.revolsys.geometry.model.impl.AbstractPoint;
 import com.revolsys.geometry.model.impl.AbstractPolygon;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleGeometryFactory;
@@ -250,6 +251,34 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
     @Override
     public String toString() {
       return toEwkt();
+    }
+  }
+
+  private class EmptyLineString extends AbstractLineString {
+
+    @Override
+    public int getAxisCount() {
+      return GeometryFactory.this.axisCount;
+    }
+
+    @Override
+    public double getCoordinate(final int vertexIndex, final int axisIndex) {
+      return Double.NaN;
+    }
+
+    @Override
+    public double[] getCoordinates() {
+      return Doubles.EMPTY_ARRAY;
+    }
+
+    @Override
+    public GeometryFactory getGeometryFactory() {
+      return GeometryFactory.this;
+    }
+
+    @Override
+    public int getVertexCount() {
+      return 0;
     }
   }
 
@@ -820,6 +849,8 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
   private HorizontalCoordinateSystem horizontalCoordinateSystem;
 
   protected final int coordinateSystemId;
+
+  private final EmptyLineString emptyLine = new EmptyLineString();
 
   private final EmptyPoint emptyPoint = new EmptyPoint();
 
@@ -1903,7 +1934,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
   }
 
   public LineString lineString() {
-    return new LineStringDoubleGf(this);
+    return this.emptyLine;
   }
 
   public LineString lineString(final Collection<?> points) {

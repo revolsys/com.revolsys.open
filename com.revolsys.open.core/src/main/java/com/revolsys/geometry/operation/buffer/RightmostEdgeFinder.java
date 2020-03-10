@@ -44,6 +44,7 @@ import com.revolsys.geometry.geomgraph.DirectedEdgeStar;
 import com.revolsys.geometry.geomgraph.Edge;
 import com.revolsys.geometry.geomgraph.Node;
 import com.revolsys.geometry.geomgraph.Position;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.util.Assert;
 
@@ -73,17 +74,19 @@ class RightmostEdgeFinder {
 
   private void checkForRightmostCoordinate(final DirectedEdge de) {
     final Edge edge = de.getEdge();
-    for (int i = 0; i < edge.getVertexCount() - 1; i++) {
+    final LineString line = edge.getLineString();
+    final int maxVertexCount = line.getVertexCount() - 1;
+    for (int i = 0; i < maxVertexCount; i++) {
       // only check vertices which are the start or end point of a
       // non-horizontal segment
       // <FIX> MD 19 Sep 03 - NO! we can test all vertices, since the rightmost
       // must have a non-horiz segment adjacent to it
       final int i1 = i;
-      final Point point = edge.getPoint(i1);
-      if (this.minCoord == null || point.getX() > this.minCoord.getX()) {
+      final double x = line.getX(i1);
+      if (this.minCoord == null || x > this.minCoord.getX()) {
         this.minDe = de;
         this.minIndex = i;
-        this.minCoord = point;
+        this.minCoord = line.getPoint(i1);
       }
       // }
     }
@@ -190,17 +193,18 @@ class RightmostEdgeFinder {
 
   private int getRightmostSideOfSegment(final DirectedEdge de, final int i) {
     final Edge edge = de.getEdge();
-    if (i < 0 || i + 1 >= edge.getVertexCount()) {
+    final LineString line = edge.getLineString();
+    if (i < 0 || i + 1 >= line.getVertexCount()) {
       return -1;
     }
-    final Point p1 = edge.getPoint(i);
-    final Point p2 = edge.getPoint(i + 1);
-    if (p1.getY() == p2.getY()) {
+    final double y1 = line.getY(i);
+    final double y2 = line.getY(i + 1);
+    if (y1 == y2) {
       return -1; // indicates edge is parallel to x-axis
     }
 
     int pos = Position.LEFT;
-    if (p1.getY() < p2.getY()) {
+    if (y1 < y2) {
       pos = Position.RIGHT;
     }
     return pos;

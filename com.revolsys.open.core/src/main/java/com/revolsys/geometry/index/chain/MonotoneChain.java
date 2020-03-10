@@ -32,12 +32,14 @@
  */
 package com.revolsys.geometry.index.chain;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.revolsys.geometry.geomgraph.Quadrant;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
-import com.revolsys.geometry.model.segment.LineSegment;
-import com.revolsys.geometry.model.segment.LineSegmentDouble;
+import com.revolsys.geometry.noding.SegmentString;
 import com.revolsys.geometry.util.RectangleUtil;
 
 /**
@@ -53,14 +55,14 @@ import com.revolsys.geometry.util.RectangleUtil;
  * the same monotone chain for intersection.
  * <p>
  * Property 2 allows
- * an efficient binary search to be used to find the intersection points of two monotone chains.
+ * an efficient binary search to be used to find the intersection line of two monotone chains.
  * For many types of real-world data, these properties eliminate a large number of
  * segment comparisons, producing substantial speed gains.
  * <p>
  * One of the goals of this implementation of MonotoneChains is to be
  * as space and time efficient as possible. One design choice that aids this
- * is that a MonotoneChain is based on a subarray of a list of points.
- * This means that new arrays of points (potentially very large) do not
+ * is that a MonotoneChain is based on a subarray of a list of line.
+ * This means that new arrays of line (potentially very large) do not
  * have to be allocated.
  * <p>
  *
@@ -82,25 +84,118 @@ import com.revolsys.geometry.util.RectangleUtil;
  *
  * @version 1.7
  */
-public class MonotoneChain {
+public class MonotoneChain extends BoundingBoxDoubleXY {
 
-  private Object context = null;// user-defined information
+  /**
+   * Finds the index of the last point in a monotone chain
+   * starting at a given point.
+   * Any repeated line (0-length segments) will be included
+   * in the monotone chain returned.
+   *
+   * @return the index of the last point in the monotone chain
+   * starting at <code>start</code>.
+   */
+  private static int findChainEnd(final LineString points, final int start) {
+    int safeStart = start;
+    // skip any zero-length segments at the start of the sequence
+    // (since they cannot be used to establish a quadrant)
+    final int size = points.getVertexCount();
+    double startX1 = points.getX(safeStart);
+    double startY1 = points.getY(safeStart);
+    double startX2 = points.getX(safeStart + 1);
+    double startY2 = points.getY(safeStart + 1);
+    while (safeStart < size - 2 && startX1 == startX2 && startY1 == startY2) {
+      startX1 = startX2;
+      startY1 = startY2;
+      safeStart++;
+      startX2 = points.getX(safeStart + 1);
+      startY2 = points.getY(safeStart + 1);
+    }
+    // check if there are NO non-zero-length segments
+    if (safeStart >= size - 2) {
+      return size - 1;
+    }
+    // determine overall quadrant for chain (which is the starting quadrant)
+    final int chainQuad = Quadrant.quadrant(startX1, startY1, startX2, startY2);
+    int last = start + 1;
+    if (last < size) {
+      double lastX1 = points.getX(last - 1);
+      double lastY1 = points.getY(last - 1);
+      while (last < size) {
+        final double lastX2 = points.getX(last);
+        final double lastY2 = points.getY(last);
+        // skip zero-length segments, but include them in the chain
+        if (!(lastX1 == lastX2 && lastY1 == lastY2)) {
+          // compute quadrant for next possible segment in chain
+          final int quad = Quadrant.quadrant(lastX1, lastY1, lastX2, lastY2);
+          if (quad != chainQuad) {
+            break;
+          }
+        }
+        last++;
+        lastX1 = lastX2;
+        lastY1 = lastY2;
+      }
+    }
+    return last - 1;
+  }
 
-  private BoundingBox env = null;
+  public static MonotoneChain[] getChainsArray(final LineString points,
+    final SegmentString context) {
+    final List<Integer> indices = getChainStartIndices(points);
+    final MonotoneChain[] mcList = new MonotoneChain[indices.size() - 1];
+    int startIndex = indices.get(0);
+    for (int i = 1; i < indices.size(); i++) {
+      final int endIndex = indices.get(i);
+      final MonotoneChain chain = new MonotoneChain(points, startIndex, endIndex, context);
+      mcList[i - 1] = chain;
+      startIndex = endIndex;
+    }
+    return mcList;
+  }
+
+  /**
+   * Return an array containing lists of start/end indexes of the monotone chains
+   * for the given list of coordinates.
+   * The last entry in the array line to the end point of the point array,
+   * for use as a sentinel.
+   */
+  private static List<Integer> getChainStartIndices(final LineString line) {
+    // find the startpoint (and endpoints) of all monotone chains in this edge
+    int start = 0;
+    final List<Integer> startIndexList = new ArrayList<>();
+    startIndexList.add(start);
+    final int vertexCount = line.getVertexCount();
+    do {
+      final int last = findChainEnd(line, start);
+      startIndexList.add(last);
+      start = last;
+    } while (start < vertexCount - 1);
+    return startIndexList;
+  }
+
+  private final SegmentString context;// user-defined information
 
   private int id;// useful for optimizing chain comparisons
 
-  private final LineString points;
+  private final LineString line;
 
   private final int start;
 
   private final int end;
 
-  public MonotoneChain(final LineString pts, final int start, final int end, final Object context) {
-    this.points = pts;
+  public MonotoneChain(final LineString line, final int start, final int end,
+    final SegmentString context) {
+    this.line = line;
     this.start = start;
     this.end = end;
     this.context = context;
+    final double x1 = line.getX(start);
+    final double y1 = line.getY(start);
+    expandBbox(x1, y1);
+    final double x2 = line.getX(end);
+    final double y2 = line.getY(end);
+    expandBbox(x2, y2);
   }
 
   private void computeOverlaps(final int start, final int end, final double startX,
@@ -115,11 +210,11 @@ public class MonotoneChain {
 
       // the chains overlap, so split each in half and iterate (binary search)
       final int mid = (start + end) / 2;
-      final LineString points = this.points;
+      final LineString points = this.line;
       final double midX = points.getX(mid);
       final double midY = points.getY(mid);
       final int cMid = (cStart + cEnd) / 2;
-      final LineString chainPoints = chain.points;
+      final LineString chainPoints = chain.line;
       final double cMidX = chainPoints.getX(cMid);
       final double cMidY = chainPoints.getY(cMid);
 
@@ -167,12 +262,12 @@ public class MonotoneChain {
     final int end = this.end;
     final int cStart = chain.start;
     final int cEnd = chain.end;
-    final LineString points = this.points;
+    final LineString points = this.line;
     final double x1 = points.getX(start);
     final double y1 = points.getY(start);
     final double x2 = points.getX(end);
     final double y2 = points.getY(end);
-    final LineString chainPoints = chain.points;
+    final LineString chainPoints = chain.line;
     final double cx1 = chainPoints.getX(cStart);
     final double cy1 = chainPoints.getY(cStart);
     final double cx2 = chainPoints.getX(cEnd);
@@ -183,10 +278,11 @@ public class MonotoneChain {
 
   private void computeSelect(final BoundingBox searchEnv, final int start0, final int end0,
     final MonotoneChainSelectAction mcs) {
-    final double x1 = this.points.getX(start0);
-    final double y1 = this.points.getY(start0);
-    final double x2 = this.points.getX(end0);
-    final double y2 = this.points.getY(end0);
+    final LineString line = this.line;
+    final double x1 = line.getX(start0);
+    final double y1 = line.getY(start0);
+    final double x2 = line.getX(end0);
+    final double y2 = line.getY(end0);
 
     // terminating condition for the recursion
     if (end0 - start0 == 1) {
@@ -207,54 +303,16 @@ public class MonotoneChain {
     }
   }
 
-  public Object getContext() {
+  public SegmentString getContext() {
     return this.context;
-  }
-
-  /**
-   * Return the subsequence of coordinates forming this chain.
-   * Allocates a new array to hold the Coordinates
-   */
-  public Point[] getCoordinates() {
-    final Point coord[] = new Point[this.end - this.start + 1];
-    int index = 0;
-    for (int i = this.start; i <= this.end; i++) {
-      coord[index++] = this.points.getPoint(i);
-    }
-    return coord;
-  }
-
-  public int getEndIndex() {
-    return this.end;
-  }
-
-  public BoundingBox getEnvelope() {
-    if (this.env == null) {
-      final double x1 = this.points.getX(this.start);
-      final double y1 = this.points.getY(this.start);
-      final double x2 = this.points.getX(this.end);
-      final double y2 = this.points.getY(this.end);
-      this.env = new BoundingBoxDoubleXY(x1, y1, x2, y2);
-    }
-    return this.env;
   }
 
   public int getId() {
     return this.id;
   }
 
-  /**
-   * Gets the line segment starting at <code>index</code>
-   *
-   * @param index index of segment
-   * @param ls line segment to extract into
-   */
-  public LineSegment getLineSegment(final int index) {
-    return new LineSegmentDouble(this.points.getPoint(index), this.points.getPoint(index + 1));
-  }
-
-  public int getStartIndex() {
-    return this.start;
+  public LineString getLine() {
+    return this.line;
   }
 
   /**
@@ -269,11 +327,11 @@ public class MonotoneChain {
    * This saves on the overhead of checking envelope intersection
    * each time, since clients may be able to do this more efficiently.
    *
-   * @param searchEnv the search envelope
-   * @param mcs the select action to execute on selected segments
+   * @param boundingBox the search envelope
+   * @param action the select action to execute on selected segments
    */
-  public void select(final BoundingBox searchEnv, final MonotoneChainSelectAction mcs) {
-    computeSelect(searchEnv, this.start, this.end, mcs);
+  public void select(final BoundingBox boundingBox, final MonotoneChainSelectAction action) {
+    computeSelect(boundingBox, this.start, this.end, action);
   }
 
   public void setId(final int id) {

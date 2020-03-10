@@ -43,7 +43,6 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.Punctual;
-import com.revolsys.geometry.model.impl.LineStringDoubleGf;
 import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.geometry.model.impl.PointDoubleXYZ;
 import com.revolsys.geometry.util.Assert;
@@ -72,9 +71,8 @@ public class MiscellaneousTest extends TestCase {
     org.junit.Assert.assertTrue("Instanceof Point",
       this.geometryFactory.linearRing().getBoundary() instanceof Point);
     org.junit.Assert.assertTrue("instanceof Point",
-      this.geometryFactory.lineString(new Point[] {}).getBoundary() instanceof Point);
-    Assert.equals(LineStringDoubleGf.class,
-      this.geometryFactory.polygon().getBoundary().getClass());
+      this.geometryFactory.lineString(new Point[0]).getBoundary() instanceof Point);
+    org.junit.Assert.assertTrue(this.geometryFactory.polygon().getBoundary() instanceof LineString);
     try {
       this.geometryFactory.geometryCollection().getBoundary();
       assertTrue(false);

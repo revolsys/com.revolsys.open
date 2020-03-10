@@ -33,7 +33,6 @@
 package com.revolsys.geometry.noding;
 
 import com.revolsys.geometry.model.LineString;
-import com.revolsys.geometry.model.impl.AbstractDelegatingLineString;
 
 /**
  * Represents a list of contiguous line segments,
@@ -47,10 +46,11 @@ import com.revolsys.geometry.model.impl.AbstractDelegatingLineString;
  *
  * @version 1.7
  */
-public class BasicSegmentString extends AbstractDelegatingLineString implements SegmentString {
-  private static final long serialVersionUID = 1L;
+public class BasicSegmentString implements SegmentString {
 
   private Object data;
+
+  private final LineString line;
 
   /**
    * Creates a new segment string from a list of vertices.
@@ -59,7 +59,7 @@ public class BasicSegmentString extends AbstractDelegatingLineString implements 
    * @param data the user-defined data of this segment string (may be null)
    */
   public BasicSegmentString(final LineString line, final Object data) {
-    super(line);
+    this.line = line;
     this.data = data;
   }
 
@@ -78,6 +78,11 @@ public class BasicSegmentString extends AbstractDelegatingLineString implements 
     return this.data;
   }
 
+  @Override
+  public LineString getLineString() {
+    return this.line;
+  }
+
   /**
    * Gets the octant of the segment starting at vertex <code>index</code>.
    *
@@ -86,14 +91,20 @@ public class BasicSegmentString extends AbstractDelegatingLineString implements 
    * @return the octant of the segment at the vertex
    */
   public int getSegmentOctant(final int index) {
-    if (index == getVertexCount() - 1) {
+    final LineString line = this.line;
+    if (index == line.getVertexCount() - 1) {
       return -1;
     }
-    final double x1 = getX(index);
-    final double y1 = getY(index);
-    final double x2 = getX(index + 1);
-    final double y2 = getY(index + 1);
+    final double x1 = line.getX(index);
+    final double y1 = line.getY(index);
+    final double x2 = line.getX(index + 1);
+    final double y2 = line.getY(index + 1);
     return Octant.octant(x1, y1, x2, y2);
+  }
+
+  @Override
+  public boolean isClosed() {
+    return this.line.isClosed();
   }
 
   /**
@@ -108,11 +119,11 @@ public class BasicSegmentString extends AbstractDelegatingLineString implements 
 
   @Override
   public int size() {
-    return getVertexCount();
+    return this.line.getVertexCount();
   }
 
   @Override
   public String toString() {
-    return toWkt();
+    return this.line.toWkt();
   }
 }

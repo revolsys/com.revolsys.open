@@ -1856,6 +1856,10 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    */
   int getVertexCount();
 
+  default boolean hasGeometryType(final GeometryDataType<?, ?> dataType) {
+    return false;
+  }
+
   boolean hasInvalidXyCoordinates();
 
   /**

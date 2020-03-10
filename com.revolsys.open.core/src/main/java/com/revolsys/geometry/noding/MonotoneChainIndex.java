@@ -7,6 +7,6 @@ public class MonotoneChainIndex extends StrTree<MonotoneChain> {
   private static final long serialVersionUID = 1L;
 
   public void insertItem(final MonotoneChain chain) {
-    super.insertItem(chain.getEnvelope(), chain);
+    super.insertItem(chain, chain);
   }
 }

@@ -8,6 +8,7 @@ import org.jeometry.common.function.BiFunctionDouble;
 import org.jeometry.common.function.Consumer3Double;
 
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataType;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.impl.GeometryCollectionImpl;
 
@@ -69,6 +70,16 @@ public class GeometryCollectionImplEditor
     for (final GeometryEditor<?> editor : this.editors) {
       editor.forEachVertex(action);
     }
+  }
+
+  @Override
+  public boolean hasGeometryType(final GeometryDataType<?, ?> dataType) {
+    for (final Geometry geometry : geometries()) {
+      if (geometry.hasGeometryType(dataType)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @SuppressWarnings("unchecked")

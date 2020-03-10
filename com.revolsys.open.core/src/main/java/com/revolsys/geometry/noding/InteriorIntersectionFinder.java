@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.geometry.algorithm.LineIntersector;
+import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
 
 /**
@@ -158,16 +159,19 @@ public class InteriorIntersectionFinder implements SegmentIntersector {
       }
     }
 
-    final double x1 = e0.getX(segIndex0);
-    final double y1 = e0.getY(segIndex0);
-    final double x2 = e0.getX(segIndex0 + 1);
-    final double y2 = e0.getY(segIndex0 + 1);
-    final double x3 = e1.getX(segIndex1);
-    final double y3 = e1.getY(segIndex1);
-    final double x4 = e1.getX(segIndex1 + 1);
-    final double y4 = e1.getY(segIndex1 + 1);
+    final LineString line1 = e0.getLineString();
+    final double x1 = line1.getX(segIndex0);
+    final double y1 = line1.getY(segIndex0);
+    final double x2 = line1.getX(segIndex0 + 1);
+    final double y2 = line1.getY(segIndex0 + 1);
 
-    this.li.computeIntersection(x1, y1, x2, y2, x3, y3, x4, y4);
+    final LineString line2 = e1.getLineString();
+    final double x3 = line2.getX(segIndex1);
+    final double y3 = line2.getY(segIndex1);
+    final double x4 = line2.getX(segIndex1 + 1);
+    final double y4 = line2.getY(segIndex1 + 1);
+
+    this.li.computeIntersectionLine(x1, y1, x2, y2, x3, y3, x4, y4);
 
     if (this.li.hasIntersection()) {
       if (this.li.isInteriorIntersection()) {

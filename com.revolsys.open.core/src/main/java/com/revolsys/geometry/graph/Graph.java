@@ -829,7 +829,9 @@ public class Graph<T> extends BaseObjectWithProperties implements GeometryFactor
 
   public List<Node<T>> getNodes() {
     final List<Integer> nodeIds = new ArrayList<>(this.nodesIdsByPoint.values());
-    return new NodeList<>(this, nodeIds);
+    final NodeList<T> nodeList = new NodeList<>(this, nodeIds);
+    nodeList.sort(PointComparators.leftLowest());
+    return nodeList;
   }
 
   public List<Node<T>> getNodes(final BoundingBox boundingBox, final Predicate<Node<T>> filter) {

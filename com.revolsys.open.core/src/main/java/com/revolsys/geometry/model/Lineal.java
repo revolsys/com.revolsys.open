@@ -60,6 +60,7 @@ import com.revolsys.geometry.operation.valid.GeometryValidationError;
  *
  */
 public interface Lineal extends Geometry {
+
   static boolean addIsSimpleErrors(final Lineal lineal, final List<GeometryValidationError> errors,
     final boolean shortCircuit) {
     final LineSegmentIndex index = new LineSegmentIndex(lineal);
@@ -215,6 +216,11 @@ public interface Lineal extends Geometry {
 
   default double getZ(final int partIndex, final int vertexIndex) {
     return getCoordinate(partIndex, vertexIndex, Z);
+  }
+
+  @Override
+  default boolean hasGeometryType(final GeometryDataType<?, ?> dataType) {
+    return GeometryDataTypes.LINE_STRING == dataType;
   }
 
   boolean isClosed();
