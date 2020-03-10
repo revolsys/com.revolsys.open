@@ -186,16 +186,16 @@ public abstract class GeometryTransformer {
    * Subclasses may wish to override this method and check for this situation
    * (e.g. a subclass may choose to eliminate degenerate linear rings)
    *
-   * @param geom the ring to simplify
+   * @param ring the ring to simplify
    * @param parent the parent geometry
    * @return a LinearRing if the transformation resulted in a structurally valid ring
    * @return a LineString if the transformation caused the LinearRing to collapse to 3 or fewer points
    */
-  protected Geometry transformLinearRing(final LinearRing geometry, final Geometry parent) {
-    if (geometry == null) {
+  protected Geometry transformLinearRing(final LinearRing ring, final Geometry parent) {
+    if (ring == null) {
       return this.factory.linearRing();
     } else {
-      final LineString points = transformCoordinates(geometry, geometry);
+      final LineString points = transformCoordinates(ring, ring);
       if (points == null) {
         return this.factory.linearRing();
       } else {

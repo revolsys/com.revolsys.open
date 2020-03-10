@@ -9,6 +9,7 @@ import javax.swing.JTable;
 import javax.swing.RowSorter;
 import javax.swing.RowSorter.SortKey;
 import javax.swing.SortOrder;
+import javax.swing.SwingUtilities;
 import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
@@ -110,12 +111,18 @@ public class LabelCountMapTableModel extends AbstractTableModel {
 
   public void addRowLabel(final CharSequence label) {
     final String labelString = label.toString();
-    Invoke.andWait(() -> {
+    if (SwingUtilities.isEventDispatchThread()) {
       if (!this.labels.contains(labelString)) {
         this.labels.add(labelString);
         fireTableDataChanged();
       }
-    });
+    } else {
+      if (!this.labels.contains(labelString)) {
+        Invoke.andWait(() -> {
+          addRowLabel(labelString);
+        });
+      }
+    }
   }
 
   public TotalLabelCounters addTotalColumn(final String totalCountName) {

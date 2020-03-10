@@ -405,19 +405,19 @@ class SnapTransformer extends GeometryTransformer {
    * Subclasses may wish to override this method and check for this situation
    * (e.g. a subclass may choose to eliminate degenerate linear rings)
    *
-   * @param geom the ring to simplify
+   * @param ring the ring to simplify
    * @param parent the parent geometry
    * @return a LinearRing if the transformation resulted in a structurally valid ring
    * @return a LineString if the transformation caused the LinearRing to collapse to 3 or fewer points
    */
   @Override
-  protected Geometry transformLinearRing(final LinearRing geometry, final Geometry parent) {
-    if (geometry == null) {
+  protected Geometry transformLinearRing(final LinearRing ring, final Geometry parent) {
+    if (ring == null) {
       return this.factory.linearRing();
     } else {
-      final LineString newLine = transformCoordinates(geometry, geometry);
-      if (newLine == geometry) {
-        return geometry;
+      final LineString newLine = transformCoordinates(ring, ring);
+      if (newLine == ring) {
+        return ring;
       } else {
         final int vertexCount = newLine.getVertexCount();
         // ensure a valid LinearRing

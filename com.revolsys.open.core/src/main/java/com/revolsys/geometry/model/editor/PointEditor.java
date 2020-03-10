@@ -261,6 +261,13 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
   }
 
   @Override
+  public void removeGeometry(final int partIndex) {
+    this.point = null;
+    this.coordinates = null;
+    setModified(true);
+  }
+
+  @Override
   public void revertChanges() {
     this.coordinates = null;
     setModified(false);
@@ -297,6 +304,7 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
           }
         }
         this.coordinates[axisIndex] = coordinate;
+        setModified(true);
       }
       return oldValue;
     } else {
@@ -316,7 +324,7 @@ public class PointEditor extends AbstractGeometryEditor<PointEditor>
   @Override
   public PointEditor setCoordinate(final int[] vertexId, final int axisIndex,
     final double coordinate) {
-    if (vertexId.length == 0) {
+    if (vertexId.length <= 1) {
       setCoordinate(axisIndex, coordinate);
     }
     return this;

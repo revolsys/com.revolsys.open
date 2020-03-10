@@ -66,12 +66,9 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
    */
   protected Map<EdgeEnd, E> edgeMap = new TreeMap<>();
 
-  /**
-   * The location of the point for this star in Geometry i Areas
-   */
-  private final Location[] ptInAreaLocation = {
-    Location.NONE, Location.NONE
-  };
+  private Location location1 = Location.NONE;
+
+  private Location location2 = Location.NONE;
 
   public EdgeEndStar() {
 
@@ -187,7 +184,6 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
           } else {
             final double x = e.getX1();
             final double y = e.getY1();
-            final Point c = e.getCoordinate();
             loc = getLocation(geomi, x, y, geomGraph);
           }
           label.setAllLocationsIfNull(geomi, loc);
@@ -233,14 +229,23 @@ abstract public class EdgeEndStar<E extends EdgeEnd> implements Iterable<E> {
     return this.edgeList;
   }
 
-  private Location getLocation(final int geomIndex, final double x, final double y,
-    final GeometryGraph[] geom) {
+  private Location getLocation(final int geometryIndex, final double x, final double y,
+    final GeometryGraph[] graphs) {
     // compute location only on demand
-    Location location = this.ptInAreaLocation[geomIndex];
+    Location location;
+    if (geometryIndex == 0) {
+      location = this.location1;
+    } else {
+      location = this.location2;
+    }
     if (location == Location.NONE) {
-      final Geometry geometry = geom[geomIndex].getGeometry();
+      final Geometry geometry = graphs[geometryIndex].getGeometry();
       location = SimplePointInAreaLocator.locate(geometry, x, y);
-      this.ptInAreaLocation[geomIndex] = location;
+      if (geometryIndex == 0) {
+        this.location1 = location;
+      } else {
+        this.location2 = location;
+      }
     }
     return location;
   }

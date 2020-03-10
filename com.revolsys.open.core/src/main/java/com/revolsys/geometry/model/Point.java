@@ -57,6 +57,7 @@ import com.revolsys.geometry.model.vertex.PointVertex;
 import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.geometry.util.NumberUtil;
 import com.revolsys.geometry.util.Points;
+import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 
 /**
@@ -659,6 +660,28 @@ public interface Point extends Punctual, Serializable, BoundingBox {
       }
       return false;
     }
+  }
+
+  /**
+   * First the vertex or segment that is within the specified maxDistance. If a vertex is within the
+   * distance, then it is returned, even if a segment is closer.
+   * @param x
+   * @param y
+   * @param maxDistance
+   * @return
+   */
+  @Override
+  default Pair<GeometryComponent, Double> findGeometryComponentWithinDistance(final double x,
+    final double y, final double maxDistance) {
+    if (!isEmpty()) {
+      final double distance = distancePoint(x, y);
+      if (distance < maxDistance) {
+        return new Pair<>(vertices(), distance);
+      } else {
+
+      }
+    }
+    return new Pair<>();
   }
 
   @Override

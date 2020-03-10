@@ -357,6 +357,12 @@ public class PolygonEditor extends AbstractGeometryEditor<PolygonEditor>
   }
 
   @Override
+  public void removeGeometry(final int partIndex) {
+    this.editors.clear();
+    setModified(true);
+  }
+
+  @Override
   public Polygon removeHoles() {
     while (this.editors.size() > 1) {
       this.editors.remove(this.editors.size() - 1);

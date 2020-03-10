@@ -141,6 +141,8 @@ public interface GeometryEditor<GE extends GeometryEditor<?>> extends Geometry {
    */
   <GA extends Geometry> GA newGeometryAny();
 
+  void removeGeometry(int partIndex);
+
   void revertChanges();
 
   GeometryEditor<?> setAxisCount(int axisCount);
