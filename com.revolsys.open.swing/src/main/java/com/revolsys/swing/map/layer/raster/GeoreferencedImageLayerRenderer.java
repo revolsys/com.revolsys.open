@@ -29,7 +29,8 @@ public class GeoreferencedImageLayerRenderer
           }
           if (!view.isCancelled()) {
             final double alpha = layer.getOpacity() / 255.0;
-            view.drawImage(image, false, alpha, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            final boolean useTransform = !layer.isShowOriginalImage();
+            view.drawImage(image, useTransform, alpha, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
             view.drawDifferentCoordinateSystem(boundingBox);
           }
         }
