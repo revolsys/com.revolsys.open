@@ -288,6 +288,7 @@ public interface Record
     }
   }
 
+  @Override
   default boolean equalValue(final CharSequence fieldName, Object value) {
     final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
     if (fieldDefinition == null) {
@@ -613,35 +614,34 @@ public interface Record
   @Override
   default Identifier getIdentifier() {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    final List<Integer> idFieldIndexes = recordDefinition.getIdFieldIndexes();
-    final int idCount = idFieldIndexes.size();
-    if (idCount == 0) {
-      return null;
-    } else if (idCount == 1) {
-      final Integer idFieldIndex = idFieldIndexes.get(0);
-      final Object idValue = getValue(idFieldIndex);
-      if (idValue == null) {
-        return null;
-      } else {
-        return Identifier.newIdentifier(idValue);
-      }
-    } else {
-      boolean notNull = false;
-      final Object[] idValues = new Object[idCount];
-      for (int i = 0; i < idValues.length; i++) {
-        final Integer idFieldIndex = idFieldIndexes.get(i);
-        final Object value = getValue(idFieldIndex);
-        if (value != null) {
-          notNull = true;
+    if (recordDefinition.hasIdField()) {
+      final List<Integer> idFieldIndexes = recordDefinition.getIdFieldIndexes();
+      final int idCount = idFieldIndexes.size();
+      if (idCount == 1) {
+        final Integer idFieldIndex = idFieldIndexes.get(0);
+        final Object idValue = getValue(idFieldIndex);
+        if (idValue == null) {
+          return null;
+        } else {
+          return Identifier.newIdentifier(idValue);
         }
-        idValues[i] = value;
-      }
-      if (notNull) {
-        return new ListIdentifier(idValues);
       } else {
-        return null;
+        boolean notNull = false;
+        final Object[] idValues = new Object[idCount];
+        for (int i = 0; i < idValues.length; i++) {
+          final Integer idFieldIndex = idFieldIndexes.get(i);
+          final Object value = getValue(idFieldIndex);
+          if (value != null) {
+            notNull = true;
+          }
+          idValues[i] = value;
+        }
+        if (notNull) {
+          return new ListIdentifier(idValues);
+        }
       }
     }
+    return null;
   }
 
   @Override
