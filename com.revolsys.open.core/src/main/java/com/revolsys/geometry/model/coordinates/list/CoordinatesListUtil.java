@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jeometry.common.math.Angle;
 import org.jeometry.common.number.Doubles;
 
 import com.revolsys.geometry.algorithm.RobustDeterminant;
@@ -30,40 +29,6 @@ public class CoordinatesListUtil {
   public static final String SEGMENT_DISTANCE = "segmentDistance";
 
   public static final String SEGMENT_INDEX = "segmentIndex";
-
-  public static double angleToNext(final LineString points, final int i) {
-    final double x1 = points.getX(i);
-    final double y1 = points.getY(i);
-    double x2;
-    double y2;
-    int j = i + 1;
-    do {
-      x2 = points.getX(j);
-      y2 = points.getY(j);
-      j++;
-    } while (x1 == x2 && y1 == y2 && j < points.getVertexCount());
-    final double angle = Angle.angle2d(x1, y1, x2, y2);
-    return angle;
-  }
-
-  public static double angleToPrevious(final LineString points, final int i) {
-    if (i > 0) {
-      final double x1 = points.getX(i);
-      final double y1 = points.getY(i);
-      double x2;
-      double y2;
-      int j = i - 1;
-      do {
-        x2 = points.getX(j);
-        y2 = points.getY(j);
-        j--;
-      } while (x1 == x2 && y1 == y2 && j > -1);
-      final double angle = Angle.angle2d(x1, y1, x2, y2);
-      return angle;
-    } else {
-      throw new IllegalArgumentException("Index must be > 0 to calculate previous angle");
-    }
-  }
 
   public static int append(final int axisCount, final LineString source, final int sourceIndex,
     final double[] targetCoordinates, final int targetIndex, final int vertexCount) {

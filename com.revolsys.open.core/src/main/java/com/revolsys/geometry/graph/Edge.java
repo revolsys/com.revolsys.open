@@ -24,7 +24,6 @@ import com.revolsys.geometry.model.Direction;
 import com.revolsys.geometry.model.End;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.coordinates.list.CoordinatesListUtil;
 import com.revolsys.geometry.util.LineStringUtil;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.util.Property;
@@ -388,8 +387,7 @@ public class Edge<T> implements DelegatingLineString, ObjectWithProperties, Exte
 
   public double getFromAngle() {
     final LineString line = getLineString();
-    final LineString points = line;
-    return CoordinatesListUtil.angleToNext(points, 0);
+    return line.angleForwards(0);
   }
 
   public Node<T> getFromNode() {
@@ -485,8 +483,7 @@ public class Edge<T> implements DelegatingLineString, ObjectWithProperties, Exte
     if (line == null) {
       return Double.NaN;
     } else {
-      final LineString points = line;
-      return CoordinatesListUtil.angleToPrevious(points, points.getVertexCount() - 1);
+      return line.angleBackwards(line.getLastSegmentIndex());
     }
   }
 

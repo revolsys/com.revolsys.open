@@ -67,14 +67,21 @@ public enum Side {
 
   private String upperName;
 
+  private String lowerName;
+
   private Side(final String name) {
     this.name = name;
+    this.lowerName = name.toLowerCase();
     this.upperName = name.toUpperCase();
     this.letter = name.charAt(0);
   }
 
   public char getLetter() {
     return this.letter;
+  }
+
+  public String getLowerName() {
+    return this.lowerName;
   }
 
   public String getName() {

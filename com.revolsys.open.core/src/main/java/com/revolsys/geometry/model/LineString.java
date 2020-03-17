@@ -149,6 +149,36 @@ public interface LineString extends Lineal {
     }
   }
 
+  default double angleBackwards(final int segmentIndex) {
+    final double x1 = getX(segmentIndex + 1);
+    final double y1 = getY(segmentIndex + 1);
+    double x2;
+    double y2;
+    int i = segmentIndex;
+
+    do {
+      x2 = getX(i);
+      y2 = getY(i);
+      i--;
+    } while (x1 == x2 && y1 == y2 && i > 0);
+    return Math.atan2(y2 - y1, x2 - x1);
+  }
+
+  default double angleForwards(final int segmentIndex) {
+    final double x1 = getX(segmentIndex);
+    final double y1 = getY(segmentIndex);
+    double x2;
+    double y2;
+    int j = segmentIndex + 1;
+    final int vertexCount = getVertexCount();
+    do {
+      x2 = getX(j);
+      y2 = getY(j);
+      j++;
+    } while (x1 == x2 && y1 == y2 && j < vertexCount);
+    return Math.atan2(y2 - y1, x2 - x1);
+  }
+
   @Override
   default Lineal applyLineal(final Function<LineString, LineString> function) {
     final LineString newLine = function.apply(this);
@@ -1152,6 +1182,10 @@ public interface LineString extends Lineal {
     } else {
       return getPoint(0);
     }
+  }
+
+  default int getLastSegmentIndex() {
+    return getSegmentCount() - 1;
   }
 
   default int getLastVertexIndex() {
