@@ -8,10 +8,17 @@ public class LazyValue<V> extends ValueHolder<V> {
     return new LazyValue<>(supplier);
   }
 
+  private boolean initialized = false;
+
   private Supplier<V> supplier;
 
   public LazyValue(final Supplier<V> supplier) {
     this.supplier = supplier;
+  }
+
+  public synchronized void clearValue() {
+    this.initialized = false;
+    this.value = null;
   }
 
   @Override
@@ -22,8 +29,10 @@ public class LazyValue<V> extends ValueHolder<V> {
 
   @Override
   public synchronized V getValue() {
-    if (this.value == null && this.supplier != null) {
-      this.value = this.supplier.get();
+    final Supplier<V> supplier = this.supplier;
+    if (!this.initialized && supplier != null) {
+      this.initialized = true;
+      this.value = supplier.get();
     }
     return this.value;
   }
