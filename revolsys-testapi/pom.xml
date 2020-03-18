@@ -5,31 +5,22 @@
 >
   <modelVersion>4.0.0</modelVersion>
   <parent>
+    <artifactId>revolsys-parent</artifactId>
     <groupId>com.revolsys.open</groupId>
-    <artifactId>com.revolsys.open.parent</artifactId>
     <version>TRUNK-SNAPSHOT</version>
   </parent>
-  <artifactId>com.revolsys.open.fgdb</artifactId>
-  <packaging>jar</packaging>
-  <name>RS ESRI File Geodatabase</name>
+  <artifactId>revolsys-testapi</artifactId>
+  <name>RS Test API</name>
 
   <dependencies>
     <dependency>
       <groupId>com.revolsys.open</groupId>
-      <artifactId>com.revolsys.open.core</artifactId>
+      <artifactId>revolsys-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.revolsys.esri</groupId>
-      <artifactId>filegdb-jni</artifactId>
-      <version>1.5.1-8</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
     </dependency>
   </dependencies>
 </project>
-

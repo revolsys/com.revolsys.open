@@ -5,11 +5,11 @@
   xsi:schemaLocation=" http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd "
 >
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>com.revolsys.open.web</artifactId>
+  <artifactId>revolsys-web</artifactId>
   <name>RS Web</name>
   <packaging>jar</packaging>
   <parent>
-    <artifactId>com.revolsys.open.parent</artifactId>
+    <artifactId>revolsys-parent</artifactId>
     <groupId>com.revolsys.open</groupId>
     <version>TRUNK-SNAPSHOT</version>
   </parent>
@@ -34,7 +34,7 @@
     </dependency>
     <dependency>
       <groupId>com.revolsys.open</groupId>
-      <artifactId>com.revolsys.open.core</artifactId>
+      <artifactId>revolsys-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

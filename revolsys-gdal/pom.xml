@@ -4,30 +4,23 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
 >
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>com.revolsys.open.oracle</artifactId>
-  <name>RS Oracle</name>
+  <artifactId>revolsys-gdal</artifactId>
+  <name>RS GDAL</name>
   <parent>
     <groupId>com.revolsys.open</groupId>
-    <artifactId>com.revolsys.open.parent</artifactId>
+    <artifactId>revolsys-parent</artifactId>
     <version>TRUNK-SNAPSHOT</version>
   </parent>
   <dependencies>
     <dependency>
       <groupId>com.revolsys.open</groupId>
-      <artifactId>com.revolsys.open.core</artifactId>
+      <artifactId>revolsys-core</artifactId>
       <version>${project.version}</version>
-      <scope>compile</scope>
-    </dependency> 
-    <dependency>
-      <groupId>com.oracle.ojdbc</groupId>
-      <artifactId>ojdbc8</artifactId>
-      <version>19.3.0.0</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <scope>test</scope>
+      <groupId>com.revolsys.gdal</groupId>
+      <artifactId>gdal-jni</artifactId>
+      <version>${org.gdal.version}</version>
     </dependency>
   </dependencies>
 </project>

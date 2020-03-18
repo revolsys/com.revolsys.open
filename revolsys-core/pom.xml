@@ -3,11 +3,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>com.revolsys.open.parent</artifactId>
+    <artifactId>revolsys-parent</artifactId>
     <groupId>com.revolsys.open</groupId>
     <version>TRUNK-SNAPSHOT</version>
   </parent>
-  <artifactId>com.revolsys.open.core</artifactId>
+  <artifactId>revolsys-core</artifactId>
   <name>RS Core</name>
 
   <dependencies>

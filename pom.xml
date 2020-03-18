@@ -6,7 +6,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.revolsys.open</groupId>
-  <artifactId>com.revolsys.open.parent</artifactId>
+  <artifactId>revolsys-parent</artifactId>
   <packaging>pom</packaging>
   <name>Revolution Systems Open Library</name>
   <version>TRUNK-SNAPSHOT</version>
@@ -46,16 +46,16 @@
   </issueManagement>
 
   <modules>
-    <module>com.revolsys.open.core</module>
-    <module>com.revolsys.open.testapi</module>
-    <module>com.revolsys.open.fgdb</module>
-    <module>com.revolsys.open.gdal</module>
+    <module>revolsys-core</module>
+    <module>revolsys-testapi</module>
+    <module>revolsys-fgdb</module>
+    <module>revolsys-gdal</module>
     <module>revolsys-geopackage</module>
-    <module>com.revolsys.open.oracle</module>
-    <module>com.revolsys.open.postgresql</module>
-    <module>com.revolsys.open.maki</module>
-    <module>com.revolsys.open.swing</module>
-    <module>com.revolsys.open.web</module>
+    <module>revolsys-oracle</module>
+    <module>revolsys-postgresql</module>
+    <module>revolsys-maki</module>
+    <module>revolsys-swing</module>
+    <module>revolsys-web</module>
     <module>war-overlay</module>
   </modules>
 

@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.revolsys.open</groupId>
-    <artifactId>com.revolsys.open.parent</artifactId>
+    <artifactId>revolsys-parent</artifactId>
     <version>TRUNK-SNAPSHOT</version>
   </parent>
   <artifactId>revolsys-geopackage</artifactId>
@@ -15,7 +15,7 @@
   <dependencies>
     <dependency>
       <groupId>com.revolsys.open</groupId>
-      <artifactId>com.revolsys.open.core</artifactId>
+      <artifactId>revolsys-core</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>

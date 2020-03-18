@@ -4,11 +4,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 >
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>com.revolsys.open.maki</artifactId>
+  <artifactId>revolsys-maki</artifactId>
   <name>Maki Markers</name>
   <packaging>jar</packaging>
   <parent>
-    <artifactId>com.revolsys.open.parent</artifactId>
+    <artifactId>revolsys-parent</artifactId>
     <groupId>com.revolsys.open</groupId>
     <version>TRUNK-SNAPSHOT</version>
   </parent>
@@ -24,7 +24,7 @@
   <dependencies>
     <dependency>
       <groupId>com.revolsys.open</groupId>
-      <artifactId>com.revolsys.open.swing</artifactId>
+      <artifactId>revolsys-swing</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

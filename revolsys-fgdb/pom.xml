@@ -4,25 +4,32 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
 >
   <modelVersion>4.0.0</modelVersion>
-  <name>RS PostgreSQL</name>
-  <artifactId>com.revolsys.open.postgresql</artifactId>
-  <url>http://www.revolsys.com</url>
   <parent>
     <groupId>com.revolsys.open</groupId>
-    <artifactId>com.revolsys.open.parent</artifactId>
+    <artifactId>revolsys-parent</artifactId>
     <version>TRUNK-SNAPSHOT</version>
   </parent>
+  <artifactId>revolsys-fgdb</artifactId>
+  <packaging>jar</packaging>
+  <name>RS ESRI File Geodatabase</name>
+
   <dependencies>
     <dependency>
       <groupId>com.revolsys.open</groupId>
-      <artifactId>com.revolsys.open.core</artifactId>
+      <artifactId>revolsys-core</artifactId>
       <version>${project.version}</version>
-      <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <version>42.2.9</version>
+      <groupId>com.revolsys.esri</groupId>
+      <artifactId>filegdb-jni</artifactId>
+      <version>1.5.1-8</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>
+

@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.revolsys.open</groupId>
-    <artifactId>com.revolsys.open.parent</artifactId>
+    <artifactId>revolsys-parent</artifactId>
     <version>TRUNK-SNAPSHOT</version>
   </parent>
   <artifactId>tests</artifactId>
@@ -29,27 +29,27 @@
   <dependencies>
     <dependency>
       <groupId>com.revolsys.open</groupId>
-      <artifactId>com.revolsys.open.fgdb</artifactId>
+      <artifactId>revolsys-fgdb</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.revolsys.open</groupId>
-      <artifactId>com.revolsys.open.oracle</artifactId>
+      <artifactId>revolsys-oracle</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.revolsys.open</groupId>
-      <artifactId>com.revolsys.open.postgresql</artifactId>
+      <artifactId>revolsys-postgresql</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.revolsys.open</groupId>
-      <artifactId>com.revolsys.open.testapi</artifactId>
+      <artifactId>revolsys-testapi</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.revolsys.open</groupId>
-      <artifactId>com.revolsys.open.swing</artifactId>
+      <artifactId>revolsys-swing</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

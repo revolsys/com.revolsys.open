@@ -4,23 +4,25 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
 >
   <modelVersion>4.0.0</modelVersion>
+  <name>RS PostgreSQL</name>
+  <artifactId>revolsys-postgresql</artifactId>
+  <url>http://www.revolsys.com</url>
   <parent>
-    <artifactId>com.revolsys.open.parent</artifactId>
     <groupId>com.revolsys.open</groupId>
+    <artifactId>revolsys-parent</artifactId>
     <version>TRUNK-SNAPSHOT</version>
   </parent>
-  <artifactId>com.revolsys.open.testapi</artifactId>
-  <name>RS Test API</name>
-
   <dependencies>
     <dependency>
       <groupId>com.revolsys.open</groupId>
-      <artifactId>com.revolsys.open.core</artifactId>
+      <artifactId>revolsys-core</artifactId>
       <version>${project.version}</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.2.9</version>
     </dependency>
   </dependencies>
 </project>
