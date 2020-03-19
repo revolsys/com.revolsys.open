@@ -56,7 +56,6 @@
     <module>revolsys-maki</module>
     <module>revolsys-swing</module>
     <module>revolsys-web</module>
-    <module>war-overlay</module>
   </modules>
 
   <build>
