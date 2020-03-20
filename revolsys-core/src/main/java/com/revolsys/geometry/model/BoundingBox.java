@@ -360,7 +360,7 @@ public interface BoundingBox
   default boolean bboxCovers(final Point point) {
     if (point == null || point.isEmpty()) {
       return false;
-    } else if (isSameCoordinateSystem(this)) {
+    } else if (isSameCoordinateSystem(point)) {
       final double x = point.getX();
       final double y = point.getY();
       return bboxCovers(x, y);
@@ -459,7 +459,7 @@ public interface BoundingBox
   default boolean bboxEquals(final BoundingBox boundingBox) {
     if (boundingBox == null || boundingBox.isEmpty()) {
       return false;
-    } else if (isSameCoordinateSystem(this)) {
+    } else if (isSameCoordinateSystem(boundingBox)) {
       if (getMaxX() == boundingBox.getMaxX()) {
         if (getMaxY() == boundingBox.getMaxY()) {
           if (getMinX() == boundingBox.getMinX()) {
@@ -527,7 +527,7 @@ public interface BoundingBox
   default boolean bboxIntersects(final BoundingBox boundingBox) {
     if (boundingBox == null || boundingBox.isEmpty()) {
       return false;
-    } else if (isSameCoordinateSystem(this)) {
+    } else if (isSameCoordinateSystem(boundingBox)) {
       final double minX = boundingBox.getMinX();
       final double minY = boundingBox.getMinY();
       final double maxX = boundingBox.getMaxX();
