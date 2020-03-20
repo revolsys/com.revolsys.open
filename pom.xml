@@ -517,12 +517,12 @@
     <repository>
       <id>github-maven-project</id>
       <name>Github Releases</name>
-      <url>${gitHubMavenUrl}</url>
+      <url>https://maven.pkg.github.com/revolsys/com.revolsys.open</url>
     </repository>
     <site>
       <id>gh-pages</id>
       <name>Deployment through GitHub's site deployment plugin</name>
-      <url>github:https://${gitHubUser}.github.io/${gitHubRepository}</url>
+      <url>github:https://revolsys.github.io/com.revolsys.open</url>
     </site>
   </distributionManagement>
 
@@ -573,13 +573,6 @@
     <org.apache.xmlgraphics.batik.version>1.12</org.apache.xmlgraphics.batik.version>
     <gpg.skip>true</gpg.skip>
     <github.global.server>github</github.global.server>
-    <gitHubUser>revolsys</gitHubUser>
-    <gitHubProject>com.revolsys.open</gitHubProject>
-    <gitHubRepository>${gitHubUser}/${gitHubProject}</gitHubRepository>
-    <gitHubUrl>https://github.com/${gitHubRepository}/</gitHubUrl>
-    <gitHubToken>PERSONAL ACCESS TOKEN WITH PACKAGE DEPLOY PERMISSION</gitHubToken>
-    <gitHubMavenUrl>https://token:${gitHubToken}@maven.pkg.github.com/${gitHubRepository}</gitHubMavenUrl>
-    <siteUrl>http://${gitHubUser}.github.io/${gitHubProject}/</siteUrl>
     <skipTests>true</skipTests>
   </properties>
 </project>
