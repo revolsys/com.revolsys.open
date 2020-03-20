@@ -63,7 +63,7 @@ public interface Grid extends ObjectWithProperties, BoundingBoxProxy {
 
   /**
    *
-   * @author Paul Austin <paul.austin@revolsys.com>
+   * 
    * @param a
    * @param b
    * @param c

@@ -1263,7 +1263,7 @@ public interface LineString extends Lineal {
 
   /**
    * Get the
-   * @author Paul Austin <paul.austin@revolsys.com>
+   * 
    * @param x
    * @param y
    * @param maxDistance

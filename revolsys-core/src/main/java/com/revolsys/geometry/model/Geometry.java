@@ -1819,7 +1819,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   /**
    * <p>Get the {@link Segment} at the specified vertexId (see {@link Segment#getSegmentId()}).</p>
    *
-   * @author Paul Austin <paul.austin@revolsys.com>
+   * 
    * @param vertexId The id of the vertex.
    * @return The vertex or null if it does not exist.
    */
@@ -1832,7 +1832,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   /**
    * <p>Get the {@link Vertex} at the specified vertexId starting at the end of the geometry (see {@link Vertex#getVertexId()}).</p>
    *
-   * @author Paul Austin <paul.austin@revolsys.com>
+   * 
    * @param vertexId The id of the vertex.
    * @return The vertex or null if it does not exist.
    */
@@ -1841,7 +1841,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
   /**
    * <p>Get the {@link Vertex} at the specified vertexId (see {@link Vertex#getVertexId()}).</p>
    *
-   * @author Paul Austin <paul.austin@revolsys.com>
+   * 
    * @param vertexId The id of the vertex.
    * @return The vertex or null if it does not exist.
    */
@@ -2533,7 +2533,7 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
    * <p>The {@link Iterable#iterator()} method always returns the same {@link Iterator} instance.
    * Therefore that method should not be called more than once.</p>
    *
-   * @author Paul Austin <paul.austin@revolsys.com>
+   * 
    * @return The iterator over the vertices of the geometry.
    */
   Vertex vertices();

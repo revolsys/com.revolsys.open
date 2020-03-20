@@ -1171,7 +1171,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
    * If there is one geometry that single geometry will be returned. Otherwise the result
    * will be a subclass of {@link GeometryCollection}.
    *
-   * @author Paul Austin <paul.austin@revolsys.com>
+   * 
    * @param geometries
    * @return
    */

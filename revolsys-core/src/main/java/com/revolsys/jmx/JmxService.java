@@ -28,8 +28,6 @@ import com.revolsys.record.schema.FieldDefinition;
  * server has a list of object names and labels and the list of attributes and
  * operations to be exposed on that server. The only servers, objects,
  * attributes and operations to be exposed are those in the configuration.
- *
- * @author Paul Austin paul.austin@revolsys.com
  */
 public class JmxService {
   /** The JMX server configurations. */
