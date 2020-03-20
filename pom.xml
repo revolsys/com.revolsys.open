@@ -515,31 +515,27 @@
 
   <distributionManagement>
     <repository>
-      <id>revolsys-releases</id>
-      <name>revolsys-releases</name>
-      <url>https://open.revolsys.com/artifactory/libs-release</url>
+      <id>github-maven-project</id>
+      <name>Github Releases</name>
+      <url>${gitHubMavenUrl}</url>
     </repository>
-    <snapshotRepository>
-      <id>revolsys-snapshots</id>
-      <name>revolsys-snapshots</name>
-      <url>https://open.revolsys.com/artifactory/libs-snapshot</url>
-    </snapshotRepository>
     <site>
       <id>gh-pages</id>
       <name>Deployment through GitHub's site deployment plugin</name>
-      <url>github:http://revolsys.github.io/com.revolsys.open</url>
+      <url>github:https://${gitHubUser}.github.io/${gitHubRepository}</url>
     </site>
   </distributionManagement>
 
   <repositories>
     <repository>
-      <id>jcenter</id>
-      <url>https://jcenter.bintray.com/</url>
+      <id>github-maven-project</id>
+      <name>Github Releases</name>
+      <url>${gitHubMavenUrl}</url>
       <releases>
-         <enabled>true</enabled>
+        <enabled>true</enabled>
       </releases>
       <snapshots>
-        <enabled>false</enabled>
+        <enabled>true</enabled>
       </snapshots>
     </repository>
   </repositories>
@@ -558,8 +554,11 @@
     <github.global.server>github</github.global.server>
     <gitHubUser>revolsys</gitHubUser>
     <gitHubProject>com.revolsys.open</gitHubProject>
+    <gitHubRepository>${gitHubUser}/${gitHubProject}</gitHubRepository>
+    <gitHubUrl>https://github.com/${gitHubRepository}/</gitHubUrl>
+    <gitHubToken>PERSONAL ACCESS TOKEN WITH PACKAGE DEPLOY PERMISSION</gitHubToken>
+    <gitHubMavenUrl>https://token:${gitHubToken}@maven.pkg.github.com/${gitHubRepository}</gitHubMavenUrl>
     <siteUrl>http://${gitHubUser}.github.io/${gitHubProject}/</siteUrl>
-    <gitHubUrl>https://github.com/${gitHubUser}/${gitHubProject}/</gitHubUrl>
     <skipTests>true</skipTests>
   </properties>
 </project>
