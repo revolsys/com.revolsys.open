@@ -528,14 +528,35 @@
 
   <repositories>
     <repository>
-      <id>github-maven-project</id>
-      <name>Github Releases</name>
-      <url>${gitHubMavenUrl}</url>
+      <id>jcenter</id>
+      <url>https://jcenter.bintray.com/</url>
+      <releases>
+         <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>revolsys external</id>
       <releases>
         <enabled>true</enabled>
       </releases>
       <snapshots>
         <enabled>true</enabled>
+      </snapshots>
+      <name>ext</name>
+      <url>https://open.revolsys.com/artifactory/ext</url>
+    </repository>
+    <repository>
+      <id>github-maven-project</id>
+      <name>Github Releases</name>
+      <url>https://maven.pkg.github.com/revolsys/com.revolsys.open</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
       </snapshots>
     </repository>
   </repositories>
