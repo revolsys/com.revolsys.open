@@ -43,16 +43,16 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
   private GeometryFactory geometryFactory;
 
   public GeoJsonRecordWriter(final Writer out) {
-    this.out = new JsonWriter(new BufferedWriter(out));
-    this.out.setIndent(true);
+    this(out, null);
   }
 
   public GeoJsonRecordWriter(final Writer out, final RecordDefinition recordDefinition) {
-    this(out);
-    this.recordDefinition = recordDefinition;
+    super(recordDefinition);
     if (recordDefinition != null) {
       this.geometryFactory = recordDefinition.getGeometryFactory();
     }
+    this.out = new JsonWriter(new BufferedWriter(out));
+    this.out.setIndent(true);
   }
 
   /**
@@ -183,6 +183,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     this.out.endList();
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
@@ -190,11 +191,6 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
   @Override
   public ClockDirection getPolygonRingDirection() {
     return ClockDirection.COUNTER_CLOCKWISE;
-  }
-
-  @Override
-  public RecordDefinition getRecordDefinition() {
-    return this.recordDefinition;
   }
 
   public boolean isAllowCustomCoordinateSystem() {

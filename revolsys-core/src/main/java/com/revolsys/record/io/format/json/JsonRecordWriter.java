@@ -24,8 +24,6 @@ public class JsonRecordWriter extends AbstractRecordWriter {
 
   private Writer out;
 
-  private RecordDefinition recordDefinition;
-
   private boolean singleObject;
 
   private boolean startAttribute;
@@ -35,7 +33,7 @@ public class JsonRecordWriter extends AbstractRecordWriter {
   private final JsonStringEncodingWriter encodingOut;
 
   public JsonRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
-    this.recordDefinition = recordDefinition;
+    super(recordDefinition);
     this.out = out;
     this.encodingOut = new JsonStringEncodingWriter(out);
   }
@@ -57,7 +55,6 @@ public class JsonRecordWriter extends AbstractRecordWriter {
     } finally {
       FileUtil.closeSilent(this.out);
       this.out = null;
-      this.recordDefinition = null;
     }
   }
 
@@ -158,7 +155,7 @@ public class JsonRecordWriter extends AbstractRecordWriter {
 
   @Override
   public String toString() {
-    return this.recordDefinition.getPath().toString();
+    return getPathName().toString();
   }
 
   @SuppressWarnings("unchecked")
@@ -225,7 +222,7 @@ public class JsonRecordWriter extends AbstractRecordWriter {
       }
       startObject();
       boolean hasValue = false;
-      for (final FieldDefinition field : this.recordDefinition.getFields()) {
+      for (final FieldDefinition field : getFieldDefinitions()) {
         final int fieldIndex = field.getIndex();
         final Object value;
         if (isWriteCodeValues()) {

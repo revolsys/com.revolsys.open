@@ -9,28 +9,20 @@ public class DirectoryRecordStoreWriter extends AbstractRecordWriter {
 
   private DirectoryRecordStore recordStore;
 
-  private RecordDefinition recordDefinition;
-
   public DirectoryRecordStoreWriter(final DirectoryRecordStore recordStore) {
-    this.recordStore = recordStore;
+    this(recordStore, null);
   }
 
   public DirectoryRecordStoreWriter(final DirectoryRecordStore recordStore,
     final RecordDefinition recordDefinition) {
+    super(recordDefinition);
     this.recordStore = recordStore;
-    this.recordDefinition = recordDefinition;
   }
 
   @Override
   public void close() {
     super.close();
     this.recordStore = null;
-    this.recordDefinition = null;
-  }
-
-  @Override
-  public RecordDefinition getRecordDefinition() {
-    return this.recordDefinition;
   }
 
   @Override

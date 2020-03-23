@@ -2,6 +2,7 @@ package com.revolsys.io;
 
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
 public abstract class AbstractRecordWriter extends AbstractWriter<Record> implements RecordWriter {
@@ -12,6 +13,17 @@ public abstract class AbstractRecordWriter extends AbstractWriter<Record> implem
   private boolean indent = false;
 
   private Resource resource;
+
+  private final RecordDefinition recordDefinition;
+
+  public AbstractRecordWriter(final RecordDefinition recordDefinition) {
+    this.recordDefinition = recordDefinition;
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
+  }
 
   public Resource getResource() {
     return this.resource;

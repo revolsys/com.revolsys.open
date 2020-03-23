@@ -57,6 +57,6 @@ public class Kmz extends GeometryRecordReaderFactory
   public RecordWriter newRecordWriter(final String baseName,
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
-    return new KmzRecordWriter(outputStream, charset);
+    return new KmzRecordWriter(recordDefinition, outputStream, charset);
   }
 }

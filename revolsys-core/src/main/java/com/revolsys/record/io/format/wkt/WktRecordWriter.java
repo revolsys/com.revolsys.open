@@ -21,12 +21,10 @@ public class WktRecordWriter extends AbstractRecordWriter {
 
   private final Writer out;
 
-  private final RecordDefinition recordDefinition;
-
   private GeometryFactory geometryFactory;
 
   public WktRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
-    this.recordDefinition = recordDefinition;
+    super(recordDefinition);
     this.out = new BufferedWriter(out);
     final FieldDefinition geometryField = recordDefinition.getGeometryField();
     if (geometryField != null) {
@@ -47,6 +45,7 @@ public class WktRecordWriter extends AbstractRecordWriter {
     }
   }
 
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
@@ -62,7 +61,7 @@ public class WktRecordWriter extends AbstractRecordWriter {
 
   @Override
   public String toString() {
-    return this.recordDefinition.getPath().toString();
+    return getPathName().toString();
   }
 
   @Override

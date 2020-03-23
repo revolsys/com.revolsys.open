@@ -45,10 +45,8 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
 
   private final XmlWriter out;
 
-  private final RecordDefinition recordDefinition;
-
   public EsriGeodatabaseXmlRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
-    this.recordDefinition = recordDefinition;
+    super(recordDefinition);
     this.out = new XmlWriter(out);
   }
 
@@ -79,7 +77,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     this.out.startTag(VALUES);
     this.out.attribute(XsiConstants.TYPE, VALUES_TYPE);
 
-    for (final FieldDefinition field : this.recordDefinition.getFields()) {
+    for (final FieldDefinition field : getFieldDefinitions()) {
       final String fieldName = field.getName();
       final Object value;
       if (isWriteCodeValues()) {
@@ -93,7 +91,7 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
         fieldType.writeValue(this.out, value);
       }
     }
-    if (this.recordDefinition.getField("OBJECTID") == null) {
+    if (!hasField("OBJECTID")) {
       final EsriGeodatabaseXmlFieldType fieldType = this.fieldTypes.getFieldType(DataTypes.INT);
       fieldType.writeValue(this.out, this.objectId++);
     }
@@ -332,7 +330,8 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
 
     this.out.startTag(DATASET_DEFINITIONS);
     this.out.attribute(XsiConstants.TYPE, DATASET_DEFINITIONS_TYPE);
-    writeDataElement(this.recordDefinition, geometry);
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    writeDataElement(recordDefinition, geometry);
     this.out.endTag(DATASET_DEFINITIONS);
 
     this.out.endTag(WORKSPACE_DEFINITION);
@@ -390,13 +389,14 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     this.out.startTag(DATASET_DATA);
     this.out.attribute(XsiConstants.TYPE, DATASET_DATA_TABLE_DATA);
 
-    this.out.element(DATASET_NAME, this.recordDefinition.getName());
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    this.out.element(DATASET_NAME, recordDefinition.getName());
     this.out.element(DATASET_TYPE, this.datasetType);
 
     this.out.startTag(DATA);
     this.out.attribute(XsiConstants.TYPE, DATA_RECORD_SET);
 
-    writeFields(this.recordDefinition);
+    writeFields(recordDefinition);
 
     this.out.startTag(RECORDS);
     this.out.attribute(XsiConstants.TYPE, RECORDS_TYPE);

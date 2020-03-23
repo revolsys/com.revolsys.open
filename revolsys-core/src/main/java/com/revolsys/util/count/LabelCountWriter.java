@@ -12,9 +12,11 @@ public class LabelCountWriter extends AbstractRecordWriter {
   private Writer<Record> writer;
 
   public LabelCountWriter() {
+    super(null);
   }
 
   public LabelCountWriter(final Writer<Record> writer) {
+    super(null);
     setWriter(writer);
   }
 

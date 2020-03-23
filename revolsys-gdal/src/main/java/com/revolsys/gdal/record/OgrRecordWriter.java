@@ -34,6 +34,7 @@ public class OgrRecordWriter extends AbstractRecordWriter {
   private OgrRecordStore recordStore;
 
   OgrRecordWriter(final OgrRecordStore recordStore) {
+    super(null);
     this.recordStore = recordStore;
     this.dataSource = recordStore.newDataSource(true);
   }

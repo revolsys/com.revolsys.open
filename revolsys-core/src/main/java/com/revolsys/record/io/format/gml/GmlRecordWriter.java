@@ -41,6 +41,7 @@ public class GmlRecordWriter extends AbstractRecordWriter {
   private QName qualifiedName;
 
   public GmlRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
+    super(recordDefinition);
     this.out = new XmlWriter(out);
     this.qualifiedName = recordDefinition.getProperty(RecordProperties.QUALIFIED_NAME);
     if (this.qualifiedName == null) {
@@ -81,6 +82,11 @@ public class GmlRecordWriter extends AbstractRecordWriter {
   @Override
   public void flush() {
     this.out.flush();
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
   }
 
   @Override

@@ -74,8 +74,6 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
 
   private OutputStream out;
 
-  private final RecordDefinition recordDefinition;
-
   private SpreadsheetMLPackage spreadsheetPackage;
 
   private WorksheetPart sheet;
@@ -85,8 +83,8 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
   private List<Row> sheetRows = Collections.emptyList();
 
   public XlsxRecordWriter(final RecordDefinition recordDefinition, final OutputStream out) {
+    super(recordDefinition);
     try {
-      this.recordDefinition = recordDefinition;
       this.out = new BufferedOutputStream(out);
       this.spreadsheetPackage = SpreadsheetMLPackage.createPackage();
       final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
@@ -200,7 +198,7 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
   public synchronized void close() {
     if (this.out != null) {
       try {
-        final long fieldCount = this.recordDefinition.getFieldCount();
+        final long fieldCount = getFieldCount();
         final String ref = "A1:" + getRef(fieldCount, this.sheetRows.size());
         final TablePart tablePart = new TablePart();
         this.spreadsheetPackage.addTargetPart(tablePart);
@@ -208,7 +206,8 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
         tablePart.setContents(table);
         table.setId(1);
         table.setName("Table1");
-        table.setDisplayName(this.recordDefinition.getName());
+        final RecordDefinition recordDefinition = getRecordDefinition();
+        table.setDisplayName(recordDefinition.getName());
         table.setRef(ref);
 
         final CTAutoFilter autoFilter = smlObjectFactory.createCTAutoFilter();
@@ -220,7 +219,7 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
         tableColumns.setCount(fieldCount);
         table.setTableColumns(tableColumns);
         final List<CTTableColumn> columns = tableColumns.getTableColumn();
-        for (final String fieldName : this.recordDefinition.getFieldNames()) {
+        for (final String fieldName : getFieldNames()) {
           final CTTableColumn column = smlObjectFactory.createCTTableColumn();
           column.setId(columnIndex);
           column.setName(fieldName);
@@ -261,16 +260,11 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
   }
 
   @Override
-  public RecordDefinition getRecordDefinition() {
-    return this.recordDefinition;
-  }
-
-  @Override
   public void write(final Record record) {
     final Row recordRow = smlObjectFactory.createRow();
     this.sheetRows.add(recordRow);
     final List<Cell> cells = recordRow.getC();
-    for (final FieldDefinition field : this.recordDefinition.getFields()) {
+    for (final FieldDefinition field : getFieldDefinitions()) {
       final Object value = record.getValue(field);
       final String string = field.toString(value);
       if (value instanceof Number) {

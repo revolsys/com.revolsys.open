@@ -26,8 +26,6 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
   /** The writer */
   private XmlWriter out;
 
-  private final RecordDefinition recordDefinition;
-
   private boolean singleObject;
 
   private String title;
@@ -35,7 +33,7 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
   private boolean wrap = true;
 
   public XhtmlRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
-    this.recordDefinition = recordDefinition;
+    super(recordDefinition);
     this.out = new XmlWriter(out);
   }
 
@@ -82,7 +80,7 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
       writeHeader();
     }
     if (this.singleObject) {
-      for (final FieldDefinition fieldDefinition : this.recordDefinition.getFields()) {
+      for (final FieldDefinition fieldDefinition : getFieldDefinitions()) {
         final String fieldName = fieldDefinition.getName();
         final Object value = record.getValue(fieldName);
         if (isValueWritable(value)) {
@@ -102,7 +100,7 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
       }
     } else {
       this.out.startTag(HtmlElem.TR);
-      for (final FieldDefinition fieldDefinition : this.recordDefinition.getFields()) {
+      for (final FieldDefinition fieldDefinition : getFieldDefinitions()) {
         final String fieldName = fieldDefinition.getName();
         final Object value;
         if (isWriteCodeValues()) {
@@ -200,7 +198,7 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
 
       this.out.startTag(HtmlElem.THEAD);
       this.out.startTag(HtmlElem.TR);
-      for (final String name : this.recordDefinition.getFieldNames()) {
+      for (final String name : getFieldNames()) {
         this.out.element(HtmlElem.TH, name);
       }
       this.out.endTag(HtmlElem.TR);

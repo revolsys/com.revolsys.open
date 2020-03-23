@@ -17,8 +17,6 @@ public class FileGdbWriter extends AbstractRecordWriter {
 
   private final Map<PathName, TableWrapper> tablesByPathName = new HashMap<>();
 
-  private RecordDefinition recordDefinition;
-
   private FileGdbRecordDefinition fileGdbRecordDefinition;
 
   private TableWrapper table;
@@ -28,16 +26,17 @@ public class FileGdbWriter extends AbstractRecordWriter {
   private final List<TableWrapper> tables = new ArrayList<>();
 
   FileGdbWriter(final FileGdbRecordStore recordStore) {
+    super(null);
     this.recordStore = recordStore;
     this.loadOnlyMode = false;
   }
 
   FileGdbWriter(final FileGdbRecordStore recordStore, final RecordDefinition recordDefinition,
     final FileGdbRecordDefinition fileGdbRecordDefinition, final boolean loadOnlyMode) {
+    super(recordDefinition);
     this.recordStore = recordStore;
     this.loadOnlyMode = loadOnlyMode;
     if (recordDefinition != null) {
-      this.recordDefinition = recordDefinition;
       this.fileGdbRecordDefinition = fileGdbRecordDefinition;
       final PathName pathName = recordDefinition.getPathName();
       final PathName fileGdbPathName = fileGdbRecordDefinition.getPathName();
@@ -56,7 +55,6 @@ public class FileGdbWriter extends AbstractRecordWriter {
           table.close();
         }
       } finally {
-        this.recordDefinition = null;
         this.fileGdbRecordDefinition = null;
         this.tablesByPathName.clear();
         this.tables.clear();
@@ -73,7 +71,6 @@ public class FileGdbWriter extends AbstractRecordWriter {
         if (table != null) {
           if (table == this.table) {
             this.table = null;
-            this.recordDefinition = null;
             this.fileGdbRecordDefinition = null;
           }
           this.tables.remove(table);
@@ -96,10 +93,6 @@ public class FileGdbWriter extends AbstractRecordWriter {
   }
 
   @Override
-  public RecordDefinition getRecordDefinition() {
-    return this.recordDefinition;
-  }
-
   public FileGdbRecordStore getRecordStore() {
     return this.recordStore;
   }
@@ -109,7 +102,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
       if (recordDefinition == null) {
         return null;
       } else if (this.table != null) {
-        if (this.recordDefinition == recordDefinition //
+        if (getRecordDefinition() == recordDefinition //
           || this.fileGdbRecordDefinition == recordDefinition //
         ) {
           return this.table;

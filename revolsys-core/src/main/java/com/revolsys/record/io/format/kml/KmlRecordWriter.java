@@ -50,7 +50,8 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
 
   private final java.io.Writer writer;
 
-  public KmlRecordWriter(final java.io.Writer out) {
+  public KmlRecordWriter(final RecordDefinition recordDefinition, final java.io.Writer out) {
+    super(recordDefinition);
     this.writer = out;
   }
 
@@ -75,6 +76,11 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }
+  }
+
+  @Override
+  public GeometryFactory getGeometryFactory() {
+    return GEOMETRY_FACTORY_3D;
   }
 
   public boolean isKmlWriteNulls() {

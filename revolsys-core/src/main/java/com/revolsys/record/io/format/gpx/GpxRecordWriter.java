@@ -2,7 +2,6 @@ package com.revolsys.record.io.format.gpx;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.DateFormat;
@@ -32,12 +31,8 @@ public class GpxRecordWriter extends AbstractRecordWriter implements GpxAttribut
 
   private final XmlWriter out;
 
-  public GpxRecordWriter(final File file) throws IOException {
-    this(new FileWriter(file));
-    this.file = file;
-  }
-
-  public GpxRecordWriter(final Writer writer) {
+  public GpxRecordWriter(final RecordDefinition recordDefinition, final Writer writer) {
+    super(recordDefinition);
     this.out = new XmlWriter(new BufferedWriter(writer));
     this.out.setIndent(false);
     this.out.startDocument("UTF-8", "1.0");

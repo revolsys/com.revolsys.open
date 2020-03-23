@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.Writer;
@@ -15,7 +16,7 @@ import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
-public interface RecordWriter extends Writer<Record> {
+public interface RecordWriter extends Writer<Record>, RecordDefinitionProxy {
   static boolean isWritable(final File file) {
     for (final String fileNameExtension : FileUtil.getFileNameExtensions(file)) {
       if (isWritable(fileNameExtension)) {
@@ -46,10 +47,21 @@ public interface RecordWriter extends Writer<Record> {
     return null;
   }
 
+  @Override
+  default GeometryFactory getGeometryFactory() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition == null) {
+      return GeometryFactory.DEFAULT_2D;
+    } else {
+      return recordDefinition.getGeometryFactory();
+    }
+  }
+
   default ClockDirection getPolygonRingDirection() {
     return ClockDirection.NONE;
   }
 
+  @Override
   default RecordDefinition getRecordDefinition() {
     return null;
   }

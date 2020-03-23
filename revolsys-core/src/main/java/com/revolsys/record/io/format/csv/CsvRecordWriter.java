@@ -22,8 +22,6 @@ public class CsvRecordWriter extends AbstractRecordWriter {
   /** The writer */
   private Writer out;
 
-  private final RecordDefinition recordDefinition;
-
   private boolean useQuotes;
 
   private boolean paused = false;
@@ -42,8 +40,8 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   public CsvRecordWriter(final RecordDefinition recordDefinition, final Writer out,
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
+    super(recordDefinition);
     try {
-      this.recordDefinition = recordDefinition;
       this.out = out;
       this.fieldSeparator = fieldSeparator;
       this.useQuotes = useQuotes;
@@ -90,11 +88,6 @@ public class CsvRecordWriter extends AbstractRecordWriter {
       }
     }
 
-  }
-
-  @Override
-  public RecordDefinition getRecordDefinition() {
-    return this.recordDefinition;
   }
 
   public void pause() {
@@ -158,10 +151,9 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     }
     if (out != null) {
       try {
-        final RecordDefinition recordDefinition = this.recordDefinition;
         final char fieldSeparator = this.fieldSeparator;
         boolean first = true;
-        for (final FieldDefinition field : recordDefinition.getFields()) {
+        for (final FieldDefinition field : getFieldDefinitions()) {
           if (first) {
             first = false;
           } else {

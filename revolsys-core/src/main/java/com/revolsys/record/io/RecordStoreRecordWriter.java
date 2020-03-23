@@ -12,13 +12,11 @@ public class RecordStoreRecordWriter extends AbstractRecordWriter {
 
   private final RecordWriter writer;
 
-  private final RecordDefinition recordDefinition;
-
   public RecordStoreRecordWriter(final RecordStore recordStore,
     final RecordDefinition recordDefinition) {
+    super(recordStore.getRecordDefinition(recordDefinition));
     this.recordStore = recordStore;
-    this.recordDefinition = recordStore.getRecordDefinition(recordDefinition);
-    if (this.recordDefinition == null) {
+    if (getRecordDefinition() == null) {
       throw new IllegalArgumentException(
         "Cannot find recordDefinition=" + recordDefinition.getPathName() + " for " + recordStore);
     }
@@ -38,11 +36,6 @@ public class RecordStoreRecordWriter extends AbstractRecordWriter {
   @Override
   public void flush() {
     this.writer.flush();
-  }
-
-  @Override
-  public RecordDefinition getRecordDefinition() {
-    return this.recordDefinition;
   }
 
   protected RecordWriter getWriter() {

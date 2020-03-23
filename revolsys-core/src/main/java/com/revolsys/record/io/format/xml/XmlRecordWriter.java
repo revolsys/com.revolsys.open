@@ -23,14 +23,12 @@ public class XmlRecordWriter extends AbstractRecordWriter {
 
   private XmlWriter out;
 
-  private final RecordDefinition recordDefinition;
-
   private boolean singleObject;
 
   boolean startAttribute;
 
   public XmlRecordWriter(final RecordDefinition recordDefinition, final java.io.Writer out) {
-    this.recordDefinition = recordDefinition;
+    super(recordDefinition);
     if (out instanceof XmlWriter) {
       this.out = (XmlWriter)out;
     } else {
@@ -112,7 +110,7 @@ public class XmlRecordWriter extends AbstractRecordWriter {
 
   @Override
   public String toString() {
-    return this.recordDefinition.getPath().toString();
+    return getPathName().toString();
   }
 
   @Override
@@ -120,14 +118,15 @@ public class XmlRecordWriter extends AbstractRecordWriter {
     if (!this.opened) {
       writeHeader();
     }
-    QName qualifiedName = this.recordDefinition.getProperty(RecordProperties.QUALIFIED_NAME);
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    QName qualifiedName = recordDefinition.getProperty(RecordProperties.QUALIFIED_NAME);
     if (qualifiedName == null) {
-      qualifiedName = new QName(this.recordDefinition.getName());
+      qualifiedName = new QName(recordDefinition.getName());
     }
 
     this.out.startTag(qualifiedName);
 
-    for (final FieldDefinition field : this.recordDefinition.getFields()) {
+    for (final FieldDefinition field : getFieldDefinitions()) {
       final int fieldIndex = field.getIndex();
       final Object value;
       if (isWriteCodeValues()) {

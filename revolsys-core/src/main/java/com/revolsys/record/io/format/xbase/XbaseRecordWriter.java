@@ -68,14 +68,12 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
 
   private int recordCount = 0;
 
-  private final RecordDefinition recordDefinition;
-
   private Map<String, String> shortNames = new HashMap<>();
 
   private boolean useZeroForNull = true;
 
   public XbaseRecordWriter(final RecordDefinition recordDefinition, final Resource resource) {
-    this.recordDefinition = recordDefinition;
+    super(recordDefinition);
     setResource(resource);
   }
 
@@ -196,11 +194,6 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
 
   public Charset getCharset() {
     return this.charset;
-  }
-
-  @Override
-  public RecordDefinition getRecordDefinition() {
-    return this.recordDefinition;
   }
 
   public Map<String, String> getShortNames() {
@@ -422,11 +415,12 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
 
       this.fields.clear();
       int fieldCount = 0;
-      for (final String name : this.recordDefinition.getFieldNames()) {
-        final int index = this.recordDefinition.getFieldIndex(name);
-        final int length = this.recordDefinition.getFieldLength(index);
-        final int scale = this.recordDefinition.getFieldScale(index);
-        final DataType fieldType = this.recordDefinition.getFieldType(index);
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      for (final String name : recordDefinition.getFieldNames()) {
+        final int index = recordDefinition.getFieldIndex(name);
+        final int length = recordDefinition.getFieldLength(index);
+        final int scale = recordDefinition.getFieldScale(index);
+        final DataType fieldType = recordDefinition.getFieldType(index);
         final Class<?> typeJavaClass = fieldType.getJavaClass();
         final int fieldLength = addDbaseField(name, fieldType, typeJavaClass, length, scale);
         if (fieldLength > 0) {

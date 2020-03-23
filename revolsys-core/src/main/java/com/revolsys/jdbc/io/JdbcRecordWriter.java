@@ -97,14 +97,23 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
 
   private final Map<JdbcRecordDefinition, List<Record>> typeDeleteRecords = new HashMap<>();
 
-  private RecordDefinition recordDefinition;
-
   public JdbcRecordWriter(final JdbcRecordStore recordStore) {
-    this(recordStore, recordStore.getStatistics());
+    this(recordStore, null, recordStore.getStatistics());
   }
 
   public JdbcRecordWriter(final JdbcRecordStore recordStore,
     final CategoryLabelCountMap statistics) {
+    this(recordStore, null, statistics);
+  }
+
+  public JdbcRecordWriter(final JdbcRecordStore recordStore,
+    final RecordDefinition recordDefinition) {
+    this(recordStore, recordDefinition, recordStore.getStatistics());
+  }
+
+  public JdbcRecordWriter(final JdbcRecordStore recordStore,
+    final RecordDefinition recordDefinition, final CategoryLabelCountMap statistics) {
+    super(recordDefinition);
     this.recordStore = recordStore;
     this.statistics = statistics;
     this.connection = recordStore.getJdbcConnection();
@@ -119,12 +128,6 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
     if (statistics != null) {
       statistics.connect();
     }
-  }
-
-  public JdbcRecordWriter(final JdbcRecordStore recordStore,
-    final RecordDefinition recordDefinition) {
-    this(recordStore);
-    this.recordDefinition = recordDefinition;
   }
 
   public void appendIdEquals(final StringBuilder sqlBuffer, final List<FieldDefinition> idFields) {
@@ -389,11 +392,6 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
 
   public String getLabel() {
     return this.label;
-  }
-
-  @Override
-  public RecordDefinition getRecordDefinition() {
-    return this.recordDefinition;
   }
 
   private JdbcRecordDefinition getRecordDefinition(final PathName typePath) {

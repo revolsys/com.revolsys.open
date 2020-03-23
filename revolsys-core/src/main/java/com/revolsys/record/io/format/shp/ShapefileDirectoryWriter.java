@@ -36,9 +36,11 @@ public class ShapefileDirectoryWriter extends AbstractRecordWriter {
   private Map<String, Writer<Record>> writers = new HashMap<>();
 
   public ShapefileDirectoryWriter() {
+    super(null);
   }
 
   public ShapefileDirectoryWriter(final File baseDirectory) {
+    super(null);
     setDirectory(baseDirectory);
   }
 

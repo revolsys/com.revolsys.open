@@ -97,6 +97,6 @@ public class Kml extends GeometryRecordReaderFactory
     final RecordDefinition recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.newUtf8Writer(outputStream);
-    return new KmlRecordWriter(writer);
+    return new KmlRecordWriter(recordDefinition, writer);
   }
 }

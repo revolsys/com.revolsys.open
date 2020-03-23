@@ -96,6 +96,11 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
   }
 
   @Override
+  public GeometryFactory getGeometryFactory() {
+    return this.geometryFactory;
+  }
+
+  @Override
   public ClockDirection getPolygonRingDirection() {
     return ClockDirection.CLOCKWISE;
   }

@@ -92,9 +92,11 @@ public class SaifWriter extends AbstractRecordWriter {
   private File tempDirectory;
 
   public SaifWriter() {
+    super(null);
   }
 
   public SaifWriter(final File file) throws IOException {
+    this();
     setFile(file);
   }
 
