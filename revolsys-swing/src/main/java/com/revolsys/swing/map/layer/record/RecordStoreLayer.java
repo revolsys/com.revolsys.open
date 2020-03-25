@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -57,7 +56,6 @@ import com.revolsys.util.Property;
 import com.revolsys.util.count.LabelCountMap;
 
 public class RecordStoreLayer extends AbstractRecordLayer {
-  private List<Set<Identifier>> cacheIdentifiers;
 
   private SwingWorker<List<LayerRecord>, Void> loadingWorker;
 
@@ -94,13 +92,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   protected RecordStoreLayer(final String type) {
     super(type);
-  }
-
-  protected synchronized void addCachedIdentifiers(final Set<Identifier> identifiers) {
-    if (this.cacheIdentifiers == null) {
-      this.cacheIdentifiers = new ArrayList<>();
-    }
-    this.cacheIdentifiers.add(identifiers);
   }
 
   protected void addCachedRecord(final Identifier identifier, final LayerRecord record) {
@@ -515,6 +506,20 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return (RS)this.recordStore;
   }
 
+  @Override
+  protected List<LayerRecord> getRecordsVisibleDo(BoundingBox boundingBox) {
+    if (hasGeometryField()) {
+      boundingBox = convertBoundingBox(boundingBox);
+      if (Property.hasValue(boundingBox)) {
+        try (
+          final BaseCloseable booleanValueCloseable = eventsDisabled()) {
+          return getRecordsIndex(boundingBox);
+        }
+      }
+    }
+    return Collections.emptyList();
+  }
+
   public void incrementReferenceCount(final Identifier identifier) {
     synchronized (getSync()) {
       this.recordCountsByIdentifier.incrementCount(identifier);
@@ -586,8 +591,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   public boolean isIdentifierCached(final Identifier identifier) {
-    for (final Set<Identifier> identifiers : this.cacheIdentifiers) {
-      if (identifiers.contains(identifier)) {
+    for (final RecordCache recordCache : this.recordCaches) {
+      if (recordCache.isCached(identifier)) {
         return true;
       }
     }
@@ -749,7 +754,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     final RecordCacheCollection parentCache = newRecordCacheCollection(cacheId);
     final RecordCacheRecordStoreLayer recordCache = new RecordCacheRecordStoreLayer(cacheId, this,
       parentCache);
-    addCachedIdentifiers(recordCache.identifiers);
     this.recordStoreLayerCaches.add(recordCache);
     return recordCache;
   }

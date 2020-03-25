@@ -39,6 +39,7 @@ import javax.swing.JRootPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.tree.TreePath;
 
 import org.jeometry.common.data.type.DataTypes;
@@ -320,7 +321,7 @@ public class ProjectFrame extends BaseFrame {
   }
 
   public void addBottomTab(final ProjectFramePanel panel, final MapEx config) {
-    Invoke.later(() -> {
+    if (SwingUtilities.isEventDispatchThread()) {
       final TabbedPane tabs = getBottomTabs();
       final boolean selectTab = config.getBoolean("selectTab", true);
       final Object tableView = panel.getProperty(BOTTOM_TAB);
@@ -383,7 +384,9 @@ public class ProjectFrame extends BaseFrame {
           tabs.setSelectedComponent(component);
         }
       }
-    });
+    } else {
+      Invoke.later(() -> addBottomTab(panel, config));
+    }
   }
 
   protected void addBottomTabs(final DnDTabbedPane bottomTabs) {

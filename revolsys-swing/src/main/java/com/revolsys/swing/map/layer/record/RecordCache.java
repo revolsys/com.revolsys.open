@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.jeometry.common.data.identifier.Identifier;
+
 import com.revolsys.record.Record;
 
 public interface RecordCache {
@@ -33,6 +35,8 @@ public interface RecordCache {
 
   String getCacheId();
 
+  Object getRecordCacheSync();
+
   default <R extends LayerRecord> List<R> getRecords() {
     final List<R> records = new ArrayList<>();
     final Consumer<R> action = records::add;
@@ -46,6 +50,10 @@ public interface RecordCache {
 
   default boolean hasRecords() {
     return getSize() > 0;
+  }
+
+  default boolean isCached(final Identifier identifier) {
+    throw new UnsupportedOperationException("isCached");
   }
 
   default boolean removeContainsRecord(final LayerRecord record) {
@@ -64,9 +72,6 @@ public interface RecordCache {
     return false;
   }
 
-  default void setRecords(final Iterable<? extends LayerRecord> records) {
-    clearRecords();
-    addRecords(records);
-  }
+  void setRecords(final Iterable<? extends LayerRecord> records);
 
 }

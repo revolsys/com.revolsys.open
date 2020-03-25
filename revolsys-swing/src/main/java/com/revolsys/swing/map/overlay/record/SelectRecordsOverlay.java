@@ -19,6 +19,8 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
+import javax.swing.SwingUtilities;
+
 import org.jeometry.common.awt.WebColors;
 
 import com.revolsys.geometry.model.BoundingBox;
@@ -360,10 +362,12 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   }
 
   private void refreshImageSelectedLayer(final ViewRenderer view, final AbstractRecordLayer layer) {
-    if (layer.isSelectable()) {
+    if (layer != null && layer.isSelectable()) {
       final AbstractRecordLayerRenderer layerRenderer = layer.getRenderer();
-      final List<LayerRecord> selectedRecords = layer.getSelectedRecords();
-      layerRenderer.renderSelectedRecords(view, layer, selectedRecords);
+      if (layerRenderer != null) {
+        final List<LayerRecord> selectedRecords = layer.getSelectedRecords();
+        layerRenderer.renderSelectedRecords(view, layer, selectedRecords);
+      }
     }
   }
 
@@ -443,6 +447,7 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       BaseCloseable closeable = this.selectingRecords.closeable(true)) {
       final LayerGroup project = getProject();
       final AbstractRecordLayer selectedLayer = selectRecords(project, boundingBox, selectAction);
+      selectRecordsRefresh();
       showSelectedRecordsTab(selectedLayer);
     }
   }
@@ -473,6 +478,17 @@ public class SelectRecordsOverlay extends AbstractOverlay {
       }
     }
     return selectedLayer;
+  }
+
+  private void selectRecordsRefresh() {
+    if (SwingUtilities.isEventDispatchThread()) {
+      final MapPanel map = getMap();
+      final MapOverlay overlay = map.getLayerOverlay();
+      overlay.redraw();
+      redrawAndRepaint();
+    } else {
+      Invoke.later(this::selectRecordsRefresh);
+    }
   }
 
   public void setHighlightColors(final Color color) {
@@ -515,31 +531,31 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   private void showSelectedRecordsTab(final AbstractRecordLayer selectedLayer) {
     if (selectedLayer != null) {
-      boolean selectTab = true;
-      final ProjectFrame projectFrame = getProjectFrame();
-      final Component selectedTab = projectFrame.getBottomTabs().getSelectedComponent();
-      if (selectedTab != null) {
-        if (selectedTab instanceof TablePanel) {
-          @SuppressWarnings("resource")
-          final TablePanel tablePanel = (TablePanel)selectedTab;
-          final AbstractTableModel tableModel = tablePanel.getTableModel();
-          if (tableModel instanceof RecordLayerTableModel) {
-            final RecordLayerTableModel recordLayerTableModel = (RecordLayerTableModel)tableModel;
-            final AbstractRecordLayer recordLayer = recordLayerTableModel.getLayer();
-            if (recordLayer == selectedLayer || recordLayer.isHasSelectedRecordsWithGeometry()) {
-              selectTab = false;
+      if (SwingUtilities.isEventDispatchThread()) {
+        boolean selectTab = true;
+        final ProjectFrame projectFrame = getProjectFrame();
+        final Component selectedTab = projectFrame.getBottomTabs().getSelectedComponent();
+        if (selectedTab != null) {
+          if (selectedTab instanceof TablePanel) {
+            @SuppressWarnings("resource")
+            final TablePanel tablePanel = (TablePanel)selectedTab;
+            final AbstractTableModel tableModel = tablePanel.getTableModel();
+            if (tableModel instanceof RecordLayerTableModel) {
+              final RecordLayerTableModel recordLayerTableModel = (RecordLayerTableModel)tableModel;
+              final AbstractRecordLayer recordLayer = recordLayerTableModel.getLayer();
+              if (recordLayer == selectedLayer || recordLayer.isHasSelectedRecordsWithGeometry()) {
+                selectTab = false;
+              }
             }
           }
+          if (selectTab) {
+            selectedLayer.showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED, true);
+          }
         }
-        if (selectTab) {
-          selectedLayer.showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED, true);
-        }
+      } else {
+        Invoke.later(() -> showSelectedRecordsTab(selectedLayer));
       }
     }
-    final MapPanel map = getMap();
-    final MapOverlay overlay = map.getLayerOverlay();
-    overlay.redraw();
-    redrawAndRepaint();
   }
 
   public void unSelectRecords(final BoundingBox boundingBox) {

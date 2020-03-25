@@ -160,7 +160,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
     @Override
     public boolean addRecord(final LayerRecord record) {
-      synchronized (getSync()) {
+      synchronized (getRecordCacheSync()) {
         addRecordIndex(record);
       }
       return false;
@@ -171,9 +171,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         if (super.addRecord(record)) {
           final RecordSpatialIndex<LayerRecord> index = this.index;
           if (index != null) {
-            synchronized (index) {
-              index.addRecord(record.newRecordProxy());
-            }
+            index.addRecord(record.newRecordProxy());
           }
           return true;
         }
@@ -183,7 +181,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
     @Override
     public void addRecords(final Iterable<? extends LayerRecord> records) {
-      synchronized (getSync()) {
+      synchronized (getRecordCacheSync()) {
         for (final LayerRecord record : records) {
           addRecordIndex(record);
         }
@@ -196,14 +194,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
     @Override
     public void clearRecords() {
-      synchronized (getSync()) {
+      synchronized (getRecordCacheSync()) {
         super.clearRecords();
         clearIndex();
       }
     }
 
     private RecordSpatialIndex<LayerRecord> getIndex() {
-      synchronized (getSync()) {
+      synchronized (getRecordCacheSync()) {
         RecordSpatialIndex<LayerRecord> index = this.index;
         if (index == null) {
           final RecordSpatialIndex<LayerRecord> newIndex = newSpatialIndex();
@@ -248,7 +246,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
     @Override
     public boolean removeRecord(final LayerRecord record) {
-      synchronized (getSync()) {
+      synchronized (getRecordCacheSync()) {
         try {
           super.removeRecord(record);
         } finally {
@@ -260,7 +258,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
     @Override
     public boolean replaceRecord(final LayerRecord record) {
-      synchronized (getSync()) {
+      synchronized (getRecordCacheSync()) {
         try {
           if (super.replaceRecord(record)) {
             return true;
@@ -274,7 +272,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
 
     private void setGeometryFactory(final GeometryFactory geometryFactory) {
-      synchronized (getSync()) {
+      synchronized (getRecordCacheSync()) {
         final RecordSpatialIndex<LayerRecord> index = this.index;
         if (index != null) {
           index.setGeometryFactory(geometryFactory);
@@ -284,7 +282,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
     @Override
     public void setRecords(final Iterable<? extends LayerRecord> records) {
-      synchronized (getSync()) {
+      synchronized (getRecordCacheSync()) {
         clearIndex();
         super.setRecords(records);
       }
@@ -474,7 +472,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   private final Set<LayerRecord> proxiedRecords = new HashSet<>();
 
-  private final List<RecordCache> recordCaches = new ArrayList<>();
+  protected final List<RecordCache> recordCaches = new ArrayList<>();
 
   protected final RecordCache recordCacheDeletedInternal = newRecordCacheDo("deleted");
 
@@ -1620,12 +1618,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return Collections.emptyList();
   }
 
+  @SuppressWarnings("unchecked")
   public <R extends LayerRecord> List<R> getRecords(Geometry geometry, final double distance) {
     if (geometry == null || !hasGeometryField()) {
       return new ArrayList<>();
     } else {
       geometry = convertGeometry(geometry);
-      return getRecordsIndex(geometry, distance);
+      return (List<R>)this.recordCacheIndex.getRecordsDistance(geometry, distance);
     }
   }
 
@@ -1660,14 +1659,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return this.recordCacheIndex.getRecords(boundingBox);
   }
 
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
-  protected <R extends LayerRecord> List<R> getRecordsIndex(final Geometry geometry,
-    final double distance) {
-    return (List)this.recordCacheIndex.getRecordsDistance(geometry, distance);
-  }
-
   public <R extends LayerRecord> Collection<R> getRecordsModified() {
     return this.recordCacheModified.getRecords();
   }
@@ -1688,7 +1679,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   protected List<LayerRecord> getRecordsVisible(final BoundingBox boundingBox) {
-    final List<LayerRecord> records = getRecords(boundingBox);
+    final List<LayerRecord> records = getRecordsVisibleDo(boundingBox);
     for (final Iterator<LayerRecord> iterator = records.iterator(); iterator.hasNext();) {
       final LayerRecord layerRecord = iterator.next();
       if (!isVisible(layerRecord) || isDeleted(layerRecord)
@@ -1697,6 +1688,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       }
     }
     return records;
+  }
+
+  protected List<LayerRecord> getRecordsVisibleDo(final BoundingBox boundingBox) {
+    return getRecords(boundingBox);
   }
 
   @Override

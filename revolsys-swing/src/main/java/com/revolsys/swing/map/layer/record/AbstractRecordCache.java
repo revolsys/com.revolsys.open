@@ -7,6 +7,11 @@ import com.revolsys.record.RecordState;
 
 public abstract class AbstractRecordCache<L extends AbstractRecordLayer> implements RecordCache {
 
+  private static class RecordCacheSync {
+  }
+
+  private final RecordCacheSync recordCacheSync = new RecordCacheSync();
+
   protected L layer;
 
   protected String cacheId;
@@ -18,8 +23,8 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
 
   @Override
   public boolean addRecord(final LayerRecord record) {
-    final L layer = this.layer;
-    synchronized (layer.getSync()) {
+    synchronized (getRecordCacheSync()) {
+      final L layer = this.layer;
       if (!(record.getState() == RecordState.DELETED && !layer.isDeleted(record))) {
         final LayerRecord recordProxied = layer.getProxiedRecord(record);
         if (recordProxied != null) {
@@ -32,28 +37,49 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
     return false;
   }
 
-  public abstract boolean addRecordDo(LayerRecord record);
+  protected boolean addRecordDo(final LayerRecord record) {
+    throw new UnsupportedOperationException("addRecordDo");
+  }
+
+  @Override
+  public final void clearRecords() {
+    synchronized (getRecordCacheSync()) {
+      clearRecordsDo();
+    }
+    clearRecordsAfter();
+  }
+
+  public void clearRecordsAfter() {
+  }
+
+  protected void clearRecordsDo() {
+    throw new UnsupportedOperationException("clearRecordsDo");
+  }
 
   @Override
   public final boolean containsRecord(final LayerRecord record) {
-    final LayerRecord recordProxied = this.layer.getProxiedRecord(record);
-    if (recordProxied != null) {
-      return containsRecordDo(recordProxied);
+    synchronized (getRecordCacheSync()) {
+      final LayerRecord recordProxied = this.layer.getProxiedRecord(record);
+      if (recordProxied != null) {
+        return containsRecordDo(recordProxied);
+      }
     }
     return false;
   }
 
-  public abstract boolean containsRecordDo(LayerRecord record);
+  public boolean containsRecordDo(final LayerRecord record) {
+    return false;
+  }
 
   @Override
   public final <R extends Record> void forEachRecord(final Consumer<R> action) {
-    final L layer = this.layer;
-    synchronized (layer.getSync()) {
+    synchronized (getRecordCacheSync()) {
       forEachRecordDo(action);
     }
   }
 
-  protected abstract <R extends Record> void forEachRecordDo(Consumer<R> action);
+  protected <R extends Record> void forEachRecordDo(final Consumer<R> action) {
+  }
 
   @Override
   public String getCacheId() {
@@ -61,9 +87,13 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
   }
 
   @Override
+  public Object getRecordCacheSync() {
+    return this.recordCacheSync;
+  }
+
+  @Override
   public boolean removeContainsRecord(final LayerRecord record) {
-    final L layer = this.layer;
-    synchronized (layer.getSync()) {
+    synchronized (getRecordCacheSync()) {
       final LayerRecord recordProxied = this.layer.getProxiedRecord(record);
       if (recordProxied != null) {
         if (containsRecordDo(recordProxied)) {
@@ -77,9 +107,8 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
 
   @Override
   public boolean removeRecord(final LayerRecord record) {
-    final L layer = this.layer;
-    synchronized (layer.getSync()) {
-      final LayerRecord proxiedRecord = layer.getProxiedRecord(record);
+    synchronized (getRecordCacheSync()) {
+      final LayerRecord proxiedRecord = this.layer.getProxiedRecord(record);
       if (proxiedRecord != null) {
         return removeRecordDo(proxiedRecord);
       }
@@ -87,18 +116,27 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
     return true;
   }
 
-  public abstract boolean removeRecordDo(LayerRecord proxiedRecord);
+  public boolean removeRecordDo(final LayerRecord proxiedRecord) {
+    throw new UnsupportedOperationException("removeRecordDo");
+  }
 
   @Override
   public boolean replaceRecord(final LayerRecord record) {
-    final L layer = this.layer;
-    synchronized (layer.getSync()) {
-      final LayerRecord proxiedRecord = layer.getProxiedRecord(record);
+    synchronized (getRecordCacheSync()) {
+      final LayerRecord proxiedRecord = this.layer.getProxiedRecord(record);
       if (removeContainsRecord(proxiedRecord)) {
         return addRecordDo(proxiedRecord);
       }
     }
     return false;
+  }
+
+  @Override
+  public void setRecords(final Iterable<? extends LayerRecord> records) {
+    synchronized (getRecordCacheSync()) {
+      clearRecordsDo();
+      addRecords(records);
+    }
   }
 
   @Override

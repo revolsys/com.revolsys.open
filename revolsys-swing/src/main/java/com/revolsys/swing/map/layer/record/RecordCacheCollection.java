@@ -3,6 +3,8 @@ package com.revolsys.swing.map.layer.record;
 import java.util.Collection;
 import java.util.function.Consumer;
 
+import org.jeometry.common.data.identifier.Identifier;
+
 import com.revolsys.record.Record;
 import com.revolsys.util.ExitLoopException;
 
@@ -16,27 +18,21 @@ public class RecordCacheCollection extends AbstractRecordCache<AbstractRecordLay
   }
 
   @Override
-  public boolean addRecordDo(final LayerRecord record) {
-    synchronized (this.records) {
-      return this.records.add(record);
-    }
+  protected boolean addRecordDo(final LayerRecord record) {
+    return this.records.add(record);
   }
 
   @Override
-  public void clearRecords() {
-    synchronized (this.records) {
-      this.records.clear();
-    }
+  public void clearRecordsDo() {
+    this.records.clear();
   }
 
   @Override
   public boolean containsRecordDo(final LayerRecord record) {
-    synchronized (this.records) {
-      if (this.records.isEmpty()) {
-        return false;
-      } else {
-        return record.contains(this.records);
-      }
+    if (this.records.isEmpty()) {
+      return false;
+    } else {
+      return record.contains(this.records);
     }
   }
 
@@ -59,10 +55,13 @@ public class RecordCacheCollection extends AbstractRecordCache<AbstractRecordLay
   }
 
   @Override
+  public boolean isCached(final Identifier identifier) {
+    return false;
+  }
+
+  @Override
   public boolean removeRecordDo(final LayerRecord record) {
-    synchronized (this.records) {
-      record.removeFrom(this.records);
-    }
+    record.removeFrom(this.records);
     return true;
   }
 
