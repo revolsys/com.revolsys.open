@@ -100,11 +100,15 @@ public class ArrayRecord extends BaseRecord {
       return null;
     } else {
       try {
-        return (T)this.values[index];
+        return (T)getValueInternal(index);
       } catch (final ArrayIndexOutOfBoundsException e) {
         return null;
       }
     }
+  }
+
+  protected Object getValueInternal(final int index) {
+    return this.values[index];
   }
 
   /**
@@ -154,13 +158,17 @@ public class ArrayRecord extends BaseRecord {
     }
     final Object newValue = fieldDefinition.toFieldValue(value);
     final int index = fieldDefinition.getIndex();
-    final Object oldValue = this.values[index];
+    final Object oldValue = getValueInternal(index);
     if (!isInitializing() && !fieldDefinition.equals(oldValue, newValue)) {
       updated = true;
       updateState();
     }
-    this.values[index] = newValue;
+    setValueInternal(index, newValue);
     return updated;
+  }
+
+  protected void setValueInternal(final int index, final Object newValue) {
+    this.values[index] = newValue;
   }
 
 }

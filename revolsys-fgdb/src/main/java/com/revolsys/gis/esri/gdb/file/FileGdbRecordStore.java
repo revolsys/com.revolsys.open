@@ -767,32 +767,42 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         sql.append(" WHERE ");
         sql.append(whereClause);
       }
-      boolean first = true;
-      for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
+      boolean useOrderBy = true;
+      if (orderBy.size() == 1) {
+        final Entry<? extends CharSequence, Boolean> entry = orderBy.entrySet().iterator().next();
         final CharSequence fieldName = entry.getKey();
+        if (entry.getValue() == Boolean.TRUE && fieldName.toString().equals("OBJECTID")) {
+          useOrderBy = false;
+        }
+      }
+      if (useOrderBy) {
+        boolean first = true;
+        for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
+          final CharSequence fieldName = entry.getKey();
 
-        final DataType dataType = fileGdbRecordDefinition.getFieldType(fieldName);
-        if (dataType != null && !Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
-          if (first) {
-            sql.append(" ORDER BY ");
-            first = false;
-          } else {
-            sql.append(", ");
-          }
-          if (fieldName instanceof FieldDefinition) {
-            final FieldDefinition field = (FieldDefinition)fieldName;
-            field.appendColumnName(sql);
-          } else {
-            sql.append(fieldName);
-          }
-          final Boolean ascending = entry.getValue();
-          if (!ascending) {
-            sql.append(" DESC");
-          }
+          final DataType dataType = fileGdbRecordDefinition.getFieldType(fieldName);
+          if (dataType != null && !Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
+            if (first) {
+              sql.append(" ORDER BY ");
+              first = false;
+            } else {
+              sql.append(", ");
+            }
+            if (fieldName instanceof FieldDefinition) {
+              final FieldDefinition field = (FieldDefinition)fieldName;
+              field.appendColumnName(sql);
+            } else {
+              sql.append(fieldName);
+            }
+            final Boolean ascending = entry.getValue();
+            if (!ascending) {
+              sql.append(" DESC");
+            }
 
-        } else {
-          Logs.error(this, "Unable to sort on " + fileGdbRecordDefinition.getPath() + "."
-            + fieldName + " as the ESRI library can't sort on " + dataType + " columns");
+          } else {
+            Logs.error(this, "Unable to sort on " + fileGdbRecordDefinition.getPath() + "."
+              + fieldName + " as the ESRI library can't sort on " + dataType + " columns");
+          }
         }
       }
     }

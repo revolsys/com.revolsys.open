@@ -28,7 +28,7 @@ public class RecordCacheRecordStoreLayer extends AbstractRecordCache<RecordStore
     } else {
       this.layer.getCachedRecord(identifier, record, false);
       if (this.identifiers.add(identifier)) {
-        this.layer.incrementReferenceCount(identifier);
+        this.layer.recordReferences.incrementReferenceCount(identifier);
         return true;
       } else {
         return false;
@@ -107,7 +107,7 @@ public class RecordCacheRecordStoreLayer extends AbstractRecordCache<RecordStore
     final Identifier identifier = record.getIdentifier();
     if (identifier != null) {
       if (this.identifiers.remove(identifier)) {
-        this.layer.decrementReferenceCount(identifier);
+        this.layer.recordReferences.decrementReferenceCount(identifier);
       }
     }
     this.parentCache.removeRecordDo(record);

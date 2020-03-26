@@ -17,7 +17,6 @@ import com.revolsys.swing.map.layer.grid.GridLayer;
 import com.revolsys.swing.map.layer.grid.GridLayerRenderer;
 import com.revolsys.swing.map.layer.mapguide.MapGuideWebServer;
 import com.revolsys.swing.map.layer.ogc.wms.OgcWms;
-import com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapApiLayer;
 import com.revolsys.swing.map.layer.openstreetmap.OpenStreetMapLayer;
 import com.revolsys.swing.map.layer.pointcloud.PointCloudLayer;
 import com.revolsys.swing.map.layer.raster.GeoreferencedImageLayer;
@@ -83,8 +82,9 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
     MapObjectFactoryRegistry.newFactory("recordStoreLayer", "Record Store Layer",
       RecordStoreLayer::new);
 
-    MapObjectFactoryRegistry.newFactory("openStreetMapVectorApi", "Open Street Map (Vector API)",
-      OpenStreetMapApiLayer::newLayer);
+    // MapObjectFactoryRegistry.newFactory("openStreetMapVectorApi", "Open
+    // Street Map (Vector API)",
+    // OpenStreetMapApiLayer::newLayer);
 
     MapObjectFactoryRegistry.newFactory("gridLayer", "Grid Layer", GridLayer::newLayer);
 

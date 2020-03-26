@@ -16,12 +16,6 @@ public class NewProxyLayerRecord extends AbstractProxyLayerRecord {
   }
 
   @Override
-  protected void finalize() throws Throwable {
-    this.identifier = removeProxiedRecordIdentifier(this.identifier);
-    super.finalize();
-  }
-
-  @Override
   public Identifier getIdentifier() {
     return this.identifier;
   }
@@ -35,7 +29,6 @@ public class NewProxyLayerRecord extends AbstractProxyLayerRecord {
         if (state == RecordState.PERSISTED) {
           this.identifier = this.record.getIdentifier();
           if (this.identifier != null) {
-            addProxiedRecordIdentifier(this.identifier);
             this.record = removeProxiedRecord(this.record);
           }
         } else {

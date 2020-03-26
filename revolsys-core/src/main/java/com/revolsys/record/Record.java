@@ -1343,10 +1343,9 @@ public interface Record
 
   default void setValues(final Record record) {
     if (record != null) {
-      final List<FieldDefinition> idFields = getRecordDefinition().getIdFields();
       final List<FieldDefinition> fields = getFieldDefinitions();
       for (final FieldDefinition fieldDefintion : fields) {
-        if (!idFields.contains(fieldDefintion)) {
+        if (!isIdField(fieldDefintion)) {
           final String name = fieldDefintion.getName();
           if (record.hasField(name)) {
             final Object value = record.getValue(name);

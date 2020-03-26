@@ -146,7 +146,6 @@ import com.revolsys.swing.undo.SetRecordFieldValueUndo;
 import com.revolsys.util.PreferenceKey;
 import com.revolsys.util.Preferences;
 import com.revolsys.util.Property;
-import com.revolsys.util.ShortCounter;
 
 public abstract class AbstractRecordLayer extends AbstractLayer
   implements AddGeometryCompleteAction, RecordLayerProxy, RecordLayerFieldUiFactory {
@@ -171,7 +170,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         if (super.addRecord(record)) {
           final RecordSpatialIndex<LayerRecord> index = this.index;
           if (index != null) {
-            index.addRecord(record.newRecordProxy());
+            index.addRecord(record.getRecordProxy());
           }
           return true;
         }
@@ -468,8 +467,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   private final List<Window> formWindows = new LinkedList<>();
 
-  private final Map<Identifier, ShortCounter> proxiedRecordIdentifiers = new HashMap<>();
-
   private final Set<LayerRecord> proxiedRecords = new HashSet<>();
 
   protected final List<RecordCache> recordCaches = new ArrayList<>();
@@ -557,7 +554,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void addHighlightedRecords(final Collection<? extends LayerRecord> records) {
-    synchronized (getSync()) {
+    synchronized (this.recordCacheSelected.getRecordCacheSync()) {
       this.recordCacheHighlighted.addRecords(records);
     }
     fireHighlighted();
@@ -569,7 +566,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected void addModifiedRecord(final LayerRecord record) {
     if (this.recordCacheModified.addRecord(record)) {
-      firePropertyChange(RECORD_CACHE_MODIFIED, null, record.newRecordProxy());
+      firePropertyChange(RECORD_CACHE_MODIFIED, null, record.getRecordProxy());
       fireHasChangedRecords();
     }
   }
@@ -595,24 +592,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   void addProxiedRecord(final LayerRecord record) {
     synchronized (this.proxiedRecords) {
       this.proxiedRecords.add(record);
-    }
-  }
-
-  void addProxiedRecordIdentifier(final Identifier identifier) {
-    ShortCounter.increment(this.proxiedRecordIdentifiers, identifier);
-  }
-
-  protected void addProxiedRecordIdsToCollection(final Collection<Identifier> identifiers) {
-    synchronized (this.proxiedRecords) {
-      for (final LayerRecord record : this.proxiedRecords) {
-        final Identifier identifier = record.getIdentifier();
-        if (identifier != null) {
-          identifiers.add(identifier);
-        }
-      }
-    }
-    synchronized (this.proxiedRecordIdentifiers) {
-      identifiers.addAll(this.proxiedRecordIdentifiers.keySet());
     }
   }
 
@@ -642,10 +621,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  protected boolean addSelectedRecord(final LayerRecord record) {
-    return this.recordCacheSelected.addRecord(record);
-  }
-
   public boolean addSelectedRecords(final BoundingBox boundingBox) {
     if (isSelectable()) {
       final List<LayerRecord> records = getRecordsVisible(boundingBox);
@@ -659,9 +634,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void addSelectedRecords(final Collection<? extends LayerRecord> records) {
     final List<LayerRecord> newSelectedRecords = new ArrayList<>();
-    synchronized (getSync()) {
+    synchronized (this.recordCacheSelected.getRecordCacheSync()) {
       for (final LayerRecord record : records) {
-        if (addSelectedRecord(record)) {
+        if (this.recordCacheSelected.addRecord(record)) {
           newSelectedRecords.add(record);
         }
       }
@@ -735,9 +710,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void clearHighlightedRecords() {
-    synchronized (getSync()) {
-      this.recordCacheHighlighted.clearRecords();
-    }
+    this.recordCacheHighlighted.clearRecords();
     fireHighlighted();
   }
 
@@ -747,7 +720,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void clearSelectedRecords() {
     final List<LayerRecord> selectedRecords = getSelectedRecords();
-    synchronized (getSync()) {
+    synchronized (this.recordCacheSelected.getRecordCacheSync()) {
       this.recordCacheSelected.clearRecords();
       this.recordCacheHighlighted.clearRecords();
     }
@@ -877,7 +850,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       final List<LayerRecord> recordsDeleted = new ArrayList<>();
       final boolean deleted = deleteSingleRecordDo(record);
       if (deleted) {
-        final LayerRecord recordProxy = record.newRecordProxy();
+        final LayerRecord recordProxy = record.getRecordProxy();
         recordsDeleted.add(recordProxy);
         deleteRecordsPost(recordsDeleted);
         return true;
@@ -896,7 +869,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (!isNew) {
       this.recordCacheDeleted.addRecord(record);
     }
-    record.setState(RecordState.DELETED);
+    record.setStateDeleted();
     return true;
   }
 
@@ -906,7 +879,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     processTasks("Delete Records", records, (final LayerRecord record) -> {
       final boolean deleted = deleteSingleRecordDo(record);
       if (deleted) {
-        final LayerRecord recordProxy = record.newRecordProxy();
+        final LayerRecord recordProxy = record.getRecordProxy();
         recordsDeleted.add(recordProxy);
       }
     }, monitor -> {
@@ -1034,7 +1007,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void forEachRecord(final Query query, final Consumer<? super LayerRecord> consumer) {
     forEachRecordInternal(query, (record) -> {
-      final LayerRecord proxyRecord = newProxyLayerRecord(record);
+      final LayerRecord proxyRecord = record.getRecordProxy();
       consumer.accept(proxyRecord);
     });
   }
@@ -2350,16 +2323,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return panel;
   }
 
-  @SuppressWarnings("unchecked")
-  protected <R extends LayerRecord> R newProxyLayerRecord(final LayerRecord record) {
-    return (R)record;
-  }
-
   protected <R extends LayerRecord> List<R> newProxyLayerRecords(
     final Iterable<? extends LayerRecord> records) {
     final List<R> proxyRecords = new ArrayList<>();
     for (final LayerRecord record : records) {
-      final R proxyRecord = newProxyLayerRecord(record);
+      final R proxyRecord = record.getRecordProxy();
       proxyRecords.add(proxyRecord);
     }
     return proxyRecords;
@@ -2748,10 +2716,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     }
   }
 
-  void removeProxiedRecordIdentifier(final Identifier identifier) {
-    ShortCounter.decrement(this.proxiedRecordIdentifiers, identifier);
-  }
-
   protected boolean removeRecordFromCache(final LayerRecord record) {
     boolean removed = true;
     synchronized (getSync()) {
@@ -3073,10 +3037,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void setHighlightedRecords(final Collection<LayerRecord> highlightedRecords) {
-    synchronized (getSync()) {
-      this.recordCacheHighlighted.setRecords(highlightedRecords);
-      fireHighlighted();
-    }
+    this.recordCacheHighlighted.setRecords(highlightedRecords);
+    fireHighlighted();
   }
 
   protected void setIndexRecords(final List<LayerRecord> records) {
@@ -3156,7 +3118,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   protected void setSelectedHighlighted(final LayerRecord record, final boolean selected,
     final boolean highlighted) {
     if (selected) {
-      addSelectedRecord(record);
+      this.recordCacheSelected.addRecord(record);
       if (highlighted) {
         this.recordCacheHighlighted.addRecord(record);
       }
@@ -3176,7 +3138,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void setSelectedRecords(final Collection<LayerRecord> selectedRecords) {
     final List<LayerRecord> oldSelectedRecords = getSelectedRecords();
-    synchronized (getSync()) {
+    synchronized (this.recordCacheSelected.getRecordCacheSync()) {
       this.recordCacheSelected.clearRecords();
       this.recordCacheSelected.addRecords(selectedRecords);
       for (final LayerRecord record : getHighlightedRecords()) {
@@ -3511,7 +3473,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void unSelectRecords(final Collection<? extends LayerRecord> records) {
     final List<LayerRecord> removedRecords = new ArrayList<>();
-    synchronized (getSync()) {
+    synchronized (this.recordCacheSelected.getRecordCacheSync()) {
       for (final LayerRecord record : records) {
         if (removeSelectedRecord(record)) {
           removedRecords.add(record);

@@ -19,7 +19,6 @@ import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.iterator.Iterators;
-import com.revolsys.collection.map.IntegerCountMap;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -57,18 +56,19 @@ import com.revolsys.util.count.LabelCountMap;
 
 public class RecordStoreLayer extends AbstractRecordLayer {
 
+  private final Object loadingSync = new Object();
+
   private SwingWorker<List<LayerRecord>, Void> loadingWorker;
 
   private BoundingBox loadedBoundingBox = BoundingBox.empty();
 
-  /** Cache of records from {@link Record#getIdentifier()} to {@link Record}. */
-  private Map<Identifier, RecordStoreLayerRecord> recordsByIdentifier = new HashMap<>();
-
-  private IntegerCountMap<Identifier> recordCountsByIdentifier = new IntegerCountMap<>();
+  protected final RecordStoreLayerRecordReferences recordReferences = new RecordStoreLayerRecordReferences();
 
   private RecordStore recordStore;
 
   private PathName typePath;
+
+  private boolean hasIdField;
 
   private List<RecordCacheRecordStoreLayer> recordStoreLayerCaches;
 
@@ -95,24 +95,14 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   protected void addCachedRecord(final Identifier identifier, final LayerRecord record) {
-    synchronized (getSync()) {
-      this.recordsByIdentifier.put(identifier, (RecordStoreLayerRecord)record);
-    }
+    this.recordReferences.addRecord(identifier, (RecordStoreLayerRecord)record);
   }
 
   protected void cancelLoading(final LoadingWorker loadingWorker) {
-    synchronized (getSync()) {
+    synchronized (this.loadingSync) {
       if (loadingWorker == this.loadingWorker) {
         firePropertyChange("loaded", false, true);
         this.loadingWorker = null;
-      }
-    }
-  }
-
-  public void decrementReferenceCount(final Identifier identifier) {
-    synchronized (getSync()) {
-      if (!this.recordCountsByIdentifier.decrementCount(identifier)) {
-        this.recordsByIdentifier.remove(identifier);
       }
     }
   }
@@ -131,7 +121,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
     final SwingWorker<List<LayerRecord>, Void> loadingWorker = this.loadingWorker;
     this.loadingWorker = null;
-    this.recordsByIdentifier.clear();
+    this.recordReferences.clear();
     if (loadingWorker != null) {
       loadingWorker.cancel(true);
     }
@@ -142,7 +132,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     if (identifier == null) {
       return null;
     } else {
-      return this.recordsByIdentifier.get(identifier);
+      return this.recordReferences.getRecord(identifier);
     }
   }
 
@@ -230,7 +220,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
               synchronized (getSync()) {
                 final LayerRecord cachedRecord = getCachedRecord(identifier, record, true);
                 if (!cachedRecord.isDeleted()) {
-                  proxyRecord = newProxyLayerRecord(identifier, cachedRecord);
+                  proxyRecord = (R)cachedRecord.getRecordProxy();
                 }
               }
             }
@@ -263,8 +253,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   @Override
   protected <R extends LayerRecord> R getCachedRecord(final Identifier identifier) {
     final RecordDefinition recordDefinition = getInternalRecordDefinition();
-    synchronized (getSync()) {
-      LayerRecord record = this.recordsByIdentifier.get(identifier);
+    synchronized (this.recordReferences) {
+      LayerRecord record = this.recordReferences.getRecord(identifier);
       if (record == null) {
         final List<String> idFieldNames = recordDefinition.getIdFieldNames();
         if (idFieldNames.isEmpty()) {
@@ -299,7 +289,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
    */
   protected LayerRecord getCachedRecord(final Identifier identifier, final LayerRecord record,
     final boolean updateRecord) {
-    assert !(record instanceof AbstractProxyLayerRecord);
     synchronized (getSync()) {
       final RecordStoreLayerRecord cachedRecord = findCachedRecord(record);
       if (cachedRecord == null) {
@@ -352,7 +341,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     if (record == null) {
       return record;
     } else {
-      return newProxyLayerRecord(identifier, record);
+      return record.getRecordProxy();
     }
   }
 
@@ -442,10 +431,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         try (
           final BaseCloseable booleanValueCloseable = eventsDisabled()) {
           final BoundingBox queryBoundingBox = convertBoundingBox(boundingBox);
-          boolean covers;
-          synchronized (getSync()) {
-            covers = this.loadedBoundingBox.bboxCovers(queryBoundingBox);
-          }
+          final boolean covers = this.loadedBoundingBox.bboxCovers(queryBoundingBox);
           if (covers) {
             return getRecordsIndex(queryBoundingBox);
           } else {
@@ -520,10 +506,9 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return Collections.emptyList();
   }
 
-  public void incrementReferenceCount(final Identifier identifier) {
-    synchronized (getSync()) {
-      this.recordCountsByIdentifier.incrementCount(identifier);
-    }
+  @Override
+  public boolean hasIdField() {
+    return this.hasIdField;
   }
 
   @Override
@@ -575,7 +560,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   private void initViewBoundingBoxCache(final ViewportCacheBoundingBox cache) {
     if (hasGeometryField() && !cache.isBboxEmpty()) {
-      synchronized (getSync()) {
+      synchronized (this.loadingSync) {
         final Boolean loaded = cache.getCachedItem(this, "viewportCacheBoundingBoxLoad");
         if (Boolean.TRUE != loaded) {
           cache.setCachedItem(this, "viewportCacheBoundingBoxLoad", Boolean.TRUE);
@@ -618,17 +603,24 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
   }
 
+  private RecordStoreLayerRecord newLayerRecord() {
+    if (this.hasIdField) {
+      return new RecordStoreLayerRecordWithId(this);
+    } else {
+      return new RecordStoreLayerRecordNoId(this);
+    }
+  }
+
   @Override
   public LayerRecord newLayerRecord(final Map<String, ? extends Object> values) {
     if (!isReadOnly() && isEditable() && isCanAddRecords()) {
 
       final RecordDefinition recordDefinition = getRecordDefinition();
-      final ArrayLayerRecord newRecord = new RecordStoreLayerRecord(this);
+      final ArrayLayerRecord newRecord = newLayerRecord();
       if (values != null) {
         newRecord.setState(RecordState.INITIALIZING);
-        final List<FieldDefinition> idFields = recordDefinition.getIdFields();
         for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
-          if (!idFields.contains(fieldDefinition)) {
+          if (!isIdField(fieldDefinition)) {
             final String fieldName = fieldDefinition.getName();
             final Object value = values.get(fieldName);
             fieldDefinition.setValue(newRecord, value);
@@ -638,8 +630,6 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       }
 
       this.recordCacheNew.addRecord(newRecord);
-      if (isEventsEnabled()) {
-      }
       final LayerRecord proxyRecord = new NewProxyLayerRecord(this, newRecord);
       fireRecordInserted(proxyRecord);
       return proxyRecord;
@@ -652,7 +642,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   protected LayerRecord newLayerRecord(final RecordDefinition recordDefinition) {
     final PathName layerTypePath = getPathName();
     if (recordDefinition.getPathName().equals(layerTypePath)) {
-      return new RecordStoreLayerRecord(this);
+      return newLayerRecord();
     } else {
       throw new IllegalArgumentException("Cannot create records for " + recordDefinition);
     }
@@ -696,45 +686,11 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     return panel;
   }
 
-  @SuppressWarnings("unchecked")
-  protected <V extends LayerRecord> V newProxyLayerRecord(final Identifier identifier) {
-    return (V)new IdentifierProxyLayerRecord(this, identifier);
-  }
-
-  protected <V extends LayerRecord> V newProxyLayerRecord(final Identifier identifier,
-    final LayerRecord cachedRecord) {
-    return newProxyLayerRecord(identifier);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  protected <R extends LayerRecord> R newProxyLayerRecord(LayerRecord record) {
-    if (record instanceof AbstractProxyLayerRecord) {
-      // Already a proxy
-    } else if (RecordState.NEW.equals(record.getState())) {
-      record = new NewProxyLayerRecord(this, record);
-    } else {
-      final Identifier identifier = record.getIdentifier();
-      if (identifier == null) {
-        record = new NoIdProxyLayerRecord(this, record);
-      } else {
-        synchronized (getSync()) {
-          addCachedRecord(identifier, record);
-          record = newProxyLayerRecord(identifier);
-        }
-      }
-    }
-    return (R)record;
-  }
-
-  protected LayerRecord newProxyLayerRecordNoId(LayerRecord record) {
+  protected LayerRecord newProxyLayerRecordNoId(final LayerRecord record) {
     final AbstractProxyLayerRecord proxyRecord = new NoIdProxyLayerRecord(this, record);
     final Identifier identifier = proxyRecord.getIdentifier();
-    if (identifier != null) {
-      this.recordsByIdentifier.put(identifier, (RecordStoreLayerRecord)record);
-    }
-    record = proxyRecord;
-    return record;
+    this.recordReferences.addRecord(identifier, (RecordStoreLayerRecord)record);
+    return proxyRecord;
   }
 
   @Override
@@ -782,23 +738,12 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   public void rebuildReferenceCounts() {
-    final Map<Identifier, RecordStoreLayerRecord> recordsByIdentifier = new HashMap<>();
-    final IntegerCountMap<Identifier> recordCountsByIdentifier = new IntegerCountMap<>();
-    final Map<Identifier, RecordStoreLayerRecord> oldRecordsByIdentifier = this.recordsByIdentifier;
-    for (final RecordCacheRecordStoreLayer recordCache : this.recordStoreLayerCaches) {
-      for (final Identifier identifier : recordCache.getIdentifiers()) {
-        final RecordStoreLayerRecord record = oldRecordsByIdentifier.get(identifier);
-        recordsByIdentifier.put(identifier, record);
-        recordCountsByIdentifier.incrementCount(identifier);
-      }
-    }
-    this.recordsByIdentifier = recordsByIdentifier;
-    this.recordCountsByIdentifier = recordCountsByIdentifier;
+    this.recordReferences.rebuildReferenceCounts(this.recordStoreLayerCaches);
   }
 
   @Override
   protected void refreshDo() {
-    synchronized (getSync()) {
+    synchronized (this.loadingSync) {
       final SwingWorker<List<LayerRecord>, Void> loadingWorker = this.loadingWorker;
       if (loadingWorker != null) {
         this.loadingWorker = null;
@@ -814,10 +759,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       codeTable.refresh();
     }
     if (hasIdField()) {
-      final List<Identifier> identifiers = new ArrayList<>();
-      synchronized (getSync()) {
-        identifiers.addAll(this.recordsByIdentifier.keySet());
-      }
+      final List<Identifier> identifiers = this.recordReferences.getIdentifiers();
       if (!identifiers.isEmpty()) {
         identifiers.sort(Identifier.comparator());
         final RecordDefinition recordDefinition = recordStore.getRecordDefinition(pathName);
@@ -844,24 +786,12 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
   }
 
-  void removeCachedRecord(final Identifier identifier) {
-    this.recordsByIdentifier.remove(identifier);
-  }
-
-  private void removeFromRecordByIdentifier(final Identifier identifier) {
-    synchronized (getSync()) {
-      this.recordsByIdentifier.remove(identifier);
-    }
-  }
-
   @Override
   protected boolean removeRecordFromCache(final LayerRecord record) {
     final boolean removed = super.removeRecordFromCache(record);
     if (removed) {
       final Identifier identifier = record.getIdentifier();
-      if (identifier != null) {
-        removeFromRecordByIdentifier(identifier);
-      }
+      this.recordReferences.removeIdentifier(identifier);
     }
     return removed;
   }
@@ -917,7 +847,8 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             if (!deleted) {
               record.setState(RecordState.PERSISTED);
             }
-            removeFromRecordByIdentifier(identifier);
+            final Identifier identifier1 = identifier;
+            this.recordReferences.removeIdentifier(identifier1);
             return true;
           } catch (final Throwable e) {
             throw transaction.setRollbackOnly(e);
@@ -931,7 +862,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   protected void setIndexRecords(final LoadingWorker loadingWorker,
     final List<LayerRecord> records) {
-    synchronized (getSync()) {
+    synchronized (this.loadingSync) {
       if (this.loadingWorker == loadingWorker) {
         this.loadingWorker = null;
         setIndexRecords(records);
@@ -948,6 +879,14 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       super.setProperty(name, PathName.newPathName(value));
     } else {
       super.setProperty(name, value);
+    }
+  }
+
+  @Override
+  protected void setRecordDefinition(final RecordDefinition recordDefinition) {
+    super.setRecordDefinition(recordDefinition);
+    if (recordDefinition != null) {
+      this.hasIdField = recordDefinition.hasIdField();
     }
   }
 
@@ -982,7 +921,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       if (identifier != null) {
         this.recordCacheForm.addRecord(record);
       }
-      final LayerRecord proxyRecord = record.newRecordProxy();
+      final LayerRecord proxyRecord = record.getRecordProxy();
       super.showForm(proxyRecord, fieldName);
     }
   }
@@ -1000,7 +939,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       RecordReader reader = recordStore.getRecords(query)) {
       for (final Record record : reader) {
         final Identifier identifier = record.getIdentifier();
-        final RecordStoreLayerRecord cachedRecord = this.recordsByIdentifier.get(identifier);
+        final RecordStoreLayerRecord cachedRecord = this.recordReferences.getRecord(identifier);
         if (cachedRecord != null) {
           cachedRecord.refreshFromRecordStore(record);
         }

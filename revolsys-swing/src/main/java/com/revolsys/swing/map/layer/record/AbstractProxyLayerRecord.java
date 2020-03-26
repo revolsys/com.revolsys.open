@@ -22,12 +22,6 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
     return record;
   }
 
-  protected Identifier addProxiedRecordIdentifier(final Identifier identifier) {
-    final AbstractRecordLayer layer = getLayer();
-    layer.addProxiedRecordIdentifier(identifier);
-    return identifier;
-  }
-
   @Override
   public boolean cancelChanges() {
     final LayerRecord layerRecord = getRecordProxied();
@@ -192,12 +186,6 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
     return null;
   }
 
-  protected Identifier removeProxiedRecordIdentifier(final Identifier identifier) {
-    final AbstractRecordLayer layer = getLayer();
-    layer.removeProxiedRecordIdentifier(identifier);
-    return null;
-  }
-
   @Override
   public LayerRecord revertChanges() {
     final LayerRecord layerRecord = getRecordProxied();
@@ -212,6 +200,15 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
     } else {
       return record.setState(state);
     }
+  }
+
+  public boolean setStateDeleted() {
+    // TODO might need some work
+    final Record record = getRecord();
+    if (record != null) {
+      record.setState(RecordState.DELETED);
+    }
+    return true;
   }
 
   @Override

@@ -39,10 +39,9 @@ public class RecordCacheCollection extends AbstractRecordCache<AbstractRecordLay
   @Override
   public <R extends Record> void forEachRecordDo(final Consumer<R> action) {
     try {
-      final AbstractRecordLayer layer = this.layer;
       for (final LayerRecord record : this.records) {
         @SuppressWarnings("unchecked")
-        final R proxyRecord = (R)layer.newProxyLayerRecord(record);
+        final R proxyRecord = (R)record.getRecordProxy();
         action.accept(proxyRecord);
       }
     } catch (final ExitLoopException e) {

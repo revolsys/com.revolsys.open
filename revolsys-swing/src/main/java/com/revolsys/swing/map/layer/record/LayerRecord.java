@@ -24,12 +24,6 @@ public interface LayerRecord extends Record {
   default void clearChanges() {
   }
 
-  @Override
-  default boolean deleteRecord() {
-    final AbstractRecordLayer layer = getLayer();
-    return layer.deleteRecord(this);
-  }
-
   default BaseCloseable eventsDisabled() {
     final AbstractRecordLayer layer = getLayer();
     return layer.eventsDisabled();
@@ -93,6 +87,11 @@ public interface LayerRecord extends Record {
   default RecordDefinition getRecordDefinition() {
     final AbstractRecordLayer layer = getLayer();
     return layer.getRecordDefinition();
+  }
+
+  @SuppressWarnings("unchecked")
+  default <R extends LayerRecord> R getRecordProxy() {
+    return (R)this;
   }
 
   default boolean isDeletable() {
@@ -207,10 +206,6 @@ public interface LayerRecord extends Record {
     }
   }
 
-  default LayerRecord newRecordProxy() {
-    return this;
-  }
-
   default void postSaveDeleted() {
   }
 
@@ -254,5 +249,10 @@ public interface LayerRecord extends Record {
         }
       }
     }
+  }
+
+  default boolean setStateDeleted() {
+    setState(RecordState.DELETED);
+    return true;
   }
 }

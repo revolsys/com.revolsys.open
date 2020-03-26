@@ -1,21 +1,17 @@
 package com.revolsys.swing.map.layer.record;
 
+import java.util.List;
 import java.util.Map;
-
-import org.jeometry.common.data.identifier.Identifier;
 
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 
-public class RecordStoreLayerRecord extends ArrayLayerRecord {
+public abstract class RecordStoreLayerRecord extends ArrayLayerRecord {
+
   public RecordStoreLayerRecord(final RecordStoreLayer layer) {
     super(layer);
-  }
-
-  public RecordStoreLayerRecord(final RecordStoreLayer layer,
-    final Map<String, ? extends Object> values) {
-    super(layer, values);
   }
 
   protected RecordStoreLayerRecord(final RecordStoreLayer layer,
@@ -25,7 +21,7 @@ public class RecordStoreLayerRecord extends ArrayLayerRecord {
 
   @Override
   public LayerRecord getEventRecord() {
-    return newRecordProxy();
+    return getRecordProxy();
   }
 
   @Override
@@ -33,26 +29,43 @@ public class RecordStoreLayerRecord extends ArrayLayerRecord {
     return (RecordStoreLayer)super.getLayer();
   }
 
-  @Override
-  public LayerRecord newRecordProxy() {
-    final Identifier identifier = getIdentifier();
-    if (identifier == null) {
-      return this;
-    } else {
-      final RecordStoreLayer layer = getLayer();
-      return layer.newProxyLayerRecord(identifier);
-    }
-  }
-
-  public void refreshFromRecordStore(final Record record) {
-    synchronized (getSync()) {
-      if (!isHasOriginalValues()) {
-        final RecordState oldState = super.setState(RecordState.INITIALIZING);
-        try {
-          setValues(record);
-        } finally {
-          setState(oldState);
+  public synchronized void refreshFromRecordStore(final Record record) {
+    final RecordState oldState = super.setState(RecordState.INITIALIZING);
+    RecordState newState = null;
+    try {
+      if (record != null) {
+        Map<String, Object> originalValues = this.originalValues;
+        final List<FieldDefinition> fields = getFieldDefinitions();
+        for (final FieldDefinition fieldDefinition : fields) {
+          if (!isIdField(fieldDefinition)) {
+            final String fieldName = fieldDefinition.getName();
+            if (record.hasField(fieldName)) {
+              final int fieldIndex = fieldDefinition.getIndex();
+              final Object recordValue = record.getValue(fieldName);
+              final Object newValue = fieldDefinition.toFieldValue(recordValue);
+              final Object value = getValueInternal(fieldIndex);
+              if (originalValues.containsKey(fieldName)) {
+                if (fieldDefinition.equals(value, newValue)) {
+                  originalValues = removeOriginalValue(originalValues, fieldName);
+                  if (originalValues.isEmpty() && oldState.isModified()) {
+                    newState = RecordState.PERSISTED;
+                  }
+                } else {
+                  originalValues.put(fieldName, newValue);
+                }
+              } else if (!fieldDefinition.equals(value, newValue)) {
+                setValueInternal(fieldIndex, newValue);
+              }
+            }
+          }
         }
+      }
+    } finally {
+      if (newState == null) {
+        setState(oldState);
+      } else {
+        setState(newState);
+        this.layer.updateRecordState(this);
       }
     }
   }

@@ -139,9 +139,7 @@ public class LayerRendererOverlay extends JComponent
     final Container parent = getParent();
     if (getWidth() > 0 && getHeight() > 0) {
       if (parent != null && parent.isVisible()) {
-        if (this.layer != null && this.layer.isExists() && this.layer.isVisible()) {
-          this.cachedImage.refresh();
-        }
+        this.cachedImage.refresh();
       }
     }
   }
@@ -155,30 +153,34 @@ public class LayerRendererOverlay extends JComponent
 
   private GeoreferencedImage refreshImage(final Cancellable cancellable) {
     final Viewport2D viewport = this.viewport;
-    if (this.layer != null && viewport.isViewValid()) {
-      try (
-        final ImageViewport imageViewport = new ImageViewport(viewport)) {
-        final ViewRenderer view = imageViewport.newViewRenderer();
-        view.setCancellable(cancellable);
-        view.renderLayer(this.layer);
-        if (this.showAreaBoundingBox) {
-          final BoundingBox areaBoundingBox = view.getAreaBoundingBox();
-          if (!areaBoundingBox.isEmpty() && !areaBoundingBox.bboxCovers(view)) {
-            final Polygon viewportPolygon = view.bboxEdit(editor -> editor.expandPercent(0.1))
-              .toPolygon(0);
-            final Polygon areaPolygon = areaBoundingBox
-              .bboxEdit(editor -> editor.expandDelta(imageViewport.getUnitsPerPixel()))
-              .toPolygon(0);
-            final Geometry drawPolygon = viewportPolygon.difference(areaPolygon);
-            view.drawGeometry(drawPolygon, STYLE_AREA);
+    if (viewport != null) {
+      final double scaleForVisible = viewport.getScale();
+      if (this.layer != null && this.layer.isExists() && viewport.isViewValid()
+        && this.layer.isVisible(scaleForVisible)) {
+        try (
+          final ImageViewport imageViewport = new ImageViewport(viewport)) {
+          final ViewRenderer view = imageViewport.newViewRenderer();
+          view.setCancellable(cancellable);
+          view.renderLayer(this.layer);
+          if (this.showAreaBoundingBox) {
+            final BoundingBox areaBoundingBox = view.getAreaBoundingBox();
+            if (!areaBoundingBox.isEmpty() && !areaBoundingBox.bboxCovers(view)) {
+              final Polygon viewportPolygon = view.bboxEdit(editor -> editor.expandPercent(0.1))
+                .toPolygon(0);
+              final Polygon areaPolygon = areaBoundingBox
+                .bboxEdit(editor -> editor.expandDelta(imageViewport.getUnitsPerPixel()))
+                .toPolygon(0);
+              final Geometry drawPolygon = viewportPolygon.difference(areaPolygon);
+              view.drawGeometry(drawPolygon, STYLE_AREA);
+            }
           }
-        }
-        if (!cancellable.isCancelled()) {
-          return imageViewport.getGeoreferencedImage();
-        }
-      } catch (final Throwable t) {
-        if (!cancellable.isCancelled()) {
-          Logs.error(this, "Unable to paint", t);
+          if (!cancellable.isCancelled()) {
+            return imageViewport.getGeoreferencedImage();
+          }
+        } catch (final Throwable t) {
+          if (!cancellable.isCancelled()) {
+            Logs.error(this, "Unable to paint", t);
+          }
         }
       }
     }

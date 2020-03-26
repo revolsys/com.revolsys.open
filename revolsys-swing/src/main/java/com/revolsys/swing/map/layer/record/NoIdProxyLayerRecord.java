@@ -5,7 +5,7 @@ import org.jeometry.common.data.identifier.Identifier;
 import com.revolsys.util.UuidBuilder;
 
 public class NoIdProxyLayerRecord extends AbstractProxyLayerRecord {
-  private Identifier identifier;
+  private final Identifier identifier;
 
   private final LayerRecord record;
 
@@ -22,12 +22,6 @@ public class NoIdProxyLayerRecord extends AbstractProxyLayerRecord {
     }
     this.identifier = uuidBuilder.newStringIdentifier();
     addProxiedRecord(record);
-  }
-
-  @Override
-  protected void finalize() throws Throwable {
-    this.identifier = removeProxiedRecordIdentifier(this.identifier);
-    super.finalize();
   }
 
   @Override
