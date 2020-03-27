@@ -1171,7 +1171,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
    * If there is one geometry that single geometry will be returned. Otherwise the result
    * will be a subclass of {@link GeometryCollection}.
    *
-   * 
+   *
    * @param geometries
    * @return
    */
@@ -1421,11 +1421,15 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
   }
 
   public List<Geometry> getGeometries(final Collection<? extends Geometry> geometries) {
-    final List<Geometry> geometryList = new ArrayList<>();
-    for (final Geometry geometry : geometries) {
-      addGeometries(geometryList, geometry);
+    if (geometries == null) {
+      return Collections.emptyList();
+    } else {
+      final List<Geometry> geometryList = new ArrayList<>();
+      for (final Geometry geometry : geometries) {
+        addGeometries(geometryList, geometry);
+      }
+      return geometryList;
     }
-    return geometryList;
   }
 
   @Override
