@@ -129,6 +129,7 @@ public class WkbChannelWriter extends ChannelWriter {
     final int lineCount = multiLineString.getGeometryCount();
     putInt(lineCount);
     for (int lineIndex = 0; lineIndex < lineCount; lineIndex++) {
+      putByte((byte)0);
       final LineString line = multiLineString.getLineString(lineIndex);
       writeLineString(line);
     }
@@ -139,6 +140,7 @@ public class WkbChannelWriter extends ChannelWriter {
     final int pointCount = multiPoint.getGeometryCount();
     putInt(pointCount);
     for (int pointIndex = 0; pointIndex < pointCount; pointIndex++) {
+      putByte((byte)0);
       final Point point = multiPoint.getPoint(pointIndex);
       writePoint(point);
     }
@@ -149,6 +151,7 @@ public class WkbChannelWriter extends ChannelWriter {
     final int polygonCount = multiPolygon.getGeometryCount();
     putInt(polygonCount);
     for (int polygonIndex = 0; polygonIndex < polygonCount; polygonIndex++) {
+      putByte((byte)0);
       final Polygon polygon = multiPolygon.getPolygon(polygonIndex);
       writePolygon(polygon);
     }
