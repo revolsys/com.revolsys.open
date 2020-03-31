@@ -32,7 +32,7 @@ public class TimestampField extends Field {
       setValue(getInitialValue(request));
       final Timestamp date = getValue();
       if (date != null) {
-        this.inputValue = Dates.toTimestampString(date);
+        this.inputValue = Dates.toTimestampIsoString(date);
       }
     }
   }

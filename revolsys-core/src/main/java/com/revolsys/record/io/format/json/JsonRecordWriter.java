@@ -17,6 +17,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 
 public class JsonRecordWriter extends AbstractRecordWriter {
@@ -244,7 +245,13 @@ public class JsonRecordWriter extends AbstractRecordWriter {
       }
       startObject();
       boolean hasValue = false;
-      for (final FieldDefinition field : getFieldDefinitions()) {
+      RecordDefinition recordDefinition = getRecordDefinition();
+      if (recordDefinition == null) {
+        recordDefinition = record.getRecordDefinition();
+      }
+      final List<FieldDefinition> fieldDefinitions = recordDefinition.getFieldDefinitions();
+
+      for (final FieldDefinition field : fieldDefinitions) {
         final int fieldIndex = field.getIndex();
         final Object value;
         if (isWriteCodeValues()) {

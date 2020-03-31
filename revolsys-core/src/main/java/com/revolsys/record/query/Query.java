@@ -3,6 +3,7 @@ package com.revolsys.record.query;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -349,7 +350,11 @@ public class Query extends BaseObjectWithProperties
 
   public List<FieldDefinition> getFields(final RecordDefinition recordDefinition) {
     if (this.fieldNames.isEmpty()) {
-      return recordDefinition.getFields();
+      if (recordDefinition == null) {
+        return Collections.emptyList();
+      } else {
+        return recordDefinition.getFields();
+      }
     } else {
       final List<FieldDefinition> fields = new ArrayList<>();
       for (String fieldName : this.fieldNames) {

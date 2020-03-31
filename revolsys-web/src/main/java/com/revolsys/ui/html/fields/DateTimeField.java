@@ -31,7 +31,7 @@ public class DateTimeField extends Field {
       setValue(getInitialValue(request));
       if (getValue() != null) {
         final Date date = getValue();
-        this.inputValue = Dates.toDateTimeString(date);
+        this.inputValue = Dates.toDateTimeIsoString(date);
       }
     }
   }
