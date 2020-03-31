@@ -11,6 +11,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 
@@ -19,8 +20,8 @@ public class OutputStreamRecordWriter extends DelegatingWriter<Record> implement
 
   private File tempFile;
 
-  public OutputStreamRecordWriter(final RecordDefinition recordDefinition, final String baseName,
-    final String fileExtension, final OutputStream out) {
+  public OutputStreamRecordWriter(final RecordDefinitionProxy recordDefinition,
+    final String baseName, final String fileExtension, final OutputStream out) {
     this.out = out;
     try {
       this.tempFile = FileUtil.newTempFile(baseName, "." + fileExtension);

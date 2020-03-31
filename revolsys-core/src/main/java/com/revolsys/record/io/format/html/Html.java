@@ -12,11 +12,10 @@ import com.revolsys.io.map.MapWriterFactory;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.io.format.xml.XmlWriter;
-import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.util.HtmlAttr;
 
-public class Html extends AbstractIoFactory
-  implements MapWriterFactory, RecordWriterFactory {
+public class Html extends AbstractIoFactory implements MapWriterFactory, RecordWriterFactory {
   public static void href(final XmlWriter out, final String url) {
     out.attribute(HtmlAttr.HREF, url);
   }
@@ -40,7 +39,7 @@ public class Html extends AbstractIoFactory
 
   @Override
   public RecordWriter newRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final RecordDefinitionProxy recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.newUtf8Writer(outputStream);
     return new XhtmlRecordWriter(recordDefinition, writer);

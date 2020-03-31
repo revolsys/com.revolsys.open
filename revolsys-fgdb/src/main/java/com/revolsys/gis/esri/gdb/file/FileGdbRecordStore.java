@@ -864,11 +864,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public FileGdbWriter newRecordWriter(final RecordDefinition recordDefinition) {
+  public FileGdbWriter newRecordWriter(final RecordDefinitionProxy recordDefinition) {
     return newRecordWriter(recordDefinition, false);
   }
 
-  public FileGdbWriter newRecordWriter(final RecordDefinition recordDefinition,
+  public FileGdbWriter newRecordWriter(final RecordDefinitionProxy recordDefinition,
     final boolean loadOnlyMode) {
     synchronized (this.geodatabase) {
       final GeodatabaseReference geodatabase = this.geodatabase;

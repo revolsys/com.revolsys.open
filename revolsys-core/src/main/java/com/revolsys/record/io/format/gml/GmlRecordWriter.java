@@ -19,6 +19,7 @@ import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.record.property.RecordProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 
 public class GmlRecordWriter extends AbstractRecordWriter {
   public static final void srsName(final XmlWriter out, final GeometryFactory geometryFactory) {
@@ -40,12 +41,12 @@ public class GmlRecordWriter extends AbstractRecordWriter {
 
   private QName qualifiedName;
 
-  public GmlRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
+  public GmlRecordWriter(final RecordDefinitionProxy recordDefinition, final Writer out) {
     super(recordDefinition);
     this.out = new XmlWriter(out);
-    this.qualifiedName = recordDefinition.getProperty(RecordProperties.QUALIFIED_NAME);
+    this.qualifiedName = this.recordDefinition.getProperty(RecordProperties.QUALIFIED_NAME);
     if (this.qualifiedName == null) {
-      this.qualifiedName = new QName(recordDefinition.getName());
+      this.qualifiedName = new QName(this.recordDefinition.getName());
     }
     this.namespaceUri = this.qualifiedName.getNamespaceURI();
     this.out.setPrefix(this.qualifiedName);

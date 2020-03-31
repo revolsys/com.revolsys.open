@@ -10,7 +10,7 @@ import com.revolsys.io.IoConstants;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.HtmlAttr;
 import com.revolsys.util.HtmlElem;
@@ -32,7 +32,7 @@ public class XhtmlRecordWriter extends AbstractRecordWriter {
 
   private boolean wrap = true;
 
-  public XhtmlRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
+  public XhtmlRecordWriter(final RecordDefinitionProxy recordDefinition, final Writer out) {
     super(recordDefinition);
     this.out = new XmlWriter(out);
   }

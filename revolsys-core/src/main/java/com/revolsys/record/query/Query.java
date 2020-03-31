@@ -347,6 +347,31 @@ public class Query extends BaseObjectWithProperties
     return this.fieldNames;
   }
 
+  public List<FieldDefinition> getFields(final RecordDefinition recordDefinition) {
+    if (this.fieldNames.isEmpty()) {
+      return recordDefinition.getFields();
+    } else {
+      final List<FieldDefinition> fields = new ArrayList<>();
+      for (String fieldName : this.fieldNames) {
+        if (fieldName.equals("*")) {
+          fields.addAll(recordDefinition.getFields());
+        } else {
+          if (fieldName.endsWith("\"")) {
+            final int index = fieldName.indexOf('"');
+            if (index > 0 && fieldName.charAt(index - 1) == ' ') {
+              fieldName = fieldName.substring(index + 1, fieldName.length() - 1);
+            }
+          }
+          final FieldDefinition field = recordDefinition.getField(fieldName);
+          if (field != null) {
+            fields.add(field);
+          }
+        }
+      }
+      return fields;
+    }
+  }
+
   public String getFromClause() {
     return this.fromClause;
   }

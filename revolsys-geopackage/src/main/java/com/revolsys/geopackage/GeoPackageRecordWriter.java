@@ -2,12 +2,12 @@ package com.revolsys.geopackage;
 
 import com.revolsys.jdbc.io.JdbcRecordWriter;
 import com.revolsys.record.io.RecordStoreRecordWriter;
-import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 
 public class GeoPackageRecordWriter extends RecordStoreRecordWriter {
 
   public GeoPackageRecordWriter(final GeoPackageRecordStore recordStore,
-    final RecordDefinition recordDefinition) {
+    final RecordDefinitionProxy recordDefinition) {
     super(recordStore, recordDefinition);
 
   }

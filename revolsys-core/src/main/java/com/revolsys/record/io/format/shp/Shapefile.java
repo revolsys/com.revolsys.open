@@ -11,7 +11,7 @@ import com.revolsys.record.io.AbstractRecordIoFactory;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
-import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.OutputStreamResource;
 import com.revolsys.spring.resource.Resource;
 
@@ -42,14 +42,14 @@ public class Shapefile extends AbstractRecordIoFactory implements RecordWriterFa
   }
 
   @Override
-  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
+  public RecordWriter newRecordWriter(final RecordDefinitionProxy recordDefinition,
     final Resource resource) {
     return new ShapefileRecordWriter(recordDefinition, resource);
   }
 
   @Override
   public RecordWriter newRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final RecordDefinitionProxy recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     return newRecordWriter(recordDefinition, new OutputStreamResource(baseName, outputStream));
   }

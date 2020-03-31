@@ -11,7 +11,7 @@ import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.wkt.EWktWriter;
 import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
 
 public class CsvRecordWriter extends AbstractRecordWriter {
@@ -26,19 +26,19 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   private boolean paused = false;
 
-  public CsvRecordWriter(final RecordDefinition recordDefinition, final Object target,
+  public CsvRecordWriter(final RecordDefinitionProxy recordDefinition, final Object target,
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
     this(recordDefinition, Resource.getResource(target), fieldSeparator, useQuotes, ewkt);
   }
 
-  public CsvRecordWriter(final RecordDefinition recordDefinition, final Resource resource,
+  public CsvRecordWriter(final RecordDefinitionProxy recordDefinition, final Resource resource,
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
     this(recordDefinition, resource.newWriter(), fieldSeparator, useQuotes, ewkt);
     setResource(resource);
     recordDefinition.writePrjFile(resource);
   }
 
-  public CsvRecordWriter(final RecordDefinition recordDefinition, final Writer out,
+  public CsvRecordWriter(final RecordDefinitionProxy recordDefinition, final Writer out,
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
     super(recordDefinition);
     try {

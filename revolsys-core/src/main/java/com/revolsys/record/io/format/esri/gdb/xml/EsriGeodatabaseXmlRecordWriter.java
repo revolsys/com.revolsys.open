@@ -28,6 +28,7 @@ import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.record.io.format.xml.XsiConstants;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 
 public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
   implements EsriGeodatabaseXmlConstants {
@@ -45,7 +46,8 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
 
   private final XmlWriter out;
 
-  public EsriGeodatabaseXmlRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
+  public EsriGeodatabaseXmlRecordWriter(final RecordDefinitionProxy recordDefinition,
+    final Writer out) {
     super(recordDefinition);
     this.out = new XmlWriter(out);
   }

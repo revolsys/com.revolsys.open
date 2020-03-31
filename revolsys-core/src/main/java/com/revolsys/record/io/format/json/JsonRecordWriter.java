@@ -11,12 +11,13 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.number.Numbers;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 
 public class JsonRecordWriter extends AbstractRecordWriter {
 
@@ -32,7 +33,7 @@ public class JsonRecordWriter extends AbstractRecordWriter {
 
   private final JsonStringEncodingWriter encodingOut;
 
-  public JsonRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
+  public JsonRecordWriter(final RecordDefinitionProxy recordDefinition, final Writer out) {
     super(recordDefinition);
     this.out = out;
     this.encodingOut = new JsonStringEncodingWriter(out);
@@ -43,8 +44,29 @@ public class JsonRecordWriter extends AbstractRecordWriter {
     try {
       final Writer out = this.out;
       if (out != null) {
-        if (!this.singleObject) {
-          out.write("\n]}\n");
+        if (this.singleObject) {
+          if (!this.written) {
+            out.write("{}\n");
+          }
+        } else {
+          if (!this.written) {
+            writeHeader();
+          }
+          out.write("\n]");
+          boolean written = this.written;
+          final MapEx extraProperties = getProperty("extraProperties", MapEx.EMPTY);
+          for (final Entry<String, Object> entry : extraProperties.entrySet()) {
+            final String name = entry.getKey();
+            final Object value = entry.getValue();
+            if (written) {
+              this.out.write(",\n");
+            } else {
+              written = true;
+            }
+            label(name);
+            value(null, value);
+          }
+          out.write("}\n");
         }
         final String callback = getProperty(IoConstants.JSONP_PROPERTY);
         if (callback != null) {

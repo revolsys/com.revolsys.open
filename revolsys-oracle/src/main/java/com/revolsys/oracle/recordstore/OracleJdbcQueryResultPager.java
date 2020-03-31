@@ -4,7 +4,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import com.revolsys.jdbc.JdbcConnection;
@@ -14,7 +13,6 @@ import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.query.Query;
-import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
@@ -50,23 +48,7 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
           final JdbcConnection connection = getRecordStore().getJdbcConnection()) {
           final RecordFactory<Record> recordFactory = getRecordFactory();
           final RecordDefinition recordDefinition = getRecordDefinition();
-          final List<FieldDefinition> attributes = new ArrayList<>();
 
-          final List<String> fieldNames = query.getFieldNames();
-          if (fieldNames.isEmpty()) {
-            attributes.addAll(recordDefinition.getFields());
-          } else {
-            for (final String fieldName : fieldNames) {
-              if (fieldName.equals("*")) {
-                attributes.addAll(recordDefinition.getFields());
-              } else {
-                final FieldDefinition attribute = recordDefinition.getField(fieldName);
-                if (attribute != null) {
-                  attributes.add(attribute);
-                }
-              }
-            }
-          }
           try (
             final PreparedStatement statement = connection.prepareStatement(sql);
             final ResultSet resultSet = recordStore.getResultSet(statement, getQuery());) {
@@ -74,7 +56,7 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
               int i = 0;
               do {
                 final Record record = JdbcQueryIterator.getNextRecord(recordStore, recordDefinition,
-                  attributes, recordFactory, resultSet, this.internStrings);
+                  this.fields, recordFactory, resultSet, this.internStrings);
                 results.add(record);
                 i++;
               } while (resultSet.next() && i < pageSize);

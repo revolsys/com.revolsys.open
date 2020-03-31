@@ -44,6 +44,7 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
 
 public class XlsxRecordWriter extends AbstractRecordWriter {
@@ -82,7 +83,7 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
 
   private List<Row> sheetRows = Collections.emptyList();
 
-  public XlsxRecordWriter(final RecordDefinition recordDefinition, final OutputStream out) {
+  public XlsxRecordWriter(final RecordDefinitionProxy recordDefinition, final OutputStream out) {
     super(recordDefinition);
     try {
       this.out = new BufferedOutputStream(out);
@@ -110,7 +111,7 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
           }
         }
       }
-      String name = recordDefinition.getName();
+      String name = this.recordDefinition.getName();
       if (name == null) {
         name = "Sheet1";
       } else {
@@ -134,14 +135,14 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
       this.sheetData = worksheet.getSheetData();
       this.sheetRows = this.sheetData.getRow();
 
-      addHeaderRow(worksheet, recordDefinition);
+      addHeaderRow(worksheet, this.recordDefinition);
 
     } catch (final Docx4JException | JAXBException e) {
       throw Exceptions.wrap(e);
     }
   }
 
-  public XlsxRecordWriter(final RecordDefinition recordDefinition, final Resource resource) {
+  public XlsxRecordWriter(final RecordDefinitionProxy recordDefinition, final Resource resource) {
     this(recordDefinition, resource.newOutputStream());
     setResource(resource);
   }

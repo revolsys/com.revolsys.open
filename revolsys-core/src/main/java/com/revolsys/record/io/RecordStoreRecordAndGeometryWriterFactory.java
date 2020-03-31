@@ -6,7 +6,7 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import com.revolsys.io.AbstractIoFactory;
-import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.Resource;
 
@@ -30,7 +30,7 @@ public class RecordStoreRecordAndGeometryWriterFactory extends AbstractIoFactory
   }
 
   @Override
-  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
+  public RecordWriter newRecordWriter(final RecordDefinitionProxy recordDefinition,
     final Resource resource) {
     final File file = resource.getFile();
     final RecordStore recordStore = RecordStore.newRecordStore(file);
@@ -44,7 +44,7 @@ public class RecordStoreRecordAndGeometryWriterFactory extends AbstractIoFactory
 
   @Override
   public RecordWriter newRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final RecordDefinitionProxy recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     throw new UnsupportedOperationException("Writing to a stream not currently supported");
   }

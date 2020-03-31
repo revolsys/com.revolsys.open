@@ -20,8 +20,8 @@ import com.revolsys.io.endian.ResourceEndianOutput;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.xbase.XBaseFieldDefinition;
 import com.revolsys.record.io.format.xbase.XbaseRecordWriter;
-import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
 
 public class ShapefileRecordWriter extends XbaseRecordWriter {
@@ -50,7 +50,8 @@ public class ShapefileRecordWriter extends XbaseRecordWriter {
 
   private int shapeType = ShapefileConstants.NULL_SHAPE;
 
-  public ShapefileRecordWriter(final RecordDefinition recordDefinition, final Resource resource) {
+  public ShapefileRecordWriter(final RecordDefinitionProxy recordDefinition,
+    final Resource resource) {
     super(recordDefinition, resource.newResourceChangeExtension("dbf"));
     this.resource = resource;
   }

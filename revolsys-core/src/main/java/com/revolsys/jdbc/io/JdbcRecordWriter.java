@@ -27,7 +27,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.property.GlobalIdProperty;
 import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.count.CategoryLabelCountMap;
 
@@ -107,12 +107,12 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
   }
 
   public JdbcRecordWriter(final JdbcRecordStore recordStore,
-    final RecordDefinition recordDefinition) {
+    final RecordDefinitionProxy recordDefinition) {
     this(recordStore, recordDefinition, recordStore.getStatistics());
   }
 
   public JdbcRecordWriter(final JdbcRecordStore recordStore,
-    final RecordDefinition recordDefinition, final CategoryLabelCountMap statistics) {
+    final RecordDefinitionProxy recordDefinition, final CategoryLabelCountMap statistics) {
     super(recordDefinition);
     this.recordStore = recordStore;
     this.statistics = statistics;

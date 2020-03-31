@@ -5,6 +5,7 @@ import java.util.Map;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
 
 public class RecordStoreRecordWriter extends AbstractRecordWriter {
@@ -13,7 +14,7 @@ public class RecordStoreRecordWriter extends AbstractRecordWriter {
   private final RecordWriter writer;
 
   public RecordStoreRecordWriter(final RecordStore recordStore,
-    final RecordDefinition recordDefinition) {
+    final RecordDefinitionProxy recordDefinition) {
     super(recordStore.getRecordDefinition(recordDefinition));
     this.recordStore = recordStore;
     if (getRecordDefinition() == null) {

@@ -33,6 +33,7 @@ import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.io.format.OutputStreamRecordWriter;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
@@ -252,7 +253,7 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory
   }
 
   @Override
-  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
+  public RecordWriter newRecordWriter(final RecordDefinitionProxy recordDefinition,
     final Resource resource) {
     final GeoPackageRecordStore recordStore = GeoPackage.createRecordStore(resource);
     if (recordStore == null) {
@@ -264,7 +265,7 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory
 
   @Override
   public RecordWriter newRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final RecordDefinitionProxy recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     return new OutputStreamRecordWriter(recordDefinition, baseName, GeoPackage.FILE_EXTENSION,
       outputStream);

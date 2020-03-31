@@ -16,6 +16,7 @@ import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 
 public class GpxRecordWriter extends AbstractRecordWriter implements GpxAttributes, GpxElements {
 
@@ -31,7 +32,7 @@ public class GpxRecordWriter extends AbstractRecordWriter implements GpxAttribut
 
   private final XmlWriter out;
 
-  public GpxRecordWriter(final RecordDefinition recordDefinition, final Writer writer) {
+  public GpxRecordWriter(final RecordDefinitionProxy recordDefinition, final Writer writer) {
     super(recordDefinition);
     this.out = new XmlWriter(new BufferedWriter(writer));
     this.out.setIndent(false);

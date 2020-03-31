@@ -3,7 +3,7 @@ package com.revolsys.record.io.format.directory;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
-import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 
 public class DirectoryRecordStoreWriter extends AbstractRecordWriter {
 
@@ -14,7 +14,7 @@ public class DirectoryRecordStoreWriter extends AbstractRecordWriter {
   }
 
   public DirectoryRecordStoreWriter(final DirectoryRecordStore recordStore,
-    final RecordDefinition recordDefinition) {
+    final RecordDefinitionProxy recordDefinition) {
     super(recordDefinition);
     this.recordStore = recordStore;
   }

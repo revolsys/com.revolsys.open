@@ -13,7 +13,7 @@ import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 
 public class WktRecordWriter extends AbstractRecordWriter {
 
@@ -23,7 +23,7 @@ public class WktRecordWriter extends AbstractRecordWriter {
 
   private GeometryFactory geometryFactory;
 
-  public WktRecordWriter(final RecordDefinition recordDefinition, final Writer out) {
+  public WktRecordWriter(final RecordDefinitionProxy recordDefinition, final Writer out) {
     super(recordDefinition);
     this.out = new BufferedWriter(out);
     final FieldDefinition geometryField = recordDefinition.getGeometryField();

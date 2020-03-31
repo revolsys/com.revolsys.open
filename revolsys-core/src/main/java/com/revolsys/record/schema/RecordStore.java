@@ -664,7 +664,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     return newRecordWriter(recordDefinition);
   }
 
-  default RecordWriter newRecordWriter(final RecordDefinition recordDefinition) {
+  default RecordWriter newRecordWriter(final RecordDefinitionProxy recordDefinition) {
     return newRecordWriter();
   }
 

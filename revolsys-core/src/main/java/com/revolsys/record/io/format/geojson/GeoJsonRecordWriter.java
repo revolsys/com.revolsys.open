@@ -22,6 +22,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonWriter;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 
 public class GeoJsonRecordWriter extends AbstractRecordWriter {
 
@@ -36,8 +37,6 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
 
   private int srid = -1;
 
-  private RecordDefinition recordDefinition;
-
   private boolean allowCustomCoordinateSystem = true;
 
   private GeometryFactory geometryFactory;
@@ -46,7 +45,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
     this(out, null);
   }
 
-  public GeoJsonRecordWriter(final Writer out, final RecordDefinition recordDefinition) {
+  public GeoJsonRecordWriter(final Writer out, final RecordDefinitionProxy recordDefinition) {
     super(recordDefinition);
     if (recordDefinition != null) {
       this.geometryFactory = recordDefinition.getGeometryFactory();

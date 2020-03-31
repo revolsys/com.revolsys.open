@@ -12,12 +12,11 @@ import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
-import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.OutputStreamResource;
 import com.revolsys.spring.resource.Resource;
 
-public class XBase extends AbstractIoFactory
-  implements RecordReaderFactory, RecordWriterFactory {
+public class XBase extends AbstractIoFactory implements RecordReaderFactory, RecordWriterFactory {
   public XBase() {
     super("D-Base");
     addMediaTypeAndFileExtension("application/dbase", "dbf");
@@ -50,14 +49,14 @@ public class XBase extends AbstractIoFactory
   }
 
   @Override
-  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
+  public RecordWriter newRecordWriter(final RecordDefinitionProxy recordDefinition,
     final Resource resource) {
     return new XbaseRecordWriter(recordDefinition, resource);
   }
 
   @Override
   public RecordWriter newRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final RecordDefinitionProxy recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     return newRecordWriter(recordDefinition, new OutputStreamResource(baseName, outputStream));
   }

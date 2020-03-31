@@ -11,6 +11,7 @@ import org.jeometry.common.io.PathNameProxy;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 
 public class FileGdbWriter extends AbstractRecordWriter {
   private FileGdbRecordStore recordStore;
@@ -31,7 +32,7 @@ public class FileGdbWriter extends AbstractRecordWriter {
     this.loadOnlyMode = false;
   }
 
-  FileGdbWriter(final FileGdbRecordStore recordStore, final RecordDefinition recordDefinition,
+  FileGdbWriter(final FileGdbRecordStore recordStore, final RecordDefinitionProxy recordDefinition,
     final FileGdbRecordDefinition fileGdbRecordDefinition, final boolean loadOnlyMode) {
     super(recordDefinition);
     this.recordStore = recordStore;

@@ -218,27 +218,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
         this.recordDefinition = this.recordStore.getRecordDefinition(tableName, resultSetMetaData,
           dbTableName);
       }
-      final List<String> fieldNames = new ArrayList<>(this.query.getFieldNames());
-      if (fieldNames.isEmpty()) {
-        this.fields.addAll(this.recordDefinition.getFields());
-      } else {
-        for (String fieldName : fieldNames) {
-          if (fieldName.equals("*")) {
-            this.fields.addAll(this.recordDefinition.getFields());
-          } else {
-            if (fieldName.endsWith("\"")) {
-              final int index = fieldName.indexOf('"');
-              if (index > 0 && fieldName.charAt(index - 1) == ' ') {
-                fieldName = fieldName.substring(index + 1, fieldName.length() - 1);
-              }
-            }
-            final FieldDefinition field = this.recordDefinition.getField(fieldName);
-            if (field != null) {
-              this.fields.add(field);
-            }
-          }
-        }
-      }
+      this.fields = this.query.getFields(this.recordDefinition);
 
       final String typePath = this.query.getTypeNameAlias();
       if (typePath != null) {

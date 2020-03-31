@@ -14,7 +14,7 @@ import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.io.format.zip.ZipRecordReader;
 import com.revolsys.record.io.format.zip.ZipRecordWriter;
-import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 
@@ -38,7 +38,7 @@ public class ShapefileZip extends AbstractRecordIoFactory implements RecordWrite
 
   @Override
   public RecordWriter newRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final RecordDefinitionProxy recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     File directory;
     try {

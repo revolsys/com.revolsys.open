@@ -14,7 +14,6 @@ import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.query.Query;
-import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
@@ -47,7 +46,6 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
             final JdbcRecordStore recordStore = getRecordStore();
             try (
               JdbcConnection connection = recordStore.getJdbcConnection()) {
-              final List<FieldDefinition> attributes = recordDefinition.getFields();
 
               try (
                 final PreparedStatement statement = connection.prepareStatement(sql);
@@ -55,9 +53,9 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
                 if (resultSet.next()) {
                   int i = 0;
                   do {
-                    final Record object = JdbcQueryIterator.getNextRecord(recordStore,
-                      recordDefinition, attributes, recordFactory, resultSet, this.internStrings);
-                    results.add(object);
+                    final Record records = JdbcQueryIterator.getNextRecord(recordStore,
+                      recordDefinition, this.fields, recordFactory, resultSet, this.internStrings);
+                    results.add(records);
                     i++;
                   } while (resultSet.next() && i < pageSize);
                 }

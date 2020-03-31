@@ -12,7 +12,7 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.Record;
-import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 
 public class KmzRecordWriter extends AbstractRecordWriter {
 
@@ -20,7 +20,7 @@ public class KmzRecordWriter extends AbstractRecordWriter {
 
   private final ZipOutputStream zipOut;
 
-  public KmzRecordWriter(final RecordDefinition recordDefinition, final OutputStream out,
+  public KmzRecordWriter(final RecordDefinitionProxy recordDefinition, final OutputStream out,
     final Charset charset) {
     super(recordDefinition);
     try {

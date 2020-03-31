@@ -3,6 +3,7 @@ package com.revolsys.io;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
 
 public abstract class AbstractRecordWriter extends AbstractWriter<Record> implements RecordWriter {
@@ -14,10 +15,14 @@ public abstract class AbstractRecordWriter extends AbstractWriter<Record> implem
 
   private Resource resource;
 
-  private final RecordDefinition recordDefinition;
+  protected final RecordDefinition recordDefinition;
 
-  public AbstractRecordWriter(final RecordDefinition recordDefinition) {
-    this.recordDefinition = recordDefinition;
+  public AbstractRecordWriter(final RecordDefinitionProxy recordDefinition) {
+    if (recordDefinition == null) {
+      this.recordDefinition = null;
+    } else {
+      this.recordDefinition = recordDefinition.getRecordDefinition();
+    }
   }
 
   @Override

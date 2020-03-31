@@ -12,7 +12,7 @@ import com.revolsys.record.io.AbstractRecordIoFactory;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
-import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
 
 public class Wkt extends AbstractRecordIoFactory implements RecordWriterFactory, WktConstants {
@@ -34,7 +34,7 @@ public class Wkt extends AbstractRecordIoFactory implements RecordWriterFactory,
 
   @Override
   public RecordWriter newRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final RecordDefinitionProxy recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = FileUtil.newUtf8Writer(outputStream);
     return new WktRecordWriter(recordDefinition, writer);

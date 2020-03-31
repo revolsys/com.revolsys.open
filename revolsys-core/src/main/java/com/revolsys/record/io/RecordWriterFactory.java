@@ -10,6 +10,7 @@ import com.revolsys.geometry.io.GeometryWriterFactory;
 import com.revolsys.io.FileIoFactory;
 import com.revolsys.record.Records;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
 
 public interface RecordWriterFactory extends FileIoFactory, GeometryWriterFactory {
@@ -37,7 +38,7 @@ public interface RecordWriterFactory extends FileIoFactory, GeometryWriterFactor
    * @param resource The resource to write to.
    * @return The writer.
    */
-  default RecordWriter newRecordWriter(final RecordDefinition recordDefinition,
+  default RecordWriter newRecordWriter(final RecordDefinitionProxy recordDefinition,
     final Resource resource) {
     final OutputStream out = resource.newBufferedOutputStream();
     final String baseName = resource.getBaseName();
@@ -45,10 +46,10 @@ public interface RecordWriterFactory extends FileIoFactory, GeometryWriterFactor
   }
 
   default RecordWriter newRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream) {
+    final RecordDefinitionProxy recordDefinition, final OutputStream outputStream) {
     return newRecordWriter(baseName, recordDefinition, outputStream, StandardCharsets.UTF_8);
   }
 
-  RecordWriter newRecordWriter(String baseName, RecordDefinition recordDefinition,
+  RecordWriter newRecordWriter(String baseName, RecordDefinitionProxy recordDefinition,
     OutputStream outputStream, Charset charset);
 }

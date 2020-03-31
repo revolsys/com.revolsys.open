@@ -24,6 +24,7 @@ import com.revolsys.record.io.format.csv.CsvMapWriter;
 import com.revolsys.record.io.format.csv.CsvRecordReader;
 import com.revolsys.record.io.format.csv.CsvRecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
 
 public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
@@ -101,14 +102,14 @@ public class Tsv extends AbstractRecordIoFactory implements RecordWriterFactory,
   }
 
   @Override
-  public CsvRecordWriter newRecordWriter(final RecordDefinition recordDefinition,
+  public CsvRecordWriter newRecordWriter(final RecordDefinitionProxy recordDefinition,
     final Resource resource) {
     return new CsvRecordWriter(recordDefinition, resource, Tsv.FIELD_SEPARATOR, true, true);
   }
 
   @Override
   public RecordWriter newRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final RecordDefinitionProxy recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream, charset);
 

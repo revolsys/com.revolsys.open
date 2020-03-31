@@ -56,6 +56,7 @@ import com.revolsys.record.schema.AbstractRecordStore;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
@@ -740,7 +741,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  public RecordWriter newRecordWriter(final RecordDefinition recordDefinition) {
+  public RecordWriter newRecordWriter(final RecordDefinitionProxy recordDefinition) {
     return new JdbcRecordWriter(this, recordDefinition);
   }
 

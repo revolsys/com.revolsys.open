@@ -30,6 +30,7 @@ import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.Buffers;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
@@ -72,7 +73,7 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
 
   private boolean useZeroForNull = true;
 
-  public XbaseRecordWriter(final RecordDefinition recordDefinition, final Resource resource) {
+  public XbaseRecordWriter(final RecordDefinitionProxy recordDefinition, final Resource resource) {
     super(recordDefinition);
     setResource(resource);
   }

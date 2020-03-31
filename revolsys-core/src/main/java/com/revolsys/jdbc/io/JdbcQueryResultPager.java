@@ -16,6 +16,7 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Booleans;
 
@@ -53,6 +54,8 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
 
   protected final boolean internStrings;
 
+  protected final List<FieldDefinition> fields;
+
   public JdbcQueryResultPager(final JdbcRecordStore recordStore,
     final Map<String, Object> properties, final Query query) {
     final boolean autoCommit = Booleans.getBoolean(properties.get("autoCommit"));
@@ -71,6 +74,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
 
     this.sql = JdbcUtils.getSelectSql(query);
     this.internStrings = (Boolean)properties.getOrDefault(properties, false);
+    this.fields = query.getFields(this.recordDefinition);
   }
 
   @Override
@@ -340,8 +344,8 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
           int i = 0;
           do {
             final Record object = JdbcQueryIterator.getNextRecord(this.recordStore,
-              this.recordDefinition, this.recordDefinition.getFields(), this.recordFactory,
-              this.resultSet, this.internStrings);
+              this.recordDefinition, this.fields, this.recordFactory, this.resultSet,
+              this.internStrings);
             this.results.add(object);
             i++;
           } while (this.resultSet.next() && i < this.pageSize);

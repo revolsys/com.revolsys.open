@@ -14,7 +14,7 @@ import com.revolsys.io.map.MapWriter;
 import com.revolsys.io.map.MapWriterFactory;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
-import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
 
 public class Xml extends AbstractIoFactory
@@ -55,7 +55,7 @@ public class Xml extends AbstractIoFactory
 
   @Override
   public RecordWriter newRecordWriter(final String baseName,
-    final RecordDefinition recordDefinition, final OutputStream outputStream,
+    final RecordDefinitionProxy recordDefinition, final OutputStream outputStream,
     final Charset charset) {
     final OutputStreamWriter writer = new OutputStreamWriter(outputStream, charset);
     return new XmlRecordWriter(recordDefinition, writer);

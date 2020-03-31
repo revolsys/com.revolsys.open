@@ -16,6 +16,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.property.RecordProperties;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 
 public class XmlRecordWriter extends AbstractRecordWriter {
 
@@ -27,7 +28,7 @@ public class XmlRecordWriter extends AbstractRecordWriter {
 
   boolean startAttribute;
 
-  public XmlRecordWriter(final RecordDefinition recordDefinition, final java.io.Writer out) {
+  public XmlRecordWriter(final RecordDefinitionProxy recordDefinition, final java.io.Writer out) {
     super(recordDefinition);
     if (out instanceof XmlWriter) {
       this.out = (XmlWriter)out;

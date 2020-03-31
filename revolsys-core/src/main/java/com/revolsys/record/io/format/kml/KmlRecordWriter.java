@@ -20,6 +20,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.util.Property;
 
 public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Constants {
@@ -50,7 +51,7 @@ public class KmlRecordWriter extends AbstractRecordWriter implements Kml22Consta
 
   private final java.io.Writer writer;
 
-  public KmlRecordWriter(final RecordDefinition recordDefinition, final java.io.Writer out) {
+  public KmlRecordWriter(final RecordDefinitionProxy recordDefinition, final java.io.Writer out) {
     super(recordDefinition);
     this.writer = out;
   }
