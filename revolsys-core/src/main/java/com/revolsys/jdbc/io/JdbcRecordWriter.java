@@ -617,8 +617,13 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
             final Record record = records.get(recordIndex++);
             int columnIndex = 1;
             for (final FieldDefinition idField : recordDefinition.getIdFields()) {
-              ((JdbcFieldDefinition)idField).setFieldValueFromResultSet(generatedKeyResultSet,
-                columnIndex++, record, false);
+              final Object idValue = generatedKeyResultSet.getObject(columnIndex);
+              if (!generatedKeyResultSet.wasNull()) {
+                final int index = idField.getIndex();
+                record.setValue(index, idValue);
+                columnIndex++;
+              }
+
             }
           }
         }

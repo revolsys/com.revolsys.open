@@ -36,17 +36,21 @@ public final class HttpServletUtils {
     RESPONSE_LOCAL.remove();
   }
 
-  public static String getAbsoluteUrl(final String url) {
+  protected static String getAbsoluteUrl(final HttpServletRequest request, final String url) {
     if (url == null) {
       return null;
     } else if (url.startsWith("/")) {
-      final HttpServletRequest request = getRequest();
       final String serverUrl = getServerUrl(request);
       final String contextPath = URL_PATH_HELPER.getOriginatingContextPath(request);
       return serverUrl + contextPath + url;
     } else {
       return url;
     }
+  }
+
+  public static String getAbsoluteUrl(final String url) {
+    final HttpServletRequest request = getRequest();
+    return getAbsoluteUrl(request, url);
   }
 
   @SuppressWarnings("unchecked")
