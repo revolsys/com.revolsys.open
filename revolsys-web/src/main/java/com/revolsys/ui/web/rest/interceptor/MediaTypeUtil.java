@@ -76,7 +76,7 @@ public class MediaTypeUtil {
       addMediaType(mediaTypes, format);
     }
     final String requestUri = URL_PATH_HELPER.getRequestUri(request);
-    final String filename = FileUtil.getBaseName(requestUri);
+    final String filename = FileUtil.getFileName(requestUri);
     addMediaTypeFromFilename(mediaTypes, filename);
 
     final String acceptHeader = request.getHeader(ACCEPT_HEADER);
@@ -184,7 +184,7 @@ public class MediaTypeUtil {
         }
       } else if (source.equals("pathExtension")) {
         final String requestUri = urlPathHelper.getRequestUri(request);
-        final String pathFileName = FileUtil.getBaseName(requestUri);
+        final String pathFileName = FileUtil.getFileName(requestUri);
         final MediaType mediaType = getMediaTypeFromFilename(extensionToMediaTypeMap, pathFileName);
         if (mediaType != null) {
           return mediaType;
@@ -250,7 +250,7 @@ public class MediaTypeUtil {
       return false;
     }
     final String requestUri = URL_PATH_HELPER.getRequestUri(request);
-    final String filename = FileUtil.getBaseName(requestUri);
+    final String filename = FileUtil.getFileName(requestUri);
     final String extension = StringUtils.getFilenameExtension(filename);
     if (Property.hasValue(extension)) {
       return false;
