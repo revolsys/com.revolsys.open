@@ -64,17 +64,19 @@ public class WktRecordReader extends AbstractRecordReader {
   @Override
   protected void initDo() {
     GeometryFactory geometryFactory;
-    final FieldDefinition geometryField = getRecordDefinition().getGeometryField();
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final FieldDefinition geometryField = recordDefinition.getGeometryField();
     if (geometryField == null) {
       geometryFactory = GeometryFactory.DEFAULT_3D;
     } else {
       geometryFactory = geometryField.getGeometryFactory();
-      if (geometryFactory == null) {
+      if (geometryFactory == null || !geometryFactory.isHasHorizontalCoordinateSystem()) {
         geometryFactory = getGeometryFactory();
         if (geometryFactory == null) {
           geometryFactory = GeometryFactory.DEFAULT_3D;
         }
         geometryField.setGeometryFactory(geometryFactory);
+        recordDefinition.setGeometryFactory(geometryFactory);
       }
     }
     this.wktParser = new WktParser(geometryFactory);
