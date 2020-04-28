@@ -124,9 +124,15 @@ public class RecordLayerTablePanel extends TablePanel
           () -> actionCopyColumnValues(true, comma));
       }
 
-      final LayerRecordMenu menu = this.layer.getRecordMenu();
       final BaseTableCellEditor tableCellEditor = table.getTableCellEditor();
-      tableCellEditor.setPopupMenu(menu::newJPopupMenu);
+      tableCellEditor.setPopupMenu(() -> {
+        final LayerRecordMenu menu = this.layer.getRecordMenu();
+        if (menu == null) {
+          return null;
+        } else {
+          return menu.newJPopupMenu();
+        }
+      });
     }
 
     newToolBar(pluginConfig);
