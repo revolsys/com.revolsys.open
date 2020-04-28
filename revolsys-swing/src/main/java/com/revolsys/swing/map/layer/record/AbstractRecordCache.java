@@ -12,7 +12,7 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
 
   private final RecordCacheSync recordCacheSync = new RecordCacheSync();
 
-  protected L layer;
+  protected final L layer;
 
   protected String cacheId;
 
@@ -23,13 +23,15 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
 
   @Override
   public boolean addRecord(final LayerRecord record) {
-    synchronized (getRecordCacheSync()) {
-      final L layer = this.layer;
-      if (!(record.getState() == RecordState.DELETED && !layer.isDeleted(record))) {
-        final LayerRecord recordProxied = layer.getProxiedRecord(record);
-        if (recordProxied != null) {
-          if (!containsRecordDo(recordProxied)) {
-            return addRecordDo(recordProxied);
+    if (record != null) {
+      synchronized (getRecordCacheSync()) {
+        final L layer = this.layer;
+        if (!(record.getState() == RecordState.DELETED && !layer.isDeleted(record))) {
+          final LayerRecord recordProxied = layer.getProxiedRecord(record);
+          if (recordProxied != null) {
+            if (!containsRecordDo(recordProxied)) {
+              return addRecordDo(recordProxied);
+            }
           }
         }
       }
@@ -58,10 +60,13 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
 
   @Override
   public final boolean containsRecord(final LayerRecord record) {
-    synchronized (getRecordCacheSync()) {
-      final LayerRecord recordProxied = this.layer.getProxiedRecord(record);
-      if (recordProxied != null) {
-        return containsRecordDo(recordProxied);
+    if (record != null) {
+      synchronized (getRecordCacheSync()) {
+        final L layer = this.layer;
+        final LayerRecord recordProxied = layer.getProxiedRecord(record);
+        if (recordProxied != null) {
+          return containsRecordDo(recordProxied);
+        }
       }
     }
     return false;
@@ -93,12 +98,14 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
 
   @Override
   public boolean removeContainsRecord(final LayerRecord record) {
-    synchronized (getRecordCacheSync()) {
-      final LayerRecord recordProxied = this.layer.getProxiedRecord(record);
-      if (recordProxied != null) {
-        if (containsRecordDo(recordProxied)) {
-          removeRecordDo(recordProxied);
-          return true;
+    if (record != null) {
+      synchronized (getRecordCacheSync()) {
+        final LayerRecord recordProxied = this.layer.getProxiedRecord(record);
+        if (recordProxied != null) {
+          if (containsRecordDo(recordProxied)) {
+            removeRecordDo(recordProxied);
+            return true;
+          }
         }
       }
     }
@@ -107,10 +114,12 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
 
   @Override
   public boolean removeRecord(final LayerRecord record) {
-    synchronized (getRecordCacheSync()) {
-      final LayerRecord proxiedRecord = this.layer.getProxiedRecord(record);
-      if (proxiedRecord != null) {
-        return removeRecordDo(proxiedRecord);
+    if (record != null) {
+      synchronized (getRecordCacheSync()) {
+        final LayerRecord proxiedRecord = this.layer.getProxiedRecord(record);
+        if (proxiedRecord != null) {
+          return removeRecordDo(proxiedRecord);
+        }
       }
     }
     return true;
@@ -122,10 +131,12 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
 
   @Override
   public boolean replaceRecord(final LayerRecord record) {
-    synchronized (getRecordCacheSync()) {
-      final LayerRecord proxiedRecord = this.layer.getProxiedRecord(record);
-      if (removeContainsRecord(proxiedRecord)) {
-        return addRecordDo(proxiedRecord);
+    if (record != null) {
+      synchronized (getRecordCacheSync()) {
+        final LayerRecord proxiedRecord = this.layer.getProxiedRecord(record);
+        if (removeContainsRecord(proxiedRecord)) {
+          return addRecordDo(proxiedRecord);
+        }
       }
     }
     return false;
