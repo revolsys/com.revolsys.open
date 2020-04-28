@@ -316,7 +316,7 @@ public final class ShapefileGeometryUtil {
     in.skipBytes(4 * Doubles.BYTES_IN_DOUBLE);
     final int vertexCount = in.readLEInt();
     int axisCount;
-    if (recordLength == 20 + 12 * vertexCount) {
+    if (40 + 24 * vertexCount == recordLength * 2) {
       geometryFactory = geometryFactory.convertAxisCount(3);
       axisCount = 3;
     } else {
@@ -384,7 +384,7 @@ public final class ShapefileGeometryUtil {
     final double x = in.readLEDouble();
     final double y = in.readLEDouble();
     final double z = in.readLEDouble();
-    if (recordLength == 14) {
+    if (recordLength * 2 == 28) {
       return geometryFactory.convertAxisCount(3).point(x, y, z);
     } else {
       final double m = in.readLEDouble();
@@ -443,7 +443,7 @@ public final class ShapefileGeometryUtil {
     final int vertexCount = in.readLEInt();
     final int[] partIndex = readPartIndex(in, numParts, vertexCount);
     final int axisCount;
-    if (recordLength == 22 + 8 + 2 * numParts + 12 * vertexCount) {
+    if (44 + 16 + 4 * numParts + 24 * vertexCount == recordLength * 2) {
       axisCount = 3;
       geometryFactory = geometryFactory.convertAxisCount(3);
     } else {
@@ -572,7 +572,7 @@ public final class ShapefileGeometryUtil {
     in.skipBytes(4 * Doubles.BYTES_IN_DOUBLE);
     final int geometryCount = in.readLEInt();
     final int vertexCount = in.readLEInt();
-    if (22 + geometryCount * 2 + vertexCount * 12 == recordLength) {
+    if (44 + 16 + 4 * geometryCount + 24 * vertexCount == recordLength * 2) {
       geometryFactory = geometryFactory.convertAxisCount(3);
       return readPolylineZ(geometryFactory, in, geometryCount, vertexCount, 3);
     } else {
