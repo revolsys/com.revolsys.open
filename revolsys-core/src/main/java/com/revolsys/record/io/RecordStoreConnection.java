@@ -115,7 +115,9 @@ public class RecordStoreConnection
     final JsonObject map = toMapInternal();
     if (!isSavePassword()) {
       final Map<String, Object> connection = (Map<String, Object>)map.get("connection");
-      connection.remove("password");
+      if (connection != null) {
+        connection.remove("password");
+      }
     }
     return map;
   }

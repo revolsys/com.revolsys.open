@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.beans.PropertyChangeSupport;
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.map.MapEx;
@@ -223,7 +225,11 @@ public abstract class AbstractConnectionRegistry<C extends Connection>
     if (this.directory != null && Files.isDirectory(this.directory)) {
       for (final Path connectionFile : Paths.getChildPaths(this.directory, this.fileExtension,
         "rgobject")) {
-        loadConnection(connectionFile, false);
+        try {
+          loadConnection(connectionFile, false);
+        } catch (final Exception e) {
+          Logs.error(this, "Error loading connection file:" + connectionFile, e);
+        }
       }
     }
   }

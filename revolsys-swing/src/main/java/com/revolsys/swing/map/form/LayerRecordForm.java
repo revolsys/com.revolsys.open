@@ -772,8 +772,11 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
       if (field == null) {
         final boolean editable = !this.readOnlyFieldNames.contains(fieldName);
         try {
-          field = this.layer.newFormField(fieldName, editable);
-          addField(fieldName, field);
+          final AbstractRecordLayer layer = this.layer;
+          if (layer != null) {
+            field = layer.newFormField(fieldName, editable);
+            addField(fieldName, field);
+          }
         } catch (final IllegalArgumentException e) {
         }
       }

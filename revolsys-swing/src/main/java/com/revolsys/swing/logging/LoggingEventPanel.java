@@ -15,6 +15,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
 import org.apache.commons.io.output.StringBuilderWriter;
@@ -104,7 +105,7 @@ public class LoggingEventPanel extends JPanel {
     final Level level = event.getLevel();
     final String loggerName = event.getLoggerName();
     final String threadName = event.getThreadName();
-    final Object message = event.getMessage();
+    final Object message = event.getMessage().getFormattedMessage();
     showDialog(timestamp, level, loggerName, message, threadName, stackTrace);
   }
 
@@ -130,11 +131,15 @@ public class LoggingEventPanel extends JPanel {
   public static void showDialog(final Timestamp timestamp, final Level level,
     final String loggerName, final Object message, final String threadName,
     final String stackTrace) {
-    Invoke.later(() -> {
+    if (SwingUtilities.isEventDispatchThread()) {
       final LoggingEventPanel panel = new LoggingEventPanel(timestamp, level, loggerName,
         threadName, message, stackTrace);
       panel.showDialog("Application Log Details");
-    });
+    } else {
+      Invoke.later(() -> {
+        showDialog(timestamp, level, loggerName, message, threadName, stackTrace);
+      });
+    }
   }
 
   private final StringBuilder copyText = new StringBuilder();

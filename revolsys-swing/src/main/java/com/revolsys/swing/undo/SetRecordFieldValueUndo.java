@@ -29,10 +29,9 @@ public class SetRecordFieldValueUndo extends AbstractUndoableEdit {
 
   @Override
   public boolean canRedo() {
-    if (this.record != null && !this.record.isDeleted() && super.canRedo()) {
-      if (!this.record.equalValue(this.fieldName, this.newValue)) {
-        return true;
-      }
+    final Record record = this.record;
+    if (super.canRedo() && record != null && !record.isDeleted()) {
+      return true;
     }
     return false;
   }
