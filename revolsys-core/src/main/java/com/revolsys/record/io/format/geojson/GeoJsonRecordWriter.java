@@ -37,7 +37,7 @@ public class GeoJsonRecordWriter extends AbstractRecordWriter {
 
   private int srid = -1;
 
-  private boolean allowCustomCoordinateSystem = true;
+  private boolean allowCustomCoordinateSystem = false;
 
   private GeometryFactory geometryFactory;
 
