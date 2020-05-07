@@ -20,6 +20,10 @@ import com.revolsys.util.CaseConverter;
 public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, RecordStoreSchemaElement,
   MapSerializer, RecordDefinitionProxy, RecordFactory<Record> {
 
+  static RecordDefinitionBuilder builder() {
+    return new RecordDefinitionBuilder();
+  }
+
   static RecordDefinition newRecordDefinition(final GeometryFactory geometryFactory,
     final DataType dataType) {
     final String name = dataType.getName();
