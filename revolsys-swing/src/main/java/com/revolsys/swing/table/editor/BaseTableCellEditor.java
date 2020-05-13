@@ -199,7 +199,6 @@ public class BaseTableCellEditor extends AbstractCellEditor
   protected void startEditing(final int rowIndex, final int columnIndex) {
     this.editing = true;
     this.rowIndex = this.table.convertRowIndexToModel(rowIndex);
-    ;
     this.columnIndex = this.table.convertColumnIndexToModel(columnIndex);
   }
 

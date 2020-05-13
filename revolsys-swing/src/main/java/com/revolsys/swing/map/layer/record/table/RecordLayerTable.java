@@ -257,7 +257,6 @@ public class RecordLayerTable extends RecordRowTable {
     } else {
       return false;
     }
-
   }
 
   @SuppressWarnings("unchecked")
