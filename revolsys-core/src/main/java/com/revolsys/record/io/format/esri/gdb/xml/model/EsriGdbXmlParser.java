@@ -77,15 +77,23 @@ public class EsriGdbXmlParser extends XmlProcessor implements EsriGeodatabaseXml
 
   @SuppressWarnings("unchecked")
   public static <T> T parse(final Resource resource) {
-    final EsriGdbXmlParser parser = new EsriGdbXmlParser();
-    return (T)parser.process(resource);
+    if (resource == null) {
+      return null;
+    } else {
+      final EsriGdbXmlParser parser = new EsriGdbXmlParser();
+      return (T)parser.process(resource);
+    }
   }
 
   @SuppressWarnings("unchecked")
   public static <T> T parse(final String text) {
-    final byte[] bytes = text.getBytes();
-    final ByteArrayResource resource = new ByteArrayResource(bytes);
-    return (T)parse(resource);
+    if (text == null) {
+      return null;
+    } else {
+      final byte[] bytes = text.getBytes();
+      final ByteArrayResource resource = new ByteArrayResource(bytes);
+      return (T)parse(resource);
+    }
   }
 
   public EsriGdbXmlParser() {
