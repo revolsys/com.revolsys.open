@@ -30,7 +30,7 @@ import com.revolsys.geometry.model.GeometryDataTypes;
 public class ShapefileConstants {
   public static final Map<Integer, DataType> DATA_TYPE_MAP = new HashMap<>();
 
-  public static final String DESCRIPTION = "ESRI Shapefile";
+  public static final String DESCRIPTION = "Shapefile (ESRI)";
 
   public static final int FILE_CODE = 9994;
 

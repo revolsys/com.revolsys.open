@@ -21,7 +21,7 @@ import com.revolsys.spring.resource.Resource;
 public class ShapefileZip extends AbstractRecordIoFactory implements RecordWriterFactory {
 
   public ShapefileZip() {
-    super("ESRI Shapefile inside a ZIP archive");
+    super("Shapefile (ESRI) inside a ZIP archive");
     addMediaTypeAndFileExtension("application/x-shp+zip", "shpz");
   }
 
