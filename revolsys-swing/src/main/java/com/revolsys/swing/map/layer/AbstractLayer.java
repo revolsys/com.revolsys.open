@@ -909,8 +909,9 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
         refreshAllDo();
       } catch (final Throwable e) {
         Logs.error(this, "Unable to refresh layer: " + getName(), e);
+      } finally {
+        refreshPostDo();
       }
-      refreshPostDo();
     } else {
       initializeForce();
     }

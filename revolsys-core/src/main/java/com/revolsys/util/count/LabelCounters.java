@@ -60,6 +60,15 @@ public interface LabelCounters {
 
   Long getCount(CharSequence label);
 
+  default long getCount(final CharSequence label, final long defaultValue) {
+    final Long value = getCount(label);
+    if (value == null) {
+      return defaultValue;
+    } else {
+      return value;
+    }
+  }
+
   Counter getCounter(CharSequence label);
 
   Set<String> getLabels();

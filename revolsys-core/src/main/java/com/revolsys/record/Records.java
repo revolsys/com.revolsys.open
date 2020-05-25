@@ -473,6 +473,11 @@ public interface Records {
     final Record record2, final String fieldName, final String separator) {
     final String value1 = record1.getString(fieldName);
     final String value2 = record2.getString(fieldName);
+    mergeStringListValue(record, fieldName, value1, value2);
+  }
+
+  static void mergeStringListValue(final Map<String, Object> record, final String fieldName,
+    final String value1, final String value2) {
     Object value;
     if (!Property.hasValue(value1)) {
       value = value2;

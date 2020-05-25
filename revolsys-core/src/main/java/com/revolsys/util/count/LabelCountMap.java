@@ -12,6 +12,8 @@ import com.revolsys.util.LongCounter;
 public class LabelCountMap extends AbstractLabelCounters {
   private final Map<String, Counter> counterByLabel = new TreeMap<>();
 
+  private final Counter total = new LongCounter("total");
+
   public LabelCountMap() {
     this(null);
   }
@@ -25,6 +27,7 @@ public class LabelCountMap extends AbstractLabelCounters {
     if (label == null) {
       return false;
     } else {
+      this.total.add(count);
       final String labelString = label.toString();
       Counter counter = this.counterByLabel.get(labelString);
       if (counter == null) {
@@ -103,6 +106,10 @@ public class LabelCountMap extends AbstractLabelCounters {
   @Override
   public synchronized Set<String> getLabels() {
     return this.counterByLabel.keySet();
+  }
+
+  public long getTotal() {
+    return this.total.get();
   }
 
   @Override

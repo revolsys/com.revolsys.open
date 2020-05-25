@@ -7,69 +7,68 @@ import javax.swing.DefaultListSelectionModel;
 
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 
 public class RecordLayerHighlightedListSelectionModel extends DefaultListSelectionModel {
   private static final long serialVersionUID = 1L;
 
   private final RecordLayerTableModel model;
 
+  private final AbstractRecordLayer layer;
+
   public RecordLayerHighlightedListSelectionModel(final RecordLayerTableModel model) {
     this.model = model;
+    this.layer = model.getLayer();
   }
 
   @Override
-  public void addSelectionInterval(final int index0, final int index1) {
-    super.addSelectionInterval(convertRowIndexToModel(index0), convertRowIndexToModel(index1));
-    final List<LayerRecord> records = getObjects(index0, index1);
-    final AbstractRecordLayer layer = this.model.getLayer();
-    layer.addHighlightedRecords(records);
+  public void addSelectionInterval(final int rowIndexFrom, final int rowIndexTo) {
+    super.addSelectionInterval(rowIndexFrom, rowIndexTo);
+    final List<LayerRecord> records = getRecords(rowIndexFrom, rowIndexTo);
+    this.layer.addHighlightedRecords(records);
   }
 
-  public int convertRowIndexToModel(final int i) {
-    return this.model.getTable().convertRowIndexToModel(i);
+  private LayerRecord getRecord(final int viewRowIndex) {
+    final RecordLayerTableModel model = this.model;
+    final RecordLayerTable table = model.getTable();
+    final int rowIndex = table.convertRowIndexToModel(viewRowIndex);
+    return model.getRecord(rowIndex);
   }
 
-  protected List<LayerRecord> getObjects(final int index0, final int index1) {
+  protected List<LayerRecord> getRecords(final int rowIndexFrom, final int rowIndexTo) {
     final List<LayerRecord> records = new ArrayList<>();
-    for (int i = index0; i <= index1; i++) {
-      final int rowIndex = convertRowIndexToModel(i);
-      final LayerRecord record = this.model.getRecord(rowIndex);
+    for (int viewRowIndex = rowIndexFrom; viewRowIndex <= rowIndexTo; viewRowIndex++) {
+      final LayerRecord record = getRecord(viewRowIndex);
       records.add(record);
     }
     return records;
   }
 
   @Override
-  public boolean isSelectedIndex(final int index) {
-    final int rowIndex = convertRowIndexToModel(index);
-    final LayerRecord record = this.model.getRecord(rowIndex);
+  public boolean isSelectedIndex(final int rowIndex) {
+    final LayerRecord record = getRecord(rowIndex);
     if (record != null) {
-      final AbstractRecordLayer layer = this.model.getLayer();
-      return layer.isHighlighted(record);
+      return this.layer.isHighlighted(record);
     }
     return false;
   }
 
   @Override
   public boolean isSelectionEmpty() {
-    final AbstractRecordLayer layer = this.model.getLayer();
-
-    return layer.getHighlightedCount() == 0;
+    return this.layer.getHighlightedCount() == 0;
   }
 
   @Override
-  public void removeSelectionInterval(final int index0, final int index1) {
-    super.removeSelectionInterval(convertRowIndexToModel(index0), convertRowIndexToModel(index1));
-    final List<LayerRecord> records = getObjects(index0, index1);
-    final AbstractRecordLayer layer = this.model.getLayer();
-    layer.unHighlightRecords(records);
+  public void removeSelectionInterval(final int rowIndexFrom, final int rowIndexTo) {
+    super.removeSelectionInterval(rowIndexFrom, rowIndexTo);
+    final List<LayerRecord> records = getRecords(rowIndexFrom, rowIndexTo);
+    this.layer.unHighlightRecords(records);
   }
 
   @Override
-  public void setSelectionInterval(final int index0, final int index1) {
-    final List<LayerRecord> records = getObjects(index0, index1);
-    final AbstractRecordLayer layer = this.model.getLayer();
-    layer.setHighlightedRecords(records);
-    super.setSelectionInterval(convertRowIndexToModel(index0), convertRowIndexToModel(index1));
+  public void setSelectionInterval(final int rowIndexFrom, final int rowIndexTo) {
+    final List<LayerRecord> records = getRecords(rowIndexFrom, rowIndexTo);
+    this.layer.setHighlightedRecords(records);
+    super.setSelectionInterval(rowIndexFrom, rowIndexTo);
   }
 }

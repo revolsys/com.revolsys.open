@@ -250,14 +250,13 @@ public class RecordLayerTable extends RecordRowTable {
 
   @Override
   public boolean editCellAt(final int row, final int column, final EventObject e) {
-    if (e instanceof MouseEvent && !((MouseEvent)e).isShiftDown()) {
+    if (e == null || e instanceof MouseEvent && !((MouseEvent)e).isShiftDown()) {
       final LayerRecord record = getRecord(row);
       LayerRecordMenu.setEventRecord(record);
       return super.editCellAt(row, column, e);
     } else {
       return false;
     }
-
   }
 
   @SuppressWarnings("unchecked")

@@ -77,8 +77,12 @@ public class EsriGdbXmlParser extends XmlProcessor implements EsriGeodatabaseXml
 
   @SuppressWarnings("unchecked")
   public static <T> T parse(final Resource resource) {
-    final EsriGdbXmlParser parser = new EsriGdbXmlParser();
-    return (T)parser.process(resource);
+    if (resource == null) {
+      return null;
+    } else {
+      final EsriGdbXmlParser parser = new EsriGdbXmlParser();
+      return (T)parser.process(resource);
+    }
   }
 
   @SuppressWarnings("unchecked")
