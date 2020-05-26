@@ -239,7 +239,10 @@ public class FieldFilterPanel extends JComponent implements PropertyChangeListen
         this.lastValue = null;
         String searchField = this.previousSearchFieldName;
         if (!Property.hasValue(searchField)) {
-          searchField = this.recordDefinition.getFieldNames().get(0);
+          final List<String> fieldNames = this.recordDefinition.getFieldNames();
+          if (!fieldNames.isEmpty()) {
+            searchField = fieldNames.get(0);
+          }
         }
         setSearchFieldName(searchField);
         setFilter(Condition.ALL);

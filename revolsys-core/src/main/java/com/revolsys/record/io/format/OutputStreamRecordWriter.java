@@ -46,7 +46,11 @@ public class OutputStreamRecordWriter extends DelegatingWriter<Record> implement
       super.close();
     } finally {
       try {
-        FileUtil.copy(this.tempFile, this.out);
+        try {
+          FileUtil.copy(this.tempFile, this.out);
+        } finally {
+          this.out.close();
+        }
       } catch (final IOException e) {
         throw new RuntimeException("Unable to copy file", e);
       } finally {

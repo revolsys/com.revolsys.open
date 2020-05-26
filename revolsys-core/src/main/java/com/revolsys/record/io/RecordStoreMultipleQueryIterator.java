@@ -35,10 +35,13 @@ public class RecordStoreMultipleQueryIterator extends AbstractMultipleIterator<R
   }
 
   public RecordDefinition getRecordDefinition() {
-    final AbstractIterator<Record> iterator = getIterator();
-    if (iterator instanceof RecordReader) {
-      final RecordReader reader = (RecordReader)iterator;
-      return reader.getRecordDefinition();
+    try {
+      final AbstractIterator<Record> iterator = getIterator();
+      if (iterator instanceof RecordReader) {
+        final RecordReader reader = (RecordReader)iterator;
+        return reader.getRecordDefinition();
+      }
+    } catch (final NoSuchElementException e) {
     }
     return null;
   }

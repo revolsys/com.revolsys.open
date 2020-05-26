@@ -32,7 +32,6 @@ import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.io.format.OutputStreamRecordWriter;
 import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.Resource;
@@ -144,7 +143,7 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory
 
   @Override
   public String getFileExtension(final String mediaType) {
-    if (MIME_TYPE.equals(mediaType)) {
+    if (MIME_TYPE.equals(mediaType) || FILE_EXTENSION.equals(mediaType)) {
       return FILE_EXTENSION;
     } else {
       return null;
@@ -255,11 +254,17 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory
   @Override
   public RecordWriter newRecordWriter(final RecordDefinitionProxy recordDefinition,
     final Resource resource) {
-    final GeoPackageRecordStore recordStore = GeoPackage.createRecordStore(resource);
-    if (recordStore == null) {
-      return null;
+    if (resource.isFile()) {
+      final GeoPackageRecordStore recordStore = GeoPackage.createRecordStore(resource);
+      if (recordStore == null) {
+        return null;
+      } else {
+        return new GeoPackageRecordWriter(recordStore, recordDefinition);
+      }
     } else {
-      return new GeoPackageRecordWriter(recordStore, recordDefinition);
+      final OutputStream out = resource.newBufferedOutputStream();
+      final String baseName = resource.getBaseName();
+      return newRecordWriter(baseName, recordDefinition, out);
     }
   }
 

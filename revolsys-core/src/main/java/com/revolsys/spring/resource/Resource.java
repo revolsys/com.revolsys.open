@@ -78,8 +78,11 @@ public interface Resource extends org.springframework.core.io.Resource, FileProx
         return resource.getFile();
       } else {
         final String filename = resource.getFilename();
-        final String baseName = FileUtil.getBaseName(filename);
+        String baseName = FileUtil.getBaseName(filename);
         final String fileExtension = FileNames.getFileNameExtension(filename);
+        if (baseName.length() < 3) {
+          baseName += "___";
+        }
         return File.createTempFile(baseName, fileExtension);
       }
     } catch (final IOException e) {

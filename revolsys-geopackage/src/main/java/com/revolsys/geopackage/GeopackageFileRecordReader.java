@@ -24,6 +24,7 @@ public class GeopackageFileRecordReader implements RecordReader {
     final RecordFactory<? extends Record> factory, final MapEx properties) {
     this.recordStore = GeoPackage.openRecordStore(resource);
     this.recordStore.setProperties(properties);
+    this.recordStore.initialize();
     final List<Query> queries = new ArrayList<>();
     for (final RecordDefinition recordDefinition : this.recordStore.getRootSchema()
       .getRecordDefinitions()) {
