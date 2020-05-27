@@ -57,4 +57,9 @@ public class ManifestUtil {
     }
     return null;
   }
+
+  public static String getScmCommit(final String implementationTitle) {
+    return getMainAttributeByImplementationTitle(implementationTitle, new Name("SCM-Commit"),
+      "HEAD");
+  }
 }
