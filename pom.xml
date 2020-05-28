@@ -566,7 +566,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <org.apache.log4j.version>2.13.1</org.apache.log4j.version>
+    <org.apache.log4j.version>2.13.3</org.apache.log4j.version>
     <org.gdal.version>2.4.0</org.gdal.version>
     <org.graalvm.version>20.0.0</org.graalvm.version>
     <org.jeometry.version>TRUNK-SNAPSHOT</org.jeometry.version>
