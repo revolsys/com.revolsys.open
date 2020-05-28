@@ -37,6 +37,10 @@ public class IntRange extends AbstractNumberRange<Integer> {
     return this.from <= number && number <= this.to;
   }
 
+  public boolean equalsRange(final int from, final int to) {
+    return this.from == from && this.to == to;
+  }
+
   @Override
   public AbstractRange<?> expand(final Object value) {
     final Integer intValue = Integers.toInteger(value);

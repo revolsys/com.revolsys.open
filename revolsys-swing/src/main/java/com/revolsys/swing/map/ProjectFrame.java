@@ -70,7 +70,7 @@ import com.revolsys.swing.component.BaseFrame;
 import com.revolsys.swing.component.DnDTabbedPane;
 import com.revolsys.swing.component.TabClosableTitle;
 import com.revolsys.swing.io.SwingIo;
-import com.revolsys.swing.logging.Log4jTableModel;
+import com.revolsys.swing.logging.LoggingTableModel;
 import com.revolsys.swing.map.layer.AbstractLayer.PanelComponentHolder;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -391,7 +391,7 @@ public class ProjectFrame extends BaseFrame {
 
   protected void addBottomTabs(final DnDTabbedPane bottomTabs) {
     addBottomTabsTasks();
-    Log4jTableModel.addNewTabPane(bottomTabs);
+    LoggingTableModel.addNewTabPane(bottomTabs);
   }
 
   protected void addBottomTabsTasks() {

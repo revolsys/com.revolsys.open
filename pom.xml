@@ -333,21 +333,6 @@
         <version>4.0.1</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-api</artifactId>
-        <version>${org.apache.log4j.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-core</artifactId>
-        <version>${org.apache.log4j.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.logging.log4j</groupId>
-        <artifactId>log4j-slf4j-impl</artifactId>
-        <version>${org.apache.log4j.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.docx4j</groupId>
         <artifactId>docx4j-JAXB-MOXy</artifactId>
         <version>8.1.4</version>
@@ -566,7 +551,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <org.apache.log4j.version>2.13.3</org.apache.log4j.version>
+    <ch.qos.logback.version>1.2.3</ch.qos.logback.version>
     <org.gdal.version>2.4.0</org.gdal.version>
     <org.graalvm.version>20.0.0</org.graalvm.version>
     <org.jeometry.version>TRUNK-SNAPSHOT</org.jeometry.version>

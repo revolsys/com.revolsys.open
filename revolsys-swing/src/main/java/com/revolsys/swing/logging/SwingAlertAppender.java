@@ -1,9 +1,10 @@
 package com.revolsys.swing.logging;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.LogEvent;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.AppenderBase;
 
-public class SwingAlertAppender extends BaseAppender {
+public class SwingAlertAppender extends AppenderBase<ILoggingEvent> {
 
   private boolean hasError = false;
 
@@ -12,7 +13,7 @@ public class SwingAlertAppender extends BaseAppender {
   }
 
   @Override
-  public void append(final LogEvent event) {
+  protected void append(final ILoggingEvent event) {
     if (event.getLevel().equals(Level.ERROR)) {
       this.hasError = true;
       LoggingEventPanel.showDialog(event);

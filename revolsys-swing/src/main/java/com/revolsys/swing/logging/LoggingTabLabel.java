@@ -21,7 +21,7 @@ import com.revolsys.swing.menu.MenuFactory;
  * Contains a JLabel to show the text and
  * a JButton to close the tab it belongs to
  */
-public class Log4jTabLabel extends JLabel implements MouseListener, TableModelListener {
+public class LoggingTabLabel extends JLabel implements MouseListener, TableModelListener {
   private static final long serialVersionUID = 1L;
 
   private static final Icon ANIMATED = Icons.getAnimatedIcon("error_animated.gif");
@@ -30,11 +30,11 @@ public class Log4jTabLabel extends JLabel implements MouseListener, TableModelLi
 
   private final JTabbedPane tabs;
 
-  private final Log4jTableModel tableModel;
+  private final LoggingTableModel tableModel;
 
   private final MenuFactory menuFactory;
 
-  public Log4jTabLabel(final JTabbedPane tabs, final Log4jTableModel tableModel) {
+  public LoggingTabLabel(final JTabbedPane tabs, final LoggingTableModel tableModel) {
     this.tabs = tabs;
     this.tableModel = tableModel;
     setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 1));

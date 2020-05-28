@@ -12,14 +12,14 @@ import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLErrorCodesFactory;
 
 import com.revolsys.jdbc.io.DataSourceImpl;
-import com.revolsys.log.LogAppender;
+import com.revolsys.log.LogbackUtil;
 import com.revolsys.util.Property;
 
 public class JdbcExceptionTranslator extends SQLErrorCodeSQLExceptionTranslator {
   private static final Map<String, BiFunction<String, SQLException, DataAccessException>> ERROR_CODE_TO_FUNCTION = new HashMap<>();
 
   static {
-    LogAppender.setLevel(SQLErrorCodesFactory.class.getName(), "ERROR");
+    LogbackUtil.setLevel(SQLErrorCodesFactory.class.getName(), "ERROR");
     ERROR_CODE_TO_FUNCTION.put("org.postgresql.Driver-28000",
       UsernameOrPasswordInvalidException::new);
     ERROR_CODE_TO_FUNCTION.put("org.postgresql.Driver-28P01",

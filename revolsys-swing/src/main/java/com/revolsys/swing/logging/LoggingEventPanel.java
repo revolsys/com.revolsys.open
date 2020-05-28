@@ -19,9 +19,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 
 import org.apache.commons.io.output.StringBuilderWriter;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.LogEvent;
-import org.apache.logging.log4j.core.impl.ThrowableProxy;
 import org.jdesktop.swingx.plaf.basic.core.BasicTransferable;
 import org.jeometry.common.data.type.DataTypes;
 
@@ -33,6 +30,15 @@ import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.Property;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.IThrowableProxy;
+import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.classic.spi.StackTraceElementProxy;
+import ch.qos.logback.classic.spi.ThrowableProxy;
+import ch.qos.logback.classic.spi.ThrowableProxyUtil;
+import ch.qos.logback.core.CoreConstants;
 
 public class LoggingEventPanel extends JPanel {
   private static final long serialVersionUID = 1L;
@@ -73,17 +79,55 @@ public class LoggingEventPanel extends JPanel {
     panel.add(label);
   }
 
-  public static String getStackTrace(final LogEvent event) {
-    final ThrowableProxy thrown = event.getThrownProxy();
+  public static String getStackTrace(final ILoggingEvent event) {
+    final IThrowableProxy thrown = event.getThrowableProxy();
     return getStackTrace(thrown);
   }
 
-  static String getStackTrace(final ThrowableProxy thrown) {
+  static String getStackTrace(IThrowableProxy thrown) {
     if (thrown == null) {
       return null;
     } else {
-      return thrown.getExtendedStackTraceAsString();
+      final LoggingEvent event = new LoggingEvent();
+      event.setThrowableProxy((ThrowableProxy)thrown);
+      final StringBuilder string = new StringBuilder();
+      do {
+        recursiveAppend(string, null, 1, thrown);
+        thrown = thrown.getCause();
+      } while (thrown != null);
+      return string.toString();
     }
+  }
+
+  private static void recursiveAppend(final StringBuilder sb, final String prefix, final int indent,
+    final IThrowableProxy tp) {
+    if (tp == null) {
+      return;
+    }
+    subjoinFirstLine(sb, prefix, indent, tp);
+    sb.append(CoreConstants.LINE_SEPARATOR);
+    subjoinSTEPArray(sb, indent, tp);
+    final IThrowableProxy[] suppressed = tp.getSuppressed();
+    if (suppressed != null) {
+      for (final IThrowableProxy current : suppressed) {
+        recursiveAppend(sb, CoreConstants.SUPPRESSED,
+          indent + ThrowableProxyUtil.SUPPRESSED_EXCEPTION_INDENT, current);
+      }
+    }
+    recursiveAppend(sb, CoreConstants.CAUSED_BY, indent, tp.getCause());
+  }
+
+  public static void showDialog(final ILoggingEvent event) {
+    final long time = event.getTimeStamp();
+    final Timestamp timestamp = new Timestamp(time);
+
+    final String stackTrace = getStackTrace(event);
+
+    final Level level = event.getLevel();
+    final String loggerName = event.getLoggerName();
+    final String threadName = event.getThreadName();
+    final Object message = event.getFormattedMessage();
+    showDialog(timestamp, level, loggerName, message, threadName, stackTrace);
   }
 
   public static void showDialog(final List<Object> event) {
@@ -93,19 +137,6 @@ public class LoggingEventPanel extends JPanel {
     final String message = (String)event.get(3);
     final String threadName = (String)event.get(4);
     final String stackTrace = getStackTrace((ThrowableProxy)event.get(5)); // TODO
-    showDialog(timestamp, level, loggerName, message, threadName, stackTrace);
-  }
-
-  public static void showDialog(final LogEvent event) {
-    final long time = event.getTimeMillis();
-    final Timestamp timestamp = new Timestamp(time);
-
-    final String stackTrace = getStackTrace(event);
-
-    final Level level = event.getLevel();
-    final String loggerName = event.getLoggerName();
-    final String threadName = event.getThreadName();
-    final Object message = event.getMessage().getFormattedMessage();
     showDialog(timestamp, level, loggerName, message, threadName, stackTrace);
   }
 
@@ -142,6 +173,47 @@ public class LoggingEventPanel extends JPanel {
     }
   }
 
+  private static void subjoinExceptionMessage(final StringBuilder buf, final IThrowableProxy tp) {
+    final String className = tp.getClassName();
+    final String message = tp.getMessage();
+    buf.append(className).append(": ").append(message);
+  }
+
+  private static void subjoinFirstLine(final StringBuilder buf, final String prefix,
+    final int indent, final IThrowableProxy tp) {
+    ThrowableProxyUtil.indent(buf, indent - 1);
+    if (prefix != null) {
+      buf.append(prefix);
+    }
+    subjoinExceptionMessage(buf, tp);
+  }
+
+  private static void subjoinSTEPArray(final StringBuilder buf, final int indent,
+    final IThrowableProxy tp) {
+    final StackTraceElementProxy[] stepArray = tp.getStackTraceElementProxyArray();
+    final int commonFrames = tp.getCommonFrames();
+
+    int maxIndex = stepArray.length;
+    if (commonFrames > 0) {
+      maxIndex -= commonFrames;
+    }
+
+    for (int i = 0; i < maxIndex; i++) {
+      final StackTraceElementProxy element = stepArray[i];
+      ThrowableProxyUtil.indent(buf, indent);
+      buf.append(element);
+      buf.append(CoreConstants.LINE_SEPARATOR);
+    }
+
+    if (commonFrames > 0) {
+      ThrowableProxyUtil.indent(buf, indent);
+      buf.append("... ")
+        .append(tp.getCommonFrames())
+        .append(" common frames omitted")
+        .append(CoreConstants.LINE_SEPARATOR);
+    }
+  }
+
   private final StringBuilder copyText = new StringBuilder();
 
   public LoggingEventPanel(final Timestamp time, final Object level, final String loggerName,
@@ -167,6 +239,10 @@ public class LoggingEventPanel extends JPanel {
 
     GroupLayouts.makeColumns(this, 2, true);
     setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+  }
+
+  private boolean isIgnoredStackTraceLine(final String line) {
+    return false;
   }
 
   private void showDialog(final String title) {

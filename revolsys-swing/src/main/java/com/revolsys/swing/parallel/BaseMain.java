@@ -4,6 +4,7 @@ import java.awt.Image;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.sql.Timestamp;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -13,20 +14,21 @@ import javax.swing.ToolTipManager;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Appender;
-import org.apache.logging.log4j.core.LogEvent;
-import org.apache.logging.log4j.core.Logger;
-import org.apache.logging.log4j.core.impl.Log4jLogEvent;
-import org.apache.logging.log4j.message.SimpleMessage;
 import org.jeometry.common.logging.Logs;
 
+import com.revolsys.log.LogbackUtil;
 import com.revolsys.swing.desktop.DesktopInitializer;
-import com.revolsys.swing.logging.ListLog4jAppender;
+import com.revolsys.swing.logging.ListLoggingAppender;
 import com.revolsys.swing.logging.LoggingEventPanel;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.classic.spi.ThrowableProxy;
+import ch.qos.logback.core.Appender;
 
 public class BaseMain implements UncaughtExceptionHandler {
 
@@ -137,20 +139,21 @@ public class BaseMain implements UncaughtExceptionHandler {
       }
     }
     Logs.error(logClass, message, e);
-    final Logger rootLogger = (Logger)LogManager.getRootLogger();
-    for (final Appender appender : rootLogger.getAppenders().values()) {
-      if (appender instanceof ListLog4jAppender) {
+    final Logger rootLogger = LogbackUtil.getRootLogger();
+    for (final Iterator<Appender<ILoggingEvent>> iterator = rootLogger
+      .iteratorForAppenders(); iterator.hasNext();) {
+      final Appender<ILoggingEvent> appender = iterator.next();
+      if (appender instanceof ListLoggingAppender) {
         return;
       }
     }
-    final Logger logger = (Logger)LogManager.getLogger(logClass);
+    final Logger logger = LogbackUtil.getLogger(logClass);
     final String name = logger.getClass().getName();
-    final LogEvent event = Log4jLogEvent.newBuilder()//
-      .setLoggerName(name) //
-      .setLevel(Level.ERROR) //
-      .setMessage(new SimpleMessage(message)) //
-      .setThrown(e)
-      .build();
+    final LoggingEvent event = new LoggingEvent();
+    event.setLoggerName(name);
+    event.setLevel(Level.INFO);
+    event.setMessage(message.toString());
+    event.setThrowableProxy(new ThrowableProxy(e));
 
     LoggingEventPanel.showDialog(event);
   }

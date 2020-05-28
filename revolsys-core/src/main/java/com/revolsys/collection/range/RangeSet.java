@@ -309,6 +309,17 @@ public class RangeSet extends AbstractSet<Object>
     }
   }
 
+  public boolean equalsRange(final int from, final int to) {
+    if (size() == 1) {
+      final AbstractRange<?> range = this.ranges.get(0);
+      if (range instanceof IntRange) {
+        final IntRange intRange = (IntRange)range;
+        return intRange.equalsRange(from, to);
+      }
+    }
+    return false;
+  }
+
   public Object getEndValue(final End end) {
     if (!isEmpty()) {
       if (End.isFrom(end)) {

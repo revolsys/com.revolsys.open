@@ -11,16 +11,10 @@ import javax.swing.JTable;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.LogEvent;
-import org.apache.logging.log4j.core.Logger;
-import org.apache.logging.log4j.core.impl.ThrowableProxy;
-import org.apache.logging.log4j.message.Message;
 import org.jdesktop.swingx.plaf.basic.core.BasicTransferable;
 import org.jdesktop.swingx.table.TableColumnExt;
 
-import com.revolsys.log.LogAppender;
+import com.revolsys.log.LogbackUtil;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.TabbedPane;
 import com.revolsys.swing.dnd.ClipboardUtil;
@@ -32,7 +26,13 @@ import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.util.Property;
 
-public class Log4jTableModel extends AbstractTableModel {
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.IThrowableProxy;
+import ch.qos.logback.classic.spi.ThrowableProxy;
+
+public class LoggingTableModel extends AbstractTableModel {
   private static final List<String> COLUMN_NAMES = Arrays.asList("Time", "Level", "Logger Name",
     "Message");
 
@@ -41,18 +41,18 @@ public class Log4jTableModel extends AbstractTableModel {
   public static void addNewTabPane(final TabbedPane tabs) {
     final TablePanel panel = newPanel();
 
-    final Log4jTableModel tableModel = panel.getTableModel();
+    final LoggingTableModel tableModel = panel.getTableModel();
 
     final int tabIndex = tabs.getTabCount();
     tabs.addTab(null, Icons.getIcon("error"), panel);
 
-    final Log4jTabLabel tabLabel = new Log4jTabLabel(tabs, tableModel);
+    final LoggingTabLabel tabLabel = new LoggingTabLabel(tabs, tableModel);
     tabs.setTabComponentAt(tabIndex, tabLabel);
     tabs.setSelectedIndex(tabIndex);
   }
 
   private static BaseJTable newLogTable() {
-    final Log4jTableModel model = new Log4jTableModel();
+    final LoggingTableModel model = new LoggingTableModel();
     final BaseJTable table = new BaseJTable(model);
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
 
@@ -96,14 +96,14 @@ public class Log4jTableModel extends AbstractTableModel {
     return new TablePanel(table);
   }
 
-  private final ListLog4jAppender appender = new ListLog4jAppender(this);
+  private final ListLoggingAppender appender = new ListLoggingAppender(this);
 
   private List<List<Object>> rows = new ArrayList<>();
 
   private boolean hasNewErrors = false;
 
-  public Log4jTableModel() {
-    LogAppender.addRootAppender(this.appender);
+  public LoggingTableModel() {
+    LogbackUtil.addRootAppender(this.appender);
     final MenuFactory menu = getMenu();
     menu.addMenuItem("all", "Delete all messages", "delete", this::clear);
     addMenuItem("selected", "Delete selected messages", "delete", (final BaseJTable table) -> {
@@ -122,23 +122,19 @@ public class Log4jTableModel extends AbstractTableModel {
     addMenuItem("message", "Copy message", "page_copy", this::copyLoggingEvent);
   }
 
-  public void addLoggingEvent(final LogEvent event) {
+  public void addLoggingEvent(final ILoggingEvent event) {
     if (event != null) {
-      final long time = event.getTimeMillis();
+      final long time = event.getTimeStamp();
       final Timestamp timestamp = new Timestamp(time);
       final Level level = event.getLevel();
       final String loggerName = event.getLoggerName();
-      final Message message = event.getMessage();
 
-      final String formattedMessage = message.getFormattedMessage();
-      final ThrowableProxy thrownProxy = event.getThrownProxy();
-      // if (thrownProxy != null) {
-      // String thrownMessage = thrownProxy.
-      // }
+      final String formattedMessage = event.getFormattedMessage();
+      final IThrowableProxy thrownProxy = event.getThrowableProxy();
       final List<Object> row = Arrays.asList(timestamp, level, loggerName, formattedMessage,
         event.getThreadName(), thrownProxy);
       Invoke.later(() -> {
-        if (event.getLevel().isMoreSpecificThan(Level.ERROR)) {
+        if (Level.ERROR.isGreaterOrEqual(event.getLevel())) {
           this.hasNewErrors = true;
         }
         this.rows.add(row);
@@ -195,8 +191,8 @@ public class Log4jTableModel extends AbstractTableModel {
   @Override
   protected void finalize() throws Throwable {
     super.finalize();
-    final Logger rootLogger = (Logger)LogManager.getRootLogger();
-    rootLogger.removeAppender(this.appender);
+    final Logger rootLogger = LogbackUtil.getRootLogger();
+    rootLogger.detachAppender(this.appender);
   }
 
   @Override
