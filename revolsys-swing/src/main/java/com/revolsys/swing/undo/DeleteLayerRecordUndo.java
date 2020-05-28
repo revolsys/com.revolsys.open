@@ -29,28 +29,8 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
   }
 
   @Override
-  public boolean canRedo() {
-    if (super.canRedo()) {
-      if (this.record != null) {
-        return !this.layer.isDeleted(this.record);
-      }
-    }
-    return false;
-  }
-
-  @Override
-  public boolean canUndo() {
-    if (super.canUndo()) {
-      if (this.record == null && this.layer != null) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @Override
   protected void redoDo() {
-    if (this.record != null) {
+    if (this.record != null && !this.layer.isDeleted(this.record)) {
       this.layer.deleteRecordAndSaveChanges(this.record);
       this.record = null;
     }
