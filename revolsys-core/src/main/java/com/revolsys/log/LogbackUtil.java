@@ -59,21 +59,20 @@ public class LogbackUtil {
     return appender;
   }
 
-  public static FileAppender<ILoggingEvent> addFileAppender(final Logger logger, final File logFile,
-    final String pattern, final boolean append) {
+  public static FileAppender<ILoggingEvent> addFileAppender(final String name, final Logger logger,
+    final File logFile, final String pattern, final boolean append) {
     final LoggerContext context = logger.getLoggerContext();
     final PatternLayout layout = newLayout(context, pattern);
 
     final FileAppender<ILoggingEvent> appender = new FileAppender<>();
+    appender.setContext(context);
+    appender.setName(name);
     appender.setAppend(append);
     appender.setImmediateFlush(true);
     final String absolutePath = logFile.getAbsolutePath();
     appender.setFile(absolutePath);
     appender.setLayout(layout);
-    appender.setContext(context);
-    if (!appender.isStarted()) {
-      appender.start();
-    }
+    appender.start();
     logger.addAppender(appender);
     return appender;
   }
@@ -94,13 +93,15 @@ public class LogbackUtil {
   public static FileAppender<ILoggingEvent> addRootFileAppender(final File logFile,
     final String pattern, final boolean append) {
     final Logger logger = getRootLogger();
-    return addFileAppender(logger, logFile, pattern, append);
+    return addFileAppender(logFile.getName(), logger, logFile, pattern, append);
   }
 
   public static Object addRootFileAppender(final File logFile, final String pattern,
     final boolean append, final String category, final String... messages) {
+    final String name = logFile.getName();
     final Logger logger = getRootLogger();
-    final FileAppender<ILoggingEvent> appender = addFileAppender(logger, logFile, pattern, append);
+    final FileAppender<ILoggingEvent> appender = addFileAppender(name, logger, logFile, pattern,
+      append);
     for (final String message : messages) {
       final LoggingEvent event = new LoggingEvent();
       event.setLoggerName(category);
