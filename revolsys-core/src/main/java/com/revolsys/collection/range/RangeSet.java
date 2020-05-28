@@ -310,7 +310,7 @@ public class RangeSet extends AbstractSet<Object>
   }
 
   public boolean equalsRange(final int from, final int to) {
-    if (size() == 1) {
+    if (this.ranges.size() == 1) {
       final AbstractRange<?> range = this.ranges.get(0);
       if (range instanceof IntRange) {
         final IntRange intRange = (IntRange)range;
