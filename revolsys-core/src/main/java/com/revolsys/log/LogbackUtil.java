@@ -152,22 +152,27 @@ public class LogbackUtil {
     for (final Iterator<Appender<ILoggingEvent>> iterator = logger.iteratorForAppenders(); iterator
       .hasNext();) {
       final Appender<ILoggingEvent> appender = iterator.next();
-      logger.detachAppender(appender);
+      removeAppender(logger, appender);
     }
   }
 
-  private static void removeRootAppender(final Appender<ILoggingEvent> appender) {
+  public static void removeAppender(final Logger logger, final Appender<ILoggingEvent> appender) {
+    if (appender != null) {
+      logger.detachAppender(appender);
+      appender.stop();
+    }
+  }
+
+  public static void removeRootAppender(final Appender<ILoggingEvent> appender) {
     final Logger logger = getRootLogger();
-    logger.detachAppender(appender);
+    removeAppender(logger, appender);
   }
 
   @SuppressWarnings("unchecked")
   public static void removeRootAppender(final Object appender) {
     if (appender instanceof Appender) {
       final Appender<ILoggingEvent> a = (Appender<ILoggingEvent>)appender;
-      a.stop();
       removeRootAppender(a);
-
     }
   }
 

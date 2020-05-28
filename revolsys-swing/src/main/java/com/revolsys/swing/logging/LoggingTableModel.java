@@ -191,8 +191,8 @@ public class LoggingTableModel extends AbstractTableModel {
   @Override
   protected void finalize() throws Throwable {
     super.finalize();
-    final Logger rootLogger = LogbackUtil.getRootLogger();
-    rootLogger.detachAppender(this.appender);
+    final Logger logger = LogbackUtil.getRootLogger();
+    LogbackUtil.removeAppender(logger, this.appender);
   }
 
   @Override
