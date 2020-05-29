@@ -608,9 +608,9 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
       this.typeCountMap.put(recordDefinition, typeCount);
       statement.executeBatch();
 
-      if (hasGeneratedKeys) {
-        final List<Record> records = recordsByType.remove(recordDefinition);
-        if (records != null) {
+      final List<Record> records = recordsByType.get(recordDefinition);
+      if (records != null) {
+        if (hasGeneratedKeys) {
           final ResultSet generatedKeyResultSet = statement.getGeneratedKeys();
           int recordIndex = 0;
           while (generatedKeyResultSet.next()) {
@@ -627,7 +627,9 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
             }
           }
         }
+        records.clear();
       }
+
     } catch (final SQLException e) {
       final String sql = sqlMap.get(recordDefinition);
       throw this.connection.getException("Process Batch", sql, e);

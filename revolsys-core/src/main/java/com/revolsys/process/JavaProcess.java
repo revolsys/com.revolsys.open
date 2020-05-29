@@ -83,6 +83,7 @@ public final class JavaProcess implements Runnable {
   public ProcessBuilder newBuilder() {
     final String javaHome = System.getProperty("java.home");
     final String javaBin = javaHome + File.separator + "bin" + File.separator + "java";
+    final String jstackBin = javaHome + File.separator + "bin" + File.separator + "jstack";
 
     final List<String> params = new ArrayList<>();
     params.add(javaBin);
@@ -94,10 +95,11 @@ public final class JavaProcess implements Runnable {
     final String libraryPath = System.getProperty("java.library.path");
     params.add("-Djava.library.path=" + libraryPath);
 
+    params.add("-XX:OnError=" + jstackBin + " %p > jstack_%p.txt");
     final RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
     final List<String> inputArguments = runtimeMXBean.getInputArguments();
     for (final String inputArgument : inputArguments) {
-      if (!inputArgument.startsWith("-agentlib")
+      if (!inputArgument.startsWith("-agentlib") && !inputArgument.startsWith("-XX:OnError")
         && !Arrays.asList("abort", "exit").contains(inputArgument)) {
         params.add(inputArgument);
       }

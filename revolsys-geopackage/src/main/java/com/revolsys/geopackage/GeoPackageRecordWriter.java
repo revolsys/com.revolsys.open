@@ -9,7 +9,7 @@ public class GeoPackageRecordWriter extends RecordStoreRecordWriter {
   public GeoPackageRecordWriter(final GeoPackageRecordStore recordStore,
     final RecordDefinitionProxy recordDefinition) {
     super(recordStore, recordDefinition);
-
+    getWriter().setProperty("batchSize", 1000);
   }
 
   @Override
