@@ -594,10 +594,7 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
     final Map<JdbcRecordDefinition, String> sqlMap, final PreparedStatement statement,
     final Map<JdbcRecordDefinition, Integer> batchCountMap,
     final Map<JdbcRecordDefinition, List<Record>> recordsByType, final boolean hasGeneratedKeys) {
-    Integer batchCount = batchCountMap.get(recordDefinition);
-    if (batchCount == null) {
-      batchCount = 0;
-    }
+    final int batchCount = batchCountMap.getOrDefault(recordDefinition, 0);
     try {
       Integer typeCount = this.typeCountMap.get(recordDefinition);
       if (typeCount == null) {
@@ -611,19 +608,21 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
       final List<Record> records = recordsByType.get(recordDefinition);
       if (records != null) {
         if (hasGeneratedKeys) {
-          final ResultSet generatedKeyResultSet = statement.getGeneratedKeys();
-          int recordIndex = 0;
-          while (generatedKeyResultSet.next()) {
-            final Record record = records.get(recordIndex++);
-            int columnIndex = 1;
-            for (final FieldDefinition idField : recordDefinition.getIdFields()) {
-              final Object idValue = generatedKeyResultSet.getObject(columnIndex);
-              if (!generatedKeyResultSet.wasNull()) {
-                final int index = idField.getIndex();
-                record.setValue(index, idValue);
-                columnIndex++;
-              }
+          try (
+            final ResultSet generatedKeyResultSet = statement.getGeneratedKeys()) {
+            int recordIndex = 0;
+            while (generatedKeyResultSet.next() && recordIndex < records.size()) {
+              final Record record = records.get(recordIndex++);
+              int columnIndex = 1;
+              for (final FieldDefinition idField : recordDefinition.getIdFields()) {
+                final Object idValue = generatedKeyResultSet.getObject(columnIndex);
+                if (!generatedKeyResultSet.wasNull()) {
+                  final int index = idField.getIndex();
+                  record.setValue(index, idValue);
+                  columnIndex++;
+                }
 
+              }
             }
           }
         }
