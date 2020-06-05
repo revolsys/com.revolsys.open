@@ -23,9 +23,12 @@ import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
+import org.jeometry.common.logging.Logs;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.sqlite.BusyHandler;
 import org.sqlite.SQLiteConnection;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geopackage.field.GeoPackageGeometryFieldAdder;
@@ -35,6 +38,7 @@ import com.revolsys.geopackage.function.GeoPackageIsEmptyFunction;
 import com.revolsys.io.StringWriter;
 import com.revolsys.io.file.Paths;
 import com.revolsys.jdbc.JdbcConnection;
+import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
@@ -61,6 +65,15 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
 
   private Path file;
 
+  private final BusyHandler busyHandler = new BusyHandler() {
+
+    @Override
+    protected int callback(final int nbPrevInvok) throws SQLException {
+      // TODO Auto-generated method stub
+      return 1;
+    }
+  };
+
   public GeoPackageRecordStore(final GeoPackage geoPackage,
     final Map<String, ? extends Object> connectionProperties) {
     super(geoPackage, connectionProperties);
@@ -77,10 +90,12 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
   private void addFunctions(final JdbcConnection connection) {
     try {
       final SQLiteConnection dbConnection = connection.unwrap(SQLiteConnection.class);
+      BusyHandler.setHandler(dbConnection, this.busyHandler);
       GeoPackageIsEmptyFunction.add(dbConnection);
       GeoPackageEnvelopeValueFunction.add(dbConnection);
     } catch (final SQLException e) {
-//      throw connection.getException("Add functions", "", e);
+      Logs.error(this, e);
+      // throw connection.getException("Add functions", "", e);
     }
   }
 
@@ -176,33 +191,57 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     ddlWriter.writeCreateTable(newRecordDefinition);
 
     final String createTable = out.toString();
-    executeSql("Create table", createTable);
+    executeSqlNoFunctions("Create table", createTable);
 
     final String gpkgContents = ddlWriter.insertGpkgContents(newRecordDefinition);
-    executeSql("gpkgContents", gpkgContents);
+    executeSqlNoFunctions("gpkgContents", gpkgContents);
 
     for (final FieldDefinition field : newRecordDefinition.getGeometryFields()) {
       final CoordinateSystem coordinateSystem = field.getHorizontalCoordinateSystem();
       if (coordinateSystem != null) {
         final int coordinateSystemId = coordinateSystem.getCoordinateSystemId();
-        try {
-          selectInt("SELECT srs_id from gpkg_spatial_ref_sys where srs_id = ?", coordinateSystemId);
-        } catch (final IllegalArgumentException e) {
-          final String sql = "INSERT INTO gpkg_spatial_ref_sys (srs_name, srs_id, organization, organization_coordsys_id, definition, description) VALUES (?,?,?,?,?,?)";
-          final String coordinateSystemName = coordinateSystem.getCoordinateSystemName();
-          final String esriWktCs = coordinateSystem.toEsriWktCs();
-          executeUpdate(sql, coordinateSystemName, coordinateSystemId, "EPSG", coordinateSystemId,
-            esriWktCs, null);
+        final String sridSql = "SELECT srs_id from gpkg_spatial_ref_sys where srs_id = ?";
+        try (
+          JdbcConnection connection = super.getJdbcConnection(true)) {
+          try (
+            final PreparedStatement statement = connection.prepareStatement(sridSql)) {
+            statement.setInt(1, coordinateSystemId);
+
+            try (
+              final ResultSet resultSet = statement.executeQuery()) {
+              if (!resultSet.next()) {
+                final String insertSrsSql = "INSERT INTO gpkg_spatial_ref_sys (srs_name, srs_id, organization, organization_coordsys_id, definition, description) VALUES (?,?,?,?,?,?)";
+                final String coordinateSystemName = coordinateSystem.getCoordinateSystemName();
+                final String esriWktCs = coordinateSystem.toEsriWktCs();
+
+                try (
+                  final PreparedStatement insertStatement = connection
+                    .prepareStatement(insertSrsSql)) {
+                  insertStatement.setString(1, coordinateSystemName);
+                  insertStatement.setInt(2, coordinateSystemId);
+                  insertStatement.setString(3, "EPSG");
+                  insertStatement.setInt(4, coordinateSystemId);
+                  insertStatement.setString(5, esriWktCs);
+                  insertStatement.setNull(6, Types.CHAR);
+                  insertStatement.executeUpdate();
+                } catch (final SQLException e2) {
+                  throw connection.getException("Update", insertSrsSql, e2);
+                }
+              }
+            }
+          } catch (final SQLException e) {
+            throw connection.getException("selectInt", sridSql, e);
+          }
         }
       }
       final String gpkgGeometryColumns = ddlWriter.insertGpkgGeometryColumns(field);
-      executeSql("gpkgGeometryColumns", gpkgGeometryColumns);
+      executeSqlNoFunctions("gpkgGeometryColumns", gpkgGeometryColumns);
       final String fieldName = field.getName();
       for (String sql : getSqlTemplates("rtree_tiggers.sql")) {
         sql = sql.replace("<t>", tableName);
         sql = sql.replace("<c>", fieldName);
         sql = sql.replace("<i>", idFieldName);
-        executeSql("rtree", sql);
+        executeSqlNoFunctions("rtree", sql);
       }
     }
 
@@ -212,8 +251,8 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
   }
 
   private void createRecordStore() {
-    executeSql("application_id", "PRAGMA application_id = " + APPLICATION_ID + ";");
-    executeSql("user_version", "PRAGMA user_version = 10201;");
+    executeSqlNoFunctions("application_id", "PRAGMA application_id = " + APPLICATION_ID + ";");
+    executeSqlNoFunctions("user_version", "PRAGMA user_version = 10201;");
 
     for (final String fileName : Arrays.asList("gpkg_spatial_ref_sys.sql", "gpkg_contents.sql",
       "gpkg_data_columns.sql", "gpkg_data_column_constraints.sql", "gpkg_extensions.sql",
@@ -221,20 +260,20 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     // , "gpkg_tile_matrix.sql", "gpkg_tile_matrix_set.sql"
     )) {
       for (final String sql : getSqlTemplates(fileName)) {
-        executeSql(fileName, sql);
+        executeSqlNoFunctions(fileName, sql);
       }
 
     }
   }
 
   @Override
-  public synchronized void execteBatch(final PreparedStatement statement) throws SQLException {
-    super.execteBatch(statement);
+  public void execteBatch(final PreparedStatement statement) throws SQLException {
+    statement.executeBatch();
   }
 
-  protected void executeSql(final String task, final String sql) {
+  private void executeSqlNoFunctions(final String task, final String sql) {
     try (
-      JdbcConnection connection = getJdbcConnection(true);) {
+      JdbcConnection connection = getJdbcConnection(true)) {
       if (sql.trim().length() > 0) {
         try (
           Statement statement = connection.createStatement()) {
@@ -491,6 +530,28 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     }
 
     return elementsByPath;
+  }
+
+  public MapEx selectMapNoFunctions(final String sql, final Object... parameters) {
+    try (
+      JdbcConnection connection = super.getJdbcConnection(true)) {
+      try (
+        final PreparedStatement statement = connection.prepareStatement(sql)) {
+        JdbcUtils.setParameters(statement, parameters);
+
+        try (
+          final ResultSet resultSet = statement.executeQuery()) {
+          if (resultSet.next()) {
+            return JdbcUtils.readMap(resultSet);
+          } else {
+            throw new IllegalArgumentException(
+              "Value not found for " + sql + " " + Arrays.asList(parameters));
+          }
+        }
+      } catch (final SQLException e) {
+        throw connection.getException(null, sql, e);
+      }
+    }
   }
 
   @Override

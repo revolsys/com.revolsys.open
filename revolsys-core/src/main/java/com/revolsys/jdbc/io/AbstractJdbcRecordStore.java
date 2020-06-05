@@ -730,19 +730,28 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   protected JdbcRecordWriter newRecordWriter(final int batchSize) {
-    final JdbcRecordWriter writer = new JdbcRecordWriter(this);
-    writer.setSqlPrefix(this.sqlPrefix);
-    writer.setSqlSuffix(this.sqlSuffix);
-    writer.setBatchSize(batchSize);
-    writer.setLabel(getLabel());
-    writer.setFlushBetweenTypes(this.flushBetweenTypes);
-    writer.setQuoteColumnNames(false);
-    return writer;
+    return newRecordWriter(null, batchSize);
   }
 
   @Override
   public RecordWriter newRecordWriter(final RecordDefinitionProxy recordDefinition) {
-    return new JdbcRecordWriter(this, recordDefinition);
+    return newRecordWriter(recordDefinition, 0);
+  }
+
+  protected JdbcRecordWriter newRecordWriter(final RecordDefinitionProxy recordDefinition,
+    final int batchSize) {
+    if (batchSize > 1) {
+      final JdbcRecordWriterBatch writer = new JdbcRecordWriterBatch(this, recordDefinition,
+        batchSize);
+      writer.setSqlPrefix(this.sqlPrefix);
+      writer.setSqlSuffix(this.sqlSuffix);
+      writer.setLabel(getLabel());
+      writer.setFlushBetweenTypes(this.flushBetweenTypes);
+      writer.setQuoteColumnNames(false);
+      return writer;
+    } else {
+      return new JdbcRecordWriterSingle(this, recordDefinition);
+    }
   }
 
   @Override
@@ -827,7 +836,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
         final Map<String, List<String>> idFieldNameMap = loadIdFieldNames(dbSchemaName);
         for (final JdbcRecordDefinition recordDefinition : recordDefinitionMap.values()) {
           final PathName typePath = recordDefinition.getPathName();
-          final List<String> idFieldNames = idFieldNameMap.get(typePath);
+          final List<String> idFieldNames = idFieldNameMap.get(typePath.toString());
           if (Property.isEmpty(idFieldNames)) {
             addRowIdFieldDefinition(recordDefinition);
 

@@ -17,8 +17,10 @@ import javax.sql.DataSource;
 
 import org.jeometry.common.logging.Logs;
 import org.sqlite.SQLiteConfig;
+import org.sqlite.SQLiteConfig.LockingMode;
 import org.sqlite.SQLiteDataSource;
 import org.sqlite.SQLiteJDBCLoader;
+import org.sqlite.SQLiteOpenMode;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
@@ -247,8 +249,8 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory
       // }
       final SQLiteConfig sqliteConfig = new SQLiteConfig();
       sqliteConfig.setBusyTimeout(60000);
-      // sqliteConfig.setLockingMode(LockingMode.NORMAL);
-      // sqliteConfig.setOpenMode(SQLiteOpenMode.FULLMUTEX);
+      sqliteConfig.setLockingMode(LockingMode.NORMAL);
+      sqliteConfig.setOpenMode(SQLiteOpenMode.FULLMUTEX);
       for (final Entry<String, Object> property : newConfig.entrySet()) {
         final String name = property.getKey();
         final Object value = property.getValue();

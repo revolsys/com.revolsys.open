@@ -10,6 +10,7 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geopackage.GeoPackageRecordStore;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
@@ -45,7 +46,8 @@ public class GeoPackageGeometryFieldAdder extends JdbcFieldAdder {
       int axisCount = 2;
       try {
         final String sql = "select geometry_type_name, srs_id, Z, M from gpkg_geometry_columns where UPPER(TABLE_NAME) = UPPER(?) AND UPPER(COLUMN_NAME) = UPPER(?)";
-        final MapEx values = recordStore.selectMap(sql, tableName, columnName);
+        final MapEx values = ((GeoPackageRecordStore)recordStore).selectMapNoFunctions(sql,
+          tableName, columnName);
         srid = values.getInteger("srs_id", 0);
         type = values.getString("geometry_type_name", "GEOMETRY");
         if (values.getInteger("z", 0) > 0) {
