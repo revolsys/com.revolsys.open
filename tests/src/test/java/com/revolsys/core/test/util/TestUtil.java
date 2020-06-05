@@ -5,7 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.log.LogAppender;
+import com.revolsys.log.LogbackUtil;
 import com.revolsys.record.Record;
 import com.revolsys.util.Strings;
 
@@ -13,8 +13,8 @@ public class TestUtil {
 
   public static void enableInfo(final Class<?> clazz) {
     final String name = clazz.getName();
-    LogAppender.setLevel(name, "INFO");
-    LogAppender.setLevel(null, "INFO");
+    LogbackUtil.setLevel(name, "INFO");
+    LogbackUtil.setLevel(null, "INFO");
   }
 
   public static void logValues(final Class<?> clazz, final Record record) {

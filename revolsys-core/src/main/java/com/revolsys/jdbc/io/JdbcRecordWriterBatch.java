@@ -97,7 +97,7 @@ public class JdbcRecordWriterBatch extends AbstractJdbcRecordWriter {
         if (records != null) {
           final ResultSet generatedKeyResultSet = statement.getGeneratedKeys();
           int recordIndex = 0;
-          while (generatedKeyResultSet.next()) {
+          while (generatedKeyResultSet.next() && recordIndex < records.size()) {
             final Record record = records.get(recordIndex++);
             int columnIndex = 1;
             for (final FieldDefinition idField : recordDefinition.getIdFields()) {

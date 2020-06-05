@@ -22,7 +22,6 @@ public class RecordStoreRecordWriter extends AbstractRecordWriter {
         "Cannot find recordDefinition=" + recordDefinition.getPathName() + " for " + recordStore);
     }
     this.writer = recordStore.newRecordWriter(recordDefinition);
-
   }
 
   @Override

@@ -62,8 +62,9 @@ public class DirectoryRecordStore extends AbstractRecordStore {
 
   @Override
   public void close() {
+    super.close();
     this.directory = null;
-    if (this.writers != null) {
+    synchronized (this.writers) {
       for (final RecordWriter writer : this.writers.values()) {
         if (writer != null) {
           writer.close();
@@ -71,11 +72,13 @@ public class DirectoryRecordStore extends AbstractRecordStore {
       }
       this.writers.clear();
     }
-    super.close();
   }
 
-  public void closeWriters(final String typeName) {
-    final RecordWriter writer = this.writers.remove(typeName);
+  public void closeWriter(final String typeName) {
+    final RecordWriter writer;
+    synchronized (this.writers) {
+      writer = this.writers.remove(typeName);
+    }
     FileUtil.closeSilent(writer);
   }
 
@@ -165,6 +168,34 @@ public class DirectoryRecordStore extends AbstractRecordStore {
     return resource;
   }
 
+  private RecordWriter getWriter(final RecordDefinition recordDefinition) {
+    synchronized (this.writers) {
+      if (isClosed()) {
+        throw new IllegalStateException("Record store is closed");
+      } else {
+        final String typePath = recordDefinition.getPath();
+        RecordWriter writer = this.writers.get(typePath);
+        if (writer == null) {
+          final String schemaName = PathUtil.getPath(typePath);
+          final File subDirectory = FileUtil.getDirectory(getDirectory(), schemaName);
+          final String fileExtension = getFileExtension();
+          final File file = new File(subDirectory,
+            recordDefinition.getName() + "." + fileExtension);
+          final Resource resource = new PathResource(file);
+          writer = RecordWriter.newRecordWriter(recordDefinition, resource);
+          if (writer == null) {
+            throw new RuntimeException("Cannot create writer for: " + typePath);
+          } else if (writer instanceof ObjectWithProperties) {
+            final ObjectWithProperties properties = writer;
+            properties.setProperties(getProperties());
+          }
+          this.writers.put(typePath, writer);
+        }
+        return writer;
+      }
+    }
+  }
+
   @Override
   public void initializeDo() {
     super.initializeDo();
@@ -176,24 +207,10 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   @Override
   public synchronized void insertRecord(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
-    final String typePath = recordDefinition.getPath();
-    RecordWriter writer = this.writers.get(typePath);
-    if (writer == null) {
-      final String schemaName = PathUtil.getPath(typePath);
-      final File subDirectory = FileUtil.getDirectory(getDirectory(), schemaName);
-      final String fileExtension = getFileExtension();
-      final File file = new File(subDirectory, recordDefinition.getName() + "." + fileExtension);
-      final Resource resource = new PathResource(file);
-      writer = RecordWriter.newRecordWriter(recordDefinition, resource);
-      if (writer == null) {
-        throw new RuntimeException("Cannot create writer for: " + typePath);
-      } else if (writer instanceof ObjectWithProperties) {
-        final ObjectWithProperties properties = writer;
-        properties.setProperties(getProperties());
-      }
-      this.writers.put(typePath, writer);
+    final RecordWriter writer = getWriter(recordDefinition);
+    synchronized (writer) {
+      writer.write(record);
     }
-    writer.write(record);
     addStatistic("Insert", record);
   }
 

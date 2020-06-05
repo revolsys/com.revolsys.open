@@ -109,11 +109,15 @@ public class MergeRecordsDialog extends BaseDialog {
       mergeableRecord.canMergeEnableCheck, () -> {
         final MultipleUndo multipleUndo = new MultipleUndo();
         multipleUndo.addEdit(new AbstractUndoableEdit() {
+          @Override
+          public boolean canRedo() {
+            return true;
+          }
 
-          /**
-           *
-           */
-          private static final long serialVersionUID = 1L;
+          @Override
+          public boolean canUndo() {
+            return true;
+          }
 
           @Override
           protected void undoDo() {
@@ -129,16 +133,20 @@ public class MergeRecordsDialog extends BaseDialog {
           multipleUndo.addEdit(deleteRecordUndo);
         }
         multipleUndo.addEdit(new AbstractUndoableEdit() {
-          /**
-           *
-           */
-          private static final long serialVersionUID = 1L;
+          @Override
+          public boolean canRedo() {
+            return true;
+          }
+
+          @Override
+          public boolean canUndo() {
+            return true;
+          }
 
           @Override
           protected void redoDo() {
             MergeRecordsDialog.this.layer.fireRecordsChanged();
           }
-
         });
         if (this.undoManager == null) {
           multipleUndo.redo();

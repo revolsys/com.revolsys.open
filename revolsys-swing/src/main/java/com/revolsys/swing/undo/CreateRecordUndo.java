@@ -25,30 +25,6 @@ public class CreateRecordUndo extends AbstractUndoableEdit {
   }
 
   @Override
-  public boolean canRedo() {
-    if (super.canRedo()) {
-      if (Property.hasValue(this.newValues)) {
-        if (this.layerRecord == null) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  @Override
-  public boolean canUndo() {
-    if (super.canUndo()) {
-      if (Property.hasValue(this.newValues)) {
-        if (this.layerRecord != null) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  @Override
   protected void redoDo() {
     if (Property.hasValue(this.newValues) && this.layerRecord == null) {
       this.layerRecord = this.layer.newLayerRecord(this.newValues);

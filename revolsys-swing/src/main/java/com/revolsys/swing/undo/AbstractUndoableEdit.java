@@ -3,8 +3,6 @@ package com.revolsys.swing.undo;
 import java.io.Serializable;
 
 import javax.swing.UIManager;
-import javax.swing.undo.CannotRedoException;
-import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoableEdit;
 
 public abstract class AbstractUndoableEdit implements UndoableEdit, Serializable {
@@ -82,7 +80,8 @@ public abstract class AbstractUndoableEdit implements UndoableEdit, Serializable
   @Override
   public final void redo() throws CannotRedoException {
     if (!canRedo()) {
-      throw new CannotRedoException();
+      final String message = toString();
+      throw new CannotRedoException(message);
     }
     this.hasBeenDone = true;
     redoDo();
@@ -108,7 +107,8 @@ public abstract class AbstractUndoableEdit implements UndoableEdit, Serializable
   @Override
   public final void undo() throws CannotUndoException {
     if (!canUndo()) {
-      throw new CannotUndoException();
+      final String message = toString();
+      throw new CannotUndoException(message);
     }
     this.hasBeenDone = false;
     undoDo();

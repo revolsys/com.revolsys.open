@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<configuration name="revolsys-test">
+
+  <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d\t%p\t%c\t%m%n</pattern>
+    </encoder>
+  </appender>
+ 
+  <logger name="com.revolsys.core.test.gis.esri.gdb.file" level="DEBUG" />
+ 
+  <root level="error">
+    <appender-ref ref="Console"/>
+  </root>
+</configuration>
