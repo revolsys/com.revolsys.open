@@ -606,7 +606,7 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
         typeCount += batchCount;
       }
       this.typeCountMap.put(recordDefinition, typeCount);
-      statement.executeBatch();
+      this.recordStore.execteBatch(statement);
 
       if (hasGeneratedKeys) {
         final List<Record> records = recordsByType.remove(recordDefinition);

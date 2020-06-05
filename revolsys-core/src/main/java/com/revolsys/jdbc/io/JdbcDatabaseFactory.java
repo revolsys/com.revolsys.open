@@ -14,7 +14,8 @@ import javax.sql.DataSource;
 import org.jeometry.common.logging.Logs;
 import org.springframework.dao.DataAccessException;
 
-import com.revolsys.collection.map.Maps;
+import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.IoFactory;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.record.io.RecordStoreFactory;
@@ -139,7 +140,7 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
 
   default DataSource newDataSource(final Map<String, ? extends Object> config) {
     try {
-      final Map<String, Object> newConfig = new HashMap<>(config);
+      final MapEx newConfig = new LinkedHashMapEx(config);
       final String url = (String)newConfig.remove("url");
       final String user = (String)newConfig.remove("user");
       String password = (String)newConfig.remove("password");
@@ -154,25 +155,25 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
       dataSource.setUrl(url);
       dataSource.setValidationQuery(getConnectionValidationQuery());
 
-      final int minPoolSize = Maps.getInteger(config, "minPoolSize", -1);
+      final int minPoolSize = newConfig.getInteger("minPoolSize", -1);
       newConfig.remove("minPoolSize");
       dataSource.setMinIdle(minPoolSize);
       dataSource.setMaxIdle(-1);
 
-      final int maxPoolSize = Maps.getInteger(config, "maxPoolSize", 10);
+      final int maxPoolSize = newConfig.getInteger("maxPoolSize", 10);
       newConfig.remove("maxPoolSize");
       dataSource.setMaxTotal(maxPoolSize);
 
-      final int maxWaitMillis = Maps.getInteger(config, "waitTimeout", 10);
+      final int maxWaitMillis = newConfig.getInteger("waitTimeout", 10);
       newConfig.remove("waitTimeout");
       dataSource.setMaxWaitMillis(maxWaitMillis);
 
-      final boolean validateConnection = Maps.getBool(config, "validateConnection", true);
+      final boolean validateConnection = newConfig.getBoolean("validateConnection", true);
       newConfig.remove("validateConnection");
       dataSource.setTestOnCreate(validateConnection);
       // dataSource.setTestOnBorrow(validateConnection);
 
-      final int inactivityTimeout = Maps.getInteger(config, "inactivityTimeout", 60);
+      final int inactivityTimeout = newConfig.getInteger("inactivityTimeout", 60);
       newConfig.remove("inactivityTimeout");
       dataSource.setMinEvictableIdleTimeMillis(inactivityTimeout * 1000);
       dataSource.setTimeBetweenEvictionRunsMillis(inactivityTimeout * 1000);

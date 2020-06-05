@@ -20,6 +20,10 @@ import com.revolsys.transaction.Transaction;
 
 public interface JdbcRecordStore extends RecordStore {
 
+  default void execteBatch(final PreparedStatement statement) throws SQLException {
+    statement.executeBatch();
+  }
+
   default int executeUpdate(final String sql, final Object... parameters) {
     try (
       Transaction transaction = newTransaction(Propagation.REQUIRED);

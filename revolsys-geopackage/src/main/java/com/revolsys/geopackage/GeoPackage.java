@@ -9,11 +9,15 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
+import org.jeometry.common.logging.Logs;
+import org.sqlite.SQLiteConfig;
+import org.sqlite.SQLiteDataSource;
 import org.sqlite.SQLiteJDBCLoader;
 
 import com.revolsys.collection.map.LinkedHashMapEx;
@@ -218,19 +222,51 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory
   @Override
   public DataSource newDataSource(final Map<String, ? extends Object> config) {
     final MapEx newConfig = new LinkedHashMapEx(config);
-    final String url = newConfig.getString("url");
-    if (Property.hasValue(url) && !url.startsWith("jdbc")) {
+    String url = (String)newConfig.remove("url");
+    if (!Property.hasValue(url)) {
+      throw new IllegalArgumentException("jdbc url required");
+    }
+
+    if (!url.startsWith("jdbc")) {
       try {
         final UrlResource resource = new UrlResource(url);
         final File file = resource.getFile();
         final String newUrl = JDBC_PREFIX + FileUtil.getCanonicalPath(file);
-        newConfig.put("url", newUrl);
+        url = newUrl;
       } catch (final Exception e) {
         throw new IllegalArgumentException(url + " must be a file", e);
       }
     }
     newConfig.put("enable_load_extension", true);
-    return super.newDataSource(newConfig);
+
+    try {
+      // final String user = (String)newConfig.remove("user");
+      // String password = (String)newConfig.remove("password");
+      // if (Property.hasValue(password)) {
+      // password = PasswordUtil.decrypt(password);
+      // }
+      final SQLiteConfig sqliteConfig = new SQLiteConfig();
+      sqliteConfig.setBusyTimeout(60000);
+      // sqliteConfig.setLockingMode(LockingMode.NORMAL);
+      // sqliteConfig.setOpenMode(SQLiteOpenMode.FULLMUTEX);
+      for (final Entry<String, Object> property : newConfig.entrySet()) {
+        final String name = property.getKey();
+        final Object value = property.getValue();
+        try {
+          Property.setSimple(sqliteConfig, name, value);
+        } catch (final Throwable t) {
+          Logs.debug(this,
+            "Unable to set data source property " + name + " = " + value + " for " + url, t);
+        }
+      }
+
+      final SQLiteDataSource dataSource = new SQLiteDataSource(sqliteConfig);
+      dataSource.setUrl(url);
+
+      return dataSource;
+    } catch (final Throwable e) {
+      throw new IllegalArgumentException("Unable to create data source for " + config, e);
+    }
   }
 
   @Override

@@ -39,6 +39,7 @@ import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.query.CollectionValue;
 import com.revolsys.record.query.Column;
 import com.revolsys.record.query.Query;
@@ -48,6 +49,7 @@ import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionBuilder;
+import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.spring.resource.Resource;
@@ -78,7 +80,7 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
       GeoPackageIsEmptyFunction.add(dbConnection);
       GeoPackageEnvelopeValueFunction.add(dbConnection);
     } catch (final SQLException e) {
-      // throw connection.getException("Add functions", "", e);
+//      throw connection.getException("Add functions", "", e);
     }
   }
 
@@ -225,6 +227,11 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     }
   }
 
+  @Override
+  public synchronized void execteBatch(final PreparedStatement statement) throws SQLException {
+    super.execteBatch(statement);
+  }
+
   protected void executeSql(final String task, final String sql) {
     try (
       JdbcConnection connection = getJdbcConnection(true);) {
@@ -292,6 +299,21 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
   @Override
   public Identifier getNextPrimaryKey(final String typePath) {
     return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <RD extends RecordDefinition> RD getRecordDefinition(
+    final RecordDefinition recordDefinition) {
+    PathName pathName = recordDefinition.getPathName();
+    if (pathName.getElementCount() > 1) {
+      pathName = pathName.getLastElement();
+    }
+    final RecordDefinition rd = getRecordDefinition(pathName);
+    if (rd == null && recordDefinition != null && isCreateMissingTables()) {
+      return (RD)createRecordDefinitionDo(recordDefinition);
+    }
+    return (RD)rd;
   }
 
   @Override
@@ -387,6 +409,12 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
   @Override
   public boolean isSchemaExcluded(final String schemaName) {
     return false;
+  }
+
+  @Override
+  public RecordWriter newRecordWriter(final RecordDefinitionProxy recordDefinition) {
+    final RecordDefinition rd = getRecordDefinition(recordDefinition);
+    return super.newRecordWriter(rd);
   }
 
   @Override
