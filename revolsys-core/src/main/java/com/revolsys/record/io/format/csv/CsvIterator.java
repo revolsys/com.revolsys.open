@@ -119,26 +119,24 @@ public class CsvIterator implements Iterator<List<String>>, Iterable<List<String
             this.index++;
           } else {
             inQuotes = !inQuotes;
-            if (sb.length() > 0
-              && !(nextChar != this.fieldSeparator || nextChar != '\n' || nextChar != 0)) {
+            if (sb.length() > 0 && !(nextChar == this.fieldSeparator || nextChar == '\r'
+              || nextChar == '\n' || nextChar == 0)) {
               sb.append(c);
             }
           }
         break;
         case '\r':
-          if (previewNextChar() == '\n') {
+          if (inQuotes) {
+            sb.append(c);
+          } else if (previewNextChar() == '\n') {
           } else {
-            if (inQuotes) {
-              sb.append('\n');
+            if (hadQuotes || sb.length() > 0) {
+              fields.add(sb.toString());
+              sb.delete(0, sb.length());
             } else {
-              if (hadQuotes || sb.length() > 0) {
-                fields.add(sb.toString());
-                sb.delete(0, sb.length());
-              } else {
-                fields.add(null);
-              }
-              return fields;
+              fields.add(null);
             }
+            return fields;
           }
         break;
         case '\n':
@@ -156,6 +154,8 @@ public class CsvIterator implements Iterator<List<String>>, Iterable<List<String
             }
             return fields;
           }
+        break;
+        case 65279: // Byte Order Mark
         break;
         default:
           if (c == this.fieldSeparator) {

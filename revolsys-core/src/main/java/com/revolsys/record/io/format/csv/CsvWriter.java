@@ -14,6 +14,8 @@ public class CsvWriter implements BaseCloseable {
   /** The writer */
   private final Writer out;
 
+  private final String newLine = "\r\n";
+
   /**
    * Constructs CSVReader with supplied separator and quote char.
    *
@@ -66,7 +68,7 @@ public class CsvWriter implements BaseCloseable {
           this.out.write(',');
         }
       }
-      this.out.write('\n');
+      this.out.write(this.newLine);
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }

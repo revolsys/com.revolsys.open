@@ -29,6 +29,8 @@ public class CsvMapWriter extends AbstractMapWriter {
 
   private final boolean useQuotes;
 
+  private final String newLine = "\r\n";
+
   public CsvMapWriter(final File file) throws FileNotFoundException {
     this(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
   }
@@ -114,7 +116,7 @@ public class CsvMapWriter extends AbstractMapWriter {
           }
         }
       }
-      this.out.write('\n');
+      this.out.write(this.newLine);
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }

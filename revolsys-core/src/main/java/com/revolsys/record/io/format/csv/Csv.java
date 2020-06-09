@@ -4,14 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataTypes;
@@ -31,107 +26,11 @@ import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Property;
 
 public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory, MapWriterFactory {
   public static final char FIELD_SEPARATOR = ',';
 
   public static final String MIME_TYPE = "text/csv";
-
-  public static List<String> parseLine(final String text) {
-    final StringBuilder sb = new StringBuilder();
-    sb.delete(0, sb.length());
-    final List<String> fields = new ArrayList<>();
-
-    if (Property.hasValue(text)) {
-      boolean inQuotes = false;
-      boolean hadQuotes = false;
-      final int length = text.length();
-      for (int i = 0; i < length; i++) {
-        final char c = text.charAt(i);
-        switch (c) {
-          case '"':
-            if (i < length - 1) {
-              hadQuotes = true;
-
-              final char nextChar = text.charAt(i + 1);
-              if (inQuotes && nextChar == '"') {
-                sb.append('"');
-                i++;
-              } else {
-                inQuotes = !inQuotes;
-                if (sb.length() > 0 && nextChar != ',' && nextChar != '\n' && nextChar != 0) {
-                  sb.append(c);
-                }
-              }
-            } else {
-              if (inQuotes) {
-                fields.add(sb.toString());
-              }
-              return fields;
-            }
-
-          break;
-          case ',':
-            if (inQuotes) {
-              sb.append(c);
-            } else {
-              if (hadQuotes || sb.length() > 0) {
-                fields.add(sb.toString());
-                sb.delete(0, sb.length());
-              } else {
-                fields.add(null);
-              }
-              hadQuotes = false;
-            }
-          break;
-          case '\r':
-            if (i < length - 1) {
-              if (text.charAt(i + 1) == '\n') {
-              } else {
-                if (inQuotes) {
-                  sb.append('\n');
-                } else {
-                  if (hadQuotes || sb.length() > 0) {
-                    fields.add(sb.toString());
-                    sb.delete(0, sb.length());
-                  } else {
-                    fields.add(null);
-                  }
-                  return fields;
-                }
-              }
-            }
-          break;
-          case '\n':
-            if (i > length - 1) {
-              if (text.charAt(i + 1) == '\r') {
-                i++;
-              }
-              if (inQuotes) {
-                sb.append(c);
-              } else {
-                if (hadQuotes || sb.length() > 0) {
-                  fields.add(sb.toString());
-                  sb.delete(0, sb.length());
-                } else {
-                  fields.add(null);
-                }
-                return fields;
-              }
-            }
-          break;
-          default:
-            sb.append(c);
-          break;
-        }
-      }
-    }
-    if (sb.length() > 0) {
-      fields.add(sb.toString());
-    }
-    return fields;
-  }
 
   public static CsvWriter plainWriter(final File file) {
     if (file == null) {
@@ -159,36 +58,6 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
       csvMapWriter.write(map);
       return csvString.toString();
     }
-  }
-
-  public static Map<String, String> toMap(final String businessApplicationParameters) {
-    final HashMap<String, String> map = new LinkedHashMap<>();
-    final CsvIterator iterator = new CsvIterator(new StringReader(businessApplicationParameters));
-    if (iterator.hasNext()) {
-      final List<String> keys = iterator.next();
-      if (iterator.hasNext()) {
-        final List<String> values = iterator.next();
-        for (int i = 0; i < keys.size() && i < values.size(); i++) {
-          map.put(keys.get(i), values.get(i));
-        }
-      }
-    }
-    return map;
-  }
-
-  public static Map<String, Object> toObjectMap(final String businessApplicationParameters) {
-    final HashMap<String, Object> map = new LinkedHashMap<>();
-    final CsvIterator iterator = new CsvIterator(new StringReader(businessApplicationParameters));
-    if (iterator.hasNext()) {
-      final List<String> keys = iterator.next();
-      if (iterator.hasNext()) {
-        final List<String> values = iterator.next();
-        for (int i = 0; i < keys.size() && i < values.size(); i++) {
-          map.put(keys.get(i), values.get(i));
-        }
-      }
-    }
-    return map;
   }
 
   /*

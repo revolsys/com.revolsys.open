@@ -172,13 +172,13 @@ public class CsvRecordReader extends AbstractRecordReader {
             }
           break;
           case '\r':
-            in.mark(1);
-            final int nextCharacter = in.read();
-            in.reset();
-            if (nextCharacter == '\n') {
+            if (inQuotes) {
+              sb.append(character);
             } else {
-              if (inQuotes) {
-                sb.append('\n');
+              in.mark(1);
+              final int nextCharacter = in.read();
+              in.reset();
+              if (nextCharacter == '\n') {
               } else {
                 if (values.isEmpty()) {
                   if (sb.length() > 0) {

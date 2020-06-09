@@ -26,6 +26,8 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   private boolean paused = false;
 
+  private final String newLine = "\r\n";
+
   public CsvRecordWriter(final RecordDefinitionProxy recordDefinition, final Object target,
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
     this(recordDefinition, Resource.getResource(target), fieldSeparator, useQuotes, ewkt);
@@ -53,7 +55,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
         final String name = recordDefinition.getFieldName(i);
         string(name);
       }
-      this.out.write('\n');
+      this.out.write(this.newLine);
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }
@@ -185,7 +187,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
             }
           }
         }
-        out.write('\n');
+        out.write(this.newLine);
       } catch (final IOException e) {
         throw Exceptions.wrap(e);
       }
