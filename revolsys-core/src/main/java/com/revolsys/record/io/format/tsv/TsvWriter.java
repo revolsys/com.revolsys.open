@@ -14,7 +14,7 @@ public class TsvWriter implements BaseCloseable {
   /** The writer */
   private final Writer out;
 
-  private final String newLine = "\r\n";
+  private String newLine = "\n";
 
   protected TsvWriter(final Writer out) {
     this.out = out;
@@ -31,6 +31,14 @@ public class TsvWriter implements BaseCloseable {
       this.out.flush();
     } catch (final IOException e) {
     }
+  }
+
+  public String getNewLine() {
+    return this.newLine;
+  }
+
+  public void setNewLine(final String newLine) {
+    this.newLine = newLine;
   }
 
   public void write(final Collection<? extends Object> values) {

@@ -1,10 +1,16 @@
 package com.revolsys.jdbc.io;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jeometry.common.logging.Logs;
+
 import com.revolsys.record.Record;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.util.LongCounter;
 
 public class JdbcRecordWriterTypeData {
 
@@ -14,14 +20,27 @@ public class JdbcRecordWriterTypeData {
 
   private final PreparedStatement statement;
 
-  private List<Record> records;
+  private final List<Record> records = new ArrayList<>();
 
   private final JdbcRecordDefinition recordDefinition;
 
   private final boolean hasGeneratedKeys;
 
-  public JdbcRecordWriterTypeData(final JdbcRecordDefinition recordDefinition, final String sql,
+  private final AbstractJdbcRecordStore recordStore;
+
+  private final LongCounter counter;
+
+  private final int batchSize;
+
+  private final JdbcRecordWriter writer;
+
+  public JdbcRecordWriterTypeData(final JdbcRecordWriter writer,
+    final JdbcRecordDefinition recordDefinition, final String sql,
     final PreparedStatement statement, final boolean hasGeneratedKeys) {
+    this.writer = writer;
+    this.recordStore = writer.getRecordStore();
+    this.batchSize = writer.getBatchSize();
+    this.counter = writer.getCounter(recordDefinition);
     this.recordDefinition = recordDefinition;
     this.sql = sql;
     this.statement = statement;
@@ -29,22 +48,44 @@ public class JdbcRecordWriterTypeData {
   }
 
   public synchronized int addCount() {
-    return ++this.batchCount;
-  }
-
-  public int addRecord(final Record record) {
-    if (this.records == null) {
-      this.records = new ArrayList<>();
+    this.batchCount++;
+    if (this.batchCount >= this.batchSize) {
+      processCurrentBatch();
     }
-    this.records.add(record);
-    return addCount();
+    return this.batchCount;
   }
 
   public void clear() {
     this.batchCount = 0;
-    if (this.records != null) {
-      this.records.clear();
+    this.records.clear();
+  }
+
+  public void close() {
+    try {
+      processCurrentBatch();
+
+    } finally {
+      try {
+        if (!this.statement.isClosed()) {
+          this.statement.close();
+        }
+      } catch (final SQLException e) {
+        throw this.writer.connection.getException("Process Batch", this.sql, e);
+      }
     }
+  }
+
+  protected void executeUpdate() throws SQLException {
+    if (this.batchSize > 1) {
+      this.statement.addBatch();
+      addCount();
+    } else {
+      this.recordStore.executeUpdate(this.statement);
+    }
+  }
+
+  public void flush() {
+    processCurrentBatch();
   }
 
   public int getBatchCount() {
@@ -67,8 +108,62 @@ public class JdbcRecordWriterTypeData {
     return this.statement;
   }
 
+  public void insertRecord(final Record record) throws SQLException {
+    if (this.batchSize > 1) {
+      this.statement.addBatch();
+      if (this.hasGeneratedKeys) {
+        this.records.add(record);
+      }
+      addCount();
+    } else {
+      this.recordStore.executeUpdate(this.statement);
+      try (
+        final ResultSet generatedKeyResultSet = this.statement.getGeneratedKeys()) {
+        if (generatedKeyResultSet.next()) {
+          setGeneratedKeys(generatedKeyResultSet, record);
+        }
+      }
+    }
+  }
+
   public boolean isHasGeneratedKeys() {
     return this.hasGeneratedKeys;
   }
 
+  private void processCurrentBatch() {
+    try {
+      this.counter.add(this.batchCount);
+      this.recordStore.execteBatch(this.statement);
+      if (this.hasGeneratedKeys && !this.records.isEmpty()) {
+        try (
+          final ResultSet generatedKeyResultSet = this.statement.getGeneratedKeys()) {
+          int recordIndex = 0;
+          while (generatedKeyResultSet.next() && recordIndex < this.records.size()) {
+            final Record record = this.records.get(recordIndex++);
+            setGeneratedKeys(generatedKeyResultSet, record);
+          }
+        }
+      }
+    } catch (final SQLException e) {
+      throw this.writer.connection.getException("Process Batch", this.sql, e);
+    } catch (final RuntimeException e) {
+      Logs.error(this, this.sql, e);
+      throw e;
+    } finally {
+      clear();
+    }
+  }
+
+  protected void setGeneratedKeys(final ResultSet generatedKeyResultSet, final Record record)
+    throws SQLException {
+    int columnIndex = 1;
+    for (final FieldDefinition idField : this.recordDefinition.getIdFields()) {
+      final Object idValue = generatedKeyResultSet.getObject(columnIndex);
+      if (!generatedKeyResultSet.wasNull()) {
+        final int index = idField.getIndex();
+        record.setValue(index, idValue);
+        columnIndex++;
+      }
+    }
+  }
 }

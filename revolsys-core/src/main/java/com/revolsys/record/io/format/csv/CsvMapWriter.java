@@ -29,7 +29,7 @@ public class CsvMapWriter extends AbstractMapWriter {
 
   private final boolean useQuotes;
 
-  private final String newLine = "\r\n";
+  private String newLine = "\n";
 
   public CsvMapWriter(final File file) throws FileNotFoundException {
     this(new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8));
@@ -69,10 +69,18 @@ public class CsvMapWriter extends AbstractMapWriter {
     return this.fieldNames;
   }
 
+  public String getNewLine() {
+    return this.newLine;
+  }
+
   public void setFieldNames(final Collection<String> fieldNames) {
     assert this.fieldNames == null;
     this.fieldNames = new ArrayList<>(fieldNames);
     write(fieldNames);
+  }
+
+  public void setNewLine(final String newLine) {
+    this.newLine = newLine;
   }
 
   public void write(final Collection<? extends Object> values) {

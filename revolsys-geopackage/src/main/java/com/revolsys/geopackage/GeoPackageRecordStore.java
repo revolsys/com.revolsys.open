@@ -70,7 +70,7 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     @Override
     protected int callback(final int nbPrevInvok) throws SQLException {
       // TODO Auto-generated method stub
-      return 1;
+      return 0;
     }
   };
 
@@ -251,8 +251,8 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
   }
 
   private void createRecordStore() {
-    executeSqlNoFunctions("application_id", "PRAGMA application_id = " + APPLICATION_ID + ";");
-    executeSqlNoFunctions("user_version", "PRAGMA user_version = 10201;");
+    executeSql("application_id", "PRAGMA application_id = " + APPLICATION_ID + ";");
+    executeSql("user_version", "PRAGMA user_version = 10201;");
 
     for (final String fileName : Arrays.asList("gpkg_spatial_ref_sys.sql", "gpkg_contents.sql",
       "gpkg_data_columns.sql", "gpkg_data_column_constraints.sql", "gpkg_extensions.sql",
@@ -260,7 +260,7 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     // , "gpkg_tile_matrix.sql", "gpkg_tile_matrix_set.sql"
     )) {
       for (final String sql : getSqlTemplates(fileName)) {
-        executeSqlNoFunctions(fileName, sql);
+        executeSql(fileName, sql);
       }
 
     }
@@ -271,9 +271,23 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     statement.executeBatch();
   }
 
-  private void executeSqlNoFunctions(final String task, final String sql) {
+  private void executeSql(final String task, final String sql) {
     try (
       JdbcConnection connection = getJdbcConnection(true)) {
+      if (sql.trim().length() > 0) {
+        try (
+          Statement statement = connection.createStatement()) {
+          statement.execute(sql);
+        } catch (final SQLException e) {
+          throw connection.getException(task, sql, e);
+        }
+      }
+    }
+  }
+
+  private void executeSqlNoFunctions(final String task, final String sql) {
+    try (
+      JdbcConnection connection = super.getJdbcConnection(true)) {
       if (sql.trim().length() > 0) {
         try (
           Statement statement = connection.createStatement()) {

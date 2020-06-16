@@ -275,6 +275,10 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     }
   }
 
+  public synchronized void executeUpdate(final PreparedStatement statement) throws SQLException {
+    statement.executeUpdate();
+  }
+
   public Set<String> getAllSchemaNames() {
     return this.allSchemaNames;
   }
@@ -740,18 +744,13 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   protected JdbcRecordWriter newRecordWriter(final RecordDefinitionProxy recordDefinition,
     final int batchSize) {
-    if (batchSize > 1) {
-      final JdbcRecordWriterBatch writer = new JdbcRecordWriterBatch(this, recordDefinition,
-        batchSize);
-      writer.setSqlPrefix(this.sqlPrefix);
-      writer.setSqlSuffix(this.sqlSuffix);
-      writer.setLabel(getLabel());
-      writer.setFlushBetweenTypes(this.flushBetweenTypes);
-      writer.setQuoteColumnNames(false);
-      return writer;
-    } else {
-      return new JdbcRecordWriterSingle(this, recordDefinition);
-    }
+    final JdbcRecordWriter writer = new JdbcRecordWriter(this, recordDefinition, batchSize);
+    writer.setSqlPrefix(this.sqlPrefix);
+    writer.setSqlSuffix(this.sqlSuffix);
+    writer.setLabel(getLabel());
+    writer.setFlushBetweenTypes(this.flushBetweenTypes);
+    writer.setQuoteColumnNames(false);
+    return writer;
   }
 
   @Override

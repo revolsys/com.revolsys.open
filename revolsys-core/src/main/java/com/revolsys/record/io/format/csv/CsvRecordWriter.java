@@ -26,7 +26,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   private boolean paused = false;
 
-  private final String newLine = "\r\n";
+  private String newLine = "\n";
 
   public CsvRecordWriter(final RecordDefinitionProxy recordDefinition, final Object target,
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
@@ -92,6 +92,10 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   }
 
+  public String getNewLine() {
+    return this.newLine;
+  }
+
   public void pause() {
     final Resource resource = getResource();
     if (resource == null) {
@@ -117,6 +121,10 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   public void setEwkt(final boolean ewkt) {
     this.ewkt = ewkt;
+  }
+
+  public void setNewLine(final String newLine) {
+    this.newLine = newLine;
   }
 
   public void setUseQuotes(final boolean useQuotes) {
