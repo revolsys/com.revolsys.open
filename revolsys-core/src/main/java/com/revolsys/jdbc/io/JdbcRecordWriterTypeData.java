@@ -16,6 +16,8 @@ public class JdbcRecordWriterTypeData {
 
   private int batchCount = 0;
 
+  private boolean closed = false;
+
   private final String sql;
 
   private final PreparedStatement statement;
@@ -60,17 +62,20 @@ public class JdbcRecordWriterTypeData {
     this.records.clear();
   }
 
-  public void close() {
-    try {
-      processCurrentBatch();
-
-    } finally {
+  public synchronized void close() {
+    if (!this.closed) {
+      this.closed = true;
       try {
-        if (!this.statement.isClosed()) {
-          this.statement.close();
+        processCurrentBatch();
+
+      } finally {
+        try {
+          if (!this.statement.isClosed()) {
+            this.statement.close();
+          }
+        } catch (final SQLException e) {
+          throw this.writer.connection.getException("Process Batch", this.sql, e);
         }
-      } catch (final SQLException e) {
-        throw this.writer.connection.getException("Process Batch", this.sql, e);
       }
     }
   }
@@ -131,26 +136,28 @@ public class JdbcRecordWriterTypeData {
   }
 
   private void processCurrentBatch() {
-    try {
-      this.counter.add(this.batchCount);
-      this.recordStore.execteBatch(this.statement);
-      if (this.hasGeneratedKeys && !this.records.isEmpty()) {
-        try (
-          final ResultSet generatedKeyResultSet = this.statement.getGeneratedKeys()) {
-          int recordIndex = 0;
-          while (generatedKeyResultSet.next() && recordIndex < this.records.size()) {
-            final Record record = this.records.get(recordIndex++);
-            setGeneratedKeys(generatedKeyResultSet, record);
+    if (this.batchCount > 0) {
+      try {
+        this.counter.add(this.batchCount);
+        this.recordStore.execteBatch(this.statement);
+        if (this.hasGeneratedKeys && !this.records.isEmpty()) {
+          try (
+            final ResultSet generatedKeyResultSet = this.statement.getGeneratedKeys()) {
+            int recordIndex = 0;
+            while (generatedKeyResultSet.next() && recordIndex < this.records.size()) {
+              final Record record = this.records.get(recordIndex++);
+              setGeneratedKeys(generatedKeyResultSet, record);
+            }
           }
         }
+      } catch (final SQLException e) {
+        throw this.writer.connection.getException("Process Batch", this.sql, e);
+      } catch (final RuntimeException e) {
+        Logs.error(this, this.sql, e);
+        throw e;
+      } finally {
+        clear();
       }
-    } catch (final SQLException e) {
-      throw this.writer.connection.getException("Process Batch", this.sql, e);
-    } catch (final RuntimeException e) {
-      Logs.error(this, this.sql, e);
-      throw e;
-    } finally {
-      clear();
     }
   }
 
