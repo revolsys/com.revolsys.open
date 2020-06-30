@@ -275,7 +275,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     }
   }
 
-  public synchronized void executeUpdate(final PreparedStatement statement) throws SQLException {
+  public void executeUpdate(final PreparedStatement statement) throws SQLException {
     statement.executeUpdate();
   }
 
