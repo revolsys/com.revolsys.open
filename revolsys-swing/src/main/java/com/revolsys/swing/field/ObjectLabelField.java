@@ -42,7 +42,7 @@ public class ObjectLabelField extends TextField {
       if (values == null || values.isEmpty()) {
         return DataTypes.toString(fieldValue);
       } else {
-        return Strings.toString(values);
+        return " " + Strings.toString(values);
       }
     }
   }
