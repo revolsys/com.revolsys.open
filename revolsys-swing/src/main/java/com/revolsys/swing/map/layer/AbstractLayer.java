@@ -91,9 +91,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   }
 
   public class PanelComponentHolder extends BasePanel {
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
 
     public PanelComponentHolder() {

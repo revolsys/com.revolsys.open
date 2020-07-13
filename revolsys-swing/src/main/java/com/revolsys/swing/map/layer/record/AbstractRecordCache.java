@@ -7,11 +7,6 @@ import com.revolsys.record.RecordState;
 
 public abstract class AbstractRecordCache<L extends AbstractRecordLayer> implements RecordCache {
 
-  private static class RecordCacheSync {
-  }
-
-  private final RecordCacheSync recordCacheSync = new RecordCacheSync();
-
   protected final L layer;
 
   protected String cacheId;
@@ -93,7 +88,7 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
 
   @Override
   public Object getRecordCacheSync() {
-    return this.recordCacheSync;
+    return this.layer.getRecordCacheSync();
   }
 
   @Override

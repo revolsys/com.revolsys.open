@@ -289,7 +289,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
    */
   protected LayerRecord getCachedRecord(final Identifier identifier, final LayerRecord record,
     final boolean updateRecord) {
-    synchronized (getSync()) {
+    synchronized (getRecordCacheSync()) {
       final RecordStoreLayerRecord cachedRecord = findCachedRecord(record);
       if (cachedRecord == null) {
         addCachedRecord(identifier, record);
