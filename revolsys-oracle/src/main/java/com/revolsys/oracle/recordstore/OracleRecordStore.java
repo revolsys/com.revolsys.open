@@ -2,7 +2,6 @@ package com.revolsys.oracle.recordstore;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -390,7 +389,12 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   @Override
   public PreparedStatement insertStatementPrepareRowId(final JdbcConnection connection,
     final RecordDefinition recordDefinition, final String sql) throws SQLException {
-    return connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+    final List<Integer> idFieldIndexes = recordDefinition.getIdFieldIndexes();
+    final int[] indexes = new int[idFieldIndexes.size()];
+    for (int i = 0; i < indexes.length; i++) {
+      indexes[i] = idFieldIndexes.get(i) + 1;
+    }
+    return connection.prepareStatement(sql, indexes);
   }
 
   @Override
