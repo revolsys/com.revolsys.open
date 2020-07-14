@@ -10,7 +10,6 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.TableCellRenderer;
 
 import org.jdesktop.swingx.JXTable;
-import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.number.Numbers;
 
 import com.revolsys.swing.SwingUtil;
@@ -46,12 +45,12 @@ public class JsonObjectTableCellRenderer implements TableCellRenderer {
       this.valueComponent.setHorizontalTextPosition(SwingConstants.RIGHT);
       component = this.valueComponent;
     } else if (columnIndex == 1) {
-      final String title = model.getPropertyTitle(rowIndex);
+      final String title = model.getFieldTitle(rowIndex);
       this.labelComponent.setText(title);
       this.labelComponent.setBorder(new EmptyBorder(1, 2, 1, 2));
       component = this.labelComponent;
     } else {
-      final String text = DataTypes.toString(model.getValueAt(rowIndex, columnIndex));
+      final String text = model.toDisplayValue(rowIndex, value);
       this.valueComponent.setText(text);
       if (Numbers.isNumber(text)) {
         this.valueComponent.setHorizontalAlignment(SwingConstants.RIGHT);

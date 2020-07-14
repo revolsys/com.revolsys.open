@@ -432,9 +432,12 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
   }
 
   protected JPanel addScrollPaneTab(final String title) {
-    final JPanel panel = new JPanel(new VerticalLayout());
-    panel.setOpaque(false);
-    addScrollPaneTab(title, panel);
+    JPanel panel = this.tabs.getTabByTitle(title);
+    if (panel == null) {
+      panel = new JPanel(new VerticalLayout());
+      panel.setOpaque(false);
+      addScrollPaneTab(title, panel);
+    }
     return panel;
   }
 

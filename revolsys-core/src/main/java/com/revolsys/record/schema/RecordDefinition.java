@@ -51,6 +51,17 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
 
   <CT extends CodeTable> CT getCodeTable();
 
+  default CodeTable getCodeTable(final String codeTableName) {
+    CodeTable codeTable = getCodeTableByFieldName(codeTableName);
+    if (codeTable == null) {
+      final RecordStore recordStore = getRecordStore();
+      if (recordStore != null) {
+        codeTable = recordStore.getCodeTable(codeTableName);
+      }
+    }
+    return codeTable;
+  }
+
   CodeTable getCodeTableByFieldName(CharSequence fieldName);
 
   Object getDefaultValue(String fieldName);

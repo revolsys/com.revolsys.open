@@ -724,59 +724,64 @@ public interface SwingUtil {
   }
 
   @SuppressWarnings("unchecked")
-  static <T extends Field> T newField(final RecordDefinition recordDefinition,
-    final String fieldName, final boolean editable) {
-    Field field;
-    final FieldDefinition fieldDefinition = recordDefinition.getField(fieldName);
-    if (fieldDefinition == null) {
-      throw new IllegalArgumentException("Cannot find field " + fieldName);
+  static <T extends Field> T newField(final FieldDefinition fieldDefinition,
+    final boolean editable) {
+    final String fieldName = fieldDefinition.getName();
+    final boolean required = fieldDefinition.isRequired();
+    final int length = fieldDefinition.getLength();
+    CodeTable codeTable;
+    if (fieldDefinition.isIdField(fieldName)) {
+      codeTable = null;
     } else {
-      final boolean required = fieldDefinition.isRequired();
-      final int length = fieldDefinition.getLength();
-      CodeTable codeTable;
-      if (recordDefinition.isIdField(fieldName)) {
-        codeTable = null;
-      } else {
-        codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
-      }
-
-      final DataType type = fieldDefinition.getDataType();
-      int columns = length;
-      if (columns <= 0) {
-        columns = 10;
-      } else if (columns > 50) {
-        columns = 50;
-      }
-      final Class<?> javaClass = type.getJavaClass();
-      if (codeTable != null) {
-        if (editable) {
-          final JComponent component = codeTable.getSwingEditor();
-          if (component == null) {
-            field = newComboBox(fieldName, codeTable, required, -1, false);
-          } else {
-            field = ((Field)component).clone();
+      codeTable = fieldDefinition.getCodeTable();
+      if (codeTable == null) {
+        final RecordDefinition recordDefinition = fieldDefinition.getRecordDefinition();
+        if (recordDefinition != null) {
+          codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
+          if (codeTable != null) {
+            fieldDefinition.setCodeTable(codeTable);
           }
-        } else {
-          field = new ObjectLabelField(fieldName, columns, codeTable);
         }
-      } else if (!editable) {
-        final TextField textField = newTextField(fieldName, columns);
-        textField.setEditable(false);
-        field = textField;
-      } else if (Number.class.isAssignableFrom(javaClass)) {
-        final int scale = fieldDefinition.getScale();
-        final Number minValue = fieldDefinition.getMinValue();
-        final Number maxValue = fieldDefinition.getMaxValue();
-        final NumberTextField numberTextField = new NumberTextField(fieldName, type, length, scale,
-          minValue, maxValue);
-        field = numberTextField;
-      } else if (Date.class.isAssignableFrom(javaClass)) {
-        field = newDateField(fieldName);
-      } else if (Geometry.class.isAssignableFrom(javaClass)) {
-        field = new ObjectLabelField(fieldName);
-      } else {
-        field = newTextField(fieldName, columns);
       }
+    }
+
+    final DataType type = fieldDefinition.getDataType();
+    int columns = length;
+    if (columns <= 0) {
+      columns = 10;
+    } else if (columns > 50) {
+      columns = 50;
+    }
+    Field field;
+    final Class<?> javaClass = type.getJavaClass();
+    if (codeTable != null) {
+      if (editable) {
+        final JComponent component = codeTable.getSwingEditor();
+        if (component == null) {
+          field = newComboBox(fieldName, codeTable, required, -1, false);
+        } else {
+          field = ((Field)component).clone();
+        }
+      } else {
+        field = new ObjectLabelField(fieldName, columns, codeTable);
+      }
+    } else if (!editable) {
+      final TextField textField = newTextField(fieldName, columns);
+      textField.setEditable(false);
+      field = textField;
+    } else if (Number.class.isAssignableFrom(javaClass)) {
+      final int scale = fieldDefinition.getScale();
+      final Number minValue = fieldDefinition.getMinValue();
+      final Number maxValue = fieldDefinition.getMaxValue();
+      final NumberTextField numberTextField = new NumberTextField(fieldName, type, length, scale,
+        minValue, maxValue);
+      field = numberTextField;
+    } else if (Date.class.isAssignableFrom(javaClass)) {
+      field = newDateField(fieldName);
+    } else if (Geometry.class.isAssignableFrom(javaClass)) {
+      field = new ObjectLabelField(fieldName);
+    } else {
+      field = newTextField(fieldName, columns);
     }
     if (field instanceof JTextField) {
       final JTextField textField = (JTextField)field;
@@ -787,6 +792,16 @@ public interface SwingUtil {
 
     ((JComponent)field).setFont(FONT);
     return (T)field;
+  }
+
+  static <T extends Field> T newField(final RecordDefinition recordDefinition,
+    final String fieldName, final boolean editable) {
+    final FieldDefinition fieldDefinition = recordDefinition.getField(fieldName);
+    if (fieldDefinition == null) {
+      throw new IllegalArgumentException("Cannot find field " + fieldName);
+    } else {
+      return newField(fieldDefinition, editable);
+    }
   }
 
   static JFileChooser newFileChooser(final Class<?> preferencesClass, final String preferenceName) {

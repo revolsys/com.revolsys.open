@@ -88,7 +88,7 @@ public class LayerRecordTableModel extends AbstractSingleRecordTableModel
   @Override
   public BaseTableCellEditor getCellEditor(final int rowIndex, final int columnIndex) {
     if (columnIndex == 2) {
-      final String fieldName = getColumnFieldName(columnIndex);
+      final String fieldName = getColumnFieldName(rowIndex);
       if (fieldName != null) {
         final BaseJTable table = getTable();
         return this.layer.newTableCellEditor(table, fieldName);

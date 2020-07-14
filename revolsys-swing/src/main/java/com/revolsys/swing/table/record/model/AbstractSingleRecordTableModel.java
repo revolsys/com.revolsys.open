@@ -33,7 +33,7 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
     table.setAutoCreateColumnsFromModel(false);
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
     final SingleRecordTableCellRenderer cellRenderer = new SingleRecordTableCellRenderer();
-    final RecordTableCellEditor cellEditor = new RecordTableCellEditor(table);
+    final RecordTableCellEditor cellEditor = model.newCellEditor();
     cellEditor.setPopupMenu(model.getMenu()::newJPopupMenu);
 
     final RecordDefinition recordDefinition = model.getRecordDefinition();
@@ -179,6 +179,11 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
   @Override
   public boolean isSelected(final boolean selected, final int rowIndex, final int columnIndex) {
     return selected;
+  }
+
+  public RecordTableCellEditor newCellEditor() {
+    final BaseJTable table = getTable();
+    return new RecordTableCellEditor(table);
   }
 
   protected Object setDisplayValue(final String fieldName, final Object displayValue) {

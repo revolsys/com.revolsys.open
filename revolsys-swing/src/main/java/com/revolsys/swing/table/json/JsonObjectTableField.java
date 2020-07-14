@@ -11,7 +11,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
 
 import org.jdesktop.swingx.VerticalLayout;
-import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.json.JsonObject;
@@ -25,10 +24,6 @@ import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.toolbar.ToolBar;
 
 public class JsonObjectTableField extends ValueField {
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private final JsonObjectTableModel model;
@@ -66,9 +61,9 @@ public class JsonObjectTableField extends ValueField {
 
   private final TextField addNameField;
 
-  private final ComboBox<String> addNamesField;
+  private final ComboBox<FieldDefinition> addNamesField;
 
-  private final List<String> fieldNames = new ArrayList<>();
+  private final List<FieldDefinition> fields = new ArrayList<>();
 
   private final ToolBar toolBar;
 
@@ -95,7 +90,8 @@ public class JsonObjectTableField extends ValueField {
     this.addNameField.getDocument().addDocumentListener(this.addNameDocumentListener);
     this.toolBar.addComponent("add", this.addNameField);
 
-    this.addNamesField = ComboBox.newComboBox("name", this.fieldNames);
+    this.addNamesField = ComboBox.newComboBox("name", this.fields,
+      (field) -> ((FieldDefinition)field).getTitle());
     this.addNamesField.setMaximumSize(new Dimension(200, 50));
 
     this.toolBar.addComponent("add", this.addNamesField);
@@ -110,21 +106,24 @@ public class JsonObjectTableField extends ValueField {
   }
 
   private void addRow() {
-    JsonObject object = getFieldValue();
-    if (object == null) {
-      object = new JsonObjectHash();
-    }
-    final String name;
-    if (this.fieldNames.isEmpty()) {
-      name = this.addNameValue;
-      this.addNameField.setText("");
-    } else {
-      name = this.addNamesField.getSelectedItem();
-    }
-    if (name != null) {
-      object.put(name, null);
-      setFieldValue(object);
-
+    try {
+      JsonObject object = getFieldValue();
+      if (object == null) {
+        object = new JsonObjectHash();
+      }
+      final String name;
+      if (this.fields.isEmpty()) {
+        name = this.addNameValue;
+        this.addNameField.setText("");
+      } else {
+        final FieldDefinition field = this.addNamesField.getSelectedItem();
+        name = field.getName();
+      }
+      if (name != null) {
+        object.put(name, null);
+        setFieldValue(object);
+      }
+    } finally {
       refresh();
     }
   }
@@ -138,38 +137,43 @@ public class JsonObjectTableField extends ValueField {
   }
 
   private void refresh() {
-    if (!this.fieldNames.isEmpty()) {
+    if (!this.fields.isEmpty()) {
       this.addNamesField.removeAllItems();
       final JsonObject object = getFieldValue();
-      for (final String fieldName : this.fieldNames) {
+      for (final FieldDefinition field : this.fields) {
+        final String fieldName = field.getName();
         if (object == null || !object.containsKey(fieldName)) {
-          this.addNamesField.addItem(fieldName);
+          this.addNamesField.addItem(field);
         }
       }
     }
   }
 
   public void setFields(final List<FieldDefinition> fields) {
-    this.fieldNames.clear();
+    this.fields.clear();
+    this.model.setFields(fields);
     for (final FieldDefinition field : fields) {
-      final String name = field.getName();
-      this.fieldNames.add(name);
-      final DataType dataType = field.getDataType();
-      this.model.setDataType(name, dataType);
+      this.fields.add(field);
     }
-    this.addNameField.setVisible(this.fieldNames.isEmpty());
-    this.addNamesField.setVisible(!this.fieldNames.isEmpty());
+    this.addNameField.setVisible(this.fields.isEmpty());
+    this.addNamesField.setVisible(!this.fields.isEmpty());
     this.refresh();
   }
 
   @Override
   public boolean setFieldValue(final Object value) {
-    if (value != getFieldValue()) {
-      final JsonObject clone = Json.clone(value);
-      this.model.setObject(clone);
-      return super.setFieldValue(clone);
+    try {
+      if (value == getFieldValue()) {
+        this.model.setObject((JsonObject)value);
+      } else {
+        final JsonObject clone = Json.clone(value);
+        final boolean set = super.setFieldValue(clone);
+        this.model.setObject(clone);
+        return set;
+      }
+    } finally {
+      refresh();
     }
-    refresh();
     return false;
   }
 

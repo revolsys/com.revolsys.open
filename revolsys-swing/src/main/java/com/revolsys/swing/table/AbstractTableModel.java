@@ -12,6 +12,7 @@ import javax.annotation.PreDestroy;
 import javax.swing.JComponent;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.TableModelEvent;
@@ -173,13 +174,17 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
 
   @Override
   public void fireTableChanged(final TableModelEvent e) {
-    Invoke.later(() -> {
+    if (SwingUtilities.isEventDispatchThread()) {
       try {
         super.fireTableChanged(e);
       } catch (final Throwable t) {
         Logs.debug(getClass(), "Error refreshing table", t);
       }
-    });
+    } else {
+      Invoke.later(() -> {
+        this.fireTableChanged(e);
+      });
+    }
   }
 
   public BaseTableCellEditor getCellEditor(final int columnIndex) {

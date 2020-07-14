@@ -58,6 +58,16 @@ public class TabbedPane extends JTabbedPane {
     return addTab(icon, toolTipText, component, useScrollPane);
   }
 
+  @SuppressWarnings("unchecked")
+  public <C extends Component> C getTabByTitle(final String title) {
+    final int index = this.getTabIndexByTitle(title);
+    if (index == -1) {
+      return null;
+    } else {
+      return (C)getTabComponentAt(index);
+    }
+  }
+
   public int getTabIndexByTitle(final String title) {
     final int tabCount = getTabCount();
     for (int i = 0; i < tabCount; i++) {
