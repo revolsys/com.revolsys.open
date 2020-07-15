@@ -24,9 +24,6 @@ import com.revolsys.swing.table.editor.BaseTableCellEditor;
 import com.revolsys.swing.toolbar.ToolBar;
 
 public class JsonObjectRecordLayerTableCellEditor extends BaseTableCellEditor {
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   private final JDialog dialog;
@@ -39,8 +36,8 @@ public class JsonObjectRecordLayerTableCellEditor extends BaseTableCellEditor {
     final FieldDefinition fieldDefinition, final List<FieldDefinition> extendedFields) {
     super(table);
     this.dialog = new JDialog(SwingUtil.getWindowAncestor(table));
-    this.field = new JsonObjectTableField("x", extendedFields);
-    this.field.setPreferredSize(new Dimension(400, 150));
+    this.field = new JsonObjectTableField(fieldDefinition.getName(), extendedFields);
+    this.field.setMaximumSize(new Dimension(400, 150));
 
     final ToolBar toolBar = this.field.getToolBar();
     toolBar.addButtonTitleIcon("save", "Cancel", "cross", this::cancelCellEditing);

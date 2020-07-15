@@ -64,7 +64,12 @@ public class TabbedPane extends JTabbedPane {
     if (index == -1) {
       return null;
     } else {
-      return (C)getTabComponentAt(index);
+      final Component component = getComponentAt(index);
+      if (component instanceof JScrollPane) {
+        final JScrollPane scrollPane = (JScrollPane)component;
+        return (C)scrollPane.getViewport().getView();
+      }
+      return (C)component;
     }
   }
 

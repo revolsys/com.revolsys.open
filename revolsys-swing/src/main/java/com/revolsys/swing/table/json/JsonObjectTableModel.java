@@ -157,6 +157,7 @@ public class JsonObjectTableModel extends AbstractTableModel implements Property
   @Override
   public BaseJTable newTable() {
     final BaseJTable table = new BaseJTable(this);
+    table.setVisibleRowCount(Math.min(8, this.fieldByName.size()));
     table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
     table.setAutoCreateColumnsFromModel(false);
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);

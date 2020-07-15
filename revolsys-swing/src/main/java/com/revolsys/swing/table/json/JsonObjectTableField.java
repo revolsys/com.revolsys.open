@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.event.TableModelEvent;
 
 import org.jdesktop.swingx.VerticalLayout;
@@ -18,7 +16,6 @@ import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.ComboBox;
-import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.toolbar.ToolBar;
@@ -28,38 +25,7 @@ public class JsonObjectTableField extends ValueField {
 
   private final JsonObjectTableModel model;
 
-  private String addNameValue;
-
   private final JButton addButton;
-
-  private final DocumentListener addNameDocumentListener = new DocumentListener() {
-
-    @Override
-    public void changedUpdate(final DocumentEvent e) {
-      handle();
-    }
-
-    private void handle() {
-      final String name = JsonObjectTableField.this.addNameField.getText();
-      JsonObjectTableField.this.addNameValue = name;
-      final JsonObject fieldValue = getFieldValue();
-      final boolean enabled = name.length() > 0
-        && (fieldValue == null || !fieldValue.containsKey(name));
-      JsonObjectTableField.this.addButton.setEnabled(enabled);
-    }
-
-    @Override
-    public void insertUpdate(final DocumentEvent e) {
-      handle();
-    }
-
-    @Override
-    public void removeUpdate(final DocumentEvent e) {
-      handle();
-    }
-  };
-
-  private final TextField addNameField;
 
   private final ComboBox<FieldDefinition> addNamesField;
 
@@ -79,16 +45,13 @@ public class JsonObjectTableField extends ValueField {
 
     this.model = new JsonObjectTableModel(true);
     this.model.addTableModelListener(this::tableChanged);
+    setFields(fields);
 
     final TablePanel tablePanel = this.model.newTablePanel();
     add(tablePanel);
 
     this.table = tablePanel.getTable();
     this.toolBar = tablePanel.getToolBar();
-    this.addNameField = new TextField("name", 15);
-    this.addNameField.setMaximumSize(new Dimension(200, 50));
-    this.addNameField.getDocument().addDocumentListener(this.addNameDocumentListener);
-    this.toolBar.addComponent("add", this.addNameField);
 
     this.addNamesField = ComboBox.newComboBox("name", this.fields,
       (field) -> ((FieldDefinition)field).getTitle());
@@ -102,7 +65,6 @@ public class JsonObjectTableField extends ValueField {
     this.addNamesField.addItemListener((e) -> {
       this.addButton.setEnabled(this.addNamesField.getSelectedItem() != null);
     });
-    setFields(fields);
   }
 
   private void addRow() {
@@ -112,13 +74,8 @@ public class JsonObjectTableField extends ValueField {
         object = new JsonObjectHash();
       }
       final String name;
-      if (this.fields.isEmpty()) {
-        name = this.addNameValue;
-        this.addNameField.setText("");
-      } else {
-        final FieldDefinition field = this.addNamesField.getSelectedItem();
-        name = field.getName();
-      }
+      final FieldDefinition field = this.addNamesField.getSelectedItem();
+      name = field.getName();
       if (name != null) {
         object.put(name, null);
         setFieldValue(object);
@@ -137,7 +94,7 @@ public class JsonObjectTableField extends ValueField {
   }
 
   private void refresh() {
-    if (!this.fields.isEmpty()) {
+    if (this.addNamesField != null) {
       this.addNamesField.removeAllItems();
       final JsonObject object = getFieldValue();
       for (final FieldDefinition field : this.fields) {
@@ -155,9 +112,7 @@ public class JsonObjectTableField extends ValueField {
     for (final FieldDefinition field : fields) {
       this.fields.add(field);
     }
-    this.addNameField.setVisible(this.fields.isEmpty());
-    this.addNamesField.setVisible(!this.fields.isEmpty());
-    this.refresh();
+    refresh();
   }
 
   @Override
