@@ -371,7 +371,7 @@ public interface QueryValue extends Cloneable {
       return null;
     } else {
       throw new IllegalArgumentException(
-        "Unsupported expression" + expression.getClass() + " " + expression);
+        "Unsupported expression: " + expression.getClass() + " " + expression);
     }
   }
 

@@ -139,6 +139,17 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
     return this;
   }
 
+  @Override
+  public AbstractInOutProcess<I, O> setIn(final OutProcess<I> process) {
+    if (process != null) {
+      final Channel<I> in = process.getOut();
+      if (in != null) {
+        setIn(in);
+      }
+    }
+    return this;
+  }
+
   public AbstractInOutProcess<I, O> setInBufferSize(final int inBufferSize) {
     this.inBufferSize = inBufferSize;
     return this;
@@ -151,6 +162,17 @@ public abstract class AbstractInOutProcess<I, O> extends AbstractProcess
   public AbstractInOutProcess<I, O> setOut(final Channel<O> out) {
     this.out = out;
     out.writeConnect();
+    return this;
+  }
+
+  @Override
+  public AbstractInOutProcess<I, O> setOut(final InProcess<O> process) {
+    if (process != null) {
+      final Channel<O> channel = process.getIn();
+      if (channel != null) {
+        setOut(channel);
+      }
+    }
     return this;
   }
 

@@ -893,7 +893,7 @@ public class QueryWhereConditionField extends ValueField
     } else if (expression == null) {
       return null;
     } else {
-      setInvalidMessage("Unsupported expression" + expression.getClass() + " " + expression);
+      setInvalidMessage("Unsupported expression: " + expression.getClass() + " " + expression);
     }
     return null;
   }
