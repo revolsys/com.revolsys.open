@@ -15,6 +15,10 @@ public class And extends AbstractMultiCondition {
     super("AND", conditions);
   }
 
+  public And(final QueryValue value1, final QueryValue value2) {
+    this(Arrays.asList((Condition)value1, (Condition)value2));
+  }
+
   @Override
   public And and(final Condition condition) {
     if (!Property.isEmpty(condition)) {

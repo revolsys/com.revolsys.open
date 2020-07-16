@@ -10,7 +10,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -42,48 +41,8 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 
-import com.akiban.sql.StandardException;
-import com.akiban.sql.parser.BetweenOperatorNode;
-import com.akiban.sql.parser.BinaryArithmeticOperatorNode;
-import com.akiban.sql.parser.BinaryLogicalOperatorNode;
-import com.akiban.sql.parser.BinaryOperatorNode;
-import com.akiban.sql.parser.CastNode;
-import com.akiban.sql.parser.ColumnReference;
-import com.akiban.sql.parser.ConstantNode;
-import com.akiban.sql.parser.CursorNode;
-import com.akiban.sql.parser.InListOperatorNode;
-import com.akiban.sql.parser.IsNullNode;
-import com.akiban.sql.parser.LikeEscapeOperatorNode;
-import com.akiban.sql.parser.NodeTypes;
-import com.akiban.sql.parser.NotNode;
-import com.akiban.sql.parser.NumericConstantNode;
-import com.akiban.sql.parser.ResultSetNode;
-import com.akiban.sql.parser.RowConstructorNode;
-import com.akiban.sql.parser.SQLParser;
-import com.akiban.sql.parser.SQLParserException;
-import com.akiban.sql.parser.SelectNode;
-import com.akiban.sql.parser.SimpleStringOperatorNode;
-import com.akiban.sql.parser.StatementNode;
-import com.akiban.sql.parser.UserTypeConstantNode;
-import com.akiban.sql.parser.ValueNode;
-import com.akiban.sql.parser.ValueNodeList;
 import com.revolsys.record.code.CodeTable;
-import com.revolsys.record.query.And;
-import com.revolsys.record.query.Between;
-import com.revolsys.record.query.Cast;
-import com.revolsys.record.query.CollectionValue;
-import com.revolsys.record.query.Column;
 import com.revolsys.record.query.Condition;
-import com.revolsys.record.query.ILike;
-import com.revolsys.record.query.In;
-import com.revolsys.record.query.IsNotNull;
-import com.revolsys.record.query.IsNull;
-import com.revolsys.record.query.Not;
-import com.revolsys.record.query.Or;
-import com.revolsys.record.query.Q;
-import com.revolsys.record.query.QueryValue;
-import com.revolsys.record.query.Value;
-import com.revolsys.record.query.functions.Function;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Borders;
@@ -121,8 +80,6 @@ public class QueryWhereConditionField extends ValueField
 
   private final Color selectionColor;
 
-  private final String sqlPrefix;
-
   private final JTextArea statusLabel;
 
   private boolean valid;
@@ -137,6 +94,8 @@ public class QueryWhereConditionField extends ValueField
 
   private boolean likeEnabled;
 
+  private SqlParser sqlParser;
+
   public QueryWhereConditionField(final AbstractRecordLayer layer,
     final PropertyChangeListener listener, final Condition filter) {
     this(layer, listener, filter, null);
@@ -150,6 +109,9 @@ public class QueryWhereConditionField extends ValueField
     this.originalFilter = filter;
     this.listener = listener;
     this.recordDefinition = layer.getRecordDefinition();
+    // this.sqlParser = new AkibanSqlParser(this.recordDefinition);
+    this.sqlParser = new JSqlParser(this.recordDefinition);
+
     final List<FieldDefinition> fieldDefinitions = this.recordDefinition.getFields();
 
     this.fieldNamesList = ComboBox.newComboBox("fieldNames", fieldDefinitions,
@@ -220,12 +182,9 @@ public class QueryWhereConditionField extends ValueField
     // whereTextField.setContentType("text/sql"); // Requires the above scroll
     // pane
 
-    this.sqlPrefix = "SELECT * FROM "
-      + this.recordDefinition.getPath().substring(1).replace('/', '.') + " WHERE";
-
     final JPanel filterTextPanel = new JPanel(new BorderLayout());
     filterTextPanel.setOpaque(false);
-    filterTextPanel.add(new JLabel(this.sqlPrefix), BorderLayout.NORTH);
+    filterTextPanel.add(new JLabel(this.sqlParser.getSqlPrefix()), BorderLayout.NORTH);
     filterTextPanel.add(whereScroll, BorderLayout.CENTER);
 
     final ToolBar statusToolBar = new ToolBar();
@@ -686,218 +645,6 @@ public class QueryWhereConditionField extends ValueField
     GroupLayouts.makeColumns(this.searchFieldPanel, false);
   }
 
-  @SuppressWarnings("unchecked")
-  private <V extends QueryValue> V toQueryValue(final ValueNode expression) {
-    if (expression instanceof BetweenOperatorNode) {
-      final BetweenOperatorNode betweenExpression = (BetweenOperatorNode)expression;
-      final ValueNode leftValueNode = betweenExpression.getLeftOperand();
-      final ValueNodeList rightOperandList = betweenExpression.getRightOperandList();
-      final ValueNode betweenExpressionStart = rightOperandList.get(0);
-      final ValueNode betweenExpressionEnd = rightOperandList.get(1);
-      if (!(leftValueNode instanceof ColumnReference)) {
-        setInvalidMessage("Between operator must use a column name not: " + leftValueNode);
-        return null;
-      }
-
-      if (!(betweenExpressionStart instanceof NumericConstantNode)) {
-        setInvalidMessage("Between min value must be a number not: " + betweenExpressionStart);
-        return null;
-      }
-      if (!(betweenExpressionEnd instanceof NumericConstantNode)) {
-        setInvalidMessage("Between max value must be a number not: " + betweenExpressionEnd);
-        return null;
-      }
-      final Column column = toQueryValue(leftValueNode);
-      final Value min = toQueryValue(betweenExpressionStart);
-      final Value max = toQueryValue(betweenExpressionEnd);
-      final FieldDefinition fieldDefinition = this.recordDefinition.getField(column.getName());
-      min.convert(fieldDefinition);
-      max.convert(fieldDefinition);
-      return (V)new Between(column, min, max);
-    } else if (expression instanceof BinaryLogicalOperatorNode) {
-      final BinaryLogicalOperatorNode binaryOperatorNode = (BinaryLogicalOperatorNode)expression;
-      final String operator = binaryOperatorNode.getOperator().toUpperCase();
-      final ValueNode leftValueNode = binaryOperatorNode.getLeftOperand();
-      final ValueNode rightValueNode = binaryOperatorNode.getRightOperand();
-      final QueryValue leftValue = toQueryValue(leftValueNode);
-      if (leftValue instanceof Condition) {
-        final Condition leftCondition = (Condition)leftValue;
-        final QueryValue rightValue = toQueryValue(rightValueNode);
-        if (rightValue instanceof Condition) {
-          final Condition rightCondition = (Condition)rightValue;
-          if ("AND".equals(operator)) {
-            return (V)new And(leftCondition, rightCondition);
-          } else if ("OR".equals(operator)) {
-            return (V)new Or(leftCondition, rightCondition);
-          } else {
-            setInvalidMessage("Binary logical operator " + operator + " not supported.");
-            return null;
-          }
-        } else {
-          setInvalidMessage("Right side of " + operator
-            + " must be a condition (e.g. column_name = 'value') not: " + rightValue);
-          return null;
-        }
-      } else {
-        setInvalidMessage("Left side of " + operator
-          + " must be a condition (e.g. column_name = 'value') not: " + leftValue);
-        return null;
-      }
-    } else if (expression instanceof BinaryOperatorNode) {
-      final BinaryOperatorNode binaryOperatorNode = (BinaryOperatorNode)expression;
-      final String operator = binaryOperatorNode.getOperator();
-      final ValueNode leftValueNode = binaryOperatorNode.getLeftOperand();
-      final ValueNode rightValueNode = binaryOperatorNode.getRightOperand();
-      if (QueryValue.SUPPORTED_BINARY_OPERATORS.contains(operator.toUpperCase())) {
-        final QueryValue leftCondition = toQueryValue(leftValueNode);
-        QueryValue rightCondition = toQueryValue(rightValueNode);
-
-        if (leftCondition instanceof Column) {
-          if (rightCondition instanceof Value) {
-            final Object value = ((Value)rightCondition).getValue();
-            if (value == null) {
-              setInvalidMessage(
-                "Values can't be null for " + operator + " use IS NULL or IS NOT NULL instead.");
-            } else {
-              final Column column = (Column)leftCondition;
-
-              final String name = column.getName();
-              final FieldDefinition fieldDefinition = this.recordDefinition.getField(name);
-              final CodeTable codeTable = this.recordDefinition.getCodeTableByFieldName(name);
-              if (codeTable == null || fieldDefinition == this.recordDefinition.getIdField()) {
-                try {
-                  final Object convertedValue = fieldDefinition.toFieldValueException(value);
-                  if (convertedValue == null) {
-                    setInvalidMessage("Values can't be null for " + operator
-                      + " use IS NULL or IS NOT NULL instead.");
-                    return null;
-                  } else {
-                    rightCondition = new Value(fieldDefinition, convertedValue);
-                  }
-                } catch (final Throwable t) {
-                  setInvalidMessage(name + "='" + value + "' is not a valid "
-                    + fieldDefinition.getDataType().getValidationName());
-                }
-              } else {
-                Object id;
-
-                if (value instanceof String) {
-                  final String string = (String)value;
-                  final String[] values = string.split(":");
-                  id = codeTable.getIdentifier((Object[])values);
-                } else {
-                  id = codeTable.getIdentifier(value);
-                }
-                if (id == null) {
-                  setInvalidMessage(name + "='" + value + "' could not be found in the code table "
-                    + codeTable.getName());
-                } else {
-                  rightCondition = new Value(fieldDefinition, id);
-                }
-              }
-            }
-          }
-        }
-        if (expression instanceof BinaryArithmeticOperatorNode) {
-          final QueryValue arithmaticCondition = Q.arithmatic(leftCondition, operator,
-            rightCondition);
-          return (V)arithmaticCondition;
-        } else {
-          final Condition binaryCondition = Q.binary(leftCondition, operator, rightCondition);
-          return (V)binaryCondition;
-        }
-
-      } else {
-        setInvalidMessage("Unsupported binary operator " + operator);
-      }
-    } else if (expression instanceof ColumnReference) {
-      final ColumnReference column = (ColumnReference)expression;
-      String columnName = column.getColumnName();
-      columnName = columnName.replaceAll("\"", "");
-      final FieldDefinition fieldDefinition = this.recordDefinition.getField(columnName);
-      if (fieldDefinition == null) {
-        setInvalidMessage("Invalid field name " + columnName);
-      } else {
-        return (V)new Column(fieldDefinition);
-      }
-    } else if (expression instanceof LikeEscapeOperatorNode) {
-      final LikeEscapeOperatorNode likeEscapeOperatorNode = (LikeEscapeOperatorNode)expression;
-      final ValueNode leftValueNode = likeEscapeOperatorNode.getReceiver();
-      final ValueNode rightValueNode = likeEscapeOperatorNode.getLeftOperand();
-      final QueryValue leftCondition = toQueryValue(leftValueNode);
-      final QueryValue rightCondition = toQueryValue(rightValueNode);
-      return (V)new ILike(leftCondition, rightCondition);
-    } else if (expression instanceof NotNode) {
-      final NotNode notNode = (NotNode)expression;
-      final ValueNode operand = notNode.getOperand();
-      final Condition condition = toQueryValue(operand);
-      return (V)new Not(condition);
-    } else if (expression instanceof InListOperatorNode) {
-      final InListOperatorNode inListOperatorNode = (InListOperatorNode)expression;
-      final ValueNode leftOperand = inListOperatorNode.getLeftOperand();
-      final QueryValue leftCondition = toQueryValue(leftOperand);
-
-      final List<QueryValue> conditions = new ArrayList<>();
-      final RowConstructorNode itemsList = inListOperatorNode.getRightOperandList();
-      for (final ValueNode itemValueNode : itemsList.getNodeList()) {
-        final QueryValue itemCondition = toQueryValue(itemValueNode);
-        conditions.add(itemCondition);
-      }
-      return (V)new In(leftCondition, new CollectionValue(conditions));
-    } else if (expression instanceof IsNullNode) {
-      final IsNullNode isNullNode = (IsNullNode)expression;
-      final ValueNode operand = isNullNode.getOperand();
-      final QueryValue value = toQueryValue(operand);
-      if (isNullNode.getNodeType() == NodeTypes.IS_NOT_NULL_NODE) {
-        return (V)new IsNotNull(value);
-      } else {
-        return (V)new IsNull(value);
-      }
-      // } else if (expression instanceof Parenthesis) {
-      // final Parenthesis parenthesis = (Parenthesis)expression;
-      // final ValueNode parenthesisValueNode = parenthesis.getExpression();
-      // final Condition condition = toCondition(parenthesisExpression);
-      // final ParenthesisCondition parenthesisCondition = new
-      // ParenthesisCondition(
-      // condition);
-      // if (parenthesis.isNot()) {
-      // return (V)Q.not(parenthesisCondition);
-      // } else {
-      // return (V)parenthesisCondition;
-      // }
-    } else if (expression instanceof RowConstructorNode) {
-      final RowConstructorNode rowConstructorNode = (RowConstructorNode)expression;
-      final ValueNodeList values = rowConstructorNode.getNodeList();
-      final ValueNode valueNode = values.get(0);
-      return (V)toQueryValue(valueNode);
-    } else if (expression instanceof UserTypeConstantNode) {
-      final UserTypeConstantNode constant = (UserTypeConstantNode)expression;
-      final Object objectValue = constant.getObjectValue();
-      return (V)new Value(objectValue);
-    } else if (expression instanceof ConstantNode) {
-      final ConstantNode constant = (ConstantNode)expression;
-      final Object value = constant.getValue();
-      return (V)new Value(value);
-    } else if (expression instanceof SimpleStringOperatorNode) {
-      final SimpleStringOperatorNode operatorNode = (SimpleStringOperatorNode)expression;
-      final String functionName = operatorNode.getMethodName().toUpperCase();
-      final ValueNode operand = operatorNode.getOperand();
-      final QueryValue condition = toQueryValue(operand);
-      return (V)new Function(functionName, condition);
-    } else if (expression instanceof CastNode) {
-      final CastNode castNode = (CastNode)expression;
-      final String typeName = castNode.getType().getSQLstring();
-      final ValueNode operand = castNode.getCastOperand();
-      final QueryValue condition = toQueryValue(operand);
-      return (V)new Cast(condition, typeName);
-    } else if (expression == null) {
-      return null;
-    } else {
-      setInvalidMessage("Unsupported expression: " + expression.getClass() + " " + expression);
-    }
-    return null;
-  }
-
   protected void updateHasSearchText() {
     final boolean fieldValid = ((Field)this.searchField).isHasValidValue();
     setHasSearchText(fieldValid);
@@ -910,32 +657,11 @@ public class QueryWhereConditionField extends ValueField
     try {
       final String whereClause = this.whereTextField.getText();
       if (Property.hasValue(whereClause)) {
-        final String sql = "SELECT * FROM X WHERE " + "\n" + whereClause;
-        try {
-          final StatementNode statement = new SQLParser().parseStatement(sql);
-          if (statement instanceof CursorNode) {
-            final CursorNode selectStatement = (CursorNode)statement;
-            final ResultSetNode resultSetNode = selectStatement.getResultSetNode();
-            if (resultSetNode instanceof SelectNode) {
-              final SelectNode selectNode = (SelectNode)resultSetNode;
-              final ValueNode where = selectNode.getWhereClause();
-              final QueryValue queryValue = toQueryValue(where);
-              if (queryValue instanceof Condition) {
-                final Condition condition = (Condition)queryValue;
-                if (this.valid) {
-                  setFieldValue(condition);
-                  this.statusLabel.setForeground(WebColors.DarkGreen);
-                  this.statusLabel.setText("Valid");
-                }
-              }
-            }
-          }
-        } catch (final SQLParserException e) {
-          final int offset = e.getErrorPosition();
-          setInvalidMessage(offset - this.sqlPrefix.length(),
-            "Error parsing SQL: " + e.getMessage());
-        } catch (final StandardException e) {
-          Logs.error(this, "Error parsing SQL: " + whereClause, e);
+        final Condition condition = this.sqlParser.whereToCondition(whereClause);
+        if (this.valid) {
+          setFieldValue(condition);
+          this.statusLabel.setForeground(WebColors.DarkGreen);
+          this.statusLabel.setText("Valid");
         }
       } else {
         setFieldValue(Condition.ALL);

@@ -15,6 +15,10 @@ public class Or extends AbstractMultiCondition {
     super("OR", conditions);
   }
 
+  public Or(final QueryValue value1, final QueryValue value2) {
+    this(Arrays.asList((Condition)value1, (Condition)value2));
+  }
+
   @Override
   public Or clone() {
     return (Or)super.clone();

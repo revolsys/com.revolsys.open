@@ -74,7 +74,7 @@ public class Q {
     return binary(column, operator, queryValue);
   }
 
-  public static Condition binary(final QueryValue left, final String operator,
+  public static BinaryCondition binary(final QueryValue left, final String operator,
     final QueryValue right) {
     if ("=".equals(operator)) {
       return Q.equal(left, right);
@@ -101,7 +101,7 @@ public class Q {
 
   }
 
-  private static Divide divide(final QueryValue left, final QueryValue right) {
+  public static Divide divide(final QueryValue left, final QueryValue right) {
     return new Divide(left, right);
   }
 
