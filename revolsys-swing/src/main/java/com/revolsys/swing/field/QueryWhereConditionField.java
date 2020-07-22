@@ -43,6 +43,8 @@ import org.jeometry.common.logging.Logs;
 
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.parser.JSqlParser;
+import com.revolsys.record.query.parser.SqlParser;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Borders;

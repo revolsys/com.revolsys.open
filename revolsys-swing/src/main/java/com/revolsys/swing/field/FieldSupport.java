@@ -112,7 +112,7 @@ public class FieldSupport {
     return this.fieldValid;
   }
 
-  public void setEditable(final boolean editable) {
+  public void setFieldEditable(final boolean editable) {
     this.editable = editable;
   }
 

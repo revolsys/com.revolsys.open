@@ -233,7 +233,8 @@ public abstract class ArcGisResponse<V> extends AbstractWebService<V> implements
 
   protected void refreshDo() {
     final UrlResource serviceUrl = getServiceUrl();
-    final Resource resource;
+
+    Resource resource;
     if (isUseProxy()) {
       final String url = serviceUrl.getUriString() + "%3ff%3djson";
       final String username = serviceUrl.getUsername();

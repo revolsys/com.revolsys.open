@@ -1,13 +1,21 @@
 package com.revolsys.record.query.functions;
 
+import java.util.List;
+
 import com.revolsys.record.Record;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.util.Property;
 
 public class Lower extends UnaryFunction {
 
+  public static final String NAME = "LOWER";
+
+  public Lower(final List<QueryValue> parameters) {
+    super(NAME, parameters);
+  }
+
   public Lower(final QueryValue parameter) {
-    super("LOWER", parameter);
+    super(NAME, parameter);
   }
 
   @Override

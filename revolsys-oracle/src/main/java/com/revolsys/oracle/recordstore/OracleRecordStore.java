@@ -89,7 +89,8 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   }
 
   private void appendEnvelopeIntersects(final Query query, final StringBuilder sql,
-    final EnvelopeIntersects envelopeIntersects) {
+    final QueryValue queryValue) {
+    final EnvelopeIntersects envelopeIntersects = (EnvelopeIntersects)queryValue;
     final FieldDefinition geometryField = query.getGeometryField();
 
     if (geometryField instanceof OracleSdoGeometryJdbcFieldDefinition) {
@@ -98,14 +99,14 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       if (boundingBox1Value == null) {
         sql.append("NULL");
       } else {
-        boundingBox1Value.appendSql(query, this, sql);
+        appendQueryValue(query, sql, boundingBox1Value);
       }
       sql.append(",");
       final QueryValue boundingBox2Value = envelopeIntersects.getBoundingBox2Value();
       if (boundingBox2Value == null) {
         sql.append("NULL");
       } else {
-        boundingBox2Value.appendSql(query, this, sql);
+        appendQueryValue(query, sql, boundingBox2Value);
       }
       sql.append(",'mask=ANYINTERACT querytype=WINDOW') = 'TRUE'");
     } else if (geometryField instanceof ArcSdeStGeometryFieldDefinition) {
@@ -114,14 +115,14 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       if (boundingBox1Value == null) {
         sql.append("NULL");
       } else {
-        boundingBox1Value.appendSql(query, this, sql);
+        appendQueryValue(query, sql, boundingBox1Value);
       }
       sql.append(",");
       final QueryValue boundingBox2Value = envelopeIntersects.getBoundingBox2Value();
       if (boundingBox2Value == null) {
         sql.append("NULL");
       } else {
-        boundingBox2Value.appendSql(query, this, sql);
+        appendQueryValue(query, sql, boundingBox2Value);
       }
       sql.append(") = 1");
     } else {
@@ -131,7 +132,8 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   }
 
   private void appendGeometryEqual2d(final Query query, final StringBuilder sql,
-    final GeometryEqual2d equals) {
+    final QueryValue queryValue) {
+    final GeometryEqual2d equals = (GeometryEqual2d)queryValue;
     final FieldDefinition geometryField = query.getGeometryField();
 
     if (geometryField instanceof OracleSdoGeometryJdbcFieldDefinition) {
@@ -140,14 +142,14 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       if (geometry1Value == null) {
         sql.append("NULL");
       } else {
-        geometry1Value.appendSql(query, this, sql);
+        appendQueryValue(query, sql, geometry1Value);
       }
       sql.append(",");
       final QueryValue geometry2Value = equals.getGeometry2Value();
       if (geometry2Value == null) {
         sql.append("NULL");
       } else {
-        geometry2Value.appendSql(query, this, sql);
+        appendQueryValue(query, sql, geometry2Value);
       }
       sql.append(") = 'TRUE'");
     } else if (geometryField instanceof ArcSdeStGeometryFieldDefinition) {
@@ -156,14 +158,14 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       if (geometry1Value == null) {
         sql.append("NULL");
       } else {
-        geometry1Value.appendSql(query, this, sql);
+        appendQueryValue(query, sql, geometry1Value);
       }
       sql.append(",");
       final QueryValue geometry2Value = equals.getGeometry2Value();
       if (geometry2Value == null) {
         sql.append("NULL");
       } else {
-        geometry2Value.appendSql(query, this, sql);
+        appendQueryValue(query, sql, geometry2Value);
       }
       sql.append(") = 1");
     } else {
@@ -172,22 +174,9 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     }
   }
 
-  @Override
-  public void appendQueryValue(final Query query, final StringBuilder sql,
-    final QueryValue queryValue) {
-    if (queryValue instanceof GeometryEqual2d) {
-      appendGeometryEqual2d(query, sql, (GeometryEqual2d)queryValue);
-    } else if (queryValue instanceof EnvelopeIntersects) {
-      appendEnvelopeIntersects(query, sql, (EnvelopeIntersects)queryValue);
-    } else if (queryValue instanceof WithinDistance) {
-      appendWithinDistance(query, sql, (WithinDistance)queryValue);
-    } else {
-      super.appendQueryValue(query, sql, queryValue);
-    }
-  }
-
   private void appendWithinDistance(final Query query, final StringBuilder sql,
-    final WithinDistance withinDistance) {
+    final QueryValue queryValue) {
+    final WithinDistance withinDistance = (WithinDistance)queryValue;
     final FieldDefinition geometryField = query.getGeometryField();
     if (geometryField instanceof OracleSdoGeometryJdbcFieldDefinition) {
       sql.append("MDSYS.SDO_WITHIN_DISTANCE(");
@@ -195,21 +184,21 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       if (geometry1Value == null) {
         sql.append("NULL");
       } else {
-        geometry1Value.appendSql(query, this, sql);
+        appendQueryValue(query, sql, geometry1Value);
       }
       sql.append(", ");
       final QueryValue geometry2Value = withinDistance.getGeometry2Value();
       if (geometry2Value == null) {
         sql.append("NULL");
       } else {
-        geometry2Value.appendSql(query, this, sql);
+        appendQueryValue(query, sql, geometry2Value);
       }
       sql.append(",'distance = ' || ");
       final QueryValue distanceValue = withinDistance.getDistanceValue();
       if (distanceValue == null) {
         sql.append("0");
       } else {
-        distanceValue.appendSql(query, this, sql);
+        appendQueryValue(query, sql, distanceValue);
       }
       sql.append(") = 'TRUE'");
     } else if (geometryField instanceof ArcSdeStGeometryFieldDefinition) {
@@ -230,7 +219,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       boundingBox.expandDelta(distance.doubleValue());
       boundingBox.setGeometryFactory(geometryFactory);
       sql.append("(SDE.ST_ENVINTERSECTS(");
-      column.appendSql(query, this, sql);
+      appendQueryValue(query, sql, column);
       sql.append(",");
       sql.append(boundingBox.getMinX());
       sql.append(",");
@@ -240,11 +229,11 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       sql.append(",");
       sql.append(boundingBox.getMaxY());
       sql.append(") = 1 AND SDE.ST_DISTANCE(");
-      column.appendSql(query, this, sql);
+      appendQueryValue(query, sql, column);
       sql.append(", ");
-      geometry2Value.appendSql(query, this, sql);
+      appendQueryValue(query, sql, geometry2Value);
       sql.append(") <= ");
-      distanceValue.appendSql(query, this, sql);
+      appendQueryValue(query, sql, distanceValue);
       sql.append(")");
     } else {
       throw new IllegalArgumentException(
@@ -381,9 +370,10 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
 
   private void initSettings() {
     setExcludeTablePatterns(".*\\$.*");
-    // setSqlPrefix("BEGIN ");
-    // setSqlSuffix(";END;");
     setIteratorFactory(new RecordStoreIteratorFactory(this::newOracleIterator));
+    addSqlQueryAppender(GeometryEqual2d.class, this::appendGeometryEqual2d);
+    addSqlQueryAppender(EnvelopeIntersects.class, this::appendEnvelopeIntersects);
+    addSqlQueryAppender(WithinDistance.class, this::appendWithinDistance);
   }
 
   @Override

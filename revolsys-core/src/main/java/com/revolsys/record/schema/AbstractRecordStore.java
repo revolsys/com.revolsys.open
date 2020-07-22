@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.jeometry.common.function.Consumer3;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
@@ -26,6 +27,8 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.record.io.RecordStoreExtension;
 import com.revolsys.record.property.RecordDefinitionProperty;
+import com.revolsys.record.query.Query;
+import com.revolsys.record.query.QueryValue;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 import com.revolsys.util.count.CategoryLabelCountMap;
@@ -42,6 +45,8 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   private Map<String, Object> connectionProperties = new HashMap<>();
 
   private RecordStoreConnection recordStoreConnection;
+
+  private final Map<Class<?>, Consumer3<Query, StringBuilder, QueryValue>> sqlQueryAppenderByClass = new HashMap<>();
 
   private GeometryFactory geometryFactory;
 
@@ -138,6 +143,24 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
       } catch (final Throwable e) {
         Logs.error(extension.getClass(), "Unable to initialize", e);
       }
+    }
+  }
+
+  protected void addSqlQueryAppender(final Class<?> clazz,
+    final Consumer3<Query, StringBuilder, QueryValue> appender) {
+    this.sqlQueryAppenderByClass.put(clazz, appender);
+  }
+
+  @Override
+  public void appendQueryValue(final Query query, final StringBuilder sql,
+    final QueryValue queryValue) {
+    final Class<?> valueClass = queryValue.getClass();
+    final Consumer3<Query, StringBuilder, QueryValue> appender = this.sqlQueryAppenderByClass
+      .get(valueClass);
+    if (appender == null) {
+      queryValue.appendDefaultSql(query, this, sql);
+    } else {
+      appender.accept(query, sql, queryValue);
     }
   }
 

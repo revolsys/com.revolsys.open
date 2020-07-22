@@ -13,8 +13,8 @@ public class F {
   public static WithinDistance dWithin(final FieldDefinition fieldDefinition,
     final Geometry geometry, final double distance) {
     final Column column = new Column(fieldDefinition);
-    final Value geometryValue = new Value(fieldDefinition, geometry);
-    final Value distanceValue = new Value(distance);
+    final Value geometryValue = Value.newValue(fieldDefinition, geometry);
+    final Value distanceValue = Value.newValue(distance);
     return new WithinDistance(column, geometryValue, distanceValue);
   }
 
@@ -24,8 +24,8 @@ public class F {
       distance = 0;
     }
     final Column column = new Column(name);
-    final Value geometryValue = new Value(geometry);
-    final Value distanceValue = new Value(distance);
+    final Value geometryValue = Value.newValue(geometry);
+    final Value distanceValue = Value.newValue(distance);
     return new WithinDistance(column, geometryValue, distanceValue);
   }
 
@@ -35,7 +35,7 @@ public class F {
       return null;
     } else {
       final Column column = new Column(attribute);
-      final Value value = new Value(attribute, boundingBox);
+      final Value value = Value.newValue(attribute, boundingBox);
       return new EnvelopeIntersects(column, value);
     }
   }
@@ -43,7 +43,7 @@ public class F {
   public static EnvelopeIntersects envelopeIntersects(final FieldDefinition attribute,
     final Geometry geometry) {
     return new EnvelopeIntersects(new Column(attribute),
-      new Value(attribute, geometry.getBoundingBox()));
+      Value.newValue(attribute, geometry.getBoundingBox()));
   }
 
   public static EnvelopeIntersects envelopeIntersects(final RecordDefinition recordDefinition,
@@ -54,11 +54,10 @@ public class F {
 
   public static EnvelopeIntersects envelopeIntersects(final String name,
     final BoundingBoxProxy boundingBox) {
-    return new EnvelopeIntersects(new Column(name), new Value(boundingBox.getBoundingBox()));
+    return new EnvelopeIntersects(new Column(name), Value.newValue(boundingBox.getBoundingBox()));
   }
 
   public static Lower lower(final QueryValue value) {
-
     return new Lower(value);
   }
 

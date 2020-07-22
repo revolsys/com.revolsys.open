@@ -403,6 +403,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       if (recordStore != null) {
         try (
           Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW)) {
+          transaction.setRollbackOnly();
           return recordStore.getRecordCount(query);
         }
       }

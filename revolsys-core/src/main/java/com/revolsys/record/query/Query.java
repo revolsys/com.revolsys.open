@@ -80,7 +80,7 @@ public class Query extends BaseObjectWithProperties
   public static Query equal(final FieldDefinition field, final Object value) {
     final RecordDefinition recordDefinition = field.getRecordDefinition();
     final Query query = new Query(recordDefinition);
-    final Value valueCondition = new Value(field, value);
+    final Value valueCondition = Value.newValue(field, value);
     final BinaryCondition equal = Q.equal(field, valueCondition);
     query.setWhereCondition(equal);
     return query;
@@ -93,7 +93,7 @@ public class Query extends BaseObjectWithProperties
       return null;
     } else {
       final Query query = new Query(recordDefinition);
-      final Value valueCondition = new Value(fieldDefinition, value);
+      final Value valueCondition = Value.newValue(fieldDefinition, value);
       final BinaryCondition equal = Q.equal(name, valueCondition);
       query.setWhereCondition(equal);
       return query;
@@ -145,7 +145,7 @@ public class Query extends BaseObjectWithProperties
     final FieldDefinition field, final Object value) {
     final RecordDefinition recordDefinition = field.getRecordDefinition();
     final Query query = new Query(recordDefinition);
-    final Value valueCondition = new Value(field, value);
+    final Value valueCondition = Value.newValue(field, value);
     final BinaryCondition equal = whereFunction.apply(field, valueCondition);
     query.setWhereCondition(equal);
     return query;

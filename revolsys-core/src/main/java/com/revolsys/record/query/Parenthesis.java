@@ -1,11 +1,20 @@
 package com.revolsys.record.query;
 
 import com.revolsys.record.Record;
+import com.revolsys.record.schema.RecordStore;
 
 public class Parenthesis extends AbstractUnaryQueryValue implements Condition {
 
   public Parenthesis(final QueryValue value) {
     super(value);
+  }
+
+  @Override
+  public void appendDefaultSql(final Query query, final RecordStore recordStore,
+    final StringBuilder buffer) {
+    buffer.append("(");
+    super.appendDefaultSql(query, recordStore, buffer);
+    buffer.append(")");
   }
 
   @Override

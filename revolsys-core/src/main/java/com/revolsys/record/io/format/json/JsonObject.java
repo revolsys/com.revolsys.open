@@ -72,4 +72,29 @@ public interface JsonObject extends MapEx, JsonType {
 
   @Override
   JsonObject clone();
+
+  default Object getByPath(final String[] names) {
+    return getByPath(names, 0);
+  }
+
+  default Object getByPath(final String[] names, final int offset) {
+    if (offset == names.length) {
+      return this;
+    } else if (offset < names.length) {
+      final String name = names[offset];
+      Object value;
+      if ("$".equals(name)) {
+        value = this;
+      } else {
+        value = getValue(name);
+      }
+      if (offset + 1 == names.length) {
+        return value;
+      } else if (value instanceof JsonObject) {
+        final JsonObject object = (JsonObject)value;
+        return object.getByPath(names, offset + 1);
+      }
+    }
+    return null;
+  }
 }

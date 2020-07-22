@@ -40,6 +40,7 @@ import com.revolsys.record.property.ShortNameProperty;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.functions.EnvelopeIntersects;
+import com.revolsys.record.query.functions.JsonValue;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
@@ -110,27 +111,39 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     return field;
   }
 
-  @Override
-  public void appendQueryValue(final Query query, final StringBuilder sql,
+  private void appendEnvelopeIntersects(final Query query, final StringBuilder sql,
     final QueryValue queryValue) {
-    if (queryValue instanceof EnvelopeIntersects) {
-      final EnvelopeIntersects envelopeIntersects = (EnvelopeIntersects)queryValue;
-      final QueryValue boundingBox1Value = envelopeIntersects.getBoundingBox1Value();
-      if (boundingBox1Value == null) {
-        sql.append("NULL");
-      } else {
-        boundingBox1Value.appendSql(query, this, sql);
-      }
-      sql.append(" && ");
-      final QueryValue boundingBox2Value = envelopeIntersects.getBoundingBox2Value();
-      if (boundingBox2Value == null) {
-        sql.append("NULL");
-      } else {
-        boundingBox2Value.appendSql(query, this, sql);
-      }
+    final EnvelopeIntersects envelopeIntersects = (EnvelopeIntersects)queryValue;
+    final QueryValue boundingBox1Value = envelopeIntersects.getBoundingBox1Value();
+    if (boundingBox1Value == null) {
+      sql.append("NULL");
     } else {
-      super.appendQueryValue(query, sql, queryValue);
+      appendQueryValue(query, sql, boundingBox1Value);
     }
+    sql.append(" && ");
+    final QueryValue boundingBox2Value = envelopeIntersects.getBoundingBox2Value();
+    if (boundingBox2Value == null) {
+      sql.append("NULL");
+    } else {
+      appendQueryValue(query, sql, boundingBox2Value);
+    }
+  }
+
+  private void appendJsonValue(final Query query, final StringBuilder sql,
+    final QueryValue queryValue) {
+    final JsonValue jsonValue = (JsonValue)queryValue;
+    final QueryValue jsonParameter = jsonValue.getParameter(0);
+    sql.append('(');
+    jsonParameter.appendSql(query, this, sql);
+
+    final String[] path = jsonValue.getPath().split("\\.");
+    for (int i = 1; i < path.length; i++) {
+      final String propertyName = path[i];
+      sql.append(" -> '");
+      sql.append(propertyName);
+      sql.append("'");
+    }
+    sql.append(")::text");
   }
 
   @Override
@@ -273,6 +286,8 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
       new RecordStoreIteratorFactory(PostgreSQLRecordStore::newPostgreSQLIterator));
     setExcludeTablePaths("/PUBLIC/GEOMETRY_COLUMNS", "/PUBLIC/GEOGRAPHY_COLUMNS",
       "/PUBLIC/PG_BUFFER_CACHE", "/PUBLIC/PG_STAT_STATEMENTS", "/PUBLIC/SPATIAL_REF_SYS");
+    addSqlQueryAppender(EnvelopeIntersects.class, this::appendEnvelopeIntersects);
+    addSqlQueryAppender(JsonValue.class, this::appendJsonValue);
   }
 
   @Override

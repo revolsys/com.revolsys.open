@@ -1,4 +1,4 @@
-package com.revolsys.swing.field;
+package com.revolsys.record.query.parser;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.Add;
 import com.revolsys.record.query.And;
 import com.revolsys.record.query.Cast;
@@ -34,7 +35,6 @@ import com.revolsys.record.query.Value;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 
-import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.CastExpression;
 import net.sf.jsqlparser.expression.DateValue;
@@ -75,16 +75,12 @@ import net.sf.jsqlparser.util.cnfexpression.MultiAndExpression;
 import net.sf.jsqlparser.util.cnfexpression.MultiOrExpression;
 import net.sf.jsqlparser.util.cnfexpression.MultipleExpression;
 
-public class JSqlParser implements SqlParser {
+public class JSqlParser extends AbstractSqlParser {
 
   private final Map<Class<? extends Expression>, Function<Expression, QueryValue>> converters = new HashMap<>();
 
-  private final RecordDefinition recordDefinition;
-
-  private final String sqlPrefix;
-
   public JSqlParser(final RecordDefinition recordDefinition) {
-    this.recordDefinition = recordDefinition;
+    super(recordDefinition);
 
     this.converters.put(Parenthesis.class, this::convertParenthesis);
 
@@ -126,8 +122,7 @@ public class JSqlParser implements SqlParser {
     this.converters.put(IsNullExpression.class, this::convertIsNullExpression);
     this.converters.put(NotExpression.class, this::convertNotExpression);
 
-    this.sqlPrefix = "SELECT * FROM "
-      + this.recordDefinition.getPath().substring(1).replace('/', '.') + " WHERE";
+    this.converters.put(net.sf.jsqlparser.expression.Function.class, this::convertFunction);
 
   }
 
@@ -147,7 +142,7 @@ public class JSqlParser implements SqlParser {
   // <li>ExistsExpression</li>
   // <li>ExtractExpression</li>
   // <li>FullTextSearch</li>
-  // <li>Function</li>
+  // <li>SimpleFunction</li>
   // <li>HexValue</li>
   // <li>IntegerDivision</li>
   // <li>IntervalExpression</li>
@@ -199,8 +194,11 @@ public class JSqlParser implements SqlParser {
     final BiFunction<QueryValue, QueryValue, QueryValue> constructor) {
     return (final Expression expression) -> {
       final BinaryExpression binaryExpression = (BinaryExpression)expression;
-      final QueryValue leftValue = convertLeftExpression(binaryExpression);
-      final QueryValue rightValue = convertRightExpression(binaryExpression);
+      QueryValue leftValue = convertLeftExpression(binaryExpression);
+      QueryValue rightValue = convertRightExpression(binaryExpression);
+      rightValue = setFieldDefinition(leftValue, rightValue);
+      leftValue = setFieldDefinition(rightValue, leftValue);
+
       return constructor.apply(leftValue, rightValue);
     };
   }
@@ -216,14 +214,14 @@ public class JSqlParser implements SqlParser {
 
   private Column convertColumn(final Expression expression) {
     final net.sf.jsqlparser.schema.Column column = (net.sf.jsqlparser.schema.Column)expression;
-    String columnName = column.getFullyQualifiedName();
+    String columnName = column.getColumnName();
     columnName = columnName.replaceAll("\"", "");
     final FieldDefinition fieldDefinition = this.recordDefinition.getField(columnName);
     if (fieldDefinition == null) {
       throw new IllegalArgumentException("Invalid field name " + columnName);
-    } else {
-      return new Column(fieldDefinition);
     }
+
+    return new Column(fieldDefinition);
   }
 
   @SuppressWarnings("unchecked")
@@ -242,6 +240,20 @@ public class JSqlParser implements SqlParser {
       } while (clazz != Object.class);
       throw new IllegalArgumentException("No converter for: " + expression);
     }
+  }
+
+  private QueryValue convertFunction(final Expression expression) {
+    final net.sf.jsqlparser.expression.Function function = (net.sf.jsqlparser.expression.Function)expression;
+    final String name = function.getName();
+    final ExpressionList expressions = function.getParameters();
+    final List<QueryValue> parameters = new ArrayList<>();
+    if (expressions != null) {
+      for (final Expression parameter : expressions.getExpressions()) {
+        final QueryValue parameterVaue = convertExpression(parameter);
+        parameters.add(parameterVaue);
+      }
+    }
+    return newFunction(name, parameters);
   }
 
   private Condition convertInExpression(final Expression expression) {
@@ -324,7 +336,7 @@ public class JSqlParser implements SqlParser {
     return (final Expression expression) -> {
       final V expressionValue = (V)expression;
       final Object value = converter.apply(expressionValue);
-      return new Value(value);
+      return Value.newValue(value);
     };
   }
 
@@ -333,9 +345,44 @@ public class JSqlParser implements SqlParser {
     return this.sqlPrefix;
   }
 
+  private QueryValue setFieldDefinition(final QueryValue value1, final QueryValue value2) {
+    if (this.recordDefinition != null) {
+      if (value1 instanceof Column) {
+        if (value2 instanceof Value) {
+          final Column column = (Column)value1;
+
+          final String name = column.getName();
+          final Object value = ((Value)value2).getValue();
+          final FieldDefinition fieldDefinition = this.recordDefinition.getField(name);
+          final CodeTable codeTable = this.recordDefinition.getCodeTableByFieldName(name);
+          if (codeTable == null || fieldDefinition == this.recordDefinition.getIdField()) {
+            final Object convertedValue = fieldDefinition.toFieldValueException(value);
+            return Value.newValue(fieldDefinition, convertedValue);
+          } else {
+            Object id;
+            if (value instanceof String) {
+              final String string = (String)value;
+              final String[] values = string.split(":");
+              id = codeTable.getIdentifier((Object[])values);
+            } else {
+              id = codeTable.getIdentifier(value);
+            }
+            if (id == null) {
+              throw new IllegalArgumentException(name + "='" + value
+                + "' could not be found in the code table " + codeTable.getName());
+            } else {
+              return Value.newValue(fieldDefinition, id);
+            }
+          }
+        }
+      }
+    }
+    return value2;
+  }
+
   @Override
   public Condition whereToCondition(final String whereClause) {
-    final String sql = "SELECT * FROM X WHERE (" + "\n" + whereClause + "\n)";
+    final String sql = this.sqlPrefix + " (" + "\n" + whereClause + "\n)";
     try {
       final Statement statement = CCJSqlParserUtil.parse(sql);
       if (statement instanceof Select) {
@@ -353,7 +400,7 @@ public class JSqlParser implements SqlParser {
         }
       }
 
-    } catch (final JSQLParserException e) {
+    } catch (final Exception e) {
       throw new IllegalArgumentException("Error parsing SQL", e);
     }
     return null;

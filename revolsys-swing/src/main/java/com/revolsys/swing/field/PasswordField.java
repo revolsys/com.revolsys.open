@@ -125,12 +125,13 @@ public class PasswordField extends JPasswordField implements Field, FocusListene
   }
 
   @Override
-  public void setEditable(final boolean editable) {
+  public PasswordField setFieldEditable(final boolean editable) {
     final boolean oldEditable = isEditable();
     if (editable != oldEditable) {
       super.setEditable(editable);
       setForeground(getForeground());
     }
+    return this;
   }
 
   @Override

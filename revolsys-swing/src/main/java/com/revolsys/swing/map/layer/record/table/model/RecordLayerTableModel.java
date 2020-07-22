@@ -98,6 +98,8 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   private Condition filter = Condition.ALL;
 
+  private String filterError;
+
   private boolean filterByBoundingBox;
 
   private final LinkedList<Condition> filterHistory = new LinkedList<>();
@@ -227,6 +229,10 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   public Condition getFilter() {
     return this.filter;
+  }
+
+  public String getFilterError() {
+    return this.filterError;
   }
 
   public LinkedList<Condition> getFilterHistory() {
@@ -477,6 +483,8 @@ public class RecordLayerTableModel extends RecordRowTableModel
         filter = Condition.ALL;
       }
       if (!DataType.equal(filter, this.filter)) {
+        final String oldFilterError = this.filterError;
+        this.filterError = null;
         final Object oldValue = this.filter;
         this.filter = filter;
         updateFilterQuery();
@@ -507,6 +515,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
         firePropertyChange("filter", oldValue, this.filter);
         final boolean hasFilter = isHasFilter();
         firePropertyChange("hasFilter", !hasFilter, hasFilter);
+        firePropertyChange("filterError", oldFilterError, this.filterError);
       }
     }
   }
@@ -522,6 +531,12 @@ public class RecordLayerTableModel extends RecordRowTableModel
       refresh();
     }
     firePropertyChange("geometryFilterMode", oldValue, geometryFilterMode);
+  }
+
+  public void setFilterError(final String filterError) {
+    final String oldValue = this.filterError;
+    this.filterError = filterError;
+    firePropertyChange("filterError", oldValue, filterError);
   }
 
   public String setGeometryFilterMode(final String mode) {

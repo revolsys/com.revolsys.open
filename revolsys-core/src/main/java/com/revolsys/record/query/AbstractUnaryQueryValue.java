@@ -14,6 +14,9 @@ public abstract class AbstractUnaryQueryValue implements QueryValue {
 
   private QueryValue value;
 
+  public AbstractUnaryQueryValue() {
+  }
+
   public AbstractUnaryQueryValue(final QueryValue value) {
     this.value = value;
   }
@@ -32,14 +35,14 @@ public abstract class AbstractUnaryQueryValue implements QueryValue {
     return index;
   }
 
-  protected void appendValue(final StringBuilder buffer, final Query query,
+  protected void appendValue(final StringBuilder sql, final Query query,
     final RecordStore recordStore) {
     if (this.value == null) {
-      buffer.append("NULL");
+      sql.append("NULL");
     } else {
-      this.value.appendSql(query, recordStore, buffer);
+      this.value.appendSql(query, recordStore, sql);
     }
-    buffer.append(" ");
+    sql.append(" ");
   }
 
   @Override
@@ -82,6 +85,10 @@ public abstract class AbstractUnaryQueryValue implements QueryValue {
   @Override
   public <V> V getValue(final Record record) {
     return this.value.getValue(record);
+  }
+
+  protected void setValue(final QueryValue value) {
+    this.value = value;
   }
 
   @Override

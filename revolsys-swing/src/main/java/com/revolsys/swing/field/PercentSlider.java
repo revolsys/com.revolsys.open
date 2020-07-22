@@ -105,8 +105,9 @@ public class PercentSlider extends JSlider implements Field, FocusListener, Chan
   }
 
   @Override
-  public void setEditable(final boolean editable) {
+  public PercentSlider setFieldEditable(final boolean editable) {
     setEnabled(editable);
+    return this;
   }
 
   @Override

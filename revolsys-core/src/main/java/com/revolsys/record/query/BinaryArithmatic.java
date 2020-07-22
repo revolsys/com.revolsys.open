@@ -15,7 +15,7 @@ public abstract class BinaryArithmatic extends AbstractBinaryQueryValue {
   }
 
   public BinaryArithmatic(final String name, final String operator, final Object value) {
-    this(new Column(name), operator, new Value(value));
+    this(new Column(name), operator, Value.newValue(value));
   }
 
   @Override

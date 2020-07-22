@@ -27,11 +27,11 @@ public class Column implements QueryValue {
 
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
-    final StringBuilder buffer) {
+    final StringBuilder sql) {
     if (this.fieldDefinition == null) {
-      buffer.append(toString());
+      sql.append(toString());
     } else {
-      this.fieldDefinition.appendColumnName(buffer, null);
+      this.fieldDefinition.appendColumnName(sql, null);
     }
   }
 
@@ -90,7 +90,8 @@ public class Column implements QueryValue {
 
   @Override
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
-    this.fieldDefinition = recordDefinition.getField(getName());
+    final String getName = getName();
+    this.fieldDefinition = recordDefinition.getField(getName);
   }
 
   @Override

@@ -4,8 +4,6 @@ import java.awt.Component;
 
 import javax.swing.JPanel;
 
-import org.jeometry.common.awt.WebColors;
-
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.field.Field;
@@ -77,7 +75,7 @@ public class SetRecordsFieldValue extends AbstractUpdateField {
     try {
       fieldDefinition.validate(value);
     } catch (final IllegalArgumentException e) {
-      field.setFieldInvalid(e.getMessage(), WebColors.Red, WebColors.Pink);
+      field.setFieldInvalid(e.getMessage());
       valid = false;
     }
     setFormValid(valid);

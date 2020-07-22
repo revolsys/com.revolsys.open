@@ -37,9 +37,13 @@ public class In extends AbstractBinaryQueryValue implements Condition {
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
     final StringBuilder buffer) {
-    super.appendLeft(buffer, query, recordStore);
-    buffer.append("IN");
-    super.appendRight(buffer, query, recordStore);
+    if (isEmpty()) {
+      buffer.append("1==0");
+    } else {
+      super.appendLeft(buffer, query, recordStore);
+      buffer.append(" IN ");
+      super.appendRight(buffer, query, recordStore);
+    }
   }
 
   @Override

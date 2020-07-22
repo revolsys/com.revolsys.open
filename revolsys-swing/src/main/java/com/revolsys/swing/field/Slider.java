@@ -97,8 +97,9 @@ public class Slider extends JSlider implements Field, FocusListener, ChangeListe
   }
 
   @Override
-  public void setEditable(final boolean editable) {
+  public Slider setFieldEditable(final boolean editable) {
     setEnabled(editable);
+    return this;
   }
 
   @Override

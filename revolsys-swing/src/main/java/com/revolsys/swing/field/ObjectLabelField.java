@@ -54,7 +54,8 @@ public class ObjectLabelField extends TextField {
   }
 
   @Override
-  public void setEditable(final boolean editable) {
+  public ObjectLabelField setFieldEditable(final boolean editable) {
+    return this;
   }
 
   @Override

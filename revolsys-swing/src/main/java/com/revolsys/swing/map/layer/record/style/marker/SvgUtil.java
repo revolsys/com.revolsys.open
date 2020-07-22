@@ -37,7 +37,7 @@ public class SvgUtil {
         return documentFactory.createDocument(SVGConstants.SVG_NAMESPACE_URI,
           SVGConstants.SVG_SVG_TAG, uri);
       } catch (final Throwable e) {
-        Logs.debug(SvgUtil.class, PARSER_CLASS_NAME, e);
+        Logs.errorOnce(SvgUtil.class, PARSER_CLASS_NAME, e);
       }
     }
     return null;

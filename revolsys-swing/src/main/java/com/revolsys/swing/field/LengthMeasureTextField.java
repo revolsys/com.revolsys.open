@@ -122,9 +122,10 @@ public class LengthMeasureTextField extends ValueField implements ItemListener {
   }
 
   @Override
-  public void setEditable(final boolean enabled) {
+  public LengthMeasureTextField setFieldEditable(final boolean enabled) {
     this.valueField.setEditable(enabled);
     this.unitField.setEditable(enabled);
+    return this;
   }
 
   @Override

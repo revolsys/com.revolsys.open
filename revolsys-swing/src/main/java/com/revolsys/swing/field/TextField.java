@@ -123,12 +123,13 @@ public class TextField extends JTextField implements Field, FocusListener {
   }
 
   @Override
-  public void setEditable(final boolean editable) {
+  public TextField setFieldEditable(final boolean editable) {
     final boolean oldEditable = isEditable();
     if (editable != oldEditable) {
       super.setEditable(editable);
       setForeground(getForeground());
     }
+    return this;
   }
 
   @Override

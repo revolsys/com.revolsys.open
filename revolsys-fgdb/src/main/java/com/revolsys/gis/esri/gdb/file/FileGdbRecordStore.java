@@ -50,21 +50,17 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.EsriGdbXmlSerializer;
 import com.revolsys.record.io.format.esri.gdb.xml.model.EsriXmlRecordDefinitionUtil;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
 import com.revolsys.record.io.format.esri.gdb.xml.model.SpatialReference;
-import com.revolsys.record.query.AbstractMultiCondition;
 import com.revolsys.record.query.BinaryCondition;
 import com.revolsys.record.query.CollectionValue;
-import com.revolsys.record.query.Column;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.ILike;
-import com.revolsys.record.query.In;
-import com.revolsys.record.query.LeftUnaryCondition;
 import com.revolsys.record.query.Like;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
-import com.revolsys.record.query.RightUnaryCondition;
 import com.revolsys.record.query.SqlCondition;
 import com.revolsys.record.query.Value;
 import com.revolsys.record.query.functions.EnvelopeIntersects;
+import com.revolsys.record.query.functions.JsonValue;
 import com.revolsys.record.query.functions.WithinDistance;
 import com.revolsys.record.schema.AbstractRecordStore;
 import com.revolsys.record.schema.FieldDefinition;
@@ -133,6 +129,14 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     setConnectionProperties(Collections.singletonMap("url", FileUtil.toUrl(file).toString()));
     setCreateMissingRecordStore(true);
     setCreateMissingTables(true);
+    addSqlQueryAppender(EnvelopeIntersects.class, this::appendFakeTrue);
+    addSqlQueryAppender(JsonValue.class, this::appendFakeTrue);
+    addSqlQueryAppender(WithinDistance.class, this::appendFakeTrue);
+    addSqlQueryAppender(Like.class, this::appendLike);
+    addSqlQueryAppender(ILike.class, this::appendLike);
+    addSqlQueryAppender(SqlCondition.class, this::appendSqlCondition);
+    addSqlQueryAppender(Value.class, this::appendValue);
+    addSqlQueryAppender(CollectionValue.class, this::appendCollectionValue);
   }
 
   @Override
@@ -153,140 +157,88 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     this.geodatabase.alterDomain(domain);
   }
 
-  @Override
-  public void appendQueryValue(final Query query, final StringBuilder buffer,
+  private void appendCollectionValue(final Query query, final StringBuilder sql,
     final QueryValue condition) {
-    if (condition instanceof Like || condition instanceof ILike) {
-      final BinaryCondition like = (BinaryCondition)condition;
-      final QueryValue left = like.getLeft();
-      final QueryValue right = like.getRight();
-      buffer.append("UPPER(CAST(");
-      appendQueryValue(query, buffer, left);
-      buffer.append(" AS VARCHAR(4000))) LIKE ");
-      if (right instanceof Value) {
-        final Value valueCondition = (Value)right;
-        final Object value = valueCondition.getValue();
-        buffer.append("'");
-        if (value != null) {
-          final String string = DataTypes.toString(value);
-          buffer.append(string.toUpperCase().replaceAll("'", "''"));
-        }
-        buffer.append("'");
+    final CollectionValue collectionValue = (CollectionValue)condition;
+    final List<Object> values = collectionValue.getValues();
+    boolean first = true;
+    for (final Object value : values) {
+      if (first) {
+        first = false;
       } else {
-        appendQueryValue(query, buffer, right);
+        sql.append(", ");
       }
-    } else if (condition instanceof LeftUnaryCondition) {
-      final LeftUnaryCondition unaryCondition = (LeftUnaryCondition)condition;
-      final String operator = unaryCondition.getOperator();
-      final QueryValue right = unaryCondition.getValue();
-      buffer.append(operator);
-      buffer.append(" ");
-      appendQueryValue(query, buffer, right);
-    } else if (condition instanceof RightUnaryCondition) {
-      final RightUnaryCondition unaryCondition = (RightUnaryCondition)condition;
-      final QueryValue left = unaryCondition.getValue();
-      final String operator = unaryCondition.getOperator();
-      appendQueryValue(query, buffer, left);
-      buffer.append(" ");
-      buffer.append(operator);
-    } else if (condition instanceof BinaryCondition) {
-      final BinaryCondition binaryCondition = (BinaryCondition)condition;
-      final QueryValue left = binaryCondition.getLeft();
-      final String operator = binaryCondition.getOperator();
-      final QueryValue right = binaryCondition.getRight();
-      appendQueryValue(query, buffer, left);
-      buffer.append(" ");
-      buffer.append(operator);
-      buffer.append(" ");
-      appendQueryValue(query, buffer, right);
-    } else if (condition instanceof AbstractMultiCondition) {
-      final AbstractMultiCondition multipleCondition = (AbstractMultiCondition)condition;
-      buffer.append("(");
-      boolean first = true;
-      final String operator = multipleCondition.getOperator();
-      for (final QueryValue subCondition : multipleCondition.getQueryValues()) {
-        if (first) {
-          first = false;
-        } else {
-          buffer.append(" ");
-          buffer.append(operator);
-          buffer.append(" ");
-        }
-        appendQueryValue(query, buffer, subCondition);
-      }
-      buffer.append(")");
-    } else if (condition instanceof In) {
-      final In in = (In)condition;
-      if (in.isEmpty()) {
-        buffer.append("1==0");
-      } else {
-        final QueryValue left = in.getLeft();
-        appendQueryValue(query, buffer, left);
-        buffer.append(" IN (");
-        appendQueryValue(query, buffer, in.getValues());
-        buffer.append(")");
-      }
-    } else if (condition instanceof Value) {
-      final Value valueCondition = (Value)condition;
-      Object value = valueCondition.getValue();
-      if (value instanceof Identifier) {
-        final Identifier identifier = (Identifier)value;
-        value = identifier.getValue(0);
-      }
-      appendValue(buffer, value);
-    } else if (condition instanceof CollectionValue) {
-      final CollectionValue collectionValue = (CollectionValue)condition;
-      final List<Object> values = collectionValue.getValues();
-      boolean first = true;
-      for (final Object value : values) {
-        if (first) {
-          first = false;
-        } else {
-          buffer.append(", ");
-        }
-        appendValue(buffer, value);
-      }
-    } else if (condition instanceof Column) {
-      final Column column = (Column)condition;
-      final Object name = column.getName();
-      buffer.append(name);
-    } else if (condition instanceof SqlCondition) {
-      final SqlCondition sqlCondition = (SqlCondition)condition;
-      final String where = sqlCondition.getSql();
-      final List<Object> parameters = sqlCondition.getParameterValues();
-      if (parameters.isEmpty()) {
-        if (where.indexOf('?') > -1) {
-          throw new IllegalArgumentException(
-            "No arguments specified for a where clause with placeholders: " + where);
-        } else {
-          buffer.append(where);
-        }
-      } else {
-        final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
-        int i = 0;
-        while (matcher.find()) {
-          if (i >= parameters.size()) {
-            throw new IllegalArgumentException(
-              "Not enough arguments for where clause with placeholders: " + where);
-          }
-          final Object argument = parameters.get(i);
-          final StringBuffer replacement = new StringBuffer();
-          matcher.appendReplacement(replacement, DataTypes.toString(argument));
-          buffer.append(replacement);
-          appendValue(buffer, argument);
-          i++;
-        }
-        final StringBuffer tail = new StringBuffer();
-        matcher.appendTail(tail);
-        buffer.append(tail);
-      }
-    } else if (condition instanceof EnvelopeIntersects) {
-      buffer.append("1 = 1");
-    } else if (condition instanceof WithinDistance) {
-      buffer.append("1 = 1");
-    } else {
-      condition.appendDefaultSql(query, this, buffer);
+      appendValue(sql, value);
     }
+  }
+
+  private void appendFakeTrue(final Query query, final StringBuilder sql,
+    final QueryValue queryValue) {
+    sql.append("1 = 1");
+  }
+
+  private void appendLike(final Query query, final StringBuilder sql, final QueryValue condition) {
+    final BinaryCondition like = (BinaryCondition)condition;
+    final QueryValue left = like.getLeft();
+    final QueryValue right = like.getRight();
+    sql.append("UPPER(CAST(");
+    appendQueryValue(query, sql, left);
+    sql.append(" AS VARCHAR(4000))) LIKE ");
+    if (right instanceof Value) {
+      final Value valueCondition = (Value)right;
+      final Object value = valueCondition.getValue();
+      sql.append("'");
+      if (value != null) {
+        final String string = DataTypes.toString(value);
+        sql.append(string.toUpperCase().replaceAll("'", "''"));
+      }
+      sql.append("'");
+    } else {
+      appendQueryValue(query, sql, right);
+    }
+  }
+
+  private void appendSqlCondition(final Query query, final StringBuilder sql,
+    final QueryValue condition) {
+    final SqlCondition sqlCondition = (SqlCondition)condition;
+    final String where = sqlCondition.getSql();
+    final List<Object> parameters = sqlCondition.getParameterValues();
+    if (parameters.isEmpty()) {
+      if (where.indexOf('?') > -1) {
+        throw new IllegalArgumentException(
+          "No arguments specified for a where clause with placeholders: " + where);
+      } else {
+        sql.append(where);
+      }
+    } else {
+      final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
+      int i = 0;
+      while (matcher.find()) {
+        if (i >= parameters.size()) {
+          throw new IllegalArgumentException(
+            "Not enough arguments for where clause with placeholders: " + where);
+        }
+        final Object argument = parameters.get(i);
+        final StringBuffer replacement = new StringBuffer();
+        matcher.appendReplacement(replacement, DataTypes.toString(argument));
+        sql.append(replacement);
+        appendValue(sql, argument);
+        i++;
+      }
+      final StringBuffer tail = new StringBuffer();
+      matcher.appendTail(tail);
+      sql.append(tail);
+    }
+  }
+
+  private void appendValue(final Query query, final StringBuilder sql, final QueryValue condition) {
+    final Value valueCondition = (Value)condition;
+    Object value = valueCondition.getValue();
+    if (value instanceof Identifier) {
+      final Identifier identifier = (Identifier)value;
+      value = identifier.getValue(0);
+    }
+    appendValue(sql, value);
   }
 
   public void appendValue(final StringBuilder buffer, Object value) {

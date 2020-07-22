@@ -37,6 +37,23 @@ public class Value implements QueryValue {
     }
   }
 
+  public static boolean isString(final QueryValue queryValue) {
+    if (queryValue instanceof Value) {
+      final Value value = (Value)queryValue;
+      return value.getValue() instanceof String;
+
+    }
+    return false;
+  }
+
+  public static Value newValue(final FieldDefinition field, final Object value) {
+    return new Value(field, value);
+  }
+
+  public static Value newValue(final Object value) {
+    return newValue(JdbcFieldDefinitions.newFieldDefinition(value), value);
+  }
+
   private FieldDefinition fieldDefinition;
 
   private Object displayValue;
@@ -45,15 +62,11 @@ public class Value implements QueryValue {
 
   private Object queryValue;
 
-  public Value(final FieldDefinition field, final Object value) {
+  protected Value(final FieldDefinition field, final Object value) {
     this.fieldDefinition = field;
     setQueryValue(value);
     this.displayValue = this.queryValue;
     setFieldDefinition(field);
-  }
-
-  public Value(final Object value) {
-    this(JdbcFieldDefinitions.newFieldDefinition(value), value);
   }
 
   @Override
@@ -192,8 +205,9 @@ public class Value implements QueryValue {
     }
   }
 
-  protected void setQueryValue(final Object value) {
+  public Value setQueryValue(final Object value) {
     this.queryValue = getValue(value);
+    return this;
   }
 
   @Override

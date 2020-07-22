@@ -7,7 +7,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.util.Property;
 
-public class GetMapValue extends Function {
+public class GetMapValue extends SimpleFunction {
 
   public GetMapValue(final List<QueryValue> parameters) {
     super("get_map_value", parameters);

@@ -63,7 +63,7 @@ public class LayerRecordMenu extends MenuFactory {
           try {
             return filter.test(node);
           } catch (final Throwable e) {
-            Logs.debug(TreeNodes.class, "Exception processing enable check", e);
+            Logs.errorOnce(TreeNodes.class, "Exception processing enable check", e);
             return false;
           }
         }

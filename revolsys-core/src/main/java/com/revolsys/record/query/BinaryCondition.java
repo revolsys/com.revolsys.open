@@ -15,14 +15,16 @@ public class BinaryCondition extends AbstractBinaryQueryValue implements Conditi
   }
 
   public BinaryCondition(final String name, final String operator, final Object value) {
-    this(new Column(name), operator, new Value(value));
+    this(new Column(name), operator, Value.newValue(value));
   }
 
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
     final StringBuilder buffer) {
     appendLeft(buffer, query, recordStore);
+    buffer.append(" ");
     buffer.append(this.operator);
+    buffer.append(" ");
     appendRight(buffer, query, recordStore);
   }
 

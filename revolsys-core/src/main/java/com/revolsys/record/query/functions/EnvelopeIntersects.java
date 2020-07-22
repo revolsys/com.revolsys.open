@@ -1,5 +1,8 @@
 package com.revolsys.record.query.functions;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.geometry.model.BoundingBox;
@@ -11,7 +14,9 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordStore;
 
-public class EnvelopeIntersects extends AbstractBinaryQueryValue implements Condition {
+public class EnvelopeIntersects extends AbstractBinaryQueryValue implements Condition, Function {
+
+  public static final String NAME = "ST_INTERSECTS";
 
   public EnvelopeIntersects(final QueryValue boundingBox1Value,
     final QueryValue boundingBox2Value) {
@@ -68,6 +73,21 @@ public class EnvelopeIntersects extends AbstractBinaryQueryValue implements Cond
   }
 
   @Override
+  public String getName() {
+    return NAME;
+  }
+
+  @Override
+  public int getParameterCount() {
+    return 2;
+  }
+
+  @Override
+  public List<QueryValue> getParameters() {
+    return Arrays.asList(getLeft(), getRight());
+  }
+
+  @Override
   public boolean test(final Record record) {
     final QueryValue left = getLeft();
     final BoundingBox boundingBox1 = getBoundingBox(left, record);
@@ -84,7 +104,6 @@ public class EnvelopeIntersects extends AbstractBinaryQueryValue implements Cond
   public String toString() {
     final QueryValue left = getLeft();
     final QueryValue right = getRight();
-    return "ST_INTERSECTS(" + DataTypes.toString(left) + "," + DataTypes.toString(right) + ")";
+    return NAME + "(" + DataTypes.toString(left) + "," + DataTypes.toString(right) + ")";
   }
-
 }

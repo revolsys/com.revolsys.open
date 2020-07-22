@@ -127,7 +127,7 @@ public interface RecordLayerFieldUiFactory extends RecordLayerProxy {
     if (field == null) {
       final RecordDefinition recordDefinition = layer.getRecordDefinition();
       field = SwingUtil.newField(recordDefinition, fieldName, editable);
-      field.setEditable(editable);
+      field.setFieldEditable(editable);
     }
     return field;
   }

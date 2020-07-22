@@ -3,7 +3,6 @@ package com.revolsys.record.query.functions;
 import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
@@ -16,7 +15,9 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordStore;
 
-public class WithinDistance implements Condition {
+public class WithinDistance implements Condition, Function {
+  public static final String NAME = "ST_DWithin";
+
   private QueryValue distanceValue;
 
   private QueryValue geometry1Value;
@@ -36,7 +37,7 @@ public class WithinDistance implements Condition {
     if (this.geometry1Value == null || this.geometry2Value == null || this.distanceValue == null) {
       sql.append("1 = 0");
     } else {
-      sql.append("ST_DWithin(");
+      sql.append(NAME + "(");
       this.geometry1Value.appendSql(query, recordStore, sql);
       sql.append(", ");
       this.geometry2Value.appendSql(query, recordStore, sql);
@@ -107,6 +108,21 @@ public class WithinDistance implements Condition {
   }
 
   @Override
+  public String getName() {
+    return NAME;
+  }
+
+  @Override
+  public int getParameterCount() {
+    return 3;
+  }
+
+  @Override
+  public List<QueryValue> getParameters() {
+    return Arrays.asList(this.geometry1Value, this.geometry2Value, this.distanceValue);
+  }
+
+  @Override
   public List<QueryValue> getQueryValues() {
     return Arrays.asList(this.geometry1Value, this.geometry2Value, this.distanceValue);
   }
@@ -141,7 +157,7 @@ public class WithinDistance implements Condition {
   @SuppressWarnings("unchecked")
   @Override
   public <QV extends QueryValue> QV updateQueryValues(
-    final Function<QueryValue, QueryValue> valueHandler) {
+    final java.util.function.Function<QueryValue, QueryValue> valueHandler) {
     final QueryValue distanceValue = valueHandler.apply(this.distanceValue);
     final QueryValue geometry1Value = valueHandler.apply(this.geometry1Value);
     final QueryValue geometry2Value = valueHandler.apply(this.geometry2Value);
@@ -157,5 +173,4 @@ public class WithinDistance implements Condition {
       return (QV)clone;
     }
   }
-
 }

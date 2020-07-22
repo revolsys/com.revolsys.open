@@ -384,9 +384,9 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
       final String name = entry.getKey();
       final Field field = entry.getValue();
       if (this.readOnlyFieldNames.contains(name)) {
-        field.setEditable(false);
+        field.setFieldEditable(false);
       } else {
-        field.setEditable(true);
+        field.setFieldEditable(true);
       }
     }
   }
@@ -784,7 +784,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
         }
       }
       if (field != null && !isEditable()) {
-        field.setEditable(false);
+        field.setFieldEditable(false);
       }
       return (T)field;
     }
@@ -1240,7 +1240,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     for (final String fieldName : getFieldNames()) {
       if (!getReadOnlyFieldNames().contains(fieldName)) {
         final Field field = getField(fieldName);
-        field.setEditable(editable);
+        field.setFieldEditable(editable);
       }
     }
     this.propertyChangeSupport.firePropertyChange("editable", oldValue, editable);
@@ -1271,7 +1271,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     if (!DataType.equal(message, oldValue)) {
       this.fieldInValidMessage.put(fieldName, message);
       final Field field = getField(fieldName);
-      field.setFieldInvalid(message, WebColors.Red, WebColors.Pink);
+      field.setFieldInvalid(message);
 
       this.invalidFieldNames.add(fieldName);
       final int tabIndex = getTabIndex(fieldName);
@@ -1522,7 +1522,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
         if (Property.hasValue(warnings)) {
           message += "<br />" + warnings;
         }
-        field.setFieldInvalid("<html>" + message + "</html>", WebColors.Red, WebColors.Pink);
+        field.setFieldInvalid("<html>" + message + "</html>");
       } else {
         field.setFieldValid();
         if (Property.hasValue(warnings)) {
@@ -1554,9 +1554,9 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
       final String name = entry.getKey();
       final Field field = entry.getValue();
       if (this.readOnlyFieldNames.contains(name)) {
-        field.setEditable(false);
+        field.setFieldEditable(false);
       } else {
-        field.setEditable(true);
+        field.setFieldEditable(true);
       }
     }
     if (this.fieldsTableModel != null) {

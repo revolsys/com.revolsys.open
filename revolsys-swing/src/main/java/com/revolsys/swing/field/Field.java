@@ -7,6 +7,8 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 
+import org.jeometry.common.awt.WebColors;
+
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.undo.UndoManager;
 import com.revolsys.util.Property;
@@ -66,11 +68,6 @@ public interface Field extends Cloneable {
     return Property.hasValue(fieldValue) && fieldSupport.isFieldValid();
   }
 
-  default void setEditable(final boolean editable) {
-    final FieldSupport fieldSupport = getFieldSupport();
-    fieldSupport.setEditable(editable);
-  }
-
   default void setFieldBackgroundColor(Color color) {
     if (color == null) {
       color = DEFAULT_BACKGROUND;
@@ -81,6 +78,12 @@ public interface Field extends Cloneable {
     }
   }
 
+  default Field setFieldEditable(final boolean editable) {
+    final FieldSupport fieldSupport = getFieldSupport();
+    fieldSupport.setFieldEditable(editable);
+    return this;
+  }
+
   default void setFieldForegroundColor(Color color) {
     if (color == null) {
       color = DEFAULT_BACKGROUND;
@@ -89,6 +92,10 @@ public interface Field extends Cloneable {
       final JComponent component = (JComponent)this;
       component.setForeground(color);
     }
+  }
+
+  default void setFieldInvalid(final String message) {
+    setFieldInvalid(message, WebColors.Red, WebColors.Pink);
   }
 
   default void setFieldInvalid(final String message, final Color foregroundColor,

@@ -56,7 +56,7 @@ public class MarkerLibrary extends MarkerGroup {
       try {
         markers.add(marker);
       } catch (final Throwable e) {
-        Logs.debug(MarkerLibrary.class, "Marker not found", e);
+        Logs.errorOnce(MarkerLibrary.class, "Marker not found", e);
       }
     }
     return markers;

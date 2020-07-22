@@ -170,8 +170,9 @@ public class ValueField extends JPanel implements Field {
   }
 
   @Override
-  public void setEditable(final boolean editable) {
+  public ValueField setFieldEditable(final boolean editable) {
     setEnabled(editable);
+    return this;
   }
 
   @Override

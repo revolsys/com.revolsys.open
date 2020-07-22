@@ -147,8 +147,9 @@ public class FileField extends ValueField implements Field {
   }
 
   @Override
-  public void setEditable(final boolean editable) {
+  public FileField setFieldEditable(final boolean editable) {
     setEnabled(editable);
+    return this;
   }
 
   @Override

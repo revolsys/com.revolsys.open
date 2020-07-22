@@ -15,7 +15,6 @@ import java.util.function.Predicate;
 import javax.swing.BorderFactory;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -107,7 +106,7 @@ public class FieldFilterPanel extends JComponent implements PropertyChangeListen
 
   private RecordLayerTableModel tableModel;
 
-  private final JLabel whereLabel = new JLabel();
+  private final TextField whereField = new TextField(20).setFieldEditable(false);;
 
   private final ItemListener itemListener = (e) -> {
     if (this.settingFilter.isFalse()) {
@@ -168,13 +167,13 @@ public class FieldFilterPanel extends JComponent implements PropertyChangeListen
     if (this.fieldNames.isEmpty()) {
       setVisible(false);
     } else {
-      this.whereLabel.setMaximumSize(new Dimension(100, 250));
-      this.whereLabel.setFont(SwingUtil.FONT);
-      this.whereLabel.setOpaque(true);
-      this.whereLabel.setBorder(BorderFactory.createCompoundBorder(
+      this.whereField.setMaximumSize(new Dimension(100, 250));
+      this.whereField.setFont(SwingUtil.FONT);
+      this.whereField.setOpaque(true);
+      this.whereField.setBorder(BorderFactory.createCompoundBorder(
         BorderFactory.createLoweredBevelBorder(), BorderFactory.createEmptyBorder(1, 2, 1, 2)));
-      this.whereLabel.setBackground(WebColors.White);
-      add(this.whereLabel);
+      this.whereField.setBackground(WebColors.White);
+      add(this.whereField);
 
       this.nameField = ComboBox.newComboBox("fieldNames", this.fieldNames,
         (final Object fieldName) -> {
@@ -208,6 +207,7 @@ public class FieldFilterPanel extends JComponent implements PropertyChangeListen
         final Condition condition = sqlFilter.getCondition();
         setFilter(condition);
       }
+      this.tableModel.addPropertyChangeListener("filterError", this::setFiterError);
     }
   }
 
@@ -434,7 +434,7 @@ public class FieldFilterPanel extends JComponent implements PropertyChangeListen
             }
           }
           if (simple) {
-            this.whereLabel.setVisible(false);
+            this.whereField.setVisible(false);
             if (this.nameField != null) {
               this.nameField.setVisible(true);
             }
@@ -443,13 +443,10 @@ public class FieldFilterPanel extends JComponent implements PropertyChangeListen
             }
             this.searchFieldPanel.setVisible(true);
           } else {
-            String filterText = filter.toString();
-            if (filterText.length() > 40) {
-              filterText = filterText.substring(0, 40) + "...";
-            }
-            this.whereLabel.setText(filterText);
-            this.whereLabel.setToolTipText(filterText);
-            this.whereLabel.setVisible(true);
+            final String filterText = filter.toString();
+            this.whereField.setFieldValue(filterText);
+            this.whereField.setToolTipText(filterText);
+            this.whereField.setVisible(true);
             if (this.nameField != null) {
               this.nameField.setVisible(false);
             }
@@ -458,6 +455,15 @@ public class FieldFilterPanel extends JComponent implements PropertyChangeListen
           }
         }
       }
+    }
+  }
+
+  private void setFiterError(final PropertyChangeEvent e) {
+    final String filterError = this.tableModel.getFilterError();
+    if (filterError == null) {
+      this.whereField.setFieldValid();
+    } else {
+      this.whereField.setFieldInvalid(filterError);
     }
   }
 

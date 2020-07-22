@@ -45,11 +45,11 @@ import org.jdesktop.swingx.decorator.ComponentAdapter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.decorator.HighlighterFactory;
 import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.collection.map.LruMap;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.io.PathName;
 
-import com.revolsys.collection.map.LruMap;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
@@ -120,7 +120,7 @@ public abstract class AbstractRecordQueryField extends ValueField
     this.typePath = typePath;
     this.displayField = displayField;
     this.queries = Arrays.asList(
-      new Query(typePath, new Equal(F.upper(displayField), new Value(null))),
+      new Query(typePath, new Equal(F.upper(displayField), Value.newValue(null))),
       new Query(typePath, Q.iLike(displayField, "")));
 
     final Document document = this.searchField.getDocument();
@@ -465,8 +465,7 @@ public abstract class AbstractRecordQueryField extends ValueField
         } else {
           clear();
           this.searchField.setFieldInvalid(
-            "Minimum " + this.minSearchCharacters + " characters required for search",
-            WebColors.Red, WebColors.Pink);
+            "Minimum " + this.minSearchCharacters + " characters required for search");
         }
       } else {
         this.listModel.clear();

@@ -12,9 +12,10 @@ import javax.swing.Icon;
 import javax.swing.SwingWorker;
 
 import org.jeometry.common.awt.WebColors;
+import org.jeometry.common.collection.map.LruMap;
 import org.jeometry.common.logging.Logs;
+import org.springframework.jdbc.BadSqlGrammarException;
 
-import com.revolsys.collection.map.LruMap;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.record.Record;
 import com.revolsys.record.query.Condition;
@@ -112,18 +113,37 @@ public class ModeAllPaged extends ModeAbstractCached {
     }
   }
 
-  protected int getRecordCountPersisted() {
-    final Query query = getQuery();
+  protected final int getRecordCountPersisted() {
     try {
-      final AbstractRecordLayer layer = getLayer();
-      if (query == null) {
-        return layer.getRecordCountPersisted();
-      } else {
-        return layer.getRecordCountPersisted(query);
+      return getRecordCountPersistedDo();
+    } catch (final BadSqlGrammarException e) {
+      final RecordLayerTableModel tableModel = getTableModel();
+      final Throwable cause = e.getCause();
+      tableModel.setFilterError(cause.getMessage());
+      String message = "getRecordCount";
+      final Query query = getQuery();
+      if (query != null) {
+        message += ": " + query;
       }
-    } catch (final Throwable e) {
-      Logs.debug(this, "Error running query:" + query, e);
-      return 0;
+      Logs.errorOnce(this, message, e);
+    } catch (final Exception e) {
+      String message = "getRecordCount";
+      final Query query = getQuery();
+      if (query != null) {
+        message += ": " + query;
+      }
+      Logs.errorOnce(this, message, e);
+    }
+    return 0;
+  }
+
+  protected int getRecordCountPersistedDo() {
+    final Query query = getQuery();
+    final AbstractRecordLayer layer = getLayer();
+    if (query == null) {
+      return layer.getRecordCountPersisted();
+    } else {
+      return layer.getRecordCountPersisted(query);
     }
   }
 

@@ -54,8 +54,9 @@ public class CheckBox extends JCheckBox implements Field, ActionListener {
   }
 
   @Override
-  public void setEditable(final boolean editable) {
+  public CheckBox setFieldEditable(final boolean editable) {
     setEnabled(editable);
+    return this;
   }
 
   @Override

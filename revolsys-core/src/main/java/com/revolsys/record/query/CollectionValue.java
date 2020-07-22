@@ -35,7 +35,7 @@ public class CollectionValue extends AbstractMultiQueryValue {
       if (value instanceof QueryValue) {
         queryValue = (QueryValue)value;
       } else {
-        queryValue = new Value(value);
+        queryValue = Value.newValue(value);
       }
       addValue(queryValue);
     }

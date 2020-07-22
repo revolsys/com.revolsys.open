@@ -1,4 +1,4 @@
-package com.revolsys.swing.field;
+package com.revolsys.record.query.parser;
 
 import com.revolsys.record.query.Condition;
 

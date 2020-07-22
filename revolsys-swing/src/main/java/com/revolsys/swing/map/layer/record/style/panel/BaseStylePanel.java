@@ -145,7 +145,7 @@ public class BaseStylePanel extends Form implements PropertyChangeListener {
       final Field field = newField(fieldName, fieldClass, value);
       setField(field);
       if (this.readOnlyFieldNames.contains(fieldName)) {
-        field.setEditable(false);
+        field.setFieldEditable(false);
       }
       if (field instanceof JTextArea) {
         container.add(new JScrollPane((Component)field));

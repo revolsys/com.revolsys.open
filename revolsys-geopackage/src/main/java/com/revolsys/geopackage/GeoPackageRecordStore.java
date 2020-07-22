@@ -85,6 +85,7 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
       this.file = resource.getPath();
     }
     setQuoteNames(true);
+    addSqlQueryAppender(EnvelopeIntersects.class, this::appendEvelopeIntersects);
   }
 
   private void addFunctions(final JdbcConnection connection) {
@@ -99,51 +100,45 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     }
   }
 
-  @Override
-  public void appendQueryValue(final Query query, final StringBuilder sql,
+  private void appendEvelopeIntersects(final Query query, final StringBuilder sql,
     final QueryValue queryValue) {
-    if (queryValue instanceof EnvelopeIntersects) {
-      final EnvelopeIntersects envelopeIntersects = (EnvelopeIntersects)queryValue;
-      final JdbcRecordDefinition recordDefinition = (JdbcRecordDefinition)query
-        .getRecordDefinition();
-      final QueryValue boundingBox1Value = envelopeIntersects.getBoundingBox1Value();
-      final QueryValue boundingBox2Value = envelopeIntersects.getBoundingBox2Value();
-      if (boundingBox1Value instanceof Column && boundingBox2Value instanceof Value) {
-        final Column column = (Column)boundingBox1Value;
-        final Value value = (Value)boundingBox2Value;
-        final Object bboxValue = value.getQueryValue();
+    final EnvelopeIntersects envelopeIntersects = (EnvelopeIntersects)queryValue;
+    final JdbcRecordDefinition recordDefinition = (JdbcRecordDefinition)query.getRecordDefinition();
+    final QueryValue boundingBox1Value = envelopeIntersects.getBoundingBox1Value();
+    final QueryValue boundingBox2Value = envelopeIntersects.getBoundingBox2Value();
+    if (boundingBox1Value instanceof Column && boundingBox2Value instanceof Value) {
+      final Column column = (Column)boundingBox1Value;
+      final Value value = (Value)boundingBox2Value;
+      final Object bboxValue = value.getQueryValue();
 
-        final String fieldName = column.getName();
-        if (recordDefinition.isGeometryField(fieldName) && bboxValue instanceof BoundingBox) {
-          final BoundingBox boundingBox = (BoundingBox)bboxValue;
-          final String idFieldName = recordDefinition.getIdFieldName();
-          sql.append(idFieldName);
-          sql.append(" in (select id from rtree_" + recordDefinition.getDbTableName() + "_"
-            + fieldName.toLowerCase()
-            + " where minx >= ? and maxx <= ? and miny >= ? and maxy <= ?)");
-          final double minX = boundingBox.getMinX();
-          final double maxX = boundingBox.getMaxX();
-          final double minY = boundingBox.getMinY();
-          final double maxY = boundingBox.getMaxY();
-          envelopeIntersects.setRight(new CollectionValue(Arrays.asList(minX, maxX, minY, maxY)));
-          return;
-        }
+      final String fieldName = column.getName();
+      if (recordDefinition.isGeometryField(fieldName) && bboxValue instanceof BoundingBox) {
+        final BoundingBox boundingBox = (BoundingBox)bboxValue;
+        final String idFieldName = recordDefinition.getIdFieldName();
+        sql.append(idFieldName);
+        sql.append(" in (select id from rtree_" + recordDefinition.getDbTableName() + "_"
+          + fieldName.toLowerCase()
+          + " where minx >= ? and maxx <= ? and miny >= ? and maxy <= ?)");
+        final double minX = boundingBox.getMinX();
+        final double maxX = boundingBox.getMaxX();
+        final double minY = boundingBox.getMinY();
+        final double maxY = boundingBox.getMaxY();
+        envelopeIntersects.setRight(new CollectionValue(Arrays.asList(minX, maxX, minY, maxY)));
+        return;
       }
-      sql.append("1 == 2");
-      // if (boundingBox1Value == null) {
-      // sql.append("NULL");
-      // } else {
-      // boundingBox1Value.appendSql(query, this, sql);
-      // }
-      // sql.append(" && ");
-      // if (boundingBox2Value == null) {
-      // sql.append("NULL");
-      // } else {
-      // boundingBox2Value.appendSql(query, this, sql);
-      // }
-    } else {
-      super.appendQueryValue(query, sql, queryValue);
     }
+    sql.append("1 == 2");
+    // if (boundingBox1Value == null) {
+    // sql.append("NULL");
+    // } else {
+    // boundingBox1Value.appendSql(query, this, sql);
+    // }
+    // sql.append(" && ");
+    // if (boundingBox2Value == null) {
+    // sql.append("NULL");
+    // } else {
+    // boundingBox2Value.appendSql(query, this, sql);
+    // }
   }
 
   private String createIdFieldName(final RecordDefinition recordDefinition) {

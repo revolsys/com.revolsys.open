@@ -3,7 +3,8 @@ package com.revolsys.elevation.gridded.scaledint;
 import java.nio.file.Path;
 import java.util.Map;
 
-import com.revolsys.collection.map.LruMap;
+import org.jeometry.common.collection.map.LruMap;
+
 import com.revolsys.elevation.gridded.DirectFileElevationModel;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.model.GeometryFactory;

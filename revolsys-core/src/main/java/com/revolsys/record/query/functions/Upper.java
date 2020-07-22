@@ -1,13 +1,21 @@
 package com.revolsys.record.query.functions;
 
+import java.util.List;
+
 import com.revolsys.record.Record;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.util.Property;
 
 public class Upper extends UnaryFunction {
 
+  public static final String NAME = "UPPER";
+
+  public Upper(final List<QueryValue> parameters) {
+    super(NAME, parameters);
+  }
+
   public Upper(final QueryValue parameter) {
-    super("UPPER", parameter);
+    super(NAME, parameter);
   }
 
   @Override

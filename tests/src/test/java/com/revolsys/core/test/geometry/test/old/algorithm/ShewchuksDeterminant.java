@@ -45,7 +45,7 @@ import com.revolsys.geometry.model.Point;
  *   prefix incrementation operator in that function have been replaced with the postfix version. This change looks
  *   reasonable by a quick look at the code, but this needs to be more thoroughly analyzed.
  *
- * - Function orientationIndex is new and its contract is copied from
+ * - SimpleFunction orientationIndex is new and its contract is copied from
  *   com.revolsys.core.test.geometry.testold.algorithm.CGAlgorithms.orientationIndex so that the current implementation of that method
  *   can be easily replaced.
  *

@@ -215,9 +215,9 @@ public class OgrRecordStore extends AbstractRecordStore {
         sql.append("1 = 0");
       } else {
         sql.append("Intersects(");
-        boundingBox1Value.appendSql(query, this, sql);
+        appendQueryValue(query, sql, boundingBox1Value);
         sql.append(",");
-        boundingBox2Value.appendSql(query, this, sql);
+        appendQueryValue(query, sql, boundingBox2Value);
         sql.append(")");
       }
     } else if (condition instanceof WithinDistance) {
@@ -229,11 +229,11 @@ public class OgrRecordStore extends AbstractRecordStore {
         sql.append("1 = 0");
       } else {
         sql.append("Distance(");
-        geometry1Value.appendSql(query, this, sql);
+        appendQueryValue(query, sql, geometry1Value);
         sql.append(", ");
-        geometry2Value.appendSql(query, this, sql);
+        appendQueryValue(query, sql, geometry2Value);
         sql.append(") <= ");
-        distanceValue.appendSql(query, this, sql);
+        appendQueryValue(query, sql, distanceValue);
         sql.append(")");
       }
     } else {
