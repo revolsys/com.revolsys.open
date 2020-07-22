@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.record.table.model;
 
 import java.awt.Color;
+import java.io.InterruptedIOException;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -13,6 +14,7 @@ import javax.swing.SwingWorker;
 
 import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.collection.map.LruMap;
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.logging.Logs;
 import org.springframework.jdbc.BadSqlGrammarException;
 
@@ -127,12 +129,16 @@ public class ModeAllPaged extends ModeAbstractCached {
       }
       Logs.errorOnce(this, message, e);
     } catch (final Exception e) {
-      String message = "getRecordCount";
-      final Query query = getQuery();
-      if (query != null) {
-        message += ": " + query;
+      if (Exceptions.hasCause(e, InterruptedIOException.class)) {
+        return -1;
+      } else {
+        String message = "getRecordCount";
+        final Query query = getQuery();
+        if (query != null) {
+          message += ": " + query;
+        }
+        Logs.errorOnce(this, message, e);
       }
-      Logs.errorOnce(this, message, e);
     }
     return 0;
   }
