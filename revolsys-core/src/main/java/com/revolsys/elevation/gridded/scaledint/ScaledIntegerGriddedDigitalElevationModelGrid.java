@@ -8,27 +8,24 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.grid.AbstractGrid;
-import com.revolsys.io.BaseCloseable;
+import com.revolsys.parallel.channel.Channel;
+import com.revolsys.parallel.process.InProcess;
+import com.revolsys.parallel.process.ProcessNetwork;
 
 public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGrid
   implements GriddedElevationModel {
 
-  private class FileChannelHolder implements BaseCloseable {
+  private class ElevationFile {
     private final int tileX;
 
     private final int tileY;
 
     private FileChannel fileChannel;
-
-    private final AtomicInteger openCount = new AtomicInteger(1);
-
-    private final AtomicInteger closeCount = new AtomicInteger(0);
 
     private final ByteBuffer bytes = ByteBuffer.allocateDirect(4);
 
@@ -36,32 +33,20 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGrid
 
     private boolean exists = true;
 
-    public FileChannelHolder(final int tileX, final int tileY, final Path path) throws IOException {
+    public ElevationFile(final int tileX, final int tileY) {
       this.tileX = tileX;
       this.tileY = tileY;
-      this.path = path;
-      this.fileChannel = newChannel();
+      this.path = getPath(tileX, tileY);
     }
 
-    @Override
-    public void close() {
-      synchronized (ScaledIntegerGriddedDigitalElevationModelGrid.this.channelsByXandY) {
-        final int closedCount = this.closeCount.incrementAndGet();
-        if (!ScaledIntegerGriddedDigitalElevationModelGrid.this.cacheChannels) {
-          if (closedCount == this.openCount.get()) {
-            closeDo();
-          }
-        }
-      }
-    }
-
-    public synchronized void closeDo() {
-      if (this.fileChannel != null) {
+    private void close() {
+      final FileChannel fileChannel = this.fileChannel;
+      if (fileChannel != null) {
+        this.fileChannel = null;
         try {
-          this.fileChannel.close();
+          fileChannel.close();
         } catch (final Exception e) {
         }
-        this.fileChannel = null;
       }
     }
 
@@ -70,46 +55,55 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGrid
       this.fileChannel.close();
     }
 
-    public synchronized int getInt(final long offset) throws IOException {
-      if (this.fileChannel == null) {
-        this.fileChannel = newChannel();
-      }
-      this.bytes.rewind();
-      this.fileChannel.read(this.bytes, offset);
-      return this.bytes.getInt(0);
-    }
-
-    public FileChannel newChannel() throws IOException {
-      try {
-        return FileChannel.open(this.path, StandardOpenOption.READ);
-      } catch (final Exception e) {
-        this.exists = false;
-        return null;
-      }
-    }
-
-    public FileChannelHolder open() {
-      synchronized (ScaledIntegerGriddedDigitalElevationModelGrid.this.channelsByXandY) {
-        this.openCount.incrementAndGet();
-        return this;
-      }
-    }
-
-    private boolean remove() {
-      if (this.openCount.get() == this.closeCount.get()) {
-        ScaledIntegerGriddedDigitalElevationModelGrid.this.channelsByXandY.get(this.tileX)
-          .remove(this.tileY);
-        closeDo();
-        return true;
+    private synchronized double getElevation(final long offset) throws IOException {
+      checkNotClosed();
+      final int elevationInt = getInt(offset);
+      if (elevationInt == Integer.MIN_VALUE) {
+        return Double.NaN;
       } else {
-        return false;
+        return elevationInt / ScaledIntegerGriddedDigitalElevationModelGrid.this.scaleZ;
       }
     }
+
+    private synchronized int getInt(final long offset) throws IOException {
+      if (this.exists) {
+        FileChannel fileChannel = this.fileChannel;
+        if (fileChannel == null) {
+          try {
+            fileChannel = this.fileChannel = FileChannel.open(this.path, StandardOpenOption.READ);
+            addOpenFile(this);
+          } catch (final Exception e) {
+            this.exists = false;
+            return Integer.MIN_VALUE;
+          }
+        }
+        final ByteBuffer bytes = this.bytes;
+        bytes.rewind();
+        fileChannel.read(bytes, offset);
+        if (!ScaledIntegerGriddedDigitalElevationModelGrid.this.cacheFiles) {
+          fileChannel.close();
+        }
+        return bytes.getInt(0);
+      } else {
+        return Integer.MIN_VALUE;
+      }
+    }
+
+    private synchronized void remove(final Iterator<ElevationFile> iterator) {
+      close();
+      iterator.remove();
+    }
+
+    @Override
+    public String toString() {
+      return this.tileX + "," + this.tileY;
+    }
+
   }
 
   private final double scaleZ;
 
-  private final IntHashMap<IntHashMap<FileChannelHolder>> channelsByXandY = new IntHashMap<>();
+  private final IntHashMap<IntHashMap<ElevationFile>> filesByXandY = new IntHashMap<>();
 
   private final int gridSizePixels;
 
@@ -123,11 +117,19 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGrid
 
   private final String filePrefix;
 
-  private final int maxOpenChannels = 10000;
+  private int maxOpenFiles = 10000;
 
-  private final LinkedList<FileChannelHolder> channels = new LinkedList<>();
+  private final LinkedList<ElevationFile> openFiles = new LinkedList<>();
 
-  private boolean cacheChannels = true;
+  private boolean cacheFiles = true;
+
+  private boolean closed = false;
+
+  private final InProcess<ElevationFile> addFileProcess = InProcess
+    .<ElevationFile> lambda(this::addOpenFile)//
+    .setInBufferSize(100);
+
+  private final ProcessNetwork processes = new ProcessNetwork(this.addFileProcess);
 
   public ScaledIntegerGriddedDigitalElevationModelGrid(final Path basePath, final String filePrefix,
     final int coordinateSystemId, final int gridTileSize, final int gridCellSize,
@@ -145,81 +147,60 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGrid
       .resolve(Integer.toString(coordinateSystemId))//
       .resolve(Integer.toString(gridTileSize))//
     ;
+    this.processes.start();
   }
 
-  // public double getElevation(final double x, final double y) {
-  // final int gridTileSize = this.gridTileSize;
-  // final int tileX = (int)Math.floor(x / gridTileSize) * gridTileSize;
-  // final int tileY = (int)Math.floor(y / gridTileSize) * gridTileSize;
-  //
-  // try {
-  // final int gridCellSize = this.gridCellSize;
-  // final int gridCellX = GriddedElevationModel.getGridCellX(tileX,
-  // gridCellSize, x);
-  // final int gridCellY = GriddedElevationModel.getGridCellY(tileY,
-  // gridCellSize, y);
-  // final int elevationByteSize = 4;
-  // final int offset =
-  // CompressedScaledIntegerGriddedDigitalElevation.HEADER_SIZE
-  // + (gridCellY * this.gridSizePixels + gridCellX) * elevationByteSize;
-  // try (
-  // FileChannelHolder channelHolder = getFileChannel(tileX, tileY)) {
-  // final int elevationInt = channelHolder.getInt(offset);
-  // if (elevationInt == Integer.MIN_VALUE) {
-  // return Double.NaN;
-  // } else {
-  // return elevationInt / this.scaleZ;
-  // }
-  // }
-  // } catch (final NoSuchFileException e) {
-  // return Double.NaN;
-  // } catch (final IOException e) {
-  // return Double.NaN;
-  // }
-  // }
-
-  private FileChannelHolder getFileChannel(final int tileX, final int tileY) throws IOException {
-    synchronized (this.channelsByXandY) {
-
-      IntHashMap<FileChannelHolder> channelsByY = this.channelsByXandY.get(tileX);
-      if (channelsByY == null) {
-        channelsByY = new IntHashMap<>();
-        this.channelsByXandY.put(tileX, channelsByY);
+  private void addOpenFile(final Channel<ElevationFile> channel, final ElevationFile file) {
+    final LinkedList<ElevationFile> openFiles = this.openFiles;
+    openFiles.add(file);
+    if (openFiles.size() > this.maxOpenFiles) {
+      for (final Iterator<ElevationFile> iterator = openFiles.iterator(); openFiles
+        .size() > this.maxOpenFiles && iterator.hasNext();) {
+        final ElevationFile closeFile = iterator.next();
+        closeFile.remove(iterator);
       }
-      FileChannelHolder fileChannelHolder = channelsByY.get(tileY);
-      if (fileChannelHolder == null) {
-        final StringBuilder fileNameBuilder = new StringBuilder(this.filePrefix);
-        fileNameBuilder.append('_');
-        fileNameBuilder.append(this.coordinateSystemId);
-        fileNameBuilder.append('_');
-        fileNameBuilder.append(this.gridTileSize);
-        fileNameBuilder.append('_');
-        fileNameBuilder.append(tileX);
-        fileNameBuilder.append('_');
-        fileNameBuilder.append(tileY);
-        fileNameBuilder.append('.');
-        fileNameBuilder.append(ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION);
-        final String fileName = fileNameBuilder.toString();
-        final Path path = this.tileBasePath//
-          .resolve(Integer.toString(tileX))//
-          .resolve(fileName);
+    }
+  }
 
-        fileChannelHolder = new FileChannelHolder(tileX, tileY, path);
-        channelsByY.put(tileY, fileChannelHolder);
-        this.channels.add(fileChannelHolder);
-        if (this.channels.size() > this.maxOpenChannels) {
-          for (final Iterator<FileChannelHolder> iterator = this.channels.iterator(); this.channels
-            .size() > this.maxOpenChannels && iterator.hasNext();) {
-            final FileChannelHolder channelHolder = iterator.next();
-            if (channelHolder.remove()) {
-              iterator.remove();
-            }
-          }
-        }
-        return fileChannelHolder;
-      } else {
-        return fileChannelHolder.open();
+  private void addOpenFile(final ElevationFile elevationFile) {
+    if (this.cacheFiles) {
+      this.addFileProcess.write(elevationFile);
+    }
+  }
+
+  private void checkNotClosed() {
+    if (this.closed) {
+      throw new IllegalStateException("closed");
+    }
+  }
+
+  @Override
+  public void close() {
+    this.closed = true;
+    this.addFileProcess.getIn().close();
+    for (final ElevationFile elevationFile : this.openFiles) {
+      elevationFile.close();
+    }
+    this.processes.stop();
+  }
+
+  private ElevationFile getElevationFile(final int tileX, final int tileY) throws IOException {
+    checkNotClosed();
+    IntHashMap<ElevationFile> filesByY;
+    synchronized (this.filesByXandY) {
+      filesByY = this.filesByXandY.get(tileX);
+      if (filesByY == null) {
+        filesByY = new IntHashMap<>();
+        this.filesByXandY.put(tileX, filesByY);
       }
+    }
+    synchronized (filesByY) {
+      ElevationFile file = filesByY.get(tileY);
+      if (file == null) {
+        file = new ElevationFile(tileX, tileY);
+        filesByY.put(tileY, file);
+      }
+      return file;
     }
   }
 
@@ -231,6 +212,29 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGrid
   @Override
   public double getGridMinY() {
     return 0;
+  }
+
+  public int getMaxOpenFiles() {
+    return this.maxOpenFiles;
+  }
+
+  private Path getPath(final int tileX, final int tileY) {
+    final StringBuilder fileNameBuilder = new StringBuilder(this.filePrefix);
+    fileNameBuilder.append('_');
+    fileNameBuilder.append(this.coordinateSystemId);
+    fileNameBuilder.append('_');
+    fileNameBuilder.append(this.gridTileSize);
+    fileNameBuilder.append('_');
+    fileNameBuilder.append(tileX);
+    fileNameBuilder.append('_');
+    fileNameBuilder.append(tileY);
+    fileNameBuilder.append('.');
+    fileNameBuilder.append(ScaledIntegerGriddedDigitalElevation.FILE_EXTENSION);
+    final String fileName = fileNameBuilder.toString();
+    final Path path = this.tileBasePath//
+      .resolve(Integer.toString(tileX))//
+      .resolve(fileName);
+    return path;
   }
 
   @Override
@@ -254,19 +258,8 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGrid
       final int elevationByteSize = 4;
       final int offset = ScaledIntegerGriddedDigitalElevation.HEADER_SIZE
         + (gridCellY * this.gridSizePixels + gridCellX) * elevationByteSize;
-      try (
-        FileChannelHolder channelHolder = getFileChannel(tileX, tileY)) {
-        if (channelHolder.exists) {
-          final int elevationInt = channelHolder.getInt(offset);
-          if (elevationInt == Integer.MIN_VALUE) {
-            return Double.NaN;
-          } else {
-            return elevationInt / this.scaleZ;
-          }
-        } else {
-          return Double.NaN;
-        }
-      }
+      final ElevationFile elevationFile = getElevationFile(tileX, tileY);
+      return elevationFile.getElevation(offset);
     } catch (final NoSuchFileException e) {
       return Double.NaN;
     } catch (final IOException e) {
@@ -286,19 +279,9 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGrid
       final int elevationByteSize = 4;
       final int offset = ScaledIntegerGriddedDigitalElevation.HEADER_SIZE
         + (gridCellY * this.gridSizePixels + gridCellX) * elevationByteSize;
-      try (
-        FileChannelHolder channelHolder = getFileChannel(tileX, tileY)) {
-        if (channelHolder.exists) {
-          final int elevationInt = channelHolder.getInt(offset);
-          if (elevationInt == Integer.MIN_VALUE) {
-            return Double.NaN;
-          } else {
-            return elevationInt / this.scaleZ;
-          }
-        } else {
-          return Double.NaN;
-        }
-      }
+
+      final ElevationFile elevationFile = getElevationFile(tileX, tileY);
+      return elevationFile.getElevation(offset);
     } catch (final NoSuchFileException e) {
       return Double.NaN;
     } catch (final IOException e) {
@@ -306,8 +289,8 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGrid
     }
   }
 
-  public boolean isCacheChannels() {
-    return this.cacheChannels;
+  public boolean isCacheFiles() {
+    return this.cacheFiles;
   }
 
   @Override
@@ -316,8 +299,14 @@ public class ScaledIntegerGriddedDigitalElevationModelGrid extends AbstractGrid
     throw new UnsupportedOperationException("Tiled elevation models are too large to copy");
   }
 
-  public void setCacheChannels(final boolean cacheChannels) {
-    this.cacheChannels = cacheChannels;
+  public ScaledIntegerGriddedDigitalElevationModelGrid setCacheFiles(final boolean cacheFiles) {
+    this.cacheFiles = cacheFiles;
+    return this;
+  }
+
+  public ScaledIntegerGriddedDigitalElevationModelGrid setMaxOpenFiles(final int maxOpenFiles) {
+    this.maxOpenFiles = maxOpenFiles;
+    return this;
   }
 
   @Override

@@ -187,7 +187,7 @@ public class TiledGriddedElevationModelLayer
         final ScaledIntegerGriddedDigitalElevationModelGrid elevationModel = new ScaledIntegerGriddedDigitalElevationModelGrid(
           basePath, this.filePrefix, coordinateSystemId, this.tileSizePixels, this.minResolution,
           this.scaleZ);
-        elevationModel.setCacheChannels(false);
+        elevationModel.setCacheFiles(false);
         this.elevationModel = elevationModel;
 
       }
