@@ -112,18 +112,22 @@ public interface GriddedElevationModel extends Grid {
   @SuppressWarnings("unchecked")
   static <G extends Geometry> G setGeometryElevations(final G geometry,
     final BiFunctionDoubleDouble getElevation) {
-    final GeometryEditor<?> editor = geometry.newGeometryEditor();
-    editor.setAxisCount(3);
-    for (final Vertex vertex : geometry.vertices()) {
-      final double x = vertex.getX();
-      final double y = vertex.getY();
-      final double elevation = getElevation.apply(x, y);
-      if (Double.isFinite(elevation)) {
-        final int[] vertexId = vertex.getVertexId();
-        editor.setZ(vertexId, elevation);
+    if (geometry == null) {
+      return null;
+    } else {
+      final GeometryEditor<?> editor = geometry.newGeometryEditor();
+      editor.setAxisCount(3);
+      for (final Vertex vertex : geometry.vertices()) {
+        final double x = vertex.getX();
+        final double y = vertex.getY();
+        final double elevation = getElevation.apply(x, y);
+        if (Double.isFinite(elevation)) {
+          final int[] vertexId = vertex.getVertexId();
+          editor.setZ(vertexId, elevation);
+        }
       }
+      return (G)editor.newGeometry();
     }
-    return (G)editor.newGeometry();
   }
 
   default void cancelChanges() {
