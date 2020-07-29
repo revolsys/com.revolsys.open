@@ -17,7 +17,6 @@ public class RecordStoreLayerRecordWithId extends RecordStoreLayerRecord {
         if (this.proxyRecord == null) {
           this.proxyRecord = new RecordStoreLayerRecordWithIdProxy(this.layer, this);
         }
-
       }
     }
     return (R)this.proxyRecord;
