@@ -186,8 +186,8 @@ public class ArcGisRestServerTileCacheLayer
               if (service instanceof MapService) {
                 this.mapService = (MapService)service;
               } else {
-                Logs.error(this,
-                  getPath() + ": Web service " + this.connectionName + " is not a ArcGIS service");
+                Logs.error(this, getPath() + ": Web service '" + this.connectionName
+                  + "' is not a ArcGIS service");
                 return false;
               }
             } else {

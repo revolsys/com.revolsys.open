@@ -289,7 +289,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
    */
   protected LayerRecord getCachedRecord(final Identifier identifier, final LayerRecord record,
     final boolean updateRecord) {
-    synchronized (getSync()) {
+    synchronized (getRecordCacheSync()) {
       final RecordStoreLayerRecord cachedRecord = findCachedRecord(record);
       if (cachedRecord == null) {
         addCachedRecord(identifier, record);
@@ -403,6 +403,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       if (recordStore != null) {
         try (
           Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW)) {
+          transaction.setRollbackOnly();
           return recordStore.getRecordCount(query);
         }
       }

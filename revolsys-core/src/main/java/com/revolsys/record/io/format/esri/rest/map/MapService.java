@@ -206,6 +206,9 @@ public class MapService extends ArcGisRestAbstractLayerService {
 
   public int getZoomLevel(final double resolution) {
     final TileInfo tileInfo = getTileInfo();
+    if (tileInfo == null) {
+      return 0;
+    }
     final List<LevelOfDetail> levelOfDetails = tileInfo.getLevelOfDetails();
     LevelOfDetail previousLevel = levelOfDetails.get(0);
     for (final LevelOfDetail levelOfDetail : levelOfDetails) {

@@ -10,9 +10,14 @@ public class RecordStoreLayerRecordWithId extends RecordStoreLayerRecord {
 
   @SuppressWarnings("unchecked")
   @Override
-  public synchronized <R extends LayerRecord> R getRecordProxy() {
+  public <R extends LayerRecord> R getRecordProxy() {
     if (this.proxyRecord == null) {
-      this.proxyRecord = new RecordStoreLayerRecordWithIdProxy(this.layer, this);
+      final RecordStoreLayer layer = getLayer();
+      synchronized (layer.getRecordCacheSync()) {
+        if (this.proxyRecord == null) {
+          this.proxyRecord = new RecordStoreLayerRecordWithIdProxy(this.layer, this);
+        }
+      }
     }
     return (R)this.proxyRecord;
   }
