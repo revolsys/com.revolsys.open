@@ -105,7 +105,7 @@
       <plugin>
         <groupId>pl.project13.maven</groupId>
         <artifactId>git-commit-id-plugin</artifactId>
-        <version>4.0.0</version>
+        <version>4.0.1</version>
         <executions>
           <execution>
             <id>get-the-git-infos</id>
@@ -154,7 +154,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.1.1</version>
+        <version>3.2.0</version>
         <configuration>
           <failOnError>false</failOnError>
           <quiet>yes</quiet>
@@ -176,7 +176,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <version>3.2.3</version>
+        <version>3.3.1</version>
         <configuration>
           <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
@@ -231,7 +231,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M4</version>
+        <version>3.0.0-M5</version>
         <configuration>
           <argLine>
             --illegal-access=permit
@@ -241,7 +241,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.8.2</version>
+        <version>3.9.1</version>
         <executions>
           <execution>
             <id>attach-descriptor</id>
@@ -254,7 +254,7 @@
           <dependency>
             <groupId>org.apache.maven.doxia</groupId>
             <artifactId>doxia-module-markdown</artifactId>
-            <version>1.9</version>
+            <version>1.9.1</version>
           </dependency>
           <dependency>
             <groupId>lt.velykis.maven.skins</groupId>
@@ -290,7 +290,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
-        <version>3.0.0</version>
+        <version>3.1.0</version>
         <configuration>
           <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
           <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
@@ -335,7 +335,7 @@
       <dependency>
         <groupId>org.docx4j</groupId>
         <artifactId>docx4j-JAXB-MOXy</artifactId>
-        <version>8.1.4</version>
+        <version>8.2.1</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -553,12 +553,12 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <ch.qos.logback.version>1.2.3</ch.qos.logback.version>
     <org.gdal.version>2.4.0</org.gdal.version>
-    <org.graalvm.version>20.0.0</org.graalvm.version>
+    <org.graalvm.version>20.1.0</org.graalvm.version>
     <org.jeometry.version>TRUNK-SNAPSHOT</org.jeometry.version>
     <org.slf4j.version>1.7.30</org.slf4j.version>
-    <org.springframework.version>5.2.4.RELEASE</org.springframework.version>
-    <org.springframework.security.version>5.3.0.RELEASE</org.springframework.security.version>
-    <org.apache.xmlgraphics.batik.version>1.12</org.apache.xmlgraphics.batik.version>
+    <org.springframework.version>5.2.8.RELEASE</org.springframework.version>
+    <org.springframework.security.version>5.3.4.RELEASE</org.springframework.security.version>
+    <org.apache.xmlgraphics.batik.version>1.13</org.apache.xmlgraphics.batik.version>
     <gpg.skip>true</gpg.skip>
     <github.global.server>github</github.global.server>
     <skipTests>true</skipTests>
