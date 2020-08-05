@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.revolsys.geometry.model.BoundingBox;
-import com.revolsys.io.Reader;
 import com.revolsys.parallel.process.AbstractProcess;
 import com.revolsys.record.Record;
 import com.revolsys.record.query.Query;
@@ -43,7 +42,7 @@ public class RecordStoreQueryTask extends AbstractProcess {
     final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(this.path);
     final Query query = Query.intersects(recordDefinition, this.boundingBox);
     try (
-      final Reader<Record> reader = this.recordStore.getRecords(query)) {
+      final RecordReader reader = this.recordStore.getRecords(query)) {
       for (final Record object : reader) {
         try {
           this.objects.add(object);

@@ -9,11 +9,10 @@ import java.util.Map.Entry;
 import org.jeometry.common.io.PathName;
 
 import com.revolsys.io.AbstractDirectoryReader;
-import com.revolsys.io.Reader;
 import com.revolsys.record.ArrayRecord;
-import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordDirectoryReader;
+import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
@@ -59,7 +58,7 @@ public class ShapefileDirectoryReader extends RecordDirectoryReader {
   }
 
   @Override
-  protected Reader<Record> newReader(final Resource resource) {
+  protected RecordReader newReader(final Resource resource) {
     try {
       final RecordFactory<ArrayRecord> recordFactory = ArrayRecord.FACTORY;
       final ShapefileRecordReader iterator = new ShapefileRecordReader(resource, recordFactory);

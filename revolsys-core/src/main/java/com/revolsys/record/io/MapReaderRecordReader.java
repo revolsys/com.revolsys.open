@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.AbstractReader;
 import com.revolsys.io.map.MapReader;
 import com.revolsys.record.ArrayRecord;
@@ -57,19 +58,31 @@ public class MapReaderRecordReader extends AbstractReader<Record>
   public Record next() {
     if (hasNext()) {
       final MapEx source = this.mapIterator.next();
-      final Record target = new ArrayRecord(this.recordDefinition);
-      for (final FieldDefinition field : this.recordDefinition.getFields()) {
-        final String name = field.getName();
-        final Object value = source.get(name);
-        if (value != null) {
-          final DataType dataType = this.recordDefinition.getFieldType(name);
-          final Object convertedValue;
-          try {
-            convertedValue = dataType.toObject(value);
-          } catch (final Throwable e) {
-            throw new FieldValueInvalidException(name, value, e);
+      final RecordDefinition recordDefinition = this.recordDefinition;
+      final Record target = new ArrayRecord(recordDefinition);
+      for (final String fieldName : source.keySet()) {
+        final FieldDefinition field = recordDefinition.getField(fieldName);
+        if (field != null) {
+          final String name = field.getName();
+          final Object value = source.get(fieldName);
+          if (value != null) {
+            final DataType dataType = recordDefinition.getFieldType(name);
+            final Object convertedValue;
+            try {
+              convertedValue = dataType.toObject(value);
+            } catch (final Throwable e) {
+              throw new FieldValueInvalidException(name, value, e);
+            }
+            target.setValue(name, convertedValue);
           }
-          target.setValue(name, convertedValue);
+        }
+      }
+      if (recordDefinition.hasGeometryField()) {
+        if (target.getGeometry() == null) {
+          if (source instanceof Record) {
+            final Geometry geometry = ((Record)source).getGeometry();
+            target.setGeometryValue(geometry);
+          }
         }
       }
       return target;

@@ -12,8 +12,8 @@ import javax.swing.event.EventListenerList;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import com.revolsys.io.Reader;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.query.BinaryCondition;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Q;
@@ -106,7 +106,7 @@ public class RecordStoreQueryListModel implements ListModel {
             }
           }
           query.setLimit(this.maxResults);
-          final Reader<Record> reader = this.recordStore.getRecords(query);
+          final RecordReader reader = this.recordStore.getRecords(query);
           try {
             final List<Record> objects = reader.toList();
             for (final Record object : objects) {

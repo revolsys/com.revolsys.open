@@ -16,9 +16,9 @@ import org.jeometry.common.date.Dates;
 import org.jeometry.common.io.PathName;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.io.Reader;
 import com.revolsys.record.Record;
 import com.revolsys.record.comparator.RecordFieldComparator;
+import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.property.RecordDefinitionProperty;
 import com.revolsys.record.query.And;
 import com.revolsys.record.query.Q;
@@ -282,7 +282,7 @@ public class MultiValueCodeTableProperty extends AbstractMultiValueCodeTable
               query.addOrderBy(order);
             }
             try (
-              Reader<Record> reader = this.recordStore.getRecords(query)) {
+              RecordReader reader = this.recordStore.getRecords(query)) {
               final List<Record> codes = reader.toList();
               final CategoryLabelCountMap statistics = this.recordStore.getStatistics();
               if (statistics != null) {
@@ -330,7 +330,7 @@ public class MultiValueCodeTableProperty extends AbstractMultiValueCodeTable
         }
       }
       query.setWhereCondition(and);
-      final Reader<Record> reader = this.recordStore.getRecords(query);
+      final RecordReader reader = this.recordStore.getRecords(query);
       try {
         final List<Record> codes = reader.toList();
         if (codes.size() > 0) {

@@ -7,10 +7,10 @@ import java.sql.Date;
 import org.jeometry.common.date.Dates;
 
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.Reader;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordDirectoryReader;
+import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionFactory;
 import com.revolsys.spring.resource.PathResource;
@@ -68,7 +68,7 @@ public class MoepDirectoryReader extends RecordDirectoryReader implements Record
    * @throws IOException If an I/O error occurs.
    */
   @Override
-  protected Reader<Record> newReader(final Resource resource) {
+  protected RecordReader newReader(final Resource resource) {
     return new MoepBinaryReader(this, resource, ArrayRecord.FACTORY);
   }
 
@@ -77,7 +77,7 @@ public class MoepDirectoryReader extends RecordDirectoryReader implements Record
     super.setDirectory(directory);
     final String name = FileUtil.getFileName(directory);
     final File file = new File(directory, name + "s.bin");
-    final Reader<Record> supDataReader = newReader(new PathResource(file));
+    final RecordReader supDataReader = newReader(new PathResource(file));
     for (final Record supData : supDataReader) {
       final String featureCode = supData.getValue(MoepConstants.FEATURE_CODE);
       if (featureCode.equals("KN00020000")) {

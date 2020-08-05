@@ -15,9 +15,9 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.io.PathName;
 
 import com.revolsys.collection.ResultPager;
-import com.revolsys.io.Reader;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
+import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.query.Or;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
@@ -100,7 +100,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
       return true;
     } else {
       final Query query = Query.equal(recordDefinition, fieldName, value);
-      final Reader<Record> results = recordStore.getRecords(query);
+      final RecordReader results = recordStore.getRecords(query);
       final List<Record> objects = results.toList();
       if (object.getState() == RecordState.NEW) {
         return objects.isEmpty();

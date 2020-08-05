@@ -25,7 +25,6 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
@@ -77,7 +76,7 @@ public class RecordReaderHttpMessageConverter extends AbstractHttpMessageConvert
       if (readerFactory == null) {
         throw new HttpMessageNotReadableException("Cannot read data in format" + mediaType);
       } else {
-        final Reader<Record> reader = readerFactory
+        final RecordReader reader = readerFactory
           .newRecordReader(new InputStreamResource("recordInput", body));
 
         GeometryFactory factory = this.geometryFactory;
@@ -88,7 +87,7 @@ public class RecordReaderHttpMessageConverter extends AbstractHttpMessageConvert
           factory = GeometryFactory.floating3d(Integer.parseInt(srid));
         }
         reader.setProperty(IoConstants.GEOMETRY_FACTORY, factory);
-        return (RecordReader)reader;
+        return reader;
       }
     } catch (final IOException e) {
       throw new HttpMessageNotReadableException("Error reading data", e);

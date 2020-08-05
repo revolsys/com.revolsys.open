@@ -6,8 +6,8 @@ import java.util.function.Supplier;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.io.PathName;
 
-import com.revolsys.io.Reader;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
@@ -61,7 +61,7 @@ public class RecordStoreQueryField extends AbstractRecordQueryField {
   @Override
   protected List<Record> getRecords(final Query query) {
     try (
-      Reader<Record> reader = this.recordStore.getRecords(query)) {
+      RecordReader reader = this.recordStore.getRecords(query)) {
       return reader.toList();
     }
   }

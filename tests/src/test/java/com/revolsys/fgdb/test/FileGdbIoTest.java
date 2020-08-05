@@ -16,9 +16,9 @@ import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStoreFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
-import com.revolsys.io.Reader;
 import com.revolsys.io.Writer;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.testapi.GeometryAssert;
 
@@ -73,7 +73,7 @@ public class FileGdbIoTest {
         writer.write(record);
       }
       try (
-        Reader<Record> reader = recordStore.getRecords(typePath)) {
+        RecordReader reader = recordStore.getRecords(typePath)) {
         final List<Record> objects = reader.toList();
         Assert.assertEquals("Geometry Count", 1, objects.size());
         final Geometry actual = objects.get(0).getGeometry();

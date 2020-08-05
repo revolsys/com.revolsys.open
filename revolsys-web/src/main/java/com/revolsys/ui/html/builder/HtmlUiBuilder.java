@@ -45,8 +45,8 @@ import org.springframework.web.servlet.HandlerMapping;
 import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.Maps;
-import com.revolsys.io.Reader;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.xml.XmlWriter;
 import com.revolsys.record.query.Query;
@@ -1225,7 +1225,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
         final List<KeySerializer> serializers = getSerializers(pageName, "list");
 
         try (
-          Reader<Record> reader = recordStore.getRecords(query)) {
+          RecordReader reader = recordStore.getRecords(query)) {
           for (Record record : reader) {
             record = convertRecord(record);
             final List<String> row = new ArrayList<>();

@@ -46,7 +46,7 @@ public class GeometryAssert {
     boolean valid = true;
     final Resource resource = new ClassPathResource(file, clazz);
     try (
-      Reader<Record> reader = RecordReader.newRecordReader(resource)) {
+      RecordReader reader = RecordReader.newRecordReader(resource)) {
       int i = 0;
       for (final Record object : reader) {
         final int srid = object.getInteger("srid");
