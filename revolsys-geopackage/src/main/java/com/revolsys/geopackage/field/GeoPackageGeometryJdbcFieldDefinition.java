@@ -98,6 +98,11 @@ public class GeoPackageGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
+  public boolean isSortable() {
+    return false;
+  }
+
+  @Override
   public int setInsertPreparedStatementValue(final PreparedStatement statement,
     final int parameterIndex, final Object value) throws SQLException {
     final Object jdbcValue = toJdbc(value);

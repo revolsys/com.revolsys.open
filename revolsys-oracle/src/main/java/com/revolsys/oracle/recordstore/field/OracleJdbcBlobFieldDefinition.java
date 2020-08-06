@@ -29,6 +29,11 @@ public class OracleJdbcBlobFieldDefinition extends JdbcFieldDefinition {
     return resultSet.getBlob(columnIndex);
   }
 
+  @Override
+  public boolean isSortable() {
+    return false;
+  }
+
   private InputStream openInputStream(final Object value) {
     if (value instanceof byte[]) {
       final byte[] bytes = (byte[])value;

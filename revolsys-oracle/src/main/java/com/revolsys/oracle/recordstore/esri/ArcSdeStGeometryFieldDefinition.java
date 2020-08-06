@@ -140,6 +140,11 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
+  public boolean isSortable() {
+    return false;
+  }
+
+  @Override
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
     final Record object, final boolean internStrings) throws SQLException {
     super.setFieldValueFromResultSet(resultSet, columnIndex, object, internStrings);

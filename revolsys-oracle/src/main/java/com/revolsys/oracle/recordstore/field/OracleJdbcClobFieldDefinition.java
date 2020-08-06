@@ -31,6 +31,11 @@ public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
+  public boolean isSortable() {
+    return false;
+  }
+
+  @Override
   public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
     final Object value) throws SQLException {
     if (value == null) {

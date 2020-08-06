@@ -69,6 +69,11 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
+  public boolean isSortable() {
+    return false;
+  }
+
+  @Override
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     if (geometryFactory != null) {
       super.setGeometryFactory(geometryFactory.convertAxisCount(this.axisCount));
