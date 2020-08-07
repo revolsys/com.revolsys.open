@@ -32,13 +32,16 @@ public class GeoPackageDateTimeField extends JdbcFieldDefinition {
   public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
     final boolean internStrings) throws SQLException {
     final String dateString = resultSet.getString(columnIndex);
-    final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-    try {
-      return dateFormat.parse(dateString);
-    } catch (final ParseException e) {
-      return dateString;
+    if (dateString == null) {
+      return null;
+    } else {
+      final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+      dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+      try {
+        return dateFormat.parse(dateString);
+      } catch (final ParseException e) {
+        return dateString;
+      }
     }
   }
 
