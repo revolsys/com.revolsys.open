@@ -3,6 +3,7 @@ package com.revolsys.jdbc.field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
@@ -80,6 +81,22 @@ public class JdbcFieldDefinition extends FieldDefinition {
 
   public boolean isQuoteName() {
     return this.quoteName;
+  }
+
+  @Override
+  public boolean isSortable() {
+    switch (this.sqlType) {
+      case Types.ARRAY:
+      case Types.BLOB:
+      case Types.CLOB:
+      case Types.JAVA_OBJECT:
+      case Types.OTHER:
+      case Types.STRUCT:
+      case Types.SQLXML:
+        return false;
+      default:
+        return true;
+    }
   }
 
   public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,

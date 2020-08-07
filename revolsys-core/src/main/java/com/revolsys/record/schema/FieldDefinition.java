@@ -546,6 +546,10 @@ public class FieldDefinition extends BaseObjectWithProperties
     return this.required;
   }
 
+  public boolean isSortable() {
+    return true;
+  }
+
   public boolean isValid(final Object value) {
     try {
       validate(value);

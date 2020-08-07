@@ -24,6 +24,11 @@ public class GeometryFieldDefinition extends FieldDefinition {
   }
 
   @Override
+  public boolean isSortable() {
+    return false;
+  }
+
+  @Override
   public <V> V toFieldValueException(final Object value) {
     final GeometryFactory geometryFactory = getGeometryFactory();
     Geometry geometry;

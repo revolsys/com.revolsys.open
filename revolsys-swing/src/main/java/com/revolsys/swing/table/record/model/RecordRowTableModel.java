@@ -358,6 +358,17 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     return false;
   }
 
+  @Override
+  public boolean isColumnSortable(final int columnIndex) {
+    final FieldDefinition field = getColumnFieldDefinition(columnIndex);
+    if (field != null) {
+      if (!field.isSortable()) {
+        return false;
+      }
+    }
+    return super.isColumnSortable(columnIndex);
+  }
+
   public boolean isFieldEditable(final int columnIndex) {
     final String fieldName = getColumnFieldName(columnIndex);
     if (fieldName != null) {

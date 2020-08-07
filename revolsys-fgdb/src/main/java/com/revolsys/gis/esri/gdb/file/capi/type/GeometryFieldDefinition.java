@@ -141,6 +141,11 @@ public class GeometryFieldDefinition extends AbstractFileGdbFieldDefinition {
   }
 
   @Override
+  public boolean isSortable() {
+    return false;
+  }
+
+  @Override
   public void setValue(final Record record, final Row row, final Object value) {
     if (value == null) {
       setNull(row);

@@ -43,7 +43,7 @@ public abstract class AbstractUpdateField extends BaseDialog {
         final RecordLayerTable table = (RecordLayerTable)object;
         final int columnIndex = TablePanel.getEventColumn();
         final RecordLayerTableModel tableModel = table.getModel();
-        if (tableModel.isFieldEditable(columnIndex)) {
+        if (tableModel.isFieldBulkEditable(columnIndex)) {
           if (tableModel.isIdField(columnIndex)) {
             return false;
           } else {

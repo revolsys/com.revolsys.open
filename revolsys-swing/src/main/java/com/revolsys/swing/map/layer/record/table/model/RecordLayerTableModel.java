@@ -27,6 +27,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.record.Records;
+import com.revolsys.record.io.format.json.JsonType;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.functions.EnvelopeIntersects;
@@ -392,6 +393,18 @@ public class RecordLayerTableModel extends RecordRowTableModel
   @Override
   public boolean isEditable() {
     return super.isEditable() && this.layer.isEditable() && this.layer.isCanEditRecords();
+  }
+
+  public boolean isFieldBulkEditable(final int columnIndex) {
+    if (isFieldEditable(columnIndex)) {
+      final Class<?> columnClass = getColumnClass(columnIndex);
+      if (JsonType.class.isAssignableFrom(columnClass)) {
+        return false;
+      }
+      return true;
+    } else {
+      return false;
+    }
   }
 
   @Override
