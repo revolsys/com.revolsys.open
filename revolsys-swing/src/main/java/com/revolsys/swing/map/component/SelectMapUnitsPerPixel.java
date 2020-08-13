@@ -133,7 +133,7 @@ public class SelectMapUnitsPerPixel extends JComboBox<Double>
     } else if ("geometryFactory".equals(propertyName)) {
       String toolTip;
       final GeometryFactory geometryFactory = this.viewport.getGeometryFactory();
-      if (geometryFactory == null) {
+      if (geometryFactory == null || !geometryFactory.isHasHorizontalCoordinateSystem()) {
         toolTip = "Map Resolution (m/pixel)";
       } else {
         final HorizontalCoordinateSystem coordinateSystem = geometryFactory
@@ -141,7 +141,6 @@ public class SelectMapUnitsPerPixel extends JComboBox<Double>
         this.projected = !geometryFactory.isGeographic();
         if (this.projected) {
           this.format = new DecimalFormat("#,###.###", FORMAT_SYMBOLS);
-
         } else {
           this.format = new DecimalFormat("#,###.#######", FORMAT_SYMBOLS);
         }

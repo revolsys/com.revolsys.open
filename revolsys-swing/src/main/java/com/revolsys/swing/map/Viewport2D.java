@@ -763,14 +763,17 @@ public abstract class Viewport2D implements GeometryFactoryProxy, PropertyChange
       final Quantity<Length> modelWidthLength = boundingBox.getWidthLength();
       double modelWidthMetres;
       final GeometryFactory geometryFactory = getGeometryFactory();
-      if (geometryFactory.isProjected()) {
-        modelWidthMetres = QuantityType.doubleValue(modelWidthLength, Units.METRE);
-      } else {
+      if (geometryFactory.isGeographic()) {
         final double minX = boundingBox.getMinX();
         final double centreY = boundingBox.getCentreY();
         final double maxX = boundingBox.getMaxX();
-        final Ellipsoid ellipsoid = geometryFactory.getEllipsoid();
+        Ellipsoid ellipsoid = geometryFactory.getEllipsoid();
+        if (ellipsoid == null) {
+          ellipsoid = GeometryFactory.wgs84().getEllipsoid();
+        }
         modelWidthMetres = ellipsoid.distanceMetres(minX, centreY, maxX, centreY);
+      } else {
+        modelWidthMetres = QuantityType.doubleValue(modelWidthLength, Units.METRE);
       }
       this.metresPerPixel = modelWidthMetres / viewWidthPixels;
       this.scale = this.metresPerPixel / pixelSizeMetres;
