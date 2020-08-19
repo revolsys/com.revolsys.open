@@ -70,4 +70,7 @@ public interface JsonObject extends MapEx, JsonType {
     return this;
   }
 
+  @Override
+  JsonObject clone();
+
 }
