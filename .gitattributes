@@ -1,6 +1,9 @@
 * text=auto
 
 # text lf
+.derived text eol=lf
+.gitattributes text eol=lf
+.gitignore text eol=lf
 *.c text eol=lf
 *.css text eol=lf
 *.cxx text eol=lf
@@ -17,6 +20,11 @@
 *.xsd text eol=lf
 *.rglayer text eol=lf
 *.rgobject text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
+*.tsv text eol=lf
+*.html text eol=lf
+*.sql text eol=lf
 
 #text crlf
 *.bat text eol=crlf
