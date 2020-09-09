@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import javax.swing.JMenuItem;
 import javax.swing.ListSelectionModel;
@@ -43,6 +44,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.menu.BaseJPopupMenu;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.SortableTableModel;
@@ -146,6 +148,18 @@ public class RecordLayerTableModel extends RecordRowTableModel
       query.addFieldName(fieldName);
     }
   }
+
+  public <V extends Record> RunnableAction addMenuItem(final String groupName,
+    final CharSequence name, final String iconName, final Consumer<V> consumer) {
+    return addMenuItem(groupName, name, iconName, (Predicate<V>)null, consumer);
+  }
+
+  public <V extends Record> RunnableAction addMenuItem(final String groupName,
+    final CharSequence name, final String iconName, final Predicate<V> enabledFilter,
+    final Consumer<V> consumer) {
+    final LayerRecordMenu menu = getMenu();
+    return menu.addMenuItem(groupName, -1, name, null, iconName, enabledFilter, consumer);
+  };
 
   @Override
   public void dispose() {
@@ -256,12 +270,17 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   @Override
+  public LayerRecordMenu getMenu() {
+    return (LayerRecordMenu)super.getMenu();
+  }
+
+  @Override
   public BaseJPopupMenu getMenu(final int rowIndex, final int columnIndex) {
     final LayerRecord record = getRecord(rowIndex);
     if (record != null) {
       final AbstractRecordLayer layer = getLayer();
       if (layer != null) {
-        LayerRecordMenu.setEventRecord(record);
+        layer.setMenuRecord(record);
         if (isUseRecordMenu()) {
           final LayerRecordMenu menu = record.getMenu();
 
@@ -452,6 +471,11 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   public boolean isUseRecordMenu() {
     return this.useRecordMenu;
+  }
+
+  @Override
+  protected MenuFactory newMenu() {
+    return new LayerRecordMenu(this.layer);
   }
 
   public void refresh() {

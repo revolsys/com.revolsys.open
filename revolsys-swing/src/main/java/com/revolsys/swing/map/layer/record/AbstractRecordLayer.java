@@ -9,6 +9,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.File;
+import java.lang.ref.Reference;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -47,6 +49,7 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
+import com.revolsys.collection.EmptyReference;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
@@ -461,6 +464,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   private final List<String> fieldNamesSetNames = new ArrayList<>();
 
   private final Map<String, List<String>> fieldNamesSets = new HashMap<>();
+
+  private Reference<LayerRecord> menuRecord = new EmptyReference<>();
 
   private Condition filter = Condition.ALL;
 
@@ -1201,6 +1206,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return null;
   }
 
+  @SuppressWarnings("unchecked")
+  public <R extends Record> R getMenuRecord() {
+    return (R)this.menuRecord.get();
+  }
+
   public List<LayerRecord> getMergeableSelectedRecords() {
     final GeometryFactory geometryFactory = getGeometryFactory();
     if (geometryFactory == null) {
@@ -1580,7 +1590,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public LayerRecordMenu getRecordMenu(final LayerRecord record) {
     if (isLayerRecord(record)) {
-      LayerRecordMenu.setEventRecord(record);
+      setMenuRecord(record);
       return this.recordMenu;
     }
     return null;
@@ -1847,7 +1857,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
             mapPanel.panToRecord(record);
           }
         });
-        final EditRecordMenu editRecordMenu = EditRecordMenu.newSingleRecord();
+        final EditRecordMenu editRecordMenu = EditRecordMenu.newSingleRecord(this);
         menu.addComponentFactory("record", editRecordMenu);
       }
       menu.addMenuItem("record", "Delete Record", "table_row_delete", LayerRecord::isDeletable,
@@ -3063,6 +3073,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
         }
       }
     }
+  }
+
+  public void setMenuRecord(final LayerRecord menuRecord) {
+    this.menuRecord = new WeakReference<>(menuRecord);
   }
 
   @Override

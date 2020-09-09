@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import javax.annotation.PreDestroy;
 import javax.swing.SortOrder;
@@ -23,9 +21,6 @@ import com.revolsys.record.RecordState;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.swing.action.RunnableAction;
-import com.revolsys.swing.map.layer.record.LayerRecordMenu;
-import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.table.SortableTableModel;
 import com.revolsys.swing.table.record.RecordRowTable;
 import com.revolsys.util.Property;
@@ -68,27 +63,6 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
       final String idFieldName = recordDefinition.getIdFieldName();
       setSortOrder(idFieldName);
     }
-  }
-
-  public <V extends Record> RunnableAction addMenuItem(final String groupName,
-    final CharSequence name, final String iconName, final Consumer<V> consumer) {
-    return addMenuItem(groupName, name, iconName, (Predicate<V>)null, consumer);
-  }
-
-  public <V extends Record> RunnableAction addMenuItem(final String groupName,
-    final CharSequence name, final String iconName, final Predicate<V> enabledFilter,
-    final Consumer<V> consumer) {
-    final MenuFactory menu = getMenu();
-    return LayerRecordMenu.addMenuItem(menu, groupName, -1, name, null, iconName, enabledFilter,
-      consumer);
-  }
-
-  public <V extends Record> RunnableAction addMenuItem(final String groupName, final int index,
-    final CharSequence name, final String toolTip, final String iconName,
-    final Predicate<V> enabledFilter, final Consumer<V> consumer) {
-    final MenuFactory menu = getMenu();
-    return LayerRecordMenu.addMenuItem(menu, groupName, index, name, toolTip, iconName,
-      enabledFilter, consumer);
   }
 
   public void clearSortedColumns() {

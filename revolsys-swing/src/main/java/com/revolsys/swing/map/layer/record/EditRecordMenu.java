@@ -35,17 +35,10 @@ public class EditRecordMenu extends MenuFactory {
       forEachRecordFunction);
   }
 
-  public static EditRecordMenu newSingleRecord() {
-    final Supplier<AbstractRecordLayer> layerSupplier = () -> {
-      final LayerRecord record = LayerRecordMenu.getEventRecord();
-      if (record == null) {
-        return null;
-      } else {
-        return record.getLayer();
-      }
-    };
-    final Function<AbstractRecordLayer, Integer> recordCountFunction = (layer) -> {
-      final LayerRecord record = LayerRecordMenu.getEventRecord();
+  public static EditRecordMenu newSingleRecord(final AbstractRecordLayer layer) {
+    final Supplier<AbstractRecordLayer> layerSupplier = () -> layer;
+    final Function<AbstractRecordLayer, Integer> recordCountFunction = (menuLayer) -> {
+      final LayerRecord record = menuLayer.getMenuRecord();
       if (record == null) {
         return 0;
       } else {
@@ -53,8 +46,8 @@ public class EditRecordMenu extends MenuFactory {
       }
     };
     final Function<AbstractRecordLayer, Consumer<Consumer<LayerRecord>>> forEachRecordFunction = (
-      layer) -> (action) -> {
-        final LayerRecord record = LayerRecordMenu.getEventRecord();
+      menuLayer) -> (action) -> {
+        final LayerRecord record = menuLayer.getMenuRecord();
         if (record != null) {
           action.accept(record);
         }

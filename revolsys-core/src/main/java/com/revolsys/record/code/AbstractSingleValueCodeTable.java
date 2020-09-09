@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.identifier.SingleIdentifier;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.util.CaseConverter;
 
 public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
@@ -258,5 +259,13 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
     this.identifiers.clear();
     this.idValueCache.clear();
     this.valueIdCache.clear();
+  }
+
+  public void setValues(final MapEx values) {
+    for (final String key : values.keySet()) {
+      final Object value = values.get(key);
+      final Identifier id = Identifier.newIdentifier(key);
+      addValue(id, value);
+    }
   }
 }

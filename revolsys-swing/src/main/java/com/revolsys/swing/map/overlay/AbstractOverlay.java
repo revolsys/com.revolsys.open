@@ -857,7 +857,7 @@ public abstract class AbstractOverlay extends JComponent
       } else {
         final LayerRecordMenu menuFactory = record.getMenu();
         popupMenu = BaseJPopupMenu.showMenu(() -> {
-          LayerRecordMenu.setEventRecord(record);
+          layer.setMenuRecord(record);
           final BaseJPopupMenu menu = menuFactory.newJPopupMenu();
           final String title = layer.getName();
           menu.addTitle(title);

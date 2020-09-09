@@ -38,7 +38,6 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
-import com.revolsys.swing.map.layer.record.LayerRecordMenu;
 import com.revolsys.swing.map.layer.record.table.model.RecordLayerTableModel;
 import com.revolsys.swing.table.TablePanel;
 import com.revolsys.swing.table.editor.BaseTableCellEditor;
@@ -252,7 +251,8 @@ public class RecordLayerTable extends RecordRowTable {
   public boolean editCellAt(final int row, final int column, final EventObject e) {
     if (e == null || e instanceof MouseEvent && !((MouseEvent)e).isShiftDown()) {
       final LayerRecord record = getRecord(row);
-      LayerRecordMenu.setEventRecord(record);
+      final AbstractRecordLayer layer = getLayer();
+      layer.setMenuRecord(record);
       return super.editCellAt(row, column, e);
     } else {
       return false;

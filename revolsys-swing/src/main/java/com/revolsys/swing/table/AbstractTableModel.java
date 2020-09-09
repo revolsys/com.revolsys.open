@@ -42,7 +42,7 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
 
   private static final long serialVersionUID = 1L;
 
-  private MenuFactory menu = new MenuFactory(getClass().getName());
+  private MenuFactory menu;
 
   private PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
 
@@ -204,13 +204,16 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
     return null;
   }
 
-  public MenuFactory getMenu() {
+  public synchronized MenuFactory getMenu() {
+    if (this.menu == null) {
+      this.menu = newMenu();
+    }
     return this.menu;
   }
 
   public BaseJPopupMenu getMenu(final int rowIndex, final int columnIndex) {
     if (rowIndex >= 0 && rowIndex < getRowCount()) {
-      return this.menu.newJPopupMenu();
+      return getMenu().newJPopupMenu();
     } else {
       return null;
     }
@@ -256,6 +259,10 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
     return null;
   }
 
+  protected MenuFactory newMenu() {
+    return new MenuFactory(getClass().getName());
+  }
+
   public BaseJTable newTable() {
     final BaseJTable table = new BaseJTable(this);
     this.undoManager.addKeyMap(table);
@@ -271,10 +278,6 @@ public abstract class AbstractTableModel extends javax.swing.table.AbstractTable
   public TablePanel newTablePanel() {
     final BaseJTable table = newTable();
     return new TablePanel(table);
-  }
-
-  public void setMenu(final MenuFactory menu) {
-    this.menu = menu;
   }
 
   public void setTable(final BaseJTable table) {

@@ -35,7 +35,7 @@ public class SingleValueCodeTableProperty extends SingleValueRecordStoreCodeTabl
     recordDefinition.setProperty(propertyName, this);
     recordDefinition.setProperty("codeTable", this);
     final RecordStore recordStore = getRecordStore();
-    recordStore.addCodeTable(this.getCodeTable());
+    recordStore.addCodeTable(getCodeTable());
   }
 
   @Override
