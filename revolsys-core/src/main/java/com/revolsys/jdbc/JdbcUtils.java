@@ -1,10 +1,13 @@
 package com.revolsys.jdbc;
 
+import java.lang.management.ManagementFactory;
 import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Date;
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -13,10 +16,12 @@ import java.sql.Statement;
 import java.sql.Struct;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.management.ObjectName;
 import javax.sql.DataSource;
 
 import org.jeometry.common.io.PathName;
@@ -296,7 +301,7 @@ public final class JdbcUtils {
 
   public static String getSelectSql(final Query query) {
     final String tableName = query.getTypeName();
-    final String dbTableName = getQualifiedTableName(tableName);
+    final String dbTableName = query.getQualifiedTableName();
 
     String sql = query.getSql();
     final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
@@ -358,7 +363,6 @@ public final class JdbcUtils {
     final String tablePrefix, final boolean distinct, final String fromClause,
     final List<String> fieldNames, final Query query,
     final Map<? extends CharSequence, Boolean> orderBy, final LockMode lockMode) {
-    final String typePath = recordDefinition.getPath();
     final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");
     if (distinct) {
@@ -374,7 +378,7 @@ public final class JdbcUtils {
     if (Property.hasValue(fromClause)) {
       sql.append(fromClause);
     } else {
-      final String tableName = getQualifiedTableName(typePath);
+      final String tableName = recordDefinition.getQualifiedTableName();
       sql.append(tableName);
       sql.append(" ");
       sql.append(tablePrefix);
@@ -545,7 +549,7 @@ public final class JdbcUtils {
     }
   }
 
-  public static Map<String, Object> selectMap(final Connection connection, final String sql,
+  public static MapEx selectMap(final Connection connection, final String sql,
     final Object... parameters) throws SQLException {
     final PreparedStatement statement = connection.prepareStatement(sql);
     try {
@@ -566,7 +570,7 @@ public final class JdbcUtils {
     }
   }
 
-  public static Map<String, Object> selectMap(final DataSource dataSource, final String sql,
+  public static MapEx selectMap(final DataSource dataSource, final String sql,
     final Object... parameters) throws SQLException {
     final Connection connection = getConnection(dataSource);
     try {
@@ -628,6 +632,34 @@ public final class JdbcUtils {
   public static Struct struct(final Connection connection, final String type, final Object... args)
     throws SQLException {
     return connection.createStruct(type, args);
+  }
+
+  public static void unregisterDrivers(final ClassLoader classLoader) {
+    try {
+      final Enumeration<Driver> drivers = DriverManager.getDrivers();
+      while (drivers.hasMoreElements()) {
+        final Driver driver = drivers.nextElement();
+        try {
+          final Class<? extends Driver> driverClass = driver.getClass();
+          if (driverClass.getClassLoader() == classLoader) {
+            DriverManager.deregisterDriver(driver);
+          }
+
+        } catch (final Throwable e) {
+          Logs.error(JdbcUtils.class, "Unable to unregister driver: " + driver, e);
+        }
+      }
+    } catch (final Throwable e) {
+      Logs.error(JdbcUtils.class, "Unable to unregister drivers", e);
+    }
+    try {
+      // Cleanup Oracle MBean
+      final ObjectName objectname = new ObjectName("com.oracle.jdbc:type=diagnosability,name="
+        + classLoader.getClass().getName() + "@" + Integer.toHexString(classLoader.hashCode()));
+      ManagementFactory.getPlatformMBeanServer().unregisterMBean(objectname);
+    } catch (final Throwable e) {
+      Logs.error(JdbcUtils.class, "Unable to remove Oracle MBean", e);
+    }
   }
 
   private JdbcUtils() {

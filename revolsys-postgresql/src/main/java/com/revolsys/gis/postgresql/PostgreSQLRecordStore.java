@@ -13,6 +13,7 @@ import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.CollectionDataType;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.io.PathName;
 import org.postgresql.jdbc.PgConnection;
 
 import com.revolsys.collection.ResultPager;
@@ -36,6 +37,7 @@ import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
+import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.property.ShortNameProperty;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
@@ -98,14 +100,15 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
       final DataType elementDataType = elementField.getDataType();
       final CollectionDataType listDataType = new CollectionDataType(
         "List" + elementDataType.getName(), List.class, elementDataType);
-      field = new PostgreSQLArrayFieldDefinition(dbColumnName, name, listDataType, sqlType, length,
-        scale, required, description, elementField, getProperties());
+      field = new PostgreSQLArrayFieldDefinition(dbColumnName, name, listDataType,
+        elementDbDataType, sqlType, length, scale, required, description, elementField,
+        getProperties());
       recordDefinition.addField(field);
     } else {
       field = super.addField(recordDefinition, dbColumnName, name, dbDataType, sqlType, length,
         scale, required, description);
     }
-    if (!dbColumnName.matches("[a-z_]+")) {
+    if (!dbColumnName.equals(dbColumnName.toLowerCase())) {
       field.setQuoteName(true);
     }
     return field;
@@ -247,10 +250,15 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
 
     addFieldAdder("date", new JdbcFieldAdder(DataTypes.DATE_TIME));
     addFieldAdder("timestamp", new JdbcFieldAdder(DataTypes.TIMESTAMP));
+    addFieldAdder("timestamptz", new JdbcFieldAdder(DataTypes.TIMESTAMP));
 
     addFieldAdder("bool", new JdbcFieldAdder(DataTypes.BOOLEAN));
 
+    addFieldAdder("uuid", new JdbcFieldAdder(DataTypes.UUID));
+
     addFieldAdder("oid", PostgreSQLJdbcBlobFieldDefinition::new);
+
+    addFieldAdder("jsonb", new JdbcFieldAdder(Json.JSON_TYPE));
 
     final JdbcFieldAdder geometryFieldAdder = new PostgreSQLGeometryFieldAdder(this);
     addFieldAdder("geometry", geometryFieldAdder);
@@ -322,6 +330,15 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
 
   public boolean isUseSchemaSequencePrefix() {
     return this.useSchemaSequencePrefix;
+  }
+
+  @Override
+  protected JdbcRecordDefinition newRecordDefinition(final JdbcRecordStoreSchema schema,
+    final PathName pathName, String dbTableName) {
+    if (dbTableName.charAt(0) != '"' && !dbTableName.equals(dbTableName.toLowerCase())) {
+      dbTableName = '"' + dbTableName + '"';
+    }
+    return super.newRecordDefinition(schema, pathName, dbTableName);
   }
 
   @Override

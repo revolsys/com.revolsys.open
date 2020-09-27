@@ -137,6 +137,20 @@ public class JdbcConnection implements Connection {
     return getConnection().createStruct(typeName, attributes);
   }
 
+  public int executeUpdate(final String sql, final Object... parameters) {
+    try {
+      final PreparedStatement statement = this.connection.prepareStatement(sql);
+      try {
+        JdbcUtils.setParameters(statement, parameters);
+        return statement.executeUpdate();
+      } finally {
+        JdbcUtils.close(statement);
+      }
+    } catch (final SQLException e) {
+      throw this.getException("Update", sql, e);
+    }
+  }
+
   @Override
   public boolean getAutoCommit() throws SQLException {
     return getConnection().getAutoCommit();
@@ -357,6 +371,11 @@ public class JdbcConnection implements Connection {
   @Override
   public void setReadOnly(final boolean readOnly) throws SQLException {
     getConnection().setReadOnly(readOnly);
+  }
+
+  public int setRole(final String roleName) {
+    final String sql = "SET ROLE " + roleName;
+    return executeUpdate(sql);
   }
 
   @Override

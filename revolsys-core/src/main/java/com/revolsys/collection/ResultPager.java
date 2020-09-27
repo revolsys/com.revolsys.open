@@ -17,6 +17,7 @@ package com.revolsys.collection;
 
 import java.io.Closeable;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * <p>
@@ -35,6 +36,11 @@ import java.util.List;
 public interface ResultPager<T> extends Closeable {
   @Override
   void close();
+
+  default void forEachInPage(final Consumer<T> action) {
+    final List<T> list = getList();
+    list.forEach(action);
+  }
 
   /**
    * Get the index of the last object in the current page.

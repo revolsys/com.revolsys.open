@@ -8,7 +8,7 @@ import java.util.Set;
 import com.revolsys.collection.map.MapEx;
 
 public interface JsonObject extends MapEx, JsonType {
-  public static final JsonObject EMPTY = new JsonObject() {
+  JsonObject EMPTY = new JsonObject() {
     @Override
     public JsonObject clone() {
       return this;
@@ -48,7 +48,7 @@ public interface JsonObject extends MapEx, JsonType {
     return new JsonObjectHash(key, value);
   }
 
-  public static JsonObject newItems(final List<?> items) {
+  static JsonObject newItems(final List<?> items) {
     return new JsonObjectHash("items", items);
   }
 
@@ -98,4 +98,7 @@ public interface JsonObject extends MapEx, JsonType {
     return null;
   }
 
+  default String toJsonString() {
+    return Json.toString(this);
+  }
 }

@@ -1,11 +1,13 @@
 package com.revolsys.record.schema;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.code.CodeTable;
 
@@ -38,7 +40,8 @@ public class RecordDefinitionBuilder {
       final FieldDefinition fieldDefinition = recordDefinition.getFieldDefinition(fieldName);
       addField(fieldDefinition);
     }
-    this.recordDefinition.setIdFieldNames(recordDefinition.getIdFieldNames());
+    this.recordDefinition.setIdFieldNames(
+      Lists.filter(recordDefinition.getIdFieldNames(), (name) -> fieldNames.contains(name)));
     this.recordDefinition.setGeometryFieldName(recordDefinition.getGeometryFieldName());
     this.recordDefinition.setGeometryFactory(recordDefinition.getGeometryFactory());
   }
@@ -142,6 +145,11 @@ public class RecordDefinitionBuilder {
 
   public void setIdFieldName(final String name) {
     this.recordDefinition.setIdFieldName(name);
+  }
+
+  public RecordDefinitionBuilder setIdFieldNames(final List<String> idFieldNames) {
+    this.recordDefinition.setIdFieldNames(idFieldNames);
+    return this;
   }
 
   public RecordDefinitionBuilder setPathName(final String path) {

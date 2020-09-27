@@ -39,6 +39,7 @@ import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.record.io.RecordStoreFactory;
 import com.revolsys.record.io.RecordStoreQueryReader;
 import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
@@ -300,6 +301,24 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   RecordStoreIteratorFactory getIteratorFactory();
 
   String getLabel();
+
+  default Record getRecord(final PathName typePath, final Condition condition) {
+    final Query query = new Query(typePath)//
+      .setWhereCondition(condition);
+
+    Record firstRecord = null;
+    try (
+      RecordReader records = getRecords(query)) {
+      for (final Record record : records) {
+        if (firstRecord == null) {
+          firstRecord = record;
+        } else {
+          throw new IllegalArgumentException("Query matched multiple objects\n" + query);
+        }
+      }
+    }
+    return firstRecord;
+  }
 
   default Record getRecord(final PathName typePath, final Identifier id) {
     final Query query = newGetRecordQuery(typePath, id);

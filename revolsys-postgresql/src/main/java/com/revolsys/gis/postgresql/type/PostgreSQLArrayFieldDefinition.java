@@ -5,11 +5,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import org.jeometry.common.data.type.CollectionDataType;
 import org.jeometry.common.data.type.DataType;
+import org.postgresql.jdbc.PgConnection;
 
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 
@@ -19,11 +21,14 @@ public class PostgreSQLArrayFieldDefinition extends JdbcFieldDefinition {
 
   private final JdbcFieldDefinition elementField;
 
+  private final String elementDbDataType;
+
   public PostgreSQLArrayFieldDefinition(final String dbName, final String name,
-    final CollectionDataType dataType, final int sqlType, final int length, final int scale,
-    final boolean required, final String description, final JdbcFieldDefinition elementField,
-    final Map<String, Object> properties) {
+    final CollectionDataType dataType, final String elementDbDataType, final int sqlType,
+    final int length, final int scale, final boolean required, final String description,
+    final JdbcFieldDefinition elementField, final Map<String, Object> properties) {
     super(dbName, name, dataType, sqlType, length, scale, required, description, properties);
+    this.elementDbDataType = elementDbDataType;
     this.elementDataType = dataType.getContentType();
     this.elementField = elementField;
   }
@@ -49,7 +54,28 @@ public class PostgreSQLArrayFieldDefinition extends JdbcFieldDefinition {
   @Override
   public int setInsertPreparedStatementValue(final PreparedStatement statement,
     final int parameterIndex, final Object value) throws SQLException {
-    statement.setObject(parameterIndex, value);
+    Array array;
+    if (value instanceof Array) {
+      array = (Array)value;
+    } else if (value instanceof Collection) {
+      final Collection<?> elements = (Collection<?>)value;
+      final int size = elements.size();
+      final Object[] values = new Object[size];
+      int i = 0;
+      for (final Object element : elements) {
+        values[i++] = this.elementDataType.toObject(element);
+      }
+      final PgConnection connection = statement.getConnection().unwrap(PgConnection.class);
+      array = connection.createArrayOf(this.elementDbDataType, elements);
+    } else {
+      final Object[] values = new Object[] {
+        this.elementDataType.toObject(value)
+      };
+      final PgConnection connection = statement.getConnection().unwrap(PgConnection.class);
+      array = connection.createArrayOf(this.elementDbDataType, values);
+    }
+
+    statement.setArray(parameterIndex, array);
     return parameterIndex + 1;
   }
 

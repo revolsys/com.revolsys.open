@@ -37,6 +37,11 @@ public class JdbcRecordDefinition extends RecordDefinitionImpl {
   }
 
   @Override
+  public String getQualifiedTableName() {
+    return this.dbTableQualifiedName;
+  }
+
+  @Override
   public JdbcRecordDefinition rename(final String path) {
     final JdbcRecordStoreSchema schema = getSchema();
     final PathName pathName = PathName.newPathName(path);

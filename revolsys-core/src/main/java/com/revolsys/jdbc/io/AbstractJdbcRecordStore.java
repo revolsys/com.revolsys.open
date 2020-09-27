@@ -119,6 +119,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   private final Object writerKey = new Object();
 
+  private boolean useUpperCaseNames = true;
+
   public AbstractJdbcRecordStore() {
     this(ArrayRecord.FACTORY);
   }
@@ -149,7 +151,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   protected void addAllSchemaNames(final String schemaName) {
-    this.allSchemaNames.add(schemaName.toUpperCase());
+    this.allSchemaNames.add(toUpperIfNeeded(schemaName));
   }
 
   public void addExcludeTablePaths(final String tableName) {
@@ -172,7 +174,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     final int length = resultSetMetaData.getPrecision(i);
     final int scale = resultSetMetaData.getScale(i);
     final boolean required = false;
-    addField(recordDefinition, name, name.toUpperCase(), dataType, sqlType, length, scale, required,
+    final String fieldName = toUpperIfNeeded(name);
+    addField(recordDefinition, name, fieldName, dataType, sqlType, length, scale, required,
       description);
   }
 
@@ -420,7 +423,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
       final RecordDefinition recordDefinition = getRecordDefinition(typePath);
       for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
-        final String fieldName = resultSetMetaData.getColumnName(i).toUpperCase();
+        final String columnName = resultSetMetaData.getColumnName(i);
+        final String fieldName = toUpperIfNeeded(columnName);
         if (recordDefinition != null && recordDefinition.isIdField(fieldName)) {
           resultRecordDefinition.setIdFieldIndex(i - 1);
         }
@@ -517,9 +521,9 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   protected boolean isExcluded(final String dbSchemaName, final String tableName) {
     String path = "/";
     if (dbSchemaName != null) {
-      path += dbSchemaName.toUpperCase() + "/";
+      path += toUpperIfNeeded(dbSchemaName) + "/";
     }
-    path += tableName.toUpperCase();
+    path += toUpperIfNeeded(tableName);
     path = path.replaceAll("/+", "/");
     if (this.excludeTablePaths.contains(path)) {
       return true;
@@ -552,8 +556,12 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   public abstract boolean isSchemaExcluded(String schemaName);
 
+  public boolean isUseUpperCaseNames() {
+    return this.useUpperCaseNames;
+  }
+
   protected synchronized Map<String, List<String>> loadIdFieldNames(final String dbSchemaName) {
-    final String schemaName = "/" + dbSchemaName.toUpperCase();
+    final String schemaName = "/" + toUpperIfNeeded(dbSchemaName);
     final Map<String, List<String>> idFieldNames = new HashMap<>();
     if (Property.hasValue(this.primaryKeySql)) {
       try {
@@ -566,7 +574,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
           try (
             final ResultSet rs = statement.executeQuery()) {
             while (rs.next()) {
-              final String tableName = rs.getString("TABLE_NAME").toUpperCase();
+              final String tableName = toUpperIfNeeded(rs.getString("TABLE_NAME"));
               final String idFieldName = rs.getString("COLUMN_NAME");
               if (Property.hasValue(dbSchemaName)) {
                 Maps.addToList(idFieldNames, schemaName + "/" + tableName, idFieldName);
@@ -626,7 +634,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
         while (resultSet.next()) {
           final String dbTableName = resultSet.getString("TABLE_NAME");
           if (!isExcluded(dbSchemaName, dbTableName)) {
-            final String tableName = dbTableName.toUpperCase();
+            final String tableName = toUpperIfNeeded(dbTableName);
             final PathName pathName = schemaPath.newChild(tableName);
 
             JdbcRecordDefinition recordDefinition = recordDefinitionMap.get(pathName);
@@ -801,7 +809,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
         final Map<PathName, RecordStoreSchemaElement> schemas = new TreeMap<>();
         final Set<String> databaseSchemaNames = getDatabaseSchemaNames();
         for (final String dbSchemaName : databaseSchemaNames) {
-          final PathName childSchemaPath = schemaPath.newChild(dbSchemaName.toUpperCase());
+          final PathName childSchemaPath = schemaPath.newChild(toUpperIfNeeded(dbSchemaName));
           RecordStoreSchema childSchema = schema.getSchema(childSchemaPath);
           if (childSchema == null) {
             childSchema = new JdbcRecordStoreSchema(rootSchema, childSchemaPath, dbSchemaName);
@@ -845,12 +853,12 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
         try (
           final ResultSet columnsRs = databaseMetaData.getColumns(null, dbSchemaName, "%", "%")) {
           while (columnsRs.next()) {
-            final String tableName = columnsRs.getString("TABLE_NAME").toUpperCase();
+            final String tableName = toUpperIfNeeded(columnsRs.getString("TABLE_NAME"));
             final PathName typePath = schemaPath.newChild(tableName);
             final JdbcRecordDefinition recordDefinition = recordDefinitionMap.get(typePath);
             if (recordDefinition != null) {
               final String dbColumnName = columnsRs.getString("COLUMN_NAME");
-              final String name = dbColumnName.toUpperCase();
+              final String name = toUpperIfNeeded(dbColumnName);
               final int sqlType = columnsRs.getInt("DATA_TYPE");
               final String dataType = columnsRs.getString("TYPE_NAME");
               final int length = columnsRs.getInt("COLUMN_SIZE");
@@ -860,8 +868,10 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
               }
               final boolean required = !columnsRs.getString("IS_NULLABLE").equals("YES");
               final String description = columnsRs.getString("REMARKS");
-              addField(recordDefinition, dbColumnName, name, dataType, sqlType, length, scale,
-                required, description);
+              final JdbcFieldDefinition field = addField(recordDefinition, dbColumnName, name,
+                dataType, sqlType, length, scale, required, description);
+              final boolean generated = columnsRs.getString("IS_GENERATEDCOLUMN").equals("YES");
+              field.setGenerated(generated);
             }
           }
 
@@ -954,6 +964,22 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   protected void setUsesSchema(final boolean usesSchema) {
     this.usesSchema = usesSchema;
+  }
+
+  @Override
+  public JdbcRecordStore setUseUpperCaseNames(final boolean useUpperCaseNames) {
+    this.useUpperCaseNames = useUpperCaseNames;
+    return this;
+  }
+
+  protected String toUpperIfNeeded(final String name) {
+    String fieldName;
+    if (isUseUpperCaseNames()) {
+      fieldName = name.toUpperCase();
+    } else {
+      fieldName = name;
+    }
+    return fieldName;
   }
 
 }

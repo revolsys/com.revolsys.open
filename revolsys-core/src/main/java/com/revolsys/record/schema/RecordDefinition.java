@@ -6,12 +6,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.io.PathName;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
@@ -239,6 +241,11 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
   List<FieldDefinition> getIdFields();
 
   ClockDirection getPolygonRingDirection();
+
+  default String getQualifiedTableName() {
+    final PathName pathName = getPathName();
+    return JdbcUtils.getQualifiedTableName(pathName.toString());
+  }
 
   @Override
   default RecordDefinition getRecordDefinition() {

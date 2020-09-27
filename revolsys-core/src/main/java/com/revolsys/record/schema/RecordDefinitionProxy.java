@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.io.PathNameProxy;
 
@@ -11,6 +12,8 @@ import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
+import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.Query;
 import com.revolsys.util.IconNameProxy;
 
 public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, GeometryFactoryProxy {
@@ -152,6 +155,36 @@ public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, Geo
     }
   }
 
+  default Record getRecord(final Condition condition) {
+    final PathName pathName = getPathName();
+    final RecordStore recordStore = getRecordStore();
+    if (recordStore == null) {
+      throw new IllegalStateException(String.format("%s doesn't have a record store", pathName));
+    } else {
+      return recordStore.getRecord(pathName, condition);
+    }
+  }
+
+  default Record getRecord(final Identifier id) {
+    final PathName pathName = getPathName();
+    final RecordStore recordStore = getRecordStore();
+    if (recordStore == null) {
+      throw new IllegalStateException(String.format("%s doesn't have a record store", pathName));
+    } else {
+      return recordStore.getRecord(pathName, id);
+    }
+  }
+
+  default Record getRecord(final String id) {
+    final PathName pathName = getPathName();
+    final RecordStore recordStore = getRecordStore();
+    if (recordStore == null) {
+      throw new IllegalStateException(String.format("%s doesn't have a record store", pathName));
+    } else {
+      return recordStore.getRecord(pathName, id);
+    }
+  }
+
   RecordDefinition getRecordDefinition();
 
   default <R extends Record> RecordFactory<R> getRecordFactory() {
@@ -235,6 +268,11 @@ public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, Geo
     } else {
       return recordDefinition.isIdField(fieldName);
     }
+  }
+
+  default Query newQuery() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return new Query(recordDefinition);
   }
 
   default RecordDefinition newRecordDefinition(final Collection<String> fieldNames) {

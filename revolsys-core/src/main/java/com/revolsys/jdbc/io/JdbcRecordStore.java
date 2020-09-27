@@ -28,11 +28,7 @@ public interface JdbcRecordStore extends RecordStore {
     try (
       Transaction transaction = newTransaction(Propagation.REQUIRED);
       final JdbcConnection connection = getJdbcConnection()) {
-      try {
-        return JdbcUtils.executeUpdate(connection, sql, parameters);
-      } catch (final SQLException e) {
-        throw connection.getException("Update", sql, e);
-      }
+      return connection.executeUpdate(sql, parameters);
     }
   }
 
@@ -61,11 +57,8 @@ public interface JdbcRecordStore extends RecordStore {
       final JdbcConnection connection = getJdbcConnection()) {
       final String tableName = JdbcUtils.getQualifiedTableName(typePath);
       final String sql = "LOCK TABLE " + tableName + " IN SHARE MODE";
-      JdbcUtils.executeUpdate(connection, sql);
-    } catch (final SQLException e) {
-      throw new RuntimeException("Unable to lock table " + typePath, e);
+      connection.executeUpdate(sql);
     }
-
   }
 
   default int selectInt(final String sql, final Object... parameters) {
@@ -155,5 +148,11 @@ public interface JdbcRecordStore extends RecordStore {
       where.appendParameters(index, statement);
     }
   }
+
+  default int setRole(final String roleName) {
+    return executeUpdate("SET ROLE " + roleName);
+  }
+
+  JdbcRecordStore setUseUpperCaseNames(boolean useUpperCaseNames);
 
 }

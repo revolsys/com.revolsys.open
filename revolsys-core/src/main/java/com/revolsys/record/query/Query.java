@@ -240,7 +240,7 @@ public class Query extends BaseObjectWithProperties
     if (this.recordDefinition != null) {
       final FieldDefinition fieldDefinition = this.recordDefinition.getField(fieldName);
       if (fieldDefinition != null) {
-        return this.addOrderBy(fieldDefinition, ascending);
+        return addOrderBy(fieldDefinition, ascending);
       }
     }
     this.orderBy.put(fieldName, ascending);
@@ -406,6 +406,14 @@ public class Query extends BaseObjectWithProperties
     return this.parameters;
   }
 
+  public String getQualifiedTableName() {
+    if (this.recordDefinition == null) {
+      return JdbcUtils.getQualifiedTableName(getTypeName());
+    } else {
+      return this.recordDefinition.getQualifiedTableName();
+    }
+  }
+
   @Override
   public RecordDefinition getRecordDefinition() {
     return this.recordDefinition;
@@ -449,6 +457,10 @@ public class Query extends BaseObjectWithProperties
     return this.whereCondition;
   }
 
+  public boolean hasOrderBy(final String fieldName) {
+    return this.orderBy.containsKey(fieldName);
+  }
+
   public boolean isDistinct() {
     return this.distinct;
   }
@@ -480,7 +492,7 @@ public class Query extends BaseObjectWithProperties
     return this;
   }
 
-  public Query setFieldNames(final List<String> fieldNames) {
+  public Query setFieldNames(final Collection<String> fieldNames) {
     this.fieldNames = Lists.toArray(fieldNames);
     return this;
   }

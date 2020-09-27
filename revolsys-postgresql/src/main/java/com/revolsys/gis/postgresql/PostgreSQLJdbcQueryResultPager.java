@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.io.JdbcQueryIterator;
@@ -28,43 +29,51 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
   }
 
   @Override
+  public void forEachInPage(final Consumer<Record> action) {
+    synchronized (this) {
+      final int pageSize = getPageSize();
+      final int pageNumber = getPageNumber();
+      if (pageNumber != -1) {
+        String sql = getSql();
+
+        final int startRowNum = (pageNumber - 1) * pageSize;
+        sql = getSql() + " OFFSET " + startRowNum + " LIMIT " + pageSize;
+
+        final RecordDefinition recordDefinition = getRecordDefinition();
+        if (recordDefinition != null) {
+          final RecordFactory recordFactory = getRecordFactory();
+          final JdbcRecordStore recordStore = getRecordStore();
+          try (
+            JdbcConnection connection = recordStore.getJdbcConnection()) {
+
+            try (
+              final PreparedStatement statement = connection.prepareStatement(sql);
+              final ResultSet resultSet = recordStore.getResultSet(statement, getQuery());) {
+              if (resultSet.next()) {
+                int i = 0;
+                do {
+                  final Record record = JdbcQueryIterator.getNextRecord(recordStore,
+                    recordDefinition, this.fields, recordFactory, resultSet, this.internStrings);
+                  action.accept(record);
+                  i++;
+                } while (resultSet.next() && i < pageSize);
+              }
+            } catch (final SQLException e) {
+              throw connection.getException("updateResults", sql, e);
+            }
+          }
+        }
+      }
+
+    }
+  }
+
+  @Override
   public List<Record> getList() {
     synchronized (this) {
       if (this.results == null) {
         final ArrayList<Record> results = new ArrayList<>();
-        final int pageSize = getPageSize();
-        final int pageNumber = getPageNumber();
-        if (pageNumber != -1) {
-          String sql = getSql();
-
-          final int startRowNum = (pageNumber - 1) * pageSize;
-          sql = getSql() + " OFFSET " + startRowNum + " LIMIT " + pageSize;
-
-          final RecordDefinition recordDefinition = getRecordDefinition();
-          if (recordDefinition != null) {
-            final RecordFactory recordFactory = getRecordFactory();
-            final JdbcRecordStore recordStore = getRecordStore();
-            try (
-              JdbcConnection connection = recordStore.getJdbcConnection()) {
-
-              try (
-                final PreparedStatement statement = connection.prepareStatement(sql);
-                final ResultSet resultSet = recordStore.getResultSet(statement, getQuery());) {
-                if (resultSet.next()) {
-                  int i = 0;
-                  do {
-                    final Record records = JdbcQueryIterator.getNextRecord(recordStore,
-                      recordDefinition, this.fields, recordFactory, resultSet, this.internStrings);
-                    results.add(records);
-                    i++;
-                  } while (resultSet.next() && i < pageSize);
-                }
-              } catch (final SQLException e) {
-                throw connection.getException("updateResults", sql, e);
-              }
-            }
-          }
-        }
+        forEachInPage(results::add);
         this.results = results;
       }
       return this.results;

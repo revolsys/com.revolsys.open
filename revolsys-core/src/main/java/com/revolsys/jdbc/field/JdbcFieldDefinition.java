@@ -18,6 +18,8 @@ public class JdbcFieldDefinition extends FieldDefinition {
 
   private int sqlType;
 
+  private boolean generated = false;
+
   JdbcFieldDefinition() {
     setName(JdbcFieldDefinitions.UNKNOWN);
   }
@@ -79,6 +81,10 @@ public class JdbcFieldDefinition extends FieldDefinition {
     return resultSet.getObject(columnIndex);
   }
 
+  public boolean isGenerated() {
+    return this.generated;
+  }
+
   public boolean isQuoteName() {
     return this.quoteName;
   }
@@ -105,6 +111,11 @@ public class JdbcFieldDefinition extends FieldDefinition {
     final int index = getIndex();
     record.setValue(index, value);
     return columnIndex + 1;
+  }
+
+  public JdbcFieldDefinition setGenerated(final boolean generated) {
+    this.generated = generated;
+    return this;
   }
 
   public int setInsertPreparedStatementValue(final PreparedStatement statement,

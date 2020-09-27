@@ -85,9 +85,9 @@ public class LogbackUtil {
     logger.addAppender(appender);
   }
 
-  public static void addRootAppender(final String pattern) {
+  public static ConsoleAppender<ILoggingEvent> addRootAppender(final String pattern) {
     final Logger logger = getRootLogger();
-    addConsoleAppender(logger, pattern);
+    return addConsoleAppender(logger, pattern);
   }
 
   public static FileAppender<ILoggingEvent> addRootFileAppender(final File logFile,

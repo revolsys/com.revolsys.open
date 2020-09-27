@@ -121,7 +121,12 @@ public class JdbcRecordWriterTypeData {
       }
       addCount();
     } else {
-      this.recordStore.executeUpdate(this.statement);
+      try {
+        this.recordStore.executeUpdate(this.statement);
+      } catch (final SQLException e) {
+        System.out.println(this.sql);
+        throw e;
+      }
       try (
         final ResultSet generatedKeyResultSet = this.statement.getGeneratedKeys()) {
         if (generatedKeyResultSet.next()) {

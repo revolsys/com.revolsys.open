@@ -290,32 +290,37 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
     sqlBuffer.append(" (");
     boolean first = true;
     for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
-      if (!(hasRowIdField && fieldDefinition.isIdField())) {
-        if (first) {
-          first = false;
-        } else {
-          sqlBuffer.append(',');
+      final JdbcFieldDefinition jdbcField = (JdbcFieldDefinition)fieldDefinition;
+      if (!jdbcField.isGenerated()) {
+        if (!(hasRowIdField && fieldDefinition.isIdField())) {
+          if (first) {
+            first = false;
+          } else {
+            sqlBuffer.append(',');
+          }
+          fieldDefinition.appendColumnName(sqlBuffer, this.quoteColumnNames);
         }
-        fieldDefinition.appendColumnName(sqlBuffer, this.quoteColumnNames);
       }
     }
 
     sqlBuffer.append(") VALUES (");
     first = true;
     for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
-      final boolean idField = fieldDefinition.isIdField();
-      if (!(hasRowIdField && idField)) {
-        if (first) {
-          first = false;
-        } else {
-          sqlBuffer.append(',');
-        }
-        if (idField && generatePrimaryKey) {
-          final String primaryKeySql = recordStore.getGeneratePrimaryKeySql(recordDefinition);
-          sqlBuffer.append(primaryKeySql);
-        } else {
-          ((JdbcFieldDefinition)fieldDefinition).addInsertStatementPlaceHolder(sqlBuffer,
-            generatePrimaryKey);
+      final JdbcFieldDefinition jdbcField = (JdbcFieldDefinition)fieldDefinition;
+      if (!jdbcField.isGenerated()) {
+        final boolean idField = fieldDefinition.isIdField();
+        if (!(hasRowIdField && idField)) {
+          if (first) {
+            first = false;
+          } else {
+            sqlBuffer.append(',');
+          }
+          if (idField && generatePrimaryKey) {
+            final String primaryKeySql = recordStore.getGeneratePrimaryKeySql(recordDefinition);
+            sqlBuffer.append(primaryKeySql);
+          } else {
+            jdbcField.addInsertStatementPlaceHolder(sqlBuffer, generatePrimaryKey);
+          }
         }
       }
     }
@@ -375,14 +380,16 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
       for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
         if (!idFields.contains(fieldDefinition)) {
           final JdbcFieldDefinition jdbcFieldDefinition = (JdbcFieldDefinition)fieldDefinition;
-          if (first) {
-            first = false;
-          } else {
-            sqlBuffer.append(", ");
+          if (!jdbcFieldDefinition.isGenerated()) {
+            if (first) {
+              first = false;
+            } else {
+              sqlBuffer.append(", ");
+            }
+            jdbcFieldDefinition.appendColumnName(sqlBuffer, this.quoteColumnNames);
+            sqlBuffer.append(" = ");
+            jdbcFieldDefinition.addInsertStatementPlaceHolder(sqlBuffer, false);
           }
-          jdbcFieldDefinition.appendColumnName(sqlBuffer, this.quoteColumnNames);
-          sqlBuffer.append(" = ");
-          jdbcFieldDefinition.addInsertStatementPlaceHolder(sqlBuffer, false);
         }
       }
       sqlBuffer.append(" where ");
@@ -433,8 +440,11 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
       final PreparedStatement statement = data.getStatement();
       int parameterIndex = 1;
       for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
-        parameterIndex = ((JdbcFieldDefinition)fieldDefinition)
-          .setInsertPreparedStatementValue(statement, parameterIndex, record);
+        final JdbcFieldDefinition jdbcField = (JdbcFieldDefinition)fieldDefinition;
+        if (!jdbcField.isGenerated()) {
+          parameterIndex = jdbcField.setInsertPreparedStatementValue(statement, parameterIndex,
+            record);
+        }
       }
       data.insertRecord(record);
     }
@@ -573,8 +583,10 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
     for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
       if (!fieldDefinition.isIdField()) {
         final JdbcFieldDefinition jdbcFieldDefinition = (JdbcFieldDefinition)fieldDefinition;
-        parameterIndex = jdbcFieldDefinition.setInsertPreparedStatementValue(statement,
-          parameterIndex, record);
+        if (!jdbcFieldDefinition.isGenerated()) {
+          parameterIndex = jdbcFieldDefinition.setInsertPreparedStatementValue(statement,
+            parameterIndex, record);
+        }
       }
     }
     parameterIndex = setIdEqualsValues(statement, parameterIndex, recordDefinition, record);

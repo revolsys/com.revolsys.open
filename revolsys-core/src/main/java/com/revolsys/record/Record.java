@@ -136,6 +136,11 @@ public interface Record
     return s.toString();
   }
 
+  @Override
+  default Record add(final String key, final Object value) {
+    return (Record)MapEx.super.add(key, value);
+  }
+
   @SuppressWarnings("unchecked")
   default <R extends Record> int addTo(final List<R> records) {
     if (!contains(records)) {
