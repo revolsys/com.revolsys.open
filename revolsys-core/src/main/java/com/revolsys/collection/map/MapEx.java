@@ -14,7 +14,7 @@ import org.jeometry.common.data.type.DataTypedValue;
 import org.jeometry.common.data.type.DataTypes;
 
 public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedValue {
-  static final MapEx EMPTY = new MapEx() {
+  MapEx EMPTY = new MapEx() {
     @Override
     public MapEx clone() {
       return this;
@@ -271,5 +271,28 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
   default boolean hasValue(final CharSequence name) {
     final Object value = getValue(name);
     return value != null;
+  }
+
+  @SuppressWarnings("unchecked")
+  default <T extends Object> T removeValue(final CharSequence name) {
+    if (name == null) {
+      return null;
+    } else {
+      return (T)remove(name.toString());
+    }
+  }
+
+  default <T extends Object> T removeValue(final CharSequence name, final DataType dataType) {
+    final Object value = removeValue(name);
+    return dataType.toObject(value);
+  }
+
+  default <V> V removeValue(final CharSequence name, final V defaultValue) {
+    final V value = removeValue(name);
+    if (value == null) {
+      return defaultValue;
+    } else {
+      return value;
+    }
   }
 }

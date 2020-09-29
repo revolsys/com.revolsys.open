@@ -66,7 +66,7 @@ public class PostgreSQLArrayFieldDefinition extends JdbcFieldDefinition {
         values[i++] = this.elementDataType.toObject(element);
       }
       final PgConnection connection = statement.getConnection().unwrap(PgConnection.class);
-      array = connection.createArrayOf(this.elementDbDataType, elements);
+      array = connection.createArrayOf(this.elementDbDataType, values);
     } else {
       final Object[] values = new Object[] {
         this.elementDataType.toObject(value)

@@ -517,7 +517,11 @@ public class Query extends BaseObjectWithProperties
   }
 
   public Query setLockMode(final LockMode lockMode) {
-    this.lockMode = lockMode;
+    if (lockMode == null) {
+      this.lockMode = LockMode.NONE;
+    } else {
+      this.lockMode = lockMode;
+    }
     return this;
   }
 

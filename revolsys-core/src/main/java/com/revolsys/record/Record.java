@@ -151,6 +151,18 @@ public interface Record
     return -1;
   }
 
+  default <V> Record appendList(final String name, final V value) {
+    List<V> collection = getValue(name);
+    if (collection == null) {
+      collection = new ArrayList<V>();
+    } else {
+      collection = new ArrayList<V>(collection);
+    }
+    collection.add(value);
+    setValue(name, collection);
+    return this;
+  }
+
   @Override
   Record clone();
 
