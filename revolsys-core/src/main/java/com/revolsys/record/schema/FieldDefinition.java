@@ -80,7 +80,7 @@ public class FieldDefinition extends BaseObjectWithProperties
   private String title;
 
   /** The data type of the field value. */
-  private DataType type;
+  private DataType type = DataTypes.STRING;
 
   public FieldDefinition() {
   }

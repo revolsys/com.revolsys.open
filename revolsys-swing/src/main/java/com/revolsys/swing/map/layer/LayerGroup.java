@@ -47,6 +47,7 @@ import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
+import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
@@ -870,7 +871,12 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
     if (layerFiles != null) {
       for (String fileName : layerFiles) {
         if (fileName.endsWith(".rgmap")) {
-          final Resource childResource = Resource.getBaseResource(fileName);
+          final Resource childResource;
+          if (fileName.startsWith("folderconnection://")) {
+            childResource = new PathResource(new UrlResource(fileName).getFile());
+          } else {
+            childResource = Resource.getBaseResource(fileName);
+          }
           if (!importProject(rootProject, childResource, false)) {
             Logs.error(LayerGroup.class, "Project not found: " + childResource);
           }
