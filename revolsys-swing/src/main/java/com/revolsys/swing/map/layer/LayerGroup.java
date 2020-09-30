@@ -866,38 +866,48 @@ public class LayerGroup extends AbstractLayer implements Parent<Layer>, Iterable
 
   @SuppressWarnings("unchecked")
   protected void loadLayers(final Project rootProject, final Map<String, ? extends Object> config) {
-    final List<String> layerFiles = (List<String>)config.remove("layers");
+    final List<Object> childLayerReferences = (List<Object>)config.remove("layers");
     setProperties(config);
-    if (layerFiles != null) {
-      for (String fileName : layerFiles) {
-        if (fileName.endsWith(".rgmap")) {
-          final Resource childResource;
-          if (fileName.startsWith("folderconnection://")) {
-            childResource = new PathResource(new UrlResource(fileName).getFile());
-          } else {
-            childResource = Resource.getBaseResource(fileName);
-          }
-          if (!importProject(rootProject, childResource, false)) {
-            Logs.error(LayerGroup.class, "Project not found: " + childResource);
-          }
-        } else {
-          if (!fileName.endsWith("rgobject")) {
-            fileName += "/rgLayerGroup.rgobject";
-          }
-          final Resource childResource = Resource.getBaseResource(fileName);
-          if (childResource.exists()) {
-            final Object object = MapObjectFactory.toObject(childResource);
-            if (object instanceof Layer) {
-              final Layer layer = (Layer)object;
-              addLayer(layer);
-            } else if (object != null) {
-              Logs.error(this,
-                "Unexpected object type " + object.getClass() + " in " + childResource);
+    if (childLayerReferences != null) {
+      for (final Object childLayerReference : childLayerReferences) {
+        if (childLayerReference instanceof String) {
+          String layerFileName = (String)childLayerReference;
+          if (layerFileName.endsWith(".rgmap")) {
+            final Resource childResource;
+            if (layerFileName.startsWith("folderconnection://")) {
+              childResource = new PathResource(new UrlResource(layerFileName).getFile());
+            } else {
+              childResource = Resource.getBaseResource(layerFileName);
+            }
+            if (!importProject(rootProject, childResource, false)) {
+              Logs.error(LayerGroup.class, "Project not found: " + childResource);
             }
           } else {
-            Logs.error(LayerGroup.class, "Layer not found: " + childResource);
+            if (!layerFileName.endsWith("rgobject")) {
+              layerFileName += "/rgLayerGroup.rgobject";
+            }
+            final Resource childResource = Resource.getBaseResource(layerFileName);
+            if (childResource.exists()) {
+              final Object object = MapObjectFactory.toObject(childResource);
+              if (object instanceof Layer) {
+                final Layer layer = (Layer)object;
+                addLayer(layer);
+              } else if (object != null) {
+                Logs.error(this,
+                  "Unexpected object type " + object.getClass() + " in " + childResource);
+              }
+            } else {
+              Logs.error(LayerGroup.class, "Layer not found: " + childResource);
+            }
           }
+        } else if (childLayerReference instanceof JsonObject) {
+          final JsonObject childLayerConfig = (JsonObject)childLayerReference;
+          final String name = childLayerConfig.getString("name");
+
+        } else {
+          Logs.error(this, "Invalid layer config\n" + childLayerReference);
         }
+
       }
     }
   }
