@@ -3,6 +3,3 @@
 .classpath
 *.log
 target
-/revolsys-core/
-/revolsys-postgresql/
-/revolsys-swing/
