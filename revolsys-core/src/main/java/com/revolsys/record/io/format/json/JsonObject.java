@@ -101,4 +101,8 @@ public interface JsonObject extends MapEx, JsonType {
   default String toJsonString() {
     return Json.toString(this);
   }
+
+  default String toJsonString(final boolean indent) {
+    return Json.toString(this, indent);
+  }
 }

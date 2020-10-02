@@ -311,19 +311,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     final Query query = new Query(typePath)//
       .setWhereCondition(condition)
       .setLockMode(lockMode);
-
-    Record firstRecord = null;
-    try (
-      RecordReader records = getRecords(query)) {
-      for (final Record record : records) {
-        if (firstRecord == null) {
-          firstRecord = record;
-        } else {
-          throw new IllegalArgumentException("Query matched multiple objects\n" + query);
-        }
-      }
-    }
-    return firstRecord;
+    return getRecord(query);
   }
 
   default Record getRecord(final PathName typePath, final Identifier id) {
@@ -339,6 +327,21 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   default Record getRecord(final PathName typePath, final Object... id) {
     final Identifier identifier = Identifier.newIdentifier(id);
     return getRecord(typePath, identifier);
+  }
+
+  default Record getRecord(final Query query) {
+    Record firstRecord = null;
+    try (
+      RecordReader records = getRecords(query)) {
+      for (final Record record : records) {
+        if (firstRecord == null) {
+          firstRecord = record;
+        } else {
+          throw new IllegalArgumentException("Query matched multiple objects\n" + query);
+        }
+      }
+    }
+    return firstRecord;
   }
 
   int getRecordCount(Query query);

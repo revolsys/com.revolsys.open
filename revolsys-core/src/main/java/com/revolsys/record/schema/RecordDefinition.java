@@ -8,6 +8,7 @@ import java.util.Set;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.io.PathName;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -287,6 +288,12 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
   boolean isInstanceOf(RecordDefinition classDefinition);
 
   Record newRecord();
+
+  default Record newRecord(final MapEx values) {
+    final Record newRecord = newRecord();
+    newRecord.setValues(values);
+    return newRecord;
+  }
 
   default Record newRecord(final Record record) {
     final Record newRecord = newRecord();

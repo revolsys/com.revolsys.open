@@ -257,8 +257,9 @@ public class Query extends BaseObjectWithProperties
   }
 
   @Deprecated
-  public void addParameter(final Object value) {
+  public Query addParameter(final Object value) {
     this.parameters.add(value);
+    return this;
   }
 
   public Query and(final Condition condition) {

@@ -335,7 +335,7 @@
       <dependency>
         <groupId>org.docx4j</groupId>
         <artifactId>docx4j-JAXB-MOXy</artifactId>
-        <version>8.2.1</version>
+        <version>11.1.8</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -552,6 +552,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <ch.qos.logback.version>1.2.3</ch.qos.logback.version>
+    <org.docx4j.version>11.1.8</org.docx4j.version>
     <org.gdal.version>2.4.0</org.gdal.version>
     <org.graalvm.version>20.1.0</org.graalvm.version>
     <org.jeometry.version>TRUNK-SNAPSHOT</org.jeometry.version>

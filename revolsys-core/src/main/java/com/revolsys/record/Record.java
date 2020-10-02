@@ -151,6 +151,16 @@ public interface Record
     return -1;
   }
 
+  default Record addValues(final MapEx values) {
+    if (values instanceof Record) {
+      final Record record = (Record)values;
+      setValues(record);
+    } else if (values != null) {
+      setValues(values, new ArrayList<>(values.keySet()));
+    }
+    return this;
+  }
+
   default <V> Record appendList(final String name, final V value) {
     List<V> collection = getValue(name);
     if (collection == null) {
