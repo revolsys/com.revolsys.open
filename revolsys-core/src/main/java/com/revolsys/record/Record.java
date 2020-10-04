@@ -151,6 +151,17 @@ public interface Record
     return -1;
   }
 
+  default Record addValue(final String key, final Map<String, Object> source) {
+    final Object value = source.get(key);
+    return add(key, value);
+  }
+
+  default Record addValue(final String key, final Map<String, Object> source,
+    final String sourceKey) {
+    final Object value = source.get(sourceKey);
+    return add(key, value);
+  }
+
   default Record addValues(final MapEx values) {
     if (values instanceof Record) {
       final Record record = (Record)values;

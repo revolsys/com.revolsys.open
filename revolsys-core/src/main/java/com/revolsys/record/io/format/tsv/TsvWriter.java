@@ -16,6 +16,8 @@ public class TsvWriter implements BaseCloseable {
 
   private String newLine = "\n";
 
+  private boolean useQuotes = true;
+
   protected TsvWriter(final Writer out) {
     this.out = out;
   }
@@ -37,8 +39,16 @@ public class TsvWriter implements BaseCloseable {
     return this.newLine;
   }
 
+  public boolean isUseQuotes() {
+    return this.useQuotes;
+  }
+
   public void setNewLine(final String newLine) {
     this.newLine = newLine;
+  }
+
+  public void setUseQuotes(final boolean useQuotes) {
+    this.useQuotes = useQuotes;
   }
 
   public void write(final Collection<? extends Object> values) {
@@ -51,15 +61,20 @@ public class TsvWriter implements BaseCloseable {
         final Object value = values[i];
         if (value != null) {
           final String string = DataTypes.toString(value);
-          this.out.write('"');
+          final boolean useQuotes = this.useQuotes || string.indexOf('\t') != -1;
+          if (useQuotes) {
+            this.out.write('"');
+          }
           for (int j = 0; j < string.length(); j++) {
             final char c = string.charAt(j);
-            if (c == '"') {
+            if (useQuotes && c == '"') {
               this.out.write('"');
             }
             this.out.write(c);
           }
-          this.out.write('"');
+          if (useQuotes) {
+            this.out.write('"');
+          }
         }
         if (i < values.length - 1) {
           this.out.write('\t');

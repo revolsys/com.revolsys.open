@@ -38,7 +38,9 @@ import com.revolsys.jdbc.exception.JdbcExceptionTranslator;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.field.JdbcFieldDefinitions;
 import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.Join;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.LockMode;
 import com.revolsys.record.schema.RecordDefinition;
@@ -117,17 +119,22 @@ public final class JdbcUtils {
     return sql;
   }
 
+  public static void appendQueryValue(final StringBuilder sql, final Query query,
+    final QueryValue queryValue) {
+    final RecordDefinition recordDefinition = query.getRecordDefinition();
+    if (recordDefinition == null) {
+      queryValue.appendSql(query, null, sql);
+    } else {
+      final RecordStore recordStore = recordDefinition.getRecordStore();
+      queryValue.appendSql(query, recordStore, sql);
+    }
+  }
+
   public static void appendWhere(final StringBuilder sql, final Query query) {
     final Condition where = query.getWhereCondition();
     if (!where.isEmpty()) {
       sql.append(" WHERE ");
-      final RecordDefinition recordDefinition = query.getRecordDefinition();
-      if (recordDefinition == null) {
-        where.appendSql(query, null, sql);
-      } else {
-        final RecordStore recordStore = recordDefinition.getRecordStore();
-        where.appendSql(query, recordStore, sql);
-      }
+      appendQueryValue(sql, query, where);
     }
   }
 
@@ -281,6 +288,15 @@ public final class JdbcUtils {
     }
   }
 
+  public static String getQualifiedTableName(final PathName pathName) {
+    if (Property.hasValue(pathName)) {
+      final String path = pathName.toString();
+      return getQualifiedTableName(path);
+    } else {
+      return null;
+    }
+  }
+
   public static String getQualifiedTableName(final String typePath) {
     if (Property.hasValue(typePath)) {
       final String tableName = typePath.replaceAll("^/+", "");
@@ -322,10 +338,11 @@ public final class JdbcUtils {
         }
       }
       final String fromClause = query.getFromClause();
+      final List<Join> joins = query.getJoins();
       final LockMode lockMode = query.getLockMode();
       final boolean distinct = query.isDistinct();
-      sql = newSelectSql(recordDefinition, "T", distinct, fromClause, fieldNames, query, orderBy,
-        lockMode);
+      sql = newSelectSql(recordDefinition, "T", distinct, fromClause, joins, fieldNames, query,
+        orderBy, lockMode);
     } else {
       if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
         final StringBuilder newSql = new StringBuilder("SELECT ");
@@ -361,7 +378,7 @@ public final class JdbcUtils {
 
   public static String newSelectSql(final RecordDefinition recordDefinition,
     final String tablePrefix, final boolean distinct, final String fromClause,
-    final List<String> fieldNames, final Query query,
+    final List<Join> joins, final List<String> fieldNames, final Query query,
     final Map<? extends CharSequence, Boolean> orderBy, final LockMode lockMode) {
     final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");
@@ -382,6 +399,9 @@ public final class JdbcUtils {
       sql.append(tableName);
       sql.append(" ");
       sql.append(tablePrefix);
+    }
+    for (final Join join : joins) {
+      appendQueryValue(sql, query, join);
     }
     appendWhere(sql, query);
     addOrderBy(sql, orderBy);

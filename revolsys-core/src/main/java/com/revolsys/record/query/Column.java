@@ -96,10 +96,12 @@ public class Column implements QueryValue {
 
   @Override
   public String toString() {
-    if (this.name.matches("([A-Z][_A-Z1-9]*\\.)?[A-Z][_A-Z1-9]*")) {
-      return this.name;
+    final String name = this.name;
+    if (name.indexOf('"') != -1 || name.indexOf('.') != -1
+      || name.matches("([A-Z][_A-Z1-9]*\\.)?[A-Z][_A-Z1-9]*")) {
+      return name;
     } else {
-      return "\"" + this.name + "\"";
+      return "\"" + name + "\"";
     }
   }
 }
