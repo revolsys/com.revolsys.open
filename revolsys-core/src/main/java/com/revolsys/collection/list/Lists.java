@@ -23,11 +23,11 @@ import com.revolsys.util.Cancellable;
 import com.revolsys.util.Property;
 
 public interface Lists {
-  static final Supplier<List<?>> FACTORY_ARRAY = () -> {
+  Supplier<List<?>> FACTORY_ARRAY = () -> {
     return new ArrayList<>();
   };
 
-  public static <V> void addAll(final List<V> list, final Iterable<? extends V> values) {
+  static <V> void addAll(final List<V> list, final Iterable<? extends V> values) {
     if (values != null) {
       for (final V value : values) {
         list.add(value);
@@ -35,14 +35,13 @@ public interface Lists {
     }
   }
 
-  public static <V> void addAll(final List<V> list, final Stream<? extends V> values) {
+  static <V> void addAll(final List<V> list, final Stream<? extends V> values) {
     if (values != null) {
       values.forEach(list::add);
     }
   }
 
-  public static <V> void addAll(final List<V> list,
-    @SuppressWarnings("unchecked") final V... values) {
+  static <V> void addAll(final List<V> list, @SuppressWarnings("unchecked") final V... values) {
     if (values != null) {
       for (final V value : values) {
         list.add(value);
@@ -50,8 +49,7 @@ public interface Lists {
     }
   }
 
-  public static <V> void addListsAll(final List<V> list,
-    final Iterable<? extends Iterable<V>> lists) {
+  static <V> void addListsAll(final List<V> list, final Iterable<? extends Iterable<V>> lists) {
     if (lists != null) {
       for (final Iterable<V> values : lists) {
         for (final V value : values) {
@@ -67,7 +65,7 @@ public interface Lists {
   * @param value
   * @return
   */
-  public static <V> boolean addNotContains(final List<V> list, final int index, final V value) {
+  static <V> boolean addNotContains(final List<V> list, final int index, final V value) {
     if (Property.hasValue(value)) {
       if (!list.contains(value)) {
         list.add(index, value);
@@ -83,7 +81,7 @@ public interface Lists {
    * @param value
    * @return
    */
-  public static <V> boolean addNotContains(final List<V> list, final V value) {
+  static <V> boolean addNotContains(final List<V> list, final V value) {
     if (Property.hasValue(value)) {
       if (!list.contains(value)) {
         return list.add(value);
@@ -98,7 +96,7 @@ public interface Lists {
    * @param value
    * @return
    */
-  public static <V> boolean addNotContainsLast(final List<V> list, final V value) {
+  static <V> boolean addNotContainsLast(final List<V> list, final V value) {
     if (Property.hasValue(value)) {
       if (list.isEmpty() || !list.get(list.size() - 1).equals(value)) {
         list.add(value);
@@ -114,7 +112,7 @@ public interface Lists {
    * @param value
    * @return
    */
-  public static <V> boolean addNotEmpty(final List<V> list, final int index, final V value) {
+  static <V> boolean addNotEmpty(final List<V> list, final int index, final V value) {
     if (Property.hasValue(value)) {
       list.add(index, value);
       return true;
@@ -129,7 +127,7 @@ public interface Lists {
    * @param value
    * @return
    */
-  public static <V> boolean addNotEmpty(final List<V> list, final V value) {
+  static <V> boolean addNotEmpty(final List<V> list, final V value) {
     if (list != null && Property.hasValue(value)) {
       return list.add(value);
     } else {
@@ -175,6 +173,10 @@ public interface Lists {
       list.add(value);
     }
     return list;
+  }
+
+  static <V> ListBuilder<V> buildArray() {
+    return new ListBuilder<V>(new ArrayList<>());
   }
 
   static <T> boolean containsReference(final List<WeakReference<T>> list, final T object) {
@@ -224,11 +226,11 @@ public interface Lists {
   @SuppressWarnings({
     "unchecked", "rawtypes"
   })
-  public static <V> Supplier<List<V>> factoryArray() {
+  static <V> Supplier<List<V>> factoryArray() {
     return (Supplier)FACTORY_ARRAY;
   }
 
-  public static <V> Supplier<List<V>> factoryLinked() {
+  static <V> Supplier<List<V>> factoryLinked() {
     return () -> {
       return new LinkedList<>();
     };
@@ -319,20 +321,20 @@ public interface Lists {
     return values;
   }
 
-  public static <V> LinkedList<V> linked(@SuppressWarnings("unchecked") final V... values) {
+  static <V> LinkedList<V> linked(@SuppressWarnings("unchecked") final V... values) {
     final LinkedList<V> list = new LinkedList<>();
     addAll(list, values);
     return list;
   }
 
-  public static <V> List<V> newArray(final BiConsumer<Consumer<V>, Predicate<V>> forEachFunction,
+  static <V> List<V> newArray(final BiConsumer<Consumer<V>, Predicate<V>> forEachFunction,
     final Predicate<V> filter) {
     final List<V> values = new ArrayList<>();
     forEachFunction.accept(values::add, filter);
     return values;
   }
 
-  public static <V> ArrayList<V> newArray(final Consumer<Consumer<V>> action) {
+  static <V> ArrayList<V> newArray(final Consumer<Consumer<V>> action) {
     final ArrayList<V> list = new ArrayList<>();
     action.accept(list::add);
     return list;
@@ -362,7 +364,7 @@ public interface Lists {
     }
   }
 
-  public static <V> ArrayList<V> newArray(@SuppressWarnings("unchecked") final V... values) {
+  static <V> ArrayList<V> newArray(@SuppressWarnings("unchecked") final V... values) {
     final ArrayList<V> list = new ArrayList<>();
     addAll(list, values);
     return list;
@@ -392,9 +394,8 @@ public interface Lists {
     }
   }
 
-  public static <V> List<V> newArraySorted(
-    final BiConsumer<Consumer<V>, Predicate<V>> forEachFunction, final Predicate<V> filter,
-    final Comparator<V> comparator) {
+  static <V> List<V> newArraySorted(final BiConsumer<Consumer<V>, Predicate<V>> forEachFunction,
+    final Predicate<V> filter, final Comparator<V> comparator) {
     final List<V> values = new ArrayList<>();
     forEachFunction.accept(values::add, filter);
     values.sort(comparator);
@@ -421,14 +422,13 @@ public interface Lists {
     }
   }
 
-  public static <V> List<V> to(final Supplier<List<V>> factory,
-    final Iterable<? extends V> values) {
+  static <V> List<V> to(final Supplier<List<V>> factory, final Iterable<? extends V> values) {
     final List<V> list = factory.get();
     addAll(list, values);
     return list;
   }
 
-  public static <V> List<V> toArray(final Iterable<? extends V> values) {
+  static <V> List<V> toArray(final Iterable<? extends V> values) {
     final List<V> list = new ArrayList<>();
     addAll(list, values);
     return list;
@@ -469,7 +469,7 @@ public interface Lists {
     }
   }
 
-  public static <V> List<V> toArray(final Stream<? extends V> values) {
+  static <V> List<V> toArray(final Stream<? extends V> values) {
     final List<V> list = new ArrayList<>();
     addAll(list, values);
     return list;
@@ -485,7 +485,7 @@ public interface Lists {
     }
   }
 
-  public static <V> List<V> toArrayThreadSafe(final List<? extends V> values) {
+  static <V> List<V> toArrayThreadSafe(final List<? extends V> values) {
     final List<V> list = new ArrayList<>(values.size());
     for (int i = 0; i < values.size(); i++) {
       try {
@@ -497,7 +497,7 @@ public interface Lists {
     return list;
   }
 
-  public static <V> List<V> toList(final Supplier<List<V>> constructor,
+  static <V> List<V> toList(final Supplier<List<V>> constructor,
     final Iterable<? extends V> values) {
     final List<V> list = constructor.get();
     addAll(list, values);
@@ -530,11 +530,11 @@ public interface Lists {
 
   }
 
-  public static <V> List<V> unmodifiable(final Iterable<? extends V> values) {
+  static <V> List<V> unmodifiable(final Iterable<? extends V> values) {
     return new UnmodifiableArrayList<>(values);
   }
 
-  public static <V> List<V> unmodifiable(@SuppressWarnings("unchecked") final V... values) {
+  static <V> List<V> unmodifiable(@SuppressWarnings("unchecked") final V... values) {
     return new UnmodifiableArrayList<>(values);
   }
 }

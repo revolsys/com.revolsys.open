@@ -34,6 +34,11 @@ public interface JsonObject extends MapEx, JsonType {
       final Collection<? extends CharSequence> excludeFieldNames) {
       return equals(object);
     }
+
+    @Override
+    public String toString() {
+      return "{}";
+    }
   };
 
   static JsonObject hash() {

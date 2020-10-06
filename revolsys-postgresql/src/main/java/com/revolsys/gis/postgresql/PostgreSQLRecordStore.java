@@ -30,6 +30,7 @@ import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.jdbc.field.JdbcStringFieldAdder;
 import com.revolsys.jdbc.io.AbstractJdbcDatabaseFactory;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
@@ -219,9 +220,10 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     final JdbcFieldAdder numberFieldAdder = new JdbcFieldAdder(DataTypes.DECIMAL);
     addFieldAdder("numeric", numberFieldAdder);
 
-    final JdbcFieldAdder stringFieldAdder = new JdbcFieldAdder(DataTypes.STRING);
+    final JdbcStringFieldAdder stringFieldAdder = new JdbcStringFieldAdder();
     addFieldAdder("varchar", stringFieldAdder);
     addFieldAdder("text", stringFieldAdder);
+    addFieldAdder("citext", stringFieldAdder);
     addFieldAdder("name", stringFieldAdder);
     addFieldAdder("bpchar", stringFieldAdder);
 
