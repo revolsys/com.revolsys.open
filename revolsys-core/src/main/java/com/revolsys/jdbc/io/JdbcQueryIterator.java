@@ -180,18 +180,19 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
   }
 
   protected ResultSet getResultSet() {
-    final String tableName = this.query.getTypeName();
-    final RecordDefinition queryRecordDefinition = this.query.getRecordDefinition();
+    final Query query = this.query;
+    final String tableName = query.getTypeName();
+    final RecordDefinition queryRecordDefinition = query.getRecordDefinition();
     if (queryRecordDefinition != null) {
       this.recordDefinition = this.recordStore.getRecordDefinition(queryRecordDefinition);
       if (this.recordDefinition != null) {
-        this.query.setRecordDefinition(this.recordDefinition);
+        query.setRecordDefinition(this.recordDefinition);
       }
     }
     if (this.recordDefinition == null) {
       if (tableName != null) {
         this.recordDefinition = this.recordStore.getRecordDefinition(tableName);
-        this.query.setRecordDefinition(this.recordDefinition);
+        query.setRecordDefinition(this.recordDefinition);
       }
     }
     String dbTableName;
@@ -206,21 +207,21 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
       dbTableName = this.recordDefinition.getDbTableName();
     }
 
-    final String sql = getSql(this.query);
+    final String sql = getSql(query);
     try {
       this.statement = this.connection.prepareStatement(sql);
       this.statement.setFetchSize(this.fetchSize);
 
-      this.resultSet = this.recordStore.getResultSet(this.statement, this.query);
+      this.resultSet = this.recordStore.getResultSet(this.statement, query);
       final ResultSetMetaData resultSetMetaData = this.resultSet.getMetaData();
 
-      if (this.recordDefinition == null) {
+      if (this.recordDefinition == null || !query.getJoins().isEmpty()) {
         this.recordDefinition = this.recordStore.getRecordDefinition(tableName, resultSetMetaData,
           dbTableName);
       }
-      this.fields = this.query.getFields(this.recordDefinition);
+      this.fields = query.getFields(this.recordDefinition);
 
-      final String typePath = this.query.getTypeNameAlias();
+      final String typePath = query.getTypeNameAlias();
       if (typePath != null) {
         final JdbcRecordDefinition newRecordDefinition = this.recordDefinition.rename(typePath);
         this.recordDefinition = newRecordDefinition;

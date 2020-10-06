@@ -151,6 +151,8 @@ public class Query extends BaseObjectWithProperties
     return query;
   }
 
+  private final List<Join> joins = new ArrayList<>();
+
   private boolean distinct = false;
 
   private Cancellable cancellable;
@@ -223,6 +225,11 @@ public class Query extends BaseObjectWithProperties
     return this;
   }
 
+  public Query addJoin(final Join join) {
+    this.joins.add(join);
+    return this;
+  }
+
   public Query addOrderBy(final CharSequence field) {
     return addOrderBy(field, true);
   }
@@ -257,8 +264,9 @@ public class Query extends BaseObjectWithProperties
   }
 
   @Deprecated
-  public void addParameter(final Object value) {
+  public Query addParameter(final Object value) {
     this.parameters.add(value);
+    return this;
   }
 
   public Query and(final Condition condition) {
@@ -361,10 +369,18 @@ public class Query extends BaseObjectWithProperties
         if (fieldName.equals("*")) {
           fields.addAll(recordDefinition.getFields());
         } else {
+          final int dotIndex = fieldName.lastIndexOf('.');
+          if (dotIndex != -1) {
+            fieldName = fieldName.substring(dotIndex + 1);
+          }
           if (fieldName.endsWith("\"")) {
-            final int index = fieldName.indexOf('"');
-            if (index > 0 && fieldName.charAt(index - 1) == ' ') {
-              fieldName = fieldName.substring(index + 1, fieldName.length() - 1);
+            if (fieldName.startsWith("\"")) {
+              fieldName = fieldName.substring(1, fieldName.length() - 1);
+            } else {
+              final int index = fieldName.indexOf('"');
+              if (index > 0 && fieldName.charAt(index - 1) == ' ') {
+                fieldName = fieldName.substring(index + 1, fieldName.length() - 1);
+              }
             }
           }
           final FieldDefinition field = recordDefinition.getField(fieldName);
@@ -384,6 +400,10 @@ public class Query extends BaseObjectWithProperties
   @Override
   public FieldDefinition getGeometryField() {
     return getRecordDefinition().getGeometryField();
+  }
+
+  public List<Join> getJoins() {
+    return this.joins;
   }
 
   public int getLimit() {

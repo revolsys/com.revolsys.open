@@ -34,6 +34,8 @@ public class JsonRecordWriter extends AbstractRecordWriter {
 
   private final JsonStringEncodingWriter encodingOut;
 
+  private String itemsPropertyName = "items";
+
   public JsonRecordWriter(final RecordDefinitionProxy recordDefinition, final Writer out) {
     super(recordDefinition);
     this.out = out;
@@ -108,6 +110,10 @@ public class JsonRecordWriter extends AbstractRecordWriter {
     }
   }
 
+  public String getItemsPropertyName() {
+    return this.itemsPropertyName;
+  }
+
   private void indent() throws IOException {
     final Writer out = this.out;
     if (isIndent()) {
@@ -147,6 +153,10 @@ public class JsonRecordWriter extends AbstractRecordWriter {
       value(null, value);
     }
     endList();
+  }
+
+  public void setItemsPropertyName(final String itemsPropertyName) {
+    this.itemsPropertyName = itemsPropertyName;
   }
 
   private void startList() throws IOException {
@@ -287,7 +297,9 @@ public class JsonRecordWriter extends AbstractRecordWriter {
     }
     this.singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
     if (!this.singleObject) {
-      out.write("{\"items\": [\n");
+      out.write("{\"");
+      out.write(this.itemsPropertyName);
+      out.write("\": [\n");
     }
     this.written = true;
   }

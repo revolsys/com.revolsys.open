@@ -75,17 +75,13 @@ public final class FileUtil {
   private static Thread deleteFilesOnExitThread;
 
   public static final FilenameFilter IMAGE_FILENAME_FILTER = new ExtensionFilenameFilter(
-    Arrays.asList(new String[] {
-      "gif", "jpg", "png", "tif", "tiff", "bmp"
-    }));
+    Arrays.asList("gif", "jpg", "png", "tif", "tiff", "bmp"));
 
   /** The file path separator for UNIX based systems. */
   public static final char UNIX_FILE_SEPARATOR = '/';
 
   public static final FilenameFilter VIDEO_FILENAME_FILTER = new ExtensionFilenameFilter(
-    Arrays.asList(new String[] {
-      "avi", "wmv", "flv", "mpg"
-    }));
+    Arrays.asList("avi", "wmv", "flv", "mpg"));
 
   /** The file path separator for Windows based systems. */
   public static final char WINDOWS_FILE_SEPARATOR = '\\';
@@ -859,6 +855,11 @@ public final class FileUtil {
   public static List<String> getFileNamesByExtension(final File directory, final String extension) {
     final FilenameFilter filter = new ExtensionFilenameFilter(extension);
     return getFileNames(directory, filter);
+  }
+
+  public static String getFileNameWithExtension(final String fileName, final String extension) {
+    final String baseName = getBaseName(fileName);
+    return baseName + "." + extension;
   }
 
   public static List<File> getFiles(final File directory, final FilenameFilter filter) {

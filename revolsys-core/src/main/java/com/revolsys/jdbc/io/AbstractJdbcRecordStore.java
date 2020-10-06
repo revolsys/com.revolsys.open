@@ -425,10 +425,11 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       for (int i = 1; i <= resultSetMetaData.getColumnCount(); i++) {
         final String columnName = resultSetMetaData.getColumnName(i);
         final String fieldName = toUpperIfNeeded(columnName);
+        addField(resultSetMetaData, resultRecordDefinition, fieldName, i, null);
         if (recordDefinition != null && recordDefinition.isIdField(fieldName)) {
           resultRecordDefinition.setIdFieldIndex(i - 1);
         }
-        addField(resultSetMetaData, resultRecordDefinition, fieldName, i, null);
+
       }
 
       addRecordDefinitionProperties(resultRecordDefinition);

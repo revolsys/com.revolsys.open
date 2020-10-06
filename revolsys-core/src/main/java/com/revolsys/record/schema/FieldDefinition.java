@@ -533,6 +533,10 @@ public class FieldDefinition extends BaseObjectWithProperties
     return this.name.hashCode();
   }
 
+  public boolean isGenerated() {
+    return false;
+  }
+
   public boolean isIdField() {
     return this.idField;
   }
@@ -888,7 +892,9 @@ public class FieldDefinition extends BaseObjectWithProperties
     try {
       return validate(value);
     } catch (final Throwable e) {
-      throw new ObjectPropertyException(record, fieldName, e.getMessage(), e);
+      throw new ObjectPropertyException(record, fieldName, e.getMessage(), e
+
+      );
     }
   }
 }

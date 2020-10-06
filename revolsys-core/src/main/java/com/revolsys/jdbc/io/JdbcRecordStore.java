@@ -12,6 +12,7 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.field.JdbcFieldDefinitions;
 import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.Join;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
@@ -143,9 +144,12 @@ public interface JdbcRecordStore extends RecordStore {
         throw new RuntimeException("Error setting value:" + parameter, e);
       }
     }
+    for (final Join join : query.getJoins()) {
+      index = join.appendParameters(index, statement);
+    }
     final Condition where = query.getWhereCondition();
     if (!where.isEmpty()) {
-      where.appendParameters(index, statement);
+      index = where.appendParameters(index, statement);
     }
   }
 

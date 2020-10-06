@@ -81,6 +81,7 @@ public class JdbcFieldDefinition extends FieldDefinition {
     return resultSet.getObject(columnIndex);
   }
 
+  @Override
   public boolean isGenerated() {
     return this.generated;
   }
