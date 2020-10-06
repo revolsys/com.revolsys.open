@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.revolsys.swing.menu.MenuFactory;
 
-public class BaseMapLayerGroup extends LayerGroup {
+public class BaseMapLayerGroup extends LayerGroupImpl {
   static {
     MenuFactory.addMenuInitializer(BaseMapLayerGroup.class, (menu) -> {
       menu.deleteGroup("scale");
@@ -45,7 +45,7 @@ public class BaseMapLayerGroup extends LayerGroup {
   }
 
   @Override
-  protected void importProject(final Project importProject) {
+  public void importProject(final Project importProject) {
     importProjectBaseMaps(importProject);
   }
 

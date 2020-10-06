@@ -8,9 +8,9 @@ import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
-import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.BaseMapLayer;
 import com.revolsys.swing.map.layer.BaseMapLayerGroup;
+import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.tree.node.WebServiceConnectionTrees;
@@ -25,7 +25,7 @@ public interface ArcGisRestServer {
     if (layerGroup != null) {
       final ArcGisRestServerRecordLayer layer = new ArcGisRestServerRecordLayer(layerDescription);
       layerGroup.addLayer(layer);
-      if (AbstractLayer.isShowNewLayerTableView()) {
+      if (Layer.isShowNewLayerTableView()) {
         layer.showTableView();
       }
     }

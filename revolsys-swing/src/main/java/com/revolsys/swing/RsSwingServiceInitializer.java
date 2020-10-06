@@ -8,7 +8,7 @@ import com.revolsys.record.io.RecordReaderFactory;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.BaseMapLayerGroup;
-import com.revolsys.swing.map.layer.LayerGroup;
+import com.revolsys.swing.map.layer.LayerGroupImpl;
 import com.revolsys.swing.map.layer.arcgisrest.ArcGisRestServer;
 import com.revolsys.swing.map.layer.bing.Bing;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer;
@@ -67,7 +67,7 @@ public class RsSwingServiceInitializer implements ServiceInitializer {
   }
 
   private void layers() {
-    MapObjectFactoryRegistry.newFactory("layerGroup", "Layer Group", LayerGroup::newLayer);
+    MapObjectFactoryRegistry.newFactory("layerGroup", "Layer Group", LayerGroupImpl::newLayer);
 
     MapObjectFactoryRegistry.newFactory("baseMapLayerGroup", "Base Map Layer Group",
       BaseMapLayerGroup::newLayer);

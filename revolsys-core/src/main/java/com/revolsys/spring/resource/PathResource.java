@@ -70,6 +70,16 @@ public class PathResource extends AbstractResource implements WritableResource {
   }
 
   /**
+   * @param path a PathUtil handle
+   */
+  public PathResource(final Resource parent, final Path path) {
+    super(parent);
+    Assert.notNull(parent, "Parent must not be null");
+    Assert.notNull(path, "Path must not be null");
+    this.path = path.normalize();
+  }
+
+  /**
    * Construct a new new PathResource from a PathUtil handle.
    * @param path a path
    * @see com.revolsys.io.file.com.revolsys.nio.file.Paths#getPath(String, String...)
@@ -183,7 +193,7 @@ public class PathResource extends AbstractResource implements WritableResource {
   @Override
   public Resource createRelative(final String relativePath) {
     final Path childPath = this.path.resolve(relativePath);
-    return new PathResource(childPath);
+    return new PathResource(this, childPath);
   }
 
   @Override
@@ -269,12 +279,17 @@ public class PathResource extends AbstractResource implements WritableResource {
 
   @Override
   public Resource getParent() {
-    final Path parentPath = this.path.getParent();
-    if (parentPath == null) {
-      return null;
-    } else {
-      return new PathResource(parentPath);
+    Resource parent = super.getParent();
+    if (parent == null) {
+      final Path parentPath = this.path.getParent();
+      if (parentPath == null) {
+        return null;
+      } else {
+        parent = new PathResource(parentPath);
+        setParent(parent);
+      }
     }
+    return parent;
   }
 
   /**

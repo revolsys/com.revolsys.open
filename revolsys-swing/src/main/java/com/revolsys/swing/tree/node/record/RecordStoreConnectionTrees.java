@@ -17,6 +17,7 @@ import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
 import com.revolsys.swing.map.form.RecordStoreConnectionForm;
 import com.revolsys.swing.map.layer.AbstractLayer;
+import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.RecordStoreLayer;
@@ -74,7 +75,7 @@ public class RecordStoreConnectionTrees extends ConnectionManagerTrees {
     layerConfig.put("name", recordDefinition.getName());
     layerConfig.put("connection", connection);
     layerConfig.put("typePath", typePath);
-    layerConfig.put("showTableView", AbstractLayer.isShowNewLayerTableView());
+    layerConfig.put("showTableView", Layer.isShowNewLayerTableView());
 
     final LinkedList<String> path = new LinkedList<>();
     {

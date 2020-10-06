@@ -4,7 +4,7 @@ import org.jeometry.common.io.PathName;
 
 import com.revolsys.io.map.MapObjectFactoryRegistry;
 import com.revolsys.record.io.format.mapguide.FeatureLayer;
-import com.revolsys.swing.map.layer.AbstractLayer;
+import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.menu.MenuFactory;
@@ -23,7 +23,7 @@ public class MapGuideWebServer {
       }
       final MapGuideWebServerRecordLayer layer = new MapGuideWebServerRecordLayer(layerDescription);
       layerGroup.addLayer(layer);
-      if (AbstractLayer.isShowNewLayerTableView()) {
+      if (Layer.isShowNewLayerTableView()) {
         layer.showTableView();
       }
     }

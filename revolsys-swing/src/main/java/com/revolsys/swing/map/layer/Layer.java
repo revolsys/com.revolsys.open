@@ -10,6 +10,8 @@ import java.util.List;
 import javax.swing.Icon;
 import javax.swing.SwingUtilities;
 
+import org.jeometry.common.data.type.DataTypes;
+
 import com.revolsys.beans.PropertyChangeSupportProxy;
 import com.revolsys.collection.Child;
 import com.revolsys.collection.map.MapEx;
@@ -27,10 +29,26 @@ import com.revolsys.swing.map.Viewport2D;
 import com.revolsys.swing.map.layer.record.style.panel.LayerStylePanel;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.util.Booleans;
+import com.revolsys.util.PreferenceKey;
+import com.revolsys.util.Preferences;
 
 public interface Layer extends GeometryFactoryProxy, PropertyChangeSupportProxy,
   ObjectWithProperties, PropertyChangeListener, Comparable<Layer>, MapSerializer, Child<LayerGroup>,
   Cloneable, BoundingBoxProxy, ProjectFramePanel {
+
+  static String PREFERENCE_PATH = "/com/revolsys/gis/layer";
+
+  static PreferenceKey PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW = new PreferenceKey(PREFERENCE_PATH,
+    "newLayersShowTableView", DataTypes.BOOLEAN, false)//
+      .setCategoryTitle("Layers");
+
+  static PreferenceKey PREFERENCE_NEW_LAYERS_VISIBLE = new PreferenceKey(PREFERENCE_PATH,
+    "newLayersVisible", DataTypes.BOOLEAN, false)//
+      .setCategoryTitle("Layers");
+
+  static boolean isShowNewLayerTableView() {
+    return Preferences.getValue("com.revolsys.gis", PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW);
+  }
 
   default void addParent(final List<Layer> path) {
     final LayerGroup parent = getLayerGroup();

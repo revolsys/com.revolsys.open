@@ -76,6 +76,41 @@ public class UrlResource extends AbstractResource {
     this.password = password;
   }
 
+  public UrlResource(final Resource parent, final CharSequence path) {
+    super(parent);
+    Assert.notNull(path, "Path must not be null");
+    try {
+      this.uri = null;
+      final String urlString = path.toString();
+      initUrl(new URL(urlString));
+      this.cleanedUrl = getCleanedUrl(this.url, urlString);
+    } catch (final Throwable ex) {
+      throw Exceptions.wrap(ex);
+    }
+  }
+
+  public UrlResource(final Resource parent, final CharSequence path, final String username,
+    final String password) {
+    this(parent, path);
+    this.username = username;
+    this.password = password;
+  }
+
+  public UrlResource(final Resource parent, final URL url) {
+    super(parent);
+    Assert.notNull(url, "URL must not be null");
+    initUrl(url);
+    this.cleanedUrl = getCleanedUrl(this.url, url.toString());
+    this.uri = null;
+  }
+
+  public UrlResource(final Resource parent, final URL url, final String username,
+    final String password) {
+    this(parent, url);
+    this.username = username;
+    this.password = password;
+  }
+
   /**
    * Construct a new new UrlResource based on the given URI object.
    * @param uri a URI
@@ -136,8 +171,8 @@ public class UrlResource extends AbstractResource {
       }
       final URL url = getURL();
       final URL relativeUrl = UrlUtil.getUrl(url, relativePath);
-      final UrlResource relativeResource = new UrlResource(relativeUrl.toString(), this.username,
-        this.password);
+      final UrlResource relativeResource = new UrlResource(this, relativeUrl.toString(),
+        this.username, this.password);
       return relativeResource;
     } catch (final Throwable e) {
       throw new IllegalArgumentException(
@@ -389,9 +424,14 @@ public class UrlResource extends AbstractResource {
 
   @Override
   public Resource getParent() {
-    final URL url = getURL();
-    final String parentUrl = UrlUtil.getParentString(url);
-    return new UrlResource(parentUrl, this.username, this.password);
+    Resource parent = super.getParent();
+    if (parent == null) {
+      final URL url = getURL();
+      final String parentUrl = UrlUtil.getParentString(url);
+      parent = new UrlResource(parentUrl, this.username, this.password);
+      setParent(parent);
+    }
+    return parent;
   }
 
   public String getPassword() {

@@ -33,7 +33,6 @@ import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.ScrollableSizeHint;
 import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.data.type.DataType;
-import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Doubles;
 import org.springframework.expression.EvaluationContext;
@@ -79,7 +78,6 @@ import com.revolsys.swing.table.NumberTableCellRenderer;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.PreferenceKey;
 import com.revolsys.util.Preferences;
 import com.revolsys.util.Property;
 import com.revolsys.util.ToolTipProxy;
@@ -115,16 +113,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   public static final String PLUGIN_TABLE_VIEW = "tableView";
 
-  public static final String PREFERENCE_PATH = "/com/revolsys/gis/layer";
-
-  public static final PreferenceKey PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW = new PreferenceKey(
-    PREFERENCE_PATH, "newLayersShowTableView", DataTypes.BOOLEAN, false)//
-      .setCategoryTitle("Layers");
-
-  public static final PreferenceKey PREFERENCE_NEW_LAYERS_VISIBLE = new PreferenceKey(
-    PREFERENCE_PATH, "newLayersVisible", DataTypes.BOOLEAN, false)//
-      .setCategoryTitle("Layers");
-
   static {
     MenuFactory.addMenuInitializer(AbstractLayer.class, menu -> {
       menu.addMenuItem("zoom", -1, "Zoom to Layer", "magnifier",
@@ -150,10 +138,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       PreferenceFields.addField("com.revolsys.gis", PREFERENCE_NEW_LAYERS_VISIBLE);
       PreferenceFields.addField("com.revolsys.gis", PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW);
     });
-  }
-
-  public static boolean isShowNewLayerTableView() {
-    return Preferences.getValue("com.revolsys.gis", PREFERENCE_NEW_LAYERS_SHOW_TABLE_VIEW);
   }
 
   public static void menuItemPathAddLayer(final String menuGroup, final String menuName,

@@ -50,7 +50,7 @@ import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 import com.revolsys.webservice.WebServiceConnectionRegistry;
 
-public class Project extends LayerGroup {
+public class Project extends LayerGroupImpl {
   private static WeakReference<Project> projectReference = new WeakReference<>(null);
 
   static {
@@ -173,7 +173,7 @@ public class Project extends LayerGroup {
   }
 
   @Override
-  protected Path getGroupSettingsDirectory(final Path directory) {
+  public Path getGroupSettingsDirectory(final Path directory) {
     return directory;
   }
 
@@ -266,7 +266,7 @@ public class Project extends LayerGroup {
   }
 
   @Override
-  protected void importProject(final Project importProject) {
+  public void importProject(final Project importProject) {
     super.importProject(importProject);
 
     final BaseMapLayerGroup baseMaps = getBaseMapLayers();
