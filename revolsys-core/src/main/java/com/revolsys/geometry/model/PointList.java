@@ -138,8 +138,8 @@ public class PointList extends ArrayList<Point> {
   public boolean add(final List<Point> coord, final boolean allowRepeated,
     final boolean direction) {
     if (direction) {
-      for (int i = 0; i < coord.size(); i++) {
-        add(coord.get(i), allowRepeated);
+      for (final Point element : coord) {
+        add(element, allowRepeated);
       }
     } else {
       for (int i = coord.size() - 1; i >= 0; i--) {

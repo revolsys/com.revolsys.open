@@ -2,7 +2,6 @@ package com.revolsys.geometry.dissolve;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 
@@ -73,8 +72,8 @@ public class LineDissolver {
    * @param geometries the geometries to be line-merged
    */
   public void add(final Collection geometries) {
-    for (final Iterator i = geometries.iterator(); i.hasNext();) {
-      final Geometry geometry = (Geometry)i.next();
+    for (final Object element : geometries) {
+      final Geometry geometry = (Geometry)element;
       add(geometry);
     }
   }
@@ -199,8 +198,8 @@ public class LineDissolver {
 
   private void computeResult() {
     final Collection edges = this.graph.getVertexEdges();
-    for (final Iterator i = edges.iterator(); i.hasNext();) {
-      final HalfEdge e = (HalfEdge)i.next();
+    for (final Object edge : edges) {
+      final HalfEdge e = (HalfEdge)edge;
       if (MarkHalfEdge.isMarked(e)) {
         continue;
       }

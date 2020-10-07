@@ -193,7 +193,7 @@ public class PathResource extends AbstractResource implements WritableResource {
   @Override
   public Resource createRelative(final String relativePath) {
     final Path childPath = this.path.resolve(relativePath);
-    return new PathResource(this, childPath);
+    return new PathResource(childPath);
   }
 
   @Override

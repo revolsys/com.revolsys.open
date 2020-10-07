@@ -33,7 +33,6 @@
 
 package com.revolsys.geometry.operation.predicate;
 
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.algorithm.RectangleLineIntersector;
@@ -265,8 +264,8 @@ class RectangleIntersectsSegmentVisitor extends ShortCircuitedGeometryVisitor {
   }
 
   private void checkIntersectionWithLineStrings(final List lines) {
-    for (final Iterator i = lines.iterator(); i.hasNext();) {
-      final LineString testLine = (LineString)i.next();
+    for (final Object line : lines) {
+      final LineString testLine = (LineString)line;
       checkIntersectionWithSegments(testLine);
       if (this.hasIntersection) {
         return;

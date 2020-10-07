@@ -16,7 +16,6 @@
 package com.revolsys.ui.web.config;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.jexl3.JexlExpression;
@@ -86,8 +85,8 @@ public class PageRefMenuItem extends MenuItem {
       if (getStaticParameters() != null) {
         uriParams.putAll(getStaticParameters());
       }
-      for (final Iterator params = getParameters().entrySet().iterator(); params.hasNext();) {
-        final Map.Entry param = (Map.Entry)params.next();
+      for (final Object element : getParameters().entrySet()) {
+        final Map.Entry param = (Map.Entry)element;
         final Object key = param.getKey();
         if (!uriParams.containsKey(key)) {
           final Object value = context.evaluateExpression((JexlExpression)param.getValue());

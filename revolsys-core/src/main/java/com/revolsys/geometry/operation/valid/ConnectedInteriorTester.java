@@ -34,7 +34,6 @@ package com.revolsys.geometry.operation.valid;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.geomgraph.DirectedEdge;
@@ -104,8 +103,8 @@ public class ConnectedInteriorTester {
    */
   private List buildEdgeRings(final Collection dirEdges) {
     final List edgeRings = new ArrayList();
-    for (final Iterator it = dirEdges.iterator(); it.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)it.next();
+    for (final Object dirEdge : dirEdges) {
+      final DirectedEdge de = (DirectedEdge)dirEdge;
       // if this edge has not yet been processed
       if (de.isInResult() && de.getEdgeRing() == null) {
         final MaximalEdgeRing er = new MaximalEdgeRing(de, this.geometryFactory);
@@ -133,8 +132,8 @@ public class ConnectedInteriorTester {
    * @return true if there is an unvisited edge in a non-hole ring
    */
   private boolean hasUnvisitedShellEdge(final List edgeRings) {
-    for (int i = 0; i < edgeRings.size(); i++) {
-      final EdgeRing er = (EdgeRing)edgeRings.get(i);
+    for (final Object edgeRing : edgeRings) {
+      final EdgeRing er = (EdgeRing)edgeRing;
       // don't check hole rings
       if (er.isHole()) {
         continue;
@@ -151,8 +150,8 @@ public class ConnectedInteriorTester {
        * the edgeRing is CW ring which surrounds the INT of the area, so check all
        * edges have been visited.  If any are unvisited, this is a disconnected part of the interior
        */
-      for (int j = 0; j < edges.size(); j++) {
-        de = (DirectedEdge)edges.get(j);
+      for (final Object edge : edges) {
+        de = (DirectedEdge)edge;
         // Debug.print("visted? "); Debug.println(de);
         if (!de.isVisited()) {
           // Debug.print("not visited "); Debug.println(de);

@@ -70,14 +70,14 @@ public class RobustLineIntersector extends LineIntersector {
   private int computeCollinearIntersection(final double line1x1, final double line1y1,
     final double line1x2, final double line1y2, final double line2x1, final double line2y1,
     final double line2x2, final double line2y2) {
-    final boolean p1q1p2 = RectangleUtil.intersectsPoint(line1x1, line1y1, line1x2, line1y2, line2x1,
-      line2y1);
-    final boolean p1q2p2 = RectangleUtil.intersectsPoint(line1x1, line1y1, line1x2, line1y2, line2x2,
-      line2y2);
-    final boolean q1p1q2 = RectangleUtil.intersectsPoint(line2x1, line2y1, line2x2, line2y2, line1x1,
-      line1y1);
-    final boolean q1p2q2 = RectangleUtil.intersectsPoint(line2x1, line2y1, line2x2, line2y2, line1x2,
-      line1y2);
+    final boolean p1q1p2 = RectangleUtil.intersectsPoint(line1x1, line1y1, line1x2, line1y2,
+      line2x1, line2y1);
+    final boolean p1q2p2 = RectangleUtil.intersectsPoint(line1x1, line1y1, line1x2, line1y2,
+      line2x2, line2y2);
+    final boolean q1p1q2 = RectangleUtil.intersectsPoint(line2x1, line2y1, line2x2, line2y2,
+      line1x1, line1y1);
+    final boolean q1p2q2 = RectangleUtil.intersectsPoint(line2x1, line2y1, line2x2, line2y2,
+      line1x2, line1y2);
 
     if (p1q1p2 && p1q2p2) {
       this.intersectionX1 = line2x1;

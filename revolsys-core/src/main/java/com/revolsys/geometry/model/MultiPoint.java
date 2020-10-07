@@ -81,13 +81,17 @@ public interface MultiPoint extends GeometryCollection, Punctual {
   Punctual clone();
 
   @Override
-  default double distancePoint(final double x, final double y, final double terminateDistance) {
+  default double distanceGeometry(Geometry geometry, final double terminateDistance) {
     if (isEmpty()) {
       return Double.POSITIVE_INFINITY;
+    } else if (Property.isEmpty(geometry)) {
+      return Double.POSITIVE_INFINITY;
     } else {
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      geometry = geometry.convertGeometry(geometryFactory, 2);
       double minDistance = Double.MAX_VALUE;
       for (final Point point : getPoints()) {
-        final double distance = point.distancePoint(x, y);
+        final double distance = geometry.distancePoint(point, terminateDistance);
         if (distance < minDistance) {
           minDistance = distance;
           if (distance <= terminateDistance) {
@@ -100,17 +104,13 @@ public interface MultiPoint extends GeometryCollection, Punctual {
   }
 
   @Override
-  default double distanceGeometry(Geometry geometry, final double terminateDistance) {
+  default double distancePoint(final double x, final double y, final double terminateDistance) {
     if (isEmpty()) {
       return Double.POSITIVE_INFINITY;
-    } else if (Property.isEmpty(geometry)) {
-      return Double.POSITIVE_INFINITY;
     } else {
-      final GeometryFactory geometryFactory = getGeometryFactory();
-      geometry = geometry.convertGeometry(geometryFactory, 2);
       double minDistance = Double.MAX_VALUE;
       for (final Point point : getPoints()) {
-        final double distance = geometry.distancePoint(point, terminateDistance);
+        final double distance = point.distancePoint(x, y);
         if (distance < minDistance) {
           minDistance = distance;
           if (distance <= terminateDistance) {

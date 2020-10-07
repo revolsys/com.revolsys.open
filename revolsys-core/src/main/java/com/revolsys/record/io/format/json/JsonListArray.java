@@ -8,6 +8,11 @@ import org.jeometry.common.data.type.DataType;
 
 public class JsonListArray extends ArrayList<Object> implements JsonList {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   JsonListArray() {
   }
 

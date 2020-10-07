@@ -196,8 +196,7 @@ public class SnapLayersPanel extends ValueField implements ActionListener, ListS
     super.save();
     this.layer.setSnapToAllLayers(this.snapToAllLayers.isSelected());
     final Set<String> layerPaths = new TreeSet<>();
-    for (int i = 0; i < this.snapLayerPathsModel.size(); i++) {
-      final String layerPath = this.snapLayerPathsModel.get(i);
+    for (final String layerPath : this.snapLayerPathsModel) {
       layerPaths.add(layerPath);
     }
     this.layer.setSnapLayerPaths(layerPaths);

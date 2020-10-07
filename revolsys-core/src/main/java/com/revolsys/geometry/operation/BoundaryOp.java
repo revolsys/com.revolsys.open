@@ -33,7 +33,6 @@
 package com.revolsys.geometry.operation;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -138,8 +137,8 @@ public class BoundaryOp {
       addEndpoint(line.getPoint(line.getVertexCount() - 1));
     }
 
-    for (final Iterator it = this.endpointMap.entrySet().iterator(); it.hasNext();) {
-      final Map.Entry entry = (Map.Entry)it.next();
+    for (final Object element : this.endpointMap.entrySet()) {
+      final Map.Entry entry = (Map.Entry)element;
       final Counter counter = (Counter)entry.getValue();
       final int valence = counter.count;
       if (this.bnRule.isInBoundary(valence)) {

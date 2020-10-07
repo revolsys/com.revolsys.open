@@ -6,15 +6,20 @@ import com.revolsys.collection.map.TreeMapEx;
 
 public class JsonObjectTree extends TreeMapEx implements JsonObject {
 
-   JsonObjectTree() {
+  /**
+  * 
+  */
+  private static final long serialVersionUID = 1L;
+
+  JsonObjectTree() {
     super();
   }
 
-   JsonObjectTree(final Map<? extends String, ? extends Object> m) {
+  JsonObjectTree(final Map<? extends String, ? extends Object> m) {
     super(m);
   }
 
-   JsonObjectTree(final String key, final Object value) {
+  JsonObjectTree(final String key, final Object value) {
     add(key, value);
   }
 

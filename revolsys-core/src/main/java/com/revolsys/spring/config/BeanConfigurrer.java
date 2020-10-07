@@ -238,16 +238,16 @@ public class BeanConfigurrer
     final BeanDefinitionVisitor visitor = new BeanDefinitionVisitor(valueResolver);
 
     final String[] beanNames = beanFactory.getBeanDefinitionNames();
-    for (int i = 0; i < beanNames.length; i++) {
+    for (final String beanName2 : beanNames) {
       // Check that we're not parsing our own bean definition,
       // to avoid failing on unresolvable placeholders in properties file
       // locations.
-      if (!(beanNames[i].equals(this.beanName) && beanFactory.equals(this.applicationContext))) {
-        final BeanDefinition bd = beanFactory.getBeanDefinition(beanNames[i]);
+      if (!(beanName2.equals(this.beanName) && beanFactory.equals(this.applicationContext))) {
+        final BeanDefinition bd = beanFactory.getBeanDefinition(beanName2);
         try {
           visitor.visitBeanDefinition(bd);
         } catch (final BeanDefinitionStoreException ex) {
-          throw new BeanDefinitionStoreException(bd.getResourceDescription(), beanNames[i],
+          throw new BeanDefinitionStoreException(bd.getResourceDescription(), beanName2,
             ex.getMessage());
         }
       }

@@ -202,6 +202,7 @@ public abstract class AbstractProxyLayerRecord extends AbstractLayerRecord {
     }
   }
 
+  @Override
   public boolean setStateDeleted() {
     // TODO might need some work
     final Record record = getRecord();

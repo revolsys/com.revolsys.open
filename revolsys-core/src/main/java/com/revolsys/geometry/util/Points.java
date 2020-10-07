@@ -8,6 +8,18 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
 
 public class Points {
 
+  public static Point closestPoint(final Point point, final Point point1, final Point point2) {
+    final double distance1 = point.distancePoint(point1);
+    final double distance2 = point.distancePoint(point2);
+    Point closestPoint;
+    if (distance1 <= distance2) {
+      closestPoint = point1;
+    } else {
+      closestPoint = point2;
+    }
+    return closestPoint;
+  }
+
   /**
    * Calculate the distance between two coordinates.
    *
@@ -58,18 +70,6 @@ public class Points {
         return new PointDoubleXY(x, y);
       }
     }
-  }
-
-  public static Point closestPoint(final Point point, final Point point1, final Point point2) {
-    final double distance1 = point.distancePoint(point1);
-    final double distance2 = point.distancePoint(point2);
-    Point closestPoint;
-    if (distance1 <= distance2) {
-      closestPoint = point1;
-    } else {
-      closestPoint = point2;
-    }
-    return closestPoint;
   }
 
 }

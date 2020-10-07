@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -115,8 +114,8 @@ public class NameFilenameFilter implements FilenameFilter {
     if (this.readOnly) {
       throw new IllegalArgumentException("This filname filter is readonly");
     }
-    for (final Iterator nameIter = names.iterator(); nameIter.hasNext();) {
-      final String name = (String)nameIter.next();
+    for (final Object name2 : names) {
+      final String name = (String)name2;
       addName(name);
     }
   }

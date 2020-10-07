@@ -284,8 +284,8 @@ public class RelateComputer {
   }
 
   private void insertEdgeEnds(final List ee) {
-    for (final Iterator i = ee.iterator(); i.hasNext();) {
-      final EdgeEnd e = (EdgeEnd)i.next();
+    for (final Object element : ee) {
+      final EdgeEnd e = (EdgeEnd)element;
       this.nodes.add(e);
     }
   }
@@ -380,8 +380,8 @@ public class RelateComputer {
    */
   private void updateIM(final IntersectionMatrix im) {
     // Debug.println(im);
-    for (final Iterator ei = this.isolatedEdges.iterator(); ei.hasNext();) {
-      final Edge e = (Edge)ei.next();
+    for (final Object element : this.isolatedEdges) {
+      final Edge e = (Edge)element;
       e.updateIM(im);
       // Debug.println(im);
     }

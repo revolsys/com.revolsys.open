@@ -28,6 +28,7 @@ public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
     this.fieldNumber = fieldNumber;
   }
 
+  @Override
   public FileGdbRecordStore getRecordStore() {
     if (this.recordStore == null) {
       return null;

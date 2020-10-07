@@ -1,7 +1,6 @@
 package com.revolsys.geometry.edgegraph;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.LineString;
@@ -33,8 +32,8 @@ public class EdgeGraphBuilder {
    * @param geometries the geometries to be added
    */
   public void add(final Collection geometries) {
-    for (final Iterator i = geometries.iterator(); i.hasNext();) {
-      final Geometry geometry = (Geometry)i.next();
+    for (final Object element : geometries) {
+      final Geometry geometry = (Geometry)element;
       add(geometry);
     }
   }

@@ -2,7 +2,6 @@ package com.revolsys.ui.web.config.action;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -60,17 +59,16 @@ public class DisplayConfigAction implements Action {
         pageView.add("Actions");
         final ElementContainer actionsView = new ElementContainer(new UnorderedListLayout());
         pageView.add(actionsView);
-        for (final Iterator actions = pageController.getActions().iterator(); actions.hasNext();) {
-          final Action action = (Action)actions.next();
+        for (final Object element : pageController.getActions()) {
+          final Action action = (Action)element;
           actionsView.add(action.getClass().getName());
         }
 
         pageView.add("Menus");
         final ElementContainer menusView = new ElementContainer(new UnorderedListLayout());
         pageView.add(menusView);
-        for (final Iterator menus = pageController.getMenus().entrySet().iterator(); menus
-          .hasNext();) {
-          final Map.Entry entry = (Entry)menus.next();
+        for (final Object element : pageController.getMenus().entrySet()) {
+          final Map.Entry entry = (Entry)element;
           final String name = (String)entry.getKey();
           final Menu menu = (Menu)entry.getValue();
 
@@ -82,8 +80,8 @@ public class DisplayConfigAction implements Action {
       if (!nodes.isEmpty()) {
         final ElementContainer childNodesView = new ElementContainer(new UnorderedListLayout());
         nodeView.add(childNodesView);
-        for (final Iterator nodeIter = nodes.iterator(); nodeIter.hasNext();) {
-          final SiteNode childNode = (SiteNode)nodeIter.next();
+        for (final Object node : nodes) {
+          final SiteNode childNode = (SiteNode)node;
           addSiteNode(childNodesView, childNode);
 
         }

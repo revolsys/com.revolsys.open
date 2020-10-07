@@ -371,8 +371,7 @@ public class FieldNamesSetPanel extends ValueField
   public void save() {
     super.save();
     final List<String> namesToSave = new ArrayList<>();
-    for (int i = 0; i < this.selectedFieldNamesModel.size(); i++) {
-      final String fieldName = this.selectedFieldNamesModel.get(i);
+    for (final String fieldName : this.selectedFieldNamesModel) {
       namesToSave.add(fieldName);
     }
     final String fieldNamesSetName = this.fieldNamesSetNamesField.getSelectedItem();

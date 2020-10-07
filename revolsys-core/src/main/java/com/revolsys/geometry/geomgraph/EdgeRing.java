@@ -288,8 +288,8 @@ public abstract class EdgeRing implements BoundingBoxProxy {
   public Polygon toPolygon(final GeometryFactory geometryFactory) {
     final List<LinearRing> rings = new ArrayList<>();
     rings.add(getLinearRing());
-    for (int i = 0; i < this.holes.size(); i++) {
-      final LinearRing ring = this.holes.get(i).getLinearRing();
+    for (final EdgeRing element : this.holes) {
+      final LinearRing ring = element.getLinearRing();
       rings.add(ring);
     }
     final Polygon poly = geometryFactory.polygon(rings);

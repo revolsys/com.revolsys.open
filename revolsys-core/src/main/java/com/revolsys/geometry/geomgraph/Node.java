@@ -33,7 +33,6 @@
 package com.revolsys.geometry.geomgraph;
 
 import java.io.PrintStream;
-import java.util.Iterator;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.IntersectionMatrix;
@@ -166,8 +165,8 @@ public class Node extends GraphComponent implements Point {
    * @return <code>true</code> if any indicident edge in the in the result
    */
   public boolean isIncidentEdgeInResult() {
-    for (final Iterator it = getEdges().getEdges().iterator(); it.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)it.next();
+    for (final Object element : getEdges().getEdges()) {
+      final DirectedEdge de = (DirectedEdge)element;
       if (de.getEdge().isInResult()) {
         return true;
       }
