@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.jeometry.common.logging.Logs;
+
+import com.revolsys.io.file.Paths;
 
 public class MediaTypes {
 
@@ -19,21 +22,8 @@ public class MediaTypes {
   private static Map<String, String> fileExtensionByMediaType = new HashMap<>();
 
   public static String extension(final String contentType) {
-    return fileExtensionByMediaType.getOrDefault(contentType, "bin");
-  }
-
-  public static String fromFileExtension(final String fileExtension) {
     init();
-    if (fileExtension == null) {
-      return "application/octet-stream";
-    } else {
-      String mediaType = mediaTypeByFileExtension.get(fileExtension);
-      if (mediaType == null) {
-        final String fileExtensionLower = fileExtension.toLowerCase();
-        mediaType = mediaTypeByFileExtension.get(fileExtensionLower);
-      }
-      return mediaType;
-    }
+    return fileExtensionByMediaType.getOrDefault(contentType, "bin");
   }
 
   private static void init() {
@@ -61,6 +51,25 @@ public class MediaTypes {
           }
         }
       }
+    }
+  }
+
+  public static String mediaType(final Path file) {
+    final String fileExtension = Paths.getFileNameExtension(file);
+    return mediaType(fileExtension);
+  }
+
+  public static String mediaType(final String fileExtension) {
+    init();
+    if (fileExtension == null) {
+      return "application/octet-stream";
+    } else {
+      String mediaType = mediaTypeByFileExtension.get(fileExtension);
+      if (mediaType == null) {
+        final String fileExtensionLower = fileExtension.toLowerCase();
+        mediaType = mediaTypeByFileExtension.get(fileExtensionLower);
+      }
+      return mediaType;
     }
   }
 }
