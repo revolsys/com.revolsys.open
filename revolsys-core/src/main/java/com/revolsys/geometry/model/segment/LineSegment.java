@@ -61,8 +61,9 @@ public interface LineSegment extends LineString {
         }
         coordinates[intersectionCount * axisCount + axisIndex] = value;
       }
+      return intersectionCount + 1;
     }
-    return intersectionCount + 1;
+    return intersectionCount;
   }
 
   public static int addPointIntersection(final double[] coordinates, final int intersectionCount,
