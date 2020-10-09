@@ -144,8 +144,7 @@ public class PlanarGraph {
    *    <code>null</code> if the edge was not found
    */
   public Edge findEdge(final Point p0, final Point p1) {
-    for (int i = 0; i < this.edges.size(); i++) {
-      final Edge e = this.edges.get(i);
+    for (final Edge e : this.edges) {
       if (p0.equals(e.getPoint(0)) && p1.equals(e.getPoint(1))) {
         return e;
       }
@@ -178,9 +177,7 @@ public class PlanarGraph {
    *    <code>null</code> if the edge was not found
    */
   public Edge findEdgeInSameDirection(final Point p0, final Point p1) {
-    for (int i = 0; i < this.edges.size(); i++) {
-      final Edge e = this.edges.get(i);
-
+    for (final Edge e : this.edges) {
       if (matchInSameDirection(p0, p1, e.getPoint(0), e.getPoint(1))) {
         return e;
       }

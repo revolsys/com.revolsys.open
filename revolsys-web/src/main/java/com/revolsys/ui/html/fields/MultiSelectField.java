@@ -18,7 +18,6 @@ package com.revolsys.ui.html.fields;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -157,8 +156,8 @@ public class MultiSelectField extends Field {
   }
 
   private void serializeOptions(final XmlWriter out) {
-    for (final Iterator optionIter = this.options.iterator(); optionIter.hasNext();) {
-      final FieldValue option = (FieldValue)optionIter.next();
+    for (final Object element : this.options) {
+      final FieldValue option = (FieldValue)element;
       out.startTag(HtmlElem.OPTION);
       if (this.selectedValues.containsKey(option.getStringValue())) {
         out.attribute(HtmlAttr.SELECTED, "true");
@@ -181,8 +180,7 @@ public class MultiSelectField extends Field {
     final List valueList = (List)object;
     super.setValue(valueList);
     if (valueList != null) {
-      for (final Iterator values = valueList.iterator(); values.hasNext();) {
-        final Object value = values.next();
+      for (Object value : valueList) {
         final FieldValue option = (FieldValue)this.optionValueMap.get(value);
         if (option != null) {
           this.selectedValues.put(option.getStringValue(), option.getValue());

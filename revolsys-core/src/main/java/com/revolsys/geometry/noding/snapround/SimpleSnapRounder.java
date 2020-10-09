@@ -33,7 +33,6 @@
 package com.revolsys.geometry.noding.snapround;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.algorithm.LineIntersector;
@@ -94,8 +93,8 @@ public class SimpleSnapRounder implements Noder {
    * @param li
    */
   private void computeSnaps(final Collection segStrings, final Collection snapPts) {
-    for (final Iterator i0 = segStrings.iterator(); i0.hasNext();) {
-      final NodedSegmentString ss = (NodedSegmentString)i0.next();
+    for (final Object segString : segStrings) {
+      final NodedSegmentString ss = (NodedSegmentString)segString;
       computeSnaps(ss, snapPts);
     }
   }
@@ -116,10 +115,10 @@ public class SimpleSnapRounder implements Noder {
    * @param edges the list of segment strings to snap together
    */
   public void computeVertexSnaps(final Collection edges) {
-    for (final Iterator i0 = edges.iterator(); i0.hasNext();) {
-      final NodedSegmentString edge0 = (NodedSegmentString)i0.next();
-      for (final Iterator i1 = edges.iterator(); i1.hasNext();) {
-        final NodedSegmentString edge1 = (NodedSegmentString)i1.next();
+    for (final Object edge : edges) {
+      final NodedSegmentString edge0 = (NodedSegmentString)edge;
+      for (final Object edge2 : edges) {
+        final NodedSegmentString edge1 = (NodedSegmentString)edge2;
         computeVertexSnaps(edge0, edge1);
       }
     }

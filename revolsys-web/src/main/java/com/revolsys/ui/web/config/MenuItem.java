@@ -16,7 +16,6 @@
 package com.revolsys.ui.web.config;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.commons.jexl3.JexlExpression;
@@ -175,8 +174,8 @@ public class MenuItem implements Cloneable, Comparable {
     }
     if (uri != null && this.parameters.size() > 0) {
       final Map qsParams = new HashMap();
-      for (final Iterator params = this.parameters.entrySet().iterator(); params.hasNext();) {
-        final Map.Entry param = (Map.Entry)params.next();
+      for (final Object element : this.parameters.entrySet()) {
+        final Map.Entry param = (Map.Entry)element;
         final Object key = param.getKey();
         final Object value = context.evaluateExpression((JexlExpression)param.getValue());
         qsParams.put(key, value);

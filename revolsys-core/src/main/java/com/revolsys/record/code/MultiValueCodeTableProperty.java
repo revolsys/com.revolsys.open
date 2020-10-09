@@ -186,6 +186,7 @@ public class MultiValueCodeTableProperty extends AbstractMultiValueCodeTable
     return PROPERTY_NAME;
   }
 
+  @Override
   public Record getRecord(final Identifier id) {
     return this.recordStore.getRecord(this.typePath, id);
   }

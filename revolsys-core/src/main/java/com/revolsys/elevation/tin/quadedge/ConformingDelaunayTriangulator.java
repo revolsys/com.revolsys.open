@@ -35,7 +35,6 @@ package com.revolsys.elevation.tin.quadedge;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import com.revolsys.geometry.algorithm.ConvexHull;
@@ -186,8 +185,8 @@ public class ConformingDelaunayTriangulator extends QuadEdgeDelaunayTinBuilder {
      * insertion of another constraint. However, this process must converge
      * eventually, with no splits remaining to find.
      */
-    for (final Iterator i = segsToInsert.iterator(); i.hasNext();) {
-      final LineSegmentDoubleData seg = (LineSegmentDoubleData)i.next();
+    for (final Object element : segsToInsert) {
+      final LineSegmentDoubleData seg = (LineSegmentDoubleData)element;
       // System.out.println(seg);
 
       final Point encroachPt = findNonGabrielPoint(seg);
@@ -277,8 +276,8 @@ public class ConformingDelaunayTriangulator extends QuadEdgeDelaunayTinBuilder {
     // find closest point
     Point closestNonGabriel = null;
     double minDist = Double.MAX_VALUE;
-    for (final Iterator i = result.iterator(); i.hasNext();) {
-      final KdNode nextNode = (KdNode)i.next();
+    for (final Object element : result) {
+      final KdNode nextNode = (KdNode)element;
       final Point testPt = nextNode;
       // ignore segment endpoints
       if (testPt.equals(2, p) || testPt.equals(2, q)) {

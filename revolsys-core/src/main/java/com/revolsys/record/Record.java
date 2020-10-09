@@ -182,9 +182,9 @@ public interface Record
   default <V> Record appendList(final String name, final V value) {
     List<V> collection = getValue(name);
     if (collection == null) {
-      collection = new ArrayList<V>();
+      collection = new ArrayList<>();
     } else {
-      collection = new ArrayList<V>(collection);
+      collection = new ArrayList<>(collection);
     }
     collection.add(value);
     setValue(name, collection);

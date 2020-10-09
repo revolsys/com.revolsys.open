@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -210,8 +209,8 @@ public class SqlDateSelectField extends Field {
       out.text("-");
       out.endTag();
     }
-    for (final Iterator optionIter = options.iterator(); optionIter.hasNext();) {
-      final FieldValue option = (FieldValue)optionIter.next();
+    for (final Object option2 : options) {
+      final FieldValue option = (FieldValue)option2;
       out.startTag(HtmlElem.OPTION);
       if (option.getStringValue().equals(stringValue)) {
         out.attribute(HtmlAttr.SELECTED, "true");

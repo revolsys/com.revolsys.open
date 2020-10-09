@@ -256,6 +256,11 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
 
   private class EmptyLineString extends AbstractLineString {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     @Override
     public int getAxisCount() {
       return GeometryFactory.this.axisCount;

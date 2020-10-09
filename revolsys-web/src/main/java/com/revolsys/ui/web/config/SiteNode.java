@@ -3,7 +3,6 @@ package com.revolsys.ui.web.config;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -159,8 +158,8 @@ public final class SiteNode implements Comparable, Cloneable {
       node = getNode(path);
     }
     if (node == null) {
-      for (final Iterator nodeIter = this.regexPatterns.iterator(); nodeIter.hasNext();) {
-        final Pattern pattern = (Pattern)nodeIter.next();
+      for (final Object element : this.regexPatterns) {
+        final Pattern pattern = (Pattern)element;
         if (pattern.matcher(path).matches()) {
           return (SiteNode)this.regexNodes.get(pattern.pattern());
         }
@@ -377,8 +376,7 @@ public final class SiteNode implements Comparable, Cloneable {
    * @param nodes The site nodes
    */
   public void setNodes(final Collection nodes) {
-    for (final Iterator nodeIter = nodes.iterator(); nodeIter.hasNext();) {
-      Object element = nodeIter.next();
+    for (Object element : nodes) {
       String path = null;
       boolean clone = false;
       if (element instanceof BeanReference) {

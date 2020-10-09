@@ -6,8 +6,7 @@ import com.revolsys.elevation.gridded.GriddedElevationModelReaderFactory;
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.spring.resource.Resource;
 
-public class UsNgsBin extends AbstractIoFactory
-  implements GriddedElevationModelReaderFactory {
+public class UsNgsBin extends AbstractIoFactory implements GriddedElevationModelReaderFactory {
 
   public static final String FILE_EXTENSION = "bin";
 

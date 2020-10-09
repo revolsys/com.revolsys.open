@@ -18,7 +18,6 @@ package com.revolsys.ui.web.config;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -154,8 +153,8 @@ public class DatabasePropertyOverrideConfigurer extends DatabaseConfigurer {
   @Override
   protected void processProperties(final ConfigurableListableBeanFactory beanFactory,
     final Map properties) {
-    for (final Iterator en = properties.keySet().iterator(); en.hasNext();) {
-      final String key = (String)en.next();
+    for (final Object element : properties.keySet()) {
+      final String key = (String)element;
       try {
         processKey(beanFactory, key, (String)properties.get(key));
       } catch (final BeansException ex) {

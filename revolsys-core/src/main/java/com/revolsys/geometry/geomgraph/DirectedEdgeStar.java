@@ -344,8 +344,7 @@ public class DirectedEdgeStar extends EdgeEndStar<DirectedEdge> {
     DirectedEdge incoming = null;
     int state = this.SCANNING_FOR_INCOMING;
     // link edges in CCW order
-    for (int i = 0; i < this.resultAreaEdgeList.size(); i++) {
-      final DirectedEdge nextOut = this.resultAreaEdgeList.get(i);
+    for (final DirectedEdge nextOut : this.resultAreaEdgeList) {
       final DirectedEdge nextIn = nextOut.getSym();
 
       // skip de's that we're not interested in

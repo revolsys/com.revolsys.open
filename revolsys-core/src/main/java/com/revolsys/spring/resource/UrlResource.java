@@ -171,8 +171,8 @@ public class UrlResource extends AbstractResource {
       }
       final URL url = getURL();
       final URL relativeUrl = UrlUtil.getUrl(url, relativePath);
-      final UrlResource relativeResource = new UrlResource(this, relativeUrl.toString(),
-        this.username, this.password);
+      final UrlResource relativeResource = new UrlResource(relativeUrl.toString(), this.username,
+        this.password);
       return relativeResource;
     } catch (final Throwable e) {
       throw new IllegalArgumentException(

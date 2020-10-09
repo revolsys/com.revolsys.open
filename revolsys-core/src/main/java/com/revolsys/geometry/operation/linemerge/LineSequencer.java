@@ -212,8 +212,8 @@ public class LineSequencer {
    * @param geometries a Collection of geometries to add
    */
   public void add(final Collection geometries) {
-    for (final Iterator i = geometries.iterator(); i.hasNext();) {
-      final Geometry geometry = (Geometry)i.next();
+    for (final Object element : geometries) {
+      final Geometry geometry = (Geometry)element;
       add(geometry);
     }
   }
@@ -275,10 +275,10 @@ public class LineSequencer {
   private Geometry buildSequencedGeometry(final List sequences) {
     final List lines = new ArrayList();
 
-    for (final Iterator i1 = sequences.iterator(); i1.hasNext();) {
-      final List seq = (List)i1.next();
-      for (final Iterator i2 = seq.iterator(); i2.hasNext();) {
-        final DirectedEdge de = (DirectedEdge)i2.next();
+    for (final Object element : sequences) {
+      final List seq = (List)element;
+      for (final Object element2 : seq) {
+        final DirectedEdge de = (DirectedEdge)element2;
         final LineMergeEdge e = (LineMergeEdge)de.getEdge();
         final LineString line = e.getLine();
 
@@ -347,8 +347,8 @@ public class LineSequencer {
     final List sequences = new ArrayList();
     final ConnectedSubgraphFinder csFinder = new ConnectedSubgraphFinder(this.graph);
     final List subgraphs = csFinder.getConnectedSubgraphs();
-    for (final Iterator i = subgraphs.iterator(); i.hasNext();) {
-      final Subgraph subgraph = (Subgraph)i.next();
+    for (final Object subgraph2 : subgraphs) {
+      final Subgraph subgraph = (Subgraph)subgraph2;
       if (hasSequence(subgraph)) {
         final List seq = findSequence(subgraph);
         sequences.add(seq);
@@ -473,8 +473,8 @@ public class LineSequencer {
    */
   private List reverse(final List seq) {
     final LinkedList newSeq = new LinkedList();
-    for (final Iterator i = seq.iterator(); i.hasNext();) {
-      final DirectedEdge de = (DirectedEdge)i.next();
+    for (final Object element : seq) {
+      final DirectedEdge de = (DirectedEdge)element;
       newSeq.addFirst(de.getSym());
     }
     return newSeq;

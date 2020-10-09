@@ -17,7 +17,6 @@ package com.revolsys.ui.html.layout;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -89,8 +88,8 @@ public class TableLayout implements ElementContainerLayout {
     int rowNum = 0;
     final int numElements = elementList.size();
     final int lastRow = (numElements - 1) / this.numColumns;
-    for (final Iterator elements = elementList.iterator(); elements.hasNext();) {
-      final Element element = (Element)elements.next();
+    for (final Object element2 : elementList) {
+      final Element element = (Element)element2;
       final int col = i % this.numColumns;
       String colCss = (String)this.cssClasses.get(col);
       final boolean firstCol = col == 0;
@@ -132,8 +131,8 @@ public class TableLayout implements ElementContainerLayout {
       out.startTag(HtmlElem.THEAD);
       out.startTag(HtmlElem.TR);
       int col = 0;
-      for (final Iterator titleIter = this.titles.iterator(); titleIter.hasNext();) {
-        final String title = (String)titleIter.next();
+      for (final Object element : this.titles) {
+        final String title = (String)element;
         out.startTag(HtmlElem.TH);
         String colCssClass = (String)this.cssClasses.get(col);
         if (col == 0) {

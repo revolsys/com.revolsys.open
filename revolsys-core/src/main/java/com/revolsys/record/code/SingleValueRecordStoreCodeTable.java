@@ -161,6 +161,7 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
     return this.modificationTimestampFieldName;
   }
 
+  @Override
   public Record getRecord(final Identifier id) {
     return this.recordStore.getRecord(this.typePath, id);
   }

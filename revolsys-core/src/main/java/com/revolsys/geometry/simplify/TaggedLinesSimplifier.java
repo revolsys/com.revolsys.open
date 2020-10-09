@@ -34,7 +34,6 @@
 package com.revolsys.geometry.simplify;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Simplifies a collection of TaggedLineStrings, preserving topology
@@ -71,14 +70,14 @@ class TaggedLinesSimplifier {
    * @param taggedLines the collection of lines to simplify
    */
   public void simplify(final Collection taggedLines) {
-    for (final Iterator i = taggedLines.iterator(); i.hasNext();) {
-      this.inputIndex.add((TaggedLineString)i.next());
+    for (final Object taggedLine : taggedLines) {
+      this.inputIndex.add((TaggedLineString)taggedLine);
     }
-    for (final Iterator i = taggedLines.iterator(); i.hasNext();) {
+    for (final Object taggedLine : taggedLines) {
       final TaggedLineStringSimplifier tlss = new TaggedLineStringSimplifier(this.inputIndex,
         this.outputIndex);
       tlss.setDistanceTolerance(this.distanceTolerance);
-      tlss.simplify((TaggedLineString)i.next());
+      tlss.simplify((TaggedLineString)taggedLine);
     }
   }
 

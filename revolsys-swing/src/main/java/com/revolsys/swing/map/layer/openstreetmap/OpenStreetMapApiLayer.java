@@ -76,15 +76,6 @@ public class OpenStreetMapApiLayer extends AbstractRecordLayer {
     return this.serverUrl;
   }
 
-  private synchronized OsmDocument getTile(final BoundingBox boundingBox) {
-    OsmDocument document = this.boundingBoxTileMap.get(boundingBox);
-    if (document == null) {
-      document = OsmDocument.newDocument(this.serverUrl, boundingBox);
-      this.boundingBoxTileMap.put(boundingBox, document);
-    }
-    return document;
-  }
-
   public List<BoundingBox> getTileBoundingBoxes(BoundingBox boundingBox) {
     boundingBox = boundingBox.bboxToCs(OsmConstants.WGS84_2D);
     final List<BoundingBox> boundingBoxes = new ArrayList<>();

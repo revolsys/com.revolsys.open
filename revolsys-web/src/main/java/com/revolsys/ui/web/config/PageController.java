@@ -205,8 +205,8 @@ public class PageController implements SiteNodeController {
     if (iafContext != null) {
       final HttpServletRequest request = iafContext.getRequest();
       if (request != null) {
-        for (final Iterator arguments = this.arguments.iterator(); arguments.hasNext();) {
-          final Argument argument = (Argument)arguments.next();
+        for (final Object element : this.arguments) {
+          final Argument argument = (Argument)element;
           final String name = argument.getName();
           if (!uriParameters.containsKey(name)) {
             final String value = request.getParameter(name);
@@ -353,8 +353,8 @@ public class PageController implements SiteNodeController {
    * @throws PageNotFoundException
    */
   private void processArguments(final HttpServletRequest request) throws ActionException {
-    for (final Iterator arguments = getArguments().iterator(); arguments.hasNext();) {
-      final Argument argument = (Argument)arguments.next();
+    for (final Object element : getArguments()) {
+      final Argument argument = (Argument)element;
       final String name = argument.getName();
       Object value = null;
       String stringValue = request.getParameter(name);
@@ -383,8 +383,8 @@ public class PageController implements SiteNodeController {
    * @throws PageNotFoundException
    */
   private void processAttributes(final HttpServletRequest request) throws ActionException {
-    for (final Iterator attributes = getFields().iterator(); attributes.hasNext();) {
-      final Attribute attribute = (Attribute)attributes.next();
+    for (final Object element : getFields()) {
+      final Attribute attribute = (Attribute)element;
       final String name = attribute.getName();
       final AttributeLoader loader = attribute.getLoader();
       Object value = null;
@@ -425,8 +425,8 @@ public class PageController implements SiteNodeController {
   }
 
   public void setMenuList(final Collection menus) {
-    for (final Iterator menuIter = menus.iterator(); menuIter.hasNext();) {
-      final com.revolsys.ui.model.Menu menu = (com.revolsys.ui.model.Menu)menuIter.next();
+    for (final Object element : menus) {
+      final com.revolsys.ui.model.Menu menu = (com.revolsys.ui.model.Menu)element;
       addMenu(menu);
     }
     log.debug(this + ":" + getMenus());
@@ -459,8 +459,7 @@ public class PageController implements SiteNodeController {
    * @param scripts The scripts to set.
    */
   public void setScripts(final Collection scripts) {
-    for (final Iterator scriptItet = scripts.iterator(); scriptItet.hasNext();) {
-      final Object element = scriptItet.next();
+    for (Object element : scripts) {
       if (element instanceof Script) {
         final Script script = (Script)element;
         this.scripts.add(script);
@@ -479,8 +478,7 @@ public class PageController implements SiteNodeController {
    * @param styles The styles to set.
    */
   public void setStyles(final Collection styles) {
-    for (final Iterator styleIter = styles.iterator(); styleIter.hasNext();) {
-      final Object element = styleIter.next();
+    for (Object element : styles) {
       if (element instanceof Style) {
         final Style style = (Style)element;
         this.styles.add(style);

@@ -87,6 +87,11 @@ import com.revolsys.geometry.util.RectangleUtil;
 public class MonotoneChain extends BoundingBoxDoubleXY {
 
   /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
+  /**
    * Finds the index of the last point in a monotone chain
    * starting at a given point.
    * Any repeated line (0-length segments) will be included

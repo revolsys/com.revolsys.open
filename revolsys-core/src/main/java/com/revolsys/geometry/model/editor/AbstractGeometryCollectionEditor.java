@@ -386,6 +386,7 @@ public abstract class AbstractGeometryCollectionEditor<GC extends Geometry, G ex
 
   public abstract <NGE extends Geometry> NGE newGeometryEmpty();
 
+  @Override
   public void removeGeometry(final int index) {
     this.editors.remove(index);
     setModified(true);

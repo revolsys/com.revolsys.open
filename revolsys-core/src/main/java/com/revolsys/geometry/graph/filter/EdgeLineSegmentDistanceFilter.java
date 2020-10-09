@@ -14,6 +14,22 @@ import com.revolsys.geometry.model.segment.LineSegmentDoubleXYEditor;
 public class EdgeLineSegmentDistanceFilter extends LineSegmentDoubleXYEditor
   implements Predicate<Edge<LineSegment>> {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
+  public static List<Edge<LineSegment>> getEdges(final Graph<LineSegment> graph,
+    final LineSegment lineSegment, final double maxDistance) {
+    final List<Edge<LineSegment>> results = new ArrayList<>();
+    final BoundingBox boundingBox = lineSegment.bboxNewExpandDelta(maxDistance);
+    final IdObjectIndex<Edge<LineSegment>> edgeIndex = graph.getEdgeIndex();
+    final EdgeLineSegmentDistanceFilter filter = new EdgeLineSegmentDistanceFilter(lineSegment,
+      maxDistance);
+    edgeIndex.forEach(boundingBox, filter, results::add);
+    return results;
+  }
+
   private final double maxDistance;
 
   public EdgeLineSegmentDistanceFilter(final double maxDistance) {
@@ -35,16 +51,5 @@ public class EdgeLineSegmentDistanceFilter extends LineSegmentDoubleXYEditor
     } else {
       return false;
     }
-  }
-
-  public static List<Edge<LineSegment>> getEdges(final Graph<LineSegment> graph,
-    final LineSegment lineSegment, final double maxDistance) {
-    final List<Edge<LineSegment>> results = new ArrayList<>();
-    final BoundingBox boundingBox = lineSegment.bboxNewExpandDelta(maxDistance);
-    final IdObjectIndex<Edge<LineSegment>> edgeIndex = graph.getEdgeIndex();
-    final EdgeLineSegmentDistanceFilter filter = new EdgeLineSegmentDistanceFilter(lineSegment,
-      maxDistance);
-    edgeIndex.forEach(boundingBox, filter, results::add);
-    return results;
   }
 }

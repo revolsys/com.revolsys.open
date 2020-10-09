@@ -33,7 +33,6 @@
 package com.revolsys.geometry.noding;
 
 import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Intersects two sets of {@link SegmentString}s using
@@ -84,10 +83,10 @@ public class SimpleSegmentSetMutualIntersector implements SegmentSetMutualInters
    */
   @Override
   public void process(final Collection segStrings, final SegmentIntersector segInt) {
-    for (final Iterator i = this.baseSegStrings.iterator(); i.hasNext();) {
-      final SegmentString baseSS = (SegmentString)i.next();
-      for (final Iterator j = segStrings.iterator(); j.hasNext();) {
-        final SegmentString ss = (SegmentString)j.next();
+    for (final Object element : this.baseSegStrings) {
+      final SegmentString baseSS = (SegmentString)element;
+      for (final Object segString : segStrings) {
+        final SegmentString ss = (SegmentString)segString;
         intersect(baseSS, ss, segInt);
         if (segInt.isDone()) {
           return;

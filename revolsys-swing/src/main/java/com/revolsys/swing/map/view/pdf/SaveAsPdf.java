@@ -111,7 +111,7 @@ public class SaveAsPdf {
       project.getBaseMapLayers(), true);
     addOptionalContentGroups(view, scaleForVisible, optionalContentProperties, project, false);
 
-    final COSDictionary layerDict = (COSDictionary)optionalContentProperties.getCOSObject();
+    final COSDictionary layerDict = optionalContentProperties.getCOSObject();
     final COSDictionary layerDictD = (COSDictionary)layerDict.getDictionaryObject(COSName.D);
     final COSArray layerList = (COSArray)layerDictD.getDictionaryObject(COSName.ORDER);
     layerList.clear();

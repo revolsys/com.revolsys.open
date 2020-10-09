@@ -2,7 +2,6 @@ package com.revolsys.collection.list;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 public class NoRepeatArrayList extends ArrayList {
   /**
@@ -38,8 +37,7 @@ public class NoRepeatArrayList extends ArrayList {
   public boolean addAll(final Collection values) {
     ensureCapacity(size() + values.size());
     boolean modified = false;
-    for (final Iterator iter = values.iterator(); iter.hasNext();) {
-      final Object value = iter.next();
+    for (Object value : values) {
       if (add(value)) {
         modified = true;
       }
@@ -50,8 +48,7 @@ public class NoRepeatArrayList extends ArrayList {
   @Override
   public boolean addAll(int index, final Collection values) {
     ensureCapacity(size() + values.size());
-    for (final Iterator iter = values.iterator(); iter.hasNext();) {
-      final Object value = iter.next();
+    for (Object value : values) {
       add(index++, value);
     }
     return true;

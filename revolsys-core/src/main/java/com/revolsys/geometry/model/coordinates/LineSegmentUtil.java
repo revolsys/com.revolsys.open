@@ -68,16 +68,15 @@ public class LineSegmentUtil {
    * @param D
    *          another point of the line (must be different to A)
    */
-  public static double distanceLineLine(final double l1x1, final double l1y1,
-    final double l1x2, final double l1y2, final double l2x1, final double l2y1,
-    final double l2x2, final double l2y2) {
+  public static double distanceLineLine(final double l1x1, final double l1y1, final double l1x2,
+    final double l1y2, final double l2x1, final double l2y1, final double l2x2, final double l2y2) {
     // check for zero-length segments // AB and CD are line segments
     /*
      * from comp.graphics.algo Solving the above for r and s yields
      * (Ay-Cy)(Dx-Cx)-(Ax-Cx)(Dy-Cy) r = ----------------------------- (eqn 1)
      * (Bx-Ax)(Dy-Cy)-(By-Ay)(Dx-Cx) (Ay-Cy)(Bx-Ax)-(Ax-Cx)(By-Ay) s =
-     * ----------------------------- (eqn 2) (Bx-Ax)(Dy-Cy)-(By-Ay)(Dx-Cx) Let
-     * P be the position vector of the intersection point, then P=A+r(B-A) or
+     * ----------------------------- (eqn 2) (Bx-Ax)(Dy-Cy)-(By-Ay)(Dx-Cx) Let P
+     * be the position vector of the intersection point, then P=A+r(B-A) or
      * Px=Ax+r(Bx-Ax) Py=Ay+r(By-Ay) By examining the values of r & s, you can
      * also determine some other limiting conditions: If 0<=r<=1 & 0<=s<=1,
      * intersection exists r<0 or r>1 or s<0 or s>1 line segments do not
@@ -89,23 +88,18 @@ public class LineSegmentUtil {
     } else if (l2x1 == l2x2 && l2y1 == l2y2) {
       return distanceLinePoint(l1x1, l1y1, l1x2, l1y2, l2x1, l2y1);
     } else {
-     
 
       boolean noIntersection = false;
-      if (!RectangleUtil.intersectsMinMax(l1x1, l1y1, l1x2, l1y2, l2x1, l2y1,
-        l2x2, l2y2)) {
+      if (!RectangleUtil.intersectsMinMax(l1x1, l1y1, l1x2, l1y2, l2x1, l2y1, l2x2, l2y2)) {
         noIntersection = true;
       } else {
-        final double denom = (l1x2 - l1x1) * (l2y2 - l2y1)
-          - (l1y2 - l1y1) * (l2x2 - l2x1);
+        final double denom = (l1x2 - l1x1) * (l2y2 - l2y1) - (l1y2 - l1y1) * (l2x2 - l2x1);
 
         if (denom == 0) {
           noIntersection = true;
         } else {
-          final double r_num = (l1y1 - l2y1) * (l2x2 - l2x1)
-            - (l1x1 - l2x1) * (l2y2 - l2y1);
-          final double s_num = (l1y1 - l2y1) * (l1x2 - l1x1)
-            - (l1x1 - l2x1) * (l1y2 - l1y1);
+          final double r_num = (l1y1 - l2y1) * (l2x2 - l2x1) - (l1x1 - l2x1) * (l2y2 - l2y1);
+          final double s_num = (l1y1 - l2y1) * (l1x2 - l1x1) - (l1x1 - l2x1) * (l1y2 - l1y1);
 
           final double s = s_num / denom;
           final double r = r_num / denom;
@@ -116,14 +110,10 @@ public class LineSegmentUtil {
         }
       }
       if (noIntersection) {
-        final double distance1 = distanceLinePoint(l2x1, l2y1, l2x2, l2y2, l1x1,
-          l1y1);
-        final double distance2 = distanceLinePoint(l2x1, l2y1, l2x2, l2y2, l1x2,
-          l1y2);
-        final double distance3 = distanceLinePoint(l1x1, l1y1, l1x2, l1y2, l2x1,
-          l2y1);
-        final double distance4 = distanceLinePoint(l1x1, l1y1, l1x2, l1y2, l2x2,
-          l2y2);
+        final double distance1 = distanceLinePoint(l2x1, l2y1, l2x2, l2y2, l1x1, l1y1);
+        final double distance2 = distanceLinePoint(l2x1, l2y1, l2x2, l2y2, l1x2, l1y2);
+        final double distance3 = distanceLinePoint(l1x1, l1y1, l1x2, l1y2, l2x1, l2y1);
+        final double distance4 = distanceLinePoint(l1x1, l1y1, l1x2, l1y2, l2x2, l2y2);
         double distance = distance1;
         if (distance2 < distance) {
           distance = distance2;
@@ -140,61 +130,61 @@ public class LineSegmentUtil {
         return 0.0;
       }
     }
-//    if (l1x1 == l1x2 && l1y1 == l1y2) {
-//      return distanceLinePoint(l2x1, l2y1, l2x2, l2y2, l1x1, l1y1);
-//    } else if (l2x1 == l2x2 && l2y1 == l2y2) {
-//      return distanceLinePoint(l1x1, l1y1, l1x2, l1y2, l2x1, l2y1);
-//    } else {
-//    
-//      boolean noIntersection = false;
-//      if (!RectangleUtil.intersectsMinMax(l1x1, l1y1, l1x2, l1y2, l2x1, l2y1,
-//        l2x2, l2y2)) {
-//        noIntersection = true;
-//      } else {
-//        final double denom = (l1x2 - l1x1) * (l2y2 - l2y1)
-//          - (l1y2 - l1y1) * (l2x2 - l2x1);
-//
-//        if (denom == 0) {
-//          noIntersection = true;
-//        } else {
-//          final double r_num = (l1y1 - l2y1) * (l2x2 - l2x1)
-//            - (l1x1 - l2x1) * (l2y2 - l2y1);
-//          final double s_num = (l1y1 - l2y1) * (l1x2 - l1x1)
-//            - (l1x1 - l2x1) * (l1y2 - l1y1);
-//
-//          final double s = s_num / denom;
-//          final double r = r_num / denom;
-//
-//          if (r < 0 || r > 1 || s < 0 || s > 1) {
-//            noIntersection = true;
-//          }
-//        }
-//      }
-//      if (noIntersection) {
-//        final double distance1 = distanceLinePoint(l2x1, l2y1, l2x2, l2y2, l1x1,
-//          l1y1);
-//        final double distance2 = distanceLinePoint(l2x1, l2y1, l2x2, l2y2, l1x2,
-//          l1y2);
-//        final double distance3 = distanceLinePoint(l1x1, l1y1, l1x2, l1y2, l2x1,
-//          l2y1);
-//        final double distance4 = distanceLinePoint(l1x1, l1y1, l1x2, l1y2, l2x2,
-//          l2y2);
-//        double distance = distance1;
-//        if (distance2 < distance) {
-//          distance = distance2;
-//        }
-//        if (distance3 < distance) {
-//          distance = distance3;
-//        }
-//        if (distance4 < distance) {
-//          distance = distance4;
-//        }
-//        return distance;
-//      } else {
-//        // segments intersect
-//        return 0.0;
-//      }
-//    }
+    // if (l1x1 == l1x2 && l1y1 == l1y2) {
+    // return distanceLinePoint(l2x1, l2y1, l2x2, l2y2, l1x1, l1y1);
+    // } else if (l2x1 == l2x2 && l2y1 == l2y2) {
+    // return distanceLinePoint(l1x1, l1y1, l1x2, l1y2, l2x1, l2y1);
+    // } else {
+    //
+    // boolean noIntersection = false;
+    // if (!RectangleUtil.intersectsMinMax(l1x1, l1y1, l1x2, l1y2, l2x1, l2y1,
+    // l2x2, l2y2)) {
+    // noIntersection = true;
+    // } else {
+    // final double denom = (l1x2 - l1x1) * (l2y2 - l2y1)
+    // - (l1y2 - l1y1) * (l2x2 - l2x1);
+    //
+    // if (denom == 0) {
+    // noIntersection = true;
+    // } else {
+    // final double r_num = (l1y1 - l2y1) * (l2x2 - l2x1)
+    // - (l1x1 - l2x1) * (l2y2 - l2y1);
+    // final double s_num = (l1y1 - l2y1) * (l1x2 - l1x1)
+    // - (l1x1 - l2x1) * (l1y2 - l1y1);
+    //
+    // final double s = s_num / denom;
+    // final double r = r_num / denom;
+    //
+    // if (r < 0 || r > 1 || s < 0 || s > 1) {
+    // noIntersection = true;
+    // }
+    // }
+    // }
+    // if (noIntersection) {
+    // final double distance1 = distanceLinePoint(l2x1, l2y1, l2x2, l2y2, l1x1,
+    // l1y1);
+    // final double distance2 = distanceLinePoint(l2x1, l2y1, l2x2, l2y2, l1x2,
+    // l1y2);
+    // final double distance3 = distanceLinePoint(l1x1, l1y1, l1x2, l1y2, l2x1,
+    // l2y1);
+    // final double distance4 = distanceLinePoint(l1x1, l1y1, l1x2, l1y2, l2x2,
+    // l2y2);
+    // double distance = distance1;
+    // if (distance2 < distance) {
+    // distance = distance2;
+    // }
+    // if (distance3 < distance) {
+    // distance = distance3;
+    // }
+    // if (distance4 < distance) {
+    // distance = distance4;
+    // }
+    // return distance;
+    // } else {
+    // // segments intersect
+    // return 0.0;
+    // }
+    // }
   }
 
   public static double distanceLineLine(final Point line1From, final Point line1To,

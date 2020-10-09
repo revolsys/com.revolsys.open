@@ -1492,6 +1492,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return new Query(recordDefinition, whereCondition);
   }
 
+  @Override
   public LayerRecord getRecord(final Identifier identifier) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (recordDefinition != null) {
@@ -2353,6 +2354,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return proxyRecords;
   }
 
+  @Override
   public Query newQuery() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return new Query(recordDefinition);

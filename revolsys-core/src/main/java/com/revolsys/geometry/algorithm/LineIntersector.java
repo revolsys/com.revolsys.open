@@ -148,18 +148,18 @@ public abstract class LineIntersector {
     this.scale = scale;
   }
 
+  public abstract boolean computeIntersectionLine(final double line1x1, final double line1y1,
+    final double line1x2, final double line1y2, final double line2x1, final double line2y1,
+    final double line2x2, final double line2y2);
+
   /**
    * Compute the intersection of a point p and the line p1-p2.
    * This function computes the boolean value of the hasIntersection test.
    * The actual value of the intersection (if there is one)
    * is equal to the value of <code>p</code>.
    */
-  public abstract boolean computeIntersectionPoint(double x1, double y1, double x2, double y2, double x,
-    double y);
-
-  public abstract boolean computeIntersectionLine(final double line1x1, final double line1y1,
-    final double line1x2, final double line1y2, final double line2x1, final double line2y1,
-    final double line2x2, final double line2y2);
+  public abstract boolean computeIntersectionPoint(double x1, double y1, double x2, double y2,
+    double x, double y);
 
   /**
    * Computes the intersection of the lines p1-p2 and p3-p4.

@@ -146,8 +146,8 @@ class PolygonizeGraph extends PlanarGraph {
    */
   public static void deleteAllEdges(final Node node) {
     final List edges = node.getOutEdges().getEdges();
-    for (final Iterator i = edges.iterator(); i.hasNext();) {
-      final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)i.next();
+    for (final Object edge : edges) {
+      final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)edge;
       de.setMarked(true);
       final PolygonizeDirectedEdge sym = (PolygonizeDirectedEdge)de.getSym();
       if (sym != null) {
@@ -219,8 +219,8 @@ class PolygonizeGraph extends PlanarGraph {
     final List edgeRingStarts = new ArrayList();
     // label the edge rings formed
     long currLabel = 1;
-    for (final Iterator i = dirEdges.iterator(); i.hasNext();) {
-      final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)i.next();
+    for (final Object dirEdge : dirEdges) {
+      final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)dirEdge;
       if (de.isMarked()) {
         continue;
       }
@@ -240,8 +240,8 @@ class PolygonizeGraph extends PlanarGraph {
   private static int getDegree(final Node node, final long label) {
     final List edges = node.getOutEdges().getEdges();
     int degree = 0;
-    for (final Iterator i = edges.iterator(); i.hasNext();) {
-      final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)i.next();
+    for (final Object edge : edges) {
+      final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)edge;
       if (de.getLabel() == label) {
         degree++;
       }
@@ -252,8 +252,8 @@ class PolygonizeGraph extends PlanarGraph {
   private static int getDegreeNonDeleted(final Node node) {
     final List edges = node.getOutEdges().getEdges();
     int degree = 0;
-    for (final Iterator i = edges.iterator(); i.hasNext();) {
-      final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)i.next();
+    for (final Object edge : edges) {
+      final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)edge;
       if (!de.isMarked()) {
         degree++;
       }
@@ -262,8 +262,8 @@ class PolygonizeGraph extends PlanarGraph {
   }
 
   private static void label(final Collection dirEdges, final long label) {
-    for (final Iterator i = dirEdges.iterator(); i.hasNext();) {
-      final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)i.next();
+    for (final Object dirEdge : dirEdges) {
+      final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)dirEdge;
       de.setLabel(label);
     }
   }
@@ -349,8 +349,8 @@ class PolygonizeGraph extends PlanarGraph {
    * @param ringEdges the list of start edges for the edgeRings to convert.
    */
   private void convertMaximalToMinimalEdgeRings(final List ringEdges) {
-    for (final Iterator i = ringEdges.iterator(); i.hasNext();) {
-      final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)i.next();
+    for (final Object ringEdge : ringEdges) {
+      final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)ringEdge;
       final long label = de.getLabel();
       final List intNodes = findIntersectionNodes(de, label);
 
@@ -359,8 +359,8 @@ class PolygonizeGraph extends PlanarGraph {
       }
       // flip the next pointers on the intersection nodes to create minimal edge
       // rings
-      for (final Iterator iNode = intNodes.iterator(); iNode.hasNext();) {
-        final Node node = (Node)iNode.next();
+      for (final Object intNode : intNodes) {
+        final Node node = (Node)intNode;
         computeNextCCWEdges(node, label);
       }
     }
@@ -415,8 +415,8 @@ class PolygonizeGraph extends PlanarGraph {
     final Set<LineString> dangleLines = new HashSet<>();
 
     final Stack nodeStack = new Stack();
-    for (final Iterator i = nodesToRemove.iterator(); i.hasNext();) {
-      nodeStack.push(i.next());
+    for (final Object element : nodesToRemove) {
+      nodeStack.push(element);
     }
 
     while (!nodeStack.isEmpty()) {
@@ -424,8 +424,8 @@ class PolygonizeGraph extends PlanarGraph {
 
       deleteAllEdges(node);
       final List nodeOutEdges = node.getOutEdges().getEdges();
-      for (final Iterator i = nodeOutEdges.iterator(); i.hasNext();) {
-        final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)i.next();
+      for (final Object nodeOutEdge : nodeOutEdges) {
+        final PolygonizeDirectedEdge de = (PolygonizeDirectedEdge)nodeOutEdge;
         // delete this edge and its sym
         de.setMarked(true);
         final PolygonizeDirectedEdge sym = (PolygonizeDirectedEdge)de.getSym();

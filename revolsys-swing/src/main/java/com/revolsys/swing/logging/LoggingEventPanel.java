@@ -241,10 +241,6 @@ public class LoggingEventPanel extends JPanel {
     setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
   }
 
-  private boolean isIgnoredStackTraceLine(final String line) {
-    return false;
-  }
-
   private void showDialog(final String title) {
     final JDialog dialog = Dialogs.newDocumentModal(title);
     dialog.setLayout(new BorderLayout());

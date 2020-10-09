@@ -61,8 +61,9 @@ public interface LineSegment extends LineString {
         }
         coordinates[intersectionCount * axisCount + axisIndex] = value;
       }
+      return intersectionCount + 1;
     }
-    return intersectionCount + 1;
+    return intersectionCount;
   }
 
   public static int addPointIntersection(final double[] coordinates, final int intersectionCount,
@@ -244,51 +245,6 @@ public interface LineSegment extends LineString {
     }
   }
 
-  @Override
-  default double distancePoint(final double x, final double y) {
-    final double x1 = getX(0);
-    final double y1 = getY(0);
-    final double x2 = getX(1);
-    final double y2 = getY(1);
-    if (x1 == x2 && y1 == y2) {
-      return Points.distance(x, y, x1, y1);
-    } else {
-      final double dxx1 = x - x1;
-      final double dx2x1 = x2 - x1;
-      final double dyy1 = y - y1;
-      final double dy2y1 = y2 - y1;
-      final double d2x1sq = dx2x1 * dx2x1;
-      final double dy2y1sq = dy2y1 * dy2y1;
-      final double r = (dxx1 * dx2x1 + dyy1 * dy2y1) / (d2x1sq + dy2y1sq);
-
-      if (r <= 0.0) {
-        return Points.distance(x, y, x1, y1);
-      } else if (r >= 1.0) {
-        return Points.distance(x, y, x2, y2);
-      } else {
-        final double dy1y = y1 - y;
-        final double dx1x = x1 - x;
-        final double s = (dy1y * dx2x1 - dx1x * dy2y1) / (d2x1sq + dy2y1sq);
-
-        return Math.abs(s) * Math.sqrt(d2x1sq + dy2y1sq);
-      }
-    }
-  }
-
-  /**
-   * Computes the distance between this line segment and a given point.
-   *
-   * @return the distance from this segment to the given point
-   */
-  @Override
-  default double distancePoint(final double x, final double y, final double terminateDistance) {
-    final double x1 = getX(0);
-    final double y1 = getY(0);
-    final double x2 = getX(1);
-    final double y2 = getY(1);
-    return LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
-  }
-
   default double distance(final double x1, final double y1, final double x2, final double y2) {
     final double line1x1 = getX(0);
     final double line1y1 = getY(0);
@@ -337,6 +293,51 @@ public interface LineSegment extends LineString {
     final double x2 = getX(1);
     final double y2 = getY(1);
     return LineSegmentUtil.distancePointLinePerpendicular(x, y, x1, y1, x2, y2);
+  }
+
+  @Override
+  default double distancePoint(final double x, final double y) {
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    if (x1 == x2 && y1 == y2) {
+      return Points.distance(x, y, x1, y1);
+    } else {
+      final double dxx1 = x - x1;
+      final double dx2x1 = x2 - x1;
+      final double dyy1 = y - y1;
+      final double dy2y1 = y2 - y1;
+      final double d2x1sq = dx2x1 * dx2x1;
+      final double dy2y1sq = dy2y1 * dy2y1;
+      final double r = (dxx1 * dx2x1 + dyy1 * dy2y1) / (d2x1sq + dy2y1sq);
+
+      if (r <= 0.0) {
+        return Points.distance(x, y, x1, y1);
+      } else if (r >= 1.0) {
+        return Points.distance(x, y, x2, y2);
+      } else {
+        final double dy1y = y1 - y;
+        final double dx1x = x1 - x;
+        final double s = (dy1y * dx2x1 - dx1x * dy2y1) / (d2x1sq + dy2y1sq);
+
+        return Math.abs(s) * Math.sqrt(d2x1sq + dy2y1sq);
+      }
+    }
+  }
+
+  /**
+   * Computes the distance between this line segment and a given point.
+   *
+   * @return the distance from this segment to the given point
+   */
+  @Override
+  default double distancePoint(final double x, final double y, final double terminateDistance) {
+    final double x1 = getX(0);
+    final double y1 = getY(0);
+    final double x2 = getX(1);
+    final double y2 = getY(1);
+    return LineSegmentUtil.distanceLinePoint(x1, y1, x2, y2, x, y);
   }
 
   default boolean equals(final LineSegment segment) {

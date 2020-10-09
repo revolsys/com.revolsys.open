@@ -136,7 +136,7 @@ public interface GeometryEditor<GE extends GeometryEditor<?>> extends Geometry {
   /**
    * Construct a new geometry from the geometry editor. The result may be any geometry.
    * For example a {@link LineStringEditor} with vertexCount == 1 would return a Point.
-   * 
+   *
    * @return
    */
   <GA extends Geometry> GA newGeometryAny();

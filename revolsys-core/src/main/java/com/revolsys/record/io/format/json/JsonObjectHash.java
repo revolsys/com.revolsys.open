@@ -6,6 +6,11 @@ import com.revolsys.collection.map.LinkedHashMapEx;
 
 public class JsonObjectHash extends LinkedHashMapEx implements JsonObject {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public JsonObjectHash() {
     super();
   }

@@ -115,8 +115,8 @@ public class ConsistentPolygonRingChecker {
     DirectedEdge incoming = null;
     int state = this.SCANNING_FOR_INCOMING;
     // link edges in CCW order
-    for (int i = 0; i < ringEdges.size(); i++) {
-      final DirectedEdge nextOut = (DirectedEdge)ringEdges.get(i);
+    for (final Object ringEdge : ringEdges) {
+      final DirectedEdge nextOut = (DirectedEdge)ringEdge;
       final DirectedEdge nextIn = nextOut.getSym();
 
       // skip de's that we're not interested in

@@ -89,8 +89,7 @@ public class ArrayListModel<T> extends ArrayList<T>
         if (!this.listeners.isEmpty()) {
           final ListDataEvent e = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, index0,
             index1);
-          for (int i = 0; i < this.listeners.size(); i++) {
-            final ListDataListener listener = this.listeners.get(i);
+          for (final ListDataListener listener : this.listeners) {
             listener.contentsChanged(e);
           }
         }
@@ -104,8 +103,7 @@ public class ArrayListModel<T> extends ArrayList<T>
         if (!this.listeners.isEmpty()) {
           final ListDataEvent e = new ListDataEvent(this, ListDataEvent.INTERVAL_ADDED, index0,
             index1);
-          for (int i = 0; i < this.listeners.size(); i++) {
-            final ListDataListener listener = this.listeners.get(i);
+          for (final ListDataListener listener : this.listeners) {
             try {
               listener.intervalAdded(e);
             } catch (final Throwable t) {
@@ -122,8 +120,7 @@ public class ArrayListModel<T> extends ArrayList<T>
         if (!this.listeners.isEmpty()) {
           final ListDataEvent e = new ListDataEvent(this, ListDataEvent.INTERVAL_REMOVED, index0,
             index1);
-          for (int i = 0; i < this.listeners.size(); i++) {
-            final ListDataListener listener = this.listeners.get(i);
+          for (final ListDataListener listener : this.listeners) {
             listener.intervalRemoved(e);
           }
         }

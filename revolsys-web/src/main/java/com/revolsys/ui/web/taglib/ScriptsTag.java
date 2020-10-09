@@ -137,8 +137,8 @@ public class ScriptsTag extends TagSupport {
    */
   private void writeScripts(final Collection scripts) throws IOException {
     final JspWriter out = this.pageContext.getOut();
-    for (final Iterator scriptIter = scripts.iterator(); scriptIter.hasNext();) {
-      final Script script = (Script)scriptIter.next();
+    for (final Object script2 : scripts) {
+      final Script script = (Script)script2;
       final String content = script.getContent();
       if (content != null) {
         out.print("<script type=\"");

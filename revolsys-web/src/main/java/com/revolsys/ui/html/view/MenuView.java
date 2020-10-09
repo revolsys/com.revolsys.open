@@ -17,7 +17,6 @@ package com.revolsys.ui.html.view;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -44,8 +43,8 @@ public class MenuView extends ObjectView {
     // Collection items = menu.getItems();
     if (items.size() > 0) {
       out.startTag(HtmlElem.UL);
-      for (final Iterator menuItemIter = items.iterator(); menuItemIter.hasNext();) {
-        final MenuItem menuItem = (MenuItem)menuItemIter.next();
+      for (final Object item : items) {
+        final MenuItem menuItem = (MenuItem)item;
         if (menuItem.isVisible()) {
           out.startTag(HtmlElem.LI);
 

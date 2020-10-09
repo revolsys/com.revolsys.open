@@ -176,7 +176,7 @@ public interface Lists {
   }
 
   static <V> ListBuilder<V> buildArray() {
-    return new ListBuilder<V>(new ArrayList<>());
+    return new ListBuilder<>(new ArrayList<>());
   }
 
   static <T> boolean containsReference(final List<WeakReference<T>> list, final T object) {

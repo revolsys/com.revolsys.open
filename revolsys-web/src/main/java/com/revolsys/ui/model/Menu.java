@@ -2,7 +2,6 @@ package com.revolsys.ui.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -321,8 +320,8 @@ public class Menu extends BaseObjectWithProperties implements Cloneable, BeanNam
    * @param parameters The parameters to set.
    */
   public void setParameters(final Map parameters) {
-    for (final Iterator params = parameters.entrySet().iterator(); params.hasNext();) {
-      final Map.Entry entry = (Map.Entry)params.next();
+    for (final Object element : parameters.entrySet()) {
+      final Map.Entry entry = (Map.Entry)element;
       addParameter(entry.getKey(), entry.getValue());
     }
     this.parameters = parameters;

@@ -9,8 +9,7 @@ import com.revolsys.elevation.gridded.GriddedElevationModelWriterFactory;
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.spring.resource.Resource;
 
-public class CompressedScaledIntegerGriddedDigitalElevation
-  extends AbstractIoFactory
+public class CompressedScaledIntegerGriddedDigitalElevation extends AbstractIoFactory
   implements GriddedElevationModelReaderFactory, GriddedElevationModelWriterFactory {
 
   public static final String MEDIA_TYPE = "image/x-revolsys-sigdemz";

@@ -1,6 +1,6 @@
 /*
  * $URL: https://secure.revolsys.com/svn/open.revolsys.com/rs-iaf/trunk/src/main/java/com/revolsys/ui/html/view/HtmlUiBuilderKeyView.java $
- * 
+ *
  * $Date: 2006-12-06 08:54:31 -0800 (Wed, 06 Dec 2006) $
  * $Revision: 188 $
  *
