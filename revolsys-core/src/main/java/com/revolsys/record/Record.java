@@ -141,6 +141,19 @@ public interface Record
     return (Record)MapEx.super.add(key, value);
   }
 
+  @Override
+  default Record addFieldValue(final String key, final Map<String, Object> source) {
+    final Object value = source.get(key);
+    return addValue(key, value);
+  }
+
+  @Override
+  default Record addFieldValue(final String key, final Map<String, Object> source,
+    final String sourceKey) {
+    final Object value = source.get(sourceKey);
+    return add(key, value);
+  }
+
   @SuppressWarnings("unchecked")
   default <R extends Record> int addTo(final List<R> records) {
     if (!contains(records)) {
@@ -151,15 +164,9 @@ public interface Record
     return -1;
   }
 
-  default Record addValue(final String key, final Map<String, Object> source) {
-    final Object value = source.get(key);
-    return add(key, value);
-  }
-
-  default Record addValue(final String key, final Map<String, Object> source,
-    final String sourceKey) {
-    final Object value = source.get(sourceKey);
-    return add(key, value);
+  @Override
+  default Record addValue(final String key, final Object value) {
+    return (Record)MapEx.super.addValue(key, value);
   }
 
   default Record addValues(final MapEx values) {

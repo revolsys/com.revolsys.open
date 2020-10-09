@@ -2,6 +2,7 @@ package com.revolsys.jdbc.io;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.record.Record;
-import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.RecordState;
 import com.revolsys.util.LongCounter;
 
 public class JdbcRecordWriterTypeData {
@@ -130,7 +131,7 @@ public class JdbcRecordWriterTypeData {
       try (
         final ResultSet generatedKeyResultSet = this.statement.getGeneratedKeys()) {
         if (generatedKeyResultSet.next()) {
-          setGeneratedKeys(generatedKeyResultSet, record);
+          setGeneratedValues(generatedKeyResultSet, record);
         }
       }
     }
@@ -151,7 +152,7 @@ public class JdbcRecordWriterTypeData {
             int recordIndex = 0;
             while (generatedKeyResultSet.next() && recordIndex < this.records.size()) {
               final Record record = this.records.get(recordIndex++);
-              setGeneratedKeys(generatedKeyResultSet, record);
+              setGeneratedValues(generatedKeyResultSet, record);
             }
           }
         }
@@ -166,16 +167,17 @@ public class JdbcRecordWriterTypeData {
     }
   }
 
-  protected void setGeneratedKeys(final ResultSet generatedKeyResultSet, final Record record)
-    throws SQLException {
-    int columnIndex = 1;
-    for (final FieldDefinition idField : this.recordDefinition.getIdFields()) {
-      final Object idValue = generatedKeyResultSet.getObject(columnIndex);
-      if (!generatedKeyResultSet.wasNull()) {
-        final int index = idField.getIndex();
-        record.setValue(index, idValue);
-        columnIndex++;
+  protected void setGeneratedValues(final ResultSet rs, final Record record) throws SQLException {
+    final RecordState recordState = record.setState(RecordState.INITIALIZING);
+    try {
+      final ResultSetMetaData metaData = rs.getMetaData();
+      for (int i = 1; i <= metaData.getColumnCount(); i++) {
+        final String name = metaData.getColumnName(i);
+        final Object value = rs.getObject(i);
+        record.setValue(name, value);
       }
+    } finally {
+      record.setState(recordState);
     }
   }
 }

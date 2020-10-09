@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
 
+import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 
@@ -116,6 +117,9 @@ public class JdbcFieldDefinition extends FieldDefinition {
 
   public JdbcFieldDefinition setGenerated(final boolean generated) {
     this.generated = generated;
+    if (generated) {
+      ((JdbcRecordDefinition)getRecordDefinition()).setHasGeneratedFields(true);
+    }
     return this;
   }
 

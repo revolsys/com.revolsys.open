@@ -147,7 +147,7 @@ public class JdbcConnection implements Connection {
         JdbcUtils.close(statement);
       }
     } catch (final SQLException e) {
-      throw this.getException("Update", sql, e);
+      throw this.getException("Update:\n" + sql, sql, e);
     }
   }
 

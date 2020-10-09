@@ -75,15 +75,21 @@ public interface JsonObject extends MapEx, JsonType {
     return this;
   }
 
-  default JsonObject addValue(final String key, final Map<String, Object> source) {
+  default JsonObject addFieldValue(final String key, final Map<String, Object> source) {
     final Object value = source.get(key);
-    return add(key, value);
+    return addValue(key, value);
   }
 
-  default JsonObject addValue(final String key, final Map<String, Object> source,
+  default JsonObject addFieldValue(final String key, final Map<String, Object> source,
     final String sourceKey) {
     final Object value = source.get(sourceKey);
-    return add(key, value);
+    return addValue(key, value);
+  }
+
+  @Override
+  default JsonObject addValue(final String key, final Object value) {
+    MapEx.super.addValue(key, value);
+    return this;
   }
 
   @Override

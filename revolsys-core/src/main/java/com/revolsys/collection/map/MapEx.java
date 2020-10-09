@@ -54,6 +54,22 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
     return this;
   }
 
+  default MapEx addFieldValue(final String key, final Map<String, Object> source) {
+    final Object value = source.get(key);
+    return addValue(key, value);
+  }
+
+  default MapEx addFieldValue(final String key, final Map<String, Object> source,
+    final String sourceKey) {
+    final Object value = source.get(sourceKey);
+    return addValue(key, value);
+  }
+
+  default MapEx addValue(final String key, final Object value) {
+    put(key, value);
+    return this;
+  }
+
   MapEx clone();
 
   @Override

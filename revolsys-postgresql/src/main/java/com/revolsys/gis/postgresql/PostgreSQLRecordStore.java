@@ -4,8 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -303,14 +305,24 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   @Override
   public PreparedStatement insertStatementPrepareRowId(final JdbcConnection connection,
     final RecordDefinition recordDefinition, final String sql) throws SQLException {
-    final List<FieldDefinition> idFields = recordDefinition.getIdFields();
-    final String[] idColumnNames = new String[idFields.size()];
-    for (int i = 0; i < idFields.size(); i++) {
-      final FieldDefinition idField = idFields.get(0);
-      final String columnName = ((JdbcFieldDefinition)idField).getDbName();
-      idColumnNames[i] = columnName;
+    String[] generatedColumnNames = recordDefinition.getProperty("generatedColumnNames");
+    if (generatedColumnNames == null) {
+      final List<FieldDefinition> idFields = recordDefinition.getIdFields();
+      final Set<FieldDefinition> generatedFields = new LinkedHashSet<>();
+      generatedFields.addAll(idFields);
+      for (final FieldDefinition field : recordDefinition.getFields()) {
+        if (field.isGenerated()) {
+          generatedFields.add(field);
+        }
+      }
+      generatedColumnNames = new String[generatedFields.size()];
+      int i = 0;
+      for (final FieldDefinition generatedField : generatedFields) {
+        generatedColumnNames[i++] = ((JdbcFieldDefinition)generatedField).getDbName();
+      }
+      recordDefinition.setProperty("generatedColumnNames", generatedColumnNames);
     }
-    return connection.prepareStatement(sql, idColumnNames);
+    return connection.prepareStatement(sql, generatedColumnNames);
   }
 
   @Override

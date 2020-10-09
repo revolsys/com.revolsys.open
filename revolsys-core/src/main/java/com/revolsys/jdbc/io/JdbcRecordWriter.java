@@ -435,7 +435,7 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
   protected void insert(final Record record, final JdbcRecordDefinition recordDefinition)
     throws SQLException {
     final JdbcRecordWriterTypeData data = insertStatementGet(recordDefinition, this.typeInsertData,
-      false, false);
+      false, recordDefinition.isHasGeneratedFields());
     if (data != null) {
       final PreparedStatement statement = data.getStatement();
       int parameterIndex = 1;

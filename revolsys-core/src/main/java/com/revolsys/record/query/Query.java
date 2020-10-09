@@ -590,8 +590,9 @@ public class Query extends BaseObjectWithProperties
   }
 
   @SuppressWarnings("unchecked")
-  public void setRecordFactory(final RecordFactory<?> recordFactory) {
+  public Query setRecordFactory(final RecordFactory<?> recordFactory) {
     this.recordFactory = (RecordFactory<Record>)recordFactory;
+    return this;
   }
 
   public Query setSql(final String sql) {

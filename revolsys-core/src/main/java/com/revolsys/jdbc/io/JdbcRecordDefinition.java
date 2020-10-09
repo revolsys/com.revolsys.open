@@ -10,6 +10,8 @@ public class JdbcRecordDefinition extends RecordDefinitionImpl {
 
   private final String dbTableQualifiedName;
 
+  private boolean hasGeneratedFields;
+
   public JdbcRecordDefinition(final JdbcRecordStoreSchema schema, final PathName pathName,
     final String dbTableName) {
     super(schema, pathName);
@@ -41,10 +43,18 @@ public class JdbcRecordDefinition extends RecordDefinitionImpl {
     return this.dbTableQualifiedName;
   }
 
+  public boolean isHasGeneratedFields() {
+    return this.hasGeneratedFields;
+  }
+
   @Override
   public JdbcRecordDefinition rename(final String path) {
     final JdbcRecordStoreSchema schema = getSchema();
     final PathName pathName = PathName.newPathName(path);
     return new JdbcRecordDefinition(schema, pathName, this.dbTableName);
+  }
+
+  public void setHasGeneratedFields(final boolean hasGeneratedFields) {
+    this.hasGeneratedFields = hasGeneratedFields;
   }
 }

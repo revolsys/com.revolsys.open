@@ -14,6 +14,11 @@ public class MapBuilder<K, V> extends DelegatingMap<K, V> {
     return this;
   }
 
+  public MapBuilder<K, V> addValue(final K key, final V value) {
+    this.map.put(key, value);
+    return this;
+  }
+
   @Override
   public Map<K, V> getMap() {
     return this.map;

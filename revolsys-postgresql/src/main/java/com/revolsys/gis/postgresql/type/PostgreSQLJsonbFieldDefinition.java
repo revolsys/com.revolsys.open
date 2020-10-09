@@ -1,6 +1,7 @@
 package com.revolsys.gis.postgresql.type;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -18,9 +19,18 @@ public class PostgreSQLJsonbFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
+  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+    final boolean internStrings) throws SQLException {
+    String value = resultSet.getString(columnIndex);
+    if (value != null && internStrings) {
+      value = value.intern();
+    }
+    return value;
+  }
+
+  @Override
   public int setPreparedStatementValue(final PreparedStatement statement, final int parameterIndex,
     final Object value) throws SQLException {
-
     if (value == null) {
       final int sqlType = getSqlType();
       statement.setNull(parameterIndex, sqlType);
@@ -33,5 +43,4 @@ public class PostgreSQLJsonbFieldDefinition extends JdbcFieldDefinition {
     return parameterIndex + 1;
 
   }
-
 }
