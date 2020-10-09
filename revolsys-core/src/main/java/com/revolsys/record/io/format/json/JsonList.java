@@ -200,4 +200,11 @@ public interface JsonList extends List<Object>, JsonType {
   default <V> V getValue(final int index) {
     return (V)get(index);
   }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  default Iterable<JsonObject> jsonObjects() {
+    return (Iterable)this;
+  }
 }
