@@ -239,6 +239,17 @@ public class Query extends BaseObjectWithProperties
     return this;
   }
 
+  public Query addOrderBy(final Map<String, Boolean> orderBy) {
+    for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
+      final String name = entry.getKey();
+      if (!this.orderBy.containsKey(name)) {
+        final Boolean ascending = entry.getValue();
+        this.orderBy.put(name, ascending);
+      }
+    }
+    return this;
+  }
+
   public Query addOrderBy(final String fieldName) {
     return addOrderBy(fieldName, true);
   }

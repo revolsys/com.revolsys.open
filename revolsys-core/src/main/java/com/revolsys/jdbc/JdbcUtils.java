@@ -77,11 +77,11 @@ public final class JdbcUtils {
     }
   }
 
-  public static void addOrderBy(final StringBuilder sql,
+  public static void addOrderBy(final StringBuilder sql, final RecordDefinition recordDefinition,
     final Map<? extends CharSequence, Boolean> orderBy) {
     if (!orderBy.isEmpty()) {
       sql.append(" ORDER BY ");
-      appendOrderByFields(sql, orderBy);
+      appendOrderByFields(sql, recordDefinition, orderBy);
     }
   }
 
@@ -96,7 +96,7 @@ public final class JdbcUtils {
   }
 
   public static StringBuilder appendOrderByFields(final StringBuilder sql,
-    final Map<? extends CharSequence, Boolean> orderBy) {
+    final RecordDefinition recordDefinition, final Map<? extends CharSequence, Boolean> orderBy) {
     boolean first = true;
     for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
       if (first) {
@@ -109,7 +109,17 @@ public final class JdbcUtils {
         final FieldDefinition fieldDefinition = (FieldDefinition)fieldName;
         fieldDefinition.appendColumnName(sql);
       } else {
-        sql.append(fieldName);
+        boolean add = true;
+        if (recordDefinition != null) {
+          final FieldDefinition field = recordDefinition.getField(fieldName);
+          if (field != null) {
+            field.appendColumnName(sql);
+            add = false;
+          }
+        }
+        if (add) {
+          sql.append(fieldName);
+        }
       }
       final Boolean ascending = entry.getValue();
       if (!ascending) {
@@ -353,7 +363,7 @@ public final class JdbcUtils {
       }
       if (!orderBy.isEmpty()) {
         final StringBuilder buffer = new StringBuilder(sql);
-        addOrderBy(buffer, orderBy);
+        addOrderBy(buffer, recordDefinition, orderBy);
         sql = buffer.toString();
       }
     }
@@ -404,7 +414,7 @@ public final class JdbcUtils {
       appendQueryValue(sql, query, join);
     }
     appendWhere(sql, query);
-    addOrderBy(sql, orderBy);
+    addOrderBy(sql, recordDefinition, orderBy);
     lockMode.append(sql);
     return sql.toString();
   }

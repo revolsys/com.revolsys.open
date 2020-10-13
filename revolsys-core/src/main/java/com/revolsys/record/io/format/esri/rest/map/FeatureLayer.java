@@ -264,7 +264,8 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
       // ORDER BY
       final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
       if (Property.hasValue(orderBy)) {
-        final String orderByFields = JdbcUtils.appendOrderByFields(new StringBuilder(), orderBy)
+        final String orderByFields = JdbcUtils
+          .appendOrderByFields(new StringBuilder(), this.recordDefinition, orderBy)
           .toString();
         parameters.put("orderByFields", orderByFields);
       }
