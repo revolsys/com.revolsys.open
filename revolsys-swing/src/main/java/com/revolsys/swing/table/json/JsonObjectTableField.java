@@ -51,6 +51,7 @@ public class JsonObjectTableField extends ValueField {
     add(tablePanel);
 
     this.table = tablePanel.getTable();
+    this.table.setTerminateEditOnFocusLost(true);
     this.toolBar = tablePanel.getToolBar();
 
     this.addNamesField = ComboBox.newComboBox("name", this.fields,
