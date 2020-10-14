@@ -616,6 +616,16 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     }
   }
 
+  default <R extends Record> R newRecord(final PathName typePath,
+    final RecordFactory<R> recordFactory) {
+    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    if (recordDefinition == null) {
+      return null;
+    } else {
+      return newRecord(recordDefinition, recordFactory);
+    }
+  }
+
   default Record newRecord(final Record record) {
     final RecordDefinition recordDefinition = record.getRecordDefinition();
     final RecordDefinition recordStoreRecordDefinition = getRecordDefinition(recordDefinition);
@@ -631,14 +641,8 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   }
 
   default Record newRecord(final RecordDefinition objectRecordDefinition) {
-    final RecordDefinition recordDefinition = getRecordDefinition(objectRecordDefinition);
     final RecordFactory<Record> recordFactory = getRecordFactory();
-    if (recordDefinition == null || recordFactory == null) {
-      return null;
-    } else {
-      final Record record = recordFactory.newRecord(recordDefinition);
-      return record;
-    }
+    return newRecord(objectRecordDefinition, recordFactory);
   }
 
   default Record newRecord(RecordDefinition recordDefinition,
@@ -660,6 +664,16 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
         }
       }
       return record;
+    }
+  }
+
+  default <R extends Record> R newRecord(final RecordDefinition objectRecordDefinition,
+    final RecordFactory<R> recordFactory) {
+    final RecordDefinition recordDefinition = getRecordDefinition(objectRecordDefinition);
+    if (recordDefinition == null || recordFactory == null) {
+      return null;
+    } else {
+      return recordFactory.newRecord(recordDefinition);
     }
   }
 
