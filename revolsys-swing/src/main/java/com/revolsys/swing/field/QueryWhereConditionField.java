@@ -39,6 +39,8 @@ import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.exception.WrappedException;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.record.code.CodeTable;
@@ -659,12 +661,32 @@ public class QueryWhereConditionField extends ValueField
     try {
       final String whereClause = this.whereTextField.getText();
       if (Property.hasValue(whereClause)) {
-        final Condition condition = this.sqlParser.whereToCondition(whereClause);
-        if (this.valid) {
-          setFieldValue(condition);
+        boolean valid = true;
+        Condition condition;
+        try {
+          condition = this.sqlParser.whereToCondition(whereClause);
+        } catch (final WrappedException e) {
+          Throwable cause = Exceptions.unwrap(e);
+          String message;
+          do {
+            message = cause.getMessage();
+            cause = cause.getCause();
+          } while (message == null && cause != null);
+          if (message == null) {
+            message = "SQL invalid";
+          } else {
+            message = "SQL invalid\n" + message;
+          }
+          setInvalidMessage(message);
+          valid = false;
+          condition = Condition.ALL;
+        }
+        this.valid = valid;
+        if (valid) {
           this.statusLabel.setForeground(WebColors.DarkGreen);
           this.statusLabel.setText("Valid");
         }
+        setFieldValue(condition);
       } else {
         setFieldValue(Condition.ALL);
         this.statusLabel.setForeground(WebColors.DarkGreen);

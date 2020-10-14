@@ -105,11 +105,12 @@ public class JsonObjectTableModel extends AbstractTableModel implements Property
   }
 
   public Object getObjectValue(final int rowIndex, final int columnIndex) {
-    if (this.object == null) {
+    JsonObject object = this.object;
+    if (object == null) {
       return "\u2026";
     } else {
       final String fieldName = getFieldName(rowIndex);
-      return this.object.getValue(fieldName);
+      return object.getValue(fieldName);
     }
   }
 
@@ -126,11 +127,12 @@ public class JsonObjectTableModel extends AbstractTableModel implements Property
       case 1:
         return getFieldTitle(rowIndex);
       case 2: {
-        if (this.object == null) {
+        JsonObject object = this.object;
+        if (object == null) {
           return "\u2026";
         } else {
           final String fieldName = getFieldName(rowIndex);
-          return this.object.getValue(fieldName);
+          return object.getValue(fieldName);
         }
       }
       default:
@@ -186,15 +188,19 @@ public class JsonObjectTableModel extends AbstractTableModel implements Property
 
   public void refreshFieldNames() {
     this.fieldNames.clear();
-    if (this.object != null) {
-      this.fieldNames.addAll(this.object.keySet());
+    final JsonObject object = this.object;
+    if (object != null) {
+      this.fieldNames.addAll(object.keySet());
     }
     fireTableDataChanged();
   }
 
   private void removeRow(final int rowIndex, final int columnIndex) {
     final String propertyName = getFieldName(rowIndex);
-    this.object.remove(propertyName);
+    final JsonObject object = this.object;
+    if (object != null) {
+      object.remove(propertyName);
+    }
     refreshFieldNames();
   }
 
@@ -220,11 +226,12 @@ public class JsonObjectTableModel extends AbstractTableModel implements Property
 
   @Override
   public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
-    if (this.object != null) {
+    final JsonObject object = this.object;
+    if (object != null) {
       if (columnIndex == 2) {
         final FieldDefinition field = getField(rowIndex);
         final String fieldName = field.getName();
-        final Object oldValue = this.object.put(fieldName, value);
+        final Object oldValue = object.put(fieldName, value);
         if (!DataType.equal(value, oldValue)) {
           fireTableCellUpdated(rowIndex, columnIndex);
         }

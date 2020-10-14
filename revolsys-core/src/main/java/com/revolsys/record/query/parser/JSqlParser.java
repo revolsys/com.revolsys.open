@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.Add;
 import com.revolsys.record.query.And;
@@ -34,6 +36,7 @@ import com.revolsys.record.query.Subtract;
 import com.revolsys.record.query.Value;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.util.Property;
 
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.CastExpression;
@@ -382,26 +385,28 @@ public class JSqlParser extends AbstractSqlParser {
 
   @Override
   public Condition whereToCondition(final String whereClause) {
-    final String sql = this.sqlPrefix + " (" + "\n" + whereClause + "\n)";
-    try {
-      final Statement statement = CCJSqlParserUtil.parse(sql);
-      if (statement instanceof Select) {
-        final Select select = (Select)statement;
-        final SelectBody selectBody = select.getSelectBody();
-        if (selectBody instanceof PlainSelect) {
-          final PlainSelect plainSelect = (PlainSelect)selectBody;
-          final Expression where = plainSelect.getWhere();
-          if (where instanceof Parenthesis) {
-            final Parenthesis parenthesis = (Parenthesis)where;
-            final Expression expression = parenthesis.getExpression();
-            final Condition condition = convertExpression(expression);
-            return condition;
+    if (Property.hasValue(whereClause)) {
+      final String sql = this.sqlPrefix + " (" + "\n" + whereClause + "\n)";
+      try {
+        final Statement statement = CCJSqlParserUtil.parse(sql);
+        if (statement instanceof Select) {
+          final Select select = (Select)statement;
+          final SelectBody selectBody = select.getSelectBody();
+          if (selectBody instanceof PlainSelect) {
+            final PlainSelect plainSelect = (PlainSelect)selectBody;
+            final Expression where = plainSelect.getWhere();
+            if (where instanceof Parenthesis) {
+              final Parenthesis parenthesis = (Parenthesis)where;
+              final Expression expression = parenthesis.getExpression();
+              final Condition condition = convertExpression(expression);
+              return condition;
+            }
           }
         }
-      }
 
-    } catch (final Exception e) {
-      throw new IllegalArgumentException("Error parsing SQL", e);
+      } catch (final Exception e) {
+        throw Exceptions.wrap("Error parsing SQL condition: " + whereClause, e);
+      }
     }
     return null;
   }

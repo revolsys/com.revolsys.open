@@ -120,8 +120,15 @@ public class JsonObjectTableField extends ValueField {
     try {
       if (value == getFieldValue()) {
         this.model.setObject((JsonObject)value);
+      } else if (value == null) {
+        final boolean set = super.setFieldValue(null);
+        this.model.setObject(null);
+        return set;
       } else {
-        final JsonObject clone = Json.clone(value);
+        JsonObject clone = Json.JSON_OBJECT.toObject(value);
+        if (clone == value) {
+          clone = clone.clone();
+        }
         final boolean set = super.setFieldValue(clone);
         this.model.setObject(clone);
         return set;

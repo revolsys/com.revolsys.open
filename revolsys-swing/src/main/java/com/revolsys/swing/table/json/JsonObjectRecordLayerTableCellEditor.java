@@ -15,6 +15,7 @@ import javax.swing.JTable;
 
 import org.jdesktop.swingx.VerticalLayout;
 
+import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.swing.SwingUtil;
@@ -78,7 +79,7 @@ public class JsonObjectRecordLayerTableCellEditor extends BaseTableCellEditor {
   public Component getTableCellEditorComponent(final JTable table, final Object value,
     final boolean isSelected, final int rowIndex, final int columnIndex) {
     this.table.setTerminateEditOnFocusLost(false);
-    this.cellEditorValue = (JsonObject)value;
+    this.cellEditorValue = Json.JSON_OBJECT.toObject(value);
     startEditing(rowIndex, columnIndex);
     final EventObject event = ((BaseJTable)table).getEditEvent();
     if (event instanceof MouseEvent) {
