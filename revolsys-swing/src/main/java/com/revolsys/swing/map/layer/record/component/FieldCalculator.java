@@ -46,8 +46,9 @@ public class FieldCalculator extends AbstractUpdateField implements DocumentList
 
   public static void addMenuItem(final MenuFactory headerMenu) {
     final EnableCheck enableCheck = newEnableCheck();
-    headerMenu.addMenuItem("field", "Field Calculator", "calculator:edit", enableCheck,
-      FieldCalculator::showDialog);
+    headerMenu
+      .addMenuItem("field", "Field Calculator", "calculator:edit", FieldCalculator::showDialog)
+      .setVisibleCheck(enableCheck);
   }
 
   private static void showDialog() {

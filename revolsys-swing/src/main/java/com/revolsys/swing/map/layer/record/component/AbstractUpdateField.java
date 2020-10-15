@@ -1,5 +1,6 @@
 package com.revolsys.swing.map.layer.record.component;
 
+import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -157,25 +158,26 @@ public abstract class AbstractUpdateField extends BaseDialog {
         cancel();
       }
     });
-
+    final JPanel topPanel = new JPanel(new BorderLayout());
+    add(topPanel, BorderLayout.NORTH);
     final JPanel fieldPanel = initFieldPanel();
     final String fieldTitle = this.fieldDefinition.getTitle();
-    fieldPanel.setBorder(BorderFactory.createTitledBorder("Set " + fieldTitle + " = "));
+    fieldPanel.setBorder(BorderFactory.createTitledBorder(fieldTitle));
 
-    add(fieldPanel);
+    topPanel.add(fieldPanel, BorderLayout.NORTH);
 
     final JLabel recordCountLabel = new JLabel("<html><b style='color:#32CD32'>"
       + getRecordCountString() + "</b> records will be updated.</html>");
     recordCountLabel.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
-    add(recordCountLabel);
+    topPanel.add(recordCountLabel, BorderLayout.SOUTH);
 
     final JComponent errorsPanel = initErrorsPanel();
     if (errorsPanel != null) {
-      add(errorsPanel);
+      add(errorsPanel, BorderLayout.CENTER);
     }
 
     final JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-    add(buttonsPanel);
+    add(buttonsPanel, BorderLayout.SOUTH);
 
     final JButton cancelButton = RunnableAction.newButton("Cancel", this::cancel);
     buttonsPanel.add(cancelButton);

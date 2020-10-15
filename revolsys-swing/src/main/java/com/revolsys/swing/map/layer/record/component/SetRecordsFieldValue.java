@@ -18,8 +18,9 @@ public class SetRecordsFieldValue extends AbstractUpdateField {
 
   public static void addMenuItem(final MenuFactory headerMenu) {
     final EnableCheck enableCheck = newEnableCheck();
-    headerMenu.addMenuItem("field", "Set Field Value", "table_fill_down", enableCheck,
-      SetRecordsFieldValue::showDialog);
+    headerMenu
+      .addMenuItem("field", "Set Field Value", "table_fill_down", SetRecordsFieldValue::showDialog)
+      .setVisibleCheck(enableCheck);
   }
 
   private static void showDialog() {

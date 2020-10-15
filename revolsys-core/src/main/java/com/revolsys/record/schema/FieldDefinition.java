@@ -819,7 +819,10 @@ public class FieldDefinition extends BaseObjectWithProperties
       }
     } else {
       final RecordDefinition recordDefinition = getRecordDefinition();
-      final CodeTable codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
+      CodeTable codeTable = this.codeTable;
+      if (codeTable == null && recordDefinition != null) {
+        codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
+      }
       if (codeTable == null) {
         final int maxLength = getLength();
         if (value instanceof Number) {
