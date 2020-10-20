@@ -308,7 +308,8 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   default Record getRecord(final PathName typePath, final Condition condition,
     final LockMode lockMode) {
-    final Query query = new Query(typePath)//
+    final RecordDefinition recordDefinition = getRecordDefinition(typePath);
+    final Query query = new Query(recordDefinition)//
       .setWhereCondition(condition)
       .setLockMode(lockMode);
     return getRecord(query);

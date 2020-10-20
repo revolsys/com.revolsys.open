@@ -3,7 +3,6 @@ package com.revolsys.record.query;
 import java.util.Arrays;
 
 import com.revolsys.record.Record;
-import com.revolsys.util.Property;
 
 public class Or extends AbstractMultiCondition {
 
@@ -33,9 +32,13 @@ public class Or extends AbstractMultiCondition {
   }
 
   @Override
-  public Or or(final Condition condition) {
-    if (!Property.isEmpty(condition)) {
-      addCondition(condition);
+  public Condition or(final Condition condition) {
+    if (condition != null && !condition.isEmpty()) {
+      if (isEmpty()) {
+        return condition;
+      } else {
+        addCondition(condition);
+      }
     }
     return this;
   }

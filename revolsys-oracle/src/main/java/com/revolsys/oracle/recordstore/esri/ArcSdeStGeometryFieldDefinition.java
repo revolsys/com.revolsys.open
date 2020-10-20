@@ -25,7 +25,7 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
-import com.revolsys.record.Record;
+import com.revolsys.record.query.ColumnIndexes;
 
 public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
 
@@ -110,14 +110,14 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
     final boolean internStrings) throws SQLException {
-    final int geometryType = resultSet.getInt(columnIndex);
+    final int geometryType = resultSet.getInt(indexes.incrementAndGet());
     if (resultSet.wasNull()) {
       return null;
     } else {
-      final int numPoints = resultSet.getInt(columnIndex + 1);
-      final Blob blob = resultSet.getBlob(columnIndex + 2);
+      final int numPoints = resultSet.getInt(indexes.incrementAndGet());
+      final Blob blob = resultSet.getBlob(indexes.incrementAndGet());
       try (
         final InputStream pointsIn = new BufferedInputStream(blob.getBinaryStream(), 32000)) {
 
@@ -142,13 +142,6 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
   @Override
   public boolean isSortable() {
     return false;
-  }
-
-  @Override
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record object, final boolean internStrings) throws SQLException {
-    super.setFieldValueFromResultSet(resultSet, columnIndex, object, internStrings);
-    return columnIndex + 3;
   }
 
   public void setFloat(final PreparedStatement statement, int index, final Double value,

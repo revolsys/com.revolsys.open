@@ -9,6 +9,8 @@ import java.util.Map;
 
 import javax.annotation.PreDestroy;
 
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.collection.ResultPager;
 import com.revolsys.io.FileUtil;
 import com.revolsys.jdbc.JdbcConnection;
@@ -16,7 +18,7 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.query.Query;
-import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Booleans;
 
@@ -54,7 +56,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
 
   protected final boolean internStrings;
 
-  protected final List<FieldDefinition> fields;
+  protected final List<QueryValue> selectExpressions;
 
   public JdbcQueryResultPager(final JdbcRecordStore recordStore,
     final Map<String, Object> properties, final Query query) {
@@ -65,7 +67,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
 
     this.query = query;
 
-    final String tableName = query.getTypeName();
+    final PathName tableName = query.getTablePath();
     this.recordDefinition = query.getRecordDefinition();
     if (this.recordDefinition == null) {
       this.recordDefinition = recordStore.getRecordDefinition(tableName);
@@ -74,7 +76,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
 
     this.sql = JdbcUtils.getSelectSql(query);
     this.internStrings = (Boolean)properties.getOrDefault(properties, false);
-    this.fields = query.getFields(this.recordDefinition);
+    this.selectExpressions = query.getSelectExpressions();
   }
 
   @Override
@@ -344,7 +346,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
           int i = 0;
           do {
             final Record object = JdbcQueryIterator.getNextRecord(this.recordStore,
-              this.recordDefinition, this.fields, this.recordFactory, this.resultSet,
+              this.recordDefinition, this.selectExpressions, this.recordFactory, this.resultSet,
               this.internStrings);
             this.results.add(object);
             i++;

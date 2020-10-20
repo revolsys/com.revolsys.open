@@ -26,7 +26,7 @@ public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithPro
 
   public AbstractRecordStoreSchemaElement(final RecordStoreSchema schema, final PathName pathName) {
     this.schema = schema;
-    this.pathName = pathName;
+    setPathName(pathName);
   }
 
   public AbstractRecordStoreSchemaElement(final RecordStoreSchema schema, final String path) {
@@ -120,7 +120,7 @@ public abstract class AbstractRecordStoreSchemaElement extends BaseObjectWithPro
   }
 
   protected void setPathName(final String path) {
-    this.pathName = PathName.newPathName(path);
+    setPathName(PathName.newPathName(path));
   }
 
   @Override

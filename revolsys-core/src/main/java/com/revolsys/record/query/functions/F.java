@@ -10,12 +10,11 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 
 public class F {
-  public static WithinDistance dWithin(final FieldDefinition fieldDefinition,
-    final Geometry geometry, final double distance) {
-    final Column column = new Column(fieldDefinition);
-    final Value geometryValue = Value.newValue(fieldDefinition, geometry);
+  public static WithinDistance dWithin(final FieldDefinition field, final Geometry geometry,
+    final double distance) {
+    final Value geometryValue = Value.newValue(field, geometry);
     final Value distanceValue = Value.newValue(distance);
-    return new WithinDistance(column, geometryValue, distanceValue);
+    return new WithinDistance(field, geometryValue, distanceValue);
   }
 
   public static WithinDistance dWithin(final String name, final Geometry geometry,
@@ -29,21 +28,19 @@ public class F {
     return new WithinDistance(column, geometryValue, distanceValue);
   }
 
-  public static EnvelopeIntersects envelopeIntersects(final FieldDefinition attribute,
+  public static EnvelopeIntersects envelopeIntersects(final FieldDefinition field,
     final BoundingBox boundingBox) {
-    if (attribute == null) {
+    if (field == null) {
       return null;
     } else {
-      final Column column = new Column(attribute);
-      final Value value = Value.newValue(attribute, boundingBox);
-      return new EnvelopeIntersects(column, value);
+      final Value value = Value.newValue(field, boundingBox);
+      return new EnvelopeIntersects(field, value);
     }
   }
 
-  public static EnvelopeIntersects envelopeIntersects(final FieldDefinition attribute,
+  public static EnvelopeIntersects envelopeIntersects(final FieldDefinition field,
     final Geometry geometry) {
-    return new EnvelopeIntersects(new Column(attribute),
-      Value.newValue(attribute, geometry.getBoundingBox()));
+    return new EnvelopeIntersects(field, Value.newValue(field, geometry.getBoundingBox()));
   }
 
   public static EnvelopeIntersects envelopeIntersects(final RecordDefinition recordDefinition,
@@ -71,8 +68,8 @@ public class F {
     return new RegexpReplace(value, pattern, replace, flags);
   }
 
-  public static Upper upper(final FieldDefinition fieldDefinition) {
-    return upper(new Column(fieldDefinition));
+  public static Upper upper(final FieldDefinition field) {
+    return new Upper(field);
   }
 
   public static Upper upper(final QueryValue value) {
@@ -80,6 +77,7 @@ public class F {
   }
 
   public static Upper upper(final String name) {
-    return upper(new Column(name));
+    final Column column = new Column(name);
+    return upper(column);
   }
 }

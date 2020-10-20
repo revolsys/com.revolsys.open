@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Map;
@@ -115,6 +116,11 @@ public class Csv extends AbstractRecordIoFactory implements RecordWriterFactory,
   public RecordWriter newRecordWriter(final RecordDefinitionProxy recordDefinition,
     final Resource resource) {
     return new CsvRecordWriter(recordDefinition, resource, Csv.FIELD_SEPARATOR, true, true);
+  }
+
+  public CsvRecordWriter newRecordWriter(final RecordDefinitionProxy recordDefinition,
+    final Writer writer) {
+    return new CsvRecordWriter(recordDefinition, writer, Csv.FIELD_SEPARATOR, true, true);
   }
 
   @Override

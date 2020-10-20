@@ -7,6 +7,8 @@ import java.util.Map;
 
 import org.jeometry.common.data.type.DataTypes;
 
+import com.revolsys.record.query.ColumnIndexes;
+
 public class JdbcDoubleFieldDefinition extends JdbcFieldDefinition {
   public JdbcDoubleFieldDefinition(final String dbName, final String name, final int sqlType,
     final boolean required, final String description, final Map<String, Object> properties) {
@@ -20,9 +22,9 @@ public class JdbcDoubleFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
     final boolean internStrings) throws SQLException {
-    final double value = resultSet.getDouble(columnIndex);
+    final double value = resultSet.getDouble(indexes.incrementAndGet());
     if (resultSet.wasNull()) {
       return null;
     } else {

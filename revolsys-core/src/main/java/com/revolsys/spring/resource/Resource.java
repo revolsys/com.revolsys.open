@@ -46,7 +46,7 @@ import com.revolsys.predicate.Predicates;
 import com.revolsys.util.Property;
 
 public interface Resource extends org.springframework.core.io.Resource, FileProxy, UrlProxy {
-  static String CLASSPATH_URL_PREFIX = "classpath:";
+  String CLASSPATH_URL_PREFIX = "classpath:";
 
   ThreadLocal<Resource> BASE_RESOURCE = new ThreadLocal<>();
 

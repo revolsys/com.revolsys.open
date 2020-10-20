@@ -1,5 +1,6 @@
 package com.revolsys.jdbc.field;
 
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -7,9 +8,11 @@ import java.sql.Types;
 import java.util.Map;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.record.Record;
+import com.revolsys.record.query.ColumnIndexes;
 import com.revolsys.record.schema.FieldDefinition;
 
 public class JdbcFieldDefinition extends FieldDefinition {
@@ -46,20 +49,24 @@ public class JdbcFieldDefinition extends FieldDefinition {
   }
 
   @Override
-  public void appendColumnName(final StringBuilder sql) {
+  public void appendColumnName(final Appendable sql) {
     appendColumnName(sql, this.quoteName);
   }
 
   @Override
-  public void appendColumnName(final StringBuilder sql, boolean quoteName) {
-    quoteName |= this.quoteName;
-    if (quoteName) {
-      sql.append('"');
-    }
-    final String dbName = getDbName();
-    sql.append(dbName);
-    if (quoteName) {
-      sql.append('"');
+  public void appendColumnName(final Appendable sql, boolean quoteName) {
+    try {
+      quoteName |= this.quoteName;
+      if (quoteName) {
+        sql.append('"');
+      }
+      final String dbName = getDbName();
+      sql.append(dbName);
+      if (quoteName) {
+        sql.append('"');
+      }
+    } catch (final IOException e) {
+      Exceptions.throwUncheckedException(e);
     }
   }
 
@@ -77,9 +84,10 @@ public class JdbcFieldDefinition extends FieldDefinition {
     return this.sqlType;
   }
 
-  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+  @Override
+  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
     final boolean internStrings) throws SQLException {
-    return resultSet.getObject(columnIndex);
+    return resultSet.getObject(indexes.incrementAndGet());
   }
 
   @Override
@@ -105,14 +113,6 @@ public class JdbcFieldDefinition extends FieldDefinition {
       default:
         return true;
     }
-  }
-
-  public int setFieldValueFromResultSet(final ResultSet resultSet, final int columnIndex,
-    final Record record, final boolean internStrings) throws SQLException {
-    final Object value = getValueFromResultSet(resultSet, columnIndex, internStrings);
-    final int index = getIndex();
-    record.setValue(index, value);
-    return columnIndex + 1;
   }
 
   public JdbcFieldDefinition setGenerated(final boolean generated) {

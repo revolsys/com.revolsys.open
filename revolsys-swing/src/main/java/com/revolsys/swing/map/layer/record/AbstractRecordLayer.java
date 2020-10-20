@@ -930,7 +930,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public void exportRecords(final Iterable<LayerRecord> records,
     final Predicate<? super LayerRecord> filter, final Collection<String> fieldNames,
-    final Map<? extends CharSequence, Boolean> orderBy, final Object target) {
+    final Map<QueryValue, Boolean> orderBy, final Object target) {
     if (Property.hasValue(records) && target != null) {
       final List<LayerRecord> exportRecords = Lists.toArray(records);
 
@@ -1000,7 +1000,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   public void forEachRecord(final Iterable<LayerRecord> records,
-    final Predicate<? super LayerRecord> filter, final Map<? extends CharSequence, Boolean> orderBy,
+    final Predicate<? super LayerRecord> filter, final Map<QueryValue, Boolean> orderBy,
     final Consumer<? super LayerRecord> action) {
     try {
       if (Property.hasValue(records) && action != null) {

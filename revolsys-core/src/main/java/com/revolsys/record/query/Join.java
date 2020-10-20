@@ -5,9 +5,7 @@ import java.sql.PreparedStatement;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 
-import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.record.Record;
-import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
 
@@ -17,20 +15,16 @@ public class Join implements QueryValue {
 
   private PathName tablePath;
 
-  private String qualifiedTableName;
+  private TableReference table;
 
-  private String alias;
-
-  private RecordDefinition recordDefinition;
-
-  private Condition condition;
+  private Condition condition = Condition.ALL;
 
   public Join(final JoinType joinType) {
     this.joinType = joinType;
   }
 
-  public Join alias(final String alias) {
-    this.alias = alias;
+  public Join and(final Condition condition) {
+    this.condition = this.condition.and(condition);
     return this;
   }
 
@@ -40,12 +34,7 @@ public class Join implements QueryValue {
     sql.append(' ');
     sql.append(this.joinType);
     sql.append(' ');
-    sql.append(this.qualifiedTableName);
-    if (this.alias != null) {
-      sql.append(" as \"");
-      sql.append(this.alias);
-      sql.append('"');
-    }
+    this.table.appendNameWithAlias(sql);
     if (this.condition != null) {
       sql.append(" ON ");
       this.condition.appendSql(query, recordStore, sql);
@@ -61,13 +50,8 @@ public class Join implements QueryValue {
     sql.append(' ');
     sql.append(this.joinType);
     sql.append(' ');
-    sql.append(this.qualifiedTableName);
-    if (this.alias != null) {
-      sql.append(" as \"");
-      sql.append(this.alias);
-      sql.append('"');
-    }
-    if (this.condition != null) {
+    this.table.appendNameWithAlias(sql);
+    if (!this.condition.isEmpty()) {
       sql.append(" ON ");
       sql.append(this.condition);
     }
@@ -85,7 +69,11 @@ public class Join implements QueryValue {
   }
 
   public Join condition(final Condition condition) {
-    this.condition = condition;
+    if (condition == null) {
+      this.condition = Condition.ALL;
+    } else {
+      this.condition = condition;
+    }
     return this;
   }
 
@@ -93,8 +81,8 @@ public class Join implements QueryValue {
     return this.condition;
   }
 
-  public RecordDefinition getRecordDefinition() {
-    return this.recordDefinition;
+  public TableReference getTable() {
+    return this.table;
   }
 
   public PathName getTableName() {
@@ -106,16 +94,39 @@ public class Join implements QueryValue {
     return null;
   }
 
+  public Join on(final String fromFieldName, final Object value) {
+    final Condition condition = this.table.equal(fromFieldName, value);
+    return and(condition);
+  }
+
+  public Join on(final String fieldName, final TableReference toTable) {
+    return on(fieldName, toTable, fieldName);
+  }
+
+  public Join on(final String fromFieldName, final TableReference toTable,
+    final String toFieldName) {
+    final Condition condition = this.table.equal(fromFieldName, toTable, toFieldName);
+    return and(condition);
+  }
+
+  public Join or(final Condition condition) {
+    this.condition = this.condition.or(condition);
+    return this;
+  }
+
   public Join recordDefinition(final RecordDefinitionProxy recordDefinition) {
-    this.recordDefinition = recordDefinition.getRecordDefinition();
-    this.tablePath = this.recordDefinition.getPathName();
-    this.qualifiedTableName = this.recordDefinition.getQualifiedTableName();
+    this.table = recordDefinition.getRecordDefinition();
+    this.tablePath = this.table.getTablePath();
+    return this;
+  }
+
+  public Join table(final TableReference table) {
+    this.table = table;
     return this;
   }
 
   public Join tablePath(final PathName tableName) {
     this.tablePath = tableName;
-    this.qualifiedTableName = JdbcUtils.getQualifiedTableName(this.tablePath);
     return this;
   }
 

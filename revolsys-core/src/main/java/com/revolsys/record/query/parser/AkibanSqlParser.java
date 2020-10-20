@@ -117,9 +117,9 @@ public class AkibanSqlParser implements SqlParser {
         QueryValue rightCondition = toQueryValue(recordDefinition, rightValueNode);
 
         // TODO!!!!!!!
-        if (leftCondition instanceof Column) {
+        if (leftCondition instanceof com.revolsys.record.query.ColumnReference) {
           if (rightCondition instanceof Value) {
-            final Column column = (Column)leftCondition;
+            final com.revolsys.record.query.ColumnReference column = (com.revolsys.record.query.ColumnReference)leftCondition;
 
             final String name = column.getName();
             final Object value = ((Value)rightCondition).getValue();
@@ -179,7 +179,7 @@ public class AkibanSqlParser implements SqlParser {
           recordDefinition.getField(columnName);
           throw new IllegalArgumentException("Invalid column name " + columnName);
         } else {
-          return (V)new Column(fieldDefinition);
+          return (V)fieldDefinition;
         }
       }
     } else if (expression instanceof LikeEscapeOperatorNode) {
@@ -370,14 +370,14 @@ public class AkibanSqlParser implements SqlParser {
         final QueryValue leftCondition = toQueryValue(leftValueNode);
         QueryValue rightCondition = toQueryValue(rightValueNode);
 
-        if (leftCondition instanceof Column) {
+        if (leftCondition instanceof com.revolsys.record.query.ColumnReference) {
           if (rightCondition instanceof Value) {
             final Object value = ((Value)rightCondition).getValue();
             if (value == null) {
               throw new IllegalArgumentException(
                 "Values can't be null for " + operator + " use IS NULL or IS NOT NULL instead.");
             } else {
-              final Column column = (Column)leftCondition;
+              final com.revolsys.record.query.ColumnReference column = (com.revolsys.record.query.ColumnReference)leftCondition;
 
               final String name = column.getName();
               if (this.recordDefinition != null) {
@@ -440,7 +440,7 @@ public class AkibanSqlParser implements SqlParser {
         if (fieldDefinition == null) {
           throw new IllegalArgumentException("Invalid field name " + columnName);
         } else {
-          return (V)new Column(fieldDefinition);
+          return (V)fieldDefinition;
         }
       }
     } else if (expression instanceof LikeEscapeOperatorNode) {

@@ -11,6 +11,7 @@ import org.jeometry.common.data.type.DataTypes;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
+import com.revolsys.record.query.ColumnIndexes;
 
 import oracle.sql.ROWID;
 
@@ -38,9 +39,9 @@ public class OracleJdbcRowIdFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
     final boolean internStrings) throws SQLException {
-    final ROWID rowId = (ROWID)resultSet.getRowId(columnIndex);
+    final ROWID rowId = (ROWID)resultSet.getRowId(indexes.incrementAndGet());
     if (rowId == null) {
       return null;
     } else {

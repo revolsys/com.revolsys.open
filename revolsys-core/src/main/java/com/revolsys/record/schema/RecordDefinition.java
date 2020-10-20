@@ -1,11 +1,13 @@
 package com.revolsys.record.schema;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 
 import com.revolsys.collection.map.MapEx;
@@ -18,10 +20,13 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.query.Query;
+import com.revolsys.record.query.QueryValue;
+import com.revolsys.record.query.TableReference;
 import com.revolsys.util.CaseConverter;
 
 public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, RecordStoreSchemaElement,
-  MapSerializer, RecordDefinitionProxy, RecordFactory<Record> {
+  MapSerializer, RecordDefinitionProxy, RecordFactory<Record>, TableReference {
 
   static RecordDefinitionBuilder builder() {
     return new RecordDefinitionBuilder();
@@ -45,6 +50,31 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
   }
 
   void addDefaultValue(String fieldName, Object defaultValue);
+
+  @Override
+  default void appendAllFieldNames(final Appendable string) {
+    try {
+      boolean first = true;
+      for (final FieldDefinition field : getFields()) {
+        if (first) {
+          first = false;
+        } else {
+          string.append(", ");
+        }
+        appendColumnPrefix(string);
+        field.appendColumnName(string);
+      }
+    } catch (final IOException e) {
+      Exceptions.throwUncheckedException(e);
+    }
+  }
+
+  @Override
+  default void appendQueryValue(final Query query, final StringBuilder sql,
+    final QueryValue queryValue) {
+    final RecordStore recordStore = getRecordStore();
+    queryValue.appendSql(query, recordStore, sql);
+  }
 
   void deleteRecord(Record record);
 
@@ -125,6 +155,7 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
 
   Set<String> getFieldNamesSet();
 
+  @Override
   List<FieldDefinition> getFields();
 
   /**
@@ -243,6 +274,7 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
 
   ClockDirection getPolygonRingDirection();
 
+  @Override
   default String getQualifiedTableName() {
     final PathName pathName = getPathName();
     return JdbcUtils.getQualifiedTableName(pathName.toString());
@@ -309,4 +341,6 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
   void setDefaultValues(Map<String, ? extends Object> defaultValues);
 
   void setGeometryFactory(com.revolsys.geometry.model.GeometryFactory geometryFactory);
+
+  void setTableAlias(String tableAlias);
 }

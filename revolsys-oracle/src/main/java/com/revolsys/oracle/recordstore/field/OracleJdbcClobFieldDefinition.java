@@ -12,6 +12,7 @@ import java.util.Collections;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.record.query.ColumnIndexes;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
 
@@ -25,9 +26,9 @@ public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
     final boolean internStrings) throws SQLException {
-    return resultSet.getClob(columnIndex);
+    return resultSet.getClob(indexes.incrementAndGet());
   }
 
   @Override

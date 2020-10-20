@@ -52,6 +52,7 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
 import com.revolsys.record.io.format.esri.gdb.xml.model.SpatialReference;
 import com.revolsys.record.query.BinaryCondition;
 import com.revolsys.record.query.CollectionValue;
+import com.revolsys.record.query.ColumnReference;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.ILike;
 import com.revolsys.record.query.Like;
@@ -370,16 +371,16 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     if (query == null) {
       return 0;
     } else {
-      String typePath = query.getTypeName();
+      PathName typePath = query.getTablePath();
       RecordDefinition recordDefinition = query.getRecordDefinition();
       if (recordDefinition == null) {
-        typePath = query.getTypeName();
+        typePath = query.getTablePath();
         recordDefinition = getRecordDefinition(typePath);
         if (recordDefinition == null) {
           return 0;
         }
       } else {
-        typePath = recordDefinition.getPath();
+        typePath = recordDefinition.getPathName();
       }
       final StringBuilder whereClause = getWhereClause(query);
       final BoundingBox boundingBox = QueryValue.getBoundingBox(query);
@@ -391,7 +392,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         } else {
           final StringBuilder sql = new StringBuilder();
           sql.append("SELECT OBJECTID FROM ");
-          sql.append(JdbcUtils.getTableName(typePath));
+          sql.append(JdbcUtils.getTableName(typePath.toString()));
           if (whereClause.length() > 0) {
             sql.append(" WHERE ");
             sql.append(whereClause);
@@ -416,7 +417,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
         } else {
           final StringBuilder sql = new StringBuilder();
           sql.append("SELECT " + geometryField.getName() + " FROM ");
-          sql.append(JdbcUtils.getTableName(typePath));
+          sql.append(JdbcUtils.getTableName(typePath.toString()));
           if (whereClause.length() > 0) {
             sql.append(" WHERE ");
             sql.append(whereClause);
@@ -684,7 +685,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   @Override
   public AbstractIterator<Record> newIterator(final Query query,
     final Map<String, Object> properties) {
-    PathName pathName = query.getTypePath();
+    PathName pathName = query.getTablePath();
     final RecordDefinition recordDefinition = query.getRecordDefinition();
     if (recordDefinition != null) {
       pathName = recordDefinition.getPathName();
@@ -695,7 +696,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
     final String catalogPath = fileGdbRecordDefinition.getCatalogPath();
     final BoundingBox boundingBox = QueryValue.getBoundingBox(query);
-    final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
+    final Map<QueryValue, Boolean> orderBy = query.getOrderBy();
     final StringBuilder whereClause = getWhereClause(query);
     StringBuilder sql = new StringBuilder();
     if (orderBy.isEmpty() || boundingBox != null) {
@@ -721,39 +722,46 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       }
       boolean useOrderBy = true;
       if (orderBy.size() == 1) {
-        final Entry<? extends CharSequence, Boolean> entry = orderBy.entrySet().iterator().next();
-        final CharSequence fieldName = entry.getKey();
-        if (entry.getValue() == Boolean.TRUE && fieldName.toString().equals("OBJECTID")) {
-          useOrderBy = false;
+        final Entry<QueryValue, Boolean> entry = orderBy.entrySet().iterator().next();
+        final QueryValue field = entry.getKey();
+        if (field instanceof ColumnReference) {
+          final ColumnReference column = (ColumnReference)field;
+          final String fieldName = column.getAliasName();
+          if (entry.getValue() == Boolean.TRUE && fieldName.toString().equals("OBJECTID")) {
+            useOrderBy = false;
+          }
         }
       }
       if (useOrderBy) {
         boolean first = true;
-        for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
-          final CharSequence fieldName = entry.getKey();
+        for (final Entry<QueryValue, Boolean> entry : orderBy.entrySet()) {
+          final QueryValue field = entry.getKey();
+          if (field instanceof ColumnReference) {
+            final ColumnReference column = (ColumnReference)field;
+            final String fieldName = column.getAliasName();
+            final DataType dataType = fileGdbRecordDefinition.getFieldType(fieldName);
+            if (dataType != null && !Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
+              if (first) {
+                sql.append(" ORDER BY ");
+                first = false;
+              } else {
+                sql.append(", ");
+              }
+              if (field instanceof FieldDefinition) {
+                final FieldDefinition fieldDefinition = (FieldDefinition)field;
+                fieldDefinition.appendColumnName(sql);
+              } else {
+                sql.append(fieldName);
+              }
+              final Boolean ascending = entry.getValue();
+              if (!ascending) {
+                sql.append(" DESC");
+              }
 
-          final DataType dataType = fileGdbRecordDefinition.getFieldType(fieldName);
-          if (dataType != null && !Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
-            if (first) {
-              sql.append(" ORDER BY ");
-              first = false;
             } else {
-              sql.append(", ");
+              Logs.error(this, "Unable to sort on " + fileGdbRecordDefinition.getPath() + "."
+                + fieldName + " as the ESRI library can't sort on " + dataType + " columns");
             }
-            if (fieldName instanceof FieldDefinition) {
-              final FieldDefinition field = (FieldDefinition)fieldName;
-              field.appendColumnName(sql);
-            } else {
-              sql.append(fieldName);
-            }
-            final Boolean ascending = entry.getValue();
-            if (!ascending) {
-              sql.append(" DESC");
-            }
-
-          } else {
-            Logs.error(this, "Unable to sort on " + fileGdbRecordDefinition.getPath() + "."
-              + fieldName + " as the ESRI library can't sort on " + dataType + " columns");
           }
         }
       }

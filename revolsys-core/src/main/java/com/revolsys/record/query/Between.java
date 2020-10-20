@@ -18,7 +18,7 @@ public class Between extends AbstractUnaryQueryValue implements Condition {
 
   private Value min;
 
-  public Between(final Column column, final Value min, final Value max) {
+  public Between(final ColumnReference column, final Value min, final Value max) {
     super(column);
     this.min = min;
     this.max = max;

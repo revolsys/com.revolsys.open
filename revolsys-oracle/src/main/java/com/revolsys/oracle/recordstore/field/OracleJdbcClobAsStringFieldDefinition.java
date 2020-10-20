@@ -5,6 +5,8 @@ import java.sql.SQLException;
 
 import org.jeometry.common.jdbc.StringClob;
 
+import com.revolsys.record.query.ColumnIndexes;
+
 public class OracleJdbcClobAsStringFieldDefinition extends OracleJdbcClobFieldDefinition {
   public OracleJdbcClobAsStringFieldDefinition(final String dbName, final String name,
     final int sqlType, final boolean required, final String description) {
@@ -12,9 +14,9 @@ public class OracleJdbcClobAsStringFieldDefinition extends OracleJdbcClobFieldDe
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
     final boolean internStrings) throws SQLException {
-    final String string = resultSet.getString(columnIndex);
+    final String string = resultSet.getString(indexes.incrementAndGet());
     return new StringClob(string);
   }
 

@@ -1,5 +1,6 @@
 package com.revolsys.record.schema;
 
+import java.io.IOException;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypeProxy;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.beans.ObjectPropertyException;
 import com.revolsys.collection.map.Maps;
@@ -26,6 +28,8 @@ import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonObjectHash;
+import com.revolsys.record.query.ColumnReference;
+import com.revolsys.record.query.Query;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
@@ -38,8 +42,8 @@ import com.revolsys.util.Strings;
  * @see Record
  * @see RecordDefinition
  */
-public class FieldDefinition extends BaseObjectWithProperties
-  implements CharSequence, Cloneable, MapSerializer, RecordDefinitionProxy, DataTypeProxy {
+public class FieldDefinition extends BaseObjectWithProperties implements CharSequence, Cloneable,
+  MapSerializer, RecordDefinitionProxy, DataTypeProxy, ColumnReference {
   public static FieldDefinition newFieldDefinition(final Map<String, ? extends Object> config) {
     return new FieldDefinition(config);
   }
@@ -296,26 +300,44 @@ public class FieldDefinition extends BaseObjectWithProperties
     this.allowedValues.put(value, text);
   }
 
-  public void appendColumnName(final StringBuilder sql) {
-    sql.append(this.name);
-  }
-
-  public void appendColumnName(final StringBuilder sql, final boolean quoteName) {
-    if (quoteName) {
-      sql.append('"');
-    }
-    sql.append(this.name);
-    if (quoteName) {
-      sql.append('"');
+  public void appendColumnName(final Appendable sql) {
+    try {
+      sql.append(this.name);
+    } catch (final IOException e) {
+      Exceptions.throwUncheckedException(e);
     }
   }
 
-  public void appendColumnName(final StringBuilder sql, final String tablePrefix) {
-    if (tablePrefix != null) {
-      sql.append(tablePrefix);
-      sql.append(".");
+  public void appendColumnName(final Appendable sql, final boolean quoteName) {
+    try {
+      if (quoteName) {
+        sql.append('"');
+      }
+      sql.append(this.name);
+      if (quoteName) {
+        sql.append('"');
+      }
+    } catch (final IOException e) {
+      Exceptions.throwUncheckedException(e);
     }
-    appendColumnName(sql);
+  }
+
+  public void appendColumnName(final Appendable sql, final String tablePrefix) {
+    try {
+      if (tablePrefix != null) {
+        sql.append(tablePrefix);
+        sql.append(".");
+      }
+      appendColumnName(sql);
+    } catch (final IOException e) {
+      Exceptions.throwUncheckedException(e);
+    }
+  }
+
+  @Override
+  public void appendDefaultSql(final Query query, final RecordStore recordStore,
+    final StringBuilder sql) {
+    appendColumnName(sql, getTableAlias());
   }
 
   public void appendSelectColumnName(final StringBuilder sql, final String tablePrefix) {
@@ -398,6 +420,11 @@ public class FieldDefinition extends BaseObjectWithProperties
   }
 
   @Override
+  public FieldDefinition getFieldDefinition() {
+    return this;
+  }
+
+  @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
   }
@@ -446,6 +473,7 @@ public class FieldDefinition extends BaseObjectWithProperties
    *
    * @return The name of the field.
    */
+  @Override
   public String getName() {
     return this.name;
   }
@@ -489,6 +517,22 @@ public class FieldDefinition extends BaseObjectWithProperties
       string.append(')');
     }
     return string.toString();
+  }
+
+  @Override
+  public String getStringValue(final Record record) {
+    final Object value = getValue(record);
+    return toString(value);
+  }
+
+  @Override
+  public RecordDefinition getTable() {
+    return getRecordDefinition();
+  }
+
+  public String getTableAlias() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordDefinition.getTableAlias();
   }
 
   public String getTitle() {
@@ -643,7 +687,8 @@ public class FieldDefinition extends BaseObjectWithProperties
     return this;
   }
 
-  protected void setRecordDefinition(final RecordDefinition recordDefinition) {
+  @Override
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
     this.recordDefinition = new WeakReference<>(recordDefinition);
   }
 
@@ -723,6 +768,29 @@ public class FieldDefinition extends BaseObjectWithProperties
     }
   }
 
+  @Override
+  public <V> V toColumnTypeException(final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      try {
+        if (value instanceof String) {
+          final String string = (String)value;
+          if (!Property.hasValue(string)) {
+            return null;
+          }
+        }
+        final V fieldValue = this.type.toObject(value);
+        return fieldValue;
+      } catch (final IllegalArgumentException e) {
+        throw e;
+      } catch (final Throwable e) {
+        throw new IllegalArgumentException(
+          getName() + "='" + value + "' is not a valid " + getDataType().getValidationName(), e);
+      }
+    }
+  }
+
   /**
    * Convert the object to a value that is valid for the field. If the value can't be converted then
    * the original value will be returned. This can result in invalid values in the record but those can be picked up
@@ -731,6 +799,7 @@ public class FieldDefinition extends BaseObjectWithProperties
    * @param value
    * @return
    */
+  @Override
   @SuppressWarnings("unchecked")
   public <V> V toFieldValue(final Object value) {
     try {
@@ -740,6 +809,7 @@ public class FieldDefinition extends BaseObjectWithProperties
     }
   }
 
+  @Override
   public <V> V toFieldValueException(final Object value) {
     if (value == null) {
       return null;
@@ -795,6 +865,7 @@ public class FieldDefinition extends BaseObjectWithProperties
     return this.name;
   }
 
+  @Override
   public String toString(final Object value) {
     if (value == null) {
       return null;
@@ -900,4 +971,5 @@ public class FieldDefinition extends BaseObjectWithProperties
       );
     }
   }
+
 }

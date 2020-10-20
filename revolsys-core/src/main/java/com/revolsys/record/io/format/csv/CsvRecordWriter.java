@@ -28,6 +28,8 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   private String newLine = "\n";
 
+  private int maxFieldLength = Integer.MAX_VALUE;
+
   public CsvRecordWriter(final RecordDefinitionProxy recordDefinition, final Object target,
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
     this(recordDefinition, Resource.getResource(target), fieldSeparator, useQuotes, ewkt);
@@ -123,6 +125,10 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     this.ewkt = ewkt;
   }
 
+  public void setMaxFieldLength(final int maxFieldLength) {
+    this.maxFieldLength = maxFieldLength;
+  }
+
   public void setNewLine(final String newLine) {
     this.newLine = newLine;
   }
@@ -135,9 +141,13 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     final Writer out = this.out;
     if (out != null) {
       final String string = value.toString();
+      int length = string.length();
+      if (length > this.maxFieldLength) {
+        length = this.maxFieldLength;
+      }
       if (this.useQuotes) {
         out.write('"');
-        for (int i = 0; i < string.length(); i++) {
+        for (int i = 0; i < length; i++) {
           final char c = string.charAt(i);
           if (c == '"') {
             out.write('"');
@@ -146,7 +156,7 @@ public class CsvRecordWriter extends AbstractRecordWriter {
         }
         out.write('"');
       } else {
-        out.write(string, 0, string.length());
+        out.write(string, 0, length);
       }
     }
   }
@@ -191,7 +201,11 @@ public class CsvRecordWriter extends AbstractRecordWriter {
             if (this.useQuotes && dataType.isRequiresQuotes()) {
               string(stringValue);
             } else {
-              out.write(stringValue, 0, stringValue.length());
+              int length = stringValue.length();
+              if (length > this.maxFieldLength) {
+                length = this.maxFieldLength;
+              }
+              out.write(stringValue, 0, length);
             }
           }
         }

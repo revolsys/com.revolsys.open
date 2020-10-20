@@ -1,6 +1,8 @@
 package com.revolsys.record.query;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -118,6 +120,10 @@ public interface QueryValue extends Cloneable {
 
   QueryValue clone();
 
+  default int getFieldIndex() {
+    return -1;
+  }
+
   default List<QueryValue> getQueryValues() {
     return Collections.emptyList();
   }
@@ -134,13 +140,20 @@ public interface QueryValue extends Cloneable {
     return dataType.toObject(value);
   }
 
+  default Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
+    final boolean internStrings) throws SQLException {
+    throw new UnsupportedOperationException("getValueFromResultSet not implemented");
+  }
+
   default void setFieldDefinition(final FieldDefinition fieldDefinition) {
   }
 
   default void setRecordDefinition(final RecordDefinition recordDefinition) {
-    for (final QueryValue queryValue : getQueryValues()) {
-      if (queryValue != null) {
-        queryValue.setRecordDefinition(recordDefinition);
+    if (recordDefinition != null) {
+      for (final QueryValue queryValue : getQueryValues()) {
+        if (queryValue != null) {
+          queryValue.setRecordDefinition(recordDefinition);
+        }
       }
     }
   }

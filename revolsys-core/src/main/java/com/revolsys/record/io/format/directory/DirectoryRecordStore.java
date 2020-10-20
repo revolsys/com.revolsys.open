@@ -233,7 +233,7 @@ public class DirectoryRecordStore extends AbstractRecordStore {
   @Override
   public AbstractIterator<Record> newIterator(final Query query,
     final Map<String, Object> properties) {
-    final PathName path = query.getTypePath();
+    final PathName path = query.getTablePath();
     final RecordReader reader = getRecords(path);
     reader.setProperties(properties);
     return new RecordReaderQueryIterator(reader, query);

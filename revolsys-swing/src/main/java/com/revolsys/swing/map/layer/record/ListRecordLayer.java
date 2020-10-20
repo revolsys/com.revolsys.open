@@ -14,6 +14,7 @@ import com.revolsys.record.RecordState;
 import com.revolsys.record.Records;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTable;
 import com.revolsys.swing.map.layer.record.table.RecordLayerTablePanel;
@@ -174,7 +175,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   public List<LayerRecord> getRecordsPersisted(final Query query) {
     final List<LayerRecord> records = getRecords();
     final Condition filter = query.getWhereCondition();
-    final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
+    final Map<QueryValue, Boolean> orderBy = query.getOrderBy();
     Records.filterAndSort(records, filter, orderBy);
     return records;
   }

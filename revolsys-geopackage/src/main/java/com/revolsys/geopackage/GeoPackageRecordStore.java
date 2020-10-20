@@ -45,7 +45,7 @@ import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.query.CollectionValue;
-import com.revolsys.record.query.Column;
+import com.revolsys.record.query.ColumnReference;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.Value;
@@ -106,8 +106,8 @@ public class GeoPackageRecordStore extends AbstractJdbcRecordStore {
     final JdbcRecordDefinition recordDefinition = (JdbcRecordDefinition)query.getRecordDefinition();
     final QueryValue boundingBox1Value = envelopeIntersects.getBoundingBox1Value();
     final QueryValue boundingBox2Value = envelopeIntersects.getBoundingBox2Value();
-    if (boundingBox1Value instanceof Column && boundingBox2Value instanceof Value) {
-      final Column column = (Column)boundingBox1Value;
+    if (boundingBox1Value instanceof ColumnReference && boundingBox2Value instanceof Value) {
+      final ColumnReference column = (ColumnReference)boundingBox1Value;
       final Value value = (Value)boundingBox2Value;
       final Object bboxValue = value.getQueryValue();
 

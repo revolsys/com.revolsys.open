@@ -36,8 +36,8 @@ import com.revolsys.util.CancellableProxy;
 import com.revolsys.util.Property;
 import com.revolsys.util.count.LabelCounters;
 
-public class Query extends BaseObjectWithProperties
-  implements Cloneable, CancellableProxy, RecordDefinitionProxy {
+public class Query extends BaseObjectWithProperties implements Cloneable, CancellableProxy {
+
   private static void addFilter(final Query query, final RecordDefinition recordDefinition,
     final Map<String, ?> filter, final AbstractMultiCondition multipleCondition) {
     if (filter != null && !filter.isEmpty()) {
@@ -92,7 +92,7 @@ public class Query extends BaseObjectWithProperties
     if (fieldDefinition == null) {
       return null;
     } else {
-      final Query query = new Query(recordDefinition);
+      final Query query = Query.newQuery(recordDefinition);
       final Value valueCondition = Value.newValue(fieldDefinition, value);
       final BinaryCondition equal = Q.equal(name, valueCondition);
       query.setWhereCondition(equal);
@@ -125,6 +125,16 @@ public class Query extends BaseObjectWithProperties
       return query;
     }
 
+  }
+
+  public static Query newQuery(final RecordDefinitionProxy recordDefinition) {
+    return newQuery(recordDefinition, null);
+  }
+
+  public static Query newQuery(final RecordDefinitionProxy recordDefinition,
+    final Condition whereCondition) {
+    final TableReference table = TableReference.getTableReference(recordDefinition);
+    return new Query(table, whereCondition);
   }
 
   public static Query or(final RecordDefinition recordDefinition, final Map<String, ?> filter) {
@@ -161,6 +171,10 @@ public class Query extends BaseObjectWithProperties
 
   private List<String> fieldNames = new ArrayList<>();
 
+  private List<QueryValue> selectExpressions = new ArrayList<>();
+
+  private final List<QueryValue> groupBy = new ArrayList<>();
+
   private String fromClause;
 
   private int limit = Integer.MAX_VALUE;
@@ -169,23 +183,20 @@ public class Query extends BaseObjectWithProperties
 
   private int offset = 0;
 
-  private Map<CharSequence, Boolean> orderBy = new LinkedHashMap<>();
+  private Map<QueryValue, Boolean> orderBy = new LinkedHashMap<>();
 
   private List<Object> parameters = new ArrayList<>();
 
-  private RecordDefinition recordDefinition;
+  private TableReference table;
 
   private String sql;
 
   private LabelCounters labelCountMap;
 
-  private PathName typeName;
-
-  private String typePathAlias;
-
   private Condition whereCondition = Condition.ALL;
 
   public Query() {
+    this("/Record");
   }
 
   public Query(final PathName typePath) {
@@ -193,26 +204,24 @@ public class Query extends BaseObjectWithProperties
   }
 
   public Query(final PathName typePath, final Condition whereCondition) {
-    this.typeName = typePath;
-    setWhereCondition(whereCondition);
-  }
-
-  public Query(final RecordDefinitionProxy recordDefinition) {
-    this(recordDefinition, null);
-  }
-
-  public Query(final RecordDefinitionProxy recordDefinition, final Condition whereCondition) {
-    this(recordDefinition == null ? null : recordDefinition.getPathName());
-    this.recordDefinition = recordDefinition.getRecordDefinition();
-    setWhereCondition(whereCondition);
+    this(new TableReferenceImpl(typePath), whereCondition);
   }
 
   public Query(final String typePath) {
-    this(PathName.newPathName(typePath));
+    this(typePath, null);
   }
 
   public Query(final String typePath, final Condition whereCondition) {
     this(PathName.newPathName(typePath), whereCondition);
+  }
+
+  public Query(final TableReference table) {
+    this(table, null);
+  }
+
+  public Query(final TableReference table, final Condition whereCondition) {
+    this.table = table;
+    setWhereCondition(whereCondition);
   }
 
   public Query addFieldName(final String fieldName) {
@@ -221,6 +230,26 @@ public class Query extends BaseObjectWithProperties
     }
     if (!this.fieldNames.contains(fieldName)) {
       this.fieldNames.add(fieldName);
+      final ColumnReference column = this.table.getColumn(fieldName);
+      this.selectExpressions.add(column);
+    }
+    return this;
+  }
+
+  public Query addGroupBy(final Object groupByItem) {
+    if (groupByItem instanceof QueryValue) {
+      final QueryValue queryValue = (QueryValue)groupByItem;
+      this.groupBy.add(queryValue);
+    } else if (groupByItem instanceof CharSequence) {
+      final CharSequence fieldName = (CharSequence)groupByItem;
+      final ColumnReference column = this.table.getColumn(fieldName);
+      this.groupBy.add(column);
+    } else if (groupByItem instanceof Integer) {
+      final Integer index = (Integer)groupByItem;
+      final ColumnIndex columnIndex = new ColumnIndex(index);
+      this.groupBy.add(columnIndex);
+    } else {
+      throw new IllegalArgumentException(groupByItem.toString());
     }
     return this;
   }
@@ -234,40 +263,47 @@ public class Query extends BaseObjectWithProperties
     return addOrderBy(field, true);
   }
 
-  public Query addOrderBy(final CharSequence field, final boolean ascending) {
-    this.orderBy.put(field, ascending);
-    return this;
-  }
-
-  public Query addOrderBy(final Map<String, Boolean> orderBy) {
-    for (final Entry<String, Boolean> entry : orderBy.entrySet()) {
-      final String name = entry.getKey();
-      if (!this.orderBy.containsKey(name)) {
-        final Boolean ascending = entry.getValue();
-        this.orderBy.put(name, ascending);
-      }
+  public Query addOrderBy(final Map<?, Boolean> orderBy) {
+    for (final Entry<?, Boolean> entry : orderBy.entrySet()) {
+      final Object field = entry.getKey();
+      final Boolean ascending = entry.getValue();
+      addOrderBy(field, ascending);
     }
     return this;
   }
 
-  public Query addOrderBy(final String fieldName) {
-    return addOrderBy(fieldName, true);
+  public Query addOrderBy(final Object field) {
+    return addOrderBy(field, true);
   }
 
-  public Query addOrderBy(final String fieldName, final boolean ascending) {
-    if (this.recordDefinition != null) {
-      final FieldDefinition fieldDefinition = this.recordDefinition.getField(fieldName);
-      if (fieldDefinition != null) {
-        return addOrderBy(fieldDefinition, ascending);
+  public Query addOrderBy(final Object field, final boolean ascending) {
+    QueryValue queryValue;
+    if (field instanceof QueryValue) {
+      queryValue = (QueryValue)field;
+    } else if (field instanceof CharSequence) {
+      final CharSequence name = (CharSequence)field;
+      try {
+        queryValue = this.table.getColumn(name);
+      } catch (final IllegalArgumentException e) {
+        queryValue = new Column(name);
       }
+    } else if (field instanceof Integer) {
+      final Integer index = (Integer)field;
+      queryValue = new ColumnIndex(index);
+    } else {
+      throw new IllegalArgumentException("Not a field name: " + field);
     }
-    this.orderBy.put(fieldName, ascending);
+
+    if (!this.orderBy.containsKey(queryValue)) {
+      this.orderBy.put(queryValue, ascending);
+    }
     return this;
   }
 
   public Query addOrderById() {
-    if (this.recordDefinition != null) {
-      for (final FieldDefinition idField : this.recordDefinition.getIdFields()) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition != null) {
+      for (final FieldDefinition idField : recordDefinition.getIdFields()) {
         addOrderBy(idField);
       }
     }
@@ -323,6 +359,7 @@ public class Query extends BaseObjectWithProperties
   public Query clone() {
     final Query clone = (Query)super.clone();
     clone.fieldNames = new ArrayList<>(clone.fieldNames);
+    clone.selectExpressions = new ArrayList<>(clone.selectExpressions);
     clone.parameters = new ArrayList<>(this.parameters);
     clone.orderBy = new HashMap<>(this.orderBy);
     if (this.whereCondition != null) {
@@ -337,7 +374,7 @@ public class Query extends BaseObjectWithProperties
   @SuppressWarnings("unchecked")
   public <R extends Record> void forEachRecord(final Iterable<R> records,
     final Consumer<? super R> consumer) {
-    final Map<? extends CharSequence, Boolean> orderBy = getOrderBy();
+    final Map<QueryValue, Boolean> orderBy = getOrderBy();
     final Predicate<R> filter = (Predicate<R>)getWhereCondition();
     if (orderBy.isEmpty()) {
       if (filter == null) {
@@ -362,7 +399,6 @@ public class Query extends BaseObjectWithProperties
     return this.cancellable;
   }
 
-  @Override
   public List<String> getFieldNames() {
     return this.fieldNames;
   }
@@ -394,6 +430,9 @@ public class Query extends BaseObjectWithProperties
               }
             }
           }
+          if (fieldName.startsWith("count(")) {
+            fieldName = "count"; // TODO make query use columns
+          }
           final FieldDefinition field = recordDefinition.getField(fieldName);
           if (field != null) {
             fields.add(field);
@@ -408,9 +447,12 @@ public class Query extends BaseObjectWithProperties
     return this.fromClause;
   }
 
-  @Override
   public FieldDefinition getGeometryField() {
     return getRecordDefinition().getGeometryField();
+  }
+
+  public List<QueryValue> getGroupBy() {
+    return this.groupBy;
   }
 
   public List<Join> getJoins() {
@@ -429,7 +471,7 @@ public class Query extends BaseObjectWithProperties
     return this.offset;
   }
 
-  public Map<CharSequence, Boolean> getOrderBy() {
+  public Map<QueryValue, Boolean> getOrderBy() {
     return this.orderBy;
   }
 
@@ -438,22 +480,35 @@ public class Query extends BaseObjectWithProperties
   }
 
   public String getQualifiedTableName() {
-    if (this.recordDefinition == null) {
-      return JdbcUtils.getQualifiedTableName(getTypeName());
+    if (this.table == null) {
+      return null;
     } else {
-      return this.recordDefinition.getQualifiedTableName();
+      return this.table.getQualifiedTableName();
     }
   }
 
-  @Override
   public RecordDefinition getRecordDefinition() {
-    return this.recordDefinition;
+    return this.table.getRecordDefinition();
   }
 
-  @Override
   @SuppressWarnings("unchecked")
   public <V extends Record> RecordFactory<V> getRecordFactory() {
     return (RecordFactory<V>)this.recordFactory;
+  }
+
+  public List<QueryValue> getSelect() {
+    return this.selectExpressions;
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  public List<QueryValue> getSelectExpressions() {
+    if (this.selectExpressions.isEmpty() && this.table != null) {
+      return (List)this.table.getRecordDefinition().getFieldDefinitions();
+    } else {
+      return this.selectExpressions;
+    }
   }
 
   public String getSql() {
@@ -464,20 +519,12 @@ public class Query extends BaseObjectWithProperties
     return this.labelCountMap;
   }
 
-  public String getTypeName() {
-    if (this.typeName == null) {
-      return null;
-    } else {
-      return this.typeName.getPath();
-    }
+  public TableReference getTable() {
+    return this.table;
   }
 
-  public String getTypeNameAlias() {
-    return this.typePathAlias;
-  }
-
-  public PathName getTypePath() {
-    return this.typeName;
+  public PathName getTablePath() {
+    return this.table.getTablePath();
   }
 
   public String getWhere() {
@@ -488,12 +535,44 @@ public class Query extends BaseObjectWithProperties
     return this.whereCondition;
   }
 
-  public boolean hasOrderBy(final String fieldName) {
+  public Query groupBy(final Object... groupBy) {
+    this.groupBy.clear();
+    if (groupBy != null) {
+      for (final Object groupByItem : groupBy) {
+        addGroupBy(groupByItem);
+      }
+    }
+    return this;
+  }
+
+  public boolean hasOrderBy(final Object fieldName) {
     return this.orderBy.containsKey(fieldName);
+  }
+
+  public boolean isCustomResult() {
+    if (!getJoins().isEmpty()) {
+      return true;
+    } else if (!getGroupBy().isEmpty()) {
+      return true;
+    } else if (this.selectExpressions.isEmpty()) {
+      return false;
+    } else if (this.selectExpressions.size() == 1
+      && this.selectExpressions.get(0) instanceof AllColumns) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   public boolean isDistinct() {
     return this.distinct;
+  }
+
+  public Join join(final TableReference table) {
+    final Join join = JoinType.JOIN.build(table);
+    this.joins.add(join);
+    return join;
+
   }
 
   public Query newQuery(final RecordDefinition recordDefinition) {
@@ -514,6 +593,38 @@ public class Query extends BaseObjectWithProperties
     }
   }
 
+  public Query orderBy(final Object... orderBy) {
+    this.orderBy.clear();
+    for (final Object orderByItem : orderBy) {
+      addOrderBy(orderByItem);
+    }
+    return this;
+  }
+
+  public Query select(final Object select) {
+    QueryValue selectExpression;
+    if (select instanceof QueryValue) {
+      selectExpression = (QueryValue)select;
+    } else if (select instanceof CharSequence) {
+      final CharSequence name = (CharSequence)select;
+      selectExpression = this.table.getColumn(name);
+    } else {
+      throw new IllegalArgumentException("Not a valid select expression :" + select);
+    }
+    return select(selectExpression);
+  }
+
+  public Query select(final QueryValue select) {
+    this.selectExpressions.add(select);
+    return this;
+  }
+
+  public Query select(final TableReference table, final String fieldName) {
+    final ColumnReference column = table.getColumn(fieldName);
+    this.selectExpressions.add(column);
+    return this;
+  }
+
   public void setCancellable(final Cancellable cancellable) {
     this.cancellable = cancellable;
   }
@@ -525,6 +636,11 @@ public class Query extends BaseObjectWithProperties
 
   public Query setFieldNames(final Collection<String> fieldNames) {
     this.fieldNames = Lists.toArray(fieldNames);
+    this.selectExpressions.clear();
+    for (final String fieldName : fieldNames) {
+      final ColumnReference column = this.table.getColumn(fieldName);
+      this.selectExpressions.add(column);
+    }
     return this;
   }
 
@@ -536,6 +652,22 @@ public class Query extends BaseObjectWithProperties
   public Query setFromClause(final String fromClause) {
     this.fromClause = fromClause;
     return this;
+  }
+
+  public Query setGroupBy(final List<?> groupBy) {
+    this.groupBy.clear();
+    if (groupBy != null) {
+      for (final Object groupByItem : groupBy) {
+        addGroupBy(groupByItem);
+
+      }
+    }
+    return this;
+  }
+
+  public Query setGroupBy(final String... fieldNames) {
+    final List<String> groupBy = Arrays.asList(fieldNames);
+    return setGroupBy(groupBy);
   }
 
   public Query setLimit(final int limit) {
@@ -566,16 +698,15 @@ public class Query extends BaseObjectWithProperties
     return addOrderBy(field);
   }
 
-  public Query setOrderBy(final Map<? extends CharSequence, Boolean> orderBy) {
+  public Query setOrderBy(final Map<?, Boolean> orderBy) {
     if (orderBy != this.orderBy) {
       this.orderBy.clear();
       if (orderBy != null) {
-        for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
-          final CharSequence field = entry.getKey();
+        for (final Entry<?, Boolean> entry : orderBy.entrySet()) {
+          final Object field = entry.getKey();
           final Boolean ascending = entry.getValue();
           addOrderBy(field, ascending);
         }
-        this.orderBy.putAll(orderBy);
       }
     }
     return this;
@@ -590,19 +721,32 @@ public class Query extends BaseObjectWithProperties
   }
 
   public Query setOrderByFieldNames(final String... orderBy) {
-    return setOrderByFieldNames(Arrays.asList(orderBy));
+    this.orderBy.clear();
+    for (final CharSequence field : orderBy) {
+      addOrderBy(field);
+    }
+    return this;
   }
 
-  public void setRecordDefinition(final RecordDefinition recordDefinition) {
-    this.recordDefinition = recordDefinition;
+  public Query setRecordDefinition(final RecordDefinition recordDefinition) {
+    this.table = recordDefinition;
     if (this.whereCondition != null) {
       this.whereCondition.setRecordDefinition(recordDefinition);
     }
+    return this;
   }
 
   @SuppressWarnings("unchecked")
   public Query setRecordFactory(final RecordFactory<?> recordFactory) {
     this.recordFactory = (RecordFactory<Record>)recordFactory;
+    return this;
+  }
+
+  public Query setSelect(final Object... selectExpressions) {
+    this.selectExpressions.clear();
+    for (final Object selectExpression : selectExpressions) {
+      select(selectExpression);
+    }
     return this;
   }
 
@@ -616,16 +760,9 @@ public class Query extends BaseObjectWithProperties
     return this;
   }
 
-  public void setTypeName(final String typeName) {
-    this.typeName = PathName.newPathName(typeName);
-  }
-
-  public void setTypeNameAlias(final String typePathAlias) {
-    this.typePathAlias = typePathAlias;
-  }
-
   public Query setWhere(final String where) {
-    final Condition whereCondition = QueryValue.parseWhere(this.recordDefinition, where);
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final Condition whereCondition = QueryValue.parseWhere(recordDefinition, where);
     return setWhereCondition(whereCondition);
   }
 
@@ -643,7 +780,7 @@ public class Query extends BaseObjectWithProperties
   }
 
   public <V extends Record> void sort(final List<V> records) {
-    final Map<? extends CharSequence, Boolean> orderBy = getOrderBy();
+    final Map<QueryValue, Boolean> orderBy = getOrderBy();
     if (Property.hasValue(orderBy)) {
       final Comparator<Record> comparator = Records.newComparatorOrderBy(orderBy);
       records.sort(comparator);

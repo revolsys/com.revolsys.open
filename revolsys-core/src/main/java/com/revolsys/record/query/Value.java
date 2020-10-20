@@ -54,7 +54,7 @@ public class Value implements QueryValue {
     return newValue(JdbcFieldDefinitions.newFieldDefinition(value), value);
   }
 
-  private FieldDefinition fieldDefinition;
+  private ColumnReference column;
 
   private Object displayValue;
 
@@ -62,8 +62,15 @@ public class Value implements QueryValue {
 
   private Object queryValue;
 
+  public Value(final ColumnReference column, Object value) {
+    this.column = column;
+    value = getValue(value);
+    this.displayValue = column.toColumnType(value);
+    this.queryValue = column.toFieldValue(this.displayValue);
+  }
+
   protected Value(final FieldDefinition field, final Object value) {
-    this.fieldDefinition = field;
+    this.column = field;
     setQueryValue(value);
     this.displayValue = this.queryValue;
     setFieldDefinition(field);
@@ -147,10 +154,10 @@ public class Value implements QueryValue {
   @Override
   public String getStringValue(final Record record) {
     final Object value = getValue(record);
-    if (this.fieldDefinition == null) {
+    if (this.column == null) {
       return DataTypes.toString(value);
     } else {
-      return this.fieldDefinition.toString(value);
+      return this.column.toString(value);
     }
   }
 
@@ -167,7 +174,7 @@ public class Value implements QueryValue {
   @Override
   public void setFieldDefinition(final FieldDefinition field) {
     if (field != null) {
-      this.fieldDefinition = field;
+      this.column = field;
       if (field instanceof JdbcFieldDefinition) {
         this.jdbcField = (JdbcFieldDefinition)field;
       } else {
@@ -212,7 +219,7 @@ public class Value implements QueryValue {
 
   @Override
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
-    final String fieldName = this.fieldDefinition.getName();
+    final String fieldName = this.column.getName();
     if (Property.hasValue(fieldName)) {
       final FieldDefinition field = recordDefinition.getField(fieldName);
       setFieldDefinition(field);
@@ -221,8 +228,8 @@ public class Value implements QueryValue {
 
   public void setValue(Object value) {
     value = getValue(value);
-    if (this.fieldDefinition.getName() == JdbcFieldDefinitions.UNKNOWN) {
-      this.fieldDefinition = JdbcFieldDefinitions.newFieldDefinition(value);
+    if (this.column.getName() == JdbcFieldDefinitions.UNKNOWN) {
+      this.column = JdbcFieldDefinitions.newFieldDefinition(value);
     }
     setQueryValue(value);
   }

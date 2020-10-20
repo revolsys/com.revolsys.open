@@ -56,7 +56,7 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
               int i = 0;
               do {
                 final Record record = JdbcQueryIterator.getNextRecord(recordStore, recordDefinition,
-                  this.fields, recordFactory, resultSet, this.internStrings);
+                  this.selectExpressions, recordFactory, resultSet, this.internStrings);
                 results.add(record);
                 i++;
               } while (resultSet.next() && i < pageSize);

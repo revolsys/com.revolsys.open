@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.record.query.functions.F;
@@ -23,15 +24,22 @@ public class Q {
     return and(list);
   }
 
+  public static Condition and(final Condition a, final Condition b) {
+    if (a == null) {
+      return b;
+    } else {
+      return a.and(b);
+    }
+  }
+
   public static And and(final List<? extends Condition> conditions) {
     return new And(conditions);
   }
 
   public static QueryValue arithmatic(final FieldDefinition field, final String operator,
     final Object value) {
-    final Column column = new Column(field);
     final Value queryValue = Value.newValue(field, value);
-    return arithmatic(column, operator, queryValue);
+    return arithmatic((QueryValue)field, operator, queryValue);
   }
 
   public static QueryValue arithmatic(final QueryValue left, final String operator,
@@ -59,19 +67,16 @@ public class Q {
 
   }
 
-  public static Between between(final FieldDefinition fieldDefinition, final Object min,
-    final Object max) {
-    final Column column = new Column(fieldDefinition);
-    final Value minCondition = Value.newValue(fieldDefinition, min);
-    final Value maxCondition = Value.newValue(fieldDefinition, max);
-    return new Between(column, minCondition, maxCondition);
+  public static Between between(final FieldDefinition field, final Object min, final Object max) {
+    final Value minCondition = Value.newValue(field, min);
+    final Value maxCondition = Value.newValue(field, max);
+    return new Between(field, minCondition, maxCondition);
   }
 
   public static Condition binary(final FieldDefinition field, final String operator,
     final Object value) {
-    final Column column = new Column(field);
     final Value queryValue = Value.newValue(field, value);
-    return binary(column, operator, queryValue);
+    return binary((QueryValue)field, operator, queryValue);
   }
 
   public static BinaryCondition binary(final QueryValue left, final String operator,
@@ -101,19 +106,21 @@ public class Q {
 
   }
 
+  public static QueryValue count(final TableReference table, final String fieldName) {
+    return new Count(table.getColumn(fieldName));
+  }
+
   public static Divide divide(final QueryValue left, final QueryValue right) {
     return new Divide(left, right);
   }
 
   public static Equal equal(final FieldDefinition fieldDefinition, final Object value) {
-    final String name = fieldDefinition.getName();
     final Value valueCondition = Value.newValue(fieldDefinition, value);
-    return equal(name, valueCondition);
+    return new Equal(fieldDefinition, valueCondition);
   }
 
   public static Equal equal(final FieldDefinition field, final QueryValue right) {
-    final Column leftCondition = new Column(field);
-    return new Equal(leftCondition, right);
+    return new Equal(field, right);
   }
 
   public static Equal equal(final QueryValue left, final Object value) {
@@ -265,9 +272,8 @@ public class Q {
     return new IsNotNull(condition);
   }
 
-  public static IsNull isNull(final FieldDefinition fieldDefinition) {
-    final String name = fieldDefinition.getName();
-    return isNull(name);
+  public static IsNull isNull(final QueryValue queryValue) {
+    return new IsNull(queryValue);
   }
 
   public static IsNull isNull(final String name) {
@@ -386,6 +392,14 @@ public class Q {
     return or(list);
   }
 
+  public static Condition or(final Condition a, final Condition b) {
+    if (a == null) {
+      return b;
+    } else {
+      return a.or(b);
+    }
+  }
+
   public static Or or(final List<? extends Condition> conditions) {
     return new Or(conditions);
   }
@@ -424,6 +438,10 @@ public class Q {
 
   public static SqlCondition sql(final String sql, final Object... parameters) {
     return new SqlCondition(sql, parameters);
+  }
+
+  public static QueryValue sqlExpression(final String sql, final DataType dataType) {
+    return new SqlExpression(sql, dataType);
   }
 
   private static Subtract subtract(final QueryValue left, final QueryValue right) {

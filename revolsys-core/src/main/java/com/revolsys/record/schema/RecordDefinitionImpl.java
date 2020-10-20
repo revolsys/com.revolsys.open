@@ -36,6 +36,7 @@ import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.record.property.RecordDefinitionProperty;
 import com.revolsys.record.property.ValueRecordDefinitionProperty;
+import com.revolsys.record.query.ColumnReference;
 
 public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   implements RecordDefinition {
@@ -54,6 +55,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   private ClockDirection polygonRingDirection = ClockDirection.OGC_SFS_COUNTER_CLOCKWISE;
 
   private Map<String, CodeTable> codeTableByFieldNameMap = new HashMap<>();
+
+  private String tableAlias;
 
   private Map<String, Object> defaultValues = new HashMap<>();
 
@@ -439,6 +442,24 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   @Override
+  public ColumnReference getColumn(final CharSequence name) {
+    if (name == null) {
+      throw new IllegalArgumentException("Column name must not be null");
+    } else {
+      final String nameString = name.toString();
+      FieldDefinition field = this.fieldMap.get(nameString);
+      if (field == null) {
+        final String lowerName = nameString.toLowerCase();
+        field = this.fieldMap.get(lowerName);
+        if (field == null) {
+          throw new IllegalArgumentException("Column not found: " + nameString);
+        }
+      }
+      return field;
+    }
+  }
+
+  @Override
   public Object getDefaultValue(final String fieldName) {
     return this.defaultValues.get(fieldName);
   }
@@ -709,6 +730,20 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   @Override
+  public String getTableAlias() {
+    return this.tableAlias;
+  }
+
+  @Override
+  public PathName getTablePath() {
+    return getPathName();
+  }
+
+  public boolean hasColumn(final CharSequence name) {
+    return hasField(name);
+  }
+
+  @Override
   public boolean hasField(final CharSequence name) {
     if (name == null) {
       return false;
@@ -945,6 +980,11 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   public void setRecordDefinitionFactory(final RecordDefinitionFactory recordDefinitionFactory) {
     this.recordDefinitionFactory = recordDefinitionFactory;
+  }
+
+  @Override
+  public void setTableAlias(final String tableAlias) {
+    this.tableAlias = tableAlias;
   }
 
   @Override

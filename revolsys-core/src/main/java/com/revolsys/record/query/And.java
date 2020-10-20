@@ -21,7 +21,7 @@ public class And extends AbstractMultiCondition {
 
   @Override
   public And and(final Condition condition) {
-    if (!Property.isEmpty(condition)) {
+    if (condition != null && !Property.isEmpty(condition)) {
       addCondition(condition);
     }
     return this;

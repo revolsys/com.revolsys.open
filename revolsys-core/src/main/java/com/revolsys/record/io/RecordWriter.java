@@ -47,6 +47,24 @@ public interface RecordWriter extends Writer<Record>, RecordDefinitionProxy {
     return null;
   }
 
+  @SuppressWarnings("unchecked")
+  static <R extends RecordWriter> R newRecordWriter(final String fileExtension,
+    final RecordDefinitionProxy recordDefinition, final Object target) {
+    if (recordDefinition != null) {
+      final RecordDefinition definition = recordDefinition.getRecordDefinition();
+      if (definition != null) {
+        final Resource resource = Resource.getResource(target);
+        final RecordWriterFactory writerFactory = IoFactory
+          .factoryByFileExtension(RecordWriterFactory.class, fileExtension);
+        if (writerFactory != null) {
+          final RecordWriter writer = writerFactory.newRecordWriter(definition, resource);
+          return (R)writer;
+        }
+      }
+    }
+    return null;
+  }
+
   @Override
   default GeometryFactory getGeometryFactory() {
     final RecordDefinition recordDefinition = getRecordDefinition();

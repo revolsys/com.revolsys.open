@@ -1,6 +1,8 @@
 package com.revolsys.record.query;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
@@ -10,19 +12,25 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 
-public class Column implements QueryValue {
+public class Column implements QueryValue, ColumnReference {
 
   private FieldDefinition fieldDefinition;
 
   private final String name;
 
-  public Column(final FieldDefinition fieldDefinition) {
-    this.name = fieldDefinition.getName();
-    this.fieldDefinition = fieldDefinition;
+  private TableReference table;
+
+  public Column(final CharSequence name) {
+    this(name.toString());
   }
 
   public Column(final String name) {
     this.name = name;
+  }
+
+  public Column(final TableReference tableReference, final CharSequence name) {
+    this.table = tableReference;
+    this.name = name.toString();
   }
 
   @Override
@@ -52,17 +60,28 @@ public class Column implements QueryValue {
   @Override
   public boolean equals(final Object obj) {
     if (obj instanceof Column) {
-      final Column value = (Column)obj;
+      final ColumnReference value = (ColumnReference)obj;
       return DataType.equal(value.getName(), this.getName());
     } else {
       return false;
     }
   }
 
+  @Override
   public FieldDefinition getFieldDefinition() {
     return this.fieldDefinition;
   }
 
+  @Override
+  public int getFieldIndex() {
+    if (this.fieldDefinition == null) {
+      return -1;
+    } else {
+      return this.fieldDefinition.getIndex();
+    }
+  }
+
+  @Override
   public String getName() {
     return this.name;
   }
@@ -78,6 +97,11 @@ public class Column implements QueryValue {
   }
 
   @Override
+  public TableReference getTable() {
+    return this.table;
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public <V> V getValue(final Record record) {
     if (record == null) {
@@ -89,19 +113,71 @@ public class Column implements QueryValue {
   }
 
   @Override
+  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
+    final boolean internStrings) throws SQLException {
+    if (this.fieldDefinition == null) {
+      return null;
+    } else {
+      return this.fieldDefinition.getValueFromResultSet(resultSet, indexes, internStrings);
+    }
+  }
+
+  @Override
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
     final String getName = getName();
     this.fieldDefinition = recordDefinition.getField(getName);
   }
 
   @Override
+  public <V> V toColumnTypeException(final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      if (this.fieldDefinition == null) {
+        return (V)value;
+      } else {
+        return this.fieldDefinition.toColumnTypeException(value);
+      }
+    }
+  }
+
+  @Override
+  public <V> V toFieldValueException(final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      if (this.fieldDefinition == null) {
+        return (V)value;
+      } else {
+        return this.fieldDefinition.toFieldValueException(value);
+      }
+    }
+  }
+
+  @Override
   public String toString() {
+    final StringBuilder sb = new StringBuilder();
+    if (this.table != null) {
+      this.table.appendColumnPrefix(sb);
+    }
     final String name = this.name;
     if (name.indexOf('"') != -1 || name.indexOf('.') != -1
       || name.matches("([A-Z][_A-Z1-9]*\\.)?[A-Z][_A-Z1-9]*")) {
-      return name;
+      sb.append(name);
     } else {
-      return "\"" + name + "\"";
+      sb.append('"');
+      sb.append(name);
+      sb.append('"');
+    }
+    return sb.toString();
+  }
+
+  @Override
+  public String toString(final Object value) {
+    if (this.fieldDefinition == null) {
+      return DataTypes.toString(value);
+    } else {
+      return this.fieldDefinition.toString(value);
     }
   }
 }

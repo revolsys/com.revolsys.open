@@ -34,15 +34,15 @@ public abstract class AbstractBinaryQueryValue implements QueryValue {
   @Override
   public int appendParameters(int index, final PreparedStatement statement) {
     if (this.left != null) {
-      if (this.right instanceof Column && !(this.left instanceof Column)) {
-        final FieldDefinition rightFieldDefinition = ((Column)this.right).getFieldDefinition();
+      if (this.right instanceof ColumnReference && !(this.left instanceof ColumnReference)) {
+        final FieldDefinition rightFieldDefinition = ((ColumnReference)this.right).getFieldDefinition();
         this.left.setFieldDefinition(rightFieldDefinition);
       }
       index = this.left.appendParameters(index, statement);
     }
     if (this.right != null) {
-      if (this.left instanceof Column && !(this.right instanceof Column)) {
-        final FieldDefinition rightFieldDefinition = ((Column)this.left).getFieldDefinition();
+      if (this.left instanceof ColumnReference && !(this.right instanceof ColumnReference)) {
+        final FieldDefinition rightFieldDefinition = ((ColumnReference)this.left).getFieldDefinition();
         this.right.setFieldDefinition(rightFieldDefinition);
       }
       index = this.right.appendParameters(index, statement);

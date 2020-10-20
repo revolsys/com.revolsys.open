@@ -245,11 +245,11 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   @Override
   public int deleteRecords(final Query query) {
-    final String typeName = query.getTypeName();
+    final PathName tablePath = query.getTablePath();
     RecordDefinition recordDefinition = query.getRecordDefinition();
     if (recordDefinition == null) {
-      if (typeName != null) {
-        recordDefinition = getRecordDefinition(typeName);
+      if (tablePath != null) {
+        recordDefinition = getRecordDefinition(tablePath);
         query.setRecordDefinition(recordDefinition);
       }
     }
@@ -408,10 +408,10 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  public JdbcRecordDefinition getRecordDefinition(String typePath,
+  public JdbcRecordDefinition getRecordDefinition(PathName typePath,
     final ResultSetMetaData resultSetMetaData, final String dbTableName) {
     if (Property.isEmpty(typePath)) {
-      typePath = "Record";
+      typePath = PathName.newPathName("/Record");
     }
 
     try {

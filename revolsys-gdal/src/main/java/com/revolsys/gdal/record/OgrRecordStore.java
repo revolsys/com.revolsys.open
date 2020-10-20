@@ -40,7 +40,7 @@ import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.query.AbstractMultiCondition;
 import com.revolsys.record.query.BinaryCondition;
 import com.revolsys.record.query.CollectionValue;
-import com.revolsys.record.query.Column;
+import com.revolsys.record.query.ColumnReference;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.ILike;
 import com.revolsys.record.query.LeftUnaryCondition;
@@ -173,8 +173,8 @@ public class OgrRecordStore extends AbstractRecordStore {
         }
         appendValue(sql, value);
       }
-    } else if (condition instanceof Column) {
-      final Column column = (Column)condition;
+    } else if (condition instanceof ColumnReference) {
+      final ColumnReference column = (ColumnReference)condition;
       final Object name = column.getName();
       sql.append(name);
     } else if (condition instanceof SqlCondition) {
@@ -398,22 +398,22 @@ public class OgrRecordStore extends AbstractRecordStore {
     if (query == null) {
       return 0;
     } else {
-      String typePath = query.getTypeName();
+      PathName typePath = query.getTablePath();
       RecordDefinition recordDefinition = query.getRecordDefinition();
       if (recordDefinition == null) {
-        typePath = query.getTypeName();
+        typePath = query.getTablePath();
         recordDefinition = getRecordDefinition(typePath);
         if (recordDefinition == null) {
           return 0;
         }
       } else {
-        typePath = recordDefinition.getPath();
+        typePath = recordDefinition.getPathName();
       }
       final StringBuilder whereClause = getWhereClause(query);
 
       final StringBuilder sql = new StringBuilder();
       sql.append("SELECT COUNT(*) FROM ");
-      final String layerName = getLayerName(typePath);
+      final String layerName = getLayerName(typePath.toString());
       sql.append(layerName);
       if (whereClause.length() > 0) {
         sql.append(" WHERE ");
@@ -466,7 +466,7 @@ public class OgrRecordStore extends AbstractRecordStore {
   protected String getSql(final Query query) {
     final RecordDefinition recordDefinition = query.getRecordDefinition();
     final String typePath = recordDefinition.getPath();
-    final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
+    final Map<QueryValue, Boolean> orderBy = query.getOrderBy();
     final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");
 
@@ -485,20 +485,15 @@ public class OgrRecordStore extends AbstractRecordStore {
       sql.append(whereClause);
     }
     boolean first = true;
-    for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
-      final CharSequence fieldName = entry.getKey();
+    for (final Entry<QueryValue, Boolean> entry : orderBy.entrySet()) {
+      final QueryValue field = entry.getKey();
       if (first) {
         sql.append(" ORDER BY ");
         first = false;
       } else {
         sql.append(", ");
       }
-      if (fieldName instanceof FieldDefinition) {
-        final FieldDefinition field = (FieldDefinition)fieldName;
-        field.appendColumnName(sql);
-      } else {
-        sql.append(fieldName);
-      }
+      field.appendDefaultSql(query, null, sql);
       final Boolean ascending = entry.getValue();
       if (!ascending) {
         sql.append(" DESC");
@@ -531,10 +526,10 @@ public class OgrRecordStore extends AbstractRecordStore {
   @Override
   public AbstractIterator<Record> newIterator(final Query query,
     final Map<String, Object> properties) {
-    String typePath = query.getTypeName();
+    PathName typePath = query.getTablePath();
     RecordDefinition recordDefinition = query.getRecordDefinition();
     if (recordDefinition == null) {
-      typePath = query.getTypeName();
+      typePath = query.getTablePath();
       recordDefinition = getRecordDefinition(typePath);
       if (recordDefinition == null) {
         throw new IllegalArgumentException("Type name does not exist " + typePath);
@@ -542,7 +537,7 @@ public class OgrRecordStore extends AbstractRecordStore {
         query.setRecordDefinition(recordDefinition);
       }
     } else {
-      typePath = recordDefinition.getPath();
+      typePath = recordDefinition.getPathName();
     }
 
     final OgrQueryIterator iterator = new OgrQueryIterator(this, query);

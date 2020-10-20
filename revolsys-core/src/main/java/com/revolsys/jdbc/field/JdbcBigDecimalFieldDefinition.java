@@ -4,6 +4,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
+import com.revolsys.record.query.ColumnIndexes;
+
 public class JdbcBigDecimalFieldDefinition extends JdbcDecimalFieldDefinition {
   public JdbcBigDecimalFieldDefinition(final String dbName, final String name, final int sqlType,
     final int length, final int scale, final boolean required, final String description,
@@ -18,9 +20,9 @@ public class JdbcBigDecimalFieldDefinition extends JdbcDecimalFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
     final boolean internStrings) throws SQLException {
-    return resultSet.getBigDecimal(columnIndex);
+    return resultSet.getBigDecimal(indexes.incrementAndGet());
   }
 
 }
