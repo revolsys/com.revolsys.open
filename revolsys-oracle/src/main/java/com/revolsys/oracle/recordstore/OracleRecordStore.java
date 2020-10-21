@@ -40,6 +40,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.property.ShortNameProperty;
 import com.revolsys.record.query.Column;
+import com.revolsys.record.query.ILike;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.Value;
@@ -172,6 +173,27 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
       throw new IllegalArgumentException(
         "Unknown geometry attribute type " + geometryField.getClass());
     }
+  }
+
+  private void appendILike(final Query query, final StringBuilder sql,
+    final QueryValue queryValue) {
+    final ILike iLike = (ILike)queryValue;
+    final QueryValue left = iLike.getLeft();
+    final QueryValue right = iLike.getRight();
+
+    sql.append("UPPER(CAST(");
+    if (left == null) {
+      sql.append("NULL");
+    } else {
+      left.appendSql(query, this, sql);
+    }
+    sql.append(" AS VARCHAR(4000))) LIKE UPPER(");
+    if (right == null) {
+      sql.append("NULL");
+    } else {
+      right.appendSql(query, this, sql);
+    }
+    sql.append(")");
   }
 
   private void appendWithinDistance(final Query query, final StringBuilder sql,
@@ -374,6 +396,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     addSqlQueryAppender(GeometryEqual2d.class, this::appendGeometryEqual2d);
     addSqlQueryAppender(EnvelopeIntersects.class, this::appendEnvelopeIntersects);
     addSqlQueryAppender(WithinDistance.class, this::appendWithinDistance);
+    addSqlQueryAppender(ILike.class, this::appendILike);
   }
 
   @Override
