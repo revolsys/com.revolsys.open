@@ -549,6 +549,10 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this.orderBy.containsKey(fieldName);
   }
 
+  public boolean hasSelect() {
+    return !this.selectExpressions.isEmpty();
+  }
+
   public boolean isCustomResult() {
     if (!getJoins().isEmpty()) {
       return true;
@@ -612,6 +616,14 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
       throw new IllegalArgumentException("Not a valid select expression :" + select);
     }
     return select(selectExpression);
+  }
+
+  public Query select(final Object... select) {
+    this.selectExpressions.clear();
+    for (final Object selectItem : select) {
+      select(selectItem);
+    }
+    return this;
   }
 
   public Query select(final QueryValue select) {
