@@ -95,6 +95,12 @@ public interface TableReference {
     return new ILike(field, valueCondition);
   }
 
+  default Condition in(final String fieldName, final List<?> list) {
+    final ColumnReference field = getColumn(fieldName);
+    final CollectionValue right = new CollectionValue(field, list);
+    return new In(field, right);
+  }
+
   default IsNotNull isNotNull(final CharSequence fieldName) {
     final ColumnReference field = getColumn(fieldName);
     return new IsNotNull(field);

@@ -103,6 +103,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
     this.type = field.getDataType();
     this.codeTable = field.getCodeTable();
     this.geometryFactory = field.getGeometryFactory();
+    this.recordDefinition = field.recordDefinition;
 
     final Map<String, Object> properties = field.getProperties();
     setProperties(properties);
@@ -532,7 +533,11 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
 
   public String getTableAlias() {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getTableAlias();
+    if (recordDefinition == null) {
+      return "t";
+    } else {
+      return recordDefinition.getTableAlias();
+    }
   }
 
   public String getTitle() {

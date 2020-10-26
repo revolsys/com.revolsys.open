@@ -161,7 +161,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return query;
   }
 
-  private final List<Join> joins = new ArrayList<>();
+  private List<Join> joins = new ArrayList<>();
 
   private boolean distinct = false;
 
@@ -358,7 +358,10 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
   @Override
   public Query clone() {
     final Query clone = (Query)super.clone();
+    clone.table = this.table;
+    clone.selectExpressions = new ArrayList<>(clone.selectExpressions);
     clone.fieldNames = new ArrayList<>(clone.fieldNames);
+    clone.joins = new ArrayList<>(clone.joins);
     clone.selectExpressions = new ArrayList<>(clone.selectExpressions);
     clone.parameters = new ArrayList<>(this.parameters);
     clone.orderBy = new HashMap<>(this.orderBy);

@@ -7,7 +7,7 @@ import org.jeometry.common.data.type.DataType;
 import com.revolsys.record.schema.RecordStore;
 
 public abstract class AbstractMultiCondition extends AbstractMultiQueryValue
-  implements Condition, ConditionComposer {
+  implements Condition, ConditionBuilder {
 
   private final String operator;
 
@@ -78,6 +78,11 @@ public abstract class AbstractMultiCondition extends AbstractMultiQueryValue
       }
     }
     return false;
+  }
+
+  @Override
+  public Condition getCondition() {
+    return this;
   }
 
   public String getOperator() {

@@ -343,4 +343,5 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
   void setGeometryFactory(com.revolsys.geometry.model.GeometryFactory geometryFactory);
 
   void setTableAlias(String tableAlias);
+
 }

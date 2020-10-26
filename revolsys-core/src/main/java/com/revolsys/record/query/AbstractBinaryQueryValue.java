@@ -35,14 +35,16 @@ public abstract class AbstractBinaryQueryValue implements QueryValue {
   public int appendParameters(int index, final PreparedStatement statement) {
     if (this.left != null) {
       if (this.right instanceof ColumnReference && !(this.left instanceof ColumnReference)) {
-        final FieldDefinition rightFieldDefinition = ((ColumnReference)this.right).getFieldDefinition();
+        final FieldDefinition rightFieldDefinition = ((ColumnReference)this.right)
+          .getFieldDefinition();
         this.left.setFieldDefinition(rightFieldDefinition);
       }
       index = this.left.appendParameters(index, statement);
     }
     if (this.right != null) {
       if (this.left instanceof ColumnReference && !(this.right instanceof ColumnReference)) {
-        final FieldDefinition rightFieldDefinition = ((ColumnReference)this.left).getFieldDefinition();
+        final FieldDefinition rightFieldDefinition = ((ColumnReference)this.left)
+          .getFieldDefinition();
         this.right.setFieldDefinition(rightFieldDefinition);
       }
       index = this.right.appendParameters(index, statement);
@@ -64,11 +66,19 @@ public abstract class AbstractBinaryQueryValue implements QueryValue {
   public AbstractBinaryQueryValue clone() {
     try {
       final AbstractBinaryQueryValue clone = (AbstractBinaryQueryValue)super.clone();
-      clone.left = this.left.clone();
-      clone.right = this.right.clone();
+      clone.left = clone(this.left);
+      clone.right = clone(this.right);
       return clone;
     } catch (final CloneNotSupportedException e) {
       return null;
+    }
+  }
+
+  protected QueryValue clone(final QueryValue value) {
+    if (value instanceof ColumnReference) {
+      return value;
+    } else {
+      return value.clone();
     }
   }
 

@@ -3,6 +3,7 @@ package com.revolsys.record.query;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiFunction;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
@@ -14,6 +15,9 @@ import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
 public class Q {
+  static BiFunction<QueryValue, QueryValue, Condition> ILIKE = ILike::new;
+
+  static BiFunction<QueryValue, QueryValue, Condition> EQUAL = Equal::new;
 
   public static Add add(final QueryValue left, final QueryValue right) {
     return new Add(left, right);

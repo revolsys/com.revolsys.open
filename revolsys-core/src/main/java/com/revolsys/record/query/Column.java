@@ -161,8 +161,8 @@ public class Column implements QueryValue, ColumnReference {
       this.table.appendColumnPrefix(sb);
     }
     final String name = this.name;
-    if (name.indexOf('"') != -1 || name.indexOf('.') != -1
-      || name.matches("([A-Z][_A-Z1-9]*\\.)?[A-Z][_A-Z1-9]*")) {
+    if ("*".equals(name) || name.indexOf('"') != -1 || name.indexOf('.') != -1
+      || name.matches("([A-Z][_A-Z1-9]*\\.)?[A-Z][_A-Z1-9]*\\*")) {
       sb.append(name);
     } else {
       sb.append('"');
