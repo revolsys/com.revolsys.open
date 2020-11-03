@@ -1,6 +1,7 @@
 package com.revolsys.record.query;
 
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public interface ConditionBuilder {
 
@@ -23,6 +24,12 @@ public interface ConditionBuilder {
     return addCondition(condition);
   }
 
+  default ConditionBuilder addCondition(final QueryValue left,
+    final Function<QueryValue, Condition> operator) {
+    final Condition condition = operator.apply(left);
+    return addCondition(condition);
+  }
+
   default ConditionBuilder addCondition(final TableReference table, final CharSequence fieldName,
     final BiFunction<QueryValue, QueryValue, Condition> operator, final Object value) {
     final ColumnReference field = table.getColumn(fieldName);
@@ -39,6 +46,12 @@ public interface ConditionBuilder {
       condition = operator.apply(field, right);
     }
     return addCondition(condition);
+  }
+
+  default ConditionBuilder addCondition(final TableReference table, final CharSequence fieldName,
+    final Function<QueryValue, Condition> operator) {
+    final ColumnReference field = table.getColumn(fieldName);
+    return addCondition(field, operator);
   }
 
   default ConditionBuilder equal(final TableReference table, final CharSequence fieldName,
@@ -68,6 +81,14 @@ public interface ConditionBuilder {
   default ConditionBuilder iLike(final TableReference table, final CharSequence fieldName,
     final Object value) {
     return addCondition(table, fieldName, Q.ILIKE, value);
+  }
+
+  default ConditionBuilder isNotNull(final TableReference table, final String fieldName) {
+    return addCondition(table, fieldName, Q.IS_NOT_NULL);
+  }
+
+  default ConditionBuilder isNull(final TableReference table, final String fieldName) {
+    return addCondition(table, fieldName, Q.IS_NULL);
   }
 
   default ConditionBuilder sql(final String sql, final Object... parameters) {

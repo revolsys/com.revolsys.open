@@ -166,18 +166,28 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   @Override
   public JdbcConnection getJdbcConnection(final boolean autoCommit) {
     final DataSource dataSource = getDataSource();
-    final Connection connection = JdbcUtils.getConnection(dataSource);
-    try {
-      final PgConnection pgConnection = connection.unwrap(PgConnection.class);
-      pgConnection.addDataType("geometry", PostgreSQLGeometryWrapper.class);
-      pgConnection.addDataType("box2d", PostgreSQLBoundingBoxWrapper.class);
-      pgConnection.addDataType("box3d", PostgreSQLBoundingBoxWrapper.class);
-      pgConnection.addDataType("tid", PostgreSQLTidWrapper.class);
-    } catch (final SQLException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    Connection connection = JdbcUtils.getConnection(dataSource);
+    if (connection == null) {
+      return null;
+    } else {
+      try {
+        PgConnection pgConnection;
+        try {
+          pgConnection = connection.unwrap(PgConnection.class);
+        } catch (final NullPointerException e) {
+          connection = JdbcUtils.getConnection(dataSource);
+          pgConnection = connection.unwrap(PgConnection.class);
+        }
+        pgConnection.addDataType("geometry", PostgreSQLGeometryWrapper.class);
+        pgConnection.addDataType("box2d", PostgreSQLBoundingBoxWrapper.class);
+        pgConnection.addDataType("box3d", PostgreSQLBoundingBoxWrapper.class);
+        pgConnection.addDataType("tid", PostgreSQLTidWrapper.class);
+      } catch (final SQLException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      return new JdbcConnection(connection, dataSource, autoCommit);
     }
-    return new JdbcConnection(connection, dataSource, autoCommit);
   }
 
   @Override

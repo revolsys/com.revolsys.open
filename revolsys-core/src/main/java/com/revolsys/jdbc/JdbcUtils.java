@@ -230,7 +230,13 @@ public final class JdbcUtils {
 
   public static Connection getConnection(final DataSource dataSource) {
     try {
-      return DataSourceUtils.doGetConnection(dataSource);
+      Connection connection = DataSourceUtils.doGetConnection(dataSource);
+      if (connection.isClosed()) {
+        DataSourceUtils.doReleaseConnection(connection, dataSource);
+        connection = DataSourceUtils.doGetConnection(dataSource);
+      }
+
+      return connection;
     } catch (final SQLException e) {
       throw getException(dataSource, "Get Connection", null, e);
     }

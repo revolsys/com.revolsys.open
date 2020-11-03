@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
@@ -16,6 +17,10 @@ import com.revolsys.util.Property;
 
 public class Q {
   static BiFunction<QueryValue, QueryValue, Condition> ILIKE = ILike::new;
+
+  static Function<QueryValue, Condition> IS_NOT_NULL = IsNotNull::new;
+
+  static Function<QueryValue, Condition> IS_NULL = IsNull::new;
 
   static BiFunction<QueryValue, QueryValue, Condition> EQUAL = Equal::new;
 
