@@ -205,12 +205,31 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
     super.finalize();
   }
 
+  public void forEachEdge(final Consumer<Edge<T>> action) {
+    final Graph<T> graph = this.graph;
+    for (final int edgeId : this.inEdgeIds) {
+      final Edge<T> edge = graph.getEdge(edgeId);
+      action.accept(edge);
+    }
+    for (final int edgeId : this.outEdgeIds) {
+      final Edge<T> edge = graph.getEdge(edgeId);
+      action.accept(edge);
+    }
+  }
+
   public void forEachInEdge(final Consumer<Edge<T>> action) {
     final Graph<T> graph = this.graph;
     for (final int edgeId : this.inEdgeIds) {
       final Edge<T> edge = graph.getEdge(edgeId);
       action.accept(edge);
     }
+  }
+
+  public void forEachObject(final Consumer<T> action) {
+    forEachEdge((e) -> {
+      final T object = e.getObject();
+      action.accept(object);
+    });
   }
 
   public void forEachOutEdge(final Consumer<Edge<T>> action) {
@@ -511,10 +530,6 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
       return ObjectWithProperties.getProperty(this, properties, name);
     }
     return null;
-  }
-
-  public boolean ha(final String name) {
-    return getProperties().containsKey(name);
   }
 
   public boolean hasEdge(final Edge<T> edge) {

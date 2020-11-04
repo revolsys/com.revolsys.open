@@ -203,7 +203,9 @@ public class Query extends BaseObjectWithProperties
 
   public Query(final RecordDefinitionProxy recordDefinition, final Condition whereCondition) {
     this(recordDefinition == null ? null : recordDefinition.getPathName());
-    this.recordDefinition = recordDefinition.getRecordDefinition();
+    if (recordDefinition != null) {
+      this.recordDefinition = recordDefinition.getRecordDefinition();
+    }
     setWhereCondition(whereCondition);
   }
 

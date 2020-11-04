@@ -25,9 +25,7 @@ public class RecordDefinitionBuilder {
 
   public RecordDefinitionBuilder(final RecordDefinitionProxy recordDefinition) {
     this(recordDefinition.getPathName());
-    for (final FieldDefinition fieldDefinition : recordDefinition.getFieldDefinitions()) {
-      addField(fieldDefinition);
-    }
+    addFields(recordDefinition);
     this.recordDefinition.setIdFieldNames(recordDefinition.getIdFieldNames());
     this.recordDefinition.setGeometryFieldName(recordDefinition.getGeometryFieldName());
     this.recordDefinition.setGeometryFactory(recordDefinition.getGeometryFactory());
@@ -100,6 +98,13 @@ public class RecordDefinitionBuilder {
     return this;
   }
 
+  public RecordDefinitionBuilder addFields(final RecordDefinitionProxy recordDefinition) {
+    for (final FieldDefinition fieldDefinition : recordDefinition.getFieldDefinitions()) {
+      addField(fieldDefinition);
+    }
+    return this;
+  }
+
   public RecordDefinitionBuilder addIdField(final FieldDefinition field) {
     this.recordDefinition.addIdField(field.clone());
     return this;
@@ -156,4 +161,5 @@ public class RecordDefinitionBuilder {
     this.recordDefinition.setPathName(path);
     return this;
   }
+
 }

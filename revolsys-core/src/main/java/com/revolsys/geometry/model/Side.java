@@ -9,7 +9,7 @@ public enum Side {
 
   public static List<Side> VALUES = Lists.newArray(LEFT, RIGHT);
 
-  public static List<Side> ALL_VALUES = Lists.newArray(LEFT, RIGHT);
+  public static List<Side> ALL_VALUES = Lists.newArray(LEFT, ON, RIGHT);
 
   public static Side getSide(final double x1, final double y1, final double x2, final double y2,
     final double x, final double y) {

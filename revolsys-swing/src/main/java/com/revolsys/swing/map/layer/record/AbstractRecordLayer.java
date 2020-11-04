@@ -1766,7 +1766,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   protected void initEditRecordsMenu(final EditRecordMenu editMenu) {
     final RecordDefinition recordDefinition = getRecordDefinition();
 
-    if (recordDefinition.hasGeometryField()) {
+    if (recordDefinition != null && recordDefinition.hasGeometryField()) {
       final EnableCheck editableEnableCheck = this::isEditable;
 
       final DataType geometryDataType = recordDefinition.getGeometryField().getDataType();

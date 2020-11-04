@@ -27,6 +27,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.Value;
@@ -619,6 +620,16 @@ public interface Record
     }
   }
 
+  default <E extends Enum<E>> E getEnum(final Class<E> enumType, final CharSequence fieldName,
+    final E defaultValue) {
+    final String value = getString(fieldName);
+    if (Property.hasValue(value)) {
+      return Enum.valueOf(enumType, value);
+    } else {
+      return defaultValue;
+    }
+  }
+
   @Override
   default Float getFloat(final CharSequence name) {
     final Object value = getValue(name);
@@ -647,7 +658,7 @@ public interface Record
       return null;
     } else {
       final int index = recordDefinition.getGeometryFieldIndex();
-      return (T)getValue(index);
+      return (T)getValue(index, GeometryDataTypes.GEOMETRY);
     }
   }
 
