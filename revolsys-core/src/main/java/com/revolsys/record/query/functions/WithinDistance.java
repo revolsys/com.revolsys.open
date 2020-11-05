@@ -13,6 +13,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
+import com.revolsys.record.query.TableReference;
 import com.revolsys.record.schema.RecordStore;
 
 public class WithinDistance implements Condition, Function {
@@ -64,20 +65,25 @@ public class WithinDistance implements Condition, Function {
   @Override
   public WithinDistance clone() {
     try {
-      final WithinDistance clone = (WithinDistance)super.clone();
-      if (this.geometry1Value != null) {
-        clone.geometry1Value = this.geometry1Value.clone();
-      }
-      if (this.geometry2Value != null) {
-        clone.geometry2Value = this.geometry2Value.clone();
-      }
-      if (this.distanceValue != null) {
-        clone.distanceValue = this.distanceValue.clone();
-      }
-      return clone;
+      return (WithinDistance)super.clone();
     } catch (final CloneNotSupportedException e) {
       throw Exceptions.wrap(e);
     }
+  }
+
+  @Override
+  public WithinDistance clone(final TableReference oldTable, final TableReference newTable) {
+    final WithinDistance clone = clone();
+    if (this.geometry1Value != null) {
+      clone.geometry1Value = this.geometry1Value.clone(oldTable, newTable);
+    }
+    if (this.geometry2Value != null) {
+      clone.geometry2Value = this.geometry2Value.clone(oldTable, newTable);
+    }
+    if (this.distanceValue != null) {
+      clone.distanceValue = this.distanceValue.clone(oldTable, newTable);
+    }
+    return clone;
   }
 
   @Override
@@ -157,7 +163,7 @@ public class WithinDistance implements Condition, Function {
   @SuppressWarnings("unchecked")
   @Override
   public <QV extends QueryValue> QV updateQueryValues(
-    final java.util.function.Function<QueryValue, QueryValue> valueHandler) {
+    TableReference oldTable, TableReference newTable, final java.util.function.Function<QueryValue, QueryValue> valueHandler) {
     final QueryValue distanceValue = valueHandler.apply(this.distanceValue);
     final QueryValue geometry1Value = valueHandler.apply(this.geometry1Value);
     final QueryValue geometry2Value = valueHandler.apply(this.geometry2Value);

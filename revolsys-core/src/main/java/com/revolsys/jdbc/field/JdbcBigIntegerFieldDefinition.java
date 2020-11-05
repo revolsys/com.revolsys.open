@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.jeometry.common.data.type.DataTypes;
 
+import com.revolsys.record.query.ColumnIndexes;
+
 public class JdbcBigIntegerFieldDefinition extends JdbcFieldDefinition {
   public JdbcBigIntegerFieldDefinition(final String dbName, final String name, final int sqlType,
     final int length, final boolean required, final String description,
@@ -24,20 +26,20 @@ public class JdbcBigIntegerFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
     final boolean internStrings) throws SQLException {
     Object value;
     final int length = getLength();
     if (length <= 2) {
-      value = resultSet.getByte(columnIndex);
+      value = resultSet.getByte(indexes.incrementAndGet());
     } else if (length <= 4) {
-      value = resultSet.getShort(columnIndex);
+      value = resultSet.getShort(indexes.incrementAndGet());
     } else if (length <= 9) {
-      value = resultSet.getInt(columnIndex);
+      value = resultSet.getInt(indexes.incrementAndGet());
     } else if (length <= 18) {
-      value = resultSet.getLong(columnIndex);
+      value = resultSet.getLong(indexes.incrementAndGet());
     } else {
-      final BigDecimal number = resultSet.getBigDecimal(columnIndex);
+      final BigDecimal number = resultSet.getBigDecimal(indexes.incrementAndGet());
       if (number == null) {
         value = null;
       } else {

@@ -18,6 +18,7 @@ import com.revolsys.record.query.BinaryCondition;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.query.TableReference;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
@@ -92,7 +93,8 @@ public class RecordStoreQueryListModel implements ListModel {
       final Map<String, Record> allObjects = new TreeMap<>();
       for (Query query : this.queries) {
         if (allObjects.size() < this.maxResults) {
-          query = query.clone();
+          final TableReference table = query.getTable();
+          query = query.clone(table, table);
           query.setOrderBy(this.displayFieldName);
           final Condition whereCondition = query.getWhereCondition();
           if (whereCondition instanceof BinaryCondition) {

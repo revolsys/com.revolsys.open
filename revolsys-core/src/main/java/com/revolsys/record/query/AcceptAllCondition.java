@@ -27,7 +27,18 @@ public class AcceptAllCondition implements Condition {
   }
 
   @Override
-  public Condition clone() {
+  public void changeRecordDefinition(final RecordDefinition oldRecordDefinition,
+    final RecordDefinition newRecordDefinition) {
+
+  }
+
+  @Override
+  public AcceptAllCondition clone() {
+    return this;
+  }
+
+  @Override
+  public Condition clone(final TableReference oldTable, final TableReference newTable) {
     return this;
   }
 
@@ -43,11 +54,6 @@ public class AcceptAllCondition implements Condition {
     } else {
       return condition;
     }
-  }
-
-  @Override
-  public void setRecordDefinition(final RecordDefinition recordDefinition) {
-
   }
 
   @Override

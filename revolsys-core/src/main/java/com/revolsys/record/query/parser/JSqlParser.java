@@ -15,6 +15,7 @@ import com.revolsys.record.query.And;
 import com.revolsys.record.query.Cast;
 import com.revolsys.record.query.CollectionValue;
 import com.revolsys.record.query.Column;
+import com.revolsys.record.query.ColumnReference;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Divide;
 import com.revolsys.record.query.Equal;
@@ -215,16 +216,16 @@ public class JSqlParser extends AbstractSqlParser {
     return new Cast(leftValue, dataType);
   }
 
-  private Column convertColumn(final Expression expression) {
+  private ColumnReference convertColumn(final Expression expression) {
     final net.sf.jsqlparser.schema.Column column = (net.sf.jsqlparser.schema.Column)expression;
     String columnName = column.getColumnName();
     columnName = columnName.replaceAll("\"", "");
     final FieldDefinition fieldDefinition = this.recordDefinition.getField(columnName);
     if (fieldDefinition == null) {
       throw new IllegalArgumentException("Invalid field name " + columnName);
+    } else {
+      return fieldDefinition;
     }
-
-    return new Column(fieldDefinition);
   }
 
   @SuppressWarnings("unchecked")
@@ -350,9 +351,9 @@ public class JSqlParser extends AbstractSqlParser {
 
   private QueryValue setFieldDefinition(final QueryValue value1, final QueryValue value2) {
     if (this.recordDefinition != null) {
-      if (value1 instanceof Column) {
+      if (value1 instanceof ColumnReference) {
         if (value2 instanceof Value) {
-          final Column column = (Column)value1;
+          final ColumnReference column = (ColumnReference)value1;
 
           final String name = column.getName();
           final Object value = ((Value)value2).getValue();

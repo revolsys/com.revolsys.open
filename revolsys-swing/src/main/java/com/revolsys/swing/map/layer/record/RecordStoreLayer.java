@@ -37,6 +37,7 @@ import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.In;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.query.functions.WithinDistance;
 import com.revolsys.record.schema.FieldDefinition;
@@ -143,7 +144,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         final RecordStore recordStore = getRecordStore();
         if (recordStore != null && query != null) {
           final Predicate<Record> filter = query.getWhereCondition();
-          final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
+          final Map<QueryValue, Boolean> orderBy = query.getOrderBy();
 
           final List<LayerRecord> changedRecords = new ArrayList<>();
           changedRecords.addAll(getRecordsNew());
@@ -599,7 +600,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     } else {
       Query query = getQuery();
       query = query.newQuery(recordDefinition);
-      query.and(F.envelopeIntersects(geometryField, boundingBox));
+      F.envelopeIntersects(query, boundingBox);
       return query;
     }
   }

@@ -14,6 +14,7 @@ import org.jeometry.common.data.type.DataType;
 import org.postgresql.jdbc.PgConnection;
 
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.record.query.ColumnIndexes;
 
 public class PostgreSQLArrayFieldDefinition extends JdbcFieldDefinition {
 
@@ -34,16 +35,18 @@ public class PostgreSQLArrayFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
     final boolean internStrings) throws SQLException {
-    final Object value = resultSet.getObject(columnIndex);
+    final Object value = resultSet.getObject(indexes.incrementAndGet());
     if (value instanceof Array) {
       final Array array = (Array)value;
       final List<Object> values = new ArrayList<>();
       final ResultSet arrayResultSet = array.getResultSet();
+      final ColumnIndexes columnIndex = new ColumnIndexes();
       while (arrayResultSet.next()) {
-        final Object elementValue = this.elementField.getValueFromResultSet(arrayResultSet, 2,
-          internStrings);
+        columnIndex.columnIndex = 1;
+        final Object elementValue = this.elementField.getValueFromResultSet(arrayResultSet,
+          columnIndex, internStrings);
         values.add(elementValue);
       }
       return values;

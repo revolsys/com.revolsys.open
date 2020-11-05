@@ -23,6 +23,11 @@ public class Parenthesis extends AbstractUnaryQueryValue implements Condition {
   }
 
   @Override
+  public Parenthesis clone(final TableReference oldTable, final TableReference newTable) {
+    return (Parenthesis)super.clone(oldTable, newTable);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     if (obj instanceof Parenthesis) {
       return super.equals(obj);

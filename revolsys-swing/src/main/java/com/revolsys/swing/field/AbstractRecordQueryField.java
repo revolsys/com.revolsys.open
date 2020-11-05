@@ -58,6 +58,7 @@ import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Equal;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.query.TableReference;
 import com.revolsys.record.query.Value;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.FieldDefinition;
@@ -404,7 +405,8 @@ public abstract class AbstractRecordQueryField extends ValueField
       final Map<String, Record> allRecords = new TreeMap<>();
       for (Query query : this.queries) {
         if (allRecords.size() < this.maxResults) {
-          query = query.clone()//
+          final TableReference table = query.getTable();
+          query = query.clone(table, table)//
             .addOrderBy(this.displayField);
           final Condition whereCondition = query.getWhereCondition();
           if (whereCondition instanceof BinaryCondition) {

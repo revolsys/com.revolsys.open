@@ -30,6 +30,7 @@ public class JdbcRecordDefinition extends RecordDefinitionImpl {
     return schema.getDbName();
   }
 
+  @Override
   public String getDbTableName() {
     return this.dbTableName;
   }
@@ -41,6 +42,15 @@ public class JdbcRecordDefinition extends RecordDefinitionImpl {
   @Override
   public String getQualifiedTableName() {
     return this.dbTableQualifiedName;
+  }
+
+  @Override
+  public String getTableAlias() {
+    final String tableAlias = super.getTableAlias();
+    if (tableAlias == null) {
+      return this.dbTableName;
+    }
+    return tableAlias;
   }
 
   public boolean isHasGeneratedFields() {

@@ -9,6 +9,7 @@ import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.Record;
+import com.revolsys.record.query.ColumnIndexes;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 
@@ -69,9 +70,9 @@ public class ArcSdeObjectIdJdbcFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final int columnIndex,
+  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
     final boolean internStrings) throws SQLException {
-    return resultSet.getInt(columnIndex);
+    return resultSet.getInt(indexes.incrementAndGet());
   }
 
   @Override

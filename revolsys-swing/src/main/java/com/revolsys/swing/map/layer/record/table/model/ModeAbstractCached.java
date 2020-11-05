@@ -22,6 +22,7 @@ import com.revolsys.record.RecordState;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionBuilder;
 import com.revolsys.spring.resource.PathResource;
@@ -214,7 +215,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
   @Override
   public void forEachRecord(final Query query, final Consumer<? super LayerRecord> action) {
     final Condition filter = query.getWhereCondition();
-    final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
+    final Map<QueryValue, Boolean> orderBy = query.getOrderBy();
     final AbstractRecordLayer layer = getLayer();
     final Iterable<LayerRecord> records = new ListByIndexIterator<>(this.records);
     layer.forEachRecord(records, filter, orderBy, action);

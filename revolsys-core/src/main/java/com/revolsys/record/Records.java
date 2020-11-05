@@ -32,7 +32,9 @@ import com.revolsys.predicate.Predicates;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.query.ColumnReference;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
@@ -244,7 +246,7 @@ public interface Records {
    * @param orderBy
    */
   static <V extends Record> void filterAndSort(final List<V> records,
-    final Predicate<? super V> filter, final Map<? extends CharSequence, Boolean> orderBy) {
+    final Predicate<? super V> filter, final Map<QueryValue, Boolean> orderBy) {
     // Filter records
     if (!Property.isEmpty(filter)) {
       Predicates.retain(records, filter);
@@ -528,25 +530,30 @@ public interface Records {
   }
 
   static <R extends Record> Comparator<R> newComparatorOrderBy(
-    final Map<? extends CharSequence, Boolean> orderBy) {
+    final Map<QueryValue, Boolean> orderBy) {
     return (record1, record2) -> {
       if (record1 == record2) {
         return 0;
       } else {
         if (Property.hasValue(orderBy)) {
-          for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
-            final CharSequence fieldName = entry.getKey();
-            final Boolean ascending = entry.getValue();
-            final Object value1 = record1.getValue(fieldName);
-            final Object value2 = record2.getValue(fieldName);
-            final int compare = CompareUtil.compare(value1, value2);
-            if (compare != 0) {
-              if (ascending) {
-                return compare;
-              } else {
-                return -compare;
+          for (final Entry<QueryValue, Boolean> entry : orderBy.entrySet()) {
+            final QueryValue field = entry.getKey();
+            if (field instanceof ColumnReference) {
+              final ColumnReference column = (ColumnReference)field;
+              final String fieldName = column.getAliasName();
+              final Boolean ascending = entry.getValue();
+              final Object value1 = record1.getValue(fieldName);
+              final Object value2 = record2.getValue(fieldName);
+              final int compare = CompareUtil.compare(value1, value2);
+              if (compare != 0) {
+                if (ascending) {
+                  return compare;
+                } else {
+                  return -compare;
+                }
               }
             }
+
           }
           return 0;
         } else {

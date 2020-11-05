@@ -30,8 +30,6 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
 
   private GeometryFactory geometryFactory;
 
-  private final String idFieldName;
-
   private Layer layer;
 
   private final int limit;
@@ -61,7 +59,6 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
     this.limit = query.getLimit();
     this.labelCountMap = query.getStatistics();
     this.geometryFactory = this.recordDefinition.getGeometryFactory();
-    this.idFieldName = recordStore.getIdFieldName(this.recordDefinition);
   }
 
   @Override

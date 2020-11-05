@@ -27,6 +27,11 @@ public class LeftUnaryCondition extends AbstractUnaryQueryValue implements Condi
   }
 
   @Override
+  public LeftUnaryCondition clone(final TableReference oldTable, final TableReference newTable) {
+    return (LeftUnaryCondition)super.clone(oldTable, newTable);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     if (obj instanceof LeftUnaryCondition) {
       final LeftUnaryCondition condition = (LeftUnaryCondition)obj;

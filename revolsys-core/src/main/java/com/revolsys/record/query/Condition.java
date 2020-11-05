@@ -8,10 +8,10 @@ import com.revolsys.util.Property;
 
 public interface Condition extends QueryValue, Predicate<Record>, Emptyable {
 
-  static final AcceptAllCondition ALL = new AcceptAllCondition();
+  AcceptAllCondition ALL = new AcceptAllCondition();
 
   default Condition and(final Condition condition) {
-    if (Property.isEmpty(condition)) {
+    if (condition == null || Property.isEmpty(condition)) {
       return this;
     } else if (Property.isEmpty(this)) {
       return condition;
@@ -20,8 +20,10 @@ public interface Condition extends QueryValue, Predicate<Record>, Emptyable {
     }
   }
 
-  @Override
   Condition clone();
+
+  @Override
+  Condition clone(TableReference oldTable, TableReference newTable);
 
   @SuppressWarnings("unchecked")
   @Override
@@ -44,7 +46,7 @@ public interface Condition extends QueryValue, Predicate<Record>, Emptyable {
   }
 
   default Condition or(final Condition condition) {
-    if (Property.isEmpty(condition)) {
+    if (condition == null || Property.isEmpty(condition)) {
       return this;
     } else if (Property.isEmpty(this)) {
       return condition;

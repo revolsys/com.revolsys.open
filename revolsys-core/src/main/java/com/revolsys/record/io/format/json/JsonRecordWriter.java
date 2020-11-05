@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.number.Numbers;
 
@@ -35,6 +36,8 @@ public class JsonRecordWriter extends AbstractRecordWriter {
   private final JsonStringEncodingWriter encodingOut;
 
   private String itemsPropertyName = "items";
+
+  private JsonObject header;
 
   public JsonRecordWriter(final RecordDefinitionProxy recordDefinition, final Writer out) {
     super(recordDefinition);
@@ -110,6 +113,10 @@ public class JsonRecordWriter extends AbstractRecordWriter {
     }
   }
 
+  public JsonObject getHeader() {
+    return this.header;
+  }
+
   public String getItemsPropertyName() {
     return this.itemsPropertyName;
   }
@@ -153,6 +160,10 @@ public class JsonRecordWriter extends AbstractRecordWriter {
       value(null, value);
     }
     endList();
+  }
+
+  public void setHeader(final JsonObject header) {
+    this.header = header;
   }
 
   public void setItemsPropertyName(final String itemsPropertyName) {
@@ -297,7 +308,18 @@ public class JsonRecordWriter extends AbstractRecordWriter {
     }
     this.singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
     if (!this.singleObject) {
-      out.write("{\"");
+      out.write("{");
+      if (this.header != null) {
+        for (final String headerName : this.header.keySet()) {
+          final Object value = this.header.getValue(headerName);
+          label(headerName);
+
+          final DataType dataType = DataTypes.getDataType(value);
+          value(dataType, value);
+          out.write(",\n");
+        }
+      }
+      out.write('"');
       out.write(this.itemsPropertyName);
       out.write("\": [\n");
     }

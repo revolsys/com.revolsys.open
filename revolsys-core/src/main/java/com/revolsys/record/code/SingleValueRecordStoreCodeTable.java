@@ -261,7 +261,6 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
             final RecordDefinition recordDefinition = this.recordStore
               .getRecordDefinition(this.typePath);
             final Query query = new Query(recordDefinition);
-            query.setFieldNames(recordDefinition.getFieldNames());
             query.addOrderBy(this.orderBy);
             try (
               RecordReader reader = this.recordStore.getRecords(query)) {

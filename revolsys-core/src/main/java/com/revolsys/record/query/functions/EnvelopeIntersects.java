@@ -12,6 +12,7 @@ import com.revolsys.record.query.AbstractBinaryQueryValue;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
+import com.revolsys.record.query.TableReference;
 import com.revolsys.record.schema.RecordStore;
 
 public class EnvelopeIntersects extends AbstractBinaryQueryValue implements Condition, Function {
@@ -35,8 +36,12 @@ public class EnvelopeIntersects extends AbstractBinaryQueryValue implements Cond
 
   @Override
   public EnvelopeIntersects clone() {
-    final EnvelopeIntersects clone = (EnvelopeIntersects)super.clone();
-    return clone;
+    return (EnvelopeIntersects)super.clone();
+  }
+
+  @Override
+  public EnvelopeIntersects clone(final TableReference oldTable, final TableReference newTable) {
+    return (EnvelopeIntersects)super.clone(oldTable, newTable);
   }
 
   @Override

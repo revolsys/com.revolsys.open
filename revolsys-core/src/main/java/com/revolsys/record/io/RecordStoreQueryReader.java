@@ -15,7 +15,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.SqlCondition;
 import com.revolsys.record.query.functions.F;
-import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
@@ -90,8 +89,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record> implements Re
         query.and(new SqlCondition(this.whereClause));
       }
       if (this.boundingBox != null) {
-        final FieldDefinition geometryField = query.getRecordDefinition().getGeometryField();
-        query.and(F.envelopeIntersects(geometryField, this.boundingBox));
+        F.envelopeIntersects(query, this.boundingBox);
       }
 
       final AbstractIterator<Record> iterator = this.recordStore.newIterator(query,

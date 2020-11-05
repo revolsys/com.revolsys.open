@@ -35,6 +35,11 @@ public class BinaryCondition extends AbstractBinaryQueryValue implements Conditi
   }
 
   @Override
+  public BinaryCondition clone(final TableReference oldTable, final TableReference newTable) {
+    return (BinaryCondition)super.clone(oldTable, newTable);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     if (obj instanceof BinaryCondition) {
       final BinaryCondition condition = (BinaryCondition)obj;

@@ -1,6 +1,9 @@
 package com.revolsys.record.query;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,6 +14,9 @@ import org.jeometry.common.data.type.DataTypes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
+import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
+import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.record.Record;
 import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.query.functions.WithinDistance;
@@ -22,28 +28,30 @@ import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
 public interface QueryValue extends Cloneable {
-  static <V extends QueryValue> List<V> cloneQueryValues(final List<V> values) {
+  static <V extends QueryValue> List<V> cloneQueryValues(final TableReference oldTable,
+    final TableReference newTable, final List<V> values) {
     final List<V> clonedValues = new ArrayList<>();
     for (final QueryValue value : values) {
       if (value == null) {
         clonedValues.add(null);
       } else {
         @SuppressWarnings("unchecked")
-        final V clonedValue = (V)value.clone();
+        final V clonedValue = (V)value.clone(oldTable, newTable);
         clonedValues.add(clonedValue);
       }
     }
     return clonedValues;
   }
 
-  static QueryValue[] cloneQueryValues(final QueryValue[] oldValues) {
+  static QueryValue[] cloneQueryValues(final TableReference oldTable, final TableReference newTable,
+    final QueryValue[] oldValues) {
     if (oldValues == null || oldValues.length == 0) {
       return oldValues;
     } else {
       final QueryValue[] clonedValues = new QueryValue[oldValues.length];
       for (int i = 0; i < oldValues.length; i++) {
         final QueryValue value = oldValues[i];
-        clonedValues[i] = value.clone();
+        clonedValues[i] = value.clone(oldTable, newTable);
       }
       return clonedValues;
     }
@@ -102,10 +110,31 @@ public interface QueryValue extends Cloneable {
     }
   }
 
+  default JdbcFieldDefinition addField(final AbstractJdbcRecordStore recordStore,
+    final JdbcRecordDefinition recordDefinition, final ResultSetMetaData metaData,
+    final ColumnIndexes columnIndexes) throws SQLException {
+    final int columnIndex = columnIndexes.incrementAndGet();
+    return recordStore.addField(recordDefinition, metaData, columnIndex);
+  }
+
+  default void appendDefaultSelect(final Query query, final RecordStore recordStore,
+    final Appendable sql) {
+    appendDefaultSql(query, recordStore, (StringBuilder)sql);
+  }
+
   void appendDefaultSql(Query query, RecordStore recordStore, StringBuilder sql);
 
   // TODO wrap in a more generic structure
   int appendParameters(int index, PreparedStatement statement);
+
+  default void appendSelect(final Query query, final RecordStore recordStore,
+    final Appendable sql) {
+    if (recordStore == null) {
+      appendDefaultSelect(query, null, sql);
+    } else {
+      recordStore.appendSelect(query, sql, this);
+    }
+  }
 
   default void appendSql(final Query query, final RecordStore recordStore,
     final StringBuilder sql) {
@@ -116,7 +145,22 @@ public interface QueryValue extends Cloneable {
     }
   }
 
-  QueryValue clone();
+  default void changeRecordDefinition(final RecordDefinition oldRecordDefinition,
+    final RecordDefinition newRecordDefinition) {
+    if (newRecordDefinition != null) {
+      for (final QueryValue queryValue : getQueryValues()) {
+        if (queryValue != null) {
+          queryValue.changeRecordDefinition(oldRecordDefinition, newRecordDefinition);
+        }
+      }
+    }
+  }
+
+  QueryValue clone(TableReference oldTable, TableReference newTable);
+
+  default int getFieldIndex() {
+    return -1;
+  }
 
   default List<QueryValue> getQueryValues() {
     return Collections.emptyList();
@@ -134,15 +178,12 @@ public interface QueryValue extends Cloneable {
     return dataType.toObject(value);
   }
 
-  default void setFieldDefinition(final FieldDefinition fieldDefinition) {
+  default Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
+    final boolean internStrings) throws SQLException {
+    throw new UnsupportedOperationException("getValueFromResultSet not implemented");
   }
 
-  default void setRecordDefinition(final RecordDefinition recordDefinition) {
-    for (final QueryValue queryValue : getQueryValues()) {
-      if (queryValue != null) {
-        queryValue.setRecordDefinition(recordDefinition);
-      }
-    }
+  default void setFieldDefinition(final FieldDefinition fieldDefinition) {
   }
 
   default String toFormattedString() {
@@ -151,7 +192,7 @@ public interface QueryValue extends Cloneable {
 
   @SuppressWarnings("unchecked")
   default <QV extends QueryValue> QV updateQueryValues(
-    final java.util.function.Function<QueryValue, QueryValue> valueHandler) {
+    TableReference oldTable, TableReference newTable, final java.util.function.Function<QueryValue, QueryValue> valueHandler) {
     return (QV)this;
   }
 

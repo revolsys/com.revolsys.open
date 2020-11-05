@@ -27,6 +27,11 @@ public class RightUnaryCondition extends AbstractUnaryQueryValue implements Cond
   }
 
   @Override
+  public RightUnaryCondition clone(final TableReference oldTable, final TableReference newTable) {
+    return (RightUnaryCondition)super.clone(oldTable, newTable);
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     if (obj instanceof RightUnaryCondition) {
       final RightUnaryCondition condition = (RightUnaryCondition)obj;

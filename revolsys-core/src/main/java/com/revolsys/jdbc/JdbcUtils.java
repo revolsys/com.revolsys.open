@@ -41,86 +41,35 @@ import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Join;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
-import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.query.TableReference;
 import com.revolsys.record.schema.LockMode;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
 public final class JdbcUtils {
-  public static void addColumnNames(final StringBuilder sql,
-    final RecordDefinition recordDefinition, final String tablePrefix) {
-    for (int i = 0; i < recordDefinition.getFieldCount(); i++) {
-      if (i > 0) {
-        sql.append(", ");
-      }
-      final FieldDefinition fieldDefinition = recordDefinition.getField(i);
-      addSelectColumnName(sql, tablePrefix, fieldDefinition);
-    }
-  }
 
-  public static void addColumnNames(final StringBuilder sql,
-    final RecordDefinition recordDefinition, final String tablePrefix,
-    final List<String> fieldNames, boolean hasColumns) {
-    for (final String fieldName : fieldNames) {
-      if (hasColumns) {
-        sql.append(", ");
-      }
-      final FieldDefinition attribute = recordDefinition.getField(fieldName);
-      if (attribute == null) {
-        sql.append(fieldName);
-      } else {
-        addSelectColumnName(sql, tablePrefix, attribute);
-      }
-      hasColumns = true;
-    }
-  }
-
-  public static void addOrderBy(final StringBuilder sql, final RecordDefinition recordDefinition,
-    final Map<? extends CharSequence, Boolean> orderBy) {
+  public static void addOrderBy(final Query query, final StringBuilder sql,
+    final TableReference table, final Map<QueryValue, Boolean> orderBy) {
     if (!orderBy.isEmpty()) {
       sql.append(" ORDER BY ");
-      appendOrderByFields(sql, recordDefinition, orderBy);
+      appendOrderByFields(query, sql, table, orderBy);
     }
   }
 
-  public static void addSelectColumnName(final StringBuilder sql, final String tablePrefix,
-    final FieldDefinition fieldDefinition) {
-    if (fieldDefinition instanceof JdbcFieldDefinition) {
-      final JdbcFieldDefinition jdbcFieldDefinition = (JdbcFieldDefinition)fieldDefinition;
-      jdbcFieldDefinition.appendSelectColumnName(sql, tablePrefix);
-    } else {
-      sql.append(fieldDefinition.getName());
-    }
-  }
-
-  public static StringBuilder appendOrderByFields(final StringBuilder sql,
-    final RecordDefinition recordDefinition, final Map<? extends CharSequence, Boolean> orderBy) {
+  public static StringBuilder appendOrderByFields(final Query query, final StringBuilder sql,
+    final TableReference table, final Map<QueryValue, Boolean> orderBy) {
     boolean first = true;
-    for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
+    for (final Entry<QueryValue, Boolean> entry : orderBy.entrySet()) {
       if (first) {
         first = false;
       } else {
         sql.append(", ");
       }
-      final CharSequence fieldName = entry.getKey();
-      if (fieldName instanceof FieldDefinition) {
-        final FieldDefinition fieldDefinition = (FieldDefinition)fieldName;
-        fieldDefinition.appendColumnName(sql);
-      } else {
-        boolean add = true;
-        if (recordDefinition != null) {
-          final FieldDefinition field = recordDefinition.getField(fieldName);
-          if (field != null) {
-            field.appendColumnName(sql);
-            add = false;
-          }
-        }
-        if (add) {
-          sql.append(fieldName);
-        }
-      }
+
+      final QueryValue field = entry.getKey();
+      table.appendQueryValue(query, sql, field);
+
       final Boolean ascending = entry.getValue();
       if (!ascending) {
         sql.append(" DESC");
@@ -243,15 +192,21 @@ public final class JdbcUtils {
 
   public static Connection getConnection(final DataSource dataSource) {
     try {
-      return DataSourceUtils.doGetConnection(dataSource);
+      Connection connection = DataSourceUtils.doGetConnection(dataSource);
+      if (connection.isClosed()) {
+        DataSourceUtils.doReleaseConnection(connection, dataSource);
+        connection = DataSourceUtils.doGetConnection(dataSource);
+      }
+
+      return connection;
     } catch (final SQLException e) {
       throw getException(dataSource, "Get Connection", null, e);
     }
   }
 
   public static String getDeleteSql(final Query query) {
-    final String tableName = query.getTypeName();
-    final String dbTableName = getQualifiedTableName(tableName);
+    final PathName tablePath = query.getTablePath();
+    final String dbTableName = getQualifiedTableName(tablePath);
 
     final StringBuilder sql = new StringBuilder();
     sql.append("DELETE FROM ");
@@ -325,54 +280,8 @@ public final class JdbcUtils {
     }
   }
 
-  public static String getSelectSql(final Query query) {
-    final String tableName = query.getTypeName();
-    final String dbTableName = query.getQualifiedTableName();
-
-    String sql = query.getSql();
-    final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
-    RecordDefinition recordDefinition = query.getRecordDefinition();
-    if (sql == null) {
-      if (recordDefinition == null) {
-        recordDefinition = new RecordDefinitionImpl(PathName.newPathName(tableName));
-        // throw new IllegalArgumentException("Unknown table name " +
-        // tableName);
-      }
-      final List<String> fieldNames = new ArrayList<>(query.getFieldNames());
-      if (fieldNames.isEmpty()) {
-        final List<String> recordDefinitionFieldNames = recordDefinition.getFieldNames();
-        if (recordDefinitionFieldNames.isEmpty()) {
-          fieldNames.add("T.*");
-        } else {
-          fieldNames.addAll(recordDefinitionFieldNames);
-        }
-      }
-      final String fromClause = query.getFromClause();
-      final List<Join> joins = query.getJoins();
-      final LockMode lockMode = query.getLockMode();
-      final boolean distinct = query.isDistinct();
-      sql = newSelectSql(recordDefinition, "T", distinct, fromClause, joins, fieldNames, query,
-        orderBy, lockMode);
-    } else {
-      if (sql.toUpperCase().startsWith("SELECT * FROM ")) {
-        final StringBuilder newSql = new StringBuilder("SELECT ");
-        addColumnNames(newSql, recordDefinition, dbTableName);
-        newSql.append(" FROM ");
-        newSql.append(sql.substring(14));
-        sql = newSql.toString();
-      }
-      if (!orderBy.isEmpty()) {
-        final StringBuilder buffer = new StringBuilder(sql);
-        addOrderBy(buffer, recordDefinition, orderBy);
-        sql = buffer.toString();
-      }
-    }
-    return sql;
-  }
-
   public static String getTableName(final String typePath) {
-    final String tableName = PathUtil.getName(typePath);
-    return tableName;
+    return PathUtil.getName(typePath);
   }
 
   public static void lockTable(final Connection connection, final String tableName)
@@ -386,35 +295,54 @@ public final class JdbcUtils {
     }
   }
 
-  public static String newSelectSql(final RecordDefinition recordDefinition,
-    final String tablePrefix, final boolean distinct, final String fromClause,
-    final List<Join> joins, final List<String> fieldNames, final Query query,
-    final Map<? extends CharSequence, Boolean> orderBy, final LockMode lockMode) {
+  public static String newSelectSql(final TableReference table, final String tablePrefix,
+    final boolean distinct, final String fromClause, final List<Join> joins,
+    final List<QueryValue> select, final Query query, final Map<QueryValue, Boolean> orderBy,
+    final List<QueryValue> groupBy, final LockMode lockMode) {
     final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");
     if (distinct) {
       sql.append("DISTINCT ");
     }
-    boolean hasColumns = false;
-    if (fieldNames.isEmpty() || fieldNames.remove("*")) {
-      addColumnNames(sql, recordDefinition, tablePrefix);
-      hasColumns = true;
+    if (select.isEmpty()) {
+      table.appendSelectAll(query, sql);
+    } else {
+      boolean first = true;
+      for (final QueryValue selectItem : select) {
+        if (first) {
+          first = false;
+        } else {
+          sql.append(", ");
+        }
+        table.appendSelect(query, sql, selectItem);
+      }
     }
-    addColumnNames(sql, recordDefinition, tablePrefix, fieldNames, hasColumns);
     sql.append(" FROM ");
     if (Property.hasValue(fromClause)) {
       sql.append(fromClause);
     } else {
-      final String tableName = recordDefinition.getQualifiedTableName();
-      sql.append(tableName);
-      sql.append(" ");
-      sql.append(tablePrefix);
+      table.appendNameWithAlias(sql);
     }
     for (final Join join : joins) {
       appendQueryValue(sql, query, join);
     }
     appendWhere(sql, query);
-    addOrderBy(sql, recordDefinition, orderBy);
+
+    if (groupBy != null) {
+      boolean hasGroupBy = false;
+      for (final QueryValue groupByItem : groupBy) {
+        if (hasGroupBy) {
+          sql.append(", ");
+        } else {
+          sql.append(" GROUP BY ");
+          hasGroupBy = true;
+        }
+        table.appendQueryValue(query, sql, groupByItem);
+      }
+    }
+
+    addOrderBy(query, sql, table, orderBy);
+
     lockMode.append(sql);
     return sql.toString();
   }

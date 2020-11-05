@@ -54,7 +54,7 @@ public class Value implements QueryValue {
     return newValue(JdbcFieldDefinitions.newFieldDefinition(value), value);
   }
 
-  private FieldDefinition fieldDefinition;
+  private ColumnReference column;
 
   private Object displayValue;
 
@@ -62,8 +62,15 @@ public class Value implements QueryValue {
 
   private Object queryValue;
 
+  public Value(final ColumnReference column, Object value) {
+    this.column = column;
+    value = getValue(value);
+    this.displayValue = column.toColumnType(value);
+    this.queryValue = column.toFieldValue(this.displayValue);
+  }
+
   protected Value(final FieldDefinition field, final Object value) {
-    this.fieldDefinition = field;
+    this.column = field;
     setQueryValue(value);
     this.displayValue = this.queryValue;
     setFieldDefinition(field);
@@ -93,12 +100,35 @@ public class Value implements QueryValue {
   }
 
   @Override
+  public void changeRecordDefinition(final RecordDefinition oldRecordDefinition,
+    final RecordDefinition newRecordDefinition) {
+    final String fieldName = this.column.getName();
+    if (Property.hasValue(fieldName)) {
+      final FieldDefinition field = newRecordDefinition.getField(fieldName);
+      setFieldDefinition(field);
+    }
+  }
+
+  @Override
   public Value clone() {
     try {
       return (Value)super.clone();
     } catch (final CloneNotSupportedException e) {
       return null;
     }
+  }
+
+  @Override
+  public Value clone(final TableReference oldTable, final TableReference newTable) {
+    final Value clone = clone();
+    if (oldTable != newTable && this.column.getTable() == oldTable) {
+      final String name = this.column.getName();
+      final ColumnReference newColumn = newTable.getColumn(name);
+      if (newColumn != null) {
+        setColumn(newColumn);
+      }
+    }
+    return clone;
   }
 
   public void convert(final DataType dataType) {
@@ -147,10 +177,10 @@ public class Value implements QueryValue {
   @Override
   public String getStringValue(final Record record) {
     final Object value = getValue(record);
-    if (this.fieldDefinition == null) {
+    if (this.column == null) {
       return DataTypes.toString(value);
     } else {
-      return this.fieldDefinition.toString(value);
+      return this.column.toString(value);
     }
   }
 
@@ -164,10 +194,49 @@ public class Value implements QueryValue {
     return (V)this.queryValue;
   }
 
+  private void setColumn(final ColumnReference column) {
+    this.column = column;
+    if (column != null) {
+      if (column instanceof JdbcFieldDefinition) {
+        this.jdbcField = (JdbcFieldDefinition)column;
+      } else {
+        this.jdbcField = JdbcFieldDefinitions.newFieldDefinition(this.queryValue);
+      }
+
+      CodeTable codeTable = null;
+      final TableReference table = column.getTable();
+      if (table instanceof RecordDefinition) {
+        final RecordDefinition recordDefinition = (RecordDefinition)table;
+        final String fieldName = column.getName();
+        codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
+        if (codeTable instanceof RecordDefinitionProxy) {
+          final RecordDefinitionProxy proxy = (RecordDefinitionProxy)codeTable;
+          if (proxy.getRecordDefinition() == recordDefinition) {
+            codeTable = null;
+          }
+        }
+        if (codeTable != null) {
+          final Identifier id = codeTable.getIdentifier(this.queryValue);
+          if (id == null) {
+            this.displayValue = this.queryValue;
+          } else {
+            setQueryValue(id);
+            final List<Object> values = codeTable.getValues(id);
+            if (values.size() == 1) {
+              this.displayValue = values.get(0);
+            } else {
+              this.displayValue = Strings.toString(":", values);
+            }
+          }
+        }
+      }
+    }
+  }
+
   @Override
   public void setFieldDefinition(final FieldDefinition field) {
     if (field != null) {
-      this.fieldDefinition = field;
+      this.column = field;
       if (field instanceof JdbcFieldDefinition) {
         this.jdbcField = (JdbcFieldDefinition)field;
       } else {
@@ -210,19 +279,10 @@ public class Value implements QueryValue {
     return this;
   }
 
-  @Override
-  public void setRecordDefinition(final RecordDefinition recordDefinition) {
-    final String fieldName = this.fieldDefinition.getName();
-    if (Property.hasValue(fieldName)) {
-      final FieldDefinition field = recordDefinition.getField(fieldName);
-      setFieldDefinition(field);
-    }
-  }
-
   public void setValue(Object value) {
     value = getValue(value);
-    if (this.fieldDefinition.getName() == JdbcFieldDefinitions.UNKNOWN) {
-      this.fieldDefinition = JdbcFieldDefinitions.newFieldDefinition(value);
+    if (this.column.getName() == JdbcFieldDefinitions.UNKNOWN) {
+      this.column = JdbcFieldDefinitions.newFieldDefinition(value);
     }
     setQueryValue(value);
   }

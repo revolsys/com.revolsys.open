@@ -11,6 +11,7 @@ import com.revolsys.record.query.AbstractBinaryQueryValue;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
+import com.revolsys.record.query.TableReference;
 import com.revolsys.record.schema.RecordStore;
 
 public class GeometryEqual2d extends AbstractBinaryQueryValue implements Condition, Function {
@@ -34,8 +35,12 @@ public class GeometryEqual2d extends AbstractBinaryQueryValue implements Conditi
 
   @Override
   public GeometryEqual2d clone() {
-    final GeometryEqual2d clone = (GeometryEqual2d)super.clone();
-    return clone;
+    return (GeometryEqual2d)super.clone();
+  }
+
+  @Override
+  public GeometryEqual2d clone(final TableReference oldTable, final TableReference newTable) {
+    return (GeometryEqual2d)super.clone(oldTable, newTable);
   }
 
   @Override

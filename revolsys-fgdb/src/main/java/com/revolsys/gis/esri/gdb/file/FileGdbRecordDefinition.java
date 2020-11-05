@@ -1,9 +1,11 @@
 package com.revolsys.gis.esri.gdb.file;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
@@ -35,6 +37,7 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.Index;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.record.io.format.xml.XmlProcessor;
 import com.revolsys.record.property.LengthFieldName;
+import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
 
@@ -165,6 +168,24 @@ public class FileGdbRecordDefinition extends RecordDefinitionImpl {
     }
     this.catalogPath = deTable.getCatalogPath();
     this.tableReference = recordStore.getTableReference(this, typePath, this.catalogPath);
+  }
+
+  @Override
+  public void appendSelectAll(final Query query, final Appendable sql) {
+    try {
+      boolean first = true;
+      for (final Field field : this.deTable.getFields()) {
+        final String name = field.getName();
+        if (first) {
+          first = false;
+        } else {
+          sql.append(", ");
+        }
+        sql.append(name);
+      }
+    } catch (final IOException e) {
+      Exceptions.throwUncheckedException(e);
+    }
   }
 
   @Override

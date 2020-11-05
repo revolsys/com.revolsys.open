@@ -30,7 +30,7 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.BinaryCondition;
-import com.revolsys.record.query.Column;
+import com.revolsys.record.query.ColumnReference;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.ILike;
 import com.revolsys.record.query.IsNotNull;
@@ -369,8 +369,8 @@ public class FieldFilterPanel extends JComponent implements PropertyChangeListen
             final QueryValue leftCondition = equal.getLeft();
             final QueryValue rightCondition = equal.getRight();
 
-            if (leftCondition instanceof Column && rightCondition instanceof Value) {
-              final Column column = (Column)leftCondition;
+            if (leftCondition instanceof ColumnReference && rightCondition instanceof Value) {
+              final ColumnReference column = (ColumnReference)leftCondition;
               final String searchFieldName = column.getName();
               setSearchFieldName(searchFieldName);
 
@@ -397,8 +397,8 @@ public class FieldFilterPanel extends JComponent implements PropertyChangeListen
             final QueryValue leftCondition = condition.getLeft();
             final QueryValue rightCondition = condition.getRight();
 
-            if (leftCondition instanceof Column && rightCondition instanceof Value) {
-              final Column column = (Column)leftCondition;
+            if (leftCondition instanceof ColumnReference && rightCondition instanceof Value) {
+              final ColumnReference column = (ColumnReference)leftCondition;
               final String searchFieldName = column.getName();
               setSearchFieldName(searchFieldName);
 
@@ -422,8 +422,8 @@ public class FieldFilterPanel extends JComponent implements PropertyChangeListen
             final String operator = condition.getOperator();
             if (filter instanceof IsNull || filter instanceof IsNotNull) {
               final QueryValue leftValue = condition.getValue();
-              if (leftValue instanceof Column) {
-                final Column column = (Column)leftValue;
+              if (leftValue instanceof ColumnReference) {
+                final ColumnReference column = (ColumnReference)leftValue;
                 final String searchFieldName = column.getName();
                 setSearchFieldName(searchFieldName);
 

@@ -1,5 +1,7 @@
 package com.revolsys.transaction;
 
+import java.util.function.BiFunction;
+
 import org.springframework.transaction.PlatformTransactionManager;
 
 public interface Transactionable {
@@ -12,6 +14,13 @@ public interface Transactionable {
   default Transaction newTransaction() {
     final PlatformTransactionManager transactionManager = getTransactionManager();
     return new Transaction(transactionManager, Propagation.REQUIRES_NEW);
+  }
+
+  default Transaction newTransaction(
+    final BiFunction<PlatformTransactionManager, Propagation, Transaction> constructor,
+    final Propagation propagation) {
+    final PlatformTransactionManager transactionManager = getTransactionManager();
+    return constructor.apply(transactionManager, propagation);
   }
 
   /**

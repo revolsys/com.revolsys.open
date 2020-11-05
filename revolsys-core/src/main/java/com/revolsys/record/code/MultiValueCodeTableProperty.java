@@ -275,10 +275,7 @@ public class MultiValueCodeTableProperty extends AbstractMultiValueCodeTable
         this.loading = true;
         try {
           if (this.recordStore != null) {
-            final RecordDefinition recordDefinition = this.recordStore
-              .getRecordDefinition(this.typePath);
-            final Query query = new Query(recordDefinition);
-            query.setFieldNames(recordDefinition.getFieldNames());
+            final Query query = this.recordStore.newQuery(this.typePath);
             for (final String order : this.orderBy) {
               query.addOrderBy(order);
             }

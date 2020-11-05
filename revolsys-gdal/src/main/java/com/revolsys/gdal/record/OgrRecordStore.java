@@ -16,9 +16,6 @@ import javax.annotation.PreDestroy;
 import org.gdal.ogr.DataSource;
 import org.gdal.ogr.Driver;
 import org.gdal.ogr.Feature;
-import org.gdal.ogr.FeatureDefn;
-import org.gdal.ogr.FieldDefn;
-import org.gdal.ogr.GeomFieldDefn;
 import org.gdal.ogr.Layer;
 import org.gdal.ogr.ogr;
 import org.gdal.ogr.ogrConstants;
@@ -40,7 +37,7 @@ import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.query.AbstractMultiCondition;
 import com.revolsys.record.query.BinaryCondition;
 import com.revolsys.record.query.CollectionValue;
-import com.revolsys.record.query.Column;
+import com.revolsys.record.query.ColumnReference;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.ILike;
 import com.revolsys.record.query.LeftUnaryCondition;
@@ -55,11 +52,8 @@ import com.revolsys.record.query.functions.WithinDistance;
 import com.revolsys.record.schema.AbstractRecordStore;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
-import com.revolsys.util.Property;
-import com.revolsys.util.StringBuilders;
 
 public class OgrRecordStore extends AbstractRecordStore {
 
@@ -76,8 +70,6 @@ public class OgrRecordStore extends AbstractRecordStore {
   private String driverName;
 
   private final File file;
-
-  private final Map<String, String> idFieldNames = new HashMap<>();
 
   private final Map<String, PathName> layerNameToPathMap = new HashMap<>();
 
@@ -173,8 +165,8 @@ public class OgrRecordStore extends AbstractRecordStore {
         }
         appendValue(sql, value);
       }
-    } else if (condition instanceof Column) {
-      final Column column = (Column)condition;
+    } else if (condition instanceof ColumnReference) {
+      final ColumnReference column = (ColumnReference)condition;
       final Object name = column.getName();
       sql.append(name);
     } else if (condition instanceof SqlCondition) {
@@ -314,6 +306,10 @@ public class OgrRecordStore extends AbstractRecordStore {
     return this.driverName;
   }
 
+  public File getFile() {
+    return this.file;
+  }
+
   private int getGeometryFieldType(final GeometryFactory geometryFactory,
     final FieldDefinition field) {
     int type;
@@ -343,27 +339,6 @@ public class OgrRecordStore extends AbstractRecordStore {
       type += 0x80000000;
     }
     return type;
-  }
-
-  public String getIdFieldName(final RecordDefinition recordDefinition) {
-    String path;
-    if (recordDefinition == null) {
-      path = null;
-    } else {
-      path = recordDefinition.getPath();
-    }
-
-    return getIdFieldName(path);
-  }
-
-  public String getIdFieldName(final String typePath) {
-    if (typePath != null) {
-      final String idFieldName = this.idFieldNames.get(typePath.toUpperCase());
-      if (idFieldName != null) {
-        return idFieldName;
-      }
-    }
-    return ROWID;
   }
 
   protected Layer getLayer(final String typePath) {
@@ -398,22 +373,22 @@ public class OgrRecordStore extends AbstractRecordStore {
     if (query == null) {
       return 0;
     } else {
-      String typePath = query.getTypeName();
+      PathName typePath = query.getTablePath();
       RecordDefinition recordDefinition = query.getRecordDefinition();
       if (recordDefinition == null) {
-        typePath = query.getTypeName();
+        typePath = query.getTablePath();
         recordDefinition = getRecordDefinition(typePath);
         if (recordDefinition == null) {
           return 0;
         }
       } else {
-        typePath = recordDefinition.getPath();
+        typePath = recordDefinition.getPathName();
       }
       final StringBuilder whereClause = getWhereClause(query);
 
       final StringBuilder sql = new StringBuilder();
       sql.append("SELECT COUNT(*) FROM ");
-      final String layerName = getLayerName(typePath);
+      final String layerName = getLayerName(typePath.toString());
       sql.append(layerName);
       if (whereClause.length() > 0) {
         sql.append(" WHERE ");
@@ -466,16 +441,10 @@ public class OgrRecordStore extends AbstractRecordStore {
   protected String getSql(final Query query) {
     final RecordDefinition recordDefinition = query.getRecordDefinition();
     final String typePath = recordDefinition.getPath();
-    final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
+    final Map<QueryValue, Boolean> orderBy = query.getOrderBy();
     final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");
-
-    List<String> fieldNames = query.getFieldNames();
-    if (fieldNames.isEmpty()) {
-      fieldNames = recordDefinition.getFieldNames();
-    }
-    fieldNames.remove("ROWID");
-    StringBuilders.append(sql, fieldNames);
+    query.appendSelect(sql);
     sql.append(" FROM ");
     final String layerName = getLayerName(typePath);
     sql.append(layerName);
@@ -485,20 +454,15 @@ public class OgrRecordStore extends AbstractRecordStore {
       sql.append(whereClause);
     }
     boolean first = true;
-    for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
-      final CharSequence fieldName = entry.getKey();
+    for (final Entry<QueryValue, Boolean> entry : orderBy.entrySet()) {
+      final QueryValue field = entry.getKey();
       if (first) {
         sql.append(" ORDER BY ");
         first = false;
       } else {
         sql.append(", ");
       }
-      if (fieldName instanceof FieldDefinition) {
-        final FieldDefinition field = (FieldDefinition)fieldName;
-        field.appendColumnName(sql);
-      } else {
-        sql.append(fieldName);
-      }
+      field.appendDefaultSql(query, null, sql);
       final Boolean ascending = entry.getValue();
       if (!ascending) {
         sql.append(" DESC");
@@ -531,10 +495,10 @@ public class OgrRecordStore extends AbstractRecordStore {
   @Override
   public AbstractIterator<Record> newIterator(final Query query,
     final Map<String, Object> properties) {
-    String typePath = query.getTypeName();
+    PathName typePath = query.getTablePath();
     RecordDefinition recordDefinition = query.getRecordDefinition();
     if (recordDefinition == null) {
-      typePath = query.getTypeName();
+      typePath = query.getTablePath();
       recordDefinition = getRecordDefinition(typePath);
       if (recordDefinition == null) {
         throw new IllegalArgumentException("Type name does not exist " + typePath);
@@ -542,7 +506,7 @@ public class OgrRecordStore extends AbstractRecordStore {
         query.setRecordDefinition(recordDefinition);
       }
     } else {
-      typePath = recordDefinition.getPath();
+      typePath = recordDefinition.getPathName();
     }
 
     final OgrQueryIterator iterator = new OgrQueryIterator(this, query);
@@ -568,135 +532,7 @@ public class OgrRecordStore extends AbstractRecordStore {
     if (dataSource.TestCapability(ogrConstants.ODsCCreateLayer) == false) {
       System.err.println("CreateLayer not supported by driver.");
     }
-    return newLayerRecordDefinition(schema, layer);
-  }
-
-  protected RecordDefinitionImpl newLayerRecordDefinition(final RecordStoreSchema schema,
-    final Layer layer) {
-    final String layerName = layer.GetName();
-    final PathName typePath = PathName.newPathName(layerName);
-
-    /** This primes the layer so that the fidColumn is loaded correctly. */
-    layer.GetNextFeature();
-
-    final RecordDefinitionImpl recordDefinition = new RecordDefinitionImpl(schema, typePath);
-    String idFieldName = layer.GetFIDColumn();
-    if (!Property.hasValue(idFieldName)) {
-      idFieldName = "rowid";
-    }
-    this.idFieldNames.put(typePath.getUpperPath(), idFieldName);
-    final FeatureDefn layerDefinition = layer.GetLayerDefn();
-    if (SQLITE.equals(this.driverName) || GEO_PAKCAGE.equals(this.driverName)) {
-      recordDefinition.addField(idFieldName, DataTypes.LONG, true);
-      recordDefinition.setIdFieldName(idFieldName);
-    }
-    for (int fieldIndex = 0; fieldIndex < layerDefinition.GetFieldCount(); fieldIndex++) {
-      final FieldDefn fieldDefinition = layerDefinition.GetFieldDefn(fieldIndex);
-      final String fieldName = fieldDefinition.GetName();
-      final int fieldType = fieldDefinition.GetFieldType();
-      final int fieldWidth = fieldDefinition.GetWidth();
-      final int fieldPrecision = fieldDefinition.GetPrecision();
-      DataType fieldDataType;
-      switch (fieldType) {
-        case 0:
-          fieldDataType = DataTypes.INT;
-        break;
-        case 2:
-          fieldDataType = DataTypes.DOUBLE;
-        break;
-        case 4:
-        case 6:
-          fieldDataType = DataTypes.STRING;
-        break;
-        case 9:
-          fieldDataType = DataTypes.DATE;
-        break;
-        case 11:
-          fieldDataType = DataTypes.DATE_TIME;
-        break;
-
-        default:
-          fieldDataType = DataTypes.STRING;
-          final String fieldTypeName = fieldDefinition.GetFieldTypeName(fieldType);
-          Logs.error(this,
-            "Unsupported field type " + this.file + " " + fieldName + ": " + fieldTypeName);
-        break;
-      }
-      final FieldDefinition field = new FieldDefinition(fieldName, fieldDataType, fieldWidth,
-        fieldPrecision, false);
-      recordDefinition.addField(field);
-    }
-    for (int fieldIndex = 0; fieldIndex < layerDefinition.GetGeomFieldCount(); fieldIndex++) {
-      final GeomFieldDefn fieldDefinition = layerDefinition.GetGeomFieldDefn(fieldIndex);
-      final String fieldName = fieldDefinition.GetName();
-      final int geometryFieldType = fieldDefinition.GetFieldType();
-      DataType geometryFieldDataType;
-      int axisCount = 2;
-      switch (geometryFieldType) {
-        case 1:
-          geometryFieldDataType = GeometryDataTypes.POINT;
-        break;
-        case 2:
-          geometryFieldDataType = GeometryDataTypes.LINE_STRING;
-        break;
-        case 3:
-          geometryFieldDataType = GeometryDataTypes.POLYGON;
-        break;
-        case 4:
-          geometryFieldDataType = GeometryDataTypes.MULTI_POINT;
-        break;
-        case 5:
-          geometryFieldDataType = GeometryDataTypes.MULTI_LINE_STRING;
-        break;
-        case 6:
-          geometryFieldDataType = GeometryDataTypes.MULTI_POLYGON;
-        break;
-        case 7:
-          geometryFieldDataType = GeometryDataTypes.GEOMETRY_COLLECTION;
-        break;
-        case 101:
-          geometryFieldDataType = GeometryDataTypes.LINEAR_RING;
-        break;
-        case 0x80000000 + 1:
-          geometryFieldDataType = GeometryDataTypes.POINT;
-          axisCount = 3;
-        break;
-        case 0x80000000 + 2:
-          geometryFieldDataType = GeometryDataTypes.LINE_STRING;
-          axisCount = 3;
-        break;
-        case 0x80000000 + 3:
-          geometryFieldDataType = GeometryDataTypes.POLYGON;
-          axisCount = 3;
-        break;
-        case 0x80000000 + 4:
-          geometryFieldDataType = GeometryDataTypes.MULTI_POINT;
-          axisCount = 3;
-        break;
-        case 0x80000000 + 5:
-          geometryFieldDataType = GeometryDataTypes.MULTI_LINE_STRING;
-          axisCount = 3;
-        break;
-        case 0x80000000 + 6:
-          geometryFieldDataType = GeometryDataTypes.MULTI_POLYGON;
-          axisCount = 3;
-        break;
-        case 0x80000000 + 7:
-          geometryFieldDataType = GeometryDataTypes.GEOMETRY_COLLECTION;
-          axisCount = 3;
-        break;
-
-        default:
-          geometryFieldDataType = GeometryDataTypes.GEOMETRY;
-        break;
-      }
-      final SpatialReference spatialReference = fieldDefinition.GetSpatialRef();
-      final GeometryFactory geometryFactory = Gdal.getGeometryFactory(spatialReference, axisCount);
-      final FieldDefinition field = new FieldDefinition(fieldName, geometryFieldDataType, false);
-      field.setGeometryFactory(geometryFactory);
-      recordDefinition.addField(field);
-    }
-    return recordDefinition;
+    return OgrRecordDefinition.newRecordDefinition(this, schema, layer);
   }
 
   @Override
@@ -715,7 +551,8 @@ public class OgrRecordStore extends AbstractRecordStore {
           final Layer layer = dataSource.GetLayer(layerIndex);
           if (layer != null) {
             try {
-              final RecordDefinitionImpl recordDefinition = newLayerRecordDefinition(schema, layer);
+              final OgrRecordDefinition recordDefinition = OgrRecordDefinition
+                .newRecordDefinition(this, schema, layer);
               final PathName typePath = recordDefinition.getPathName();
               final String layerName = layer.GetName();
               this.layerNameToPathMap.put(layerName.toUpperCase(), typePath);

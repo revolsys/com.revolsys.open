@@ -6,6 +6,8 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Arrays;
 
+import org.jeometry.common.io.PathName;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
@@ -39,8 +41,10 @@ public interface JdbcRecordStore extends RecordStore {
 
   JdbcConnection getJdbcConnection(boolean autoCommit);
 
-  JdbcRecordDefinition getRecordDefinition(String tableName, ResultSetMetaData resultSetMetaData,
+  JdbcRecordDefinition getRecordDefinition(PathName tablePath, ResultSetMetaData resultSetMetaData,
     String dbTableName);
+
+  JdbcRecordDefinition getRecordDefinition(Query query, ResultSetMetaData resultSetMetaData);
 
   default ResultSet getResultSet(final PreparedStatement statement, final Query query)
     throws SQLException {

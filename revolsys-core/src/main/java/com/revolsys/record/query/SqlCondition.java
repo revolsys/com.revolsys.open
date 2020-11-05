@@ -99,6 +99,11 @@ public class SqlCondition implements Condition {
   }
 
   @Override
+  public SqlCondition clone(final TableReference oldTable, final TableReference newTable) {
+    return clone();
+  }
+
+  @Override
   public boolean equals(final Object obj) {
     if (obj instanceof SqlCondition) {
       final SqlCondition sqlCondition = (SqlCondition)obj;

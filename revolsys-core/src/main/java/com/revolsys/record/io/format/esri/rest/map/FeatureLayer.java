@@ -26,6 +26,7 @@ import com.revolsys.record.io.format.esri.rest.CatalogElement;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
@@ -262,10 +263,10 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
       }
 
       // ORDER BY
-      final Map<? extends CharSequence, Boolean> orderBy = query.getOrderBy();
+      final Map<QueryValue, Boolean> orderBy = query.getOrderBy();
       if (Property.hasValue(orderBy)) {
         final String orderByFields = JdbcUtils
-          .appendOrderByFields(new StringBuilder(), this.recordDefinition, orderBy)
+          .appendOrderByFields(query, new StringBuilder(), this.recordDefinition, orderBy)
           .toString();
         parameters.put("orderByFields", orderByFields);
       }

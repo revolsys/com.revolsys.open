@@ -51,7 +51,11 @@ import com.revolsys.record.io.RecordStoreExtension;
 import com.revolsys.record.io.RecordStoreQueryReader;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.property.GlobalIdProperty;
+import com.revolsys.record.query.ColumnIndexes;
+import com.revolsys.record.query.Count;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.query.QueryValue;
+import com.revolsys.record.query.TableReference;
 import com.revolsys.record.schema.AbstractRecordStore;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -158,6 +162,18 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     addExcludeTablePaths(tableName);
   }
 
+  public JdbcFieldDefinition addField(final JdbcRecordDefinition recordDefinition,
+    final ResultSetMetaData resultSetMetaData, final int columnIndex) throws SQLException {
+    final String columnName = resultSetMetaData.getColumnName(columnIndex);
+    final String fieldName = toUpperIfNeeded(columnName);
+    final String dataType = resultSetMetaData.getColumnTypeName(columnIndex);
+    final int sqlType = resultSetMetaData.getColumnType(columnIndex);
+    final int length = resultSetMetaData.getPrecision(columnIndex);
+    final int scale = resultSetMetaData.getScale(columnIndex);
+    return addField(recordDefinition, columnName, fieldName, dataType, sqlType, length, scale,
+      false, null);
+  }
+
   protected JdbcFieldDefinition addField(final JdbcRecordDefinition recordDefinition,
     final String dbColumnName, final String name, final String dataType, final int sqlType,
     final int length, final int scale, final boolean required, final String description) {
@@ -245,11 +261,11 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   @Override
   public int deleteRecords(final Query query) {
-    final String typeName = query.getTypeName();
+    final PathName tablePath = query.getTablePath();
     RecordDefinition recordDefinition = query.getRecordDefinition();
     if (recordDefinition == null) {
-      if (typeName != null) {
-        recordDefinition = getRecordDefinition(typeName);
+      if (tablePath != null) {
+        recordDefinition = getRecordDefinition(tablePath);
         query.setRecordDefinition(recordDefinition);
       }
     }
@@ -378,11 +394,12 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     if (query == null) {
       return 0;
     } else {
-      query = query.clone();
+      final TableReference table = query.getTable();
+      query = query.clone(table, table);
       query.setSql(null);
-      query.setFieldNames("count(*)");
+      query.setSelect(new Count("*"));
       query.clearOrderBy();
-      final String sql = JdbcUtils.getSelectSql(query);
+      final String sql = query.getSelectSql();
       try (
         JdbcConnection connection = getJdbcConnection()) {
         try (
@@ -408,10 +425,10 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   }
 
   @Override
-  public JdbcRecordDefinition getRecordDefinition(String typePath,
+  public JdbcRecordDefinition getRecordDefinition(PathName typePath,
     final ResultSetMetaData resultSetMetaData, final String dbTableName) {
     if (Property.isEmpty(typePath)) {
-      typePath = "Record";
+      typePath = PathName.newPathName("/Record");
     }
 
     try {
@@ -437,6 +454,48 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       return resultRecordDefinition;
     } catch (final SQLException e) {
       throw new IllegalArgumentException("Unable to load metadata for " + typePath);
+    }
+  }
+
+  @Override
+  public JdbcRecordDefinition getRecordDefinition(final Query query,
+    final ResultSetMetaData resultSetMetaData) {
+    PathName tablePath = query.getTablePath();
+    if (Property.isEmpty(tablePath)) {
+      tablePath = PathName.newPathName("/Record");
+    }
+
+    final RecordDefinition recordDefinition = query.getRecordDefinition();
+    try {
+      final PathName schemaName = tablePath.getParent();
+      final JdbcRecordStoreSchema schema = getSchema(schemaName);
+      final String dbTableName = recordDefinition.getDbTableName();
+      final JdbcRecordDefinition resultRecordDefinition = newRecordDefinition(schema, tablePath,
+        dbTableName);
+
+      final ColumnIndexes columnIndexes = new ColumnIndexes();
+      List<? extends QueryValue> selectExpressions = query.getSelectExpressions();
+      if (selectExpressions.isEmpty()) {
+        selectExpressions = recordDefinition.getFieldDefinitions();
+      }
+      for (final QueryValue expression : selectExpressions) {
+        final FieldDefinition newField = expression.addField(this, resultRecordDefinition,
+          resultSetMetaData, columnIndexes);
+        if (expression instanceof JdbcFieldDefinition) {
+          final JdbcFieldDefinition field = (JdbcFieldDefinition)expression;
+          if (field.getRecordDefinition() == recordDefinition
+            && recordDefinition.isIdField(field)) {
+            final String name = newField.getName();
+            resultRecordDefinition.setIdFieldName(name);
+          }
+        }
+      }
+
+      addRecordDefinitionProperties(resultRecordDefinition);
+
+      return resultRecordDefinition;
+    } catch (final SQLException e) {
+      throw new IllegalArgumentException("Unable to load metadata for " + tablePath);
     }
   }
 

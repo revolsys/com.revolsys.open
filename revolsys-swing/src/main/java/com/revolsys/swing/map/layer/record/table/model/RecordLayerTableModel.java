@@ -31,6 +31,7 @@ import com.revolsys.record.Records;
 import com.revolsys.record.io.format.json.JsonType;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.query.TableReference;
 import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.FieldDefinition;
@@ -144,9 +145,8 @@ public class RecordLayerTableModel extends RecordRowTableModel
   }
 
   protected void addIdFieldNames(final Query query) {
-    for (final String fieldName : getRecordDefinition().getIdFieldNames()) {
-      query.addFieldName(fieldName);
-    }
+    final List<String> idFieldNames = getRecordDefinition().getIdFieldNames();
+    query.select(idFieldNames);
   }
 
   public <V extends Record> RunnableAction addMenuItem(final String groupName,
@@ -195,12 +195,13 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
   public void forEachColumnValue(final Cancellable cancellable, final int columnIndex,
     final Consumer<Object> action) {
+    final FieldDefinition field = getColumnFieldDefinition(columnIndex);
     final String fieldName = getColumnFieldName(columnIndex);
     final TableRecordsMode tableRecordsMode = getTableRecordsMode();
     if (tableRecordsMode != null && fieldName != null) {
       final Query query = getFilterQuery().clone();
       addIdFieldNames(query);
-      query.addFieldName(fieldName);
+      query.select(field);
       try (
         BaseCloseable eventsDisabled = this.layer.eventsDisabled()) {
         query.setCancellable(cancellable);
@@ -757,6 +758,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
         .clone() //
         .and(filter);
     }
+    final TableReference table = query.getTable();
     if (this.filterByBoundingBox) {
       final FieldDefinition geometryField = layer.getGeometryField();
       if (geometryField != null) {
@@ -766,7 +768,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
           final EnvelopeIntersects envelopeIntersects = F.envelopeIntersects(geometryField,
             viewBoundingBox);
           if (query == layerQuery) {
-            query = query.clone();
+            query = query.clone(table, table);
           }
           query.and(envelopeIntersects);
         }
@@ -774,7 +776,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
     }
     if (this.orderBy != null && !this.orderBy.isEmpty()) {
       if (query == layerQuery) {
-        query = query.clone();
+        query = query.clone(table, table);
       }
       query.setOrderBy(this.orderBy);
     }

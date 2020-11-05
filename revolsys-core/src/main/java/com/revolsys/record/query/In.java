@@ -12,13 +12,13 @@ import com.revolsys.record.schema.RecordStore;
 public class In extends AbstractBinaryQueryValue implements Condition {
 
   public In(final FieldDefinition field, final Collection<? extends Object> values) {
-    this(new Column(field), new CollectionValue(field, values));
+    this(field, new CollectionValue(field, values));
   }
 
   public In(final QueryValue left, final CollectionValue values) {
     super(left, values);
-    if (left instanceof Column) {
-      final Column column = (Column)left;
+    if (left instanceof ColumnReference) {
+      final ColumnReference column = (ColumnReference)left;
       final FieldDefinition field = column.getFieldDefinition();
       if (field != null) {
         values.setFieldDefinition(field);
@@ -50,6 +50,11 @@ public class In extends AbstractBinaryQueryValue implements Condition {
   public In clone() {
     final In clone = (In)super.clone();
     return clone;
+  }
+
+  @Override
+  public In clone(final TableReference oldTable, final TableReference newTable) {
+    return (In)super.clone(oldTable, newTable);
   }
 
   @Override
