@@ -22,6 +22,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -161,7 +162,7 @@ public interface Paths {
     }
   }
 
-  public static boolean deleteFiles(final Path path, final String glob) {
+  static boolean deleteFiles(final Path path, final String glob) {
     boolean success = true;
     try (
       DirectoryStream<Path> newDirectoryStream = Files.newDirectoryStream(path, glob)) {
@@ -404,6 +405,14 @@ public interface Paths {
       return new java.sql.Date(Files.getLastModifiedTime(path).toMillis());
     } catch (final IOException e) {
       return new java.sql.Date(0);
+    }
+  }
+
+  static Timestamp lastModifiedTimestamp(final Path path) {
+    try {
+      return new Timestamp(Files.getLastModifiedTime(path).toMillis());
+    } catch (final IOException e) {
+      return new Timestamp(0);
     }
   }
 

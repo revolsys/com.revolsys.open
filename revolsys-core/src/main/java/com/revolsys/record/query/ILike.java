@@ -2,7 +2,7 @@ package com.revolsys.record.query;
 
 import org.jeometry.common.data.type.DataType;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.util.Property;
 
 public class ILike extends BinaryCondition {
@@ -17,7 +17,7 @@ public class ILike extends BinaryCondition {
   }
 
   @Override
-  public boolean test(final Record record) {
+  public boolean test(final MapEx record) {
     final QueryValue left = getLeft();
     String value1 = left.getStringValue(record);
 

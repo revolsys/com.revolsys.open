@@ -2,7 +2,7 @@ package com.revolsys.record.query;
 
 import java.sql.PreparedStatement;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.FieldDefinition;
 
 public interface ColumnReference extends QueryValue {
@@ -28,13 +28,13 @@ public interface ColumnReference extends QueryValue {
   String getName();
 
   @Override
-  String getStringValue(final Record record);
+  String getStringValue(final MapEx record);
 
   TableReference getTable();
 
   @Override
   @SuppressWarnings("unchecked")
-  default <V> V getValue(final Record record) {
+  default <V> V getValue(final MapEx record) {
     if (record == null) {
       return null;
     } else {

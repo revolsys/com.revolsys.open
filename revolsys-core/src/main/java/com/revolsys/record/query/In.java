@@ -5,7 +5,7 @@ import java.util.Collection;
 
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
 
@@ -76,7 +76,7 @@ public class In extends AbstractBinaryQueryValue implements Condition {
   }
 
   @Override
-  public boolean test(final Record record) {
+  public boolean test(final MapEx record) {
     final QueryValue left = getLeft();
     final Object value = left.getValue(record);
 

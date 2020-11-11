@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.jeometry.common.data.type.DataTypes;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.record.Record;
 import com.revolsys.record.query.AbstractBinaryQueryValue;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
@@ -53,7 +53,7 @@ public class EnvelopeIntersects extends AbstractBinaryQueryValue implements Cond
     return false;
   }
 
-  private BoundingBox getBoundingBox(final QueryValue queryValue, final Record record) {
+  private BoundingBox getBoundingBox(final QueryValue queryValue, final MapEx record) {
     if (queryValue == null) {
       return null;
     } else {
@@ -93,7 +93,7 @@ public class EnvelopeIntersects extends AbstractBinaryQueryValue implements Cond
   }
 
   @Override
-  public boolean test(final Record record) {
+  public boolean test(final MapEx record) {
     final QueryValue left = getLeft();
     final BoundingBox boundingBox1 = getBoundingBox(left, record);
     final QueryValue right = getRight();

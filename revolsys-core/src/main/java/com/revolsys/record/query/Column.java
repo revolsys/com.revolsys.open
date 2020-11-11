@@ -9,7 +9,7 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
 
@@ -129,7 +129,7 @@ public class Column implements QueryValue, ColumnReference {
   }
 
   @Override
-  public String getStringValue(final Record record) {
+  public String getStringValue(final MapEx record) {
     final Object value = getValue(record);
     if (this.fieldDefinition == null) {
       return DataTypes.toString(value);
@@ -145,7 +145,7 @@ public class Column implements QueryValue, ColumnReference {
 
   @Override
   @SuppressWarnings("unchecked")
-  public <V> V getValue(final Record record) {
+  public <V> V getValue(final MapEx record) {
     if (record == null) {
       return null;
     } else {

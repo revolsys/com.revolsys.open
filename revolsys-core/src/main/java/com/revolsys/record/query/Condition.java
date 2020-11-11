@@ -2,11 +2,11 @@ package com.revolsys.record.query;
 
 import java.util.function.Predicate;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
 
-public interface Condition extends QueryValue, Predicate<Record>, Emptyable {
+public interface Condition extends QueryValue, Predicate<MapEx>, Emptyable {
 
   AcceptAllCondition ALL = new AcceptAllCondition();
 
@@ -27,7 +27,7 @@ public interface Condition extends QueryValue, Predicate<Record>, Emptyable {
 
   @SuppressWarnings("unchecked")
   @Override
-  default <V> V getValue(final Record record) {
+  default <V> V getValue(final MapEx record) {
     final Boolean value = test(record);
     return (V)value;
   }
@@ -56,7 +56,7 @@ public interface Condition extends QueryValue, Predicate<Record>, Emptyable {
   }
 
   @Override
-  default boolean test(final Record record) {
+  default boolean test(final MapEx record) {
     throw new UnsupportedOperationException("Cannot filter using " + toString());
   }
 

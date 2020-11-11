@@ -3,7 +3,7 @@ package com.revolsys.record.query.functions;
 import java.sql.PreparedStatement;
 import java.util.List;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Query;
@@ -65,7 +65,7 @@ public class JsonValue extends SimpleFunction {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V> V getValue(final Record record) {
+  public <V> V getValue(final MapEx record) {
 
     final JsonObject value = getParameterValue(0, record, Json.JSON_OBJECT);
     final String path = getParameterStringValue(1, record);

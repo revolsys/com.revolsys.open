@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
 
@@ -97,7 +97,7 @@ public class Join implements QueryValue {
   }
 
   @Override
-  public <V> V getValue(final Record record) {
+  public <V> V getValue(final MapEx record) {
     return null;
   }
 
