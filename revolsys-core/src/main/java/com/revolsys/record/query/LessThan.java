@@ -2,7 +2,7 @@ package com.revolsys.record.query;
 
 import org.jeometry.common.compare.CompareUtil;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 
 public class LessThan extends BinaryCondition {
 
@@ -16,7 +16,7 @@ public class LessThan extends BinaryCondition {
   }
 
   @Override
-  public boolean test(final Record record) {
+  public boolean test(final MapEx record) {
     final QueryValue left = getLeft();
     final Object value1 = left.getValue(record);
 

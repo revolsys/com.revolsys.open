@@ -11,13 +11,13 @@ import java.util.List;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
-import com.revolsys.record.Record;
 import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.query.functions.WithinDistance;
 import com.revolsys.record.query.parser.JSqlParser;
@@ -166,14 +166,14 @@ public interface QueryValue extends Cloneable {
     return Collections.emptyList();
   }
 
-  default String getStringValue(final Record record) {
+  default String getStringValue(final MapEx record) {
     final Object value = getValue(record);
     return DataTypes.toString(value);
   }
 
-  <V> V getValue(Record record);
+  <V> V getValue(MapEx record);
 
-  default <V> V getValue(final Record record, final DataType dataType) {
+  default <V> V getValue(final MapEx record, final DataType dataType) {
     final Object value = getValue(record);
     return dataType.toObject(value);
   }
@@ -191,8 +191,9 @@ public interface QueryValue extends Cloneable {
   }
 
   @SuppressWarnings("unchecked")
-  default <QV extends QueryValue> QV updateQueryValues(
-    TableReference oldTable, TableReference newTable, final java.util.function.Function<QueryValue, QueryValue> valueHandler) {
+  default <QV extends QueryValue> QV updateQueryValues(final TableReference oldTable,
+    final TableReference newTable,
+    final java.util.function.Function<QueryValue, QueryValue> valueHandler) {
     return (QV)this;
   }
 

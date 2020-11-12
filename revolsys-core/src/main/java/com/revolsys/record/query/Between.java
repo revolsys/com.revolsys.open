@@ -8,7 +8,7 @@ import java.util.function.Function;
 import org.jeometry.common.compare.CompareUtil;
 import org.jeometry.common.data.type.DataType;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.RecordStore;
 
 public class Between extends AbstractUnaryQueryValue implements Condition {
@@ -85,7 +85,7 @@ public class Between extends AbstractUnaryQueryValue implements Condition {
   }
 
   @Override
-  public boolean test(final Record record) {
+  public boolean test(final MapEx record) {
     final QueryValue colum = getColumn();
     final Object columnValue = colum.getValue(record);
     if (columnValue == null) {
@@ -114,8 +114,8 @@ public class Between extends AbstractUnaryQueryValue implements Condition {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <QV extends QueryValue> QV updateQueryValues(
-    TableReference oldTable, TableReference newTable, final Function<QueryValue, QueryValue> valueHandler) {
+  public <QV extends QueryValue> QV updateQueryValues(final TableReference oldTable,
+    final TableReference newTable, final Function<QueryValue, QueryValue> valueHandler) {
     Between between = super.updateQueryValues(oldTable, newTable, valueHandler);
     final Value min = (Value)valueHandler.apply(this.min);
     final Value max = (Value)valueHandler.apply(this.max);

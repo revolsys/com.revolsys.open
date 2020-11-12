@@ -9,9 +9,9 @@ import java.util.List;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.Exceptions;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.field.JdbcFieldDefinitions;
-import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
@@ -135,7 +135,7 @@ public class CollectionValue extends AbstractMultiQueryValue {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V> V getValue(final Record record) {
+  public <V> V getValue(final MapEx record) {
     final List<Object> values = new ArrayList<>();
     for (final QueryValue queryValue : this.values) {
       final Object value = queryValue.getValue(record);

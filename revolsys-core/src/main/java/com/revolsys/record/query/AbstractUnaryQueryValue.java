@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 import org.jeometry.common.data.type.DataType;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.RecordStore;
 
 public abstract class AbstractUnaryQueryValue implements QueryValue {
@@ -79,7 +79,7 @@ public abstract class AbstractUnaryQueryValue implements QueryValue {
   }
 
   @Override
-  public String getStringValue(final Record record) {
+  public String getStringValue(final MapEx record) {
     return this.value.getStringValue(record);
   }
 
@@ -89,7 +89,7 @@ public abstract class AbstractUnaryQueryValue implements QueryValue {
   }
 
   @Override
-  public <V> V getValue(final Record record) {
+  public <V> V getValue(final MapEx record) {
     return this.value.getValue(record);
   }
 

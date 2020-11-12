@@ -13,9 +13,9 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.date.Dates;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.field.JdbcFieldDefinitions;
-import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -175,7 +175,7 @@ public class Value implements QueryValue {
   }
 
   @Override
-  public String getStringValue(final Record record) {
+  public String getStringValue(final MapEx record) {
     final Object value = getValue(record);
     if (this.column == null) {
       return DataTypes.toString(value);
@@ -190,7 +190,7 @@ public class Value implements QueryValue {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V> V getValue(final Record record) {
+  public <V> V getValue(final MapEx record) {
     return (V)this.queryValue;
   }
 

@@ -34,6 +34,73 @@ public interface Strings {
     + "\u0150\u0170"//
   ;
 
+  static String cleanString(final String text) {
+    if (text == null) {
+      return "";
+    } else {
+      int startIndex = 0;
+      final int length = text.length();
+      int endIndex = length;
+      for (; startIndex < length && Character.isWhitespace(text.charAt(startIndex)); startIndex++) {
+      }
+      for (; endIndex > startIndex
+        && Character.isWhitespace(text.charAt(endIndex - 1)); endIndex--) {
+      }
+      if (startIndex == endIndex) {
+        return "";
+      } else {
+        StringBuilder result = null;
+        if (startIndex > 0) {
+          result = new StringBuilder();
+        } else if (endIndex < length) {
+          result = new StringBuilder();
+        }
+        for (int i = startIndex; i < endIndex; i++) {
+          final char c = text.charAt(i);
+          char replaceC = c;
+          switch (c) {
+            case '’':
+            case '‘':
+            case '‛':
+              replaceC = '\'';
+            break;
+            case '“':
+            case '”':
+            case '‟':
+              replaceC = '"';
+            break;
+            case '‐':
+            case '‑':
+            case '‒':
+            case '–':
+            case '—':
+            case '―':
+              replaceC = '-';
+            default:
+            break;
+          }
+          if (c == replaceC) {
+            if (result != null) {
+              result.append(c);
+            }
+          } else {
+            if (result == null) {
+              result = new StringBuilder(endIndex - startIndex);
+              result.append(text, startIndex, i);
+            }
+            result.append(replaceC);
+          }
+        }
+        if (result == null) {
+          return text;
+        } else {
+          return result.toString();
+        }
+      }
+    }
+
+  }
+
   static String cleanWhitespace(final String string) {
     if (string == null) {
       return null;
@@ -597,7 +664,7 @@ public interface Strings {
     return strings;
   }
 
-  public static String toUpperCaseSansAccent(final String text) {
+  static String toUpperCaseSansAccent(final String text) {
     if (text == null) {
       return null;
     } else {

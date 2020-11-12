@@ -1,6 +1,6 @@
 package com.revolsys.record.query;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.RecordStore;
 
 public class Parenthesis extends AbstractUnaryQueryValue implements Condition {
@@ -36,7 +36,7 @@ public class Parenthesis extends AbstractUnaryQueryValue implements Condition {
   }
 
   @Override
-  public boolean test(final Record record) {
+  public boolean test(final MapEx record) {
     final QueryValue value = getValue();
     if (value instanceof Condition) {
       final Condition condition = (Condition)value;

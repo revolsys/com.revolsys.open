@@ -2,7 +2,7 @@ package com.revolsys.record.query;
 
 import java.sql.PreparedStatement;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 
@@ -57,7 +57,7 @@ public class AcceptAllCondition implements Condition {
   }
 
   @Override
-  public boolean test(final Record record) {
+  public boolean test(final MapEx record) {
     return true;
   }
 

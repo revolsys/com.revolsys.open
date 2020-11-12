@@ -143,7 +143,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       try {
         final RecordStore recordStore = getRecordStore();
         if (recordStore != null && query != null) {
-          final Predicate<Record> filter = query.getWhereCondition();
+          final Predicate<MapEx> filter = query.getWhereCondition();
           final Map<QueryValue, Boolean> orderBy = query.getOrderBy();
 
           final List<LayerRecord> changedRecords = new ArrayList<>();

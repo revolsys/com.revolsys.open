@@ -2,7 +2,7 @@ package com.revolsys.record.query;
 
 import java.util.Arrays;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 
 public class Or extends AbstractMultiCondition {
 
@@ -44,7 +44,7 @@ public class Or extends AbstractMultiCondition {
   }
 
   @Override
-  public boolean test(final Record record) {
+  public boolean test(final MapEx record) {
     final QueryValue[] values = this.values;
     if (values.length == 0) {
       return true;

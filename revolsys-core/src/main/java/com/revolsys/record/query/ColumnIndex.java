@@ -4,7 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 
@@ -53,7 +53,7 @@ public class ColumnIndex implements QueryValue {
   }
 
   @Override
-  public <V> V getValue(final Record record) {
+  public <V> V getValue(final MapEx record) {
     return null;
   }
 

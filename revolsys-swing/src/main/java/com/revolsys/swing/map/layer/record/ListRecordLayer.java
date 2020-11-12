@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.predicate.Predicates;
-import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.Records;
 import com.revolsys.record.query.Condition;
@@ -133,7 +133,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   @Override
   public int getRecordCount(final Query query) {
     synchronized (this.records) {
-      final Predicate<Record> filter = query.getWhereCondition();
+      final Predicate<MapEx> filter = query.getWhereCondition();
       return Predicates.count(this.records, filter);
     }
   }

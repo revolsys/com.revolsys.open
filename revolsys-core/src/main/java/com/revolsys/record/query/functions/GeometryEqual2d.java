@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.jeometry.common.data.type.DataTypes;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.record.Record;
 import com.revolsys.record.query.AbstractBinaryQueryValue;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
@@ -76,7 +76,7 @@ public class GeometryEqual2d extends AbstractBinaryQueryValue implements Conditi
   }
 
   @Override
-  public boolean test(final Record record) {
+  public boolean test(final MapEx record) {
     final Geometry geometry1 = getLeft().getValue(record);
     final Geometry geometry2 = getRight().getValue(record);
     if (geometry1 == null || geometry2 == null) {

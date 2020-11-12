@@ -8,8 +8,8 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.Geometry;
-import com.revolsys.record.Record;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
@@ -134,13 +134,13 @@ public class WithinDistance implements Condition, Function {
   }
 
   @Override
-  public boolean test(final Record record) {
+  public boolean test(final MapEx record) {
     if (this.geometry1Value == null || this.geometry2Value == null || this.distanceValue == null) {
       return false;
     } else {
       final Geometry geometry1 = this.geometry1Value.getValue(record);
       final Geometry geometry2 = this.geometry2Value.getValue(record);
-      ;
+
       final Number acceptDistance = this.distanceValue.getValue(record);
       if (acceptDistance == null || geometry1 == null || geometry2 == null) {
         return false;
@@ -162,8 +162,9 @@ public class WithinDistance implements Condition, Function {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <QV extends QueryValue> QV updateQueryValues(
-    TableReference oldTable, TableReference newTable, final java.util.function.Function<QueryValue, QueryValue> valueHandler) {
+  public <QV extends QueryValue> QV updateQueryValues(final TableReference oldTable,
+    final TableReference newTable,
+    final java.util.function.Function<QueryValue, QueryValue> valueHandler) {
     final QueryValue distanceValue = valueHandler.apply(this.distanceValue);
     final QueryValue geometry1Value = valueHandler.apply(this.geometry1Value);
     final QueryValue geometry2Value = valueHandler.apply(this.geometry2Value);

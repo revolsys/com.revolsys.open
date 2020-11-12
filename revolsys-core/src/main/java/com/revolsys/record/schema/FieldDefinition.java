@@ -18,6 +18,7 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.beans.ObjectPropertyException;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -540,7 +541,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
   }
 
   @Override
-  public String getStringValue(final Record record) {
+  public String getStringValue(final MapEx record) {
     final Object value = getValue(record);
     return toString(value);
   }

@@ -1,6 +1,6 @@
 package com.revolsys.record.query;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 
 public class Not extends LeftUnaryCondition {
 
@@ -22,9 +22,9 @@ public class Not extends LeftUnaryCondition {
   }
 
   @Override
-  public boolean test(final Record object) {
+  public boolean test(final MapEx record) {
     final Condition condition = getValue();
-    if (condition.test(object)) {
+    if (condition.test(record)) {
       return false;
     } else {
       return true;

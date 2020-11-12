@@ -2,7 +2,7 @@ package com.revolsys.record.query.functions;
 
 import java.util.List;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.Value;
 import com.revolsys.util.Property;
@@ -26,7 +26,7 @@ public class RegexpReplace extends SimpleFunction {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V> V getValue(final Record record) {
+  public <V> V getValue(final MapEx record) {
 
     final String text = getParameterStringValue(0, record);
     final String pattern = getParameterStringValue(1, record);

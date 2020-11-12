@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 
 public class Subtract extends BinaryArithmatic {
 
@@ -26,7 +26,7 @@ public class Subtract extends BinaryArithmatic {
   }
 
   @Override
-  public <V> V getValue(final Record record) {
+  public <V> V getValue(final MapEx record) {
     final Object leftValue = getLeft().getValue(record);
     final Object rightValue = getRight().getValue(record);
     if (leftValue instanceof Number && rightValue instanceof Number) {

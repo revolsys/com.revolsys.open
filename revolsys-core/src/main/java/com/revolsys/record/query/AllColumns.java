@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 import org.jeometry.common.data.type.DataType;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.RecordStore;
 
 public class AllColumns implements QueryValue {
@@ -64,7 +64,7 @@ public class AllColumns implements QueryValue {
   }
 
   @Override
-  public String getStringValue(final Record record) {
+  public String getStringValue(final MapEx record) {
     return null;
   }
 
@@ -77,7 +77,7 @@ public class AllColumns implements QueryValue {
   }
 
   @Override
-  public <V> V getValue(final Record record) {
+  public <V> V getValue(final MapEx record) {
     return null;
   }
 
@@ -93,8 +93,8 @@ public class AllColumns implements QueryValue {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <QV extends QueryValue> QV updateQueryValues(
-    TableReference oldTable, TableReference newTable, final Function<QueryValue, QueryValue> valueHandler) {
+  public <QV extends QueryValue> QV updateQueryValues(final TableReference oldTable,
+    final TableReference newTable, final Function<QueryValue, QueryValue> valueHandler) {
     return (QV)this;
   }
 }

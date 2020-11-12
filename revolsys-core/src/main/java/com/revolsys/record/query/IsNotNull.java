@@ -1,6 +1,6 @@
 package com.revolsys.record.query;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 
 public class IsNotNull extends RightUnaryCondition {
 
@@ -9,7 +9,7 @@ public class IsNotNull extends RightUnaryCondition {
   }
 
   @Override
-  public boolean test(final Record record) {
+  public boolean test(final MapEx record) {
     final QueryValue queryValue = getValue();
     final Object value = queryValue.getValue(record);
     return value != null;
