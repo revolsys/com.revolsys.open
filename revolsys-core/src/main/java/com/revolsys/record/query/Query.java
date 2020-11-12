@@ -15,6 +15,7 @@ import java.util.function.Predicate;
 
 import org.jeometry.common.io.PathName;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.predicate.Predicates;
@@ -384,7 +385,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
   }
 
   @SuppressWarnings("unchecked")
-  public <R extends Record> void forEachRecord(final Iterable<R> records,
+  public <R extends MapEx> void forEachRecord(final Iterable<R> records,
     final Consumer<? super R> consumer) {
     final Map<QueryValue, Boolean> orderBy = getOrderBy();
     final Predicate<R> filter = (Predicate<R>)getWhereCondition();

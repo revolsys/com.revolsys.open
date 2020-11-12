@@ -21,6 +21,7 @@ import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.comparator.StringNumberComparator;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -529,7 +530,7 @@ public interface Records {
     };
   }
 
-  static <R extends Record> Comparator<R> newComparatorOrderBy(
+  static <R extends MapEx> Comparator<R> newComparatorOrderBy(
     final Map<QueryValue, Boolean> orderBy) {
     return (record1, record2) -> {
       if (record1 == record2) {
