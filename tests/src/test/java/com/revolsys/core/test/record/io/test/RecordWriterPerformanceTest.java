@@ -101,7 +101,7 @@ public class RecordWriterPerformanceTest {
       .addField("double", DataTypes.DOUBLE) //
       .addField("string", DataTypes.STRING) //
       .addField("date", DataTypes.SQL_DATE) //
-      .addField("dateTime", DataTypes.DATE) //
+      .addField("dateTime", DataTypes.UTIL_DATE) //
       .addField("timestamp", DataTypes.TIMESTAMP) //
       .addField("geometry", geometryType) //
       .getRecordDefinition();
