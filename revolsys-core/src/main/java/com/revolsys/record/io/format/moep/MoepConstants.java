@@ -76,14 +76,14 @@ public final class MoepConstants {
     type.addField(FONT_SIZE, DataTypes.DECIMAL, false);
     type.addField(FONT_WEIGHT, DataTypes.STRING, 10, false);
     type.addField(ORIGINAL_FILE_TYPE, DataTypes.STRING, 20, false);
-    type.addField(ADMIT_SOURCE_DATE, DataTypes.DATE, false);
+    type.addField(ADMIT_SOURCE_DATE, DataTypes.SQL_DATE, false);
     type.addField(ADMIT_REASON_FOR_CHANGE, DataTypes.STRING, 1, false);
-    type.addField(ADMIT_INTEGRATION_DATE, DataTypes.DATE, false);
+    type.addField(ADMIT_INTEGRATION_DATE, DataTypes.SQL_DATE, false);
     type.addField(ADMIT_REVISION_KEY, DataTypes.STRING, 10, false);
     type.addField(ADMIT_SPECIFICATIONS_RELEASE, DataTypes.STRING, 10, false);
-    type.addField(RETIRE_SOURCE_DATE, DataTypes.DATE, false);
+    type.addField(RETIRE_SOURCE_DATE, DataTypes.SQL_DATE, false);
     type.addField(RETIRE_REASON_FOR_CHANGE, DataTypes.STRING, 1, false);
-    type.addField(RETIRE_INTEGRATION_DATE, DataTypes.DATE, false);
+    type.addField(RETIRE_INTEGRATION_DATE, DataTypes.SQL_DATE, false);
     type.addField(RETIRE_REVISION_KEY, DataTypes.STRING, 10, false);
     type.addField(RETIRE_SPECIFICATIONS_RELEASE, DataTypes.STRING, 10, false);
     type.addField(GEOMETRY, GeometryDataTypes.GEOMETRY, true);

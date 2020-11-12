@@ -206,7 +206,7 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
         return Long.MAX_VALUE;
       } else if (DataTypes.SQL_DATE.equals(fieldType)) {
         return Dates.getSqlDate("9999-12-31");
-      } else if (DataTypes.DATE.equals(fieldType)) {
+      } else if (DataTypes.UTIL_DATE.equals(fieldType)) {
         return Dates.getDate("9999-12-29 23:59:59.999");
       } else if (DataTypes.DATE_TIME.equals(fieldType)) {
         return Dates.getTimestamp("9999-12-29 23:59:59.999");

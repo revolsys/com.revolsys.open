@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.util.Property;
 
 public interface JsonObject extends MapEx, JsonType {
   JsonObject EMPTY = new JsonObject() {
@@ -89,6 +90,13 @@ public interface JsonObject extends MapEx, JsonType {
     final String sourceKey) {
     final Object value = source.get(sourceKey);
     if (value != null || containsKey(key)) {
+      addValue(key, value);
+    }
+    return this;
+  }
+
+  default JsonObject addNotEmpty(final String key, final Object value) {
+    if (Property.hasValue(value)) {
       addValue(key, value);
     }
     return this;

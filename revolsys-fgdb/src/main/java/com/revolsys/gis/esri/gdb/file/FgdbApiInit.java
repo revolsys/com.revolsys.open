@@ -25,7 +25,7 @@ class FgdbApiInit implements Runnable {
     final GeometryFactory geometryFactory = GeometryFactory.fixed3d(3005, 1000.0, 1000.0, 1000.0);
     final RecordDefinition recordDefinition = new RecordDefinitionBuilder("/test") //
       .addField(DataTypes.INT) //
-      .addField(DataTypes.DATE) //
+      .addField(DataTypes.SQL_DATE) //
       .addField("text", DataTypes.STRING, 100) //
       .addField(GeometryDataTypes.LINE_STRING) //
       .setGeometryFactory(geometryFactory) //

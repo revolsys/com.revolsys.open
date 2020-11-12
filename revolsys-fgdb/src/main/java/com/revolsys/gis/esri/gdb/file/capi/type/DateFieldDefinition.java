@@ -22,7 +22,7 @@ public class DateFieldDefinition extends AbstractFileGdbFieldDefinition {
   public static final Date MIN_DATE = new Date(70, 0, 1);
 
   public DateFieldDefinition(final int fieldNumber, final Field field) {
-    super(fieldNumber, field.getName(), DataTypes.DATE,
+    super(fieldNumber, field.getName(), DataTypes.SQL_DATE,
       Booleans.getBoolean(field.getRequired()) || !field.isIsNullable());
   }
 

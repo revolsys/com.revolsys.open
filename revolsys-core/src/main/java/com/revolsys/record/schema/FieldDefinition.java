@@ -472,7 +472,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
 
     if (Number.class.isAssignableFrom(this.type.getJavaClass())) {
       length += 1;
-    } else if (DataTypes.DATE.equals(this.type)) {
+    } else if (DataTypes.SQL_DATE.equals(this.type)) {
       return 10;
     }
     return length;
