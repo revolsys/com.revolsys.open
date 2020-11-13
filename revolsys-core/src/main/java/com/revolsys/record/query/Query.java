@@ -292,6 +292,24 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this;
   }
 
+  public Query and(final CharSequence fieldName,
+    final BiFunction<QueryValue, QueryValue, Condition> operator, final Object value) {
+    final ColumnReference left = this.table.getColumn(fieldName);
+    Condition condition;
+    if (value == null) {
+      condition = new IsNull(left);
+    } else {
+      QueryValue right;
+      if (value instanceof QueryValue) {
+        right = (QueryValue)value;
+      } else {
+        right = Value.newValue(value);
+      }
+      condition = operator.apply(left, right);
+    }
+    return and(condition);
+  }
+
   public Query and(final Condition condition) {
     if (!Property.isEmpty(condition)) {
       Condition whereCondition = getWhereCondition();
@@ -625,7 +643,25 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return sql.toString();
   }
 
-  public void or(final Condition condition) {
+  public Query or(final CharSequence fieldName,
+    final BiFunction<QueryValue, QueryValue, Condition> operator, final Object value) {
+    final ColumnReference left = this.table.getColumn(fieldName);
+    Condition condition;
+    if (value == null) {
+      condition = new IsNull(left);
+    } else {
+      QueryValue right;
+      if (value instanceof QueryValue) {
+        right = (QueryValue)value;
+      } else {
+        right = Value.newValue(value);
+      }
+      condition = operator.apply(left, right);
+    }
+    return or(condition);
+  }
+
+  public Query or(final Condition condition) {
     final Condition whereCondition = getWhereCondition();
     if (whereCondition.isEmpty()) {
       setWhereCondition(condition);
@@ -635,6 +671,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     } else {
       setWhereCondition(new Or(whereCondition, condition));
     }
+    return this;
   }
 
   public Query orderBy(final Object... orderBy) {

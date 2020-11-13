@@ -16,13 +16,13 @@ import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
 public class Q {
-  static BiFunction<QueryValue, QueryValue, Condition> ILIKE = ILike::new;
+  public static BiFunction<QueryValue, QueryValue, Condition> ILIKE = ILike::new;
 
-  static Function<QueryValue, Condition> IS_NOT_NULL = IsNotNull::new;
+  public static Function<QueryValue, Condition> IS_NOT_NULL = IsNotNull::new;
 
-  static Function<QueryValue, Condition> IS_NULL = IsNull::new;
+  public static Function<QueryValue, Condition> IS_NULL = IsNull::new;
 
-  static BiFunction<QueryValue, QueryValue, Condition> EQUAL = Equal::new;
+  public static BiFunction<QueryValue, QueryValue, Condition> EQUAL = Equal::new;
 
   public static Add add(final QueryValue left, final QueryValue right) {
     return new Add(left, right);
