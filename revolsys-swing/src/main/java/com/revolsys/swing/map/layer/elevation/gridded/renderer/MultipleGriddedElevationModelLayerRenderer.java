@@ -20,7 +20,7 @@ import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.elevation.gridded.GriddedElevationModelLayer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.BaseCloneable;
 import com.revolsys.util.Property;
 
 public class MultipleGriddedElevationModelLayerRenderer
@@ -106,7 +106,7 @@ public class MultipleGriddedElevationModelLayerRenderer
   @Override
   public MultipleGriddedElevationModelLayerRenderer clone() {
     final MultipleGriddedElevationModelLayerRenderer clone = (MultipleGriddedElevationModelLayerRenderer)super.clone();
-    clone.renderers = JavaBeanUtil.clone(this.renderers);
+    clone.renderers = BaseCloneable.clone(this.renderers);
     for (final AbstractGriddedElevationModelLayerRenderer renderer : clone.renderers) {
       renderer.setParent(clone);
     }

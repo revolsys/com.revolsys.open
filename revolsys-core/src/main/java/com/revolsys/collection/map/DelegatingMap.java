@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.BaseCloneable;
 
 public class DelegatingMap<K, V> implements Map<K, V>, Cloneable {
 
@@ -36,7 +36,7 @@ public class DelegatingMap<K, V> implements Map<K, V>, Cloneable {
     try {
       @SuppressWarnings("unchecked")
       final DelegatingMap<K, V> clone = (DelegatingMap<K, V>)super.clone();
-      clone.map = JavaBeanUtil.clone(getMap());
+      clone.map = BaseCloneable.clone(getMap());
       return clone;
     } catch (final CloneNotSupportedException e) {
       return this;

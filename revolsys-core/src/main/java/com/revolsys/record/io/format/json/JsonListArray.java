@@ -7,10 +7,6 @@ import java.util.List;
 import org.jeometry.common.data.type.DataType;
 
 public class JsonListArray extends ArrayList<Object> implements JsonList {
-
-  /**
-   *
-   */
   private static final long serialVersionUID = 1L;
 
   JsonListArray() {
@@ -32,6 +28,12 @@ public class JsonListArray extends ArrayList<Object> implements JsonList {
     for (final Object value : values) {
       add(value);
     }
+  }
+
+  @Override
+  public JsonList clone() {
+    return new JsonListArray()//
+      .addValuesClone(this);
   }
 
   @Override

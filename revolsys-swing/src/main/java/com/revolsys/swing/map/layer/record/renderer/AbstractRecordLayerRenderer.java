@@ -29,7 +29,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.map.layer.record.RecordDefinitionSqlFilter;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.BaseCloneable;
 import com.revolsys.util.Property;
 
 public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<AbstractRecordLayer>
@@ -118,7 +118,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   @Override
   public AbstractRecordLayerRenderer clone() {
     final AbstractRecordLayerRenderer clone = (AbstractRecordLayerRenderer)super.clone();
-    clone.setFilter(JavaBeanUtil.clone(this.filter));
+    clone.setFilter(BaseCloneable.clone(this.filter));
     return clone;
   }
 

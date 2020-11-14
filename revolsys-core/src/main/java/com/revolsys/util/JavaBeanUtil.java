@@ -22,14 +22,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.beanutils.MethodUtils;
 import org.jeometry.common.exception.Exceptions;
@@ -45,50 +41,6 @@ public final class JavaBeanUtil {
   public static final Class<?>[] ARRAY_CLASS_0 = new Class[0];
 
   public static final Object[] ARRAY_OBJECT_0 = new Object[0];
-
-  /**
-   * Clone the value if it has a clone method.
-   *
-   * @param value The value to clone.
-   * @return The cloned value.
-   */
-  @SuppressWarnings("unchecked")
-  public static <V> V clone(final V value) {
-    if (value == null) {
-      return null;
-    } else if (value instanceof Map) {
-      final Map<Object, Object> sourceMap = (Map<Object, Object>)value;
-      final Map<Object, Object> map = new LinkedHashMap<>(sourceMap);
-      for (final Entry<Object, Object> entry : sourceMap.entrySet()) {
-        final Object key = entry.getKey();
-        final Object mapValue = entry.getValue();
-        final Object clonedMapValue = clone(mapValue);
-        map.put(key, clonedMapValue);
-      }
-      return (V)map;
-    } else if (value instanceof List) {
-      final List<?> list = (List<?>)value;
-      final List<Object> cloneList = new ArrayList<>();
-      for (final Object object : list) {
-        final Object clonedObject = clone(object);
-        cloneList.add(clonedObject);
-      }
-      return (V)cloneList;
-    } else if (value instanceof BaseCloneable) {
-      return (V)((BaseCloneable)value).clone();
-    } else if (value instanceof Cloneable) {
-      try {
-        final Class<? extends Object> valueClass = value.getClass();
-        final Method method = valueClass.getMethod("clone", ARRAY_CLASS_0);
-        if (method != null) {
-          return (V)method.invoke(value, ARRAY_OBJECT_0);
-        }
-      } catch (final Throwable e) {
-        return Exceptions.throwUncheckedException(e);
-      }
-    }
-    return value;
-  }
 
   @SuppressWarnings("unchecked")
   public static <V> V createInstance(final String className) {

@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Property;
@@ -89,6 +90,11 @@ public abstract class AbstractRecord implements Record, Cloneable {
         }
       }
     }
+  }
+
+  @Override
+  public JsonObject toJson() {
+    return Record.super.toJson();
   }
 
   /**

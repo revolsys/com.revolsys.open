@@ -30,6 +30,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Value;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -1469,6 +1470,18 @@ public interface Record
   default int size() {
     final RecordDefinition recordDefinition = getRecordDefinition();
     return recordDefinition.getFieldCount();
+  }
+
+  default JsonObject toJson() {
+    final JsonObject json = JsonObject.hash();
+    for (int i = 0; i < getFieldCount(); i++) {
+      final Object value = getValue(i);
+      if (value != null) {
+        final String fieldName = getFieldName(i);
+        json.addValueClone(fieldName, value);
+      }
+    }
+    return json;
   }
 
   default void validateField(final FieldDefinition field) {

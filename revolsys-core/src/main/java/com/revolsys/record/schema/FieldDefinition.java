@@ -32,8 +32,8 @@ import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.record.query.ColumnReference;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.TableReference;
+import com.revolsys.util.BaseCloneable;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
@@ -753,7 +753,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
     if (record != null) {
       final int index = getIndex();
       value = toFieldValue(value);
-      value = JavaBeanUtil.clone(value);
+      value = BaseCloneable.clone(value);
       record.setValue(index, value);
     }
   }

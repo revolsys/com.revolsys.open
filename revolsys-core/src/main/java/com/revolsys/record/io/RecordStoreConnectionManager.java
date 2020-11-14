@@ -17,7 +17,7 @@ import com.revolsys.io.file.Paths;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.BaseCloneable;
 import com.revolsys.util.OS;
 import com.revolsys.util.Property;
 
@@ -67,7 +67,7 @@ public class RecordStoreConnectionManager
   public static <T extends RecordStore> T getRecordStore(
     final Map<String, ? extends Object> config) {
     @SuppressWarnings("rawtypes")
-    final Map<String, Object> configClone = (Map)JavaBeanUtil.clone(config);
+    final Map<String, Object> configClone = (Map)BaseCloneable.clone(config);
     synchronized (recordStoreByConfig) {
       RecordStore recordStore = recordStoreByConfig.get(configClone);
       if (recordStore != null && recordStore.isClosed()) {
@@ -138,7 +138,7 @@ public class RecordStoreConnectionManager
   @SuppressWarnings("unchecked")
   public static void releaseRecordStore(final Map<String, ? extends Object> config) {
     @SuppressWarnings("rawtypes")
-    final Map<String, Object> configClone = (Map)JavaBeanUtil.clone(config);
+    final Map<String, Object> configClone = (Map)BaseCloneable.clone(config);
     synchronized (recordStoreByConfig) {
       final RecordStore recordStore = recordStoreByConfig.get(configClone);
       if (recordStore != null) {

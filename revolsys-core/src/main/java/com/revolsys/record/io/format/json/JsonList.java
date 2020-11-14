@@ -1,5 +1,6 @@
 package com.revolsys.record.io.format.json;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.exception.Exceptions;
 
 public interface JsonList extends List<Object>, JsonType {
 
@@ -33,6 +35,11 @@ public interface JsonList extends List<Object>, JsonType {
 
     @Override
     public void clear() {
+    }
+
+    @Override
+    public JsonList clone() {
+      return this;
     }
 
     @Override
@@ -166,6 +173,41 @@ public interface JsonList extends List<Object>, JsonType {
     return notContains;
   }
 
+  default JsonList addValuesClone(final Collection<?> values) {
+    for (Object value : values) {
+      if (value != null) {
+        value = JsonType.toJsonClone(value);
+      }
+      add(value);
+    }
+    return this;
+  }
+
+  @Override
+  default Appendable appendJson(final Appendable appendable) {
+    try {
+      appendable.append('[');
+      boolean first = true;
+      for (final Object value : this) {
+        if (first) {
+          first = false;
+        } else {
+          appendable.append(',');
+        }
+        JsonAppender.appendValue(appendable, value);
+      }
+      appendable.append(']');
+      return appendable;
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  @Override
+  default JsonList asJson() {
+    return (JsonList)JsonType.super.asJson();
+  }
+
   default boolean contains(final Object value,
     final Collection<? extends CharSequence> excludeFieldNames) {
     final int size = size();
@@ -206,5 +248,14 @@ public interface JsonList extends List<Object>, JsonType {
   })
   default Iterable<JsonObject> jsonObjects() {
     return (Iterable)this;
+  }
+
+  @Override
+  default JsonList toJson() {
+    return (JsonList)JsonType.super.toJson();
+  }
+
+  default String toJsonString(final boolean indent) {
+    return Json.toString(this, indent);
   }
 }

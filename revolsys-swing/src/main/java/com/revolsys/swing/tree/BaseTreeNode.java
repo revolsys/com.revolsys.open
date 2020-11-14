@@ -40,8 +40,8 @@ import com.revolsys.swing.tree.dnd.TreePathListTransferable;
 import com.revolsys.swing.tree.dnd.TreeTransferHandler;
 import com.revolsys.swing.tree.node.ParentTreeNode;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
+import com.revolsys.util.BaseCloneable;
 import com.revolsys.util.IconNameProxy;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 import com.revolsys.util.ToolTipProxy;
 
@@ -513,7 +513,7 @@ public class BaseTreeNode implements TreeNode, Iterable<BaseTreeNode>, PropertyC
     Object child = getUserData(sourcePath);
     if (TreeTransferHandler.isDndCopyAction(support)) {
       if (isCopySupported(child)) {
-        child = JavaBeanUtil.clone(child);
+        child = BaseCloneable.clone(child);
         pathTransferable.addCopiedPath(sourcePath);
       } else {
         return index;

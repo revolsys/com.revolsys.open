@@ -1,9 +1,12 @@
 package com.revolsys.record.io.format.json;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.util.Property;
@@ -108,6 +111,51 @@ public interface JsonObject extends MapEx, JsonType {
     return this;
   }
 
+  default JsonObject addValueClone(final String key, Object value) {
+    value = JsonType.toJsonClone(value);
+    return addValue(key, value);
+  }
+
+  default JsonObject addValuesClone(final MapEx values) {
+    for (final String name : values.keySet()) {
+      Object value = values.getValue(name);
+      if (value != null) {
+        value = JsonType.toJsonClone(value);
+      }
+      addValue(name, value);
+    }
+    return this;
+  }
+
+  @Override
+  default Appendable appendJson(final Appendable appendable) {
+    try {
+      appendable.append('{');
+      boolean first = true;
+      for (final String key : keySet()) {
+        if (first) {
+          first = false;
+        } else {
+          appendable.append(',');
+        }
+        final Object value = get(key);
+        appendable.append('"');
+        JsonAppender.appendCharacters(appendable, key);
+        appendable.append("\":");
+        JsonAppender.appendValue(appendable, value);
+      }
+      appendable.append('}');
+      return appendable;
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  @Override
+  default JsonObject asJson() {
+    return (JsonObject)JsonType.super.asJson();
+  }
+
   @Override
   JsonObject clone();
 
@@ -149,8 +197,9 @@ public interface JsonObject extends MapEx, JsonType {
     }
   }
 
-  default String toJsonString() {
-    return Json.toString(this);
+  @Override
+  default JsonObject toJson() {
+    return (JsonObject)JsonType.super.toJson();
   }
 
   default String toJsonString(final boolean indent) {

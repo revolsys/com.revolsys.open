@@ -27,9 +27,9 @@ import com.revolsys.swing.map.layer.tile.AbstractTiledLayer;
 import com.revolsys.swing.map.layer.tile.AbstractTiledLayerRenderer;
 import com.revolsys.swing.map.view.ViewRenderer;
 import com.revolsys.swing.menu.MenuFactory;
+import com.revolsys.util.BaseCloneable;
 import com.revolsys.util.BooleanCancellable;
 import com.revolsys.util.Cancellable;
-import com.revolsys.util.JavaBeanUtil;
 import com.revolsys.util.Property;
 
 public class TiledMultipleGriddedElevationModelLayerRenderer
@@ -131,7 +131,7 @@ public class TiledMultipleGriddedElevationModelLayerRenderer
   @Override
   public TiledMultipleGriddedElevationModelLayerRenderer clone() {
     final TiledMultipleGriddedElevationModelLayerRenderer clone = (TiledMultipleGriddedElevationModelLayerRenderer)super.clone();
-    clone.renderers = JavaBeanUtil.clone(this.renderers);
+    clone.renderers = BaseCloneable.clone(this.renderers);
     for (final AbstractGriddedElevationModelLayerRenderer renderer : clone.renderers) {
       renderer.setParent(clone);
     }

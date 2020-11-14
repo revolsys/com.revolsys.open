@@ -4,7 +4,7 @@ import java.util.AbstractMap;
 import java.util.Set;
 
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.BaseCloneable;
 
 public class DelegatingRecord extends AbstractMap<String, Object> implements Record {
   private final Record record;
@@ -15,7 +15,7 @@ public class DelegatingRecord extends AbstractMap<String, Object> implements Rec
 
   @Override
   public Record clone() {
-    final Record clone = JavaBeanUtil.clone(this.record);
+    final Record clone = BaseCloneable.clone(this.record);
     return new DelegatingRecord(clone);
   }
 

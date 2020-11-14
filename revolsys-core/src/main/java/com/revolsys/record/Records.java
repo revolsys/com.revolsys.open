@@ -40,7 +40,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.util.JavaBeanUtil;
+import com.revolsys.util.BaseCloneable;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
@@ -699,7 +699,7 @@ public interface Records {
         final Object oldValue = getValue(target, fieldName);
         Object newValue = getValue(source, fieldName);
         if (!DataType.equal(oldValue, newValue)) {
-          newValue = JavaBeanUtil.clone(newValue);
+          newValue = BaseCloneable.clone(newValue);
           target.setValue(fieldName, newValue);
         }
       }
