@@ -303,7 +303,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
       if (value instanceof QueryValue) {
         right = (QueryValue)value;
       } else {
-        right = Value.newValue(value);
+        right = new Value(left, value);
       }
       condition = operator.apply(left, right);
     }
@@ -716,9 +716,10 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this;
   }
 
-  public Query select(final String name) {
-    final QueryValue selectExpression = this.table.getColumn(name);
-    return select(selectExpression);
+  public Query select(final String name, final String alias) {
+    final ColumnReference column = this.table.getColumn(name);
+    final ColumnAlias columnAlias = new ColumnAlias(column, alias);
+    return select(columnAlias);
   }
 
   public Query select(final TableReference table, final String fieldName) {
