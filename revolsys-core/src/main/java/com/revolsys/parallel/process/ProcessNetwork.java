@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import javax.annotation.PostConstruct;
@@ -25,19 +24,18 @@ public class ProcessNetwork {
 
   private static ThreadLocal<ProcessNetwork> PROCESS_NETWORK = new ThreadLocal<>();
 
-  public static <V> void forEach(final int processCount, final List<V> values,
+  public static <V> void forEach(final int processCount, final Iterable<V> values,
     final Consumer<V> action) {
-    if (!values.isEmpty()) {
-      final AtomicInteger index = new AtomicInteger();
+    final Iterator<V> iterator = values.iterator();
+    if (iterator.hasNext()) {
       final ProcessNetwork processNetwork = new ProcessNetwork();
       for (int i = 0; i < processCount; i++) {
         processNetwork.addProcess(() -> {
           while (true) {
             V value;
-            synchronized (index) {
-              final int valueIndex = index.incrementAndGet();
-              if (valueIndex < values.size()) {
-                value = values.get(valueIndex);
+            synchronized (values) {
+              if (iterator.hasNext()) {
+                value = iterator.next();
               } else {
                 return;
               }
