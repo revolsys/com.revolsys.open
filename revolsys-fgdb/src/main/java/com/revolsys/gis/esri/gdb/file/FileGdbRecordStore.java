@@ -219,13 +219,13 @@ public class FileGdbRecordStore extends AbstractRecordStore {
             "Not enough arguments for where clause with placeholders: " + where);
         }
         final Object argument = parameters.get(i);
-        final StringBuffer replacement = new StringBuffer();
+        final StringBuilder replacement = new StringBuilder();
         matcher.appendReplacement(replacement, DataTypes.toString(argument));
         sql.append(replacement);
         appendValue(sql, argument);
         i++;
       }
-      final StringBuffer tail = new StringBuffer();
+      final StringBuilder tail = new StringBuilder();
       matcher.appendTail(tail);
       sql.append(tail);
     }

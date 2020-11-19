@@ -1063,7 +1063,7 @@ public class HtmlUiBuilder<T> implements BeanFactoryAware, ServletContextAware {
       + ",\"createdRow\": function( row, data, dataIndex ) {refreshButtons(row);}"
       + ",\"initComplete\": function() {$(this).DataTable().columns.adjust();}";
     jsonMap += "}";
-    final StringBuffer scriptBody = new StringBuffer();
+    final StringBuilder scriptBody = new StringBuilder();
     scriptBody.append("$(document).ready(function() {\n");
     scriptBody.append("  var tableDiv = $('#");
     scriptBody.append(tableId);

@@ -98,7 +98,7 @@ public class StringTemplate implements Serializable {
 
   private String expand(final Object... uriVariableValues) {
     final Matcher matcher = NAMES_PATTERN.matcher(this.template);
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     int i = 0;
     while (matcher.find()) {
       final Object uriVariable = uriVariableValues[i++];

@@ -382,7 +382,7 @@ public interface Strings {
   static String replaceAll(String value, final Pattern pattern, final String replacement) {
     final Matcher matcher = pattern.matcher(value);
     if (matcher.find()) {
-      final StringBuffer sb = new StringBuffer();
+      final StringBuilder sb = new StringBuilder();
       do {
         matcher.appendReplacement(sb, replacement);
       } while (matcher.find());

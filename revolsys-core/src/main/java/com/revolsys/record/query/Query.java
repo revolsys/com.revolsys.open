@@ -310,6 +310,13 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return and(condition);
   }
 
+  public Query and(final CharSequence fieldName,
+    final java.util.function.Function<QueryValue, Condition> operator) {
+    final ColumnReference column = this.table.getColumn(fieldName);
+    final Condition condition = operator.apply(column);
+    return and(condition);
+  }
+
   public Query and(final Condition condition) {
     if (!Property.isEmpty(condition)) {
       Condition whereCondition = getWhereCondition();
@@ -661,6 +668,13 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return or(condition);
   }
 
+  public Query or(final CharSequence fieldName,
+    final java.util.function.Function<QueryValue, Condition> operator) {
+    final ColumnReference column = this.table.getColumn(fieldName);
+    final Condition condition = operator.apply(column);
+    return or(condition);
+  }
+
   public Query or(final Condition condition) {
     final Condition whereCondition = getWhereCondition();
     if (whereCondition.isEmpty()) {
@@ -735,8 +749,9 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this;
   }
 
-  public void setCancellable(final Cancellable cancellable) {
+  public Query setCancellable(final Cancellable cancellable) {
     this.cancellable = cancellable;
+    return this;
   }
 
   public Query setDistinct(final boolean distinct) {

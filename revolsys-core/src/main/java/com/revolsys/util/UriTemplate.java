@@ -173,7 +173,7 @@ public class UriTemplate implements Serializable {
           + this.variableNames.size() + "; got " + uriVariableValues.length);
     }
     final Matcher matcher = NAMES_PATTERN.matcher(this.uriTemplate);
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     int i = 0;
     while (matcher.find()) {
       final Object uriVariable = uriVariableValues[i++];
@@ -204,7 +204,7 @@ public class UriTemplate implements Serializable {
           + this.variableNames.size() + "; got " + uriVariableValues.length);
     }
     final Matcher matcher = NAMES_PATTERN.matcher(this.uriTemplate);
-    final StringBuffer buffer = new StringBuffer();
+    final StringBuilder buffer = new StringBuilder();
     int i = 0;
     while (matcher.find()) {
       final Object uriVariable = uriVariableValues[i++];

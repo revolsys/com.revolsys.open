@@ -254,7 +254,7 @@ public class TextStyle extends BaseObjectWithPropertiesAndChange
     if (record == null) {
       return "Text";
     } else {
-      final StringBuffer label = new StringBuffer();
+      final StringBuilder label = new StringBuilder();
       final String labelPattern = getTextName();
       final Matcher matcher = FIELD_PATTERN.matcher(labelPattern);
       while (matcher.find()) {
