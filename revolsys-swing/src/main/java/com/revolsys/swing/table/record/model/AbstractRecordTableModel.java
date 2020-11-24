@@ -134,24 +134,28 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel {
       if (objectValue instanceof Geometry) {
         final Geometry geometry = (Geometry)objectValue;
         return geometry.getGeometryType();
-      } else if (objectValue instanceof JsonObject) {
-        final JsonObject jsonObject = (JsonObject)objectValue;
-        if (jsonObject.isEmpty()) {
-          return "-";
-        } else {
-          final StringBuilder string = new StringBuilder();
-          for (final String name : jsonObject.keySet()) {
-            final Object value = jsonObject.getValue(name);
-            if (Property.hasValue(value)) {
-              if (string.length() > 0) {
-                string.append(',');
+      } else if (field.getDataType().isAssignableTo(JsonObject.class)) {
+        try {
+          final JsonObject jsonObject = (JsonObject)field.toFieldValue(objectValue);
+          if (jsonObject.isEmpty()) {
+            return "-";
+          } else {
+            final StringBuilder string = new StringBuilder();
+            for (final String name : jsonObject.keySet()) {
+              final Object value = jsonObject.getValue(name);
+              if (Property.hasValue(value)) {
+                if (string.length() > 0) {
+                  string.append(',');
+                }
+                string.append(name);
+                string.append('=');
+                string.append(toJsonValue(field, name, value));
               }
-              string.append(name);
-              string.append('=');
-              string.append(toJsonValue(field, name, value));
             }
+            return string.toString();
           }
-          return string.toString();
+        } catch (final Exception e) {
+          return DataTypes.toString(objectValue);
         }
       }
       if (isShowCodeValues() && !isIdField(field)) {
