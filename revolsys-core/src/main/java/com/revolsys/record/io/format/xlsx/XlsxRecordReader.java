@@ -11,19 +11,23 @@ import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.OpcPackage;
 import org.docx4j.openpackaging.packages.SpreadsheetMLPackage;
 import org.docx4j.openpackaging.parts.DocPropsCustomPart;
-import org.docx4j.openpackaging.parts.Part;
 import org.docx4j.openpackaging.parts.SpreadsheetML.SharedStrings;
+import org.docx4j.openpackaging.parts.SpreadsheetML.WorkbookPart;
 import org.docx4j.openpackaging.parts.SpreadsheetML.WorksheetPart;
 import org.jeometry.common.logging.Logs;
+import org.xlsx4j.exceptions.Xlsx4jException;
+import org.xlsx4j.sml.CTRElt;
 import org.xlsx4j.sml.CTRst;
 import org.xlsx4j.sml.CTSst;
 import org.xlsx4j.sml.CTXstringWhitespace;
 import org.xlsx4j.sml.Cell;
 import org.xlsx4j.sml.Row;
 import org.xlsx4j.sml.STCellType;
+import org.xlsx4j.sml.Sheet;
 import org.xlsx4j.sml.SheetData;
 import org.xlsx4j.sml.Worksheet;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
@@ -59,6 +63,8 @@ public class XlsxRecordReader extends AbstractRecordReader {
 
   private List<CTRst> sharedStringList = Collections.emptyList();
 
+  private String tabName;
+
   public XlsxRecordReader(final Resource resource) {
     this(resource, ArrayRecord.FACTORY);
   }
@@ -67,6 +73,12 @@ public class XlsxRecordReader extends AbstractRecordReader {
     final RecordFactory<? extends Record> recordFactory) {
     super(recordFactory);
     this.resource = resource;
+  }
+
+  public XlsxRecordReader(final Resource resource,
+    final RecordFactory<? extends Record> recordFactory, final MapEx properties) {
+    this(resource, recordFactory);
+    setProperties(properties);
   }
 
   @Override
@@ -84,6 +96,38 @@ public class XlsxRecordReader extends AbstractRecordReader {
       return parseRecord(row);
     } else {
       throw new NoSuchElementException();
+    }
+  }
+
+  protected String getText(final CTRst sharedString) {
+    final CTXstringWhitespace text = sharedString.getT();
+    if (text == null) {
+      final List<CTRElt> r = sharedString.getR();
+      if (r != null) {
+        final StringBuilder t = new StringBuilder();
+        for (final CTRElt e : r) {
+          t.append(e.getT().getValue());
+        }
+        return t.toString();
+      }
+      return "";
+    } else {
+      return text.getValue();
+    }
+  }
+
+  private WorksheetPart getWorksheetPart(final WorkbookPart workbook) throws Xlsx4jException {
+    if (this.tabName == null) {
+      return workbook.getWorksheet(0);
+    } else {
+      int i = 0;
+      for (final Sheet sheet : workbook.getJaxbElement().getSheets().getSheet()) {
+        if (sheet.getName().equals(this.tabName)) {
+          return workbook.getWorksheet(i);
+        }
+        i++;
+      }
+      return null;
     }
   }
 
@@ -123,18 +167,14 @@ public class XlsxRecordReader extends AbstractRecordReader {
           scaleXy, scaleZ);
         setGeometryFactory(geometryFactory);
       }
-      WorksheetPart worksheetPart = null;
-      for (final Part part : spreadsheetPackage.getParts().getParts().values()) {
-        if (part instanceof WorksheetPart) {
-          if (worksheetPart == null) {
-            worksheetPart = (WorksheetPart)part;
-          }
-        } else if (part instanceof SharedStrings) {
-          final SharedStrings sharedStrings = (SharedStrings)part;
-          final CTSst contents = sharedStrings.getContents();
-          this.sharedStringList = contents.getSi();
-        }
+      final WorkbookPart workbook = spreadsheetPackage.getWorkbookPart();
+      final SharedStrings sharedStrings = workbook.getSharedStrings();
+      if (sharedStrings != null) {
+        final CTSst contents = sharedStrings.getContents();
+        this.sharedStringList = contents.getSi();
       }
+      final WorksheetPart worksheetPart = getWorksheetPart(workbook);
+
       if (worksheetPart != null) {
         final Worksheet worksheet = worksheetPart.getContents();
         final SheetData sheetData = worksheet.getSheetData();
@@ -143,7 +183,7 @@ public class XlsxRecordReader extends AbstractRecordReader {
         final String baseName = this.resource.getBaseName();
         newRecordDefinition(baseName, line);
       }
-    } catch (final IOException | Docx4JException e) {
+    } catch (final IOException | Docx4JException | Xlsx4jException e) {
       Logs.error(this, "Unable to open " + this.resource, e);
     } catch (final NoSuchElementException e) {
     }
@@ -175,8 +215,7 @@ public class XlsxRecordReader extends AbstractRecordReader {
           case S:
             final int stringIndex = Integer.parseInt(cellValue);
             final CTRst sharedString = this.sharedStringList.get(stringIndex);
-            final CTXstringWhitespace text = sharedString.getT();
-            value = text.getValue();
+            value = getText(sharedString);
           break;
           default:
             if (cellValue == null) {
@@ -204,5 +243,9 @@ public class XlsxRecordReader extends AbstractRecordReader {
     } else {
       throw new NoSuchElementException();
     }
+  }
+
+  public void setTabName(final String tabName) {
+    this.tabName = tabName;
   }
 }
