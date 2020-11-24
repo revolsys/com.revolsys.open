@@ -12,6 +12,7 @@ import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.table.BaseJTable;
@@ -94,8 +95,14 @@ public abstract class AbstractSingleRecordTableModel extends AbstractRecordTable
   }
 
   @Override
-  public String getColumnFieldName(final int attributeIndex) {
-    return this.fieldNames.get(attributeIndex);
+  public FieldDefinition getColumnField(final int fieldIndex) {
+    final String fieldName = getColumnFieldName(fieldIndex);
+    return getRecordDefinition().getField(fieldName);
+  }
+
+  @Override
+  public String getColumnFieldName(final int fieldIndex) {
+    return this.fieldNames.get(fieldIndex);
   }
 
   @Override

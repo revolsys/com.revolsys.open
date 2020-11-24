@@ -7,13 +7,14 @@ import java.util.Map;
 
 import javax.swing.JComponent;
 import javax.swing.JTable;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.table.JTableHeader;
 
 import org.jdesktop.swingx.table.TableColumnExt;
 import org.jeometry.common.compare.NumericComparator;
 import org.jeometry.common.data.identifier.Code;
 import org.jeometry.common.data.identifier.Identifier;
-import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.beans.PropertyChangeSupportProxy;
@@ -28,7 +29,8 @@ import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.editor.BaseTableCellEditor;
 import com.revolsys.util.Strings;
 
-public class JsonObjectTableModel extends AbstractTableModel implements PropertyChangeSupportProxy {
+public class JsonObjectTableModel extends AbstractTableModel
+  implements PropertyChangeSupportProxy, CellEditorListener {
 
   private static final long serialVersionUID = 1L;
 
@@ -36,28 +38,36 @@ public class JsonObjectTableModel extends AbstractTableModel implements Property
     "#", "Name", "Value"
   };
 
-  public static BaseJTable newTable(final JsonObject object, final boolean editable) {
-    final JsonObjectTableModel model = new JsonObjectTableModel(object, editable);
-    return model.newTable();
-  }
-
   private boolean editable;
 
   private final List<String> fieldNames = new ArrayList<>();
 
   private final Map<String, FieldDefinition> fieldByName = new HashMap<>();
 
-  private JsonObject object;
+  private JsonObject jsonObject;
+
+  private boolean removeEmptyProperties = true;
 
   public JsonObjectTableModel(final boolean editable) {
     this(null, editable);
   }
 
   public JsonObjectTableModel(final JsonObject object, final boolean editable) {
-    setObject(object);
+    setJsonObject(object);
     setEditable(editable);
 
     addMenuItem("edit", "Remove Row", "delete", this::removeRow);
+  }
+
+  @Override
+  public void editingCanceled(final ChangeEvent e) {
+    removeEmptyProperties();
+
+  }
+
+  @Override
+  public void editingStopped(final ChangeEvent e) {
+    removeEmptyProperties();
   }
 
   @Override
@@ -86,6 +96,10 @@ public class JsonObjectTableModel extends AbstractTableModel implements Property
     return this.fieldByName.get(fieldName);
   }
 
+  public int getFieldIndex(final String fieldName) {
+    return this.fieldNames.indexOf(fieldName);
+  }
+
   public String getFieldName(final int rowIndex) {
     return this.fieldNames.get(rowIndex);
   }
@@ -100,18 +114,8 @@ public class JsonObjectTableModel extends AbstractTableModel implements Property
     }
   }
 
-  public JsonObject getObject() {
-    return this.object;
-  }
-
-  public Object getObjectValue(final int rowIndex, final int columnIndex) {
-    JsonObject object = this.object;
-    if (object == null) {
-      return "\u2026";
-    } else {
-      final String fieldName = getFieldName(rowIndex);
-      return object.getValue(fieldName);
-    }
+  public JsonObject getJsonObject() {
+    return this.jsonObject;
   }
 
   @Override
@@ -127,12 +131,12 @@ public class JsonObjectTableModel extends AbstractTableModel implements Property
       case 1:
         return getFieldTitle(rowIndex);
       case 2: {
-        JsonObject object = this.object;
-        if (object == null) {
+        final JsonObject jsonObject = this.jsonObject;
+        if (jsonObject == null) {
           return "\u2026";
         } else {
           final String fieldName = getFieldName(rowIndex);
-          return object.getValue(fieldName);
+          return jsonObject.getValue(fieldName);
         }
       }
       default:
@@ -147,6 +151,10 @@ public class JsonObjectTableModel extends AbstractTableModel implements Property
 
   public boolean isEditable() {
     return this.editable;
+  }
+
+  public boolean isRemoveEmptyProperties() {
+    return this.removeEmptyProperties;
   }
 
   public void loadCodeTable(final CodeTable codeTable) {
@@ -178,6 +186,7 @@ public class JsonObjectTableModel extends AbstractTableModel implements Property
       } else {
         column.setPreferredWidth(210);
         final BaseTableCellEditor cellEditor = new BaseTableCellEditor(table);
+        cellEditor.addCellEditorListener(this);
         column.setCellEditor(cellEditor);
       }
     }
@@ -188,20 +197,34 @@ public class JsonObjectTableModel extends AbstractTableModel implements Property
 
   public void refreshFieldNames() {
     this.fieldNames.clear();
-    final JsonObject object = this.object;
-    if (object != null) {
-      this.fieldNames.addAll(object.keySet());
+    final JsonObject jsonObject = this.jsonObject;
+    if (jsonObject != null) {
+      this.fieldNames.addAll(jsonObject.keySet());
     }
     fireTableDataChanged();
   }
 
+  public void removeEmptyProperties() {
+    final JsonObject jsonObject = this.jsonObject;
+    if (this.removeEmptyProperties) {
+      final JsonObject cleanedJsonObject = jsonObject.withNonEmptyValues();
+      if (cleanedJsonObject != jsonObject) {
+        setJsonObject(cleanedJsonObject);
+      }
+    }
+  }
+
   private void removeRow(final int rowIndex, final int columnIndex) {
     final String propertyName = getFieldName(rowIndex);
-    final JsonObject object = this.object;
-    if (object != null) {
-      object.remove(propertyName);
+    final JsonObject jsonObject = this.jsonObject;
+    if (jsonObject != null && jsonObject.containsKey(propertyName)) {
+      JsonObject updatedJsonObject = jsonObject.clone();
+      updatedJsonObject.remove(propertyName);
+      if (this.removeEmptyProperties) {
+        updatedJsonObject = updatedJsonObject.withNonEmptyValues();
+      }
+      setJsonObject(updatedJsonObject);
     }
-    refreshFieldNames();
   }
 
   public void setEditable(final boolean editable) {
@@ -219,21 +242,30 @@ public class JsonObjectTableModel extends AbstractTableModel implements Property
     return this;
   }
 
-  public void setObject(final JsonObject object) {
-    this.object = object;
-    refreshFieldNames();
+  public void setJsonObject(final JsonObject jsonObject) {
+    if (this.jsonObject != jsonObject) {
+      this.jsonObject = jsonObject;
+      refreshFieldNames();
+    }
+  }
+
+  public void setRemoveEmptyProperties(final boolean removeEmptyProperties) {
+    this.removeEmptyProperties = removeEmptyProperties;
   }
 
   @Override
-  public void setValueAt(final Object value, final int rowIndex, final int columnIndex) {
-    final JsonObject object = this.object;
-    if (object != null) {
+  public void setValueAt(Object value, final int rowIndex, final int columnIndex) {
+    JsonObject jsonObject = this.jsonObject;
+    if (jsonObject != null) {
       if (columnIndex == 2) {
         final FieldDefinition field = getField(rowIndex);
         final String fieldName = field.getName();
-        final Object oldValue = object.put(fieldName, value);
-        if (!DataType.equal(value, oldValue)) {
-          fireTableCellUpdated(rowIndex, columnIndex);
+        if (!jsonObject.equalValue(fieldName, value)) {
+          value = field.toFieldValue(value);
+          jsonObject = jsonObject//
+            .clone()
+            .addValue(fieldName, value);
+          setJsonObject(jsonObject);
         }
       }
     }
@@ -246,7 +278,10 @@ public class JsonObjectTableModel extends AbstractTableModel implements Property
       final Geometry geometry = (Geometry)objectValue;
       return geometry.getGeometryType();
     }
-    final CodeTable codeTable = field.getCodeTable();
+    CodeTable codeTable = null;
+    if (field != null) {
+      codeTable = field.getCodeTable();
+    }
     if (codeTable == null) {
       text = DataTypes.toString(objectValue);
     } else {

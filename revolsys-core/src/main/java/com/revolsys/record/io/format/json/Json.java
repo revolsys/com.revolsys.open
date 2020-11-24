@@ -85,6 +85,36 @@ public class Json extends AbstractIoFactory
   @SuppressWarnings({
     "rawtypes", "unchecked"
   })
+  public static final DataType JSON_OBJECT_TREE = new FunctionDataType("JsonObjectTree",
+    JsonObjectTree.class, true, value -> {
+      if (value instanceof JsonObject) {
+        return new JsonObjectTree((JsonObject)value);
+      } else if (value instanceof Map) {
+        return new JsonObjectTree((Map)value);
+      } else if (value instanceof String) {
+        final JsonObject map = Json.toObjectMap((String)value);
+        if (map == null) {
+          return null;
+        } else {
+          return new JsonObjectTree(map);
+        }
+      } else {
+        return new JsonObjectTree(JsonParser.read(value));
+      }
+    }, (value) -> {
+      if (value instanceof Map) {
+        return Json.toString((Map)value);
+      } else if (value == null) {
+        return null;
+      } else {
+        return value.toString();
+      }
+
+    }, FunctionDataType.MAP_EQUALS, FunctionDataType.MAP_EQUALS_EXCLUDES);
+
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
   public static final DataType JSON_TYPE = new FunctionDataType("JsonType", JsonType.class, true,
     value -> {
       if (value instanceof JsonType) {

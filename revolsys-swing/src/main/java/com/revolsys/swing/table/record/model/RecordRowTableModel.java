@@ -95,6 +95,20 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
     return numColumns;
   }
 
+  @Override
+  public FieldDefinition getColumnField(final int columnIndex) {
+    if (columnIndex < this.fieldsOffset) {
+      return null;
+    } else {
+      final int fieldIndex = columnIndex - this.fieldsOffset;
+      if (fieldIndex < this.fields.size()) {
+        return this.fields.get(fieldIndex);
+      } else {
+        return null;
+      }
+    }
+  }
+
   public FieldDefinition getColumnFieldDefinition(final int columnIndex) {
     if (columnIndex >= this.fieldsOffset) {
       final int fieldIndex = columnIndex - this.fieldsOffset;
