@@ -408,7 +408,7 @@ public class QueryWhereConditionField extends ValueField
       text.append("{d '" + valueString + "'}");
     } else if (DataTypes.TIME == type) {
       text.append("{t '" + valueString + "'}");
-    } else if (DataTypes.TIMESTAMP == type || DataTypes.DATE == type) {
+    } else if (DataTypes.TIMESTAMP == type || DataTypes.UTIL_DATE == type) {
       text.append("{ts '" + valueString + "'}");
     } else if (DataTypes.DATE_TIME == type) {
       text.append("{ts '" + valueString + "'}");

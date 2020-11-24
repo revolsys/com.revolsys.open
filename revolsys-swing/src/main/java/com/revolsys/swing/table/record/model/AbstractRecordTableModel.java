@@ -8,18 +8,17 @@ import java.util.Set;
 
 import javax.annotation.PreDestroy;
 
-import org.jeometry.common.data.identifier.Code;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.util.Property;
-import com.revolsys.util.Strings;
 
 public abstract class AbstractRecordTableModel extends AbstractTableModel {
 
@@ -59,9 +58,14 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel {
     this.recordDefinition = null;
   }
 
-  public String getColumnFieldName(final int attributeIndex) {
+  public FieldDefinition getColumnField(final int fieldIndex) {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    return recordDefinition.getFieldName(attributeIndex);
+    return recordDefinition.getField(fieldIndex);
+  }
+
+  public String getColumnFieldName(final int fieldIndex) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    return recordDefinition.getFieldName(fieldIndex);
   }
 
   public abstract String getColumnFieldName(int rowIndex, int columnIndex);
@@ -76,6 +80,10 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel {
 
   public boolean isEditable() {
     return this.editable;
+  }
+
+  protected boolean isIdField(final FieldDefinition field) {
+    return this.recordDefinition.isIdField(field);
   }
 
   public boolean isReadOnly(final String fieldName) {
@@ -114,56 +122,67 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel {
     }
   }
 
-  public String toDisplayValue(final int rowIndex, final int attributeIndex,
-    final Object objectValue) {
-    String text;
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    final String fieldName = getColumnFieldName(attributeIndex);
-    if (objectValue == null || fieldName == null) {
-      if (recordDefinition.isIdField(fieldName)) {
+  protected String toDisplayValue(final FieldDefinition field, final Object objectValue) {
+    if (objectValue == null || field == null) {
+      if (isIdField(field)) {
         return "NEW";
       } else {
-        text = "-";
+        return "-";
       }
     } else {
+      String text;
       if (objectValue instanceof Geometry) {
         final Geometry geometry = (Geometry)objectValue;
         return geometry.getGeometryType();
-      }
-      CodeTable codeTable = null;
-      if (!recordDefinition.isIdField(fieldName)) {
-        codeTable = recordDefinition.getCodeTableByFieldName(fieldName);
-      }
-      if (codeTable == null || !isShowCodeValues()) {
-        text = DataTypes.toString(objectValue);
-      } else {
-        if (!codeTable.isLoadAll() || codeTable.isLoaded()) {
-          final List<Object> values = codeTable.getValues(Identifier.newIdentifier(objectValue));
-          if (values == null || values.isEmpty()) {
-            text = DataTypes.toString(objectValue);
-          } else if (values.size() == 1) {
-            final Object codeValue = values.get(0);
-            if (codeValue instanceof Code) {
-              text = ((Code)codeValue).getDescription();
-            } else {
-              text = DataTypes.toString(codeValue);
-            }
-          } else {
-            text = Strings.toString(values);
-          }
+      } else if (objectValue instanceof JsonObject) {
+        final JsonObject jsonObject = (JsonObject)objectValue;
+        if (jsonObject.isEmpty()) {
+          return "-";
         } else {
+          final StringBuilder string = new StringBuilder();
+          for (final String name : jsonObject.keySet()) {
+            final Object value = jsonObject.getValue(name);
+            if (Property.hasValue(value)) {
+              if (string.length() > 0) {
+                string.append(',');
+              }
+              string.append(name);
+              string.append('=');
+              string.append(toJsonValue(field, name, value));
+            }
+          }
+          return string.toString();
+        }
+      }
+      if (isShowCodeValues() && !isIdField(field)) {
+        if (field.isCodeTableReady()) {
+          text = field.toCodeString(objectValue);
+        } else {
+          final CodeTable codeTable = field.getCodeTable();
           if (!codeTable.isLoading()) {
             final CodeTable tableToLoad = codeTable;
             Invoke.background("Load " + codeTable, () -> loadCodeTable(tableToLoad));
           }
-          text = "...";
+          return "...";
         }
+      } else {
+        text = field.toString(objectValue);
       }
       if (text.length() == 0) {
         text = "-";
       }
+      return text;
     }
-    return text;
+  }
+
+  public String toDisplayValue(final int rowIndex, final int fieldIndex, final Object objectValue) {
+    final FieldDefinition field = getColumnField(fieldIndex);
+    return toDisplayValue(field, objectValue);
+  }
+
+  protected String toJsonValue(final FieldDefinition field, final String childName,
+    final Object value) {
+    return DataTypes.toString(value);
   }
 
   public Object toObjectValue(final String fieldName, final Object displayValue) {

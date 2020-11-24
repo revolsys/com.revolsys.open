@@ -2,7 +2,6 @@ package com.revolsys.swing.table.json;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -12,9 +11,9 @@ import org.jdesktop.swingx.VerticalLayout;
 
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.json.JsonObject;
-import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.swing.component.ValueField;
+import com.revolsys.swing.field.ArrayListComboBoxModel;
 import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.table.TablePanel;
@@ -35,12 +34,10 @@ public class JsonObjectTableField extends ValueField {
 
   private final BaseJTable table;
 
-  public JsonObjectTableField(final String fieldName) {
-    this(fieldName, Collections.emptyList());
-  }
+  private final boolean removeEmptyValues = true;
 
-  public JsonObjectTableField(final String fieldName, final List<FieldDefinition> fields) {
-    super(new VerticalLayout(), fieldName, null);
+  public JsonObjectTableField(final FieldDefinition field, final List<FieldDefinition> fields) {
+    super(new VerticalLayout(), field.getName(), null);
     setOpaque(false);
 
     this.model = new JsonObjectTableModel(true);
@@ -52,10 +49,11 @@ public class JsonObjectTableField extends ValueField {
 
     this.table = tablePanel.getTable();
     this.table.setTerminateEditOnFocusLost(true);
+
     this.toolBar = tablePanel.getToolBar();
 
     this.addNamesField = ComboBox.newComboBox("name", this.fields,
-      (field) -> ((FieldDefinition)field).getTitle());
+      (customField) -> ((FieldDefinition)customField).getTitle());
     this.addNamesField.setMaximumSize(new Dimension(200, 50));
 
     this.toolBar.addComponent("add", this.addNamesField);
@@ -66,23 +64,34 @@ public class JsonObjectTableField extends ValueField {
     this.addNamesField.addItemListener((e) -> {
       this.addButton.setEnabled(this.addNamesField.getSelectedItem() != null);
     });
+
   }
 
   private void addRow() {
-    try {
-      JsonObject object = getFieldValue();
-      if (object == null) {
-        object = new JsonObjectHash();
-      }
-      final String name;
-      final FieldDefinition field = this.addNamesField.getSelectedItem();
-      name = field.getName();
+    int editRow = -1;
+    JsonObject jsonObject = getFieldValue();
+    final FieldDefinition field = this.addNamesField.getSelectedItem();
+    if (field != null) {
+      final ArrayListComboBoxModel<FieldDefinition> namesModel = (ArrayListComboBoxModel<FieldDefinition>)this.addNamesField
+        .getModel();
+      namesModel.removeElement(field);
+      final String name = field.getName();
       if (name != null) {
-        object.put(name, null);
-        setFieldValue(object);
+        if (jsonObject == null) {
+          jsonObject = JsonObject.tree();
+        } else {
+          jsonObject = jsonObject.clone();
+        }
+        jsonObject.addValue(name, null);
+        setFieldValue(jsonObject);
+        final int row = this.model.getFieldIndex(name);
+        if (row != -1) {
+          editRow = this.table.convertRowIndexToModel(row);
+        }
       }
-    } finally {
-      refresh();
+    }
+    if (editRow != -1) {
+      this.table.editCellAt(editRow, 2);
     }
   }
 
@@ -92,6 +101,10 @@ public class JsonObjectTableField extends ValueField {
 
   public ToolBar getToolBar() {
     return this.toolBar;
+  }
+
+  public boolean isRemoveEmptyValues() {
+    return this.removeEmptyValues;
   }
 
   private void refresh() {
@@ -120,18 +133,15 @@ public class JsonObjectTableField extends ValueField {
   public boolean setFieldValue(final Object value) {
     try {
       if (value == getFieldValue()) {
-        this.model.setObject((JsonObject)value);
+        this.model.setJsonObject((JsonObject)value);
       } else if (value == null) {
         final boolean set = super.setFieldValue(null);
-        this.model.setObject(null);
+        this.model.setJsonObject(null);
         return set;
       } else {
-        JsonObject clone = Json.JSON_OBJECT.toObject(value);
-        if (clone == value) {
-          clone = clone.clone();
-        }
-        final boolean set = super.setFieldValue(clone);
-        this.model.setObject(clone);
+        final JsonObject jsonObject = Json.JSON_OBJECT.toObject(value);
+        final boolean set = super.setFieldValue(jsonObject);
+        this.model.setJsonObject(jsonObject);
         return set;
       }
     } finally {
@@ -140,16 +150,19 @@ public class JsonObjectTableField extends ValueField {
     return false;
   }
 
+  public void setRemoveEmptyProperties(final boolean removeEmptyProperties) {
+    this.model.setRemoveEmptyProperties(removeEmptyProperties);
+  }
+
   public boolean stopCellEditing() {
     return this.table.stopCellEditing();
   }
 
   private void tableChanged(final TableModelEvent e) {
-    if (e.getType() == TableModelEvent.UPDATE) {
-      final String fieldName = getFieldName();
-      final Object fieldValue = Json.clone(getFieldValue());
-      firePropertyChange(fieldName, JsonObject.EMPTY, fieldValue);
-
+    final JsonObject oldValue = getFieldValue();
+    final JsonObject value = this.model.getJsonObject();
+    if (oldValue != value) {
+      setFieldValue(value);
     }
     refresh();
   }

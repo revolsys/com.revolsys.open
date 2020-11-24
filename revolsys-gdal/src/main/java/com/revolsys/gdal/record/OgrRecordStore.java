@@ -609,7 +609,7 @@ public class OgrRecordStore extends AbstractRecordStore {
           fieldDataType = DataTypes.STRING;
         break;
         case 9:
-          fieldDataType = DataTypes.DATE;
+          fieldDataType = DataTypes.SQL_DATE;
         break;
         case 11:
           fieldDataType = DataTypes.DATE_TIME;

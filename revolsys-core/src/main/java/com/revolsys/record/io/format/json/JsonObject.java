@@ -1,11 +1,13 @@
 package com.revolsys.record.io.format.json;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.util.Property;
 
 public interface JsonObject extends MapEx, JsonType {
   JsonObject EMPTY = new JsonObject() {
@@ -75,11 +77,13 @@ public interface JsonObject extends MapEx, JsonType {
     return this;
   }
 
+  @Override
   default JsonObject addFieldValue(final String key, final Map<String, Object> source) {
     final Object value = source.get(key);
     return addValue(key, value);
   }
 
+  @Override
   default JsonObject addFieldValue(final String key, final Map<String, Object> source,
     final String sourceKey) {
     final Object value = source.get(sourceKey);
@@ -120,11 +124,37 @@ public interface JsonObject extends MapEx, JsonType {
     return null;
   }
 
+  default boolean removeEmptyProperties() {
+    boolean removed = false;
+    final Collection<Object> entries = values();
+    for (final Iterator<Object> iterator = entries.iterator(); iterator.hasNext();) {
+      final Object value = iterator.next();
+      if (!Property.hasValue(value)) {
+        iterator.remove();
+        removed = true;
+      }
+    }
+    return removed;
+  }
+
   default String toJsonString() {
     return Json.toString(this);
   }
 
   default String toJsonString(final boolean indent) {
     return Json.toString(this, indent);
+  }
+
+  default JsonObject withNonEmptyValues() {
+    JsonObject result = this;
+    for (final String key : keySet()) {
+      if (!hasValue(key)) {
+        if (result == this) {
+          result = clone();
+        }
+        result.remove(key);
+      }
+    }
+    return result;
   }
 }

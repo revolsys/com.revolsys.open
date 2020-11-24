@@ -19,7 +19,7 @@ public class GmlFieldTypeRegistry {
     addFieldType(new SimpleFieldType(DataTypes.BASE64_BINARY));
     addFieldType(new SimpleFieldType(DataTypes.BOOLEAN));
     addFieldType(new SimpleFieldType(DataTypes.BYTE));
-    addFieldType(new SimpleFieldType(DataTypes.DATE));
+    addFieldType(new SimpleFieldType(DataTypes.SQL_DATE));
     addFieldType(new SimpleFieldType(DataTypes.DATE_TIME));
     addFieldType(new SimpleFieldType(DataTypes.DECIMAL));
     addFieldType(new SimpleFieldType(DataTypes.DOUBLE));

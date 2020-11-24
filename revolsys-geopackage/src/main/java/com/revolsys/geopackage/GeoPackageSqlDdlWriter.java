@@ -166,9 +166,9 @@ public class GeoPackageSqlDdlWriter extends JdbcDdlWriter {
       out.print("FLOAT");
     } else if (dataType == DataTypes.DOUBLE) {
       out.print("DOUBLE");
-    } else if (dataType == DataTypes.DATE) {
+    } else if (dataType == DataTypes.SQL_DATE) {
       out.print("DATE");
-    } else if (dataType == DataTypes.DATE_TIME) {
+    } else if (dataType == DataTypes.DATE_TIME || dataType == DataTypes.UTIL_DATE) {
       out.print("DATETIME");
     } else if (dataType == DataTypes.BIG_INTEGER) {
       out.print("INTEGER");

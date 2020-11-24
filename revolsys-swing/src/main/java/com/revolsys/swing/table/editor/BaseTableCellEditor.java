@@ -254,7 +254,9 @@ public class BaseTableCellEditor extends AbstractCellEditor
   public void tableChanged(final TableModelEvent e) {
     if (e.getFirstRow() <= this.rowIndex && this.rowIndex <= e.getLastRow()) {
       if (e.getColumn() == TableModelEvent.ALL_COLUMNS) {
-        cancelCellEditing();
+        if (isEditing()) {
+          cancelCellEditing();
+        }
       }
     }
   }

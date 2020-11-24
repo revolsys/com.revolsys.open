@@ -514,6 +514,11 @@ public class Query extends BaseObjectWithProperties
     }
   }
 
+  public Query select(final String... fieldNames) {
+    setFieldNames(fieldNames);
+    return this;
+  }
+
   public void setCancellable(final Cancellable cancellable) {
     this.cancellable = cancellable;
   }

@@ -6,10 +6,12 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.jeometry.common.compare.NumericComparator;
+import org.jeometry.common.data.identifier.Code;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypeProxy;
@@ -425,7 +427,7 @@ public class FieldDefinition extends BaseObjectWithProperties
 
     if (Number.class.isAssignableFrom(this.type.getJavaClass())) {
       length += 1;
-    } else if (DataTypes.DATE.equals(this.type)) {
+    } else if (DataTypes.SQL_DATE.equals(this.type)) {
       return 10;
     }
     return length;
@@ -531,6 +533,14 @@ public class FieldDefinition extends BaseObjectWithProperties
   @Override
   public int hashCode() {
     return this.name.hashCode();
+  }
+
+  public boolean isCodeTableReady() {
+    if (this.codeTable == null) {
+      return true;
+    } else {
+      return !this.codeTable.isLoadAll() || this.codeTable.isLoaded();
+    }
   }
 
   public boolean isGenerated() {
@@ -704,21 +714,27 @@ public class FieldDefinition extends BaseObjectWithProperties
           return null;
         }
       }
-      final String string = this.type.toString(value);
-      return string;
+      return this.type.toString(value);
     } else {
-      final Object codeValue = this.codeTable.getValue(value);
-      if (codeValue == null) {
-        if (value instanceof String) {
-          final String string = (String)value;
-          if (!Property.hasValue(string)) {
+      final List<Object> values = this.codeTable.getValues(Identifier.newIdentifier(value));
+      if (values == null || values.isEmpty()) {
+        return this.type.toString(value);
+      } else if (values.size() == 1) {
+        final Object codeValue = values.get(0);
+        if (codeValue instanceof Code) {
+          return ((Code)codeValue).getDescription();
+        } else if (codeValue instanceof String) {
+          final String string = (String)codeValue;
+          if (Property.hasValue(string)) {
+            return string;
+          } else {
             return null;
           }
+        } else {
+          return DataTypes.toString(codeValue);
         }
-        final String string = this.type.toString(value);
-        return string;
       } else {
-        return codeValue.toString();
+        return Strings.toString(values);
       }
     }
   }
@@ -805,8 +821,7 @@ public class FieldDefinition extends BaseObjectWithProperties
           return null;
         }
       }
-      final String string = this.type.toString(value);
-      return string;
+      return this.type.toString(value);
     }
   }
 

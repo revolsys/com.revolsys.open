@@ -132,9 +132,9 @@ public class OracleDdlWriter extends JdbcDdlWriter {
       out.print("float");
     } else if (dataType == DataTypes.DOUBLE) {
       out.print("double precision");
-    } else if (dataType == DataTypes.DATE) {
+    } else if (dataType == DataTypes.SQL_DATE) {
       out.print("DATE");
-    } else if (dataType == DataTypes.DATE_TIME) {
+    } else if (dataType == DataTypes.DATE_TIME || dataType == DataTypes.UTIL_DATE) {
       out.print("TIMESTAMP");
     } else if (dataType == DataTypes.STRING) {
       out.print("VARCHAR2(");
