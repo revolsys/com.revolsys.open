@@ -66,9 +66,10 @@ public class OgrVrtWriter {
           } else if (Arrays.asList(DataTypes.FLOAT, DataTypes.DOUBLE, DataTypes.DECIMAL)
             .contains(fieldType)) {
             type = "Real";
-          } else if (DataTypes.SQL_DATE.equals(type)) {
+          } else if (DataTypes.SQL_DATE.equals(fieldType)) {
             type = "Date";
-          } else if (DataTypes.DATE_TIME.equals(type) || DataTypes.UTIL_DATE.equals(type)) {
+          } else if (DataTypes.DATE_TIME.equals(fieldType)
+            || DataTypes.UTIL_DATE.equals(fieldType)) {
             type = "DateTime";
           } else {
             type = "String";
