@@ -820,20 +820,18 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     return newRecordWriter(recordDefinition, false);
   }
 
+  // TODO deadlocks!!!!!!!!
   public FileGdbWriter newRecordWriter(final RecordDefinitionProxy recordDefinition,
     final boolean loadOnlyMode) {
-    synchronized (this.geodatabase) {
-      final GeodatabaseReference geodatabase = this.geodatabase;
-      if (geodatabase != null) {
-        synchronized (geodatabase) {
-          try (
-            BaseCloseable connection = geodatabase.connect()) {
-            final FileGdbRecordDefinition fileGdbRecordDefinition = getRecordDefinition(
-              recordDefinition);
-            if (fileGdbRecordDefinition != null) {
-              return new FileGdbWriter(this, recordDefinition, fileGdbRecordDefinition,
-                loadOnlyMode);
-            }
+    final GeodatabaseReference geodatabase = this.geodatabase;
+    if (geodatabase != null) {
+      synchronized (geodatabase) {
+        try (
+          BaseCloseable connection = geodatabase.connect()) {
+          final FileGdbRecordDefinition fileGdbRecordDefinition = getRecordDefinition(
+            recordDefinition);
+          if (fileGdbRecordDefinition != null) {
+            return new FileGdbWriter(this, recordDefinition, fileGdbRecordDefinition, loadOnlyMode);
           }
         }
       }
