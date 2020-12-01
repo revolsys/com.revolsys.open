@@ -703,6 +703,19 @@ public interface Property {
     }
   }
 
+  static boolean hasValue(final String string) {
+    if (string != null) {
+      final int length = string.length();
+      for (int i = 0; i < length; i++) {
+        final char character = string.charAt(i);
+        if (!Character.isWhitespace(character)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   static boolean hasValuesAll(final Object... values) {
     if (values == null || values.length == 0) {
       return false;
@@ -803,6 +816,10 @@ public interface Property {
     } else {
       return false;
     }
+  }
+
+  static boolean isEmpty(final String string) {
+    return !hasValue(string);
   }
 
   static <V> PropertyChangeListener newListener(final BiConsumer<String, V> consumer) {
