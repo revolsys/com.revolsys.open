@@ -430,6 +430,19 @@ public interface Paths {
     }
   }
 
+  public static List<Path> listVisibleFiles(final Path file) {
+    if (file != null && Files.isDirectory(file)) {
+      final List<Path> visibleFiles = new ArrayList<>();
+      for (final Path childFile : getChildPaths(file)) {
+        if (!exists(childFile) || !isHidden(childFile)) {
+          visibleFiles.add(childFile);
+        }
+      }
+      return visibleFiles;
+    }
+    return Collections.emptyList();
+  }
+
   static Writer newWriter(final Path path) {
     try {
       return Files.newBufferedWriter(path, StandardCharsets.UTF_8);

@@ -881,7 +881,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     zoomNextButton.setEnabled(false);
     Property.addListener(this, "zoomNextEnabled", new EnableComponentListener(zoomNextButton));
 
-    final JButton zoomSelectedButton = this.toolBar.addButtonTitleIcon("zoom", "Zoom To Selected",
+    final JButton zoomSelectedButton = this.toolBar.addButtonTitleIcon("zoom", "Zoom to Selected",
       "magnifier_zoom_selected", this::zoomToSelected);
     zoomSelectedButton.setEnabled(false);
     Property.addListener(this.project, "hasSelectedRecords",

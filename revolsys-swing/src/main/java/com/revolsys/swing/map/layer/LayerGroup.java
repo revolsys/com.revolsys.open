@@ -396,9 +396,7 @@ public interface LayerGroup extends Layer, Parent<Layer>, Iterable<Layer> {
     return false;
   }
 
-  default
-
-      boolean isHasVisibleLayer() {
+  default boolean isHasVisibleLayer() {
     for (final Layer layer : this) {
       if (layer.isVisible()) {
         return true;
