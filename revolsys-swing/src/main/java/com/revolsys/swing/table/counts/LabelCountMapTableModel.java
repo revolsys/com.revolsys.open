@@ -333,12 +333,12 @@ public class LabelCountMapTableModel extends AbstractTableModel {
   }
 
   private void setColumnWidth(final int columnIndex, final TableColumn column) {
-    int minWidth = 80;
+    int minWidth = 70;
     if (columnIndex == 0) {
-      minWidth = 270;
+      minWidth = 240;
     }
     final String columnName = getColumnName(columnIndex);
-    final int width = Math.max(minWidth, columnName.length() * 8);
+    final int width = Math.max(minWidth, columnName.length() * 7);
     column.setMinWidth(width);
     column.setPreferredWidth(width);
   }
