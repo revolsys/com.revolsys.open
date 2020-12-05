@@ -59,27 +59,41 @@ public class LabelCountMapTableModel extends AbstractTableModel {
     this.columnCount += this.countNames.size();
   }
 
-  public void addCount(final CharSequence label, final CharSequence countName) {
-    addCount(label, countName, 1);
-  }
-
-  public void addCount(final CharSequence label, final CharSequence countName, final long count) {
-    if (label != null && countName != null && count != 0) {
-      final LabelCounters labelCountMap = getLabelCountMap(label, countName);
-      labelCountMap.addCount(label, count);
+  public void addColumns(final String... columnNames) {
+    if (columnNames != null && columnNames.length > 0) {
+      for (final String columnName : columnNames) {
+        addCountNameColumn(columnName);
+      }
+      fireTableStructureChanged();
     }
   }
 
-  public void addCount(final PathNameProxy pathNameProxy, final CharSequence countName) {
-    addCount(pathNameProxy, countName, 1);
+  public LabelCountMapTableModel addCount(final CharSequence rowLabel,
+    final CharSequence columnLabel) {
+    return addCount(rowLabel, columnLabel, 1);
   }
 
-  public void addCount(final PathNameProxy pathNameProxy, final CharSequence countName,
-    final long count) {
+  public LabelCountMapTableModel addCount(final CharSequence rowLabel,
+    final CharSequence columnLabel, final long count) {
+    if (rowLabel != null && columnLabel != null && count != 0) {
+      final LabelCounters labelCountMap = getLabelCounters(rowLabel, columnLabel);
+      labelCountMap.addCount(rowLabel, count);
+    }
+    return this;
+  }
+
+  public LabelCountMapTableModel addCount(final PathNameProxy pathNameProxy,
+    final CharSequence countName) {
+    return addCount(pathNameProxy, countName, 1);
+  }
+
+  public LabelCountMapTableModel addCount(final PathNameProxy pathNameProxy,
+    final CharSequence countName, final long count) {
     if (pathNameProxy != null) {
       final CharSequence label = pathNameProxy.getPathName();
       addCount(label, countName, count);
     }
+    return this;
   }
 
   public void addCountNameColumn(final CharSequence countName) {
@@ -102,11 +116,11 @@ public class LabelCountMapTableModel extends AbstractTableModel {
 
   }
 
-  public void addCountNameColumns(final CharSequence... names) {
-    for (final CharSequence name : names) {
-      addCountNameColumn(name);
-    }
-    fireTableStructureChanged();
+  public LabelCountMapTableModel addRowAndColumn(final CharSequence countName,
+    final CharSequence label) {
+    addCountNameColumn(countName);
+    addRowLabel(label);
+    return this;
   }
 
   public void addRowLabel(final CharSequence label) {
@@ -136,7 +150,7 @@ public class LabelCountMapTableModel extends AbstractTableModel {
     final String... countNames) {
     final TotalLabelCounters total = addTotalColumn(totalCountName);
     for (final String countName : countNames) {
-      final LabelCounters labelCounters = getLabelCountMap(countName);
+      final LabelCounters labelCounters = getLabelCounters(countName);
       total.addCounters(labelCounters);
     }
     return total;
@@ -191,21 +205,22 @@ public class LabelCountMapTableModel extends AbstractTableModel {
     }
   }
 
-  public Counter getCounter(final CharSequence label, final CharSequence countName) {
-    final LabelCounters labelCountMap = getLabelCountMap(label, countName);
-    return labelCountMap.getCounter(label);
+  public Counter getCounter(final CharSequence rowLabel, final CharSequence columnLabel) {
+    final LabelCounters labelCounters = getLabelCounters(rowLabel, columnLabel);
+    return labelCounters.getCounter(rowLabel);
   }
 
-  public LabelCounters getLabelCountMap(final CharSequence countName) {
-    final LabelCounters labelCountMap = this.categoryLabelCountMap.getLabelCountMap(countName);
-    addCountNameColumn(countName);
+  public LabelCounters getLabelCounters(final CharSequence columnLabel) {
+    final LabelCounters labelCountMap = this.categoryLabelCountMap.getLabelCountMap(columnLabel);
+    addCountNameColumn(columnLabel);
     return labelCountMap;
   }
 
-  public LabelCounters getLabelCountMap(final CharSequence label, final CharSequence countName) {
-    final LabelCounters labelCountMap = getLabelCountMap(countName);
-    addRowLabel(label);
-    return labelCountMap;
+  public LabelCounters getLabelCounters(final CharSequence rowLabel,
+    final CharSequence columnLabel) {
+    final LabelCounters labelCounters = getLabelCounters(columnLabel);
+    addRowLabel(rowLabel);
+    return labelCounters;
   }
 
   public String getLabelTitle() {
@@ -237,11 +252,6 @@ public class LabelCountMapTableModel extends AbstractTableModel {
   @Override
   public boolean isCellEditable(final int rowIndex, final int columnIndex) {
     return false;
-  }
-
-  public void newStatistics(final CharSequence countName, final CharSequence label) {
-    addCountNameColumn(countName);
-    addRowLabel(label);
   }
 
   @Override
@@ -323,20 +333,20 @@ public class LabelCountMapTableModel extends AbstractTableModel {
   }
 
   private void setColumnWidth(final int columnIndex, final TableColumn column) {
-    int minWidth = 80;
+    int minWidth = 70;
     if (columnIndex == 0) {
-      minWidth = 270;
+      minWidth = 240;
     }
     final String columnName = getColumnName(columnIndex);
-    final int width = Math.max(minWidth, columnName.length() * 8);
+    final int width = Math.max(minWidth, columnName.length() * 7);
     column.setMinWidth(width);
     column.setPreferredWidth(width);
   }
 
-  public void setCounter(final CharSequence label, final CharSequence countName,
+  public void setCounter(final CharSequence rowLabel, final CharSequence columnLabel,
     final Counter counter) {
-    final LabelCounters labelCountMap = getLabelCountMap(label, countName);
-    labelCountMap.setCounter(label, counter);
+    final LabelCounters labelCountMap = getLabelCounters(rowLabel, columnLabel);
+    labelCountMap.setCounter(rowLabel, counter);
   }
 
   public void setStatistics(final String statisticName, final LabelCounters labelCountMap) {

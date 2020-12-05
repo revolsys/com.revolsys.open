@@ -13,6 +13,7 @@ import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.AbstractRecordReader;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
 public class CsvRecordReader extends AbstractRecordReader {
@@ -211,6 +212,11 @@ public class CsvRecordReader extends AbstractRecordReader {
         }
       }
     }
+  }
+
+  @Override
+  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+    super.setRecordDefinition(recordDefinition);
   }
 
   @Override

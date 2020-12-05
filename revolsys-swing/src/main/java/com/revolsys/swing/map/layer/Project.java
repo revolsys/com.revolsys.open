@@ -120,7 +120,6 @@ public class Project extends LayerGroupImpl {
         layersWithChanges.add(layer);
       }
     }
-
   }
 
   public void addZoomBookmark(final String name, final BoundingBox boundingBox) {
@@ -275,6 +274,16 @@ public class Project extends LayerGroupImpl {
 
   public boolean isBaseMapLayer(final Layer layer) {
     return this.baseMapLayers.isDescendant(layer);
+  }
+
+  @Override
+  public boolean isHasSelectedRecords() {
+    for (final Layer layer : getLayers()) {
+      if (layer.isHasSelectedRecords()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public boolean isSaved() {

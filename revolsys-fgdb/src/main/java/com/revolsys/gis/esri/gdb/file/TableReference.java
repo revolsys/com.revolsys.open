@@ -190,48 +190,51 @@ class TableReference extends CloseableValueHolder<Table> {
 
     try {
       validateRequired(record);
-      synchronized (this) {
-        final Table table = getValue();
-        if (table != null) {
-          try {
-            final Row row = table.createRowObject();
+      final Table table = getValue();
+      if (table != null) {
+        try {
+          final Row row;
+          synchronized (this) {
+            row = table.createRowObject();
+          }
 
-            try {
-              for (final FieldDefinition field : recordDefinition.getFields()) {
-                final String name = field.getName();
-                try {
-                  final Object value = record.getValue(name);
+          try {
+            for (final FieldDefinition field : recordDefinition.getFields()) {
+              final String name = field.getName();
+              try {
+                final Object value = record.getValue(name);
+                final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
+                esriField.setInsertValue(record, row, value);
+              } catch (final Throwable e) {
+                throw new ObjectPropertyException(record, name, e);
+              }
+            }
+            synchronized (this.geodatabase) {
+              table.insertRow(row);
+            }
+            if (sourceRecordDefinition == recordDefinition) {
+              record.setState(RecordState.INITIALIZING);
+              try {
+                for (final FieldDefinition field : recordDefinition.getFields()) {
                   final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
-                  esriField.setInsertValue(record, row, value);
-                } catch (final Throwable e) {
-                  throw new ObjectPropertyException(record, name, e);
-                }
-              }
-              synchronized (this.geodatabase) {
-                table.insertRow(row);
-              }
-              if (sourceRecordDefinition == recordDefinition) {
-                record.setState(RecordState.INITIALIZING);
-                try {
-                  for (final FieldDefinition field : recordDefinition.getFields()) {
-                    final AbstractFileGdbFieldDefinition esriField = (AbstractFileGdbFieldDefinition)field;
-                    try {
-                      esriField.setPostInsertValue(record, row);
-                    } catch (final Throwable e) {
-                      throw new ObjectPropertyException(record, field.getName(), e);
-                    }
+                  try {
+                    esriField.setPostInsertValue(record, row);
+                  } catch (final Throwable e) {
+                    throw new ObjectPropertyException(record, field.getName(), e);
                   }
-                } finally {
-                  record.setState(RecordState.PERSISTED);
                 }
+              } finally {
+                record.setState(RecordState.PERSISTED);
               }
-            } finally {
-              row.delete();
-              recordStore.addStatistic("Insert", record);
             }
           } finally {
-            disconnect();
+            synchronized (this) {
+              row.delete();
+            }
+            recordStore.addStatistic("Insert", record);
           }
+        } finally {
+          disconnect();
         }
       }
     } catch (final ObjectException e) {
