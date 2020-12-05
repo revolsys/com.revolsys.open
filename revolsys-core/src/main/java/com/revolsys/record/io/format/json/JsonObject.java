@@ -185,19 +185,6 @@ public interface JsonObject extends MapEx, JsonType {
     return null;
   }
 
-  default JsonObject getJsonObject(final CharSequence name) {
-    return getValue(name, Json.JSON_OBJECT);
-  }
-
-  default JsonObject getJsonObject(final CharSequence name, final JsonObject defaultValue) {
-    final JsonObject value = getJsonObject(name);
-    if (value == null) {
-      return defaultValue;
-    } else {
-      return value;
-    }
-  }
-
   default boolean removeEmptyProperties() {
     boolean removed = false;
     final Collection<Object> entries = values();
