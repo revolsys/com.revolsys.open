@@ -308,6 +308,49 @@ public interface Records {
   }
 
   @SuppressWarnings("unchecked")
+  static <T> T getFieldByPath(final MapEx map, final String path) {
+    if (map instanceof Record) {
+      final Record record = (Record)map;
+      return getFieldByPath(record, path);
+    } else if (path == null) {
+      return null;
+    } else {
+
+      final String[] propertyPath = path.split("\\.");
+      Object propertyValue = map;
+      for (int i = 0; i < propertyPath.length && propertyValue != null; i++) {
+        final String propertyName = propertyPath[i];
+        if (propertyValue instanceof Record) {
+          final Record recordValue = (Record)propertyValue;
+
+          if (recordValue.hasField(propertyName)) {
+            propertyValue = getValue(recordValue, propertyName);
+            if (propertyValue == null) {
+              return null;
+            }
+          } else {
+            return null;
+          }
+        } else if (propertyValue instanceof Map) {
+          final Map<String, Object> map2 = (Map<String, Object>)propertyValue;
+          propertyValue = map2.get(propertyName);
+          if (propertyValue == null) {
+            return null;
+          }
+        } else {
+          try {
+            final Object object = propertyValue;
+            propertyValue = Property.getSimple(object, propertyName);
+          } catch (final IllegalArgumentException e) {
+            throw new IllegalArgumentException("Path does not exist " + path, e);
+          }
+        }
+      }
+      return (T)propertyValue;
+    }
+  }
+
+  @SuppressWarnings("unchecked")
   static <T> T getFieldByPath(final Record record, final String path) {
     if (path == null) {
       return null;

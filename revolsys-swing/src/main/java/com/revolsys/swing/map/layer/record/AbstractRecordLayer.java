@@ -3090,7 +3090,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       }
     }
     super.setProperties(properties);
-    final Predicate<Record> predicate = AbstractRecordLayerRenderer.getFilter(this, properties);
+    final Predicate<MapEx> predicate = AbstractRecordLayerRenderer.getFilter(this, properties);
     if (predicate instanceof RecordDefinitionSqlFilter) {
       final RecordDefinitionSqlFilter sqlFilter = (RecordDefinitionSqlFilter)predicate;
       setWhere(sqlFilter.getQuery());

@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 
 import org.jeometry.common.data.type.DataType;
 
-import com.revolsys.record.Record;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.Records;
 
 /**
@@ -15,7 +15,7 @@ import com.revolsys.record.Records;
  *
  * @author Paul Austin
  */
-public class MultipleAttributeValuesFilter implements Predicate<Record> {
+public class MultipleAttributeValuesFilter implements Predicate<MapEx> {
   /** The values to match. */
   private Map<String, ? extends Object> values = Collections.emptyMap();
 
@@ -34,15 +34,15 @@ public class MultipleAttributeValuesFilter implements Predicate<Record> {
   /**
    * Match the property on the data object with the required value.
    *
-   * @param object The object.
+   * @param record The object.
    * @return True if the object matched the filter, false otherwise.
    */
   @Override
-  public boolean test(final Record object) {
+  public boolean test(final MapEx record) {
     for (final Entry<String, ? extends Object> entry : this.values.entrySet()) {
       final String fieldName = entry.getKey();
       final Object value = entry.getValue();
-      final Object objectValue = Records.getFieldByPath(object, fieldName);
+      final Object objectValue = Records.getFieldByPath(record, fieldName);
       if (objectValue == null) {
         if (value != null) {
           if (!DataType.equal(value, objectValue)) {

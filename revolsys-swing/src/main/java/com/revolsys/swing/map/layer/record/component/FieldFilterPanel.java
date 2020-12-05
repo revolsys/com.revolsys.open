@@ -26,8 +26,8 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.query.BinaryCondition;
 import com.revolsys.record.query.ColumnReference;
@@ -201,7 +201,7 @@ public class FieldFilterPanel extends JComponent implements PropertyChangeListen
       String searchField = this.layer.getProperty("searchField");
       searchField = (String)config.getOrDefault("searchField", searchField);
       setSearchFieldName(searchField);
-      final Predicate<Record> filter = AbstractRecordLayerRenderer.getFilter(this.layer, config);
+      final Predicate<MapEx> filter = AbstractRecordLayerRenderer.getFilter(this.layer, config);
       if (filter instanceof RecordDefinitionSqlFilter) {
         final RecordDefinitionSqlFilter sqlFilter = (RecordDefinitionSqlFilter)filter;
         final Condition condition = sqlFilter.getCondition();

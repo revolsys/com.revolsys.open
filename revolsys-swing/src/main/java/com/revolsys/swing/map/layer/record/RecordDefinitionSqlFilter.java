@@ -7,8 +7,8 @@ import java.util.function.Predicate;
 
 import org.jeometry.common.logging.Logs;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.map.MapSerializer;
-import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.record.query.Condition;
@@ -17,7 +17,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.util.UriTemplate;
 
-public class RecordDefinitionSqlFilter implements Predicate<Record>, MapSerializer {
+public class RecordDefinitionSqlFilter implements Predicate<MapEx>, MapSerializer {
   private Condition condition;
 
   private boolean initialized;
@@ -65,7 +65,7 @@ public class RecordDefinitionSqlFilter implements Predicate<Record>, MapSerializ
   }
 
   @Override
-  public boolean test(final Record record) {
+  public boolean test(final MapEx record) {
     final Condition condition = getCondition();
     if (condition == null) {
       return false;
