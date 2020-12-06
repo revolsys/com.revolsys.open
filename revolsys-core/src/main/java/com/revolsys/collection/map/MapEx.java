@@ -305,6 +305,32 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
     return value != null;
   }
 
+  default boolean hasValuesAll(final CharSequence... names) {
+    if (names == null || names.length == 0) {
+      return false;
+    } else {
+      for (final CharSequence name : names) {
+        if (!hasValue(name)) {
+          return false;
+        }
+      }
+      return true;
+    }
+  }
+
+  default boolean hasValuesAny(final CharSequence... names) {
+    if (names == null || names.length == 0) {
+      return false;
+    } else {
+      for (final CharSequence name : names) {
+        if (hasValue(name)) {
+          return true;
+        }
+      }
+      return false;
+    }
+  }
+
   @SuppressWarnings("unchecked")
   default <T extends Object> T removeValue(final CharSequence name) {
     if (name == null) {

@@ -352,4 +352,10 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
 
   void setTableAlias(String tableAlias);
 
+  default void validateRecord(final MapEx record) {
+    for (final FieldDefinition field : getFields()) {
+      field.validate(record);
+    }
+  }
+
 }

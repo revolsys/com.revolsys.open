@@ -25,8 +25,6 @@ import org.xlsx4j.sml.CTRst;
 import org.xlsx4j.sml.CTTable;
 import org.xlsx4j.sml.CTTableColumn;
 import org.xlsx4j.sml.CTTableColumns;
-import org.xlsx4j.sml.CTTablePart;
-import org.xlsx4j.sml.CTTableParts;
 import org.xlsx4j.sml.CTTableStyleInfo;
 import org.xlsx4j.sml.CTXstringWhitespace;
 import org.xlsx4j.sml.Cell;
@@ -125,12 +123,12 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
       final PartName spreadsheetPartName = new PartName("/xl/worksheets/sheet1.xml");
       this.sheet = this.spreadsheetPackage.createWorksheetPart(spreadsheetPartName, name, 1);
       final Worksheet worksheet = this.sheet.getContents();
-      final CTTableParts tableParts = smlObjectFactory.createCTTableParts();
-      tableParts.setCount(1L);
-      final CTTablePart tablePart = smlObjectFactory.createCTTablePart();
-      tablePart.setId("rId1");
-      tableParts.getTablePart().add(tablePart);
-      worksheet.setTableParts(tableParts);
+      // final CTTableParts tableParts = smlObjectFactory.createCTTableParts();
+      // tableParts.setCount(1L);
+      // final CTTablePart tablePart = smlObjectFactory.createCTTablePart();
+      // tablePart.setId("rId1");
+      // tableParts.getTablePart().add(tablePart);
+      // worksheet.setTableParts(tableParts);
 
       this.sheetData = worksheet.getSheetData();
       this.sheetRows = this.sheetData.getRow();

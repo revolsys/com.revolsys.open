@@ -920,11 +920,21 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
     }
   }
 
+  public Object validate(final MapEx record) {
+    final String fieldName = getName();
+    try {
+      final Object value = record.getValue(fieldName);
+      return validate(value);
+    } catch (final Throwable e) {
+      throw new ObjectPropertyException(record, fieldName, e.getMessage(), e);
+    }
+  }
+
   public Object validate(Object value) {
     final String fieldName = getName();
     value = toFieldValueException(value);
     if (value == null) {
-      if (isRequired()) {
+      if (isRequired() && !isGenerated()) {
         throw new IllegalArgumentException(fieldName + " is required");
       }
     } else {
@@ -1005,10 +1015,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
     try {
       return validate(value);
     } catch (final Throwable e) {
-      throw new ObjectPropertyException(record, fieldName, e.getMessage(), e
-
-      );
+      throw new ObjectPropertyException(record, fieldName, e.getMessage(), e);
     }
   }
-
 }
