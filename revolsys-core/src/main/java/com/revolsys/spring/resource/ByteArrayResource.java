@@ -2,6 +2,10 @@ package com.revolsys.spring.resource;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class ByteArrayResource extends AbstractResource {
@@ -11,6 +15,8 @@ public class ByteArrayResource extends AbstractResource {
   private final String description;
 
   private String filename;
+
+  private Charset charset = StandardCharsets.UTF_8;
 
   /**
    * Construct a new new ByteArrayResource.
@@ -79,6 +85,10 @@ public class ByteArrayResource extends AbstractResource {
     return true;
   }
 
+  public Charset getCharset() {
+    return this.charset;
+  }
+
   /**
    * Return the underlying byte array.
    */
@@ -116,6 +126,25 @@ public class ByteArrayResource extends AbstractResource {
   @Override
   public int hashCode() {
     return byte[].class.hashCode() * 29 * this.data.length;
+  }
+
+  @Override
+  public Reader newReader() {
+    final InputStream in = getInputStream();
+    if (in == null) {
+      return null;
+    } else {
+      return new InputStreamReader(in, this.charset);
+    }
+  }
+
+  public ByteArrayResource setCharset(final Charset charset) {
+    if (charset == null) {
+      this.charset = StandardCharsets.UTF_8;
+    } else {
+      this.charset = charset;
+    }
+    return this;
   }
 
 }

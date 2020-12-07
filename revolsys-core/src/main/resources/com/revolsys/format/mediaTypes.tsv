@@ -402,6 +402,7 @@ mscml	application/mediaservercontrol+xml
 mseed	application/vnd.fdsn.mseed
 mseq	application/vnd.mseq
 msf	application/vnd.epson.msf
+msg	application/vnd.ms-outlook
 msh	model/mesh
 msi	application/x-msdownload
 msl	application/vnd.mobius.msl
@@ -773,7 +774,7 @@ xdm	application/vnd.syncml.dm+xml
 xdp	application/vnd.adobe.xdp+xml
 xdw	application/vnd.fujixerox.docuworks
 xenc	application/xenc+xml
-xer	application/patch-ops-error+xml
+xer	application/x-xer
 xfdf	application/vnd.adobe.xfdf
 xfdl	application/vnd.xfdl
 xht	application/xhtml+xml

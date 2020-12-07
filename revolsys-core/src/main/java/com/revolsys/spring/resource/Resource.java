@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -338,8 +339,14 @@ public interface Resource extends org.springframework.core.io.Resource, FileProx
       return getFile();
     } catch (final Throwable e) {
       if (exists()) {
-        final String baseName = getBaseName();
-        final String fileNameExtension = getFileNameExtension();
+        String baseName = getBaseName();
+        if (baseName.length() < 3) {
+          baseName += "xxx";
+        }
+        String fileNameExtension = getFileNameExtension();
+        if (fileNameExtension.length() < 3) {
+          fileNameExtension += "xxx";
+        }
         final File file = FileUtil.newTempFile(baseName, "." + fileNameExtension);
         try (
           InputStream inputStream = getInputStream()) {
@@ -532,6 +539,11 @@ public interface Resource extends org.springframework.core.io.Resource, FileProx
   default Reader newReader() {
     final InputStream in = getInputStream();
     return FileUtil.newUtf8Reader(in);
+  }
+
+  default Reader newReader(final Charset charset) {
+    final InputStream in = getInputStream();
+    return new InputStreamReader(in, charset);
   }
 
   default Resource newResourceAddExtension(final String extension) {
