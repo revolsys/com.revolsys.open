@@ -24,6 +24,8 @@ public class Q {
 
   public static BiFunction<QueryValue, QueryValue, Condition> EQUAL = Equal::new;
 
+  public static BiFunction<QueryValue, QueryValue, Condition> IN = In::new;
+
   public static Add add(final QueryValue left, final QueryValue right) {
     return new Add(left, right);
   }

@@ -1,24 +1,28 @@
 package com.revolsys.record.schema;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.jeometry.common.io.PathName;
 
-import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStore;
+import com.revolsys.record.ArrayChangeTrackRecord;
+import com.revolsys.record.ChangeTrackRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.TableReference;
+import com.revolsys.transaction.Propagation;
+import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Property;
 
 public class AbstractTableRecordStore implements RecordDefinitionProxy {
@@ -34,11 +38,6 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
   protected Map<QueryValue, Boolean> defaultSortOrder = new LinkedHashMap<>();
 
   protected Query recordsQuery;
-
-  private final List<FieldDefinition> updateFields = new ArrayList<>();
-
-  private final List<String> nonUpdateFieldNames = Lists.newArray("id", "projectId",
-    "createTimestamp", "createUserId");
 
   public AbstractTableRecordStore(final PathName typePath) {
     this.tablePath = typePath;
@@ -118,6 +117,48 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     return this.tablePath;
   }
 
+  public Record insertOrUpdateRecord(final TableRecordStoreConnection connection,
+    final Condition condition, final Supplier<Record> newRecordSupplier,
+    final Consumer<Record> updateAction) {
+    final Query query = newQuery()//
+      .and(condition)
+      .setRecordFactory(ArrayChangeTrackRecord.FACTORY)
+      .setLockMode(LockMode.FOR_UPDATE);
+
+    final ChangeTrackRecord changeTrackRecord = getRecord(query);
+    if (changeTrackRecord == null) {
+      final Record newRecord = newRecordSupplier.get();
+      if (newRecord == null) {
+        return null;
+      } else {
+        return insertRecord(connection, newRecord);
+      }
+    } else {
+      updateAction.accept(changeTrackRecord);
+      updateRecordDo(connection, changeTrackRecord);
+      return changeTrackRecord.newRecord();
+    }
+  }
+
+  public Record insertRecord(final TableRecordStoreConnection connection, final Record record) {
+    try (
+      Transaction transaction = connection.newTransaction(Propagation.REQUIRED)) {
+      insertRecordBefore(connection, record);
+      validateRecord(record);
+      this.recordStore.insertRecord(record);
+      insertRecordAfter(connection, record);
+    }
+    return record;
+  }
+
+  protected void insertRecordAfter(final TableRecordStoreConnection connection,
+    final Record record) {
+  }
+
+  protected void insertRecordBefore(final TableRecordStoreConnection connection,
+    final Record record) {
+  }
+
   @Override
   public Query newQuery() {
     return this.recordDefinition.newQuery();
@@ -177,7 +218,6 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
           field.setGenerated(true);
         }
       }
-      updateCachedFields();
     }
   }
 
@@ -192,16 +232,48 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     setRecordDefinition(recordDefinition);
   }
 
-  private void updateCachedFields() {
-    this.updateFields.clear();
-    final List<FieldDefinition> fields = this.recordDefinition.getFields();
-    for (final FieldDefinition field : fields) {
-      final String fieldName = field.getName();
-      if (field.isGenerated()) {
-      } else if (this.nonUpdateFieldNames.contains(fieldName)) {
+  public Record updateRecord(final TableRecordStoreConnection tenant, final Condition condition,
+    final Consumer<Record> updateAction) {
+    try (
+      Transaction transaction = tenant.newTransaction(Propagation.REQUIRED)) {
+      final Query query = newQuery().and(condition);
+      query.setRecordFactory(ArrayChangeTrackRecord.FACTORY);
+      final ChangeTrackRecord record = getRecord(query);
+      if (record == null) {
+        return null;
       } else {
-        this.updateFields.add(field);
+        updateAction.accept(record);
+        updateRecordDo(tenant, record);
+        return record.newRecord();
       }
+    }
+  }
+
+  public Record updateRecord(final TableRecordStoreConnection tenant, final UUID id,
+    final Consumer<Record> updateAction) {
+    final Condition condition = this.recordDefinition.equal("id", id);
+    return updateRecord(tenant, condition, updateAction);
+  }
+
+  public Record updateRecord(final TableRecordStoreConnection tenant, final UUID id,
+    final JsonObject values) {
+    return updateRecord(tenant, id, (record) -> record.setValues(values));
+  }
+
+  protected void updateRecordAfter(final TableRecordStoreConnection connection,
+    final ChangeTrackRecord record) {
+  }
+
+  protected void updateRecordBefore(final TableRecordStoreConnection connection,
+    final ChangeTrackRecord record) {
+  }
+
+  private void updateRecordDo(final TableRecordStoreConnection connection,
+    final ChangeTrackRecord record) {
+    if (record.isModified()) {
+      updateRecordBefore(connection, record);
+      this.recordStore.updateRecord(record);
+      updateRecordAfter(connection, record);
     }
   }
 

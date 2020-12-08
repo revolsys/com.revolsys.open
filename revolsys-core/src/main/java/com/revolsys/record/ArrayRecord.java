@@ -174,4 +174,10 @@ public class ArrayRecord extends BaseRecord {
     this.values[index] = newValue;
   }
 
+  private void setValuesInternal(final Object[] values) {
+    for (int i = 0; i < values.length; i++) {
+      this.values[i] = values[i];
+    }
+  }
+
 }

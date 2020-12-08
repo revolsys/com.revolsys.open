@@ -26,6 +26,17 @@ public class In extends AbstractBinaryQueryValue implements Condition {
     }
   }
 
+  public In(final QueryValue left, final QueryValue right) {
+    super(left, right);
+    if (left instanceof ColumnReference && right instanceof CollectionValue) {
+      final ColumnReference column = (ColumnReference)left;
+      final FieldDefinition field = column.getFieldDefinition();
+      if (field != null) {
+        ((CollectionValue)right).setFieldDefinition(field);
+      }
+    }
+  }
+
   public In(final String name, final Collection<? extends Object> values) {
     this(new Column(name), new CollectionValue(values));
   }

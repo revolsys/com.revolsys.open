@@ -6,4 +6,9 @@ public interface ChangeTrackRecord extends Record {
 
   boolean isModified(String fieldName);
 
+  /*
+   * Create a shallow clone of this record. The ChangeTrackRecord shouldn't be
+   * used after this.
+   */
+  Record newRecord();
 }

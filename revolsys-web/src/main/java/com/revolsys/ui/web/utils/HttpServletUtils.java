@@ -72,6 +72,14 @@ public final class HttpServletUtils {
     return false;
   }
 
+  public static Boolean getBoolParameter(final HttpServletRequest request, final String paramName) {
+    final String value = request.getParameter(paramName);
+    if (Property.hasValue(value)) {
+      return Boolean.parseBoolean(value);
+    }
+    return null;
+  }
+
   public static String getFullRequestUrl() {
     final HttpServletRequest request = getRequest();
     return getFullRequestUrl(request);
@@ -97,6 +105,15 @@ public final class HttpServletUtils {
       }
     }
     return 0;
+  }
+
+  public static int getIntParameter(final HttpServletRequest request, final String paramName,
+    final int defaultValue) {
+    final String value = request.getParameter(paramName);
+    if (Property.hasValue(value)) {
+      return Integer.parseInt(value);
+    }
+    return defaultValue;
   }
 
   public static String getOriginatingContextPath() {
@@ -308,4 +325,5 @@ public final class HttpServletUtils {
   private HttpServletUtils() {
 
   }
+
 }
