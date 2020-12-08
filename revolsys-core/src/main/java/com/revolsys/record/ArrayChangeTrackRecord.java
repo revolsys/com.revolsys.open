@@ -73,6 +73,11 @@ public class ArrayChangeTrackRecord extends ArrayRecord implements ChangeTrackRe
     }
   }
 
+  @Override
+  public Record newRecord() {
+    return new ArrayRecord(this);
+  }
+
   protected Map<String, Object> removeOriginalValue(final Map<String, Object> originalValues,
     final String fieldName) {
     if (!originalValues.isEmpty()) {
