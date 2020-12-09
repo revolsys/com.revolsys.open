@@ -118,12 +118,14 @@ public interface JsonObject extends MapEx, JsonType {
   }
 
   default JsonObject addValuesClone(final MapEx values) {
-    for (final String name : values.keySet()) {
-      Object value = values.getValue(name);
-      if (value != null) {
-        value = JsonType.toJsonClone(value);
+    if (values != null) {
+      for (final String name : values.keySet()) {
+        Object value = values.getValue(name);
+        if (value != null) {
+          value = JsonType.toJsonClone(value);
+        }
+        addValue(name, value);
       }
-      addValue(name, value);
     }
     return this;
   }

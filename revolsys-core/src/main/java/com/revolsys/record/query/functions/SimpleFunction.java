@@ -29,6 +29,11 @@ public class SimpleFunction extends AbstractMultiQueryValue implements Function 
     }
   }
 
+  public SimpleFunction(final String name, final int expectedParameterCount,
+    final QueryValue... parameters) {
+    this(name, expectedParameterCount, Arrays.asList(parameters));
+  }
+
   public SimpleFunction(final String name, final List<QueryValue> parameters) {
     super(parameters);
     this.name = name;

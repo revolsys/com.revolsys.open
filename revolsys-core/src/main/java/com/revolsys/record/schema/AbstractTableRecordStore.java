@@ -17,6 +17,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.TableReference;
@@ -68,14 +69,23 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     return this.defaultSortOrder;
   }
 
-  @SuppressWarnings("unchecked")
-  public <R extends Record> R getRecord(final Query query) {
-    return (R)this.recordStore.getRecord(query);
+  public Record getRecord(final TableRecordStoreConnection connection, final CharSequence fieldName,
+    final Object value) {
+    final Query query = newQuery(fieldName, value);
+    return getRecord(connection, query);
   }
 
-  public Record getRecordById(final UUID id) {
-    final Query query = newQuery("id", id);
-    return getRecord(query);
+  @SuppressWarnings("unchecked")
+  public <R extends Record> R getRecord(final TableRecordStoreConnection connection,
+    final Query query) {
+    try (
+      Transaction transaction = connection.newTransaction(Propagation.REQUIRED)) {
+      return (R)this.recordStore.getRecord(query);
+    }
+  }
+
+  public Record getRecordById(final TableRecordStoreConnection connection, final UUID id) {
+    return getRecord(connection, "id", id);
   }
 
   public int getRecordCount(final Query query) {
@@ -119,11 +129,15 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     final Condition condition, final Supplier<Record> newRecordSupplier,
     final Consumer<Record> updateAction) {
     final Query query = newQuery()//
-      .and(condition)
-      .setRecordFactory(ArrayChangeTrackRecord.FACTORY)
-      .setLockMode(LockMode.FOR_UPDATE);
+      .and(condition);
+    return insertOrUpdateRecord(connection, query, newRecordSupplier, updateAction);
+  }
 
-    final ChangeTrackRecord changeTrackRecord = getRecord(query);
+  public Record insertOrUpdateRecord(final TableRecordStoreConnection connection, final Query query,
+    final Supplier<Record> newRecordSupplier, final Consumer<Record> updateAction) {
+    query.setRecordFactory(ArrayChangeTrackRecord.FACTORY).setLockMode(LockMode.FOR_UPDATE);
+
+    final ChangeTrackRecord changeTrackRecord = getRecord(connection, query);
     if (changeTrackRecord == null) {
       final Record newRecord = newRecordSupplier.get();
       if (newRecord == null) {
@@ -162,10 +176,9 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     return this.recordDefinition.newQuery();
   }
 
-  public Query newQuery(final String fieldName, final Object value) {
-    final Condition equal = this.recordDefinition.equal(fieldName, value);
+  public Query newQuery(final CharSequence fieldName, final Object value) {
     return newQuery() //
-      .and(equal)//
+      .and(fieldName, Q.EQUAL, value)//
     ;
   }
 
@@ -211,32 +224,37 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     }
   }
 
-  public Record updateRecord(final TableRecordStoreConnection tenant, final Condition condition,
+  public Record updateRecord(final TableRecordStoreConnection connection, final Condition condition,
+    final Consumer<Record> updateAction) {
+    final Query query = newQuery().and(condition);
+    return updateRecord(connection, query, updateAction);
+  }
+
+  public Record updateRecord(final TableRecordStoreConnection connection, final Query query,
     final Consumer<Record> updateAction) {
     try (
-      Transaction transaction = tenant.newTransaction(Propagation.REQUIRED)) {
-      final Query query = newQuery().and(condition);
+      Transaction transaction = connection.newTransaction(Propagation.REQUIRED)) {
       query.setRecordFactory(ArrayChangeTrackRecord.FACTORY);
-      final ChangeTrackRecord record = getRecord(query);
+      final ChangeTrackRecord record = getRecord(connection, query);
       if (record == null) {
         return null;
       } else {
         updateAction.accept(record);
-        updateRecordDo(tenant, record);
+        updateRecordDo(connection, record);
         return record.newRecord();
       }
     }
   }
 
-  public Record updateRecord(final TableRecordStoreConnection tenant, final UUID id,
+  public Record updateRecord(final TableRecordStoreConnection connection, final UUID id,
     final Consumer<Record> updateAction) {
     final Condition condition = this.recordDefinition.equal("id", id);
-    return updateRecord(tenant, condition, updateAction);
+    return updateRecord(connection, condition, updateAction);
   }
 
-  public Record updateRecord(final TableRecordStoreConnection tenant, final UUID id,
+  public Record updateRecord(final TableRecordStoreConnection connection, final UUID id,
     final JsonObject values) {
-    return updateRecord(tenant, id, (record) -> record.setValues(values));
+    return updateRecord(connection, id, (record) -> record.setValues(values));
   }
 
   protected void updateRecordAfter(final TableRecordStoreConnection connection,

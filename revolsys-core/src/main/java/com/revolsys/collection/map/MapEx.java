@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.jeometry.common.compare.CompareUtil;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypedValue;
@@ -74,6 +75,35 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
   }
 
   MapEx clone();
+
+  default int compareValue(final CharSequence fieldName, final Object value) {
+    if (containsKey(fieldName)) {
+      final Object fieldValue = getValue(fieldName);
+      return CompareUtil.compare(fieldValue, value);
+    } else {
+      return -1;
+    }
+  }
+
+  default int compareValue(final MapEx map, final CharSequence fieldName) {
+    if (map != null) {
+      final Object value = map.get(fieldName);
+      return compareValue(fieldName, value);
+    }
+    return -1;
+  }
+
+  default int compareValue(final MapEx map, final CharSequence fieldName,
+    final boolean nullsFirst) {
+    final Comparable<Object> value1 = getValue(fieldName);
+    Object value2;
+    if (map == null) {
+      value2 = null;
+    } else {
+      value2 = map.getValue(fieldName);
+    }
+    return CompareUtil.compare(value1, value2, nullsFirst);
+  }
 
   @Override
   @SuppressWarnings("unchecked")

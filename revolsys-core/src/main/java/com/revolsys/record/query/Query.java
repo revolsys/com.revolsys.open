@@ -294,26 +294,13 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   public Query and(final CharSequence fieldName,
     final BiFunction<QueryValue, QueryValue, Condition> operator, final Object value) {
-    final ColumnReference left = this.table.getColumn(fieldName);
-    Condition condition;
-    if (value == null) {
-      condition = new IsNull(left);
-    } else {
-      QueryValue right;
-      if (value instanceof QueryValue) {
-        right = (QueryValue)value;
-      } else {
-        right = new Value(left, value);
-      }
-      condition = operator.apply(left, right);
-    }
+    final Condition condition = newCondition(fieldName, operator, value);
     return and(condition);
   }
 
   public Query and(final CharSequence fieldName,
     final java.util.function.Function<QueryValue, Condition> operator) {
-    final ColumnReference column = this.table.getColumn(fieldName);
-    final Condition condition = operator.apply(column);
+    final Condition condition = newCondition(fieldName, operator);
     return and(condition);
   }
 
@@ -601,10 +588,53 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   }
 
+  public Condition newCondition(final CharSequence fieldName,
+    final BiFunction<QueryValue, QueryValue, Condition> operator, final Object value) {
+    final ColumnReference left = this.table.getColumn(fieldName);
+    Condition condition;
+    if (value == null) {
+      condition = new IsNull(left);
+    } else {
+      QueryValue right;
+      if (value instanceof QueryValue) {
+        right = (QueryValue)value;
+      } else {
+        right = new Value(left, value);
+      }
+      condition = operator.apply(left, right);
+    }
+    return condition;
+  }
+
+  public Condition newCondition(final CharSequence fieldName,
+    final java.util.function.Function<QueryValue, Condition> operator) {
+    final ColumnReference column = this.table.getColumn(fieldName);
+    final Condition condition = operator.apply(column);
+    return condition;
+  }
+
   public Query newQuery(final RecordDefinition recordDefinition) {
     final Query query = clone();
     query.setRecordDefinition(recordDefinition);
     return query;
+  }
+
+  public <QV extends QueryValue> QV newQueryValue(final CharSequence fieldName,
+    final BiFunction<QueryValue, QueryValue, QV> operator, final Object value) {
+    final ColumnReference left = this.table.getColumn(fieldName);
+    QueryValue right;
+    if (value instanceof QueryValue) {
+      right = (QueryValue)value;
+    } else {
+      right = new Value(left, value);
+    }
+    return operator.apply(left, right);
+  }
+
+  public <QV extends QueryValue> QV newQueryValue(final CharSequence fieldName,
+    final java.util.function.Function<QueryValue, QV> operator) {
+    final ColumnReference column = this.table.getColumn(fieldName);
+    return operator.apply(column);
   }
 
   public String newSelectSql(final Map<QueryValue, Boolean> orderBy, final TableReference table) {
@@ -670,8 +700,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   public Query or(final CharSequence fieldName,
     final java.util.function.Function<QueryValue, Condition> operator) {
-    final ColumnReference column = this.table.getColumn(fieldName);
-    final Condition condition = operator.apply(column);
+    final Condition condition = newCondition(fieldName, operator);
     return or(condition);
   }
 
