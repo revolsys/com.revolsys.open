@@ -1,5 +1,6 @@
 package com.revolsys.record.schema;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -33,19 +34,20 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
 
   protected final String typeName;
 
-  protected final RecordDefinition recordDefinition;
+  protected RecordDefinition recordDefinition;
 
   protected Map<QueryValue, Boolean> defaultSortOrder = new LinkedHashMap<>();
 
-  protected final Query recordsQuery;
+  protected Query recordsQuery;
 
-  public AbstractTableRecordStore(final PathName typePath, final JdbcRecordStore recordStore) {
-    this.recordStore = recordStore;
+  public AbstractTableRecordStore(final PathName typePath) {
     this.tablePath = typePath;
     this.typeName = typePath.getName();
-    this.recordDefinition = this.recordStore.getRecordDefinition(typePath);
-    this.recordsQuery = new Query(this.recordDefinition);
+  }
 
+  public AbstractTableRecordStore(final PathName typePath, final JdbcRecordStore recordStore) {
+    this(typePath);
+    setRecordStore(recordStore);
   }
 
   public void addDefaultSortOrder(final Query query) {
@@ -205,6 +207,14 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     return UUID.randomUUID();
   }
 
+  protected void setDefaultSortOrder(final Collection<String> fieldNames) {
+    this.defaultSortOrder.clear();
+    for (final String fieldName : fieldNames) {
+      addDefaultSortOrder(fieldName);
+    }
+
+  }
+
   public void setDefaultSortOrder(final String... fieldNames) {
     this.defaultSortOrder.clear();
     for (final String fieldName : fieldNames) {
@@ -222,6 +232,17 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
         }
       }
     }
+  }
+
+  protected void setRecordDefinition(final RecordDefinition recordDefinition) {
+    this.recordDefinition = recordDefinition;
+    this.recordsQuery = new Query(this.recordDefinition);
+  }
+
+  protected void setRecordStore(final JdbcRecordStore recordStore) {
+    this.recordStore = recordStore;
+    final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(this.tablePath);
+    setRecordDefinition(recordDefinition);
   }
 
   public Record updateRecord(final TableRecordStoreConnection connection, final Condition condition,
