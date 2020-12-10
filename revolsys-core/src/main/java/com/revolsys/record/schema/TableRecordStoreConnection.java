@@ -2,15 +2,19 @@ package com.revolsys.record.schema;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.io.PathNameProxy;
 
+import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.transaction.Propagation;
@@ -18,38 +22,110 @@ import com.revolsys.transaction.Transaction;
 
 public interface TableRecordStoreConnection {
 
-  void addDefaultSortOrder(PathName tablePath, Query query);
+  default void addDefaultSortOrder(final PathName tablePath, final Query query) {
+    final AbstractTableRecordStore recordStore = getTableRecordStore(tablePath);
+    recordStore.addDefaultSortOrder(query);
+  }
 
-  Map<QueryValue, Boolean> getDefaultSortOrder(PathName tablePath);
+  default Map<QueryValue, Boolean> getDefaultSortOrder(final PathName tablePath) {
+    final AbstractTableRecordStore tableRecordStore = getTableRecordStore(tablePath);
+    return tableRecordStore.getDefaultSortOrder();
+  }
 
-  Record getRecord(Query query);
+  default Record getRecord(final Query query) {
+    try (
+      Transaction transaction = newTransaction(Propagation.REQUIRED)) {
+      JdbcRecordStore recordStore = getRecordStore();
+      return recordStore.getRecord(query);
+    }
+  }
 
-  <C extends AbstractTableRecordStore> C getRecordController(PathName pathName);
+  default long getRecordCount(final Query query) {
+    JdbcRecordStore recordStore = getRecordStore();
+    return recordStore.getRecordCount(query);
+  }
 
-  <C extends AbstractTableRecordStore> C getRecordController(PathNameProxy pathNameProxy);
+  default RecordDefinition getRecordDefinition(final PathName tablePath) {
+    JdbcRecordStore recordStore = getRecordStore();
+    return recordStore.getRecordDefinition(tablePath);
+  }
 
-  long getRecordCount(Query query);
+  default RecordReader getRecordReader(final Query query) {
+    JdbcRecordStore recordStore = getRecordStore();
+    return recordStore.getRecords(query);
+  }
 
-  RecordDefinition getRecordDefinition(PathName tablePath);
+  default List<Record> getRecords(final Query query) {
+    try (
+      Transaction transaction = newTransaction(Propagation.REQUIRED);
+      RecordReader recordReader = getRecordStore().getRecords(query)) {
+      return recordReader.toList();
+    } catch (final Exception e) {
+      throw Exceptions.wrap("Query error\n" + query, e);
+    }
+  }
 
-  RecordReader getRecordReader(Query query);
+  JdbcRecordStore getRecordStore();
 
-  List<Record> getRecords(Query query);
+  <TRS extends AbstractTableRecordStore> TRS getTableRecordStore(PathName pathName);
 
-  Record insertRecord(Record record);
+  default <TRS extends AbstractTableRecordStore> TRS getTableRecordStore(
+    final PathNameProxy pathNameProxy) {
+    if (pathNameProxy != null) {
+      final PathName pathName = pathNameProxy.getPathName();
+      return getTableRecordStore(pathName);
+    }
+    return null;
+  }
 
-  Query newQuery(PathName tablePath);
+  default <TRS extends AbstractTableRecordStore> Record insertOrUpdateRecord(
+    final PathName tablePath, final Condition condition,
+    final Function<TRS, Record> newRecordSupplier, final Consumer<Record> updateAction) {
+    final TRS tableRecordStore = getTableRecordStore(tablePath);
+    return tableRecordStore.insertOrUpdateRecord(this, condition, () -> {
+      return newRecordSupplier.apply(tableRecordStore);
+    }, updateAction);
+  }
 
-  Record newRecord(PathName tablePath, JsonObject json);
+  default Record insertRecord(final Record record) {
+    final AbstractTableRecordStore tableRecordStore = getTableRecordStore(record);
+    return tableRecordStore.insertRecord(this, record);
+  }
 
-  Transaction newTransaction();
+  default Query newQuery(final PathName tablePath) {
+    final JdbcRecordStore recordStore = getRecordStore();
+    return recordStore.newQuery(tablePath);
+  }
 
-  Transaction newTransaction(Propagation propagation);
+  default Record newRecord(final PathName tablePath, final JsonObject json) {
+    final AbstractTableRecordStore tableRecordStore = getTableRecordStore(tablePath);
+    return tableRecordStore.newRecord(json);
+  }
 
-  Record updateRecord(PathName tablePath, UUID id, Consumer<Record> updateAction);
+  default Transaction newTransaction() {
+    return newTransaction(Propagation.REQUIRES_NEW);
+  }
 
-  Record updateRecord(PathName tablePath, UUID id, JsonObject values);
+  default Transaction newTransaction(final Propagation propagation) {
+    final JdbcRecordStore recordStore = getRecordStore();
+    return recordStore.newTransaction(propagation);
+  }
 
-  Record updateRecord(Record record, Consumer<Record> updateAction);
+  default Record updateRecord(final PathName tablePath, final Identifier id,
+    final Consumer<Record> updateAction) {
+    final AbstractTableRecordStore tableRecordStore = getTableRecordStore(tablePath);
+    return tableRecordStore.updateRecord(this, id, updateAction);
+  }
 
+  default Record updateRecord(final PathName tablePath, final Identifier id,
+    final JsonObject values) {
+    final AbstractTableRecordStore tableRecordStore = getTableRecordStore(tablePath);
+    return tableRecordStore.updateRecord(this, id, values);
+  }
+
+  default Record updateRecord(final Record record, final Consumer<Record> updateAction) {
+    final PathName tablePath = record.getPathName();
+    final Identifier id = record.getIdentifier();
+    return updateRecord(tablePath, id, updateAction);
+  }
 }

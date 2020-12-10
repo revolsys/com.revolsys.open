@@ -7,6 +7,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.io.PathName;
 
 import com.revolsys.collection.map.MapEx;
@@ -249,6 +250,17 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     final Consumer<Record> updateAction) {
     final Query query = newQuery().and(condition);
     return updateRecord(connection, query, updateAction);
+  }
+
+  public Record updateRecord(final TableRecordStoreConnection connection, final Identifier id,
+    final Consumer<Record> updateAction) {
+    final Condition condition = Q.equalId(this.recordDefinition.getIdFieldNames(), id);
+    return updateRecord(connection, condition, updateAction);
+  }
+
+  public Record updateRecord(final TableRecordStoreConnection connection, final Identifier id,
+    final JsonObject values) {
+    return updateRecord(connection, id, (record) -> record.setValues(values));
   }
 
   public Record updateRecord(final TableRecordStoreConnection connection, final Query query,

@@ -5,13 +5,12 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 import org.springframework.http.HttpStatus;
@@ -51,7 +50,7 @@ public class AbstractRecordRestController {
     this.typeName = tablePath.getName();
   }
 
-  protected void handleGetRecord(final TableRecordStoreConnection tenant,
+  protected void handleGetRecord(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final HttpServletResponse response, final Query query)
     throws IOException {
     final int offset = HttpServletUtils.getIntParameter(request, "$skip", 0);
@@ -65,10 +64,10 @@ public class AbstractRecordRestController {
       query.setLimit(limit);
     }
 
-    responseRecordJson(tenant, request, response, query);
+    responseRecordJson(connection, request, response, query);
   }
 
-  protected void handleGetRecords(final TableRecordStoreConnection tenant,
+  protected void handleGetRecords(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final HttpServletResponse response, final Query query)
     throws IOException {
     final int offset = HttpServletUtils.getIntParameter(request, "$skip", 0);
@@ -83,69 +82,58 @@ public class AbstractRecordRestController {
     }
     final boolean returnCount = HttpServletUtils.getBooleanParameter(request, "$count");
     try (
-      Transaction transaction = tenant.newTransaction();
-      final RecordReader records = tenant.getRecordReader(query)) {
+      Transaction transaction = connection.newTransaction();
+      final RecordReader records = connection.getRecordReader(query)) {
       Long count = null;
       if (returnCount) {
-        count = tenant.getRecordCount(query);
+        count = connection.getRecordCount(query);
       }
-      responseRecords(tenant, request, response, records, count);
+      responseRecords(connection, request, response, records, count);
     }
   }
 
-  protected void handleInsertRecord(final TableRecordStoreConnection tenant,
+  protected void handleInsertRecord(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final HttpServletResponse response) throws IOException {
     final JsonObject json = readJsonBody(request);
-    final Record record = tenant.newRecord(this.tablePath, json);
-    handleInsertRecordDo(tenant, request, response, record);
+    final Record record = connection.newRecord(this.tablePath, json);
+    handleInsertRecordDo(connection, request, response, record);
   }
 
-  protected void handleInsertRecordDo(final TableRecordStoreConnection tenant,
+  protected void handleInsertRecordDo(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final HttpServletResponse response, Record record)
     throws IOException {
-    record = tenant.insertRecord(record);
-    responseRecordJson(tenant, request, response, record);
+    record = connection.insertRecord(record);
+    responseRecordJson(connection, request, response, record);
   }
 
-  protected void handleUpdateRecord(final TableRecordStoreConnection tenant,
-    final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-    final JsonObject newValues = readJsonBody(request);
-    final UUID id = newValues.getValue("id", DataTypes.UUID);
-    if (isUpdateable(tenant, id)) {
-      handleUpdateRecordDo(tenant, request, response, id, newValues);
-    } else {
-      throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-    }
-  }
-
-  protected void handleUpdateRecordDo(final TableRecordStoreConnection tenant,
-    final HttpServletRequest request, final HttpServletResponse response, final UUID id,
+  protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
+    final HttpServletRequest request, final HttpServletResponse response, final Identifier id,
     final Consumer<Record> updateAction) throws IOException {
-    final Record record = tenant.updateRecord(this.tablePath, id, updateAction);
-    responseRecordJson(tenant, request, response, record);
+    final Record record = connection.updateRecord(this.tablePath, id, updateAction);
+    responseRecordJson(connection, request, response, record);
   }
 
-  protected void handleUpdateRecordDo(final TableRecordStoreConnection tenant,
-    final HttpServletRequest request, final HttpServletResponse response, final UUID id,
+  protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
+    final HttpServletRequest request, final HttpServletResponse response, final Identifier id,
     final JsonObject values) throws IOException {
-    final Record record = tenant.updateRecord(this.tablePath, id, values);
-    responseRecordJson(tenant, request, response, record);
+    final Record record = connection.updateRecord(this.tablePath, id, values);
+    responseRecordJson(connection, request, response, record);
   }
 
-  protected boolean isUpdateable(final TableRecordStoreConnection tenant, final UUID id) {
+  protected boolean isUpdateable(final TableRecordStoreConnection connection, final Identifier id) {
     return true;
   }
 
-  protected Query newQuery(final TableRecordStoreConnection tenant,
+  protected Query newQuery(final TableRecordStoreConnection connection,
     final HttpServletRequest request) {
-    return newQuery(tenant, request, Integer.MAX_VALUE);
+    return newQuery(connection, request, Integer.MAX_VALUE);
   }
 
-  protected Query newQuery(final TableRecordStoreConnection tenant,
+  protected Query newQuery(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final int maxRecords) {
-    final Query query = tenant.newQuery(this.tablePath);
+    final Query query = connection.newQuery(this.tablePath);
     final String select = request.getParameter("$select");
-    newQuerySelect(tenant, query, select);
+    newQuerySelect(connection, query, select);
 
     final int offset = HttpServletUtils.getIntParameter(request, "$skip", 0);
     if (offset < 0) {
@@ -161,9 +149,9 @@ public class AbstractRecordRestController {
     }
     limit = Math.min(limit, maxRecords);
     query.setLimit(limit);
-    newQueryFilterCondition(tenant, query, request);
+    newQueryFilterCondition(connection, query, request);
     final String orderBy = request.getParameter("$orderby");
-    newQueryOrderBy(tenant, query, orderBy);
+    newQueryOrderBy(connection, query, orderBy);
     return query;
   }
 
@@ -193,8 +181,8 @@ public class AbstractRecordRestController {
     }
   }
 
-  private void newQueryFilterCondition(final TableRecordStoreConnection tenant, final Query query,
-    final HttpServletRequest request) {
+  private void newQueryFilterCondition(final TableRecordStoreConnection connection,
+    final Query query, final HttpServletRequest request) {
     final String[] filterFieldNames = request.getParameterValues("filterFieldName");
     final String[] filterValues = request.getParameterValues("filterValue");
     if (filterFieldNames != null) {
@@ -212,15 +200,15 @@ public class AbstractRecordRestController {
     }
     final String search = request.getParameter("$search");
     if (search != null && search.trim().length() > 0) {
-      newQueryFilterConditionSearch(tenant, query, search);
+      newQueryFilterConditionSearch(connection, query, search);
     }
   }
 
-  protected void newQueryFilterConditionSearch(final TableRecordStoreConnection tenant,
+  protected void newQueryFilterConditionSearch(final TableRecordStoreConnection connection,
     final Query query, final String search) {
   }
 
-  private void newQueryOrderBy(final TableRecordStoreConnection tenant, final Query query,
+  private void newQueryOrderBy(final TableRecordStoreConnection connection, final Query query,
     final String orderBy) {
     if (Property.hasValue(orderBy)) {
       for (String orderClause : orderBy.split(",")) {
@@ -239,10 +227,10 @@ public class AbstractRecordRestController {
         query.addOrderBy(fieldName, ascending);
       }
     }
-    tenant.addDefaultSortOrder(this.tablePath, query);
+    connection.addDefaultSortOrder(this.tablePath, query);
   }
 
-  private void newQuerySelect(final TableRecordStoreConnection tenant, final Query query,
+  private void newQuerySelect(final TableRecordStoreConnection connection, final Query query,
     final String select) {
     if (Property.hasValue(select)) {
       for (String selectItem : select.split(",")) {
@@ -261,7 +249,7 @@ public class AbstractRecordRestController {
     return json;
   }
 
-  protected void responseJson(final TableRecordStoreConnection tenant,
+  protected void responseJson(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final HttpServletResponse response,
     final JsonObject jsonObject) throws IOException {
     setContentTypeJson(response);
@@ -273,14 +261,14 @@ public class AbstractRecordRestController {
     }
   }
 
-  protected void responseRecordJson(final TableRecordStoreConnection tenant,
+  protected void responseRecordJson(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final HttpServletResponse response, final Query query)
     throws IOException {
-    final Record record = tenant.getRecord(query);
-    responseRecordJson(tenant, request, response, record);
+    final Record record = connection.getRecord(query);
+    responseRecordJson(connection, request, response, record);
   }
 
-  protected void responseRecordJson(final TableRecordStoreConnection tenant,
+  protected void responseRecordJson(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final HttpServletResponse response, final Record record)
     throws IOException {
     if (record == null) {
@@ -298,13 +286,13 @@ public class AbstractRecordRestController {
     }
   }
 
-  protected void responseRecords(final TableRecordStoreConnection tenant,
+  protected void responseRecords(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final HttpServletResponse response, final RecordReader reader,
     final Long count) throws IOException {
     if ("csv".equals(request.getParameter("format"))) {
       responseRecordsCsv(response, reader);
     } else {
-      responseRecordsJson(tenant, response, reader, count);
+      responseRecordsJson(connection, response, reader, count);
     }
   }
 
@@ -322,18 +310,18 @@ public class AbstractRecordRestController {
     }
   }
 
-  public void responseRecordsJson(final TableRecordStoreConnection tenant,
+  public void responseRecordsJson(final TableRecordStoreConnection connection,
     final HttpServletResponse response, final Query query, final Long count) throws IOException {
     try (
-      Transaction transaction = tenant.newTransaction();
-      final RecordReader records = tenant.getRecordReader(query)) {
-      responseRecordsJson(tenant, response, records, count);
+      Transaction transaction = connection.newTransaction();
+      final RecordReader records = connection.getRecordReader(query)) {
+      responseRecordsJson(connection, response, records, count);
     } catch (final Exception e) {
       throw Exceptions.wrap(query.toString(), e);
     }
   }
 
-  protected void responseRecordsJson(final TableRecordStoreConnection tenant,
+  protected void responseRecordsJson(final TableRecordStoreConnection connection,
     final HttpServletResponse response, final RecordReader reader, final Long count)
     throws IOException {
     reader.open();
