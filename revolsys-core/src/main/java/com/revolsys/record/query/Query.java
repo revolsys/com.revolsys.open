@@ -755,7 +755,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this;
   }
 
-  public Query select(final String name, final String alias) {
+  public Query selectAlias(final String name, final String alias) {
     final ColumnReference column = this.table.getColumn(name);
     final ColumnAlias columnAlias = new ColumnAlias(column, alias);
     this.selectExpressions.add(columnAlias);
