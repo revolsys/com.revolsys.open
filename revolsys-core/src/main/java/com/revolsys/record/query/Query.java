@@ -743,7 +743,8 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     } else {
       throw new IllegalArgumentException("Not a valid select expression :" + select);
     }
-    return select(selectExpression);
+    this.selectExpressions.add(selectExpression);
+    return this;
   }
 
   public Query select(final Object... select) {
@@ -754,15 +755,11 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this;
   }
 
-  public Query select(final QueryValue select) {
-    this.selectExpressions.add(select);
-    return this;
-  }
-
   public Query select(final String name, final String alias) {
     final ColumnReference column = this.table.getColumn(name);
     final ColumnAlias columnAlias = new ColumnAlias(column, alias);
-    return select(columnAlias);
+    this.selectExpressions.add(columnAlias);
+    return this;
   }
 
   public Query select(final TableReference table, final String fieldName) {
