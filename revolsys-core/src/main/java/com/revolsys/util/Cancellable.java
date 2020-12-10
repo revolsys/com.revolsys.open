@@ -12,6 +12,9 @@ public interface Cancellable {
     return false;
   };
 
+  default void cancel() {
+  }
+
   default <V> Iterable<V> cancellable(final Iterable<V> iterable) {
     return new CancelIterable<>(this, iterable);
   }

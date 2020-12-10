@@ -23,6 +23,7 @@ import java.nio.file.attribute.DosFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -405,6 +406,14 @@ public interface Paths {
       return new java.sql.Date(Files.getLastModifiedTime(path).toMillis());
     } catch (final IOException e) {
       return new java.sql.Date(0);
+    }
+  }
+
+  static Instant lastModifiedInstant(final Path path) {
+    try {
+      return Files.getLastModifiedTime(path).toInstant();
+    } catch (final IOException e) {
+      return Instant.MIN;
     }
   }
 

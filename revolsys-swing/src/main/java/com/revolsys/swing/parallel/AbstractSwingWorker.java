@@ -32,6 +32,11 @@ public abstract class AbstractSwingWorker<B, V> extends SwingWorker<B, V>
     this.showBusyCursor = showBusyCursor;
   }
 
+  @Override
+  public void cancel() {
+    super.cancel(true);
+  }
+
   private void doDoneTask() {
     try {
       if (isCancelled()) {

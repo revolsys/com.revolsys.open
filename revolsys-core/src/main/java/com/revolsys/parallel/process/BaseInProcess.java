@@ -24,6 +24,11 @@ public class BaseInProcess<T> extends AbstractInProcess<T> implements Cancellabl
   }
 
   @Override
+  public void cancel() {
+    this.running = false;
+  }
+
+  @Override
   public boolean isCancelled() {
     if (this.running) {
       if (this.cancellable != null) {

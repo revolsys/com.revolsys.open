@@ -248,6 +248,7 @@ public interface Record
     }
   }
 
+  @Override
   default int compareValue(final CharSequence fieldName, final Object value) {
     final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
     if (fieldDefinition == null) {
@@ -850,29 +851,6 @@ public interface Record
   }
 
   /**
-   * Get the value of the field with the specified name.
-   *
-   * @param name The name of the field.
-   * @return The field value.
-   */
-
-  @Override
-  default <T extends Object> T getValue(final CharSequence name) {
-    if (name == null) {
-      return null;
-    } else {
-      final String nameString = name.toString();
-      return getValue(nameString);
-    }
-  }
-
-  @Override
-  default <T extends Object> T getValue(final CharSequence name, final DataType dataType) {
-    final Object value = getValue(name);
-    return dataType.toObject(value);
-  }
-
-  /**
    * Get the value of the field with the specified index.
    *
    * @param index The index of the field.
@@ -1010,6 +988,7 @@ public interface Record
     return Property.hasValue(value);
   }
 
+  @Override
   default boolean hasValuesAll(final CharSequence... fieldNames) {
     for (final CharSequence fieldName : fieldNames) {
       if (!hasValue(fieldName)) {
@@ -1025,6 +1004,7 @@ public interface Record
    * @param fieldNames
    * @return True if any of the fields have a value, false otherwise.
    */
+  @Override
   default boolean hasValuesAny(final CharSequence... fieldNames) {
     for (final CharSequence fieldName : fieldNames) {
       if (hasValue(fieldName)) {

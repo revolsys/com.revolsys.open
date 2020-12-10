@@ -207,6 +207,11 @@ public abstract class ViewRenderer implements BoundingBoxProxy, Cancellable {
 
   public abstract BaseCloseable applyMarkerStyle(MarkerStyle style);
 
+  @Override
+  public void cancel() {
+    this.cancellable.cancel();
+  }
+
   public void drawBboxOutline(final GeometryStyle style, final BoundingBoxProxy boundingBox) {
     final LinearRing ring = boundingBox.getBoundingBox().toLinearRing(this.geometryFactory, 50, 50);
     drawLine(style, ring);

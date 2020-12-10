@@ -2,6 +2,7 @@ package com.revolsys.collection.map;
 
 import java.sql.Clob;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -198,6 +199,10 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
     return Identifier.newIdentifier(value);
   }
 
+  default Instant getInstant(final CharSequence name) {
+    return getValue(name, DataTypes.INSTANT);
+  }
+
   default Integer getInteger(final CharSequence name) {
     return getValue(name, DataTypes.INT);
   }
@@ -292,12 +297,12 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
    * @param name The name of the field.
    * @return The field value.
    */
-  @SuppressWarnings("unchecked")
   default <T extends Object> T getValue(final CharSequence name) {
     if (name == null) {
       return null;
     } else {
-      return (T)get(name.toString());
+      final String nameString = name.toString();
+      return getValue(nameString);
     }
   }
 

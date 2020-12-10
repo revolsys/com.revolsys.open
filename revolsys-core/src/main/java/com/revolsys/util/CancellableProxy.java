@@ -3,7 +3,16 @@ package com.revolsys.util;
 import java.util.Iterator;
 import java.util.function.Predicate;
 
-public interface CancellableProxy {
+public interface CancellableProxy extends Cancellable {
+  @Override
+  default void cancel() {
+    final Cancellable cancellable = getCancellable();
+    if (cancellable != null) {
+      cancellable.cancel();
+    }
+  }
+
+  @Override
   default <V> Iterable<V> cancellable(final Iterable<V> iterable) {
     final Cancellable cancellable = getCancellable();
     if (cancellable == null) {
@@ -13,6 +22,7 @@ public interface CancellableProxy {
     }
   }
 
+  @Override
   default <V> Iterable<V> cancellable(final Iterable<V> iterable, final Predicate<V> filter) {
     final Cancellable cancellable = getCancellable();
     if (cancellable == null) {
@@ -22,6 +32,7 @@ public interface CancellableProxy {
     }
   }
 
+  @Override
   default <V> Iterator<V> cancellable(final Iterator<V> iterator) {
     final Cancellable cancellable = getCancellable();
     if (cancellable == null) {
@@ -31,6 +42,7 @@ public interface CancellableProxy {
     }
   }
 
+  @Override
   default <V> Iterator<V> cancellable(final Iterator<V> iterator, final Predicate<V> filter) {
     final Cancellable cancellable = getCancellable();
     if (cancellable == null) {
@@ -42,6 +54,7 @@ public interface CancellableProxy {
 
   Cancellable getCancellable();
 
+  @Override
   default boolean isCancelled() {
     final Cancellable cancellable = getCancellable();
     if (cancellable == null) {
