@@ -22,12 +22,12 @@ import com.revolsys.transaction.Transaction;
 
 public interface TableRecordStoreConnection {
 
-  default void addDefaultSortOrder(final PathName tablePath, final Query query) {
+  default void addDefaultSortOrder(final CharSequence tablePath, final Query query) {
     final AbstractTableRecordStore recordStore = getTableRecordStore(tablePath);
     recordStore.addDefaultSortOrder(query);
   }
 
-  default Map<QueryValue, Boolean> getDefaultSortOrder(final PathName tablePath) {
+  default Map<QueryValue, Boolean> getDefaultSortOrder(final CharSequence tablePath) {
     final AbstractTableRecordStore tableRecordStore = getTableRecordStore(tablePath);
     return tableRecordStore.getDefaultSortOrder();
   }
@@ -35,23 +35,23 @@ public interface TableRecordStoreConnection {
   default Record getRecord(final Query query) {
     try (
       Transaction transaction = newTransaction(Propagation.REQUIRED)) {
-      JdbcRecordStore recordStore = getRecordStore();
+      final JdbcRecordStore recordStore = getRecordStore();
       return recordStore.getRecord(query);
     }
   }
 
   default long getRecordCount(final Query query) {
-    JdbcRecordStore recordStore = getRecordStore();
+    final JdbcRecordStore recordStore = getRecordStore();
     return recordStore.getRecordCount(query);
   }
 
   default RecordDefinition getRecordDefinition(final PathName tablePath) {
-    JdbcRecordStore recordStore = getRecordStore();
+    final JdbcRecordStore recordStore = getRecordStore();
     return recordStore.getRecordDefinition(tablePath);
   }
 
   default RecordReader getRecordReader(final Query query) {
-    JdbcRecordStore recordStore = getRecordStore();
+    final JdbcRecordStore recordStore = getRecordStore();
     return recordStore.getRecords(query);
   }
 
@@ -67,7 +67,7 @@ public interface TableRecordStoreConnection {
 
   JdbcRecordStore getRecordStore();
 
-  <TRS extends AbstractTableRecordStore> TRS getTableRecordStore(PathName pathName);
+  <TRS extends AbstractTableRecordStore> TRS getTableRecordStore(CharSequence pathName);
 
   default <TRS extends AbstractTableRecordStore> TRS getTableRecordStore(
     final PathNameProxy pathNameProxy) {
@@ -79,7 +79,7 @@ public interface TableRecordStoreConnection {
   }
 
   default <TRS extends AbstractTableRecordStore> Record insertOrUpdateRecord(
-    final PathName tablePath, final Condition condition,
+    final CharSequence tablePath, final Condition condition,
     final Function<TRS, Record> newRecordSupplier, final Consumer<Record> updateAction) {
     final TRS tableRecordStore = getTableRecordStore(tablePath);
     return tableRecordStore.insertOrUpdateRecord(this, condition, () -> {
@@ -92,12 +92,12 @@ public interface TableRecordStoreConnection {
     return tableRecordStore.insertRecord(this, record);
   }
 
-  default Query newQuery(final PathName tablePath) {
-    final JdbcRecordStore recordStore = getRecordStore();
-    return recordStore.newQuery(tablePath);
+  default Query newQuery(final CharSequence tablePath) {
+    final AbstractTableRecordStore recordStore = getTableRecordStore(tablePath);
+    return recordStore.newQuery();
   }
 
-  default Record newRecord(final PathName tablePath, final JsonObject json) {
+  default Record newRecord(final CharSequence tablePath, final JsonObject json) {
     final AbstractTableRecordStore tableRecordStore = getTableRecordStore(tablePath);
     return tableRecordStore.newRecord(json);
   }
@@ -111,13 +111,13 @@ public interface TableRecordStoreConnection {
     return recordStore.newTransaction(propagation);
   }
 
-  default Record updateRecord(final PathName tablePath, final Identifier id,
+  default Record updateRecord(final CharSequence tablePath, final Identifier id,
     final Consumer<Record> updateAction) {
     final AbstractTableRecordStore tableRecordStore = getTableRecordStore(tablePath);
     return tableRecordStore.updateRecord(this, id, updateAction);
   }
 
-  default Record updateRecord(final PathName tablePath, final Identifier id,
+  default Record updateRecord(final CharSequence tablePath, final Identifier id,
     final JsonObject values) {
     final AbstractTableRecordStore tableRecordStore = getTableRecordStore(tablePath);
     return tableRecordStore.updateRecord(this, id, values);

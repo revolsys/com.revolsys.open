@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.exception.Exceptions;
-import org.jeometry.common.io.PathName;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -37,17 +36,11 @@ import com.revolsys.transaction.Transaction;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.Property;
 
-public class AbstractRecordRestController {
+public class AbstractTableRecordRestController {
 
   private static final String UTF_8 = StandardCharsets.UTF_8.toString();
 
-  protected final PathName tablePath;
-
-  protected final String typeName;
-
-  public AbstractRecordRestController(final PathName tablePath) {
-    this.tablePath = tablePath;
-    this.typeName = tablePath.getName();
+  public AbstractTableRecordRestController() {
   }
 
   protected void handleGetRecord(final TableRecordStoreConnection connection,
@@ -93,9 +86,10 @@ public class AbstractRecordRestController {
   }
 
   protected void handleInsertRecord(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+    final HttpServletRequest request, final HttpServletResponse response,
+    final CharSequence tablePath) throws IOException {
     final JsonObject json = readJsonBody(request);
-    final Record record = connection.newRecord(this.tablePath, json);
+    final Record record = connection.newRecord(tablePath, json);
     handleInsertRecordDo(connection, request, response, record);
   }
 
@@ -107,16 +101,17 @@ public class AbstractRecordRestController {
   }
 
   protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final HttpServletResponse response, final Identifier id,
-    final Consumer<Record> updateAction) throws IOException {
-    final Record record = connection.updateRecord(this.tablePath, id, updateAction);
+    final HttpServletRequest request, final HttpServletResponse response,
+    final CharSequence tablePath, final Identifier id, final Consumer<Record> updateAction)
+    throws IOException {
+    final Record record = connection.updateRecord(tablePath, id, updateAction);
     responseRecordJson(connection, request, response, record);
   }
 
   protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final HttpServletResponse response, final Identifier id,
-    final JsonObject values) throws IOException {
-    final Record record = connection.updateRecord(this.tablePath, id, values);
+    final HttpServletRequest request, final HttpServletResponse response,
+    final CharSequence tablePath, final Identifier id, final JsonObject values) throws IOException {
+    final Record record = connection.updateRecord(tablePath, id, values);
     responseRecordJson(connection, request, response, record);
   }
 
@@ -125,13 +120,13 @@ public class AbstractRecordRestController {
   }
 
   protected Query newQuery(final TableRecordStoreConnection connection,
-    final HttpServletRequest request) {
-    return newQuery(connection, request, Integer.MAX_VALUE);
+    final HttpServletRequest request, final CharSequence tablePath) {
+    return newQuery(connection, request, tablePath, Integer.MAX_VALUE);
   }
 
   protected Query newQuery(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final int maxRecords) {
-    final Query query = connection.newQuery(this.tablePath);
+    final HttpServletRequest request, final CharSequence tablePath, final int maxRecords) {
+    final Query query = connection.newQuery(tablePath);
     final String select = request.getParameter("$select");
     newQuerySelect(connection, query, select);
 
@@ -227,7 +222,7 @@ public class AbstractRecordRestController {
         query.addOrderBy(fieldName, ascending);
       }
     }
-    connection.addDefaultSortOrder(this.tablePath, query);
+    connection.addDefaultSortOrder(query.getTablePath(), query);
   }
 
   private void newQuerySelect(final TableRecordStoreConnection connection, final Query query,

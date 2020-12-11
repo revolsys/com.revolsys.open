@@ -339,6 +339,12 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this;
   }
 
+  public Query andEqualId(final Object id) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final String idFieldName = recordDefinition.getIdFieldName();
+    return and(idFieldName, Q.EQUAL, id);
+  }
+
   public void appendSelect(final StringBuilder sql) {
     final TableReference table = this.table;
     final List<QueryValue> select = getSelect();
@@ -755,13 +761,6 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this;
   }
 
-  public Query selectAlias(final String name, final String alias) {
-    final ColumnReference column = this.table.getColumn(name);
-    final ColumnAlias columnAlias = new ColumnAlias(column, alias);
-    this.selectExpressions.add(columnAlias);
-    return this;
-  }
-
   public Query select(final TableReference table, final String fieldName) {
     final ColumnReference column = table.getColumn(fieldName);
     this.selectExpressions.add(column);
@@ -773,6 +772,13 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
       final ColumnReference column = table.getColumn(fieldName);
       this.selectExpressions.add(column);
     }
+    return this;
+  }
+
+  public Query selectAlias(final String name, final String alias) {
+    final ColumnReference column = this.table.getColumn(name);
+    final ColumnAlias columnAlias = new ColumnAlias(column, alias);
+    this.selectExpressions.add(columnAlias);
     return this;
   }
 
