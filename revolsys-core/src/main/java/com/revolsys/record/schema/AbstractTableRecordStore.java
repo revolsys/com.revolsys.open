@@ -2,7 +2,9 @@ package com.revolsys.record.schema;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -19,6 +21,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.Or;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
@@ -41,6 +44,8 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
 
   protected Query recordsQuery;
 
+  private final Set<String> searchFieldNames = new LinkedHashSet<>();
+
   public AbstractTableRecordStore(final PathName typePath) {
     this.tablePath = typePath;
     this.typeName = typePath.getName();
@@ -49,10 +54,6 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
   public AbstractTableRecordStore(final PathName typePath, final JdbcRecordStore recordStore) {
     this(typePath);
     setRecordStore(recordStore);
-  }
-
-  public void addDefaultSortOrder(final Query query) {
-    query.addOrderBy(this.defaultSortOrder);
   }
 
   protected void addDefaultSortOrder(final String fieldName) {
@@ -66,6 +67,25 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     } else {
       this.defaultSortOrder.put(field, ascending);
     }
+  }
+
+  public void applyDefaultSortOrder(final Query query) {
+    query.addOrderBy(this.defaultSortOrder);
+  }
+
+  public Query applySearchCondition(final Query query, String search) {
+    if (!this.searchFieldNames.isEmpty()) {
+      if (Property.hasValue(search)) {
+        final Or or = new Or();
+        search = '%' + search.trim().toLowerCase() + '%';
+        for (final String fieldName : this.searchFieldNames) {
+          final Condition condition = query.newCondition(fieldName, Q.ILIKE, search);
+          or.addCondition(condition);
+        }
+        query.and(or);
+      }
+    }
+    return query;
   }
 
   public Map<QueryValue, Boolean> getDefaultSortOrder() {
@@ -244,6 +264,18 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     this.recordStore = recordStore;
     final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(this.tablePath);
     setRecordDefinition(recordDefinition);
+  }
+
+  public AbstractTableRecordStore setSearchFieldNames(final Collection<String> searchFieldNames) {
+    this.searchFieldNames.addAll(searchFieldNames);
+    return this;
+  }
+
+  public AbstractTableRecordStore setSearchFieldNames(final String... searchFieldNames) {
+    for (final String searchFieldName : searchFieldNames) {
+      this.searchFieldNames.add(searchFieldName);
+    }
+    return this;
   }
 
   public Record updateRecord(final TableRecordStoreConnection connection, final Condition condition,

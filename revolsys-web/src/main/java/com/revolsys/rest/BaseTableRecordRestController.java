@@ -45,7 +45,7 @@ public class BaseTableRecordRestController extends AbstractTableRecordRestContro
 
   protected Query newQuery(final TableRecordStoreConnection connection,
     final HttpServletRequest request) {
-    return newQuery(connection, request, Integer.MAX_VALUE);
+    return newQuery(connection, request, this.maxPageSize);
   }
 
   protected Query newQuery(final TableRecordStoreConnection connection,

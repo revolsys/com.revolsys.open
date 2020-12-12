@@ -30,6 +30,7 @@ import com.revolsys.record.io.format.json.JsonWriter;
 import com.revolsys.record.query.CollectionValue;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.AbstractTableRecordStore;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.TableRecordStoreConnection;
 import com.revolsys.transaction.Transaction;
@@ -40,7 +41,18 @@ public class AbstractTableRecordRestController {
 
   private static final String UTF_8 = StandardCharsets.UTF_8.toString();
 
+  protected int maxPageSize = Integer.MAX_VALUE;
+
   public AbstractTableRecordRestController() {
+  }
+
+  protected AbstractTableRecordStore getTableRecordStore(
+    final TableRecordStoreConnection connection, final CharSequence tablePath) {
+    final AbstractTableRecordStore tableRecordStore = connection.getTableRecordStore(tablePath);
+    if (tableRecordStore == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
+    return tableRecordStore;
   }
 
   protected void handleGetRecord(final TableRecordStoreConnection connection,
@@ -121,12 +133,13 @@ public class AbstractTableRecordRestController {
 
   protected Query newQuery(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final CharSequence tablePath) {
-    return newQuery(connection, request, tablePath, Integer.MAX_VALUE);
+    return newQuery(connection, request, tablePath, this.maxPageSize);
   }
 
   protected Query newQuery(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final CharSequence tablePath, final int maxRecords) {
-    final Query query = connection.newQuery(tablePath);
+    final AbstractTableRecordStore recordStore = getTableRecordStore(connection, tablePath);
+    final Query query = recordStore.newQuery();
     final String select = request.getParameter("$select");
     newQuerySelect(connection, query, select);
 
@@ -144,10 +157,33 @@ public class AbstractTableRecordRestController {
     }
     limit = Math.min(limit, maxRecords);
     query.setLimit(limit);
-    newQueryFilterCondition(connection, query, request);
+    newQueryFilterCondition(recordStore, query, request);
     final String orderBy = request.getParameter("$orderby");
-    newQueryOrderBy(connection, query, orderBy);
+    newQueryOrderBy(recordStore, query, orderBy);
     return query;
+  }
+
+  private void newQueryFilterCondition(final AbstractTableRecordStore recordStore,
+    final Query query, final HttpServletRequest request) {
+    final String[] filterFieldNames = request.getParameterValues("filterFieldName");
+    final String[] filterValues = request.getParameterValues("filterValue");
+    if (filterFieldNames != null) {
+      for (int i = 0; i < filterFieldNames.length; i++) {
+        final String filterFieldName = filterFieldNames[i];
+        if (Property.hasValue(filterFieldName) && i < filterValues.length) {
+          final String filterValue = filterValues[i];
+          Object value = filterValue;
+          if (filterValue.charAt(0) == '[') {
+            value = JsonParser.read(filterValue);
+          }
+          newQueryFilterCondition(query, request, filterFieldName, value);
+        }
+      }
+    }
+    final String search = request.getParameter("$search");
+    if (search != null && search.trim().length() > 0) {
+      newQueryFilterConditionSearch(recordStore, query, search);
+    }
   }
 
   protected void newQueryFilterCondition(final Query query, final HttpServletRequest request,
@@ -176,34 +212,12 @@ public class AbstractTableRecordRestController {
     }
   }
 
-  private void newQueryFilterCondition(final TableRecordStoreConnection connection,
-    final Query query, final HttpServletRequest request) {
-    final String[] filterFieldNames = request.getParameterValues("filterFieldName");
-    final String[] filterValues = request.getParameterValues("filterValue");
-    if (filterFieldNames != null) {
-      for (int i = 0; i < filterFieldNames.length; i++) {
-        final String filterFieldName = filterFieldNames[i];
-        if (Property.hasValue(filterFieldName) && i < filterValues.length) {
-          final String filterValue = filterValues[i];
-          Object value = filterValue;
-          if (filterValue.charAt(0) == '[') {
-            value = JsonParser.read(filterValue);
-          }
-          newQueryFilterCondition(query, request, filterFieldName, value);
-        }
-      }
-    }
-    final String search = request.getParameter("$search");
-    if (search != null && search.trim().length() > 0) {
-      newQueryFilterConditionSearch(connection, query, search);
-    }
-  }
-
-  protected void newQueryFilterConditionSearch(final TableRecordStoreConnection connection,
+  protected void newQueryFilterConditionSearch(final AbstractTableRecordStore recordStore,
     final Query query, final String search) {
+    recordStore.applySearchCondition(query, search);
   }
 
-  private void newQueryOrderBy(final TableRecordStoreConnection connection, final Query query,
+  private void newQueryOrderBy(final AbstractTableRecordStore recordStore, final Query query,
     final String orderBy) {
     if (Property.hasValue(orderBy)) {
       for (String orderClause : orderBy.split(",")) {
@@ -222,7 +236,7 @@ public class AbstractTableRecordRestController {
         query.addOrderBy(fieldName, ascending);
       }
     }
-    connection.addDefaultSortOrder(query.getTablePath(), query);
+    recordStore.applyDefaultSortOrder(query);
   }
 
   private void newQuerySelect(final TableRecordStoreConnection connection, final Query query,

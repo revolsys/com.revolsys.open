@@ -1,7 +1,6 @@
 package com.revolsys.record.schema;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -16,21 +15,10 @@ import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
-import com.revolsys.record.query.QueryValue;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 
 public interface TableRecordStoreConnection {
-
-  default void addDefaultSortOrder(final CharSequence tablePath, final Query query) {
-    final AbstractTableRecordStore recordStore = getTableRecordStore(tablePath);
-    recordStore.addDefaultSortOrder(query);
-  }
-
-  default Map<QueryValue, Boolean> getDefaultSortOrder(final CharSequence tablePath) {
-    final AbstractTableRecordStore tableRecordStore = getTableRecordStore(tablePath);
-    return tableRecordStore.getDefaultSortOrder();
-  }
 
   default Record getRecord(final Query query) {
     try (
