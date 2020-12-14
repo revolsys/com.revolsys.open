@@ -345,6 +345,21 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return and(idFieldName, Q.EQUAL, id);
   }
 
+  /**
+   * Create an Or from the conditions and and it to this query;
+   * @param conditions
+   * @return
+   */
+  public Query andOr(final Condition... conditions) {
+    if (conditions != null && conditions.length > 0) {
+      final Or or = new Or(conditions);
+      if (!or.isEmpty()) {
+        and(or);
+      }
+    }
+    return this;
+  }
+
   public void appendSelect(final StringBuilder sql) {
     final TableReference table = this.table;
     final List<QueryValue> select = getSelect();
