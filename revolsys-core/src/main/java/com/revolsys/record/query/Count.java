@@ -39,6 +39,9 @@ public class Count extends AbstractUnaryQueryValue {
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
     final StringBuilder buffer) {
     buffer.append("count(");
+    if (this.distinct) {
+      buffer.append("distinct ");
+    }
     super.appendDefaultSql(query, recordStore, buffer);
     buffer.append(")");
   }
