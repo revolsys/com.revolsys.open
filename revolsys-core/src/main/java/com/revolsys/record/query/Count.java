@@ -6,6 +6,26 @@ import java.sql.SQLException;
 import com.revolsys.record.schema.RecordStore;
 
 public class Count extends AbstractUnaryQueryValue {
+  public static Count count(final Query query, final String columnName) {
+    final TableReference table = query.getTable();
+    return count(table, columnName);
+  }
+
+  public static Count count(final TableReference table, final String columnName) {
+    final ColumnReference column = table.getColumn(columnName);
+    return new Count(column);
+  }
+
+  public static Count distinct(final Query query, final String columnName) {
+    final TableReference table = query.getTable();
+    return distinct(table, columnName);
+  }
+
+  public static Count distinct(final TableReference table, final String columnName) {
+    return count(table, columnName).setDistinct(true);
+  }
+
+  private boolean distinct = false;
 
   public Count(final CharSequence name) {
     this(new Column(name));
@@ -45,10 +65,18 @@ public class Count extends AbstractUnaryQueryValue {
     }
   }
 
+  public Count setDistinct(final boolean distinct) {
+    this.distinct = distinct;
+    return this;
+  }
+
   @Override
   public String toString() {
     final StringBuilder buffer = new StringBuilder();
     buffer.append("COUNT(");
+    if (this.distinct) {
+      buffer.append("distinct ");
+    }
     buffer.append(super.toString());
     buffer.append(")");
     return buffer.toString();
