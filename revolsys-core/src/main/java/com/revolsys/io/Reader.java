@@ -24,7 +24,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import com.revolsys.properties.ObjectWithProperties;
-import com.revolsys.util.BooleanCancellable;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.ExitLoopException;
 
@@ -49,7 +48,7 @@ import com.revolsys.util.ExitLoopException;
  * @author Paul Austin
  * @param <T> The type of the item to read.
  */
-public interface Reader<T> extends Iterable<T>, ObjectWithProperties, BaseCloseable {
+public interface Reader<T> extends Iterable<T>, ObjectWithProperties, BaseCloseable, Cancellable {
   Reader<?> EMPTY = new ListReader<>();
 
   @SuppressWarnings("unchecked")
@@ -65,16 +64,38 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties, BaseClosea
   }
 
   default void forEach(final BiConsumer<Cancellable, ? super T> action) {
+    forEach(this, action);
+  }
+
+  default void forEach(final Cancellable cancellable,
+    final BiConsumer<Cancellable, ? super T> action) {
     try (
       Reader<?> reader = this) {
       if (iterator() != null) {
         try {
-          final BooleanCancellable cancellable = new BooleanCancellable();
           for (final T item : this) {
             if (cancellable.isCancelled()) {
               return;
             } else {
               action.accept(cancellable, item);
+            }
+          }
+        } catch (final ExitLoopException e) {
+        }
+      }
+    }
+  }
+
+  default void forEach(final Cancellable cancellable, final Consumer<? super T> action) {
+    try (
+      Reader<?> reader = this) {
+      if (iterator() != null) {
+        try {
+          for (final T item : this) {
+            if (cancellable.isCancelled()) {
+              return;
+            } else {
+              action.accept(item);
             }
           }
         } catch (final ExitLoopException e) {

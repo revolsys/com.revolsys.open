@@ -21,6 +21,11 @@ public class RecordReaderGeometryReader implements Iterator<Geometry>, GeometryR
   }
 
   @Override
+  public void cancel() {
+    this.reader.cancel();
+  }
+
+  @Override
   public void close() {
     if (this.reader != null) {
       this.reader.close();
@@ -51,6 +56,11 @@ public class RecordReaderGeometryReader implements Iterator<Geometry>, GeometryR
   @Override
   public boolean hasNext() {
     return this.iterator.hasNext();
+  }
+
+  @Override
+  public boolean isCancelled() {
+    return this.reader.isCancelled();
   }
 
   @Override

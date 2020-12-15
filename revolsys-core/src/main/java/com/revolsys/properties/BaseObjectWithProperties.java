@@ -11,7 +11,13 @@ import com.revolsys.collection.map.Maps;
 public class BaseObjectWithProperties implements ObjectWithProperties {
   private MapEx properties = new LinkedHashMapEx();
 
+  private boolean cancelled = false;
+
   public BaseObjectWithProperties() {
+  }
+
+  public void cancel() {
+    this.cancelled = true;
   }
 
   @Override
@@ -34,6 +40,10 @@ public class BaseObjectWithProperties implements ObjectWithProperties {
   @Override
   public MapEx getProperties() {
     return this.properties;
+  }
+
+  public boolean isCancelled() {
+    return this.cancelled;
   }
 
 }

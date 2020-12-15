@@ -38,6 +38,11 @@ public class GeopackageFileRecordReader implements RecordReader {
   }
 
   @Override
+  public void cancel() {
+    this.reader.cancel();
+  }
+
+  @Override
   public void close() {
     try {
       this.reader.close();
@@ -59,6 +64,11 @@ public class GeopackageFileRecordReader implements RecordReader {
   @Override
   public RecordDefinition getRecordDefinition() {
     return this.reader.getRecordDefinition();
+  }
+
+  @Override
+  public boolean isCancelled() {
+    return this.reader.isCancelled();
   }
 
   @Override

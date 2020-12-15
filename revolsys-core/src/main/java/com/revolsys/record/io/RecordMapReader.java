@@ -13,6 +13,11 @@ public class RecordMapReader implements MapReader {
   }
 
   @Override
+  public void cancel() {
+    this.reader.cancel();
+  }
+
+  @Override
   public void close() {
     this.reader.close();
   }
@@ -20,6 +25,11 @@ public class RecordMapReader implements MapReader {
   @Override
   public MapEx getProperties() {
     return this.reader.getProperties();
+  }
+
+  @Override
+  public boolean isCancelled() {
+    return this.reader.isCancelled();
   }
 
   @SuppressWarnings({
@@ -34,5 +44,4 @@ public class RecordMapReader implements MapReader {
   public void open() {
     this.reader.open();
   }
-
 }

@@ -3,7 +3,10 @@ package com.revolsys.collection;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import com.revolsys.util.Cancellable;
 
 public interface CollectionUtil {
   static <V> void addAll(final Collection<V> collection, final Iterable<V> values) {
@@ -49,6 +52,19 @@ public interface CollectionUtil {
       final V record = iterator.next();
       if (!filter.test(record)) {
         iterator.remove();
+      }
+    }
+  }
+
+  static <V> void forEach(final Cancellable cancelable, final Iterable<V> values,
+    final Consumer<V> action) {
+    if (values != null) {
+      for (final V value : values) {
+        if (cancelable.isCancelled()) {
+          return;
+        } else {
+          action.accept(value);
+        }
       }
     }
   }
