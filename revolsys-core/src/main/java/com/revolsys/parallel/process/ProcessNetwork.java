@@ -24,6 +24,23 @@ public class ProcessNetwork {
 
   private static ThreadLocal<ProcessNetwork> PROCESS_NETWORK = new ThreadLocal<>();
 
+  public static <V> void forAll(final Consumer<V> action, final Iterable<V> values) {
+    final ProcessNetwork processNetwork = new ProcessNetwork();
+    for (final V value : values) {
+      processNetwork.addProcess(() -> action.accept(value));
+    }
+    processNetwork.startAndWait();
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <V> void forAll(final Consumer<V> action, final V... values) {
+    final ProcessNetwork processNetwork = new ProcessNetwork();
+    for (final V value : values) {
+      processNetwork.addProcess(() -> action.accept(value));
+    }
+    processNetwork.startAndWait();
+  }
+
   public static <V> void forEach(final int processCount, final Iterable<V> values,
     final Consumer<V> action) {
     final Iterator<V> iterator = values.iterator();

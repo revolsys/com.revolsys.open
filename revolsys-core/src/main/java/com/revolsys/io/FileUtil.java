@@ -280,14 +280,7 @@ public final class FileUtil {
       return 0;
     } else {
       try {
-        final byte[] buffer = new byte[4096];
-        long numBytes = 0;
-        int count;
-        while ((count = in.read(buffer)) > -1) {
-          out.write(buffer, 0, count);
-          numBytes += count;
-        }
-        return numBytes;
+        return in.transferTo(out);
       } catch (final IOException e) {
         return (Long)Exceptions.throwUncheckedException(e);
       }
@@ -1078,6 +1071,16 @@ public final class FileUtil {
       return visibleFiles;
     }
     return Collections.emptyList();
+  }
+
+  public static String lowerFileNameExtension(final String fileName) {
+    final String baseName = getBaseName(fileName);
+    final String fileExtension = getFileNameExtension(fileName);
+    if (fileExtension.length() == 0) {
+      return fileName;
+    } else {
+      return baseName + "." + fileExtension.toLowerCase();
+    }
   }
 
   public static File newFile(final Object value) {

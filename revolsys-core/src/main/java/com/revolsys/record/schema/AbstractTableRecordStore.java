@@ -148,6 +148,19 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     return this.tablePath;
   }
 
+  public boolean hasRecord(final TableRecordStoreConnection connection,
+    final CharSequence fieldName, final Object value) {
+    final Query query = newQuery(fieldName, value);
+    return hasRecord(connection, query);
+  }
+
+  public boolean hasRecord(final TableRecordStoreConnection connection, final Query query) {
+    try (
+      Transaction transaction = connection.newTransaction(Propagation.REQUIRED)) {
+      return this.recordStore.getRecordCount(query) > 0;
+    }
+  }
+
   public Record insertOrUpdateRecord(final TableRecordStoreConnection connection,
     final Condition condition, final Supplier<Record> newRecordSupplier,
     final Consumer<Record> updateAction) {

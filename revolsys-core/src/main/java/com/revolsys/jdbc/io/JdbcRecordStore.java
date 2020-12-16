@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Arrays;
 
 import org.jeometry.common.io.PathName;
@@ -159,6 +160,17 @@ public interface JdbcRecordStore extends RecordStore {
 
   default int setRole(final String roleName) {
     return executeUpdate("SET ROLE " + roleName);
+  }
+
+  default int setRole(final Transaction transaction, final String roleName) {
+    final JdbcConnection connection = getJdbcConnection();
+    final String sql = "SET ROLE " + roleName;
+    try (
+      Statement statement = connection.createStatement()) {
+      return statement.executeUpdate(sql);
+    } catch (final SQLException e) {
+      throw connection.getException("Set role", sql, e);
+    }
   }
 
   JdbcRecordStore setUseUpperCaseNames(boolean useUpperCaseNames);

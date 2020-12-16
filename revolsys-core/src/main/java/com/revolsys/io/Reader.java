@@ -16,10 +16,12 @@
 package com.revolsys.io;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -49,11 +51,19 @@ import com.revolsys.util.ExitLoopException;
  * @param <T> The type of the item to read.
  */
 public interface Reader<T> extends Iterable<T>, ObjectWithProperties, BaseCloseable, Cancellable {
-  Reader<?> EMPTY = new ListReader<>();
+  Reader<?> EMPTY = wrap(Collections.emptyIterator());
 
   @SuppressWarnings("unchecked")
   static <V> Reader<V> empty() {
     return (Reader<V>)EMPTY;
+  }
+
+  static <I, O> Reader<O> wrap(final Iterator<I> iterator, final Function<I, O> converter) {
+    return new IteratorConvertReader<>(iterator, converter);
+  }
+
+  static <V> Reader<V> wrap(final Iterator<V> iterator) {
+    return new IteratorReader<>(iterator);
   }
 
   /**
