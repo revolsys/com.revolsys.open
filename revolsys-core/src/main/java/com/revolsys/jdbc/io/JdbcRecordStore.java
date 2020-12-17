@@ -149,6 +149,7 @@ public interface JdbcRecordStore extends RecordStore {
         throw new RuntimeException("Error setting value:" + parameter, e);
       }
     }
+    index = query.appendSelectParameters(index, statement);
     for (final Join join : query.getJoins()) {
       index = join.appendParameters(index, statement);
     }

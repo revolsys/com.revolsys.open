@@ -226,6 +226,9 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
         this.recordDefinition = this.recordStore.getRecordDefinition(query, resultSetMetaData);
       }
       this.selectExpressions = query.getSelectExpressions();
+      if (this.selectExpressions.isEmpty()) {
+        this.selectExpressions = (List)this.recordDefinition.getFieldDefinitions();
+      }
 
     } catch (final SQLException e) {
       JdbcUtils.close(this.statement, this.resultSet);

@@ -4,6 +4,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.query.Column;
+import com.revolsys.record.query.ColumnReference;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.Value;
@@ -72,6 +73,10 @@ public class F {
   public static RegexpReplace regexpReplace(final QueryValue value, final String pattern,
     final String replace, final String flags) {
     return new RegexpReplace(value, pattern, replace, flags);
+  }
+
+  public static ToChar toChar(final ColumnReference column, final String format) {
+    return new ToChar(column, format);
   }
 
   public static Upper upper(final FieldDefinition field) {

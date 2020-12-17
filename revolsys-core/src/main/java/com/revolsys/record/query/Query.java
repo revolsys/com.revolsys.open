@@ -1,5 +1,6 @@
 package com.revolsys.record.query;
 
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -378,6 +379,13 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     }
   }
 
+  public int appendSelectParameters(int index, final PreparedStatement statement) {
+    for (final QueryValue select : this.selectExpressions) {
+      index = select.appendParameters(index, statement);
+    }
+    return index;
+  }
+
   public void clearOrderBy() {
     this.orderBy.clear();
   }
@@ -507,10 +515,12 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
   })
   public List<QueryValue> getSelectExpressions() {
     if (this.selectExpressions.isEmpty() && this.table != null) {
-      return (List)this.table.getRecordDefinition().getFieldDefinitions();
-    } else {
-      return this.selectExpressions;
+      final RecordDefinition recordDefinition = this.table.getRecordDefinition();
+      if (recordDefinition != null) {
+        return (List)recordDefinition.getFieldDefinitions();
+      }
     }
+    return this.selectExpressions;
   }
 
   public String getSelectSql() {
@@ -790,11 +800,21 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this;
   }
 
-  public Query selectAlias(final String name, final String alias) {
-    final ColumnReference column = this.table.getColumn(name);
+  public Query selectAlias(final ColumnReference column, final String alias) {
     final ColumnAlias columnAlias = new ColumnAlias(column, alias);
     this.selectExpressions.add(columnAlias);
     return this;
+  }
+
+  public Query selectAlias(final QueryValue value, final String alias) {
+    final SelectAlias columnAlias = new SelectAlias(value, alias);
+    this.selectExpressions.add(columnAlias);
+    return this;
+  }
+
+  public Query selectAlias(final String name, final String alias) {
+    final ColumnReference column = this.table.getColumn(name);
+    return selectAlias(column, alias);
   }
 
   public Query setCancellable(final Cancellable cancellable) {

@@ -21,8 +21,8 @@ public abstract class UnaryFunction extends AbstractUnaryQueryValue implements F
       final QueryValue parameter = parameters.get(0);
       setValue(parameter);
     } else {
-      throw new IllegalArgumentException("SimpleFunction " + name + " requires 1 argument not "
-        + parameterCount + ": " + parameters);
+      throw new IllegalArgumentException(
+        "UnaryFunction " + name + " requires 1 argument not " + parameterCount + ": " + parameters);
     }
   }
 

@@ -106,6 +106,16 @@ public class Join implements QueryValue {
     return and(condition);
   }
 
+  public Join on(final String fieldName, final Query query) {
+    final TableReference toTable = query.getTable();
+    return on(fieldName, toTable);
+  }
+
+  public Join on(final String fromFieldName, final Query query, final String toFieldName) {
+    final TableReference toTable = query.getTable();
+    return on(fromFieldName, toTable, toFieldName);
+  }
+
   public Join on(final String fieldName, final TableReference toTable) {
     return on(fieldName, toTable, fieldName);
   }
