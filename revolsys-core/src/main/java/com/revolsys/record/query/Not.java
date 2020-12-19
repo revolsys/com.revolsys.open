@@ -8,6 +8,10 @@ public class Not extends LeftUnaryCondition {
     super("NOT", condition);
   }
 
+  public Not(final QueryValue condition) {
+    super("NOT", condition);
+  }
+
   @Override
   public Not clone() {
     return (Not)super.clone();

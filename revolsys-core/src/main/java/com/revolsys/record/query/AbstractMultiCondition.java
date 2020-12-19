@@ -1,6 +1,7 @@
 package com.revolsys.record.query;
 
 import java.sql.PreparedStatement;
+import java.util.List;
 
 import org.jeometry.common.data.type.DataType;
 
@@ -88,6 +89,11 @@ public abstract class AbstractMultiCondition extends AbstractMultiQueryValue
   @Override
   public Condition getCondition() {
     return this;
+  }
+
+  @SuppressWarnings("unchecked")
+  public List<Condition> getConditions() {
+    return (List)super.getQueryValues();
   }
 
   public String getOperator() {

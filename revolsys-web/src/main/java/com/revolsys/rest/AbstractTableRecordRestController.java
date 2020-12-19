@@ -28,6 +28,7 @@ import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.io.format.json.JsonRecordWriter;
 import com.revolsys.record.io.format.json.JsonWriter;
 import com.revolsys.record.query.CollectionValue;
+import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.AbstractTableRecordStore;
@@ -44,6 +45,12 @@ public class AbstractTableRecordRestController {
   protected int maxPageSize = Integer.MAX_VALUE;
 
   public AbstractTableRecordRestController() {
+  }
+
+  protected Condition alterCondition(final HttpServletRequest request,
+    final TableRecordStoreConnection connection, final AbstractTableRecordStore recordStore,
+    final Query query, final Condition condition) {
+    return condition;
   }
 
   protected AbstractTableRecordStore getTableRecordStore(
@@ -157,33 +164,10 @@ public class AbstractTableRecordRestController {
     }
     limit = Math.min(limit, maxRecords);
     query.setLimit(limit);
-    newQueryFilterCondition(recordStore, query, request);
+    newQueryFilterCondition(connection, recordStore, query, request);
     final String orderBy = request.getParameter("$orderby");
     newQueryOrderBy(recordStore, query, orderBy);
     return query;
-  }
-
-  private void newQueryFilterCondition(final AbstractTableRecordStore recordStore,
-    final Query query, final HttpServletRequest request) {
-    final String[] filterFieldNames = request.getParameterValues("filterFieldName");
-    final String[] filterValues = request.getParameterValues("filterValue");
-    if (filterFieldNames != null) {
-      for (int i = 0; i < filterFieldNames.length; i++) {
-        final String filterFieldName = filterFieldNames[i];
-        if (Property.hasValue(filterFieldName) && i < filterValues.length) {
-          final String filterValue = filterValues[i];
-          Object value = filterValue;
-          if (filterValue.charAt(0) == '[') {
-            value = JsonParser.read(filterValue);
-          }
-          newQueryFilterCondition(query, request, filterFieldName, value);
-        }
-      }
-    }
-    final String search = request.getParameter("$search");
-    if (search != null && search.trim().length() > 0) {
-      newQueryFilterConditionSearch(recordStore, query, search);
-    }
   }
 
   protected void newQueryFilterCondition(final Query query, final HttpServletRequest request,
@@ -210,6 +194,43 @@ public class AbstractTableRecordRestController {
         }
       }
     }
+  }
+
+  private void newQueryFilterCondition(final TableRecordStoreConnection connection,
+    final AbstractTableRecordStore recordStore, final Query query,
+    final HttpServletRequest request) {
+    final String filter = request.getParameter("$filter");
+    if (filter != null) {
+      Condition condition = newQueryFilterConditionFilter(recordStore, query, filter);
+      condition = alterCondition(request, connection, recordStore, query, condition);
+      if (condition != null) {
+        query.and(condition.clone(null, query.getTable()));
+      }
+    }
+    final String[] filterFieldNames = request.getParameterValues("filterFieldName");
+    final String[] filterValues = request.getParameterValues("filterValue");
+    if (filterFieldNames != null) {
+      for (int i = 0; i < filterFieldNames.length; i++) {
+        final String filterFieldName = filterFieldNames[i];
+        if (Property.hasValue(filterFieldName) && i < filterValues.length) {
+          final String filterValue = filterValues[i];
+          Object value = filterValue;
+          if (filterValue.charAt(0) == '[') {
+            value = JsonParser.read(filterValue);
+          }
+          newQueryFilterCondition(query, request, filterFieldName, value);
+        }
+      }
+    }
+    final String search = request.getParameter("$search");
+    if (search != null && search.trim().length() > 0) {
+      newQueryFilterConditionSearch(recordStore, query, search);
+    }
+  }
+
+  protected Condition newQueryFilterConditionFilter(final AbstractTableRecordStore recordStore,
+    final Query query, final String filter) {
+    return (Condition)ODataParser.parseFilter(filter);
   }
 
   protected void newQueryFilterConditionSearch(final AbstractTableRecordStore recordStore,

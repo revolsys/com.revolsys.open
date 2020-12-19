@@ -97,6 +97,10 @@ public abstract class AbstractMultiQueryValue implements QueryValue {
     return this.values.length == 0;
   }
 
+  public void setQueryValue(final int i, final QueryValue value) {
+    this.values[i] = value;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <QV extends QueryValue> QV updateQueryValues(final TableReference oldTable,
