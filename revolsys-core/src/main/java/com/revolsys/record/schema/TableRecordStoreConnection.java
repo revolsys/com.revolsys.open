@@ -29,8 +29,11 @@ public interface TableRecordStoreConnection {
   }
 
   default long getRecordCount(final Query query) {
-    final JdbcRecordStore recordStore = getRecordStore();
-    return recordStore.getRecordCount(query);
+    try (
+      Transaction transaction = newTransaction(Propagation.REQUIRED)) {
+      final JdbcRecordStore recordStore = getRecordStore();
+      return recordStore.getRecordCount(query);
+    }
   }
 
   default RecordDefinition getRecordDefinition(final PathName tablePath) {
@@ -39,8 +42,11 @@ public interface TableRecordStoreConnection {
   }
 
   default RecordReader getRecordReader(final Query query) {
-    final JdbcRecordStore recordStore = getRecordStore();
-    return recordStore.getRecords(query);
+    try (
+      Transaction transaction = newTransaction(Propagation.REQUIRED)) {
+      final JdbcRecordStore recordStore = getRecordStore();
+      return recordStore.getRecords(query);
+    }
   }
 
   default List<Record> getRecords(final Query query) {

@@ -215,10 +215,10 @@ public final class FileUtil {
       file.getParentFile().mkdirs();
       try (
         final FileOutputStream out = new FileOutputStream(file)) {
-        return copy(in, out);
+        return in.transferTo(out);
       }
     } catch (final IOException e) {
-      throw new RuntimeException("Unable to open file: " + file, e);
+      throw Exceptions.wrap("Unable to open file: " + file, e);
     }
   }
 

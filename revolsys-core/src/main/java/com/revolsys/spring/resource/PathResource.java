@@ -37,6 +37,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
 
 import org.jeometry.common.exception.Exceptions;
 import org.springframework.core.io.WritableResource;
@@ -260,6 +261,16 @@ public class PathResource extends AbstractResource implements WritableResource {
       return Files.newInputStream(this.path, com.revolsys.io.file.Paths.OPEN_OPTIONS_NONE);
     } catch (final FileSystemException e) {
       throw Exceptions.wrap("Error opening file: " + getPath(), e);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  @Override
+  public Instant getLastModifiedInstant() {
+    final Path path = getPath();
+    try {
+      return Files.getLastModifiedTime(path).toInstant();
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }

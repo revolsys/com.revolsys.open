@@ -31,12 +31,14 @@ public class MediaTypes {
 
   public static String extension(final String mediaType) {
     init();
-    final String extension = fileExtensionByMediaType.get(mediaType);
-    if (Property.isEmpty(extension)) {
-      return "bin";
-    } else {
-      return extension;
+    String extension = fileExtensionByMediaType.get(mediaType);
+    if (extension == null) {
+      extension = fileExtensionByMediaType.get(mediaType.toLowerCase());
+      if (extension == null) {
+        return "bin";
+      }
     }
+    return extension;
   }
 
   /**
@@ -50,15 +52,14 @@ public class MediaTypes {
    */
   public static String extension(String extension, String mediaType) {
     init();
-    if (Property.hasValue(extension)) {
+    if (extension != null) {
       extension = extension.trim().toLowerCase();
+      if (mediaTypeByFileExtension.containsKey(extension)) {
+        return extension;
+      }
     }
 
-    if (mediaTypeByFileExtension.containsKey(extension)) {
-      return extension;
-    }
-
-    if (Property.hasValue(mediaType)) {
+    if (mediaType != null) {
       mediaType = mediaType.toLowerCase();
       final String result = fileExtensionByMediaType.get(mediaType);
       if (Property.hasValue(result)) {
@@ -66,10 +67,10 @@ public class MediaTypes {
       }
     }
 
-    if (Property.hasValue(extension)) {
-      return extension;
-    } else {
+    if (extension == null) {
       return "bin";
+    } else {
+      return extension;
     }
   }
 
@@ -145,26 +146,25 @@ public class MediaTypes {
    */
   public static String mediaType(String mediaType, String extension) {
     init();
-    if (Property.hasValue(mediaType)) {
+    if (mediaType != null) {
       mediaType = mediaType.trim().toLowerCase();
+      if (fileExtensionByMediaType.containsKey(mediaType)) {
+        return mediaType;
+      }
     }
 
-    if (fileExtensionByMediaType.containsKey(mediaType)) {
-      return mediaType;
-    }
-
-    if (Property.hasValue(extension)) {
+    if (extension != null) {
       extension = extension.toLowerCase();
-      final String result = fileExtensionByMediaType.get(extension);
+      final String result = mediaTypeByFileExtension.get(extension);
       if (Property.hasValue(result)) {
         return result;
       }
     }
 
-    if (Property.hasValue(mediaType)) {
-      return mediaType;
-    } else {
+    if (mediaType == null) {
       return "application/octet-stream";
+    } else {
+      return mediaType;
     }
   }
 }

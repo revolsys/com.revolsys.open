@@ -11,6 +11,7 @@ import org.jeometry.common.io.PathName;
 
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.TableRecordStoreConnection;
 
@@ -23,6 +24,14 @@ public class BaseTableRecordRestController extends AbstractTableRecordRestContro
   public BaseTableRecordRestController(final PathName tablePath) {
     this.tablePath = tablePath;
     this.typeName = tablePath.getName();
+  }
+
+  protected void handleGetRecord(final TableRecordStoreConnection tenant,
+    final HttpServletRequest request, final HttpServletResponse response, final String fieldName,
+    final String value) throws IOException {
+    final Query query = newQuery(tenant, request)//
+      .and(fieldName, Q.EQUAL, value);
+    handleGetRecord(tenant, request, response, query);
   }
 
   protected void handleInsertRecord(final TableRecordStoreConnection connection,

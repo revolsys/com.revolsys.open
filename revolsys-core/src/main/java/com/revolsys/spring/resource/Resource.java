@@ -22,7 +22,10 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -333,6 +336,15 @@ public interface Resource extends org.springframework.core.io.Resource, FileProx
     }
   }
 
+  default Instant getLastModifiedInstant() {
+    final long lastModified = getLastModified();
+    if (lastModified == Long.MAX_VALUE) {
+      return Instant.MAX;
+    } else {
+      return Instant.ofEpochMilli(lastModified);
+    }
+  }
+
   @Override
   default File getOrDownloadFile() {
     try {
@@ -367,6 +379,38 @@ public interface Resource extends org.springframework.core.io.Resource, FileProx
       return null;
     } else {
       return factory.apply(file);
+    }
+  }
+
+  default Path getOrDownloadPath() {
+    try {
+      return getPath();
+    } catch (final Throwable e) {
+      if (exists()) {
+        String baseName = getBaseName();
+        if (baseName.length() < 3) {
+          baseName += "xxx";
+        }
+        String fileNameExtension = getFileNameExtension();
+        if (fileNameExtension.length() < 3) {
+          fileNameExtension += "xxx";
+        }
+        Path path;
+        try {
+          path = Files.createTempFile(baseName, "." + fileNameExtension);
+          try (
+            InputStream inputStream = getInputStream()) {
+            Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+          } catch (final IOException e1) {
+            throw Exceptions.wrap("Error downloading: " + this, e1);
+          }
+        } catch (final IOException e1) {
+          throw Exceptions.wrap("Error downloading: " + this, e1);
+        }
+        return path;
+      } else {
+        throw new IllegalArgumentException("Cannot get File for resource " + this, e);
+      }
     }
   }
 
