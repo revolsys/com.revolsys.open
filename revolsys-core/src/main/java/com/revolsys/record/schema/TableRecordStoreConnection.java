@@ -41,6 +41,15 @@ public interface TableRecordStoreConnection {
     return recordStore.getRecordDefinition(tablePath);
   }
 
+  default RecordReader getRecordReader(final PathName tableName) {
+    final AbstractTableRecordStore recordStore = getTableRecordStore(tableName);
+    final Query query = recordStore.newQuery();
+    try (
+      Transaction transaction = newTransaction(Propagation.REQUIRED)) {
+      return recordStore.getRecords(query);
+    }
+  }
+
   default RecordReader getRecordReader(final Query query) {
     try (
       Transaction transaction = newTransaction(Propagation.REQUIRED)) {
