@@ -182,6 +182,9 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
   }
 
   protected Object getValueById(Object id) {
+    if (id == null) {
+      return null;
+    }
     if (this.valueIdCache.containsKey(id)) {
       if (id instanceof SingleIdentifier) {
         final SingleIdentifier identifier = (SingleIdentifier)id;

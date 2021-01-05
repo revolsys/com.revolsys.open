@@ -62,8 +62,6 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
 
   private String valueFieldName = DEFAULT_FIELD_NAME;
 
-  private FieldDefinition valueFieldDefinition;
-
   private boolean allowNullValues = false;
 
   public SingleValueRecordStoreCodeTable() {
@@ -198,11 +196,6 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
     } else {
       return getValue(Identifier.newIdentifier(id));
     }
-  }
-
-  @Override
-  public FieldDefinition getValueFieldDefinition() {
-    return this.valueFieldDefinition;
   }
 
   public String getValueFieldName() {
@@ -453,13 +446,12 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
       if (recordDefinition == null) {
         this.recordStore = null;
         this.typePath = null;
-        this.valueFieldDefinition = null;
       } else {
         this.typePath = recordDefinition.getPathName();
         final String name = this.typePath.getName();
         setName(name);
         this.recordStore = this.recordDefinition.getRecordStore();
-        this.valueFieldDefinition = recordDefinition.getField(this.valueFieldName);
+        setValueFieldDefinition(recordDefinition.getField(this.valueFieldName));
         setRecordDefinitionAfter(recordDefinition);
       }
     }

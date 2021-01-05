@@ -67,8 +67,6 @@ public class MultiValueCodeTableProperty extends AbstractMultiValueCodeTable
 
   private List<String> valueFieldNames = DEFAULT_FIELD_NAMES;
 
-  private FieldDefinition valueFieldDefinition;
-
   private boolean allowNullValues = false;
 
   public MultiValueCodeTableProperty() {
@@ -219,11 +217,6 @@ public class MultiValueCodeTableProperty extends AbstractMultiValueCodeTable
     } else {
       return getValue(Identifier.newIdentifier(id));
     }
-  }
-
-  @Override
-  public FieldDefinition getValueFieldDefinition() {
-    return this.valueFieldDefinition;
   }
 
   @Override
@@ -479,7 +472,6 @@ public class MultiValueCodeTableProperty extends AbstractMultiValueCodeTable
     if (this.recordDefinition != recordDefinition) {
       if (this.recordDefinition != null) {
         this.recordDefinition.setProperty(getPropertyName(), null);
-        this.valueFieldDefinition = null;
       }
       this.recordDefinition = recordDefinition;
       if (recordDefinition == null) {
@@ -495,7 +487,7 @@ public class MultiValueCodeTableProperty extends AbstractMultiValueCodeTable
         this.recordStore.addCodeTable(this.getCodeTable());
         if (!this.valueFieldNames.isEmpty()) {
           final String fieldName = this.valueFieldNames.get(0);
-          this.valueFieldDefinition = recordDefinition.getField(fieldName);
+          setValueFieldDefinition(recordDefinition.getField(fieldName));
         }
       }
     }
