@@ -7,10 +7,12 @@ import java.util.Map;
 import javax.swing.JComponent;
 
 import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.number.Numbers;
 
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
+import com.revolsys.record.schema.FieldDefinition;
 
 public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChange
   implements BaseCloseable, CodeTable, Cloneable {
@@ -30,6 +32,9 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
   protected int valueFieldLength = -1;
 
   private JComponent swingEditor;
+
+  private FieldDefinition valueFieldDefinition = new FieldDefinition("value", DataTypes.STRING,
+    true);
 
   public AbstractCodeTable() {
   }
@@ -109,6 +114,11 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
   }
 
   @Override
+  public FieldDefinition getValueFieldDefinition() {
+    return this.valueFieldDefinition;
+  }
+
+  @Override
   public int getValueFieldLength() {
     if (this.valueFieldLength == -1) {
       final int length = calculateValueFieldLength();
@@ -150,6 +160,10 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
 
   public void setSwingEditor(final JComponent swingEditor) {
     this.swingEditor = swingEditor;
+  }
+
+  public void setValueFieldDefinition(final FieldDefinition valueFieldDefinition) {
+    this.valueFieldDefinition = valueFieldDefinition;
   }
 
   protected void updateMaxId(final Number id) {
