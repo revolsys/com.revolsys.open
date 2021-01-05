@@ -3,6 +3,7 @@ package com.revolsys.io;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -238,6 +239,14 @@ public class ZipUtil {
     }
   }
 
+  public static InputStream wrapStream(final ZipInputStream in) {
+    return new FilterInputStream(in) {
+      @Override
+      public void close() throws IOException {
+      }
+    };
+  }
+
   public static void zipDirectory(final File zipFile, final File directory) {
     try {
       final OutputStream outputStream = new FileOutputStream(zipFile);
@@ -253,5 +262,4 @@ public class ZipUtil {
     addDirectoryToZipFile(zipOut, directory, directory);
     zipOut.close();
   }
-
 }
