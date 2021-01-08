@@ -20,7 +20,6 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -531,6 +530,15 @@ public abstract class AbstractOverlay extends JComponent
     return setSnapLocations(snapLocations);
   }
 
+  private boolean hasVertex(final Collection<CloseLocation> locations) {
+    for (final CloseLocation location : locations) {
+      if (location.getVertex() != null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public boolean isMouseInMap() {
     return MouseOverlay.isMouseInMap();
   }
@@ -673,43 +681,13 @@ public abstract class AbstractOverlay extends JComponent
       }
       return false;
     } else {
+
       if (!DataType.equal(snapLocations, this.snapPointLocationMap)) {
         this.snapPointIndex = 1;
         this.snapPointLocationMap = snapLocations;
         this.snapPoints.clear();
         this.snapPoints.addAll(snapLocations.keySet());
-        Collections.sort(this.snapPoints, new Comparator<Point>() {
-          @Override
-          public int compare(final Point point1, final Point point2) {
-            final Collection<CloseLocation> locations1 = snapLocations.get(point1);
-            final Collection<CloseLocation> locations2 = snapLocations.get(point2);
-            final boolean hasVertex1 = hasVertex(locations1);
-            final boolean hasVertex2 = hasVertex(locations2);
-            if (hasVertex1) {
-              if (!hasVertex2) {
-                return -1;
-              }
-            } else if (hasVertex2) {
-              return 0;
-            }
-            final double distance1 = AbstractOverlay.this.snapCentre.distancePoint(point1);
-            final double distance2 = AbstractOverlay.this.snapCentre.distancePoint(point2);
-            if (distance1 <= distance2) {
-              return -1;
-            } else {
-              return 0;
-            }
-          }
-
-          private boolean hasVertex(final Collection<CloseLocation> locations) {
-            for (final CloseLocation location : locations) {
-              if (location.getVertex() != null) {
-                return true;
-              }
-            }
-            return false;
-          }
-        });
+        sortSnapPoints(snapLocations);
       }
       final MapPanel map = getMap();
       if (this.snapPointIndex == 0) {
@@ -891,6 +869,31 @@ public abstract class AbstractOverlay extends JComponent
       }
     }
     return true;
+  }
+
+  private void sortSnapPoints(final Map<Point, Set<CloseLocation>> snapLocations) {
+    Collections.sort(this.snapPoints, (final Point point1, final Point point2) -> {
+      final Collection<CloseLocation> locations1 = snapLocations.get(point1);
+      final Collection<CloseLocation> locations2 = snapLocations.get(point2);
+      final boolean hasVertex1 = hasVertex(locations1);
+      final boolean hasVertex2 = hasVertex(locations2);
+      if (hasVertex1) {
+        if (!hasVertex2) {
+          return -1;
+        }
+      } else if (hasVertex2) {
+        return 0;
+      }
+      final double distance1 = AbstractOverlay.this.snapCentre.distancePoint(point1);
+      final double distance2 = AbstractOverlay.this.snapCentre.distancePoint(point2);
+      if (distance1 <= distance2) {
+        return -1;
+      } else {
+        return 0;
+      }
+    }
+
+    );
   }
 
 }
