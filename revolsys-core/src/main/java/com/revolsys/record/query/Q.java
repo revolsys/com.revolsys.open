@@ -24,6 +24,14 @@ public class Q {
 
   public static BiFunction<QueryValue, QueryValue, Condition> EQUAL = Equal::new;
 
+  public static BiFunction<QueryValue, QueryValue, Condition> GREATER_THAN = GreaterThan::new;
+
+  public static BiFunction<QueryValue, QueryValue, Condition> GREATER_THAN_EQUAL = GreaterThanEqual::new;
+
+  public static BiFunction<QueryValue, QueryValue, Condition> LESS_THAN = LessThan::new;
+
+  public static BiFunction<QueryValue, QueryValue, Condition> LESS_THAN_EQUAL = LessThanEqual::new;
+
   public static BiFunction<QueryValue, QueryValue, Condition> IN = In::new;
 
   public static Add add(final QueryValue left, final QueryValue right) {

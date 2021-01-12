@@ -125,12 +125,11 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
   }
 
   public RecordReader getRecords(final Condition condition) {
-    final Query query = newQuery()//
-      .and(condition);
+    final Query query = newQuery().and(condition);
     return getRecords(query);
   }
 
-  protected RecordReader getRecords(final Query query) {
+  public RecordReader getRecords(final Query query) {
     return this.recordStore.getRecords(query);
   }
 
@@ -184,6 +183,23 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     } else {
       updateAction.accept(changeTrackRecord);
       updateRecordDo(connection, changeTrackRecord);
+      return changeTrackRecord.newRecord();
+    }
+  }
+
+  public Record insertRecord(final TableRecordStoreConnection connection, final Query query,
+    final Supplier<Record> newRecordSupplier) {
+    query.setRecordFactory(ArrayChangeTrackRecord.FACTORY);
+
+    final ChangeTrackRecord changeTrackRecord = getRecord(connection, query);
+    if (changeTrackRecord == null) {
+      final Record newRecord = newRecordSupplier.get();
+      if (newRecord == null) {
+        return null;
+      } else {
+        return insertRecord(connection, newRecord);
+      }
+    } else {
       return changeTrackRecord.newRecord();
     }
   }
