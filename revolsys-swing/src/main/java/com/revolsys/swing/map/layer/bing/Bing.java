@@ -37,8 +37,10 @@ public interface Bing {
       return new BingLayer(config);
     });
 
-    MenuFactory.addMenuInitializer(BaseMapLayerGroup.class, (menu) -> {
-      menu.addMenuItem("group", "Add Bing Layer", "bing", Bing::actionAddLayer, false);
+    MenuFactory.addMenuInitializer(() -> {
+      MenuFactory.addMenuInitializer(BaseMapLayerGroup.class, (menu) -> {
+        menu.addMenuItem("group", "Add Bing Layer", "bing", Bing::actionAddLayer, false);
+      });
     });
 
   }

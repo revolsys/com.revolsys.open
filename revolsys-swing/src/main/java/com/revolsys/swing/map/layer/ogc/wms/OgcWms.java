@@ -13,10 +13,11 @@ public class OgcWms {
       return new OgcWmsImageLayer(config);
     });
 
-    MenuFactory.addMenuInitializer(WmsLayerDefinition.class, (menu) -> {
-      final Function<WmsLayerDefinition, BaseMapLayer> baseMapLayerFactory = OgcWmsImageLayer::new;
-      BaseMapLayer.addNewLayerMenu(menu, baseMapLayerFactory);
+    MenuFactory.addMenuInitializer(() -> {
+      MenuFactory.addMenuInitializer(WmsLayerDefinition.class, (menu) -> {
+        final Function<WmsLayerDefinition, BaseMapLayer> baseMapLayerFactory = OgcWmsImageLayer::new;
+        BaseMapLayer.addNewLayerMenu(menu, baseMapLayerFactory);
+      });
     });
-
   }
 }

@@ -2,7 +2,7 @@ package com.revolsys.util;
 
 import java.util.function.Supplier;
 
-public class LazyValue<V> extends ValueHolder<V> {
+public class LazyValue<V> extends SimpleValueWrapper<V> {
 
   public static <T> LazyValue<T> newValue(final Supplier<T> supplier) {
     return new LazyValue<>(supplier);

@@ -34,8 +34,11 @@ public class MapGuideWebServer {
       return new MapGuideWebServerRecordLayer(config);
     });
 
-    MenuFactory.addMenuInitializer(FeatureLayer.class, (menu) -> {
-      menu.addMenuItem("default", "Add Layer", "map:add", MapGuideWebServer::actionAddLayer, false);
+    MenuFactory.addMenuInitializer(() -> {
+      MenuFactory.addMenuInitializer(FeatureLayer.class, (menu) -> {
+        menu.addMenuItem("default", "Add Layer", "map:add", MapGuideWebServer::actionAddLayer,
+          false);
+      });
     });
   }
 }

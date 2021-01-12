@@ -1,6 +1,6 @@
 package com.revolsys.util;
 
-public class ValueHolder<R> implements ValueWrapper<R> {
+public class SimpleValueWrapper<R> implements ValueWrapper<R> {
 
   protected R value;
 

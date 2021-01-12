@@ -40,9 +40,11 @@ public interface WebMercatorTileCache {
         return new WebMercatorTileCacheLayer(config);
       });
 
-    MenuFactory.addMenuInitializer(BaseMapLayerGroup.class, (menu) -> {
-      menu.addMenuItem("group", "Add Web Mercator Tile Cache Layer",
-        Icons.getIconWithBadge("map", "add"), WebMercatorTileCache::actionAddLayer, false);
+    MenuFactory.addMenuInitializer(() -> {
+      MenuFactory.addMenuInitializer(BaseMapLayerGroup.class, (menu) -> {
+        menu.addMenuItem("group", "Add Web Mercator Tile Cache Layer",
+          Icons.getIconWithBadge("map", "add"), WebMercatorTileCache::actionAddLayer, false);
+      });
     });
   }
 

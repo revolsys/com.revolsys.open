@@ -4,7 +4,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public abstract class CloseableValueHolder<R> extends ValueHolder<R> {
+public abstract class CloseableValueHolder<R> extends SimpleValueWrapper<R> {
 
   public static <R2> CloseableValueHolder<R2> lambda(final Supplier<R2> valueFactory,
     final Consumer<R2> valueCloseFunction) {
@@ -103,7 +103,7 @@ public abstract class CloseableValueHolder<R> extends ValueHolder<R> {
         disconnect();
       }
 
-      public com.revolsys.util.ValueHolder<R> getValueHolder() {
+      public com.revolsys.util.SimpleValueWrapper<R> getValueHolder() {
         return CloseableValueHolder.this;
       }
     };

@@ -20,7 +20,7 @@ public interface ArcGisRestServer {
 
   String J_TYPE_RECORD = "arcGisRestServerRecordLayer";
 
-  static void actionAddRecordLayer(final FeatureLayer layerDescription) {
+  private static void actionAddRecordLayer(final FeatureLayer layerDescription) {
     final LayerGroup layerGroup = WebServiceConnectionTrees.getLayerGroup(layerDescription);
     if (layerGroup != null) {
       final ArcGisRestServerRecordLayer layer = new ArcGisRestServerRecordLayer(layerDescription);
@@ -31,7 +31,7 @@ public interface ArcGisRestServer {
     }
   }
 
-  static void actionAddTileCacheLayer(final BaseMapLayerGroup parent) {
+  private static void actionAddTileCacheLayer(final BaseMapLayerGroup parent) {
     final ValueField dialog = new ValueField();
     dialog.setTitle("Add ArcGIS Tile Cache");
 
@@ -70,7 +70,9 @@ public interface ArcGisRestServer {
         return new ArcGisRestServerTileCacheLayer(config);
       });
 
-    ArcGisRestServer.initMenus();
+    MenuFactory.addMenuInitializer(() -> {
+      ArcGisRestServer.initMenus();
+    });
   }
 
   public static void initMenus() {

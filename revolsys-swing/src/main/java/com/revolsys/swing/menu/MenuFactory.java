@@ -32,6 +32,7 @@ import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.swing.field.Field;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.util.Property;
+import com.revolsys.util.RunnableInitializers;
 
 public class MenuFactory extends BaseObjectWithProperties implements ComponentFactory<JMenuItem> {
   private static final ClassRegistry<MenuFactory> CLASS_MENUS = new ClassRegistry<>();
@@ -41,6 +42,8 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
   private static final String KEY_POPUP_MENU = MenuFactory.class.getName() + ".popup";
 
   private static Reference<MenuSourceHolder> menuSourceHolder = new WeakReference<>(null);
+
+  private static RunnableInitializers MENU_INITIALIZERS = new RunnableInitializers();
 
   public static void addMenuInitializer(final Class<?> clazz,
     final Consumer<MenuFactory> initializer) {
@@ -52,6 +55,10 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
       }
       list.add(initializer);
     }
+  }
+
+  public static void addMenuInitializer(final Runnable initializer) {
+    MENU_INITIALIZERS.addInitializer(initializer);
   }
 
   public static void addToComponent(final JComponent component, final MenuFactory menuFactory) {
@@ -122,6 +129,7 @@ public class MenuFactory extends BaseObjectWithProperties implements ComponentFa
           final MenuFactory parentMenu = getMenu(superClass);
           menu = new MenuFactory(clazz.getName(), parentMenu);
           CLASS_MENUS.put(clazz, menu);
+          MENU_INITIALIZERS.initialize();
           final List<Consumer<MenuFactory>> initializers = CLASS_MENUS_INITIALIZER.get(clazz);
           if (initializers != null) {
             for (final Consumer<MenuFactory> initializer : initializers) {

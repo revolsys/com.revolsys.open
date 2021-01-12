@@ -19,7 +19,7 @@ import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.CloseableValueHolder;
-import com.revolsys.util.ValueHolder;
+import com.revolsys.util.SimpleValueWrapper;
 
 class TableReference extends CloseableValueHolder<Table> {
   private class EsriFileGdbTableConnection implements TableWrapper {
@@ -35,7 +35,7 @@ class TableReference extends CloseableValueHolder<Table> {
     }
 
     @Override
-    public ValueHolder<Table> getValueHolder() {
+    public SimpleValueWrapper<Table> getValueHolder() {
       return TableReference.this;
     }
 
@@ -63,7 +63,7 @@ class TableReference extends CloseableValueHolder<Table> {
     }
 
     @Override
-    public ValueHolder<Table> getValueHolder() {
+    public SimpleValueWrapper<Table> getValueHolder() {
       return TableReference.this;
     }
 

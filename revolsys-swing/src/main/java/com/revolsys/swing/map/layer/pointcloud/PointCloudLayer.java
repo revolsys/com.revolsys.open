@@ -13,7 +13,7 @@ import javax.swing.ScrollPaneConstants;
 import org.jdesktop.swingx.VerticalLayout;
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.collection.ValueHolder;
+import com.revolsys.collection.SimpleValueHolder;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.PointCloudReadFactory;
 import com.revolsys.elevation.cloud.las.LasPointCloudWriterFactory;
@@ -36,6 +36,7 @@ import com.revolsys.swing.io.SwingIo;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.layer.AbstractLayer;
+import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.TreeNodes;
 import com.revolsys.swing.tree.node.file.PathTreeNode;
@@ -45,9 +46,10 @@ public class PointCloudLayer extends AbstractLayer {
 
   public static final String J_TYPE = "pointCloudLayer";
 
-  private static void addMenuExportPointCloud(final EnableCheck enableCheck) {
-    TreeNodes.addMenuItem(PathTreeNode.MENU, "point_cloud", "Export Point Cloud...",
-      (final PathTreeNode node) -> {
+  private static void addMenuExportPointCloud(final MenuFactory menu,
+    final EnableCheck enableCheck) {
+    TreeNodes
+      .addMenuItem(menu, "point_cloud", "Export Point Cloud...", (final PathTreeNode node) -> {
         final Path sourceFile = node.getPath();
         SwingIo.exportToFile("Point Coud", "com.revolsys.swing.map.layer.pointcloud.export",
           LasPointCloudWriterFactory.class, "las", sourceFile, targetFile -> {
@@ -60,9 +62,10 @@ public class PointCloudLayer extends AbstractLayer {
       .setIconName("point_cloud", "save");
   }
 
-  private static void addMenuPointCloudProperties(final EnableCheck enableCheck) {
-    TreeNodes.addMenuItem(PathTreeNode.MENU, "point_cloud", "Point Cloud Properties",
-      (final PathTreeNode node) -> {
+  private static void addMenuPointCloudProperties(final MenuFactory menu,
+    final EnableCheck enableCheck) {
+    TreeNodes
+      .addMenuItem(menu, "point_cloud", "Point Cloud Properties", (final PathTreeNode node) -> {
         final Path file = node.getPath();
         Invoke.later(() -> {
           final Resource resource = Resource.getResource(file);
@@ -76,18 +79,17 @@ public class PointCloudLayer extends AbstractLayer {
       .setIconName("information");
   }
 
-  private static void addMenuZoomToCloud(final EnableCheck enableCheck) {
-    TreeNodes.addMenuItem(PathTreeNode.MENU, "point_cloud", "Zoom to Point Cloud",
-      (final PathTreeNode node) -> {
-        final Path file = node.getPath();
-        final String baseName = Paths.getBaseName(file);
-        Invoke.background("Zoom to Point Cloud: " + baseName, () -> {
-          try (
-            PointCloud<?> pointCloud = PointCloud.newPointCloud(file)) {
-            MapPanel.zoomToBoundingBox(baseName, pointCloud);
-          }
-        });
-      })
+  private static void addMenuZoomToCloud(final MenuFactory menu, final EnableCheck enableCheck) {
+    TreeNodes.addMenuItem(menu, "point_cloud", "Zoom to Point Cloud", (final PathTreeNode node) -> {
+      final Path file = node.getPath();
+      final String baseName = Paths.getBaseName(file);
+      Invoke.background("Zoom to Point Cloud: " + baseName, () -> {
+        try (
+          PointCloud<?> pointCloud = PointCloud.newPointCloud(file)) {
+          MapPanel.zoomToBoundingBox(baseName, pointCloud);
+        }
+      });
+    })
       .setVisibleCheck(enableCheck) //
       .setIconName("point_cloud", "magnifier");
   }
@@ -103,9 +105,12 @@ public class PointCloudLayer extends AbstractLayer {
 
     final EnableCheck enableCheck = RsSwingServiceInitializer
       .enableCheck(PointCloudReadFactory.class);
-    addMenuExportPointCloud(enableCheck);
-    addMenuZoomToCloud(enableCheck);
-    addMenuPointCloudProperties(enableCheck);
+
+    PathTreeNode.MENU.addInitializer((menu) -> {
+      addMenuExportPointCloud(menu, enableCheck);
+      addMenuZoomToCloud(menu, enableCheck);
+      addMenuPointCloudProperties(menu, enableCheck);
+    });
 
   }
 
@@ -227,7 +232,7 @@ public class PointCloudLayer extends AbstractLayer {
     scrollPane.setMaximumSize(new Dimension(1000, 350));
     scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
     propertiesPanel.add(scrollPane);
-    final ValueHolder<JButton> buttonHolder = new ValueHolder<>();
+    final SimpleValueHolder<JButton> buttonHolder = new SimpleValueHolder<>();
     final JButton refreshButton = RunnableAction.newButton("Update Classification Counts", () -> {
       buttonHolder.getValue().setEnabled(false);
       Invoke.background("Classification Counts " + this.url, () -> {

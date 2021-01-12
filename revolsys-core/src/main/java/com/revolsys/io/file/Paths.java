@@ -37,7 +37,7 @@ import java.util.stream.Stream;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.collection.ValueHolder;
+import com.revolsys.collection.SimpleValueHolder;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.connection.file.FileConnectionManager;
@@ -95,7 +95,7 @@ public interface Paths {
   }
 
   static boolean deleteDirectories(final Path path) {
-    final ValueHolder<IOException> firstException = new ValueHolder<>();
+    final SimpleValueHolder<IOException> firstException = new SimpleValueHolder<>();
     final LinkedList<Boolean> errors = new LinkedList<>();
     try {
       Files.walkFileTree(path, new SimpleFileVisitor<Path>() {

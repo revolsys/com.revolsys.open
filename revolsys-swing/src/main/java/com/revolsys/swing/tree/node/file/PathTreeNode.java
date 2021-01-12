@@ -49,6 +49,7 @@ import com.revolsys.swing.field.ComboBox;
 import com.revolsys.swing.field.TextField;
 import com.revolsys.swing.layout.GroupLayouts;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
+import com.revolsys.swing.menu.LazyMenuFactory;
 import com.revolsys.swing.menu.MenuFactory;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.tree.BaseTreeNode;
@@ -61,20 +62,22 @@ import com.revolsys.util.Property;
 public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
   private static JFileChooser chooser;
 
-  public static final MenuFactory MENU = new MenuFactory("File");
+  public static final LazyMenuFactory MENU = new LazyMenuFactory("File");
 
   static {
-    addRefreshMenuItem(MENU);
+    MENU.addInitializer((menu) -> {
+      addRefreshMenuItem(menu);
 
-    TreeNodes
-      .addMenuItem(MENU, "record", "Export Records", "table:save",
-        PathTreeNode::actionExportRecords) //
-      .setVisibleCheck(TreeNodes.enableCheck(PathTreeNode::isRecordFileLayer));
+      TreeNodes
+        .addMenuItem(menu, "record", "Export Records", "table:save",
+          PathTreeNode::actionExportRecords) //
+        .setVisibleCheck(TreeNodes.enableCheck(PathTreeNode::isRecordFileLayer));
 
-    TreeNodes
-      .addMenuItem(MENU, "folder", "Add Folder Connection", "link:add",
-        PathTreeNode::actionAddFolderConnection)//
-      .setVisibleCheck(TreeNodes.enableCheck(PathTreeNode::isDirectory));
+      TreeNodes
+        .addMenuItem(menu, "folder", "Add Folder Connection", "link:add",
+          PathTreeNode::actionAddFolderConnection)//
+        .setVisibleCheck(TreeNodes.enableCheck(PathTreeNode::isDirectory));
+    });
   }
 
   private static Icon iconFile;
@@ -375,7 +378,7 @@ public class PathTreeNode extends LazyLoadTreeNode implements UrlProxy {
 
   @Override
   public MenuFactory getMenu() {
-    return MENU;
+    return MENU.getValue();
   }
 
   public Path getPath() {

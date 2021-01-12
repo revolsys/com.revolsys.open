@@ -113,8 +113,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
 
   public static final String PLUGIN_TABLE_VIEW = "tableView";
 
-  static {
-    MenuFactory.addMenuInitializer(AbstractLayer.class, menu -> {
+  public static void initializeMenu() {
+    MenuFactory.addMenuInitializer(AbstractLayer.class, (menu) -> {
       menu.addMenuItem("zoom", -1, "Zoom to Layer", "magnifier",
         AbstractLayer::isZoomToLayerEnabled, AbstractLayer::zoomToLayer, true);
 
@@ -140,10 +140,11 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
     });
   }
 
-  public static void menuItemPathAddLayer(final String menuGroup, final String menuName,
-    final String iconName, final Class<? extends IoFactory> factoryClass) {
+  public static void menuItemPathAddLayer(final MenuFactory menu, final String menuGroup,
+    final String menuName, final String iconName, final Class<? extends IoFactory> factoryClass) {
+
     final EnableCheck enableCheck = RsSwingServiceInitializer.enableCheck(factoryClass);
-    TreeNodes.addMenuItem(PathTreeNode.MENU, menuGroup, menuName, (final PathTreeNode node) -> {
+    TreeNodes.addMenuItem(menu, menuGroup, menuName, (final PathTreeNode node) -> {
       final URL url = node.getUrl();
       final Project project = Project.get();
       project.openFile(url);

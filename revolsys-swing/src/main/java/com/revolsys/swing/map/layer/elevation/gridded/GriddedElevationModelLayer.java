@@ -51,25 +51,6 @@ import com.revolsys.util.Property;
 public class GriddedElevationModelLayer extends AbstractLayer implements ElevationModelLayer {
   public static final String J_TYPE = "griddedElevationModelLayer";
 
-  static {
-    final MenuFactory menu = MenuFactory.getMenu(GriddedElevationModelLayer.class);
-    menu.addGroup(0, "table");
-    menu.addGroup(2, "edit");
-
-    final Predicate<GriddedElevationModelLayer> notReadOnly = ((Predicate<GriddedElevationModelLayer>)GriddedElevationModelLayer::isReadOnly)
-      .negate();
-    final Predicate<GriddedElevationModelLayer> editable = GriddedElevationModelLayer::isEditable;
-
-    menu.<GriddedElevationModelLayer> addCheckboxMenuItem("edit", "Editable", "pencil", notReadOnly,
-      GriddedElevationModelLayer::toggleEditable, editable, true);
-
-    menu.<GriddedElevationModelLayer> addMenuItem("edit", "Save As...", "disk",
-      GriddedElevationModelLayer::saveAs, true);
-
-    menu.<GriddedElevationModelLayer> addMenuItem("refresh", "Reload from File", "page:refresh",
-      GriddedElevationModelLayer::revertDo, true);
-  }
-
   private static void actionExport(final PathTreeNode node) {
     final Path path = node.getPath();
     SwingIo.exportToFile("Gridded Elevation Model", "com.revolsys.swing.io.gridded_dem.export",
@@ -116,20 +97,43 @@ public class GriddedElevationModelLayer extends AbstractLayer implements Elevati
     // Menus
     final EnableCheck enableCheck = RsSwingServiceInitializer
       .enableCheck(GriddedElevationModelReaderFactory.class);
-    menuItemPathAddLayer("gridded_dem", "Add Gridded Elevation Model Layer", "gridded_dem",
-      GriddedElevationModelReaderFactory.class);
 
-    TreeNodes
-      .addMenuItem(PathTreeNode.MENU, "gridded_dem", "Export Gridded Elevation Model",
-        (final PathTreeNode node) -> actionExport(node)) //
-      .setVisibleCheck(enableCheck) //
-      .setIconName("gridded_dem", "save");
+    PathTreeNode.MENU.addInitializer((menu) -> {
+      menuItemPathAddLayer(menu, "gridded_dem", "Add Gridded Elevation Model Layer", "gridded_dem",
+        GriddedElevationModelReaderFactory.class);
 
-    TreeNodes
-      .addMenuItem(PathTreeNode.MENU, "gridded_dem", "Zoom to Gridded Elevation Model",
-        (final PathTreeNode node) -> actionZoomTo(node))
-      .setVisibleCheck(enableCheck) //
-      .setIconName("gridded_dem", "magnifier");
+      TreeNodes
+        .addMenuItem(menu, "gridded_dem", "Export Gridded Elevation Model",
+          (final PathTreeNode node) -> actionExport(node)) //
+        .setVisibleCheck(enableCheck) //
+        .setIconName("gridded_dem", "save");
+
+      TreeNodes
+        .addMenuItem(menu, "gridded_dem", "Zoom to Gridded Elevation Model",
+          (final PathTreeNode node) -> actionZoomTo(node))
+        .setVisibleCheck(enableCheck) //
+        .setIconName("gridded_dem", "magnifier");
+    });
+  }
+
+  public static void initializeMenu() {
+    MenuFactory.addMenuInitializer(GriddedElevationModelLayer.class, (menu) -> {
+      menu.addGroup(0, "table");
+      menu.addGroup(2, "edit");
+
+      final Predicate<GriddedElevationModelLayer> notReadOnly = ((Predicate<GriddedElevationModelLayer>)GriddedElevationModelLayer::isReadOnly)
+        .negate();
+      final Predicate<GriddedElevationModelLayer> editable = GriddedElevationModelLayer::isEditable;
+
+      menu.<GriddedElevationModelLayer> addCheckboxMenuItem("edit", "Editable", "pencil",
+        notReadOnly, GriddedElevationModelLayer::toggleEditable, editable, true);
+
+      menu.<GriddedElevationModelLayer> addMenuItem("edit", "Save As...", "disk",
+        GriddedElevationModelLayer::saveAs, true);
+
+      menu.<GriddedElevationModelLayer> addMenuItem("refresh", "Reload from File", "page:refresh",
+        GriddedElevationModelLayer::revertDo, true);
+    });
   }
 
   private GriddedElevationModel elevationModel;

@@ -3,6 +3,7 @@ package com.revolsys.record.schema;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.exception.Exceptions;
@@ -13,7 +14,6 @@ import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.json.JsonObject;
-import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
@@ -82,12 +82,19 @@ public interface TableRecordStoreConnection {
   }
 
   default <TRS extends AbstractTableRecordStore> Record insertOrUpdateRecord(
-    final CharSequence tablePath, final Condition condition,
+    final CharSequence tablePath, final Function<TRS, Query> querySupplier,
     final Function<TRS, Record> newRecordSupplier, final Consumer<Record> updateAction) {
     final TRS tableRecordStore = getTableRecordStore(tablePath);
-    return tableRecordStore.insertOrUpdateRecord(this, condition, () -> {
-      return newRecordSupplier.apply(tableRecordStore);
-    }, updateAction);
+    final Query query = querySupplier.apply(tableRecordStore);
+    final Supplier<Record> insertSupplier = () -> newRecordSupplier.apply(tableRecordStore);
+    return tableRecordStore.insertOrUpdateRecord(this, query, insertSupplier, updateAction);
+  }
+
+  default <TRS extends AbstractTableRecordStore> Record insertRecord(final CharSequence tablePath,
+    final Function<TRS, Query> querySupplier, final Function<TRS, Record> newRecordSupplier) {
+    final Consumer<Record> updateAction = (record) -> {
+    };
+    return this.insertOrUpdateRecord(tablePath, querySupplier, newRecordSupplier, updateAction);
   }
 
   default Record insertRecord(final Record record) {
