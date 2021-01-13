@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.function.Consumer;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.Exceptions;
@@ -238,6 +239,12 @@ public interface JsonList extends List<Object>, JsonType {
     return true;
   }
 
+  default <V> void forEachType(final Consumer<V> action) {
+    List.super.forEach((value) -> {
+      action.accept((V)value);
+    });
+  }
+
   @SuppressWarnings("unchecked")
   default <V> V getValue(final int index) {
     return (V)get(index);
@@ -255,6 +262,7 @@ public interface JsonList extends List<Object>, JsonType {
     return (JsonList)JsonType.super.toJson();
   }
 
+  @Override
   default String toJsonString(final boolean indent) {
     return Json.toString(this, indent);
   }

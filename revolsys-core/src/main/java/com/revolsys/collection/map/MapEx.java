@@ -16,6 +16,7 @@ import org.jeometry.common.data.type.DataTypedValue;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.record.io.format.json.Json;
+import com.revolsys.record.io.format.json.JsonList;
 import com.revolsys.record.io.format.json.JsonObject;
 
 public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedValue {
@@ -209,6 +210,19 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
 
   default int getInteger(final CharSequence name, final int defaultValue) {
     final Integer value = getInteger(name);
+    if (value == null) {
+      return defaultValue;
+    } else {
+      return value;
+    }
+  }
+
+  default JsonList getJsonList(final CharSequence name) {
+    return getValue(name, Json.JSON_LIST);
+  }
+
+  default JsonList getJsonList(final CharSequence name, final JsonList defaultValue) {
+    final JsonList value = getJsonList(name);
     if (value == null) {
       return defaultValue;
     } else {
