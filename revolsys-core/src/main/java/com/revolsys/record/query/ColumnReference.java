@@ -2,6 +2,8 @@ package com.revolsys.record.query;
 
 import java.sql.PreparedStatement;
 
+import org.jeometry.common.data.type.DataType;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.FieldDefinition;
 
@@ -21,6 +23,10 @@ public interface ColumnReference extends QueryValue {
 
   default String getAliasName() {
     return getName();
+  }
+
+  default DataType getDataType() {
+    return getFieldDefinition().getDataType();
   }
 
   FieldDefinition getFieldDefinition();

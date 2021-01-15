@@ -24,6 +24,8 @@ import com.revolsys.record.query.Equal;
 import com.revolsys.record.query.GreaterThan;
 import com.revolsys.record.query.GreaterThanEqual;
 import com.revolsys.record.query.In;
+import com.revolsys.record.query.IsNotNull;
+import com.revolsys.record.query.IsNull;
 import com.revolsys.record.query.LessThan;
 import com.revolsys.record.query.LessThanEqual;
 import com.revolsys.record.query.Mod;
@@ -32,11 +34,13 @@ import com.revolsys.record.query.Negate;
 import com.revolsys.record.query.Not;
 import com.revolsys.record.query.NotEqual;
 import com.revolsys.record.query.Or;
+import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.Subtract;
 import com.revolsys.record.query.Value;
 import com.revolsys.record.query.functions.Lower;
 import com.revolsys.record.query.functions.Upper;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.util.Debug;
 import com.revolsys.util.Hex;
 import com.revolsys.util.Pair;
@@ -151,8 +155,24 @@ public class ODataParser {
     .<String, BiFunction<QueryValue, QueryValue, QueryValue>> buildLinkedHash()//
     .add("or", Or::new)
     .add("and", And::new)
-    .add("eq", Equal::new)
-    .add("ne", NotEqual::new)
+    .add("eq", (left, right) -> {
+      if (right instanceof Value) {
+        final Value value = (Value)right;
+        if (value.getValue() == null) {
+          return new IsNull(left);
+        }
+      }
+      return new Equal(left, right);
+    })
+    .add("ne", (left, right) -> {
+      if (right instanceof Value) {
+        final Value value = (Value)right;
+        if (value.getValue() == null) {
+          return new IsNotNull(left);
+        }
+      }
+      return new NotEqual(left, right);
+    })
     .add("lt", LessThan::new)
     .add("gt", GreaterThan::new)
     .add("le", LessThanEqual::new)
@@ -299,13 +319,14 @@ public class ODataParser {
     // }
   }
 
-  public static QueryValue parseFilter(final String value) {
+  public static QueryValue parseFilter(final Query query, final String value) {
     final List<Token> tokens = tokenize(value);
 
-    return readExpression(tokens);
+    return readExpression(query, tokens);
   }
 
-  private static QueryValue processBinaryExpression(final List<Token> tokens, final String op) {
+  private static QueryValue processBinaryExpression(final Query query, final List<Token> tokens,
+    final String op) {
 
     final int ts = tokens.size();
     for (int i = 0; i < ts; i++) {
@@ -317,8 +338,11 @@ public class ODataParser {
           if (wordToken.value.equals(op)) {
             final BiFunction<QueryValue, QueryValue, QueryValue> fn = BINARY_OPERATOR_FACTORIES
               .get(op);
-            final QueryValue lhs = readExpression(tokens.subList(0, i));
-            final QueryValue rhs = readExpression(tokens.subList(i + 3, ts));
+            final QueryValue lhs = readExpression(query, tokens.subList(0, i));
+            final QueryValue rhs = readExpression(query, tokens.subList(i + 3, ts));
+            if (lhs instanceof FieldDefinition) {
+              rhs.setFieldDefinition((FieldDefinition)lhs);
+            }
             return fn.apply(lhs, rhs);
           }
         }
@@ -327,7 +351,7 @@ public class ODataParser {
     return null;
   }
 
-  private static List<Token> processParentheses(final List<Token> tokens) {
+  private static List<Token> processParentheses(final Query query, final List<Token> tokens) {
 
     final List<Token> rt = new ArrayList<Token>();
 
@@ -412,7 +436,7 @@ public class ODataParser {
           } else if (methodName != null && stack == 0 && closeToken.type == TokenType.SYMBOL
             && closeToken.value.equals(",")) {
             final List<Token> tokensInsideComma = tokens.subList(start + 1, j);
-            final QueryValue expressionInsideComma = readExpression(tokensInsideComma);
+            final QueryValue expressionInsideComma = readExpression(query, tokensInsideComma);
             methodArguments.add(expressionInsideComma);
             start = j;
           } else if (closeToken.type == TokenType.CLOSEPAREN) {
@@ -424,7 +448,7 @@ public class ODataParser {
             if (methodName != null) {
               final List<Token> tokensIncludingParens = tokens.subList(k, j + 1);
               final List<Token> tokensInsideParens = tokens.subList(start + 1, j);
-              final QueryValue expressionInsideParens = readExpression(tokensInsideParens);
+              final QueryValue expressionInsideParens = readExpression(query, tokensInsideParens);
               methodArguments.add(expressionInsideParens);
 
               // method call expression: replace t mn ( t t , t t ) t with t et
@@ -438,7 +462,7 @@ public class ODataParser {
             } else if (aggregateVariable != null) {
               final List<Token> tokensIncludingParens = tokens.subList(k, j + 1);
               final List<Token> tokensInsideParens = tokens.subList(afterParenIdx, j);
-              final QueryValue expressionInsideParens = readExpression(tokensInsideParens);
+              final QueryValue expressionInsideParens = readExpression(query, tokensInsideParens);
               if (!(expressionInsideParens instanceof Condition)) {
                 throw new RuntimeException("illegal any predicate");
               }
@@ -455,7 +479,7 @@ public class ODataParser {
 
               final List<Token> tokensIncludingParens = tokens.subList(i, j + 1);
               final List<Token> tokensInsideParens = tokens.subList(i + 1, j);
-              final QueryValue expressionInsideParens = readExpression(tokensInsideParens);
+              final QueryValue expressionInsideParens = readExpression(query, tokensInsideParens);
 
               final ExpressionToken et = new ExpressionToken(expressionInsideParens,
                 tokensIncludingParens);
@@ -474,7 +498,8 @@ public class ODataParser {
 
   }
 
-  private static QueryValue processUnaryExpression(final List<Token> tokens, final String op) {
+  private static QueryValue processUnaryExpression(final Query query, final List<Token> tokens,
+    final String op) {
     final Pair<Boolean, Function<QueryValue, QueryValue>> config = UNARY_OPERATOR_FACTORIES.get(op);
     final boolean whitespaceRequired = config.getValue1();
     final int ts = tokens.size();
@@ -485,7 +510,7 @@ public class ODataParser {
           && (!whitespaceRequired || tokens.get(i + 1).type == TokenType.WHITESPACE)) {
           final Token wordToken = t;
           if (wordToken.value.equals(op)) {
-            final QueryValue expression = readExpression(
+            final QueryValue expression = readExpression(query,
               tokens.subList(i + (whitespaceRequired ? 2 : 1), ts));
             final Function<QueryValue, QueryValue> fn = config.getValue2();
             return fn.apply(expression);
@@ -504,10 +529,10 @@ public class ODataParser {
     return rt;
   }
 
-  private static QueryValue readExpression(List<Token> tokens) {
+  private static QueryValue readExpression(final Query query, List<Token> tokens) {
 
     tokens = trimWhitespace(tokens);
-    tokens = processParentheses(tokens);
+    tokens = processParentheses(query, tokens);
     if (tokens.size() == 2 && tokens.get(0).type == TokenType.WORD
       && tokens.get(1).type == TokenType.QUOTED_STRING) {
       final String word = tokens.get(0).value;
@@ -636,7 +661,11 @@ public class ODataParser {
         if (token.value.equals("false")) {
           return Value.newValue(false);
         }
-        return new Column(token.value);
+        try {
+          return query.getTable().getColumn(token.value);
+        } catch (final Exception e) {
+          return new Column(token.value);
+        }
       } else if (token.type == TokenType.NUMBER) {
         try {
           final int value = Integer.parseInt(token.value);
@@ -653,14 +682,14 @@ public class ODataParser {
     }
 
     for (final String operator : BINARY_OPERATOR_FACTORIES.keySet()) {
-      final QueryValue rt = processBinaryExpression(tokens, operator);
+      final QueryValue rt = processBinaryExpression(query, tokens, operator);
       if (rt != null) {
         return rt;
       }
     }
 
     for (final String operator : UNARY_OPERATOR_FACTORIES.keySet()) {
-      final QueryValue rt = processUnaryExpression(tokens, operator);
+      final QueryValue rt = processUnaryExpression(query, tokens, operator);
       if (rt != null) {
         return rt;
       }

@@ -204,7 +204,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   @Override
   protected String getSequenceName(final JdbcRecordDefinition recordDefinition) {
     final JdbcRecordStoreSchema schema = recordDefinition.getSchema();
-    final String dbSchemaName = schema.getDbName();
+    final String dbSchemaName = schema.getQuotedDbName();
     final String shortName = ShortNameProperty.getShortName(recordDefinition);
     final String sequenceName;
     if (Property.hasValue(shortName)) {
@@ -368,6 +368,13 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   @Override
   protected JdbcFieldDefinition newRowIdFieldDefinition() {
     return new PostgreSQLOidFieldDefinition();
+  }
+
+  @Override
+  protected JdbcRecordStoreSchema newSchema(final JdbcRecordStoreSchema rootSchema,
+    final String dbSchemaName, final PathName childSchemaPath) {
+    final boolean quoteName = !dbSchemaName.equals(dbSchemaName.toLowerCase());
+    return new JdbcRecordStoreSchema(rootSchema, childSchemaPath, dbSchemaName, quoteName);
   }
 
   @Override

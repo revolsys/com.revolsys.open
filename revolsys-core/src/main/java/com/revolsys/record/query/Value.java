@@ -123,9 +123,11 @@ public class Value implements QueryValue {
     final Value clone = clone();
     if (oldTable != newTable && this.column.getTable() == oldTable) {
       final String name = this.column.getName();
-      final ColumnReference newColumn = newTable.getColumn(name);
-      if (newColumn != null) {
-        setColumn(newColumn);
+      if (name != JdbcFieldDefinitions.UNKNOWN) {
+        final ColumnReference newColumn = newTable.getColumn(name);
+        if (newColumn != null) {
+          setColumn(newColumn);
+        }
       }
     }
     return clone;
@@ -242,6 +244,7 @@ public class Value implements QueryValue {
       } else {
         this.jdbcField = JdbcFieldDefinitions.newFieldDefinition(this.queryValue);
       }
+      this.queryValue = field.toFieldValue(this.queryValue);
 
       CodeTable codeTable = null;
       if (field != null) {
@@ -294,7 +297,9 @@ public class Value implements QueryValue {
 
   @Override
   public String toString() {
-    if (this.displayValue instanceof Number) {
+    if (this.displayValue == null) {
+      return "null";
+    } else if (this.displayValue instanceof Number) {
       final Object value = this.displayValue;
       return DataTypes.toString(value);
     } else if (this.displayValue instanceof Date) {

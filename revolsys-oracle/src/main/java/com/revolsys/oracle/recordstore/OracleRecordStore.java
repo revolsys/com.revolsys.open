@@ -320,7 +320,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     if (recordDefinition == null) {
       return null;
     } else {
-      final String dbSchemaName = recordDefinition.getDbSchemaName();
+      final String dbSchemaName = recordDefinition.getQuotedDbSchemaName();
       final String shortName = ShortNameProperty.getShortName(recordDefinition);
       final String sequenceName;
       if (Property.hasValue(shortName)) {

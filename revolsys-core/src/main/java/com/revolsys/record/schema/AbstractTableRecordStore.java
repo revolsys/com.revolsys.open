@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 
 import com.revolsys.collection.map.MapEx;
@@ -20,6 +21,8 @@ import com.revolsys.record.ChangeTrackRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.query.Cast;
+import com.revolsys.record.query.ColumnReference;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Or;
 import com.revolsys.record.query.Q;
@@ -79,7 +82,12 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
         final Or or = new Or();
         search = '%' + search.trim().toLowerCase() + '%';
         for (final String fieldName : this.searchFieldNames) {
-          final Condition condition = query.newCondition(fieldName, Q.ILIKE, search);
+          final ColumnReference column = query.getTable().getColumn(fieldName);
+          QueryValue left = column;
+          if (column.getDataType() != DataTypes.STRING) {
+            left = new Cast(left, "text");
+          }
+          final Condition condition = query.newCondition(left, Q.ILIKE, search);
           or.addCondition(condition);
         }
         query.and(or);

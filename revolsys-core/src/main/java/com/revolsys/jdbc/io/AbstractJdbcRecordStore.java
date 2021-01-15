@@ -834,6 +834,11 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     return null;
   }
 
+  protected JdbcRecordStoreSchema newSchema(final JdbcRecordStoreSchema rootSchema,
+    final String dbSchemaName, final PathName childSchemaPath) {
+    return new JdbcRecordStoreSchema(rootSchema, childSchemaPath, dbSchemaName);
+  }
+
   @Override
   public ResultPager<Record> page(final Query query) {
     return new JdbcQueryResultPager(this, getProperties(), query);
@@ -872,7 +877,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
           final PathName childSchemaPath = schemaPath.newChild(toUpperIfNeeded(dbSchemaName));
           RecordStoreSchema childSchema = schema.getSchema(childSchemaPath);
           if (childSchema == null) {
-            childSchema = new JdbcRecordStoreSchema(rootSchema, childSchemaPath, dbSchemaName);
+            childSchema = newSchema(rootSchema, dbSchemaName, childSchemaPath);
           } else {
             if (childSchema.isInitialized()) {
               childSchema.refresh();

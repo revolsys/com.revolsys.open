@@ -230,7 +230,7 @@ public class AbstractTableRecordRestController {
 
   protected Condition newQueryFilterConditionFilter(final AbstractTableRecordStore recordStore,
     final Query query, final String filter) {
-    return (Condition)ODataParser.parseFilter(filter);
+    return (Condition)ODataParser.parseFilter(query, filter);
   }
 
   protected void newQueryFilterConditionSearch(final AbstractTableRecordStore recordStore,

@@ -644,6 +644,27 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return condition;
   }
 
+  public Condition newCondition(final QueryValue left,
+    final BiFunction<QueryValue, QueryValue, Condition> operator, final Object value) {
+    Condition condition;
+    if (value == null) {
+      condition = new IsNull(left);
+    } else {
+      QueryValue right;
+      if (value instanceof QueryValue) {
+        right = (QueryValue)value;
+      } else {
+        if (left instanceof ColumnReference) {
+          right = new Value((ColumnReference)left, value);
+        } else {
+          right = Value.newValue(value);
+        }
+      }
+      condition = operator.apply(left, right);
+    }
+    return condition;
+  }
+
   public Query newQuery(final RecordDefinition recordDefinition) {
     final Query query = clone();
     query.setRecordDefinition(recordDefinition);

@@ -164,5 +164,11 @@
         </exclusion>
       </exclusions>
     </dependency>
+     <dependency>
+      <groupId>com.nimbusds</groupId>
+      <artifactId>nimbus-jose-jwt</artifactId>
+      <version>8.19</version>
+    </dependency>
+  
   </dependencies>
 </project>
