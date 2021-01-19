@@ -26,12 +26,12 @@ public class BaseTableRecordRestController extends AbstractTableRecordRestContro
     this.typeName = tablePath.getName();
   }
 
-  protected void handleGetRecord(final TableRecordStoreConnection tenant,
+  protected void handleGetRecord(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final HttpServletResponse response, final String fieldName,
-    final String value) throws IOException {
-    final Query query = newQuery(tenant, request)//
+    final Object value) throws IOException {
+    final Query query = newQuery(connection, request)//
       .and(fieldName, Q.EQUAL, value);
-    handleGetRecord(tenant, request, response, query);
+    handleGetRecord(connection, request, response, query);
   }
 
   protected void handleInsertRecord(final TableRecordStoreConnection connection,

@@ -58,7 +58,10 @@ public class PostgreSQLArrayFieldDefinition extends JdbcFieldDefinition {
   public int setInsertPreparedStatementValue(final PreparedStatement statement,
     final int parameterIndex, final Object value) throws SQLException {
     Array array;
-    if (value instanceof Array) {
+    if (value == null) {
+      statement.setNull(parameterIndex, getSqlType());
+      return parameterIndex + 1;
+    } else if (value instanceof Array) {
       array = (Array)value;
     } else if (value instanceof Collection) {
       final Collection<?> elements = (Collection<?>)value;
