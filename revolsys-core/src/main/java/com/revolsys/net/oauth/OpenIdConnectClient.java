@@ -19,13 +19,9 @@ import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Strings;
 
 public class OpenIdConnectClient extends BaseObjectWithProperties {
-  public static OpenIdConnectClient getDefaultClient(final ObjectFactoryConfig factoryConfig) {
-    return factoryConfig.getValue("defaultOidcClient");
-  }
 
   public static OpenIdConnectClient google() {
     return newClient("https://accounts.google.com/.well-known/openid-configuration");
@@ -42,11 +38,11 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
   }
 
   public static OpenIdConnectClient newClient(final ObjectFactoryConfig factoryConfig,
-    final JsonObject config) {
+    final JsonObject config, final String defaultPrefix) {
     final String url = config.getString("wellKnownUrl");
     OpenIdConnectClient client;
     if (url == null) {
-      client = getDefaultClient(factoryConfig);
+      client = factoryConfig.getValue(defaultPrefix + "OidcClient");
     } else {
       client = newClient(url);
     }
@@ -227,15 +223,7 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
     return this.userinfoEndpoint;
   }
 
-  public ObjectFactoryConfig setAsDefaultClient(final ObjectFactoryConfig factoryConfig) {
-    factoryConfig.addValue("defaultOidcClient", this);
-    return factoryConfig;
-  }
-
   public OpenIdConnectClient setClientId(final String clientId) {
-    if (clientId == null) {
-      Debug.noOp();
-    }
     this.clientId = clientId;
     return this;
   }
