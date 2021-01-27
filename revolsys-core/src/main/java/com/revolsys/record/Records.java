@@ -749,6 +749,16 @@ public interface Records {
     }
   }
 
+  static void toUpperCase(final MapEx record, final String fieldName) {
+    if (record != null) {
+      String value = record.getString(fieldName);
+      if (value != null) {
+        value = value.toUpperCase();
+        record.addValue(fieldName, value);
+      }
+    }
+  }
+
   static Geometry unionGeometry(final Collection<?> records) {
     final Geometry geometry = getGeometry(records);
     return geometry.union();
