@@ -77,7 +77,11 @@ public class ArcSdeSpatialReferenceCache {
           final String wkt = resultSet.getString(11);
           final GeometryFactory geometryFactory;
           if (srid <= 0) {
-            geometryFactory = GeometryFactory.fixed3d(wkt, scale, scale, zScale);
+            if ("UNKNOWN".equalsIgnoreCase(wkt)) {
+              geometryFactory = GeometryFactory.fixed3d(scale, scale, zScale);
+            } else {
+              geometryFactory = GeometryFactory.fixed3d(wkt, scale, scale, zScale);
+            }
           } else {
             geometryFactory = GeometryFactory.fixed3d(srid, scale, scale, zScale);
           }
