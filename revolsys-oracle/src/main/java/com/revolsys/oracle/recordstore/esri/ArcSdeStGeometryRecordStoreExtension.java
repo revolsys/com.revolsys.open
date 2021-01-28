@@ -50,48 +50,59 @@ public class ArcSdeStGeometryRecordStoreExtension implements RecordStoreExtensio
       final ResultSet resultSet = statement.executeQuery();
       try {
         while (resultSet.next()) {
-          final String tableName = resultSet.getString(1);
-          final String columnName = resultSet.getString(2);
+          PathName typePath = null;
+          String columnName = null;
+          try {
+            final String tableName = resultSet.getString(1);
+            columnName = resultSet.getString(2);
 
-          final PathName typePath = PathName.newPathName(PathUtil.toPath(schemaName, tableName));
+            typePath = PathName.newPathName(PathUtil.toPath(schemaName, tableName));
 
-          final int esriSrid = resultSet.getInt(3);
-          JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
-            ArcSdeConstants.ESRI_SRID_PROPERTY, esriSrid);
+            final int esriSrid = resultSet.getInt(3);
+            JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
+              ArcSdeConstants.ESRI_SRID_PROPERTY, esriSrid);
 
-          int axisCount = resultSet.getInt(5);
-          axisCount = Math.max(axisCount, 2);
-          JdbcFieldAdder.setColumnProperty(schema, typePath, columnName, JdbcFieldAdder.AXIS_COUNT,
-            axisCount);
+            int axisCount = resultSet.getInt(5);
+            axisCount = Math.max(axisCount, 2);
+            JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
+              JdbcFieldAdder.AXIS_COUNT, axisCount);
 
-          final ArcSdeSpatialReference spatialReference = ArcSdeSpatialReferenceCache
-            .getSpatialReference(connection, schema, esriSrid);
-          JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
-            ArcSdeConstants.SPATIAL_REFERENCE, spatialReference);
+            try {
+              final ArcSdeSpatialReference spatialReference = ArcSdeSpatialReferenceCache
+                .getSpatialReference(connection, schema, esriSrid);
+              JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
+                ArcSdeConstants.SPATIAL_REFERENCE, spatialReference);
 
-          GeometryFactory geometryFactory = JdbcFieldAdder.getColumnProperty(schema, typePath,
-            columnName, JdbcFieldAdder.GEOMETRY_FACTORY);
-          int srid = spatialReference.getCoordinateSystemId();
-          if (srid <= 0) {
-            srid = geometryFactory.getHorizontalCoordinateSystemId();
+              GeometryFactory geometryFactory = JdbcFieldAdder.getColumnProperty(schema, typePath,
+                columnName, JdbcFieldAdder.GEOMETRY_FACTORY);
+              int srid = spatialReference.getCoordinateSystemId();
+              if (srid <= 0) {
+                srid = geometryFactory.getHorizontalCoordinateSystemId();
+              }
+              axisCount = Math.min(axisCount, 3);
+              final double[] scales = spatialReference.getGeometryFactory().newScales(axisCount);
+              geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
+
+              JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
+                JdbcFieldAdder.GEOMETRY_FACTORY, geometryFactory);
+            } catch (final Exception e) {
+              Logs.error(this, "Invalid spatial reference for " + typePath + "." + columnName, e);
+            }
+
+            final int geometryType = resultSet.getInt(4);
+            JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
+              JdbcFieldAdder.GEOMETRY_TYPE, ArcSdeConstants.getGeometryDataType(geometryType));
+
+            String geometryColumnType = resultSet.getString(6);
+            if (!Property.hasValue(geometryColumnType)) {
+              geometryColumnType = ArcSdeConstants.SDEBINARY;
+            }
+            JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
+              ArcSdeConstants.GEOMETRY_COLUMN_TYPE, geometryColumnType);
+          } catch (final Exception e) {
+            Logs.error(this, "Invalid geometry configuration for " + typePath + "." + columnName,
+              e);
           }
-          axisCount = Math.min(axisCount, 3);
-          final double[] scales = spatialReference.getGeometryFactory().newScales(axisCount);
-          geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
-
-          JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
-            JdbcFieldAdder.GEOMETRY_FACTORY, geometryFactory);
-
-          final int geometryType = resultSet.getInt(4);
-          JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
-            JdbcFieldAdder.GEOMETRY_TYPE, ArcSdeConstants.getGeometryDataType(geometryType));
-
-          String geometryColumnType = resultSet.getString(6);
-          if (!Property.hasValue(geometryColumnType)) {
-            geometryColumnType = ArcSdeConstants.SDEBINARY;
-          }
-          JdbcFieldAdder.setColumnProperty(schema, typePath, columnName,
-            ArcSdeConstants.GEOMETRY_COLUMN_TYPE, geometryColumnType);
         }
       } finally {
         JdbcUtils.close(resultSet);
