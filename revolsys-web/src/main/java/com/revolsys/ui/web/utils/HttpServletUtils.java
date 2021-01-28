@@ -63,6 +63,11 @@ public final class HttpServletUtils {
     }
   }
 
+  public static StringBuffer getBaseUrl(final HttpServletRequest request) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
   public static boolean getBooleanParameter(final HttpServletRequest request,
     final String paramName) {
     final String value = request.getParameter(paramName);
@@ -87,7 +92,7 @@ public final class HttpServletUtils {
 
   public static String getFullRequestUrl(final HttpServletRequest request) {
     final String serverUrl = getServerUrl(request);
-    final String requestUri = getOriginatingRequestUri();
+    final String requestUri = getOriginatingRequestUri(request);
     return serverUrl + requestUri;
   }
 
@@ -204,9 +209,18 @@ public final class HttpServletUtils {
   }
 
   public static String getServerUrl(final HttpServletRequest request) {
-    final String scheme = request.getScheme();
+    String scheme = request.getHeader("x-forwarded-proto");
+    if (scheme == null) {
+      scheme = request.getScheme();
+    }
     final String serverName = request.getServerName();
-    final int serverPort = request.getServerPort();
+    final String forwardedPort = request.getHeader("x-forwarded-port");
+    final int serverPort;
+    if (forwardedPort == null) {
+      serverPort = request.getServerPort();
+    } else {
+      serverPort = Integer.parseInt(forwardedPort);
+    }
     final StringBuilder url = new StringBuilder();
     url.append(scheme);
     url.append("://");

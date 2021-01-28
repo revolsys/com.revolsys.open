@@ -261,6 +261,10 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     }
   }
 
+  public Transaction newTransaction() {
+    return this.recordStore.newTransaction();
+  }
+
   public UUID newUUID() {
     return UUID.randomUUID();
   }
