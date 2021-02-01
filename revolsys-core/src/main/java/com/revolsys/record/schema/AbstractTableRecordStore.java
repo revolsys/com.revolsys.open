@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
@@ -64,11 +65,13 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
   }
 
   protected void addDefaultSortOrder(final String fieldName, final boolean ascending) {
-    final FieldDefinition field = getFieldDefinition(fieldName);
-    if (field == null) {
-      throw new IllegalArgumentException("field not found: " + fieldName);
-    } else {
-      this.defaultSortOrder.put(field, ascending);
+    if (this.recordDefinition != null) {
+      final FieldDefinition field = getFieldDefinition(fieldName);
+      if (field == null) {
+        throw new IllegalArgumentException("field not found: " + fieldName);
+      } else {
+        this.defaultSortOrder.put(field, ascending);
+      }
     }
   }
 
@@ -298,7 +301,15 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
 
   protected void setRecordDefinition(final RecordDefinition recordDefinition) {
     this.recordDefinition = recordDefinition;
-    this.recordsQuery = new Query(this.recordDefinition);
+    if (recordDefinition == null) {
+      Logs.error(this, "Table doesn't exist\t" + this.typeName);
+    } else {
+      this.recordsQuery = new Query(this.recordDefinition);
+      setRecordDefinitionPost(recordDefinition);
+    }
+  }
+
+  protected void setRecordDefinitionPost(final RecordDefinition recordDefinition) {
   }
 
   protected void setRecordStore(final JdbcRecordStore recordStore) {
