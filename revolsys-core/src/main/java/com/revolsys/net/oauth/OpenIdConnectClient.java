@@ -1,21 +1,12 @@
 package com.revolsys.net.oauth;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.util.Collection;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
-import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.io.map.ObjectFactoryConfig;
+import com.revolsys.net.http.ApacheHttp;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonParser;
@@ -23,41 +14,6 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Strings;
 
 public class OpenIdConnectClient extends BaseObjectWithProperties {
-
-  public static JsonObject getJson(final HttpResponse response) throws IOException {
-    final HttpEntity entity = response.getEntity();
-    try (
-      InputStream in = entity.getContent()) {
-      return JsonParser.read(in);
-    }
-  }
-
-  public static JsonObject getJson(final RequestBuilder requestBuilder) {
-    final CloseableHttpClient httpClient = HttpClientBuilder//
-      .create()
-      .build();
-
-    final HttpUriRequest request = requestBuilder.build();
-    try {
-      final HttpResponse response = httpClient.execute(request);
-      final StatusLine statusLine = response.getStatusLine();
-      if (statusLine.getStatusCode() == 200) {
-        return getJson(response);
-      } else if (statusLine.getStatusCode() == 400) {
-        final JsonObject error = getJson(response);
-        throw new OAuthBadRequestException(error);
-      } else {
-        final HttpEntity entity = response.getEntity();
-        EntityUtils.consume(entity);
-        throw new IllegalStateException("Invalid status: " + statusLine);
-      }
-    } catch (final OAuthBadRequestException e) {
-      throw e;
-    } catch (final Exception e) {
-      throw Exceptions.wrap(request.getURI().toString(), e);
-    }
-
-  }
 
   public static OpenIdConnectClient google() {
     return newClient("https://accounts.google.com/.well-known/openid-configuration");
@@ -176,7 +132,7 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
     if (scope != null) {
       requestBuilder.addParameter("scope", scope);
     }
-    final JsonObject response = getJson(requestBuilder);
+    final JsonObject response = ApacheHttp.getJson(requestBuilder);
     return new DeviceCodeResponse(this, response, scope);
   }
 
@@ -192,7 +148,7 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
   }
 
   private BearerToken getBearerToken(final RequestBuilder requestBuilder, final String scope) {
-    final JsonObject response = getJson(requestBuilder);
+    final JsonObject response = ApacheHttp.getJson(requestBuilder);
     return new BearerToken(this, response, scope);
   }
 
