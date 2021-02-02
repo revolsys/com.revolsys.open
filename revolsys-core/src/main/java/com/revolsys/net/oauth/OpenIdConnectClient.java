@@ -12,6 +12,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.io.map.ObjectFactoryConfig;
@@ -22,6 +23,41 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Strings;
 
 public class OpenIdConnectClient extends BaseObjectWithProperties {
+
+  public static JsonObject getJson(final HttpResponse response) throws IOException {
+    final HttpEntity entity = response.getEntity();
+    try (
+      InputStream in = entity.getContent()) {
+      return JsonParser.read(in);
+    }
+  }
+
+  public static JsonObject getJson(final RequestBuilder requestBuilder) {
+    final CloseableHttpClient httpClient = HttpClientBuilder//
+      .create()
+      .build();
+
+    final HttpUriRequest request = requestBuilder.build();
+    try {
+      final HttpResponse response = httpClient.execute(request);
+      final StatusLine statusLine = response.getStatusLine();
+      if (statusLine.getStatusCode() == 200) {
+        return getJson(response);
+      } else if (statusLine.getStatusCode() == 400) {
+        final JsonObject error = getJson(response);
+        throw new OAuthBadRequestException(error);
+      } else {
+        final HttpEntity entity = response.getEntity();
+        EntityUtils.consume(entity);
+        throw new IllegalStateException("Invalid status: " + statusLine);
+      }
+    } catch (final OAuthBadRequestException e) {
+      throw e;
+    } catch (final Exception e) {
+      throw Exceptions.wrap(request.getURI().toString(), e);
+    }
+
+  }
 
   public static OpenIdConnectClient google() {
     return newClient("https://accounts.google.com/.well-known/openid-configuration");
@@ -170,41 +206,6 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
 
   public String getIssuer() {
     return this.issuer;
-  }
-
-  protected JsonObject getJson(final HttpResponse response) throws IOException {
-    final HttpEntity entity = response.getEntity();
-    try (
-      InputStream in = entity.getContent()) {
-      return JsonParser.read(in);
-    }
-  }
-
-  public JsonObject getJson(final RequestBuilder requestBuilder) {
-    final CloseableHttpClient httpClient = HttpClientBuilder//
-      .create()
-      .build();
-
-    final HttpUriRequest request = requestBuilder.build();
-    try {
-      final HttpResponse response = httpClient.execute(request);
-      final StatusLine statusLine = response.getStatusLine();
-      if (statusLine.getStatusCode() == 200) {
-        return getJson(response);
-      } else if (statusLine.getStatusCode() == 400) {
-        final JsonObject error = getJson(response);
-        throw new OAuthBadRequestException(error);
-      } else {
-        final HttpEntity entity = response.getEntity();
-        System.out.println(com.revolsys.io.FileUtil.getString(entity.getContent()));
-        throw new IllegalStateException("Invalid status: " + statusLine);
-      }
-    } catch (final OAuthBadRequestException e) {
-      throw e;
-    } catch (final Exception e) {
-      throw Exceptions.wrap(request.getURI().toString(), e);
-    }
-
   }
 
   public String getRevocationEndpoint() {

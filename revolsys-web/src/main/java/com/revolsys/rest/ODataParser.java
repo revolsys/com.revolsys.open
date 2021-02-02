@@ -12,6 +12,8 @@ import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.jeometry.coordinatesystem.util.Hex;
+
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.set.Sets;
 import com.revolsys.record.query.Add;
@@ -42,7 +44,6 @@ import com.revolsys.record.query.functions.Lower;
 import com.revolsys.record.query.functions.Upper;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.util.Debug;
-import com.revolsys.util.Hex;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Strings;
 

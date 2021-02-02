@@ -29,6 +29,10 @@ public class BearerToken {
 
   private JWT jwt;
 
+  public BearerToken(final JsonObject config) {
+    this(null, config, null);
+  }
+
   public BearerToken(final OpenIdConnectClient client, final JsonObject config,
     final String scope) {
     this.client = client;
@@ -107,7 +111,7 @@ public class BearerToken {
   }
 
   public BearerToken refreshToken() {
-    if (this.refreshToken == null) {
+    if (this.refreshToken == null || this.client == null) {
       return null;
     } else {
       return this.client.tokenRefresh(this.refreshToken, this.scope);
