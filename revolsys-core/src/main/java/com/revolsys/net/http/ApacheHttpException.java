@@ -1,10 +1,14 @@
 package com.revolsys.net.http;
 
+import java.net.URI;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
+import org.apache.http.client.methods.HttpUriRequest;
 
 public class ApacheHttpException extends RuntimeException {
-  public static ApacheHttpException create(final HttpResponse response) {
+  public static ApacheHttpException create(final HttpUriRequest request,
+    final HttpResponse response) {
     final StatusLine statusLine = response.getStatusLine();
     String content;
     try {
@@ -12,7 +16,7 @@ public class ApacheHttpException extends RuntimeException {
     } catch (final Exception e) {
       content = null;
     }
-    return new ApacheHttpException(statusLine, content);
+    return new ApacheHttpException(request.getURI(), statusLine, content);
   }
 
   private final int statusCode;
@@ -21,8 +25,12 @@ public class ApacheHttpException extends RuntimeException {
 
   private final String content;
 
-  public ApacheHttpException(final StatusLine statusLine, final String content) {
-    super(statusLine + "\n" + content);
+  private final URI requestUri;
+
+  public ApacheHttpException(final URI requestUri, final StatusLine statusLine,
+    final String content) {
+    super(requestUri + "\n" + statusLine + "\n" + content);
+    this.requestUri = requestUri;
     this.statusCode = statusLine.getStatusCode();
     this.reasonPhrase = statusLine.getReasonPhrase();
     this.content = content;
@@ -34,6 +42,10 @@ public class ApacheHttpException extends RuntimeException {
 
   public String getReasonPhrase() {
     return this.reasonPhrase;
+  }
+
+  public URI getRequestUri() {
+    return this.requestUri;
   }
 
   public int getStatusCode() {

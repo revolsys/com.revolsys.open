@@ -41,7 +41,7 @@ public class ApacheHttp {
       if (statusLine.getStatusCode() == 200) {
         return getJson(response);
       } else {
-        throw ApacheHttpException.create(response);
+        throw ApacheHttpException.create(request, response);
       }
     } catch (final ApacheHttpException e) {
       throw e;
