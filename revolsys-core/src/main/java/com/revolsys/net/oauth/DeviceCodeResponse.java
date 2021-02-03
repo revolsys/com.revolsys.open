@@ -50,7 +50,7 @@ public class DeviceCodeResponse {
     return this.message;
   }
 
-  public BearerToken getToken() {
+  public OpenIdBearerToken getToken() {
     while (true) {
       synchronized (this) {
         try {
