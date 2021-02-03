@@ -1,6 +1,5 @@
 package com.revolsys.net.http;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.http.HttpEntity;
@@ -12,20 +11,21 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
 import org.jeometry.common.exception.Exceptions;
 
-import com.revolsys.net.oauth.OAuthBadRequestException;
+import com.revolsys.io.FileUtil;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonParser;
 
 public class ApacheHttp {
 
-  public static JsonObject getJson(final HttpResponse response) throws IOException {
+  public static JsonObject getJson(final HttpResponse response) {
     final HttpEntity entity = response.getEntity();
     try (
       InputStream in = entity.getContent()) {
       return JsonParser.read(in);
+    } catch (final Exception e) {
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -40,20 +40,25 @@ public class ApacheHttp {
       final StatusLine statusLine = response.getStatusLine();
       if (statusLine.getStatusCode() == 200) {
         return getJson(response);
-      } else if (statusLine.getStatusCode() == 400) {
-        final JsonObject error = getJson(response);
-        throw new OAuthBadRequestException(error);
       } else {
-        final HttpEntity entity = response.getEntity();
-        EntityUtils.consume(entity);
-        throw new IllegalStateException("Invalid status: " + statusLine);
+        throw ApacheHttpException.create(response);
       }
-    } catch (final OAuthBadRequestException e) {
+    } catch (final ApacheHttpException e) {
       throw e;
     } catch (final Exception e) {
       throw Exceptions.wrap(request.getURI().toString(), e);
     }
 
+  }
+
+  public static String getString(final HttpResponse response) {
+    final HttpEntity entity = response.getEntity();
+    try (
+      InputStream in = entity.getContent()) {
+      return FileUtil.getString(in);
+    } catch (final Exception e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   public static StringEntity newEntity(final JsonObject body) {

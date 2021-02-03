@@ -1,6 +1,8 @@
 package com.revolsys.net.oauth;
 
+import com.revolsys.net.http.ApacheHttpException;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonParser;
 
 public class DeviceCodeResponse {
 
@@ -59,17 +61,23 @@ public class DeviceCodeResponse {
       }
       try {
         return this.client.tokenDeviceCode(this.deviceCode, this.scope);
-      } catch (final OAuthBadRequestException e) {
-        final String error = e.getError();
-        if ("authorization_pending".equals(error)) {
-          // wait and try again
-        } else if ("authorization_declined".equals(error)) {
-          throw e;
-        } else if ("bad_verification_code".equals(error)) {
-          System.err.println(this.message);
-        } else if ("expired_token".equals(error)) {
-          throw e;
-        } else {
+      } catch (final ApacheHttpException e) {
+        final String errorText = e.getContent();
+        try {
+          final JsonObject json = JsonParser.read(errorText);
+          final String error = json.getString("error");
+          if ("authorization_pending".equals(error)) {
+            // wait and try again
+          } else if ("authorization_declined".equals(error)) {
+            throw e;
+          } else if ("bad_verification_code".equals(error)) {
+            System.err.println(this.message);
+          } else if ("expired_token".equals(error)) {
+            throw e;
+          } else {
+            throw e;
+          }
+        } catch (final Exception e1) {
           throw e;
         }
       }
