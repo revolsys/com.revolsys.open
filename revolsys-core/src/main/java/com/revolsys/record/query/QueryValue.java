@@ -178,8 +178,8 @@ public interface QueryValue extends Cloneable {
     return dataType.toObject(value);
   }
 
-  default Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
-    final boolean internStrings) throws SQLException {
+  default Object getValueFromResultSet(RecordDefinition recordDefinition, final ResultSet resultSet,
+    final ColumnIndexes indexes, final boolean internStrings) throws SQLException {
     throw new UnsupportedOperationException("getValueFromResultSet not implemented");
   }
 

@@ -26,13 +26,12 @@ import org.jeometry.common.date.Dates;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.gdal.Gdal;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordIterator;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.query.AbstractMultiCondition;
 import com.revolsys.record.query.BinaryCondition;
@@ -493,8 +492,7 @@ public class OgrRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public AbstractIterator<Record> newIterator(final Query query,
-    final Map<String, Object> properties) {
+  public RecordIterator newIterator(final Query query, final Map<String, Object> properties) {
     PathName typePath = query.getTablePath();
     RecordDefinition recordDefinition = query.getRecordDefinition();
     if (recordDefinition == null) {
@@ -509,8 +507,7 @@ public class OgrRecordStore extends AbstractRecordStore {
       typePath = recordDefinition.getPathName();
     }
 
-    final OgrQueryIterator iterator = new OgrQueryIterator(this, query);
-    return iterator;
+    return new OgrQueryIterator(this, query);
   }
 
   private RecordDefinition newLayerRecordDefinition(final DataSource dataSource,

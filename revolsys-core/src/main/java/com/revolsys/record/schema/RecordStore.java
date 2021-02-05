@@ -19,7 +19,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.collection.ListResultPager;
 import com.revolsys.collection.ResultPager;
-import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
@@ -34,6 +33,7 @@ import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.ListRecordReader;
+import com.revolsys.record.io.RecordIterator;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.record.io.RecordStoreFactory;
@@ -545,7 +545,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     }
   }
 
-  default AbstractIterator<Record> newIterator(final Query query, Map<String, Object> properties) {
+  default RecordIterator newIterator(final Query query, Map<String, Object> properties) {
     if (properties == null) {
       properties = Collections.emptyMap();
     }
@@ -557,8 +557,8 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
         final RecordStoreIteratorFactory recordStoreIteratorFactory = recordDefinition
           .getProperty("recordStoreIteratorFactory");
         if (recordStoreIteratorFactory != null) {
-          final AbstractIterator<Record> iterator = recordStoreIteratorFactory.newIterator(this,
-            query, properties);
+          final RecordIterator iterator = recordStoreIteratorFactory.newIterator(this, query,
+            properties);
           if (iterator != null) {
             return iterator;
           }

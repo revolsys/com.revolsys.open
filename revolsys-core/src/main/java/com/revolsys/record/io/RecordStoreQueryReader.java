@@ -8,7 +8,6 @@ import java.util.NoSuchElementException;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.io.IteratorReader;
 import com.revolsys.record.Record;
@@ -78,11 +77,15 @@ public class RecordStoreQueryReader extends IteratorReader<Record> implements Re
   }
 
   @Override
-  public RecordStoreMultipleQueryIterator iterator() {
-    return (RecordStoreMultipleQueryIterator)super.iterator();
+  public RecordIterator iterator() {
+    if (this.queries.size() == 1) {
+      return newQueryIterator(0);
+    } else {
+      return (RecordIterator)super.iterator();
+    }
   }
 
-  protected AbstractIterator<Record> newQueryIterator(final int i) {
+  protected RecordIterator newQueryIterator(final int i) {
     if (i < this.queries.size()) {
       final Query query = this.queries.get(i);
       if (Property.hasValue(this.whereClause)) {
@@ -92,8 +95,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record> implements Re
         F.envelopeIntersects(query, this.boundingBox);
       }
 
-      final AbstractIterator<Record> iterator = this.recordStore.newIterator(query,
-        getProperties());
+      final RecordIterator iterator = this.recordStore.newIterator(query, getProperties());
       return iterator;
     }
     throw new NoSuchElementException();

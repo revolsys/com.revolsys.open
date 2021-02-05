@@ -20,11 +20,12 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
+import com.revolsys.record.io.RecordIterator;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.count.LabelCounters;
 
-public class OgrQueryIterator extends AbstractIterator<Record> {
+public class OgrQueryIterator extends AbstractIterator<Record> implements RecordIterator {
 
   private int count;
 
@@ -212,6 +213,11 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
         }
       }
     }
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
   }
 
   @Override

@@ -3,6 +3,7 @@ package com.revolsys.record.query;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 
 public class Count extends AbstractUnaryQueryValue {
@@ -58,8 +59,8 @@ public class Count extends AbstractUnaryQueryValue {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
-    final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(RecordDefinition recordDefinition, final ResultSet resultSet,
+    final ColumnIndexes indexes, final boolean internStrings) throws SQLException {
     final long value = resultSet.getLong(indexes.incrementAndGet());
     if (resultSet.wasNull()) {
       return null;

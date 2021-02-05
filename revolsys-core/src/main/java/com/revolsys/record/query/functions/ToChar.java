@@ -7,6 +7,7 @@ import java.util.List;
 import com.revolsys.record.query.ColumnIndexes;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.Value;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class ToChar extends SimpleFunction {
 
@@ -21,8 +22,8 @@ public class ToChar extends SimpleFunction {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
-    final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(RecordDefinition recordDefinition, final ResultSet resultSet,
+    final ColumnIndexes indexes, final boolean internStrings) throws SQLException {
     return resultSet.getString(indexes.incrementAndGet());
   }
 }

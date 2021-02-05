@@ -16,6 +16,7 @@ import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.record.Record;
 import com.revolsys.record.query.ColumnIndexes;
 import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class JdbcFieldDefinition extends FieldDefinition {
   private String dbName;
@@ -99,8 +100,8 @@ public class JdbcFieldDefinition extends FieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
-    final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(RecordDefinition recordDefinition, final ResultSet resultSet,
+    final ColumnIndexes indexes, final boolean internStrings) throws SQLException {
     return resultSet.getObject(indexes.incrementAndGet());
   }
 

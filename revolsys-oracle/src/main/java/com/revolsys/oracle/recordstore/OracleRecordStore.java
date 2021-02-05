@@ -17,7 +17,6 @@ import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
 
 import com.revolsys.collection.ResultPager;
-import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -431,7 +430,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     return this.useSchemaSequencePrefix;
   }
 
-  private AbstractIterator<Record> newOracleIterator(final RecordStore recordStore,
+  private OracleJdbcQueryIterator newOracleIterator(final RecordStore recordStore,
     final Query query, final Map<String, Object> properties) {
     return new OracleJdbcQueryIterator((OracleRecordStore)recordStore, query, properties);
   }

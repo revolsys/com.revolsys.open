@@ -19,7 +19,6 @@ import org.jeometry.common.io.PathName;
 import org.postgresql.jdbc.PgConnection;
 
 import com.revolsys.collection.ResultPager;
-import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.gis.postgresql.type.PostgreSQLArrayFieldDefinition;
 import com.revolsys.gis.postgresql.type.PostgreSQLBoundingBoxWrapper;
 import com.revolsys.gis.postgresql.type.PostgreSQLGeometryFieldAdder;
@@ -56,8 +55,8 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   public static final List<String> POSTGRESQL_INTERNAL_SCHEMAS = Arrays.asList("information_schema",
     "pg_catalog", "pg_toast_temp_1");
 
-  private static final AbstractIterator<Record> newPostgreSQLIterator(final RecordStore recordStore,
-    final Query query, final Map<String, Object> properties) {
+  private static final PostgreSQLJdbcQueryIterator newPostgreSQLIterator(
+    final RecordStore recordStore, final Query query, final Map<String, Object> properties) {
     return new PostgreSQLJdbcQueryIterator((PostgreSQLRecordStore)recordStore, query, properties);
   }
 

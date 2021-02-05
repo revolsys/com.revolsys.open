@@ -5,11 +5,13 @@ import java.util.NoSuchElementException;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.RecordIterator;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.RecordDefinition;
 
-public class RecordReaderQueryIterator extends AbstractIterator<Record> {
+public class RecordReaderQueryIterator extends AbstractIterator<Record> implements RecordIterator {
 
   private Iterator<Record> iterator;
 
@@ -35,6 +37,11 @@ public class RecordReaderQueryIterator extends AbstractIterator<Record> {
         return record;
       }
     }
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    return this.reader.getRecordDefinition();
   }
 
   @Override

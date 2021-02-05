@@ -20,6 +20,7 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
+import com.revolsys.record.io.RecordIterator;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.query.ColumnIndexes;
 import com.revolsys.record.query.Query;
@@ -29,7 +30,8 @@ import com.revolsys.util.Booleans;
 import com.revolsys.util.count.LabelCountMap;
 import com.revolsys.util.count.LabelCounters;
 
-public class JdbcQueryIterator extends AbstractIterator<Record> implements RecordReader {
+public class JdbcQueryIterator extends AbstractIterator<Record>
+  implements RecordReader, RecordIterator {
   public static Record getNextRecord(final JdbcRecordStore recordStore,
     final RecordDefinition recordDefinition, final List<QueryValue> selectExpression,
     final RecordFactory<Record> recordFactory, final ResultSet resultSet,
@@ -41,7 +43,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
       int fieldIndex = 0;
       for (final QueryValue expression : selectExpression) {
         try {
-          final Object value = expression.getValueFromResultSet(resultSet, indexes, internStrings);
+          final Object value = expression.getValueFromResultSet(recordDefinition, resultSet, indexes, internStrings);
           record.setValue(fieldIndex, value);
           fieldIndex++;
         } catch (final SQLException e) {
@@ -222,6 +224,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
         || this.recordStore != this.recordDefinition.getRecordStore()) {
         this.recordDefinition = this.recordStore.getRecordDefinition(tableName, resultSetMetaData,
           dbTableName);
+        query.setRecordDefinition(this.recordDefinition);
       } else if (query.isCustomResult()) {
         this.recordDefinition = this.recordStore.getRecordDefinition(query, resultSetMetaData);
       }

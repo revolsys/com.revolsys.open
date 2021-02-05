@@ -10,7 +10,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 
-public interface TableReference {
+public interface TableReference extends From {
   static TableReference getTableReference(final RecordDefinitionProxy recordDefinition) {
     if (recordDefinition == null) {
       return null;
@@ -31,13 +31,27 @@ public interface TableReference {
     }
   }
 
-  default void appendNameWithAlias(final StringBuilder sql) {
+  @Override
+  default void appendFrom(final Appendable sql) {
     final String tableName = getQualifiedTableName();
-    sql.append(tableName);
-    final String tableAlias = getTableAlias();
-    if (tableAlias != null) {
-      sql.append(" ");
-      sql.append(tableAlias);
+    try {
+      sql.append(tableName);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  @Override
+  default void appendFromWithAlias(final Appendable sql) {
+    try {
+      appendFrom(sql);
+      final String tableAlias = getTableAlias();
+      if (tableAlias != null) {
+        sql.append(" ");
+        sql.append(tableAlias);
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
     }
   }
 

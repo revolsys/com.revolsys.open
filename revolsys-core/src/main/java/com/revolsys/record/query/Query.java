@@ -164,7 +164,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   private final List<QueryValue> groupBy = new ArrayList<>();
 
-  private String fromClause;
+  private From from;
 
   private int limit = Integer.MAX_VALUE;
 
@@ -453,8 +453,8 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this.cancellable;
   }
 
-  public String getFromClause() {
-    return this.fromClause;
+  public From getFrom() {
+    return this.from;
   }
 
   public FieldDefinition getGeometryField() {
@@ -691,7 +691,10 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   public String newSelectSql(final Map<QueryValue, Boolean> orderBy, final TableReference table) {
 
-    final String fromClause = getFromClause();
+    From from = getFrom();
+    if (from == null) {
+      from = table;
+    }
     final List<Join> joins = getJoins();
     final LockMode lockMode = getLockMode();
     final boolean distinct = isDistinct();
@@ -703,11 +706,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     }
     appendSelect(sql);
     sql.append(" FROM ");
-    if (Property.hasValue(fromClause)) {
-      sql.append(fromClause);
-    } else {
-      table.appendNameWithAlias(sql);
-    }
+    from.appendFromWithAlias(sql);
     for (final Join join : joins) {
       JdbcUtils.appendQueryValue(sql, this, join);
     }
@@ -848,8 +847,19 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this;
   }
 
-  public Query setFromClause(final String fromClause) {
-    this.fromClause = fromClause;
+  public Query setFrom(final From from, final String alias) {
+    this.from = new FromAlias(from, alias);
+    return this;
+  }
+
+  public Query setFrom(final String from) {
+    this.from = new FromSql(from);
+    return this;
+  }
+
+  public Query setFrom(final String from, final String alias) {
+    final FromSql fromSql = new FromSql(from);
+    this.from = new FromAlias(fromSql, alias);
     return this;
   }
 

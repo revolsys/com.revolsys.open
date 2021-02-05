@@ -9,6 +9,7 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 
 public class SelectAlias implements QueryValue {
@@ -101,9 +102,9 @@ public class SelectAlias implements QueryValue {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
-    final boolean internStrings) throws SQLException {
-    return this.value.getValueFromResultSet(resultSet, indexes, internStrings);
+  public Object getValueFromResultSet(RecordDefinition recordDefinition, final ResultSet resultSet,
+    final ColumnIndexes indexes, final boolean internStrings) throws SQLException {
+    return this.value.getValueFromResultSet(recordDefinition, resultSet, indexes, internStrings);
   }
 
   @Override

@@ -12,6 +12,7 @@ import org.jeometry.common.jdbc.ByteArrayBlob;
 
 import com.revolsys.jdbc.LocalBlob;
 import com.revolsys.record.query.ColumnIndexes;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 
 public class JdbcBlobFieldDefinition extends JdbcFieldDefinition {
@@ -22,8 +23,8 @@ public class JdbcBlobFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
-    final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(RecordDefinition recordDefinition, final ResultSet resultSet,
+    final ColumnIndexes indexes, final boolean internStrings) throws SQLException {
     final Blob blob = resultSet.getBlob(indexes.incrementAndGet());
     return toFieldValue(blob);
   }

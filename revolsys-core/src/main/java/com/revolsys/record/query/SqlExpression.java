@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import org.jeometry.common.data.type.DataType;
 
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 
 public class SqlExpression implements Condition {
@@ -58,8 +59,8 @@ public class SqlExpression implements Condition {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
-    final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(RecordDefinition recordDefinition, final ResultSet resultSet,
+    final ColumnIndexes indexes, final boolean internStrings) throws SQLException {
     final int index = indexes.incrementAndGet();
     final Object value = resultSet.getObject(index);
     if (resultSet.wasNull()) {

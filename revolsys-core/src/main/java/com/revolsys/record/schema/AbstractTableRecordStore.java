@@ -67,9 +67,7 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
   protected void addDefaultSortOrder(final String fieldName, final boolean ascending) {
     if (this.recordDefinition != null) {
       final FieldDefinition field = getFieldDefinition(fieldName);
-      if (field == null) {
-        throw new IllegalArgumentException("field not found: " + fieldName);
-      } else {
+      if (field != null) {
         this.defaultSortOrder.put(field, ascending);
       }
     }

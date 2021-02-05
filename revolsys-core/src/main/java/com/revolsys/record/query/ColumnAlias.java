@@ -10,6 +10,7 @@ import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 
 public class ColumnAlias implements QueryValue, ColumnReference {
@@ -133,9 +134,9 @@ public class ColumnAlias implements QueryValue, ColumnReference {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
-    final boolean internStrings) throws SQLException {
-    return this.column.getValueFromResultSet(resultSet, indexes, internStrings);
+  public Object getValueFromResultSet(RecordDefinition recordDefinition, final ResultSet resultSet,
+    final ColumnIndexes indexes, final boolean internStrings) throws SQLException {
+    return this.column.getValueFromResultSet(recordDefinition, resultSet, indexes, internStrings);
   }
 
   @Override

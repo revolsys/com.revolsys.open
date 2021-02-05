@@ -165,7 +165,7 @@ public class RecordHtmlUiBuilder extends HtmlUiBuilder<Record> {
     }
     final String fromClause = (String)parameters.get("fromClause");
     if (Property.hasValue(fromClause)) {
-      query.setFromClause(fromClause);
+      query.setFrom(fromClause);
     }
     return newDataTableMap(request, pageName, query);
   }
