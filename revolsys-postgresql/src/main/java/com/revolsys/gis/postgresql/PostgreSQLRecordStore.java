@@ -205,7 +205,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     final JdbcRecordStoreSchema schema = recordDefinition.getSchema();
     final String dbSchemaName = schema.getQuotedDbName();
     final String shortName = ShortNameProperty.getShortName(recordDefinition);
-    final String sequenceName;
+    String sequenceName;
     if (Property.hasValue(shortName)) {
       if (this.useSchemaSequencePrefix) {
         sequenceName = dbSchemaName + "." + shortName.toLowerCase() + "_seq";
@@ -214,11 +214,10 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
       }
     } else {
       final String tableName = recordDefinition.getDbTableName();
-      final String idFieldName = recordDefinition.getIdFieldName().toLowerCase();
+      final String idFieldName = ((JdbcFieldDefinition)recordDefinition.getIdField()).getDbName();
+      sequenceName = '"' + tableName.replace("\"", "") + "_" + idFieldName + "_seq\"";
       if (this.useSchemaSequencePrefix) {
-        sequenceName = dbSchemaName + "." + tableName + "_" + idFieldName + "_seq";
-      } else {
-        sequenceName = tableName + "_" + idFieldName + "_seq";
+        return dbSchemaName + "." + sequenceName;
       }
     }
     return sequenceName;

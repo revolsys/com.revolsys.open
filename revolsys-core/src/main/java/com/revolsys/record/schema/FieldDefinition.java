@@ -934,7 +934,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
     final String fieldName = getName();
     value = toFieldValueException(value);
     if (value == null) {
-      if (isRequired() && !isGenerated()) {
+      if (isRequired() && !isGenerated() && !isIdField()) {
         throw new IllegalArgumentException(fieldName + " is required");
       }
     } else {

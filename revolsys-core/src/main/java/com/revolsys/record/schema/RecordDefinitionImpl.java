@@ -685,6 +685,11 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   @Override
+  public int getIdFieldCount() {
+    return getIdFieldIndexes().size();
+  }
+
+  @Override
   public int getIdFieldIndex() {
     return this.idFieldDefinitionIndex;
   }

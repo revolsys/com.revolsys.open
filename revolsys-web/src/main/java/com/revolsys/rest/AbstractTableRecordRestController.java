@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.io.PathName;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -53,6 +54,23 @@ public class AbstractTableRecordRestController {
     }
   }
 
+  public static void responseRecordJson(final HttpServletResponse response, final Record record)
+    throws IOException {
+    if (record == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    } else {
+      setContentTypeJson(response);
+      response.setStatus(200);
+      final RecordDefinition recordDefinition = record.getRecordDefinition();
+      try (
+        PrintWriter writer = response.getWriter();
+        JsonRecordWriter jsonWriter = new JsonRecordWriter(recordDefinition, writer);) {
+        jsonWriter.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
+        jsonWriter.write(record);
+      }
+    }
+  }
+
   public static void setContentTypeJson(final HttpServletResponse response) {
     setContentTypeText(response, Json.MIME_TYPE);
   }
@@ -74,9 +92,9 @@ public class AbstractTableRecordRestController {
     return condition;
   }
 
-  protected AbstractTableRecordStore getTableRecordStore(
+  protected <RS extends AbstractTableRecordStore> RS getTableRecordStore(
     final TableRecordStoreConnection connection, final CharSequence tablePath) {
-    final AbstractTableRecordStore tableRecordStore = connection.getTableRecordStore(tablePath);
+    final RS tableRecordStore = connection.getTableRecordStore(tablePath);
     if (tableRecordStore == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
@@ -137,7 +155,7 @@ public class AbstractTableRecordRestController {
     final HttpServletRequest request, final HttpServletResponse response, Record record)
     throws IOException {
     record = connection.insertRecord(record);
-    responseRecordJson(connection, request, response, record);
+    responseRecordJson(response, record);
   }
 
   protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
@@ -145,14 +163,20 @@ public class AbstractTableRecordRestController {
     final CharSequence tablePath, final Identifier id, final Consumer<Record> updateAction)
     throws IOException {
     final Record record = connection.updateRecord(tablePath, id, updateAction);
-    responseRecordJson(connection, request, response, record);
+    responseRecordJson(response, record);
   }
 
   protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final HttpServletResponse response,
     final CharSequence tablePath, final Identifier id, final JsonObject values) throws IOException {
     final Record record = connection.updateRecord(tablePath, id, values);
-    responseRecordJson(connection, request, response, record);
+    responseRecordJson(response, record);
+  }
+
+  protected Record insertRecord(final TableRecordStoreConnection connection,
+    final PathName tablePath, final JsonObject values) {
+    final Record record = connection.newRecord(tablePath, values);
+    return connection.insertRecord(record);
   }
 
   protected boolean isUpdateable(final TableRecordStoreConnection connection, final Identifier id) {
@@ -304,25 +328,7 @@ public class AbstractTableRecordRestController {
     final HttpServletRequest request, final HttpServletResponse response, final Query query)
     throws IOException {
     final Record record = connection.getRecord(query);
-    responseRecordJson(connection, request, response, record);
-  }
-
-  protected void responseRecordJson(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final HttpServletResponse response, final Record record)
-    throws IOException {
-    if (record == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-    } else {
-      setContentTypeJson(response);
-      response.setStatus(200);
-      final RecordDefinition recordDefinition = record.getRecordDefinition();
-      try (
-        PrintWriter writer = response.getWriter();
-        JsonRecordWriter jsonWriter = new JsonRecordWriter(recordDefinition, writer);) {
-        jsonWriter.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
-        jsonWriter.write(record);
-      }
-    }
+    responseRecordJson(response, record);
   }
 
   protected void responseRecords(final TableRecordStoreConnection connection,

@@ -49,7 +49,7 @@ public class BaseTableRecordRestController extends AbstractTableRecordRestContro
     final HttpServletRequest request, final HttpServletResponse response, final Identifier id,
     final JsonObject values) throws IOException {
     final Record record = connection.updateRecord(this.tablePath, id, values);
-    responseRecordJson(connection, request, response, record);
+    responseRecordJson(response, record);
   }
 
   protected Query newQuery(final TableRecordStoreConnection connection,

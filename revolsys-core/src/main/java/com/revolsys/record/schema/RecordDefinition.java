@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.identifier.ListIdentifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
@@ -246,7 +248,38 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
     return fields;
   }
 
+  default Identifier getIdentifier(final MapEx values) {
+    if (values != null && hasIdField()) {
+      final int idFieldCount = getIdFieldCount();
+      if (idFieldCount == 1) {
+        final String fieldName = getIdFieldName();
+        final Object value = values.getValue(fieldName);
+        if (value == null) {
+          return Identifier.newIdentifier(value);
+        }
+      } else if (idFieldCount > 0) {
+        final List<String> fieldNames = getIdFieldNames();
+        boolean notNull = false;
+        final Object[] idValues = new Object[idFieldCount];
+        int i = 0;
+        for (final String fieldName : fieldNames) {
+          final Object value = values.getValue(fieldName);
+          if (value != null) {
+            notNull = true;
+          }
+          idValues[i++] = value;
+        }
+        if (notNull) {
+          return new ListIdentifier(idValues);
+        }
+      }
+    }
+    return null;
+  }
+
   FieldDefinition getIdField();
+
+  int getIdFieldCount();
 
   /**
    * Get the index of the Unique identifier field.

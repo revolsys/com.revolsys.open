@@ -672,31 +672,29 @@ public interface Record
   @Override
   default Identifier getIdentifier() {
     final RecordDefinition recordDefinition = getRecordDefinition();
-    if (recordDefinition.hasIdField()) {
-      final List<Integer> idFieldIndexes = recordDefinition.getIdFieldIndexes();
-      final int idCount = idFieldIndexes.size();
-      if (idCount == 1) {
-        final Integer idFieldIndex = idFieldIndexes.get(0);
-        final Object idValue = getValue(idFieldIndex);
-        if (idValue == null) {
-          return null;
-        } else {
-          return Identifier.newIdentifier(idValue);
-        }
+    final int idFieldCount = recordDefinition.getIdFieldCount();
+    if (idFieldCount == 1) {
+      final Integer idFieldIndex = recordDefinition.getIdFieldCount();
+      final Object idValue = getValue(idFieldIndex);
+      if (idValue == null) {
+        return null;
       } else {
-        boolean notNull = false;
-        final Object[] idValues = new Object[idCount];
-        for (int i = 0; i < idValues.length; i++) {
-          final Integer idFieldIndex = idFieldIndexes.get(i);
-          final Object value = getValue(idFieldIndex);
-          if (value != null) {
-            notNull = true;
-          }
-          idValues[i] = value;
+        return Identifier.newIdentifier(idValue);
+      }
+    } else if (idFieldCount > 0) {
+      boolean notNull = false;
+      final List<Integer> idFieldIndexes = recordDefinition.getIdFieldIndexes();
+      final Object[] idValues = new Object[idFieldCount];
+      for (int i = 0; i < idValues.length; i++) {
+        final Integer idFieldIndex = idFieldIndexes.get(i);
+        final Object value = getValue(idFieldIndex);
+        if (value != null) {
+          notNull = true;
         }
-        if (notNull) {
-          return new ListIdentifier(idValues);
-        }
+        idValues[i] = value;
+      }
+      if (notNull) {
+        return new ListIdentifier(idValues);
       }
     }
     return null;

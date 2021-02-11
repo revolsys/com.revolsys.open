@@ -107,6 +107,11 @@ public interface TableRecordStoreConnection {
     return recordStore.newQuery();
   }
 
+  default Record newRecord(final CharSequence tablePath) {
+    final AbstractTableRecordStore tableRecordStore = getTableRecordStore(tablePath);
+    return tableRecordStore.newRecord();
+  }
+
   default Record newRecord(final CharSequence tablePath, final JsonObject json) {
     final AbstractTableRecordStore tableRecordStore = getTableRecordStore(tablePath);
     return tableRecordStore.newRecord(json);
