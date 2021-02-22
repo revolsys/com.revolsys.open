@@ -89,7 +89,7 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
   List<Identifier> getIdentifiers();
 
   default Identifier getIdExact(final List<Object> values) {
-    return getIdExact(values, true);
+    return getIdentifier(values);
   }
 
   default Identifier getIdExact(final Object... values) {

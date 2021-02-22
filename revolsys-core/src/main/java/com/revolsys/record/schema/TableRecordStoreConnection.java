@@ -15,6 +15,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.query.TableReference;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 
@@ -69,6 +70,15 @@ public interface TableRecordStoreConnection {
   }
 
   JdbcRecordStore getRecordStore();
+
+  default TableReference getTable(final CharSequence pathName) {
+    final AbstractTableRecordStore recordStore = getTableRecordStore(pathName);
+    if (recordStore == null) {
+      return null;
+    } else {
+      return recordStore.getTable();
+    }
+  }
 
   <TRS extends AbstractTableRecordStore> TRS getTableRecordStore(CharSequence pathName);
 
