@@ -76,7 +76,7 @@ public abstract class AbstractRecord implements Record, Cloneable {
   }
 
   @Override
-  public void setValues(final Object... values) {
+  public AbstractRecord setValues(final Object... values) {
     if (values != null) {
       int i = 0;
       final RecordDefinition recordDefinition = getRecordDefinition();
@@ -86,10 +86,11 @@ public abstract class AbstractRecord implements Record, Cloneable {
           setValue(fieldDefinition, value);
           i++;
         } else {
-          return;
+          return this;
         }
       }
     }
+    return this;
   }
 
   @Override

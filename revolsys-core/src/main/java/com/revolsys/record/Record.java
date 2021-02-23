@@ -1369,11 +1369,12 @@ public interface Record
     setValues(values, Arrays.asList(fieldNames));
   }
 
-  default void setValues(final Object... values) {
+  default Record setValues(final Object... values) {
     for (int fieldIndex = 0; fieldIndex < values.length; fieldIndex++) {
       final Object value = values[fieldIndex];
       setValue(fieldIndex, value);
     }
+    return this;
   }
 
   default void setValues(final Record record) {
