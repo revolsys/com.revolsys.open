@@ -452,7 +452,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
         final String lowerName = nameString.toLowerCase();
         field = this.fieldMap.get(lowerName);
         if (field == null) {
-          throw new IllegalArgumentException("Column not found: " + nameString);
+          throw new IllegalArgumentException("Column not found: " + getName() + "." + nameString);
         }
       }
       return field;
