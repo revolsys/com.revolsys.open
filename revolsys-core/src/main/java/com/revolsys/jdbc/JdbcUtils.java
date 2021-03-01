@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import javax.management.ObjectName;
 import javax.sql.DataSource;
 
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 import org.springframework.dao.DataAccessException;
@@ -44,6 +45,7 @@ import com.revolsys.record.query.TableReference;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public final class JdbcUtils {
 
@@ -214,7 +216,7 @@ public final class JdbcUtils {
     return sql.toString();
   }
 
-  public static DataAccessException getException(final DataSource dataSource, final String task,
+  public static RuntimeException getException(final DataSource dataSource, final String task,
     final String sql, final SQLException e) {
     SQLExceptionTranslator translator;
     if (dataSource == null) {
@@ -222,7 +224,11 @@ public final class JdbcUtils {
     } else {
       translator = new JdbcExceptionTranslator(dataSource);
     }
-    return translator.translate(task, sql, e);
+    final DataAccessException exception = translator.translate(task, sql, e);
+    if (exception == null) {
+      return Exceptions.wrap(Strings.toString("\n", task, sql), exception);
+    }
+    return exception;
   }
 
   public static String getProductName(final DataSource dataSource) {
