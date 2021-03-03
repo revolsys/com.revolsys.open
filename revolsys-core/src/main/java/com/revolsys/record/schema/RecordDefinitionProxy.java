@@ -189,6 +189,16 @@ public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, Geo
     }
   }
 
+  default Record getRecord(final Query query) {
+    final PathName pathName = getPathName();
+    final RecordStore recordStore = getRecordStore();
+    if (recordStore == null) {
+      throw new IllegalStateException(String.format("%s doesn't have a record store", pathName));
+    } else {
+      return recordStore.getRecord(query);
+    }
+  }
+
   default Record getRecord(final String id) {
     final PathName pathName = getPathName();
     final RecordStore recordStore = getRecordStore();
