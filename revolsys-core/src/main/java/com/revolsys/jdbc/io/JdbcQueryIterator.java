@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.UncategorizedSQLException;
@@ -43,7 +44,8 @@ public class JdbcQueryIterator extends AbstractIterator<Record>
       int fieldIndex = 0;
       for (final QueryValue expression : selectExpression) {
         try {
-          final Object value = expression.getValueFromResultSet(recordDefinition, resultSet, indexes, internStrings);
+          final Object value = expression.getValueFromResultSet(recordDefinition, resultSet,
+            indexes, internStrings);
           record.setValue(fieldIndex, value);
           fieldIndex++;
         } catch (final SQLException e) {
@@ -158,7 +160,11 @@ public class JdbcQueryIterator extends AbstractIterator<Record>
       if (cancelled) {
         throw new NoSuchElementException();
       } else {
-        throw e2;
+        if (e2 == null) {
+          throw Exceptions.wrap(e);
+        } else {
+          throw e2;
+        }
       }
     } catch (final RuntimeException e) {
       close();
