@@ -228,6 +228,14 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
     return getOpenIdBearerToken(requestBuilder, scope);
   }
 
+  public OpenIdBearerToken tokenClientCredentialsResource(final String resource) {
+    final RequestBuilder requestBuilder = tokenBuilder("client_credentials", true);
+    if (resource != null) {
+      requestBuilder.addParameter("resource", resource);
+    }
+    return getOpenIdBearerToken(requestBuilder, resource);
+  }
+
   public OpenIdBearerToken tokenDeviceCode(final String deviceCode, final String scope) {
     final String grantType = "urn:ietf:params:oauth:grant-type:device_code";
     final RequestBuilder requestBuilder = tokenBuilder(grantType, false) //
@@ -255,5 +263,15 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
       requestBuilder.addParameter("scope", scope);
     }
     return getOpenIdBearerToken(requestBuilder, scope);
+  }
+
+  public OpenIdBearerToken tokenRefreshResource(final String refreshToken, final String resource) {
+    final RequestBuilder requestBuilder = tokenBuilder("refresh_token", true);
+    requestBuilder //
+      .addParameter("refresh_token", refreshToken);
+    if (resource != null) {
+      requestBuilder.addParameter("resource", resource);
+    }
+    return getOpenIdBearerToken(requestBuilder, resource);
   }
 }

@@ -1,6 +1,7 @@
 package com.revolsys.net.http;
 
 import java.io.InputStream;
+import java.util.function.Function;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -19,6 +20,21 @@ import com.revolsys.record.io.format.json.JsonParser;
 
 public class ApacheHttp {
 
+  public static <V> V execute(final RequestBuilder requestBuilder,
+    final Function<HttpResponse, V> action) {
+    final HttpUriRequest request = requestBuilder.build();
+    try (
+      final CloseableHttpClient httpClient = newClient()) {
+
+      final HttpResponse response = getResponse(httpClient, requestBuilder);
+      return action.apply(response);
+    } catch (final ApacheHttpException e) {
+      throw e;
+    } catch (final Exception e) {
+      throw Exceptions.wrap(request.getURI().toString(), e);
+    }
+  }
+
   public static JsonObject getJson(final HttpResponse response) {
     final HttpEntity entity = response.getEntity();
     try (
@@ -30,16 +46,17 @@ public class ApacheHttp {
   }
 
   public static JsonObject getJson(final RequestBuilder requestBuilder) {
-    final CloseableHttpClient httpClient = HttpClientBuilder//
-      .create()
-      .build();
+    return execute(requestBuilder, ApacheHttp::getJson);
+  }
 
+  public static HttpResponse getResponse(final CloseableHttpClient httpClient,
+    final RequestBuilder requestBuilder) {
     final HttpUriRequest request = requestBuilder.build();
     try {
       final HttpResponse response = httpClient.execute(request);
       final StatusLine statusLine = response.getStatusLine();
       if (statusLine.getStatusCode() == 200) {
-        return getJson(response);
+        return response;
       } else {
         throw ApacheHttpException.create(request, response);
       }
@@ -48,7 +65,6 @@ public class ApacheHttp {
     } catch (final Exception e) {
       throw Exceptions.wrap(request.getURI().toString(), e);
     }
-
   }
 
   public static String getString(final HttpResponse response) {
@@ -59,6 +75,16 @@ public class ApacheHttp {
     } catch (final Exception e) {
       throw Exceptions.wrap(e);
     }
+  }
+
+  public static String getString(final RequestBuilder requestBuilder) {
+    return execute(requestBuilder, ApacheHttp::getString);
+  }
+
+  public static CloseableHttpClient newClient() {
+    return HttpClientBuilder//
+      .create()
+      .build();
   }
 
   public static StringEntity newEntity(final JsonObject body) {
