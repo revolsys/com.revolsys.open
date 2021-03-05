@@ -97,6 +97,18 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     return query;
   }
 
+  public int deleteRecords(final TableRecordStoreConnection connection, final Condition condition) {
+    final Query query = newQuery().and(condition);
+    return deleteRecords(connection, query);
+  }
+
+  public int deleteRecords(final TableRecordStoreConnection connection, final Query query) {
+    try (
+      Transaction transaction = connection.newTransaction(Propagation.REQUIRED)) {
+      return this.recordStore.deleteRecords(query);
+    }
+  }
+
   public Map<QueryValue, Boolean> getDefaultSortOrder() {
     return this.defaultSortOrder;
   }
@@ -359,17 +371,6 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
         return record.newRecord();
       }
     }
-  }
-
-  public Record updateRecord(final TableRecordStoreConnection connection, final UUID id,
-    final Consumer<Record> updateAction) {
-    final Condition condition = this.recordDefinition.equal("id", id);
-    return updateRecord(connection, condition, updateAction);
-  }
-
-  public Record updateRecord(final TableRecordStoreConnection connection, final UUID id,
-    final JsonObject values) {
-    return updateRecord(connection, id, (record) -> record.setValues(values));
   }
 
   protected void updateRecordAfter(final TableRecordStoreConnection connection,

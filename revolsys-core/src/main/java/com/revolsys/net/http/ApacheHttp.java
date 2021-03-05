@@ -1,6 +1,7 @@
 package com.revolsys.net.http;
 
 import java.io.InputStream;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.apache.http.HttpEntity;
@@ -20,6 +21,21 @@ import com.revolsys.record.io.format.json.JsonParser;
 
 public class ApacheHttp {
 
+  public static void execute(final RequestBuilder requestBuilder,
+    final Consumer<HttpResponse> action) {
+    final HttpUriRequest request = requestBuilder.build();
+    try (
+      final CloseableHttpClient httpClient = newClient()) {
+
+      final HttpResponse response = getResponse(httpClient, requestBuilder);
+      action.accept(response);
+    } catch (final ApacheHttpException e) {
+      throw e;
+    } catch (final Exception e) {
+      throw Exceptions.wrap(request.getURI().toString(), e);
+    }
+  }
+
   public static <V> V execute(final RequestBuilder requestBuilder,
     final Function<HttpResponse, V> action) {
     final HttpUriRequest request = requestBuilder.build();
@@ -35,6 +51,22 @@ public class ApacheHttp {
     }
   }
 
+  public static InputStream getInputStream(final RequestBuilder requestBuilder) {
+    final HttpUriRequest request = requestBuilder.build();
+    final CloseableHttpClient httpClient = newClient();
+    try {
+      final HttpResponse response = getResponse(httpClient, requestBuilder);
+      final HttpEntity entity = response.getEntity();
+      return new ApacheEntityInputStream(httpClient, entity);
+    } catch (final ApacheHttpException e) {
+      FileUtil.closeSilent(httpClient);
+      throw e;
+    } catch (final Exception e) {
+      FileUtil.closeSilent(httpClient);
+      throw Exceptions.wrap(request.getURI().toString(), e);
+    }
+  }
+
   public static JsonObject getJson(final HttpResponse response) {
     final HttpEntity entity = response.getEntity();
     try (
@@ -46,7 +78,8 @@ public class ApacheHttp {
   }
 
   public static JsonObject getJson(final RequestBuilder requestBuilder) {
-    return execute(requestBuilder, ApacheHttp::getJson);
+    final Function<HttpResponse, JsonObject> function = ApacheHttp::getJson;
+    return execute(requestBuilder, function);
   }
 
   public static HttpResponse getResponse(final CloseableHttpClient httpClient,
@@ -55,7 +88,8 @@ public class ApacheHttp {
     try {
       final HttpResponse response = httpClient.execute(request);
       final StatusLine statusLine = response.getStatusLine();
-      if (statusLine.getStatusCode() == 200) {
+      final int statusCode = statusLine.getStatusCode();
+      if (statusCode >= 200 && statusCode <= 299) {
         return response;
       } else {
         throw ApacheHttpException.create(request, response);
@@ -78,7 +112,8 @@ public class ApacheHttp {
   }
 
   public static String getString(final RequestBuilder requestBuilder) {
-    return execute(requestBuilder, ApacheHttp::getString);
+    final Function<HttpResponse, String> function = ApacheHttp::getString;
+    return execute(requestBuilder, function);
   }
 
   public static CloseableHttpClient newClient() {

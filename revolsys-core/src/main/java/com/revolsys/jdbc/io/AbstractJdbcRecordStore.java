@@ -36,7 +36,6 @@ import com.revolsys.collection.ResultPager;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcConnection;
-import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.field.JdbcFieldFactory;
@@ -268,7 +267,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
         query.setRecordDefinition(recordDefinition);
       }
     }
-    final String sql = JdbcUtils.getDeleteSql(query);
+    final String sql = query.newDeleteSql();
     try (
       Transaction transaction = newTransaction(com.revolsys.transaction.Propagation.REQUIRED)) {
       // It's important to have this in an inner try. Otherwise the exceptions

@@ -665,6 +665,18 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return condition;
   }
 
+  public String newDeleteSql() {
+    final StringBuilder sql = new StringBuilder();
+    sql.append("DELETE FROM ");
+    From from = getFrom();
+    if (from == null) {
+      from = this.table;
+    }
+    from.appendFromWithAlias(sql);
+    JdbcUtils.appendWhere(sql, this);
+    return sql.toString();
+  }
+
   public Query newQuery(final RecordDefinition recordDefinition) {
     final Query query = clone();
     query.setRecordDefinition(recordDefinition);
