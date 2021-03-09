@@ -46,6 +46,7 @@ import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.code.AbstractMultiValueCodeTable;
 import com.revolsys.record.io.RecordIterator;
+import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordStoreExtension;
 import com.revolsys.record.io.RecordStoreQueryReader;
 import com.revolsys.record.io.RecordWriter;
@@ -497,6 +498,11 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     } catch (final SQLException e) {
       throw new IllegalArgumentException("Unable to load metadata for " + tablePath);
     }
+  }
+
+  @Override
+  public RecordReader getRecords(final Query query) {
+    return newIterator(query, null);
   }
 
   public String getSchemaTablePermissionsSql() {

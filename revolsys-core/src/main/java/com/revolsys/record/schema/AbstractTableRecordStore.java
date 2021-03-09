@@ -155,10 +155,7 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
   }
 
   public RecordReader getRecords(final TableRecordStoreConnection connection, final Query query) {
-    try (
-      Transaction transaction = connection.newTransaction(Propagation.REQUIRED)) {
-      return this.recordStore.getRecords(query);
-    }
+    return this.recordStore.getRecords(query);
   }
 
   @SuppressWarnings("unchecked")

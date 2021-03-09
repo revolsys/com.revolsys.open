@@ -683,8 +683,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   }
 
   default RecordStoreQueryReader newRecordReader() {
-    final RecordStoreQueryReader reader = new RecordStoreQueryReader(this);
-    return reader;
+    return new RecordStoreQueryReader(this);
   }
 
   default Record newRecordWithIdentifier(final RecordDefinition recordDefinition) {

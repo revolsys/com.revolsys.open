@@ -16,6 +16,7 @@ import com.revolsys.record.query.SqlCondition;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
+import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Property;
 
 public class RecordStoreQueryReader extends IteratorReader<Record> implements RecordReader {
@@ -31,6 +32,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record> implements Re
   private String whereClause;
 
   public RecordStoreQueryReader() {
+    Transaction.assertInTransaction();
     setIterator(new RecordStoreMultipleQueryIterator(this));
   }
 

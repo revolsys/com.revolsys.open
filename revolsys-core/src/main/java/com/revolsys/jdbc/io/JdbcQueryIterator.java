@@ -27,8 +27,8 @@ import com.revolsys.record.query.ColumnIndexes;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Booleans;
-import com.revolsys.util.count.LabelCountMap;
 import com.revolsys.util.count.LabelCounters;
 
 public class JdbcQueryIterator extends AbstractIterator<Record>
@@ -59,6 +59,8 @@ public class JdbcQueryIterator extends AbstractIterator<Record>
     return record;
   }
 
+  private boolean autoCommit;
+
   private boolean internStrings;
 
   private JdbcConnection connection;
@@ -88,10 +90,8 @@ public class JdbcQueryIterator extends AbstractIterator<Record>
   public JdbcQueryIterator(final JdbcRecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
     super();
+    Transaction.assertInTransaction();
 
-    final boolean autoCommit = Booleans.getBoolean(properties.get("autoCommit"));
-    this.internStrings = Booleans.getBoolean(properties.get("internStrings"));
-    this.connection = recordStore.getJdbcConnection(autoCommit);
     this.recordFactory = query.getRecordFactory();
     if (this.recordFactory == null) {
       this.recordFactory = recordStore.getRecordFactory();
@@ -99,8 +99,12 @@ public class JdbcQueryIterator extends AbstractIterator<Record>
     this.recordStore = recordStore;
     this.query = query;
     this.labelCountMap = query.getStatistics();
-    if (this.labelCountMap == null) {
-      this.labelCountMap = (LabelCounters)properties.get(LabelCountMap.class.getName());
+    if (properties != null) {
+      this.autoCommit = Booleans.getBoolean(properties.get("autoCommit"));
+      this.internStrings = Booleans.getBoolean(properties.get("internStrings"));
+      if (this.labelCountMap == null) {
+        this.labelCountMap = (LabelCounters)properties.get(LabelCounters.class.getName());
+      }
     }
   }
 
@@ -252,11 +256,21 @@ public class JdbcQueryIterator extends AbstractIterator<Record>
 
   @Override
   protected void initDo() {
+    this.connection = this.recordStore.getJdbcConnection(this.autoCommit);
+
     this.resultSet = getResultSet();
+  }
+
+  public boolean isAutoCommit() {
+    return this.autoCommit;
   }
 
   public boolean isInternStrings() {
     return this.internStrings;
+  }
+
+  public void setAutoCommit(final boolean autoCommit) {
+    this.autoCommit = autoCommit;
   }
 
   public void setInternStrings(final boolean internStrings) {

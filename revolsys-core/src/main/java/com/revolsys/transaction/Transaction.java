@@ -24,6 +24,10 @@ public class Transaction implements BaseCloseable {
     }
   }
 
+  public static void assertInTransaction() {
+    assert currentTransaction.get() != null : "Must be called in a transaction";
+  }
+
   public static Transaction getCurrentTransaction() {
     return currentTransaction.get();
   }
