@@ -132,8 +132,11 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     return getRecord(connection, "id", id);
   }
 
-  public int getRecordCount(final Query query) {
-    return this.recordStore.getRecordCount(query);
+  public int getRecordCount(final TableRecordStoreConnection connection, final Query query) {
+    try (
+      Transaction transaction = connection.newTransaction(Propagation.REQUIRED)) {
+      return this.recordStore.getRecordCount(query);
+    }
   }
 
   @Override
@@ -141,17 +144,21 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     return this.recordDefinition;
   }
 
-  public RecordReader getRecords() {
-    return this.recordStore.getRecords(this.recordsQuery);
+  public RecordReader getRecords(final TableRecordStoreConnection connection) {
+    return getRecords(connection, this.recordsQuery);
   }
 
-  public RecordReader getRecords(final Condition condition) {
+  public RecordReader getRecords(final TableRecordStoreConnection connection,
+    final Condition condition) {
     final Query query = newQuery().and(condition);
-    return getRecords(query);
+    return getRecords(connection, query);
   }
 
-  public RecordReader getRecords(final Query query) {
-    return this.recordStore.getRecords(query);
+  public RecordReader getRecords(final TableRecordStoreConnection connection, final Query query) {
+    try (
+      Transaction transaction = connection.newTransaction(Propagation.REQUIRED)) {
+      return this.recordStore.getRecords(query);
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -175,10 +182,7 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
   }
 
   public boolean hasRecord(final TableRecordStoreConnection connection, final Query query) {
-    try (
-      Transaction transaction = connection.newTransaction(Propagation.REQUIRED)) {
-      return this.recordStore.getRecordCount(query) > 0;
-    }
+    return getRecordCount(connection, query) > 0;
   }
 
   public Record insertOrUpdateRecord(final TableRecordStoreConnection connection,
@@ -193,18 +197,21 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     final Supplier<Record> newRecordSupplier, final Consumer<Record> updateAction) {
     query.setRecordFactory(ArrayChangeTrackRecord.FACTORY).setLockMode(LockMode.FOR_UPDATE);
 
-    final ChangeTrackRecord changeTrackRecord = getRecord(connection, query);
-    if (changeTrackRecord == null) {
-      final Record newRecord = newRecordSupplier.get();
-      if (newRecord == null) {
-        return null;
+    try (
+      Transaction transaction = connection.newTransaction(Propagation.REQUIRED)) {
+      final ChangeTrackRecord changeTrackRecord = getRecord(connection, query);
+      if (changeTrackRecord == null) {
+        final Record newRecord = newRecordSupplier.get();
+        if (newRecord == null) {
+          return null;
+        } else {
+          return insertRecord(connection, newRecord);
+        }
       } else {
-        return insertRecord(connection, newRecord);
+        updateAction.accept(changeTrackRecord);
+        updateRecordDo(connection, changeTrackRecord);
+        return changeTrackRecord.newRecord();
       }
-    } else {
-      updateAction.accept(changeTrackRecord);
-      updateRecordDo(connection, changeTrackRecord);
-      return changeTrackRecord.newRecord();
     }
   }
 

@@ -47,7 +47,7 @@ public interface TableRecordStoreConnection {
     final Query query = recordStore.newQuery();
     try (
       Transaction transaction = newTransaction(Propagation.REQUIRED)) {
-      return recordStore.getRecords(query);
+      return recordStore.getRecords(this, query);
     }
   }
 
