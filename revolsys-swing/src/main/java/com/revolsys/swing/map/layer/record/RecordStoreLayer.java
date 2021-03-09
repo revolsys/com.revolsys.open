@@ -158,7 +158,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
           final Comparator<Record> comparator = Records.newComparatorOrderBy(orderBy);
           try (
             final BaseCloseable booleanValueCloseable = eventsDisabled();
-            Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW);
+            Transaction transaction = recordStore.newTransaction();
             final RecordReader reader = newRecordStoreRecordReader(query);) {
             transaction.setRollbackOnly();
             for (LayerRecord record : reader.<LayerRecord> i()) {
@@ -208,7 +208,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       if (recordStore != null) {
         try (
           final BaseCloseable booleanValueCloseable = eventsDisabled();
-          Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW);
+          Transaction transaction = recordStore.newTransaction();
           final RecordReader reader = newRecordStoreRecordReader(query);) {
           transaction.setRollbackOnly();
           final LabelCountMap labelCountMap = query.getProperty("statistics");
@@ -403,7 +403,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
       final RecordStore recordStore = getRecordStore();
       if (recordStore != null) {
         try (
-          Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW)) {
+          Transaction transaction = recordStore.newTransaction()) {
           transaction.setRollbackOnly();
           return recordStore.getRecordCount(query);
         }
@@ -814,7 +814,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         return true;
       } else {
         try (
-          Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW)) {
+          Transaction transaction = recordStore.newTransaction()) {
           try {
             Identifier identifier = record.getIdentifier();
             try (
@@ -937,7 +937,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
 
   private void updateCachedRecords(final RecordStore recordStore, final Query query) {
     try (
-      Transaction transaction = recordStore.newTransaction(Propagation.REQUIRES_NEW);
+      Transaction transaction = recordStore.newTransaction();
       RecordReader reader = recordStore.getRecords(query)) {
       for (final Record record : reader) {
         final Identifier identifier = record.getIdentifier();

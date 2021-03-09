@@ -249,6 +249,7 @@ public class ProgressMonitor implements Cancellable {
     }
   }
 
+  @Override
   public void cancel() {
     this.cancelled = true;
     this.propertyChangeSupport.firePropertyChange("cancelled", false, true);

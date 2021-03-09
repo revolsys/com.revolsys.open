@@ -282,6 +282,11 @@ public class MergeRecordsDialog extends BaseDialog {
       } //
         .setCellEditor(table -> new RecordLayerTableCellEditor(table, this.layer) {
 
+          /**
+           *
+           */
+          private static final long serialVersionUID = 1L;
+
           @Override
           protected String getColumnFieldName(final int rowIndex, final int columnIndex) {
             return recordDefinition.getFieldName(rowIndex);

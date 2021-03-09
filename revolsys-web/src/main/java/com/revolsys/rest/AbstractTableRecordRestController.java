@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jeometry.common.data.identifier.Identifier;
-import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -36,6 +35,7 @@ import com.revolsys.record.schema.AbstractTableRecordStore;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.TableRecordStoreConnection;
 import com.revolsys.transaction.Transaction;
+import com.revolsys.transaction.TransactionOptions;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.Property;
 
@@ -133,7 +133,7 @@ public class AbstractTableRecordRestController {
     }
     final boolean returnCount = HttpServletUtils.getBooleanParameter(request, "$count");
     try (
-      Transaction transaction = connection.newTransaction();
+      Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRES_NEW_READONLY);
       final RecordReader records = connection.getRecordReader(query)) {
       Long count = null;
       if (returnCount) {
@@ -358,11 +358,9 @@ public class AbstractTableRecordRestController {
   public void responseRecordsJson(final TableRecordStoreConnection connection,
     final HttpServletResponse response, final Query query, final Long count) throws IOException {
     try (
-      Transaction transaction = connection.newTransaction();
+      Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRES_NEW_READONLY);
       final RecordReader records = connection.getRecordReader(query)) {
       responseRecordsJson(connection, response, records, count);
-    } catch (final Exception e) {
-      throw Exceptions.wrap(query.toString(), e);
     }
   }
 

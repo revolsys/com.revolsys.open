@@ -9,6 +9,7 @@ import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.io.PathNameProxy;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.Record;
@@ -16,22 +17,25 @@ import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.TableReference;
-import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
+import com.revolsys.transaction.TransactionOptions;
+import com.revolsys.transaction.TransactionRecordReader;
+import com.revolsys.transaction.Transactionable;
 
-public interface TableRecordStoreConnection {
+public interface TableRecordStoreConnection extends Transactionable {
 
-  default Record getRecord(final Query query) {
+  @SuppressWarnings("unchecked")
+  default <R extends Record> R getRecord(final Query query) {
+    final JdbcRecordStore recordStore = getRecordStore();
     try (
-      Transaction transaction = newTransaction(Propagation.REQUIRED)) {
-      final JdbcRecordStore recordStore = getRecordStore();
-      return recordStore.getRecord(query);
+      Transaction transaction = newTransaction(TransactionOptions.REQUIRED_READONLY)) {
+      return (R)recordStore.getRecord(query);
     }
   }
 
   default long getRecordCount(final Query query) {
     try (
-      Transaction transaction = newTransaction(Propagation.REQUIRED)) {
+      Transaction transaction = newTransaction(TransactionOptions.REQUIRED_READONLY)) {
       final JdbcRecordStore recordStore = getRecordStore();
       return recordStore.getRecordCount(query);
     }
@@ -43,22 +47,23 @@ public interface TableRecordStoreConnection {
   }
 
   default RecordReader getRecordReader(final PathName tableName) {
-    Transaction.assertInTransaction();
     final AbstractTableRecordStore recordStore = getTableRecordStore(tableName);
     final Query query = recordStore.newQuery();
-    return recordStore.getRecords(this, query);
+    return recordStore.getRecordReader(this, query);
   }
 
   default RecordReader getRecordReader(final Query query) {
-    Transaction.assertInTransaction();
     final JdbcRecordStore recordStore = getRecordStore();
-    return recordStore.getRecords(query);
+    final Transaction transaction = newTransaction(TransactionOptions.REQUIRED);
+    final RecordReader reader = recordStore.getRecords(query);
+    return new TransactionRecordReader(reader, transaction);
   }
 
   default List<Record> getRecords(final Query query) {
+    final JdbcRecordStore recordStore = getRecordStore();
     try (
-      Transaction transaction = newTransaction(Propagation.REQUIRED);
-      RecordReader recordReader = getRecordStore().getRecords(query)) {
+      Transaction transaction = newTransaction(TransactionOptions.REQUIRED_READONLY);
+      RecordReader recordReader = recordStore.getRecords(query)) {
       return recordReader.toList();
     } catch (final Exception e) {
       throw Exceptions.wrap("Query error\n" + query, e);
@@ -87,6 +92,12 @@ public interface TableRecordStoreConnection {
     return null;
   }
 
+  @Override
+  default PlatformTransactionManager getTransactionManager() {
+    final JdbcRecordStore recordStore = getRecordStore();
+    return recordStore.getTransactionManager();
+  }
+
   default <TRS extends AbstractTableRecordStore> Record insertOrUpdateRecord(
     final CharSequence tablePath, final Function<TRS, Query> querySupplier,
     final Function<TRS, Record> newRecordSupplier, final Consumer<Record> updateAction) {
@@ -100,7 +111,7 @@ public interface TableRecordStoreConnection {
     final Function<TRS, Query> querySupplier, final Function<TRS, Record> newRecordSupplier) {
     final Consumer<Record> updateAction = (record) -> {
     };
-    return this.insertOrUpdateRecord(tablePath, querySupplier, newRecordSupplier, updateAction);
+    return insertOrUpdateRecord(tablePath, querySupplier, newRecordSupplier, updateAction);
   }
 
   default Record insertRecord(final Record record) {
@@ -121,15 +132,6 @@ public interface TableRecordStoreConnection {
   default Record newRecord(final CharSequence tablePath, final JsonObject json) {
     final AbstractTableRecordStore tableRecordStore = getTableRecordStore(tablePath);
     return tableRecordStore.newRecord(json);
-  }
-
-  default Transaction newTransaction() {
-    return newTransaction(Propagation.REQUIRES_NEW);
-  }
-
-  default Transaction newTransaction(final Propagation propagation) {
-    final JdbcRecordStore recordStore = getRecordStore();
-    return recordStore.newTransaction(propagation);
   }
 
   default Record updateRecord(final CharSequence tablePath, final Identifier id,

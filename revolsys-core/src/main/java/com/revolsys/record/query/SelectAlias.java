@@ -102,8 +102,9 @@ public class SelectAlias implements QueryValue {
   }
 
   @Override
-  public Object getValueFromResultSet(RecordDefinition recordDefinition, final ResultSet resultSet,
-    final ColumnIndexes indexes, final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(final RecordDefinition recordDefinition,
+    final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
+    throws SQLException {
     return this.value.getValueFromResultSet(recordDefinition, resultSet, indexes, internStrings);
   }
 

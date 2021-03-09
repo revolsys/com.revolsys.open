@@ -4,8 +4,6 @@ import javax.servlet.http.HttpServletRequest;
 
 public class AuthorizeResponse {
 
-  private final OpenIdConnectClient client;
-
   private final String sessionState;
 
   private final String state;
@@ -14,7 +12,6 @@ public class AuthorizeResponse {
 
   public AuthorizeResponse(final OpenIdConnectClient client, final HttpServletRequest request,
     final String scope) {
-    this.client = client;
     this.code = request.getParameter("code");
     this.state = request.getParameter("state");
     this.sessionState = request.getParameter("session_state");

@@ -354,7 +354,7 @@ public class ODataParser {
 
   private static List<Token> processParentheses(final Query query, final List<Token> tokens) {
 
-    final List<Token> rt = new ArrayList<Token>();
+    final List<Token> rt = new ArrayList<>();
 
     for (int i = 0; i < tokens.size(); i++) {
       final Token openToken = tokens.get(i);
@@ -742,7 +742,7 @@ public class ODataParser {
 
   // tokenizer
   private static List<Token> tokenize(final String value) {
-    final List<Token> rt = new ArrayList<Token>();
+    final List<Token> rt = new ArrayList<>();
     int current = 0;
     int end = 0;
 

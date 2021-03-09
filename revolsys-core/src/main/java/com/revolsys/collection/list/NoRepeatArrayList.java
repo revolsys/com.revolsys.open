@@ -37,7 +37,7 @@ public class NoRepeatArrayList extends ArrayList {
   public boolean addAll(final Collection values) {
     ensureCapacity(size() + values.size());
     boolean modified = false;
-    for (Object value : values) {
+    for (final Object value : values) {
       if (add(value)) {
         modified = true;
       }
@@ -48,7 +48,7 @@ public class NoRepeatArrayList extends ArrayList {
   @Override
   public boolean addAll(int index, final Collection values) {
     ensureCapacity(size() + values.size());
-    for (Object value : values) {
+    for (final Object value : values) {
       add(index++, value);
     }
     return true;

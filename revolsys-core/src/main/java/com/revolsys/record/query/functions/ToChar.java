@@ -22,8 +22,9 @@ public class ToChar extends SimpleFunction {
   }
 
   @Override
-  public Object getValueFromResultSet(RecordDefinition recordDefinition, final ResultSet resultSet,
-    final ColumnIndexes indexes, final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(final RecordDefinition recordDefinition,
+    final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
+    throws SQLException {
     return resultSet.getString(indexes.incrementAndGet());
   }
 }

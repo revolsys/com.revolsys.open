@@ -4,6 +4,7 @@ public class BooleanCancellable implements Cancellable {
 
   private boolean cancelled = false;
 
+  @Override
   public void cancel() {
     this.cancelled = true;
   }

@@ -23,8 +23,9 @@ public class JdbcIntegerFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(RecordDefinition recordDefinition, final ResultSet resultSet,
-    final ColumnIndexes indexes, final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(final RecordDefinition recordDefinition,
+    final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
+    throws SQLException {
     final int value = resultSet.getInt(indexes.incrementAndGet());
     if (resultSet.wasNull()) {
       return null;

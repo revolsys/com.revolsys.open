@@ -14,6 +14,7 @@ import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.field.JdbcFieldDefinitions;
+import com.revolsys.record.Record;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Join;
 import com.revolsys.record.query.Query;
@@ -21,6 +22,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
+import com.revolsys.transaction.TransactionOptions;
 
 public interface JdbcRecordStore extends RecordStore {
 
@@ -41,6 +43,14 @@ public interface JdbcRecordStore extends RecordStore {
   JdbcConnection getJdbcConnection();
 
   JdbcConnection getJdbcConnection(boolean autoCommit);
+
+  @Override
+  default Record getRecord(final Query query) {
+    try (
+      Transaction transaction = newTransaction(TransactionOptions.REQUIRED_READONLY)) {
+      return RecordStore.super.getRecord(query);
+    }
+  }
 
   JdbcRecordDefinition getRecordDefinition(PathName tablePath, ResultSetMetaData resultSetMetaData,
     String dbTableName);

@@ -165,7 +165,14 @@ public interface RecordDefinitionProxy extends PathNameProxy, IconNameProxy, Geo
     if (recordStore == null) {
       throw new IllegalStateException(String.format("%s doesn't have a record store", pathName));
     } else {
-      return recordStore.getRecord(pathName, condition, lockMode);
+      final Query query = newQuery();
+      if (condition != null) {
+        query.and(condition);
+      }
+      if (lockMode != null) {
+        query.setLockMode(lockMode);
+      }
+      return getRecord(query);
     }
   }
 

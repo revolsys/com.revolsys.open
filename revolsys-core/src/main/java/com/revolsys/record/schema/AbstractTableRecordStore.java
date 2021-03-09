@@ -15,6 +15,7 @@ import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.ArrayChangeTrackRecord;
@@ -30,23 +31,24 @@ import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.TableReference;
-import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
+import com.revolsys.transaction.TransactionOptions;
+import com.revolsys.transaction.TransactionRecordReader;
 import com.revolsys.util.Property;
 
 public class AbstractTableRecordStore implements RecordDefinitionProxy {
 
-  protected JdbcRecordStore recordStore;
+  private JdbcRecordStore recordStore;
 
-  protected final PathName tablePath;
+  private final PathName tablePath;
 
-  protected final String typeName;
+  private final String typeName;
 
-  protected RecordDefinition recordDefinition;
+  private RecordDefinition recordDefinition;
 
   protected Map<QueryValue, Boolean> defaultSortOrder = new LinkedHashMap<>();
 
-  protected Query recordsQuery;
+  private Query recordsQuery;
 
   private final Set<String> searchFieldNames = new LinkedHashSet<>();
 
@@ -65,7 +67,7 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
   }
 
   protected void addDefaultSortOrder(final String fieldName, final boolean ascending) {
-    if (this.recordDefinition != null) {
+    if (getRecordDefinition() != null) {
       final FieldDefinition field = getFieldDefinition(fieldName);
       if (field != null) {
         this.defaultSortOrder.put(field, ascending);
@@ -104,13 +106,25 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
 
   public int deleteRecords(final TableRecordStoreConnection connection, final Query query) {
     try (
-      Transaction transaction = connection.newTransaction(Propagation.REQUIRED)) {
+      Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED)) {
       return this.recordStore.deleteRecords(query);
+    }
+  }
+
+  protected void executeUpdate(final TableRecordStoreConnection connection, final String sql,
+    final Object... parameters) {
+    try (
+      Transaction transaction = connection.newTransaction()) {
+      this.recordStore.executeUpdate(sql, parameters);
     }
   }
 
   public Map<QueryValue, Boolean> getDefaultSortOrder() {
     return this.defaultSortOrder;
+  }
+
+  protected JdbcConnection getJdbcConnection() {
+    return this.recordStore.getJdbcConnection();
   }
 
   public Record getRecord(final TableRecordStoreConnection connection, final CharSequence fieldName,
@@ -123,7 +137,7 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
   public <R extends Record> R getRecord(final TableRecordStoreConnection connection,
     final Query query) {
     try (
-      Transaction transaction = connection.newTransaction(Propagation.REQUIRED)) {
+      Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED_READONLY)) {
       return (R)this.recordStore.getRecord(query);
     }
   }
@@ -132,9 +146,9 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     return getRecord(connection, "id", id);
   }
 
-  public int getRecordCount(final TableRecordStoreConnection connection, final Query query) {
+  public long getRecordCount(final TableRecordStoreConnection connection, final Query query) {
     try (
-      Transaction transaction = connection.newTransaction(Propagation.REQUIRED)) {
+      Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED_READONLY)) {
       return this.recordStore.getRecordCount(query);
     }
   }
@@ -144,18 +158,21 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     return this.recordDefinition;
   }
 
-  public RecordReader getRecords(final TableRecordStoreConnection connection) {
-    return getRecords(connection, this.recordsQuery);
+  public RecordReader getRecordReader(final TableRecordStoreConnection connection) {
+    return getRecordReader(connection, this.recordsQuery);
   }
 
-  public RecordReader getRecords(final TableRecordStoreConnection connection,
+  public RecordReader getRecordReader(final TableRecordStoreConnection connection,
     final Condition condition) {
     final Query query = newQuery().and(condition);
-    return getRecords(connection, query);
+    return getRecordReader(connection, query);
   }
 
-  public RecordReader getRecords(final TableRecordStoreConnection connection, final Query query) {
-    return this.recordStore.getRecords(query);
+  public RecordReader getRecordReader(final TableRecordStoreConnection connection,
+    final Query query) {
+    final Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED);
+    final RecordReader reader = this.recordStore.getRecords(query);
+    return new TransactionRecordReader(reader, transaction);
   }
 
   @SuppressWarnings("unchecked")
@@ -165,11 +182,15 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
   }
 
   public TableReference getTable() {
-    return this.recordDefinition;
+    return getRecordDefinition();
   }
 
   public PathName getTablePath() {
     return this.tablePath;
+  }
+
+  protected String getTypeName() {
+    return this.typeName;
   }
 
   public boolean hasRecord(final TableRecordStoreConnection connection,
@@ -195,7 +216,7 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     query.setRecordFactory(ArrayChangeTrackRecord.FACTORY).setLockMode(LockMode.FOR_UPDATE);
 
     try (
-      Transaction transaction = connection.newTransaction(Propagation.REQUIRED)) {
+      Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED)) {
       final ChangeTrackRecord changeTrackRecord = getRecord(connection, query);
       if (changeTrackRecord == null) {
         final Record newRecord = newRecordSupplier.get();
@@ -231,7 +252,7 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
 
   public Record insertRecord(final TableRecordStoreConnection connection, final Record record) {
     try (
-      Transaction transaction = connection.newTransaction(Propagation.REQUIRED)) {
+      Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED)) {
       insertRecordBefore(connection, record);
       validateRecord(record);
       this.recordStore.insertRecord(record);
@@ -250,7 +271,7 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
 
   @Override
   public Query newQuery() {
-    return this.recordDefinition.newQuery();
+    return getRecordDefinition().newQuery();
   }
 
   public Query newQuery(final CharSequence fieldName, final Object value) {
@@ -260,7 +281,7 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
   }
 
   public Record newRecord() {
-    return this.recordDefinition.newRecord();
+    return getRecordDefinition().newRecord();
   }
 
   public Record newRecord(final MapEx values) {
@@ -302,9 +323,9 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
   }
 
   protected void setGeneratedFields(final String... fieldNames) {
-    if (this.recordDefinition != null) {
+    if (getRecordDefinition() != null) {
       for (final String fieldName : fieldNames) {
-        final JdbcFieldDefinition field = (JdbcFieldDefinition)this.recordDefinition
+        final JdbcFieldDefinition field = (JdbcFieldDefinition)getRecordDefinition()
           .getField(fieldName);
         if (field != null) {
           field.setGenerated(true);
@@ -316,9 +337,9 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
   protected void setRecordDefinition(final RecordDefinition recordDefinition) {
     this.recordDefinition = recordDefinition;
     if (recordDefinition == null) {
-      Logs.error(this, "Table doesn't exist\t" + this.typeName);
+      Logs.error(this, "Table doesn't exist\t" + getTypeName());
     } else {
-      this.recordsQuery = new Query(this.recordDefinition);
+      this.recordsQuery = new Query(getRecordDefinition());
       setRecordDefinitionPost(recordDefinition);
     }
   }
@@ -352,7 +373,7 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
 
   public Record updateRecord(final TableRecordStoreConnection connection, final Identifier id,
     final Consumer<Record> updateAction) {
-    final Condition condition = Q.equalId(this.recordDefinition.getIdFieldNames(), id);
+    final Condition condition = Q.equalId(getRecordDefinition().getIdFieldNames(), id);
     return updateRecord(connection, condition, updateAction);
   }
 
@@ -364,7 +385,7 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
   public Record updateRecord(final TableRecordStoreConnection connection, final Query query,
     final Consumer<Record> updateAction) {
     try (
-      Transaction transaction = connection.newTransaction(Propagation.REQUIRED)) {
+      Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED)) {
       query.setRecordFactory(ArrayChangeTrackRecord.FACTORY);
       final ChangeTrackRecord record = getRecord(connection, query);
       if (record == null) {
@@ -395,7 +416,7 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
   }
 
   public void validateRecord(final MapEx record) {
-    this.recordDefinition.validateRecord(record);
+    getRecordDefinition().validateRecord(record);
   }
 
 }

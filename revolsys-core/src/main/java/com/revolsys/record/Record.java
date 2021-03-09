@@ -31,6 +31,8 @@ import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.io.format.json.JsonType;
+import com.revolsys.record.io.format.json.Jsonable;
 import com.revolsys.record.query.Value;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -38,8 +40,8 @@ import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
-public interface Record
-  extends MapEx, Comparable<Object>, Identifiable, RecordDefinitionProxy, BoundingBoxProxy {
+public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordDefinitionProxy,
+  BoundingBoxProxy, Jsonable {
   String EVENT_RECORD_CHANGED = "_recordChanged";
 
   String EXCLUDE_GEOMETRY = Record.class.getName() + ".excludeGeometry";
@@ -191,6 +193,11 @@ public interface Record
     collection.add(value);
     setValue(name, collection);
     return this;
+  }
+
+  @Override
+  default JsonType asJson() {
+    return JsonObject.hash(this);
   }
 
   @Override
@@ -1451,6 +1458,7 @@ public interface Record
     return recordDefinition.getFieldCount();
   }
 
+  @Override
   default JsonObject toJson() {
     final JsonObject json = JsonObject.hash();
     for (int i = 0; i < getFieldCount(); i++) {
@@ -1463,6 +1471,7 @@ public interface Record
     return json;
   }
 
+  @Override
   default String toJsonString() {
     return toJson().toJsonString();
   }

@@ -7,6 +7,11 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpUriRequest;
 
 public class ApacheHttpException extends RuntimeException {
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   public static ApacheHttpException create(final HttpUriRequest request,
     final HttpResponse response) {
     final StatusLine statusLine = response.getStatusLine();

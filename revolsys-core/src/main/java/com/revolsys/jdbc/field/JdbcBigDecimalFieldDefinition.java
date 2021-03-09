@@ -21,8 +21,9 @@ public class JdbcBigDecimalFieldDefinition extends JdbcDecimalFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(RecordDefinition recordDefinition, final ResultSet resultSet,
-    final ColumnIndexes indexes, final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(final RecordDefinition recordDefinition,
+    final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
+    throws SQLException {
     return resultSet.getBigDecimal(indexes.incrementAndGet());
   }
 

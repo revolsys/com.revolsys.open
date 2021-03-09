@@ -23,8 +23,9 @@ public class JdbcLongFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(RecordDefinition recordDefinition, final ResultSet resultSet,
-    final ColumnIndexes indexes, final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(final RecordDefinition recordDefinition,
+    final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
+    throws SQLException {
     final long value = resultSet.getLong(indexes.incrementAndGet());
     if (resultSet.wasNull()) {
       return null;

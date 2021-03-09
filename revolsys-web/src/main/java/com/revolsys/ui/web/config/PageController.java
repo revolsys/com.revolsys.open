@@ -459,7 +459,7 @@ public class PageController implements SiteNodeController {
    * @param scripts The scripts to set.
    */
   public void setScripts(final Collection scripts) {
-    for (Object element : scripts) {
+    for (final Object element : scripts) {
       if (element instanceof Script) {
         final Script script = (Script)element;
         this.scripts.add(script);
@@ -478,7 +478,7 @@ public class PageController implements SiteNodeController {
    * @param styles The styles to set.
    */
   public void setStyles(final Collection styles) {
-    for (Object element : styles) {
+    for (final Object element : styles) {
       if (element instanceof Style) {
         final Style style = (Style)element;
         this.styles.add(style);
