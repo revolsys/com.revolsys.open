@@ -62,6 +62,7 @@ import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
+import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
@@ -313,6 +314,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     final Set<String> schemaNames = new TreeSet<>();
     try {
       try (
+        Transaction transaction = newTransaction(Propagation.REQUIRED);
         final Connection connection = getJdbcConnection();
         final PreparedStatement statement = connection.prepareStatement(this.schemaPermissionsSql);
         final ResultSet resultSet = statement.executeQuery();) {
@@ -398,6 +400,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       query.clearOrderBy();
       final String sql = "select count(mainquery.*) from (" + query.getSelectSql() + ") mainquery";
       try (
+        Transaction transaction = newTransaction(Propagation.REQUIRED);
         JdbcConnection connection = getJdbcConnection()) {
         try (
           final PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -533,6 +536,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   @Override
   protected void initializePost() {
     try (
+      Transaction transaction = newTransaction(Propagation.REQUIRES_NEW);
       JdbcConnection connection = getJdbcConnection()) {
       // Get a connection to test that the database works
     }
@@ -623,6 +627,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     if (Property.hasValue(this.primaryKeySql)) {
       try {
         try (
+          Transaction transaction = newTransaction(Propagation.REQUIRED);
           final Connection connection = getJdbcConnection();
           final PreparedStatement statement = connection.prepareStatement(this.primaryKeySql);) {
           if (this.primaryKeySql.indexOf('?') != -1) {
@@ -653,6 +658,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     final List<String> idFieldNames = new ArrayList<>();
     try {
       try (
+        Transaction transaction = newTransaction(Propagation.REQUIRED);
         final Connection connection = getJdbcConnection();
         final PreparedStatement statement = connection
           .prepareStatement(this.primaryKeySql + this.primaryKeyTableCondition);) {
@@ -678,6 +684,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     final PathName schemaPath = schema.getPathName();
     final String dbSchemaName = schema.getDbName();
     try (
+      Transaction transaction = newTransaction(Propagation.REQUIRED);
       final Connection connection = getJdbcConnection();
       final PreparedStatement statement = connection
         .prepareStatement(this.schemaTablePermissionsSql)) {
@@ -900,6 +907,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     final Map<PathName, RecordStoreSchemaElement> elementsByPath = new TreeMap<>();
     try {
       try (
+        Transaction transaction = newTransaction(Propagation.REQUIRED);
         final Connection connection = getJdbcConnection()) {
         final DatabaseMetaData databaseMetaData = connection.getMetaData();
         final Map<String, List<String>> idFieldNameMap = loadIdFieldNames(dbSchemaName);

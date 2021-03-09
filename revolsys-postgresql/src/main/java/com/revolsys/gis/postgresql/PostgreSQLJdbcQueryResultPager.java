@@ -16,6 +16,8 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.transaction.Propagation;
+import com.revolsys.transaction.Transaction;
 
 public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
 
@@ -44,6 +46,7 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
           final RecordFactory recordFactory = getRecordFactory();
           final JdbcRecordStore recordStore = getRecordStore();
           try (
+            Transaction transaction = recordStore.newTransaction(Propagation.REQUIRED);
             JdbcConnection connection = recordStore.getJdbcConnection()) {
 
             try (
