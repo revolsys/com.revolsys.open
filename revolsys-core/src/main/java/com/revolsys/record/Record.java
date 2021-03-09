@@ -1463,6 +1463,10 @@ public interface Record
     return json;
   }
 
+  default String toJsonString() {
+    return toJson().toJsonString();
+  }
+
   default void validateField(final FieldDefinition field) {
     if (field != null) {
       final int index = field.getIndex();

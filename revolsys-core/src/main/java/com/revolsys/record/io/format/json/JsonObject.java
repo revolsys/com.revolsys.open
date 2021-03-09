@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.jeometry.common.exception.Exceptions;
 
@@ -56,6 +57,14 @@ public interface JsonObject extends MapEx, JsonType {
 
   static JsonObject hash(final String key, final Object value) {
     return new JsonObjectHash(key, value);
+  }
+
+  static <V> V mapTo(final JsonObject value, final Function<JsonObject, V> mapper) {
+    if (value == null) {
+      return null;
+    } else {
+      return mapper.apply(value);
+    }
   }
 
   static JsonObject newItems(final List<?> items) {
@@ -185,6 +194,10 @@ public interface JsonObject extends MapEx, JsonType {
       }
     }
     return null;
+  }
+
+  default <V> V mapTo(final Function<JsonObject, V> mapper) {
+    return mapper.apply(this);
   }
 
   default boolean removeEmptyProperties() {

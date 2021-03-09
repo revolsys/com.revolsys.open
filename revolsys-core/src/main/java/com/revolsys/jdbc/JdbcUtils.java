@@ -226,7 +226,7 @@ public final class JdbcUtils {
     }
     final DataAccessException exception = translator.translate(task, sql, e);
     if (exception == null) {
-      return Exceptions.wrap(Strings.toString("\n", task, sql), exception);
+      return Exceptions.wrap(Strings.toString("\n", task, sql), e);
     }
     return exception;
   }
