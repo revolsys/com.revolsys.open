@@ -47,7 +47,7 @@ public interface JdbcRecordStore extends RecordStore {
   @Override
   default Record getRecord(final Query query) {
     try (
-      Transaction transaction = newTransaction(TransactionOptions.REQUIRED_READONLY)) {
+      Transaction transaction = newTransaction(TransactionOptions.REQUIRED)) {
       return RecordStore.super.getRecord(query);
     }
   }

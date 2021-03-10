@@ -28,14 +28,14 @@ public interface TableRecordStoreConnection extends Transactionable {
   default <R extends Record> R getRecord(final Query query) {
     final JdbcRecordStore recordStore = getRecordStore();
     try (
-      Transaction transaction = newTransaction(TransactionOptions.REQUIRED_READONLY)) {
+      Transaction transaction = newTransaction(TransactionOptions.REQUIRED)) {
       return (R)recordStore.getRecord(query);
     }
   }
 
   default long getRecordCount(final Query query) {
     try (
-      Transaction transaction = newTransaction(TransactionOptions.REQUIRED_READONLY)) {
+      Transaction transaction = newTransaction(TransactionOptions.REQUIRED)) {
       final JdbcRecordStore recordStore = getRecordStore();
       return recordStore.getRecordCount(query);
     }
@@ -62,7 +62,7 @@ public interface TableRecordStoreConnection extends Transactionable {
   default List<Record> getRecords(final Query query) {
     final JdbcRecordStore recordStore = getRecordStore();
     try (
-      Transaction transaction = newTransaction(TransactionOptions.REQUIRED_READONLY);
+      Transaction transaction = newTransaction(TransactionOptions.REQUIRED);
       RecordReader recordReader = recordStore.getRecords(query)) {
       return recordReader.toList();
     } catch (final Exception e) {

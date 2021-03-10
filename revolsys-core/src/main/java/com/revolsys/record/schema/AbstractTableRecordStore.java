@@ -36,7 +36,7 @@ import com.revolsys.transaction.TransactionOptions;
 import com.revolsys.transaction.TransactionRecordReader;
 import com.revolsys.util.Property;
 
-public class AbstractTableRecordStore implements RecordDefinitionProxy {
+public class AbstractTableRecordStore {
 
   private JdbcRecordStore recordStore;
 
@@ -67,8 +67,9 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
   }
 
   protected void addDefaultSortOrder(final String fieldName, final boolean ascending) {
-    if (getRecordDefinition() != null) {
-      final FieldDefinition field = getFieldDefinition(fieldName);
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition != null) {
+      final FieldDefinition field = recordDefinition.getFieldDefinition(fieldName);
       if (field != null) {
         this.defaultSortOrder.put(field, ascending);
       }
@@ -133,11 +134,17 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     return getRecord(connection, query);
   }
 
+  public <R extends Record> R getRecord(final TableRecordStoreConnection connection,
+    final Condition condition) {
+    final Query query = newQuery().and(condition);
+    return getRecord(connection, query);
+  }
+
   @SuppressWarnings("unchecked")
   public <R extends Record> R getRecord(final TableRecordStoreConnection connection,
     final Query query) {
     try (
-      Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED_READONLY)) {
+      Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED)) {
       return (R)this.recordStore.getRecord(query);
     }
   }
@@ -148,12 +155,11 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
 
   public long getRecordCount(final TableRecordStoreConnection connection, final Query query) {
     try (
-      Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED_READONLY)) {
+      Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED)) {
       return this.recordStore.getRecordCount(query);
     }
   }
 
-  @Override
   public RecordDefinition getRecordDefinition() {
     return this.recordDefinition;
   }
@@ -176,7 +182,6 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
   }
 
   @SuppressWarnings("unchecked")
-  @Override
   public <R extends RecordStore> R getRecordStore() {
     return (R)this.recordStore;
   }
@@ -269,7 +274,6 @@ public class AbstractTableRecordStore implements RecordDefinitionProxy {
     final Record record) {
   }
 
-  @Override
   public Query newQuery() {
     return getRecordDefinition().newQuery();
   }

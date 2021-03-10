@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -147,29 +148,47 @@ public class AbstractTableRecordRestController {
     final HttpServletRequest request, final HttpServletResponse response,
     final CharSequence tablePath) throws IOException {
     final JsonObject json = readJsonBody(request);
-    final Record record = connection.newRecord(tablePath, json);
-    handleInsertRecordDo(connection, request, response, record);
-  }
-
-  protected void handleInsertRecordDo(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final HttpServletResponse response, Record record)
-    throws IOException {
-    record = connection.insertRecord(record);
+    Record record = connection.newRecord(tablePath, json);
+    try (
+      Transaction transaction = connection.newTransaction()) {
+      try {
+        record = connection.insertRecord(record);
+      } catch (final Exception e) {
+        // TODO return error
+        transaction.setRollbackOnly(e);
+      }
+    }
     responseRecordJson(response, record);
   }
 
   protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final HttpServletResponse response,
-    final CharSequence tablePath, final Identifier id, final Consumer<Record> updateAction)
-    throws IOException {
-    final Record record = connection.updateRecord(tablePath, id, updateAction);
-    responseRecordJson(response, record);
+    final HttpServletResponse response, final CharSequence tablePath, final Identifier id,
+    final Consumer<Record> updateAction) throws IOException {
+    handleUpdateRecordDo(connection, response, () -> {
+      return connection.updateRecord(tablePath, id, updateAction);
+    });
   }
 
   protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final HttpServletResponse response,
-    final CharSequence tablePath, final Identifier id, final JsonObject values) throws IOException {
-    final Record record = connection.updateRecord(tablePath, id, values);
+    final HttpServletResponse response, final CharSequence tablePath, final Identifier id,
+    final JsonObject values) throws IOException {
+    handleUpdateRecordDo(connection, response, () -> {
+      return connection.updateRecord(tablePath, id, values);
+    });
+  }
+
+  protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
+    final HttpServletResponse response, final Supplier<Record> action) throws IOException {
+    final Record record;
+    try (
+      Transaction transaction = connection.newTransaction()) {
+      try {
+        record = action.get();
+      } catch (final Exception e) {
+        // TODO display error
+        throw transaction.setRollbackOnly(e);
+      }
+    }
     responseRecordJson(response, record);
   }
 

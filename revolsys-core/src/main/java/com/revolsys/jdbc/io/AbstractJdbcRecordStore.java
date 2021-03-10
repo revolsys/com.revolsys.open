@@ -400,7 +400,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       query.clearOrderBy();
       final String sql = "select count(mainquery.*) from (" + query.getSelectSql() + ") mainquery";
       try (
-        Transaction transaction = newTransaction(TransactionOptions.REQUIRED_READONLY);
+        Transaction transaction = newTransaction(TransactionOptions.REQUIRED);
         JdbcConnection connection = getJdbcConnection()) {
         try (
           final PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -850,8 +850,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     final JdbcRecordStoreSchema rootSchema = getRootSchema();
     final PathName schemaPath = jdbcSchema.getPathName();
     try (
-      Transaction transaction = newTransaction(TransactionOptions.REQUIRED_READONLY)
-        .setRollbackOnly()) {
+      Transaction transaction = newTransaction(TransactionOptions.REQUIRED).setRollbackOnly()) {
       if (jdbcSchema == rootSchema) {
         if (this.usesSchema) {
           final Map<PathName, RecordStoreSchemaElement> schemas = new TreeMap<>();

@@ -134,4 +134,10 @@ public class ApacheHttp {
     requestBuilder.setEntity(entity);
     return requestBuilder;
   }
+
+  public static void setJsonEntity(final RequestBuilder request, final JsonObject record) {
+    final String jsonString = record.toJsonString();
+    final StringEntity entity = new StringEntity(jsonString, ContentType.APPLICATION_JSON);
+    request.setEntity(entity);
+  }
 }
