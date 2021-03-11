@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -28,9 +27,7 @@ import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.io.format.json.JsonRecordWriter;
 import com.revolsys.record.io.format.json.JsonWriter;
-import com.revolsys.record.query.CollectionValue;
 import com.revolsys.record.query.Condition;
-import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.AbstractTableRecordStore;
 import com.revolsys.record.schema.RecordDefinition;
@@ -234,32 +231,6 @@ public class AbstractTableRecordRestController {
     return query;
   }
 
-  protected void newQueryFilterCondition(final Query query, final HttpServletRequest request,
-    String filterFieldName, final Object value) {
-
-    if (filterFieldName != null) {
-      if (filterFieldName.startsWith("t.")) {
-        filterFieldName = filterFieldName.substring(2);
-      }
-      if ("null".equals(value)) {
-        query.and(filterFieldName, Q.IS_NULL);
-      } else {
-        if (value instanceof List<?>) {
-          final List<?> list = (List<?>)value;
-          final CollectionValue collection = new CollectionValue(list);
-          query.and(filterFieldName, Q.IN, collection);
-        } else {
-          final Object conditionValue = value;
-          if (value instanceof String && ((String)value).indexOf('%') == -1) {
-            query.and(filterFieldName, Q.EQUAL, conditionValue);
-          } else {
-            query.and(filterFieldName, Q.ILIKE, conditionValue);
-          }
-        }
-      }
-    }
-  }
-
   private void newQueryFilterCondition(final TableRecordStoreConnection connection,
     final AbstractTableRecordStore recordStore, final Query query,
     final HttpServletRequest request) {
@@ -269,21 +240,6 @@ public class AbstractTableRecordRestController {
       condition = alterCondition(request, connection, recordStore, query, condition);
       if (condition != null) {
         query.and(condition.clone(null, query.getTable()));
-      }
-    }
-    final String[] filterFieldNames = request.getParameterValues("filterFieldName");
-    final String[] filterValues = request.getParameterValues("filterValue");
-    if (filterFieldNames != null) {
-      for (int i = 0; i < filterFieldNames.length; i++) {
-        final String filterFieldName = filterFieldNames[i];
-        if (Property.hasValue(filterFieldName) && i < filterValues.length) {
-          final String filterValue = filterValues[i];
-          Object value = filterValue;
-          if (filterValue.charAt(0) == '[') {
-            value = JsonParser.read(filterValue);
-          }
-          newQueryFilterCondition(query, request, filterFieldName, value);
-        }
       }
     }
     final String search = request.getParameter("$search");
