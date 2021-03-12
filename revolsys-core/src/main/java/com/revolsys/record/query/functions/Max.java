@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.revolsys.record.query.ColumnIndexes;
 import com.revolsys.record.query.QueryValue;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class Max extends UnaryFunction {
 
@@ -20,10 +21,11 @@ public class Max extends UnaryFunction {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
-    final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(final RecordDefinition recordDefinition,
+    final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
+    throws SQLException {
     final QueryValue parameter = getParameter();
-    return parameter.getValueFromResultSet(resultSet, indexes, internStrings);
+    return parameter.getValueFromResultSet(recordDefinition, resultSet, indexes, internStrings);
   }
 
 }

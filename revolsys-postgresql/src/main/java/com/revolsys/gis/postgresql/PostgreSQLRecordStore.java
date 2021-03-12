@@ -19,7 +19,6 @@ import org.jeometry.common.io.PathName;
 import org.postgresql.jdbc.PgConnection;
 
 import com.revolsys.collection.ResultPager;
-import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.gis.postgresql.type.PostgreSQLArrayFieldDefinition;
 import com.revolsys.gis.postgresql.type.PostgreSQLBoundingBoxWrapper;
 import com.revolsys.gis.postgresql.type.PostgreSQLGeometryFieldAdder;
@@ -56,8 +55,8 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   public static final List<String> POSTGRESQL_INTERNAL_SCHEMAS = Arrays.asList("information_schema",
     "pg_catalog", "pg_toast_temp_1");
 
-  private static final AbstractIterator<Record> newPostgreSQLIterator(final RecordStore recordStore,
-    final Query query, final Map<String, Object> properties) {
+  private static final PostgreSQLJdbcQueryIterator newPostgreSQLIterator(
+    final RecordStore recordStore, final Query query, final Map<String, Object> properties) {
     return new PostgreSQLJdbcQueryIterator((PostgreSQLRecordStore)recordStore, query, properties);
   }
 
@@ -206,7 +205,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     final JdbcRecordStoreSchema schema = recordDefinition.getSchema();
     final String dbSchemaName = schema.getQuotedDbName();
     final String shortName = ShortNameProperty.getShortName(recordDefinition);
-    final String sequenceName;
+    String sequenceName;
     if (Property.hasValue(shortName)) {
       if (this.useSchemaSequencePrefix) {
         sequenceName = dbSchemaName + "." + shortName.toLowerCase() + "_seq";
@@ -215,11 +214,10 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
       }
     } else {
       final String tableName = recordDefinition.getDbTableName();
-      final String idFieldName = recordDefinition.getIdFieldName().toLowerCase();
+      final String idFieldName = ((JdbcFieldDefinition)recordDefinition.getIdField()).getDbName();
+      sequenceName = '"' + tableName.replace("\"", "") + "_" + idFieldName + "_seq\"";
       if (this.useSchemaSequencePrefix) {
-        sequenceName = dbSchemaName + "." + tableName + "_" + idFieldName + "_seq";
-      } else {
-        sequenceName = tableName + "_" + idFieldName + "_seq";
+        return dbSchemaName + "." + sequenceName;
       }
     }
     return sequenceName;

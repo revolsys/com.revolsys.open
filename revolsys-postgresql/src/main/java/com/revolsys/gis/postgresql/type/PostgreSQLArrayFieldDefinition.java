@@ -15,6 +15,7 @@ import org.postgresql.jdbc.PgConnection;
 
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.query.ColumnIndexes;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class PostgreSQLArrayFieldDefinition extends JdbcFieldDefinition {
 
@@ -35,8 +36,9 @@ public class PostgreSQLArrayFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
-    final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(final RecordDefinition recordDefinition,
+    final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
+    throws SQLException {
     final Object value = resultSet.getObject(indexes.incrementAndGet());
     if (value instanceof Array) {
       final Array array = (Array)value;
@@ -45,8 +47,8 @@ public class PostgreSQLArrayFieldDefinition extends JdbcFieldDefinition {
       final ColumnIndexes columnIndex = new ColumnIndexes();
       while (arrayResultSet.next()) {
         columnIndex.columnIndex = 1;
-        final Object elementValue = this.elementField.getValueFromResultSet(arrayResultSet,
-          columnIndex, internStrings);
+        final Object elementValue = this.elementField.getValueFromResultSet(recordDefinition,
+          arrayResultSet, columnIndex, internStrings);
         values.add(elementValue);
       }
       return values;

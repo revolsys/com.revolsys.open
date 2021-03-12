@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.UncategorizedSQLException;
@@ -20,16 +21,18 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
+import com.revolsys.record.io.RecordIterator;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.query.ColumnIndexes;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.transaction.Transaction;
 import com.revolsys.util.Booleans;
-import com.revolsys.util.count.LabelCountMap;
 import com.revolsys.util.count.LabelCounters;
 
-public class JdbcQueryIterator extends AbstractIterator<Record> implements RecordReader {
+public class JdbcQueryIterator extends AbstractIterator<Record>
+  implements RecordReader, RecordIterator {
   public static Record getNextRecord(final JdbcRecordStore recordStore,
     final RecordDefinition recordDefinition, final List<QueryValue> selectExpression,
     final RecordFactory<Record> recordFactory, final ResultSet resultSet,
@@ -41,7 +44,8 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
       int fieldIndex = 0;
       for (final QueryValue expression : selectExpression) {
         try {
-          final Object value = expression.getValueFromResultSet(resultSet, indexes, internStrings);
+          final Object value = expression.getValueFromResultSet(recordDefinition, resultSet,
+            indexes, internStrings);
           record.setValue(fieldIndex, value);
           fieldIndex++;
         } catch (final SQLException e) {
@@ -54,6 +58,8 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
     }
     return record;
   }
+
+  private boolean autoCommit;
 
   private boolean internStrings;
 
@@ -84,10 +90,8 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
   public JdbcQueryIterator(final JdbcRecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
     super();
+    Transaction.assertInTransaction();
 
-    final boolean autoCommit = Booleans.getBoolean(properties.get("autoCommit"));
-    this.internStrings = Booleans.getBoolean(properties.get("internStrings"));
-    this.connection = recordStore.getJdbcConnection(autoCommit);
     this.recordFactory = query.getRecordFactory();
     if (this.recordFactory == null) {
       this.recordFactory = recordStore.getRecordFactory();
@@ -95,8 +99,12 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
     this.recordStore = recordStore;
     this.query = query;
     this.labelCountMap = query.getStatistics();
-    if (this.labelCountMap == null) {
-      this.labelCountMap = (LabelCounters)properties.get(LabelCountMap.class.getName());
+    if (properties != null) {
+      this.autoCommit = Booleans.getBoolean(properties.get("autoCommit"));
+      this.internStrings = Booleans.getBoolean(properties.get("internStrings"));
+      if (this.labelCountMap == null) {
+        this.labelCountMap = (LabelCounters)properties.get(LabelCounters.class.getName());
+      }
     }
   }
 
@@ -156,7 +164,11 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
       if (cancelled) {
         throw new NoSuchElementException();
       } else {
-        throw e2;
+        if (e2 == null) {
+          throw Exceptions.wrap(e);
+        } else {
+          throw e2;
+        }
       }
     } catch (final RuntimeException e) {
       close();
@@ -222,6 +234,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
         || this.recordStore != this.recordDefinition.getRecordStore()) {
         this.recordDefinition = this.recordStore.getRecordDefinition(tableName, resultSetMetaData,
           dbTableName);
+        query.setRecordDefinition(this.recordDefinition);
       } else if (query.isCustomResult()) {
         this.recordDefinition = this.recordStore.getRecordDefinition(query, resultSetMetaData);
       }
@@ -243,11 +256,21 @@ public class JdbcQueryIterator extends AbstractIterator<Record> implements Recor
 
   @Override
   protected void initDo() {
+    this.connection = this.recordStore.getJdbcConnection(this.autoCommit);
+
     this.resultSet = getResultSet();
+  }
+
+  public boolean isAutoCommit() {
+    return this.autoCommit;
   }
 
   public boolean isInternStrings() {
     return this.internStrings;
+  }
+
+  public void setAutoCommit(final boolean autoCommit) {
+    this.autoCommit = autoCommit;
   }
 
   public void setInternStrings(final boolean internStrings) {

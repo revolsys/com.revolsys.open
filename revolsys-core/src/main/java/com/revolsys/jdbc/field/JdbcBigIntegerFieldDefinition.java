@@ -10,6 +10,7 @@ import java.util.Map;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.record.query.ColumnIndexes;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class JdbcBigIntegerFieldDefinition extends JdbcFieldDefinition {
   public JdbcBigIntegerFieldDefinition(final String dbName, final String name, final int sqlType,
@@ -26,8 +27,9 @@ public class JdbcBigIntegerFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
-    final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(final RecordDefinition recordDefinition,
+    final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
+    throws SQLException {
     Object value;
     final int length = getLength();
     if (length <= 2) {

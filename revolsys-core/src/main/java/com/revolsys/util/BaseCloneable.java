@@ -11,8 +11,6 @@ import org.jeometry.common.exception.Exceptions;
 
 public interface BaseCloneable extends Cloneable {
 
-  public Object clone();
-
   /**
    * Clone the value if it has a clone method.
    *
@@ -56,4 +54,6 @@ public interface BaseCloneable extends Cloneable {
     }
     return value;
   }
+
+  public Object clone();
 }

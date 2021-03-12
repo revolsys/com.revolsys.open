@@ -66,14 +66,10 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
   private final Map<JdbcRecordDefinition, LongCounter> typeCountMap = new HashMap<>();
 
   public JdbcRecordWriter(final AbstractJdbcRecordStore recordStore,
-    final RecordDefinitionProxy recordDefinition) {
-    this(recordStore, recordDefinition, recordStore.getStatistics(), 1);
-  }
-
-  public JdbcRecordWriter(final AbstractJdbcRecordStore recordStore,
     final RecordDefinitionProxy recordDefinition, final CategoryLabelCountMap statistics,
     final int batchSize) {
     super(recordDefinition);
+    Transaction.assertInTransaction();
     this.recordStore = recordStore;
     this.statistics = statistics;
     this.connection = recordStore.getJdbcConnection();

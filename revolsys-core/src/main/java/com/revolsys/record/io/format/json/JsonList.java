@@ -1,12 +1,14 @@
 package com.revolsys.record.io.format.json;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.Exceptions;
@@ -255,6 +257,15 @@ public interface JsonList extends List<Object>, JsonType {
   })
   default Iterable<JsonObject> jsonObjects() {
     return (Iterable)this;
+  }
+
+  default <V> List<V> mapTo(final Function<JsonObject, V> mapper) {
+    final List<V> objects = new ArrayList<>();
+    forEachType((final JsonObject record) -> {
+      final V object = mapper.apply(record);
+      objects.add(object);
+    });
+    return objects;
   }
 
   @Override

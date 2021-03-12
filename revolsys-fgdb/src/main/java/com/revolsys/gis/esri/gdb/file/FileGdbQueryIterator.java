@@ -13,6 +13,7 @@ import com.revolsys.gis.esri.gdb.file.convert.GeometryConverter;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
+import com.revolsys.record.io.RecordIterator;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
@@ -20,7 +21,8 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Strings;
 import com.revolsys.util.count.LabelCounters;
 
-public class FileGdbQueryIterator extends AbstractIterator<Record> implements RecordReader {
+public class FileGdbQueryIterator extends AbstractIterator<Record>
+  implements RecordReader, RecordIterator {
 
   private BoundingBox boundingBox;
 

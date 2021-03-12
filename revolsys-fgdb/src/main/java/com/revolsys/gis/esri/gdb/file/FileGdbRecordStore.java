@@ -22,7 +22,6 @@ import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.esri.filegdb.jni.EsriFileGdb;
 import com.revolsys.esri.filegdb.jni.Geodatabase;
@@ -41,6 +40,7 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.parallel.SingleThreadExecutor;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.io.RecordIterator;
 import com.revolsys.record.io.format.esri.gdb.xml.model.DEFeatureClass;
 import com.revolsys.record.io.format.esri.gdb.xml.model.DEFeatureDataset;
 import com.revolsys.record.io.format.esri.gdb.xml.model.DETable;
@@ -682,8 +682,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public AbstractIterator<Record> newIterator(final Query query,
-    final Map<String, Object> properties) {
+  public RecordIterator newIterator(final Query query, final Map<String, Object> properties) {
     PathName pathName = query.getTablePath();
     final RecordDefinition recordDefinition = query.getRecordDefinition();
     if (recordDefinition != null) {

@@ -10,6 +10,7 @@ import org.postgresql.util.PGobject;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.query.ColumnIndexes;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class PostgreSQLJsonbFieldDefinition extends JdbcFieldDefinition {
 
@@ -20,8 +21,9 @@ public class PostgreSQLJsonbFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
-    final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(final RecordDefinition recordDefinition,
+    final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
+    throws SQLException {
     String value = resultSet.getString(indexes.incrementAndGet());
     if (value != null && internStrings) {
       value = value.intern();

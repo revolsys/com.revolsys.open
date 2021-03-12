@@ -11,10 +11,10 @@ import java.util.List;
 
 import org.jeometry.common.exception.WrappedException;
 import org.jeometry.common.logging.Logs;
+import org.jeometry.coordinatesystem.util.Hex;
 
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
-import com.revolsys.util.Hex;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Property;
 

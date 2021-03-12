@@ -36,10 +36,25 @@
 				<ignoreVersion type="regex">.*-b\d+.\d+</ignoreVersion>
 			</ignoreVersions>
 		</rule>
-		<rule groupId="javax.measure" comparisonMethod="maven">
-			<ignoreVersions>
-				<ignoreVersion type="regex">.*-EDR</ignoreVersion>
-			</ignoreVersions>
-		</rule>
+    <rule groupId="javax.measure" comparisonMethod="maven">
+      <ignoreVersions>
+        <ignoreVersion type="regex">.*-EDR</ignoreVersion>
+      </ignoreVersions>
+    </rule>
+    <rule groupId="commons-beanutils" comparisonMethod="maven">
+      <ignoreVersions>
+        <ignoreVersion type="regex">\d{8}(\.\d{6})?</ignoreVersion>
+      </ignoreVersions>
+    </rule>
+    <rule groupId="commons-cli" comparisonMethod="maven">
+      <ignoreVersions>
+        <ignoreVersion type="regex">\d{8}\.\d{6}</ignoreVersion>
+      </ignoreVersions>
+    </rule>
+    <rule groupId="commons-io" comparisonMethod="maven">
+      <ignoreVersions>
+        <ignoreVersion type="regex">\d{8}\.\d{6}</ignoreVersion>
+      </ignoreVersions>
+    </rule>
 	</rules>
 </ruleset>

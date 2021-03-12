@@ -180,7 +180,7 @@ public class MultiSelectField extends Field {
     final List valueList = (List)object;
     super.setValue(valueList);
     if (valueList != null) {
-      for (Object value : valueList) {
+      for (final Object value : valueList) {
         final FieldValue option = (FieldValue)this.optionValueMap.get(value);
         if (option != null) {
           this.selectedValues.put(option.getStringValue(), option.getValue());

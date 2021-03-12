@@ -8,6 +8,7 @@ import java.util.Map;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.record.query.ColumnIndexes;
+import com.revolsys.record.schema.RecordDefinition;
 
 public class JdbcBooleanFieldDefinition extends JdbcFieldDefinition {
   public JdbcBooleanFieldDefinition(final String dbName, final String name, final int sqlType,
@@ -23,8 +24,9 @@ public class JdbcBooleanFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
-    final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(final RecordDefinition recordDefinition,
+    final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
+    throws SQLException {
     final boolean value = resultSet.getBoolean(indexes.incrementAndGet());
     if (resultSet.wasNull()) {
       return null;

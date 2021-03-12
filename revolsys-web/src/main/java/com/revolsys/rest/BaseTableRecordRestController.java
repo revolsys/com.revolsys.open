@@ -14,6 +14,7 @@ import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.TableRecordStoreConnection;
+import com.revolsys.transaction.Transaction;
 
 public class BaseTableRecordRestController extends AbstractTableRecordRestController {
 
@@ -36,20 +37,24 @@ public class BaseTableRecordRestController extends AbstractTableRecordRestContro
 
   protected void handleInsertRecord(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final HttpServletResponse response) throws IOException {
-    super.handleInsertRecord(connection, request, response, this.tablePath);
+    handleInsertRecord(connection, request, response, this.tablePath);
   }
 
   protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final HttpServletResponse response, final Identifier id,
-    final Consumer<Record> updateAction) throws IOException {
-    super.handleUpdateRecordDo(connection, request, response, this.tablePath, id, updateAction);
+    final HttpServletResponse response, final Identifier id, final Consumer<Record> updateAction)
+    throws IOException {
+    handleUpdateRecordDo(connection, response, this.tablePath, id, updateAction);
   }
 
   protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final HttpServletResponse response, final Identifier id,
-    final JsonObject values) throws IOException {
-    final Record record = connection.updateRecord(this.tablePath, id, values);
-    responseRecordJson(connection, request, response, record);
+    final HttpServletResponse response, final Identifier id, final JsonObject values)
+    throws IOException {
+    final Record record;
+    try (
+      Transaction transaction = connection.newTransaction()) {
+      record = connection.updateRecord(this.tablePath, id, values);
+    }
+    responseRecordJson(response, record);
   }
 
   protected Query newQuery(final TableRecordStoreConnection connection,

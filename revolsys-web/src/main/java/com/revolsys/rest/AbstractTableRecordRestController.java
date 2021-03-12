@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jeometry.common.data.identifier.Identifier;
-import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.io.PathName;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,20 +27,57 @@ import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.io.format.json.JsonRecordWriter;
 import com.revolsys.record.io.format.json.JsonWriter;
-import com.revolsys.record.query.CollectionValue;
 import com.revolsys.record.query.Condition;
-import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.AbstractTableRecordStore;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.TableRecordStoreConnection;
 import com.revolsys.transaction.Transaction;
+import com.revolsys.transaction.TransactionOptions;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.Property;
 
 public class AbstractTableRecordRestController {
 
   private static final String UTF_8 = StandardCharsets.UTF_8.toString();
+
+  public static void responseJson(final HttpServletResponse response, final JsonObject jsonObject)
+    throws IOException {
+    setContentTypeJson(response);
+    response.setStatus(200);
+    try (
+      PrintWriter writer = response.getWriter();
+      JsonWriter jsonWriter = new JsonWriter(writer);) {
+      jsonWriter.write(jsonObject);
+    }
+  }
+
+  public static void responseRecordJson(final HttpServletResponse response, final Record record)
+    throws IOException {
+    if (record == null) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    } else {
+      setContentTypeJson(response);
+      response.setStatus(200);
+      final RecordDefinition recordDefinition = record.getRecordDefinition();
+      try (
+        PrintWriter writer = response.getWriter();
+        JsonRecordWriter jsonWriter = new JsonRecordWriter(recordDefinition, writer);) {
+        jsonWriter.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
+        jsonWriter.write(record);
+      }
+    }
+  }
+
+  public static void setContentTypeJson(final HttpServletResponse response) {
+    setContentTypeText(response, Json.MIME_TYPE);
+  }
+
+  public static void setContentTypeText(final HttpServletResponse response,
+    final String contentType) {
+    response.setCharacterEncoding(UTF_8);
+    response.setContentType(contentType);
+  }
 
   protected int maxPageSize = Integer.MAX_VALUE;
 
@@ -53,9 +90,9 @@ public class AbstractTableRecordRestController {
     return condition;
   }
 
-  protected AbstractTableRecordStore getTableRecordStore(
+  protected <RS extends AbstractTableRecordStore> RS getTableRecordStore(
     final TableRecordStoreConnection connection, final CharSequence tablePath) {
-    final AbstractTableRecordStore tableRecordStore = connection.getTableRecordStore(tablePath);
+    final RS tableRecordStore = connection.getTableRecordStore(tablePath);
     if (tableRecordStore == null) {
       throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
@@ -94,7 +131,7 @@ public class AbstractTableRecordRestController {
     }
     final boolean returnCount = HttpServletUtils.getBooleanParameter(request, "$count");
     try (
-      Transaction transaction = connection.newTransaction();
+      Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRES_NEW_READONLY);
       final RecordReader records = connection.getRecordReader(query)) {
       Long count = null;
       if (returnCount) {
@@ -108,30 +145,54 @@ public class AbstractTableRecordRestController {
     final HttpServletRequest request, final HttpServletResponse response,
     final CharSequence tablePath) throws IOException {
     final JsonObject json = readJsonBody(request);
-    final Record record = connection.newRecord(tablePath, json);
-    handleInsertRecordDo(connection, request, response, record);
-  }
-
-  protected void handleInsertRecordDo(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final HttpServletResponse response, Record record)
-    throws IOException {
-    record = connection.insertRecord(record);
-    responseRecordJson(connection, request, response, record);
-  }
-
-  protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final HttpServletResponse response,
-    final CharSequence tablePath, final Identifier id, final Consumer<Record> updateAction)
-    throws IOException {
-    final Record record = connection.updateRecord(tablePath, id, updateAction);
-    responseRecordJson(connection, request, response, record);
+    Record record = connection.newRecord(tablePath, json);
+    try (
+      Transaction transaction = connection.newTransaction()) {
+      try {
+        record = connection.insertRecord(record);
+      } catch (final Exception e) {
+        // TODO return error
+        transaction.setRollbackOnly(e);
+      }
+    }
+    responseRecordJson(response, record);
   }
 
   protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final HttpServletResponse response,
-    final CharSequence tablePath, final Identifier id, final JsonObject values) throws IOException {
-    final Record record = connection.updateRecord(tablePath, id, values);
-    responseRecordJson(connection, request, response, record);
+    final HttpServletResponse response, final CharSequence tablePath, final Identifier id,
+    final Consumer<Record> updateAction) throws IOException {
+    handleUpdateRecordDo(connection, response, () -> {
+      return connection.updateRecord(tablePath, id, updateAction);
+    });
+  }
+
+  protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
+    final HttpServletResponse response, final CharSequence tablePath, final Identifier id,
+    final JsonObject values) throws IOException {
+    handleUpdateRecordDo(connection, response, () -> {
+      return connection.updateRecord(tablePath, id, values);
+    });
+  }
+
+  protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
+    final HttpServletResponse response, final Supplier<Record> action) throws IOException {
+    final Record record;
+    try (
+      Transaction transaction = connection.newTransaction()) {
+      try {
+        record = action.get();
+      } catch (final Exception e) {
+        // TODO display error
+        throw transaction.setRollbackOnly(e);
+      }
+    }
+    responseRecordJson(response, record);
+  }
+
+  protected Record insertRecord(final TableRecordStoreConnection connection,
+    final PathName tablePath, final JsonObject values) {
+    final Record record = connection.newRecord(tablePath, values);
+    return connection.insertRecord(record);
   }
 
   protected boolean isUpdateable(final TableRecordStoreConnection connection, final Identifier id) {
@@ -170,32 +231,6 @@ public class AbstractTableRecordRestController {
     return query;
   }
 
-  protected void newQueryFilterCondition(final Query query, final HttpServletRequest request,
-    String filterFieldName, final Object value) {
-
-    if (filterFieldName != null) {
-      if (filterFieldName.startsWith("t.")) {
-        filterFieldName = filterFieldName.substring(2);
-      }
-      if ("null".equals(value)) {
-        query.and(filterFieldName, Q.IS_NULL);
-      } else {
-        if (value instanceof List<?>) {
-          final List<?> list = (List<?>)value;
-          final CollectionValue collection = new CollectionValue(list);
-          query.and(filterFieldName, Q.IN, collection);
-        } else {
-          final Object conditionValue = value;
-          if (value instanceof String && ((String)value).indexOf('%') == -1) {
-            query.and(filterFieldName, Q.EQUAL, conditionValue);
-          } else {
-            query.and(filterFieldName, Q.ILIKE, conditionValue);
-          }
-        }
-      }
-    }
-  }
-
   private void newQueryFilterCondition(final TableRecordStoreConnection connection,
     final AbstractTableRecordStore recordStore, final Query query,
     final HttpServletRequest request) {
@@ -205,21 +240,6 @@ public class AbstractTableRecordRestController {
       condition = alterCondition(request, connection, recordStore, query, condition);
       if (condition != null) {
         query.and(condition.clone(null, query.getTable()));
-      }
-    }
-    final String[] filterFieldNames = request.getParameterValues("filterFieldName");
-    final String[] filterValues = request.getParameterValues("filterValue");
-    if (filterFieldNames != null) {
-      for (int i = 0; i < filterFieldNames.length; i++) {
-        final String filterFieldName = filterFieldNames[i];
-        if (Property.hasValue(filterFieldName) && i < filterValues.length) {
-          final String filterValue = filterValues[i];
-          Object value = filterValue;
-          if (filterValue.charAt(0) == '[') {
-            value = JsonParser.read(filterValue);
-          }
-          newQueryFilterCondition(query, request, filterFieldName, value);
-        }
       }
     }
     final String search = request.getParameter("$search");
@@ -279,41 +299,11 @@ public class AbstractTableRecordRestController {
     return json;
   }
 
-  protected void responseJson(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final HttpServletResponse response,
-    final JsonObject jsonObject) throws IOException {
-    setContentTypeJson(response);
-    response.setStatus(200);
-    try (
-      PrintWriter writer = response.getWriter();
-      JsonWriter jsonWriter = new JsonWriter(writer);) {
-      jsonWriter.write(jsonObject);
-    }
-  }
-
   protected void responseRecordJson(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final HttpServletResponse response, final Query query)
     throws IOException {
     final Record record = connection.getRecord(query);
-    responseRecordJson(connection, request, response, record);
-  }
-
-  protected void responseRecordJson(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final HttpServletResponse response, final Record record)
-    throws IOException {
-    if (record == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-    } else {
-      setContentTypeJson(response);
-      response.setStatus(200);
-      final RecordDefinition recordDefinition = record.getRecordDefinition();
-      try (
-        PrintWriter writer = response.getWriter();
-        JsonRecordWriter jsonWriter = new JsonRecordWriter(recordDefinition, writer);) {
-        jsonWriter.setProperty(IoConstants.SINGLE_OBJECT_PROPERTY, true);
-        jsonWriter.write(record);
-      }
-    }
+    responseRecordJson(response, record);
   }
 
   protected void responseRecords(final TableRecordStoreConnection connection,
@@ -343,11 +333,9 @@ public class AbstractTableRecordRestController {
   public void responseRecordsJson(final TableRecordStoreConnection connection,
     final HttpServletResponse response, final Query query, final Long count) throws IOException {
     try (
-      Transaction transaction = connection.newTransaction();
+      Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRES_NEW_READONLY);
       final RecordReader records = connection.getRecordReader(query)) {
       responseRecordsJson(connection, response, records, count);
-    } catch (final Exception e) {
-      throw Exceptions.wrap(query.toString(), e);
     }
   }
 
@@ -366,15 +354,6 @@ public class AbstractTableRecordRestController {
       jsonWriter.setItemsPropertyName("value");
       jsonWriter.writeAll(reader);
     }
-  }
-
-  public void setContentTypeJson(final HttpServletResponse response) {
-    setContentTypeText(response, Json.MIME_TYPE);
-  }
-
-  public void setContentTypeText(final HttpServletResponse response, final String contentType) {
-    response.setCharacterEncoding(UTF_8);
-    response.setContentType(contentType);
   }
 
 }

@@ -45,7 +45,7 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
           + ") T2 ) WHERE TROWNUM BETWEEN " + startRowNum + " AND " + endRowNum;
 
         try (
-          final JdbcConnection connection = getRecordStore().getJdbcConnection()) {
+          final JdbcConnection connection = recordStore.getJdbcConnection()) {
           final RecordFactory<Record> recordFactory = getRecordFactory();
           final RecordDefinition recordDefinition = getRecordDefinition();
 

@@ -79,8 +79,9 @@ public class DelegatingRecord extends AbstractMap<String, Object> implements Rec
   }
 
   @Override
-  public void setValues(final Object... values) {
+  public Record setValues(final Object... values) {
     this.record.setValues(values);
+    return this;
   }
 
   @Override

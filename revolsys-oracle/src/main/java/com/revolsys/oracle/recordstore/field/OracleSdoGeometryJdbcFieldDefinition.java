@@ -37,6 +37,7 @@ import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.record.query.ColumnIndexes;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
@@ -195,8 +196,9 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
-    final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(final RecordDefinition recordDefinition,
+    final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
+    throws SQLException {
     Object value;
     final int geometryTypeIndex = indexes.incrementAndGet();
     final int geometryType = resultSet.getInt(geometryTypeIndex);

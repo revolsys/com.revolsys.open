@@ -2,7 +2,7 @@ package com.revolsys.transaction;
 
 import org.springframework.transaction.TransactionDefinition;
 
-public enum Propagation {
+public enum Propagation implements TransactionOption {
   /** */
   MANDATORY(TransactionDefinition.PROPAGATION_MANDATORY),
   /** */
@@ -24,8 +24,12 @@ public enum Propagation {
     this.value = value;
   }
 
+  @Override
+  public void initialize(final Transaction transaction) {
+    transaction.setPropagation(this);
+  }
+
   public int value() {
     return this.value;
   }
-
 }

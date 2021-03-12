@@ -4,6 +4,11 @@ import com.revolsys.record.io.format.json.JsonObject;
 
 public class OAuthBadRequestException extends RuntimeException {
 
+  /**
+   *
+   */
+  private static final long serialVersionUID = 1L;
+
   private final String correlationId;
 
   private final String error;

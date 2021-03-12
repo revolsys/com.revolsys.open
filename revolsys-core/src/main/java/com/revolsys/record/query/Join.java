@@ -34,7 +34,7 @@ public class Join implements QueryValue {
     sql.append(' ');
     sql.append(this.joinType);
     sql.append(' ');
-    this.table.appendNameWithAlias(sql);
+    this.table.appendFromWithAlias(sql);
     if (this.condition != null) {
       sql.append(" ON ");
       this.condition.appendSql(query, recordStore, sql);
@@ -50,7 +50,7 @@ public class Join implements QueryValue {
     sql.append(' ');
     sql.append(this.joinType);
     sql.append(' ');
-    this.table.appendNameWithAlias(sql);
+    this.table.appendFromWithAlias(sql);
     if (!this.condition.isEmpty()) {
       sql.append(" ON ");
       sql.append(this.condition);

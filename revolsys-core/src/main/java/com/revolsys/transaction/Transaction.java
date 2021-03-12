@@ -1,15 +1,18 @@
 package com.revolsys.transaction;
 
+import java.util.function.Consumer;
+import java.util.function.Function;
+
 import org.jeometry.common.exception.Exceptions;
+import org.springframework.lang.Nullable;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.DefaultTransactionStatus;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.revolsys.io.BaseCloseable;
 
-public class Transaction implements BaseCloseable {
+public class Transaction implements BaseCloseable, TransactionDefinition {
 
   private static ThreadLocal<Transaction> currentTransaction = new ThreadLocal<>();
 
@@ -24,23 +27,16 @@ public class Transaction implements BaseCloseable {
     }
   }
 
+  public static void assertInTransaction() {
+    assert currentTransaction.get() != null : "Must be called in a transaction";
+  }
+
   public static Transaction getCurrentTransaction() {
     return currentTransaction.get();
   }
 
   public static boolean isHasCurrentTransaction() {
     return getCurrentTransaction() != null;
-  }
-
-  public static Runnable runnable(final Runnable runnable,
-    final PlatformTransactionManager transactionManager, final Propagation propagation) {
-    if (transactionManager == null || propagation == null) {
-      return runnable;
-    } else {
-      final DefaultTransactionDefinition transactionDefinition = Transaction
-        .transactionDefinition(propagation);
-      return new TransactionRunnable(transactionManager, transactionDefinition, runnable);
-    }
   }
 
   public static void setCurrentRollbackOnly() {
@@ -50,67 +46,41 @@ public class Transaction implements BaseCloseable {
     }
   }
 
-  public static DefaultTransactionDefinition transactionDefinition(final Propagation propagation) {
-    if (propagation == null) {
-      return null;
-    } else {
-      final int propagationValue = propagation.value();
-      final DefaultTransactionDefinition transactionDefinition = new DefaultTransactionDefinition(
-        propagationValue);
-      return transactionDefinition;
-    }
-  }
-
-  public static DefaultTransactionStatus transactionStatus(
-    final PlatformTransactionManager transactionManager, final Propagation propagation) {
-    if (propagation == null || transactionManager == null) {
-      return null;
-    } else {
-      final DefaultTransactionDefinition transactionDefinition = transactionDefinition(propagation);
-      return transactionStatus(transactionManager, transactionDefinition);
-    }
-  }
-
-  public static DefaultTransactionStatus transactionStatus(
-    final PlatformTransactionManager transactionManager,
-    final TransactionDefinition transactionDefinition) {
-    if (transactionManager == null || transactionDefinition == null) {
-      return null;
-    } else {
-      return (DefaultTransactionStatus)transactionManager.getTransaction(transactionDefinition);
-    }
-  }
-
   private Transaction previousTransaction;
 
   private PlatformTransactionManager transactionManager;
 
   private DefaultTransactionStatus transactionStatus;
 
-  public Transaction(final PlatformTransactionManager transactionManager) {
-    this(transactionManager, Propagation.REQUIRES_NEW);
-  }
+  private Propagation propagation = Propagation.REQUIRES_NEW;
+
+  private Isolation isolation = Isolation.DEFAULT;
+
+  private int timeout = TIMEOUT_DEFAULT;
+
+  private boolean readOnly;
+
+  private boolean rollbackOnly = false;
+
+  @Nullable
+  private String name;
 
   public Transaction(final PlatformTransactionManager transactionManager,
-    final DefaultTransactionStatus transactionStatus) {
+    final TransactionOption... options) {
+    for (final TransactionOption option : options) {
+      option.initialize(this);
+    }
     this.transactionManager = transactionManager;
     if (transactionManager == null) {
       this.transactionStatus = null;
     } else {
-      this.transactionStatus = transactionStatus;
+      this.transactionStatus = (DefaultTransactionStatus)transactionManager.getTransaction(this);
+      if (this.rollbackOnly) {
+        this.transactionStatus.setRollbackOnly();
+      }
     }
     this.previousTransaction = getCurrentTransaction();
     currentTransaction.set(this);
-  }
-
-  public Transaction(final PlatformTransactionManager transactionManager,
-    final Propagation propagation) {
-    this(transactionManager, Transaction.transactionStatus(transactionManager, propagation));
-  }
-
-  public Transaction(final PlatformTransactionManager transactionManager,
-    final TransactionDefinition transactionDefinition) {
-    this(transactionManager, transactionStatus(transactionManager, transactionDefinition));
   }
 
   @Override
@@ -123,19 +93,51 @@ public class Transaction implements BaseCloseable {
   }
 
   protected void commit() {
-    if (this.transactionManager != null && this.transactionStatus != null) {
-      if (!this.transactionStatus.isCompleted()) {
-        if (this.transactionStatus.isRollbackOnly()) {
+    DefaultTransactionStatus transactionStatus = this.transactionStatus;
+    if (this.transactionManager != null && transactionStatus != null) {
+      if (!transactionStatus.isCompleted()) {
+        if (transactionStatus.isRollbackOnly()) {
           rollback();
         } else {
           try {
-            this.transactionManager.commit(this.transactionStatus);
+            this.transactionManager.commit(transactionStatus);
           } catch (final Throwable e) {
             Exceptions.throwUncheckedException(e);
           }
         }
       }
     }
+  }
+
+  public void execute(final Consumer<Transaction> action) {
+    try {
+      action.accept(this);
+    } catch (final Throwable e) {
+      setRollbackOnly(e);
+    }
+  }
+
+  public <V> V execute(final Function<Transaction, V> action) {
+    try {
+      return action.apply(this);
+    } catch (final Throwable e) {
+      throw setRollbackOnly(e);
+    }
+  }
+
+  @Override
+  public int getIsolationLevel() {
+    return this.isolation.value();
+  }
+
+  @Override
+  public int getPropagationBehavior() {
+    return this.propagation.value();
+  }
+
+  @Override
+  public int getTimeout() {
+    return this.timeout;
   }
 
   public PlatformTransactionManager getTransactionManager() {
@@ -154,8 +156,21 @@ public class Transaction implements BaseCloseable {
     }
   }
 
+  public boolean isPropagation(final Propagation propagation) {
+    return propagation == this.propagation;
+  }
+
+  @Override
+  public boolean isReadOnly() {
+    return this.readOnly;
+  }
+
   public boolean isRollbackOnly() {
-    return this.transactionStatus.isRollbackOnly();
+    if (this.transactionStatus == null) {
+      return isReadOnly();
+    } else {
+      return this.transactionStatus.isRollbackOnly();
+    }
   }
 
   protected void rollback() {
@@ -164,14 +179,32 @@ public class Transaction implements BaseCloseable {
     }
   }
 
-  public void setRollbackOnly() {
+  public void setIsolation(final Isolation isolation) {
+    this.isolation = isolation;
+  }
+
+  void setPropagation(final Propagation propagation) {
+    this.propagation = propagation;
+  }
+
+  void setReadOnly(final boolean readOnly) {
+    this.readOnly = readOnly;
+  }
+
+  public Transaction setRollbackOnly() {
+    this.rollbackOnly = true;
     if (this.transactionStatus != null) {
       this.transactionStatus.setRollbackOnly();
     }
+    return this;
   }
 
   public RuntimeException setRollbackOnly(final Throwable e) {
     setRollbackOnly();
     return Exceptions.throwUncheckedException(e);
+  }
+
+  void setTimeout(final int timeout) {
+    this.timeout = timeout;
   }
 }

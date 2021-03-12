@@ -92,6 +92,7 @@ public class ViewportCacheBoundingBox implements BoundingBoxProxy, Cancellable {
     }
   }
 
+  @Override
   public void cancel() {
     synchronized (this.tasks) {
       this.cancelled = true;

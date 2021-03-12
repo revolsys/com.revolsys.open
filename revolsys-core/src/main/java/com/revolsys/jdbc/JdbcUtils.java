@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import javax.management.ObjectName;
 import javax.sql.DataSource;
 
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 import org.springframework.dao.DataAccessException;
@@ -38,14 +39,13 @@ import com.revolsys.jdbc.exception.JdbcExceptionTranslator;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.field.JdbcFieldDefinitions;
 import com.revolsys.record.query.Condition;
-import com.revolsys.record.query.Join;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.TableReference;
-import com.revolsys.record.schema.LockMode;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 public final class JdbcUtils {
 
@@ -216,7 +216,7 @@ public final class JdbcUtils {
     return sql.toString();
   }
 
-  public static DataAccessException getException(final DataSource dataSource, final String task,
+  public static RuntimeException getException(final DataSource dataSource, final String task,
     final String sql, final SQLException e) {
     SQLExceptionTranslator translator;
     if (dataSource == null) {
@@ -224,7 +224,11 @@ public final class JdbcUtils {
     } else {
       translator = new JdbcExceptionTranslator(dataSource);
     }
-    return translator.translate(task, sql, e);
+    final DataAccessException exception = translator.translate(task, sql, e);
+    if (exception == null) {
+      return Exceptions.wrap(Strings.toString("\n", task, sql), e);
+    }
+    return exception;
   }
 
   public static String getProductName(final DataSource dataSource) {
@@ -293,58 +297,6 @@ public final class JdbcUtils {
     } finally {
       close(statement);
     }
-  }
-
-  public static String newSelectSql(final TableReference table, final String tablePrefix,
-    final boolean distinct, final String fromClause, final List<Join> joins,
-    final List<QueryValue> select, final Query query, final Map<QueryValue, Boolean> orderBy,
-    final List<QueryValue> groupBy, final LockMode lockMode) {
-    final StringBuilder sql = new StringBuilder();
-    sql.append("SELECT ");
-    if (distinct) {
-      sql.append("DISTINCT ");
-    }
-    if (select.isEmpty()) {
-      table.appendSelectAll(query, sql);
-    } else {
-      boolean first = true;
-      for (final QueryValue selectItem : select) {
-        if (first) {
-          first = false;
-        } else {
-          sql.append(", ");
-        }
-        table.appendSelect(query, sql, selectItem);
-      }
-    }
-    sql.append(" FROM ");
-    if (Property.hasValue(fromClause)) {
-      sql.append(fromClause);
-    } else {
-      table.appendNameWithAlias(sql);
-    }
-    for (final Join join : joins) {
-      appendQueryValue(sql, query, join);
-    }
-    appendWhere(sql, query);
-
-    if (groupBy != null) {
-      boolean hasGroupBy = false;
-      for (final QueryValue groupByItem : groupBy) {
-        if (hasGroupBy) {
-          sql.append(", ");
-        } else {
-          sql.append(" GROUP BY ");
-          hasGroupBy = true;
-        }
-        table.appendQueryValue(query, sql, groupByItem);
-      }
-    }
-
-    addOrderBy(query, sql, table, orderBy);
-
-    lockMode.append(sql);
-    return sql.toString();
   }
 
   public static MapEx readMap(final ResultSet rs) throws SQLException {

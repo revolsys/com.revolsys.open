@@ -15,6 +15,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.query.ColumnIndexes;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 
 import oracle.sql.ROWID;
@@ -46,8 +47,9 @@ public class OracleJdbcRowIdFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public Object getValueFromResultSet(final ResultSet resultSet, final ColumnIndexes indexes,
-    final boolean internStrings) throws SQLException {
+  public Object getValueFromResultSet(final RecordDefinition recordDefinition,
+    final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
+    throws SQLException {
     final ROWID rowId = (ROWID)resultSet.getRowId(indexes.incrementAndGet());
     if (rowId == null) {
       return null;

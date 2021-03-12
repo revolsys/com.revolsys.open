@@ -21,6 +21,8 @@ import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
 import com.revolsys.oracle.recordstore.OracleRecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
+import com.revolsys.transaction.Propagation;
+import com.revolsys.transaction.Transaction;
 
 public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
 
@@ -126,6 +128,7 @@ public class OracleSdoGeometryFieldAdder extends JdbcFieldAdder {
   @Override
   public void initialize(final JdbcRecordStoreSchema schema) {
     try (
+      Transaction transaction = this.recordStore.newTransaction(Propagation.REQUIRED);
       final JdbcConnection connection = this.recordStore.getJdbcConnection()) {
       final String schemaName = schema.getDbName();
       final String sridSql = "select M.TABLE_NAME, M.COLUMN_NAME, M.SRID, M.DIMINFO, C.GEOMETRY_TYPE "
