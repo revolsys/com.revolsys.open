@@ -59,6 +59,13 @@ public class LabelCountMapTableModel extends AbstractTableModel {
     this.columnCount += this.countNames.size();
   }
 
+  public LabelCountMapTableModel addColumnAndRow(final CharSequence columnName,
+    final CharSequence rowLabel) {
+    addCountNameColumn(columnName);
+    addRowLabel(rowLabel);
+    return this;
+  }
+
   public void addColumns(final String... columnNames) {
     if (columnNames != null && columnNames.length > 0) {
       for (final String columnName : columnNames) {
@@ -114,13 +121,6 @@ public class LabelCountMapTableModel extends AbstractTableModel {
       });
     }
 
-  }
-
-  public LabelCountMapTableModel addRowAndColumn(final CharSequence countName,
-    final CharSequence label) {
-    addCountNameColumn(countName);
-    addRowLabel(label);
-    return this;
   }
 
   public void addRowLabel(final CharSequence label) {

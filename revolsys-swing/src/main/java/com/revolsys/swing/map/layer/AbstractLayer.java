@@ -1273,8 +1273,8 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
       addToMap(map, "selectable", this.selectable);
     }
     addToMap(map, "selectSupported", this.selectSupported);
-    addToMap(map, "maximumScale", this.maximumScale);
-    addToMap(map, "minimumScale", this.minimumScale);
+    addToMap(map, "maximumScale", this.maximumScale, 0);
+    addToMap(map, "minimumScale", this.minimumScale, Long.MAX_VALUE);
     addToMap(map, "style", this.renderer);
     addToMap(map, "selectedGeometryFactory", this.selectedGeometryFactory);
     addToMap(map, "pluginConfig", this.pluginConfigByName);
