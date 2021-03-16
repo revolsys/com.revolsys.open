@@ -15,6 +15,7 @@
  */
 package com.revolsys.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import org.jeometry.common.data.type.DataTypes;
@@ -172,6 +175,37 @@ public final class UrlUtil {
     return url.replaceAll("/+", "/")
       .replaceAll("^((\\w)+:)/", "$1//")
       .replaceAll("^file://", "file:///");
+  }
+
+  public static String encodePathSegment(final String segment) {
+
+    final byte[] bytes = segment.getBytes(StandardCharsets.UTF_8);
+    boolean valid = true;
+    int i = 0;
+    for (; i < segment.length(); i++) {
+      final char c = segment.charAt(i);
+      if (!isPathChar(c)) {
+        valid = false;
+        break;
+      }
+    }
+    if (valid) {
+      return segment;
+    } else {
+      final ByteArrayOutputStream baos = new ByteArrayOutputStream(bytes.length);
+      for (final byte b : bytes) {
+        if (isPathChar(b)) {
+          baos.write(b);
+        } else {
+          baos.write('%');
+          final char hex1 = Character.toUpperCase(Character.forDigit(b >> 4 & 0xF, 16));
+          final char hex2 = Character.toUpperCase(Character.forDigit(b & 0xF, 16));
+          baos.write(hex1);
+          baos.write(hex2);
+        }
+      }
+      return new String(baos.toByteArray(), StandardCharsets.UTF_8);
+    }
   }
 
   public static String getContent(final String urlString) {
@@ -420,6 +454,13 @@ public final class UrlUtil {
     }
   }
 
+  public static boolean isPathChar(final int c) {
+    // a-zA-Z0-9-._~!$&\()*+,;=:@
+    return c >= 'a' && c <= 'z' || c >= '@' && c <= 'Z' || c >= '0' && c <= ';'
+      || c >= '\'' && c <= '.' || '=' == c || '_' == c || '~' == c || '!' == c || '$' == c
+      || '&' == c;
+  }
+
   public static boolean isValidEmail(final String email) {
     return EMAIL_PATTERN.matcher(email).matches();
   }
@@ -442,6 +483,78 @@ public final class UrlUtil {
         params.put(key, value);
       }
     }
+  }
+
+  private static String parseName(final String s, final StringBuilder sb) {
+    sb.setLength(0);
+    for (int i = 0; i < s.length(); i++) {
+      final char c = s.charAt(i);
+      switch (c) {
+        case '+':
+          sb.append(' ');
+        break;
+        case '%':
+          try {
+            sb.append((char)Integer.parseInt(s.substring(i + 1, i + 3), 16));
+            i += 2;
+          } catch (final NumberFormatException e) {
+            // XXX
+            // need to be more specific about illegal arg
+            throw new IllegalArgumentException();
+          } catch (final StringIndexOutOfBoundsException e) {
+            final String rest = s.substring(i);
+            sb.append(rest);
+            if (rest.length() == 2) {
+              i++;
+            }
+          }
+
+        break;
+        default:
+          sb.append(c);
+        break;
+      }
+    }
+
+    return sb.toString();
+  }
+
+  public static Map<String, String[]> parseQueryString(final String s) {
+
+    String valArray[] = null;
+
+    if (s == null) {
+      throw new IllegalArgumentException();
+    }
+
+    final Map<String, String[]> ht = new LinkedHashMap<>();
+    final StringBuilder sb = new StringBuilder();
+    final StringTokenizer st = new StringTokenizer(s, "&");
+    while (st.hasMoreTokens()) {
+      final String pair = st.nextToken();
+      final int pos = pair.indexOf('=');
+      if (pos == -1) {
+        // XXX
+        // should give more detail about the illegal argument
+        throw new IllegalArgumentException();
+      }
+      final String key = parseName(pair.substring(0, pos), sb);
+      final String val = parseName(pair.substring(pos + 1, pair.length()), sb);
+      if (ht.containsKey(key)) {
+        final String oldVals[] = ht.get(key);
+        valArray = new String[oldVals.length + 1];
+        for (int i = 0; i < oldVals.length; i++) {
+          valArray[i] = oldVals[i];
+        }
+        valArray[oldVals.length] = val;
+      } else {
+        valArray = new String[1];
+        valArray[0] = val;
+      }
+      ht.put(key, valArray);
+    }
+
+    return ht;
   }
 
   public static String percentDecode(final String encodedText) {
