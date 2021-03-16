@@ -13,13 +13,14 @@ import javax.swing.JComponent;
 import org.jeometry.common.compare.CompareUtil;
 import org.jeometry.common.data.identifier.Identifier;
 
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
 
-public interface CodeTable extends Emptyable, Cloneable, Comparator<Object> {
+public interface CodeTable extends Emptyable, Cloneable, Comparator<Object>, BaseCloseable {
   static CodeTable newCodeTable(final Map<String, ? extends Object> config) {
     if (config.containsKey("valueFieldNames")) {
       return new MultiValueCodeTableProperty(config);
