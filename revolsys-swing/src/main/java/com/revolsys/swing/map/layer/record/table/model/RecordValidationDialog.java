@@ -28,6 +28,7 @@ import org.jdesktop.swingx.decorator.Highlighter;
 import org.jeometry.common.awt.WebColors;
 
 import com.revolsys.beans.ObjectPropertyException;
+import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Dialogs;
@@ -45,8 +46,7 @@ import com.revolsys.util.Property;
 
 public class RecordValidationDialog implements PropertyChangeListener, Closeable {
   public static void validateRecords(final String title, final AbstractRecordLayer layer,
-    final Iterable<? extends LayerRecord> records,
-    final Consumer<RecordValidationDialog> successAction,
+    final Iterable<? extends Record> records, final Consumer<RecordValidationDialog> successAction,
     final Consumer<RecordValidationDialog> cancelAction) {
     try (
       final RecordValidationDialog validator = new RecordValidationDialog(layer)) {
@@ -60,9 +60,9 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
   }
 
   public static void validateRecords(final String title, final AbstractRecordLayer layer,
-    final LayerRecord record, final Consumer<RecordValidationDialog> successAction,
+    final Record record, final Consumer<RecordValidationDialog> successAction,
     final Consumer<RecordValidationDialog> cancelAction) {
-    final List<LayerRecord> records = Collections.singletonList(record);
+    final List<Record> records = Collections.singletonList(record);
     validateRecords(title, layer, records, successAction, cancelAction);
   }
 
@@ -333,10 +333,9 @@ public class RecordValidationDialog implements PropertyChangeListener, Closeable
     }
   }
 
-  private void validateRecords(final Iterable<? extends LayerRecord> records,
-    final boolean wasInvalid) {
-    for (final LayerRecord record : records) {
-      validateRecord(record, wasInvalid);
+  private void validateRecords(final Iterable<? extends Record> records, final boolean wasInvalid) {
+    for (final Record record : records) {
+      validateRecord((LayerRecord)record, wasInvalid);
     }
   }
 }

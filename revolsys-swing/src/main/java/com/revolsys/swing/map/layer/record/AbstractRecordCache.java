@@ -17,7 +17,7 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
   }
 
   @Override
-  public boolean addRecord(final LayerRecord record) {
+  public boolean addRecord(final Record record) {
     if (record != null) {
       synchronized (getRecordCacheSync()) {
         final L layer = this.layer;
@@ -54,7 +54,7 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
   }
 
   @Override
-  public final boolean containsRecord(final LayerRecord record) {
+  public final boolean containsRecord(final Record record) {
     if (record != null) {
       synchronized (getRecordCacheSync()) {
         final L layer = this.layer;
@@ -67,7 +67,7 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
     return false;
   }
 
-  public boolean containsRecordDo(final LayerRecord record) {
+  public boolean containsRecordDo(final Record record) {
     return false;
   }
 
@@ -92,7 +92,7 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
   }
 
   @Override
-  public boolean removeContainsRecord(final LayerRecord record) {
+  public boolean removeContainsRecord(final Record record) {
     if (record != null) {
       synchronized (getRecordCacheSync()) {
         final LayerRecord recordProxied = this.layer.getProxiedRecord(record);
@@ -108,7 +108,7 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
   }
 
   @Override
-  public boolean removeRecord(final LayerRecord record) {
+  public boolean removeRecord(final Record record) {
     if (record != null) {
       synchronized (getRecordCacheSync()) {
         final LayerRecord proxiedRecord = this.layer.getProxiedRecord(record);
@@ -125,7 +125,7 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
   }
 
   @Override
-  public boolean replaceRecord(final LayerRecord record) {
+  public boolean replaceRecord(final Record record) {
     if (record != null) {
       synchronized (getRecordCacheSync()) {
         final LayerRecord proxiedRecord = this.layer.getProxiedRecord(record);
@@ -138,7 +138,7 @@ public abstract class AbstractRecordCache<L extends AbstractRecordLayer> impleme
   }
 
   @Override
-  public void setRecords(final Iterable<? extends LayerRecord> records) {
+  public void setRecords(final Iterable<? extends Record> records) {
     synchronized (getRecordCacheSync()) {
       clearRecordsDo();
       addRecords(records);

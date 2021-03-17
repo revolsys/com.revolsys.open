@@ -24,6 +24,11 @@ public interface LayerRecord extends Record {
   default void clearChanges() {
   }
 
+  default boolean deleteRecordWithConfirm() {
+    final AbstractRecordLayer layer = getLayer();
+    return layer.deleteRecordWithConfirm(this);
+  }
+
   default BaseCloseable eventsDisabled() {
     final AbstractRecordLayer layer = getLayer();
     return layer.eventsDisabled();
@@ -249,6 +254,11 @@ public interface LayerRecord extends Record {
         }
       }
     }
+  }
+
+  default boolean saveChanges() {
+    final AbstractRecordLayer layer = getLayer();
+    return layer.saveChanges(this);
   }
 
   default boolean setStateDeleted() {
