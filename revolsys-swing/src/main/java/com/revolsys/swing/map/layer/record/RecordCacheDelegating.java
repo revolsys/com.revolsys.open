@@ -15,7 +15,7 @@ public class RecordCacheDelegating implements RecordCache {
   }
 
   @Override
-  public boolean addRecord(final LayerRecord record) {
+  public boolean addRecord(final Record record) {
     return this.cache.addRecord(record);
   }
 
@@ -25,12 +25,12 @@ public class RecordCacheDelegating implements RecordCache {
   }
 
   @Override
-  public boolean containsRecord(final LayerRecord record) {
+  public boolean containsRecord(final Record record) {
     return this.cache.containsRecord(record);
   }
 
   @Override
-  public <R extends Record> void forEachRecord(final Consumer<R> action) {
+  public <R2 extends Record> void forEachRecord(final Consumer<R2> action) {
     this.cache.forEachRecord(action);
   }
 
@@ -59,22 +59,22 @@ public class RecordCacheDelegating implements RecordCache {
   }
 
   @Override
-  public boolean removeContainsRecord(final LayerRecord record) {
+  public boolean removeContainsRecord(final Record record) {
     return this.cache.removeContainsRecord(record);
   }
 
   @Override
-  public boolean removeRecord(final LayerRecord record) {
+  public boolean removeRecord(final Record record) {
     return this.cache.removeRecord(record);
   }
 
   @Override
-  public boolean replaceRecord(final LayerRecord record) {
+  public boolean replaceRecord(final Record record) {
     return this.cache.replaceRecord(record);
   }
 
   @Override
-  public void setRecords(final Iterable<? extends LayerRecord> records) {
+  public void setRecords(final Iterable<? extends Record> records) {
     this.cache.setRecords(records);
   }
 

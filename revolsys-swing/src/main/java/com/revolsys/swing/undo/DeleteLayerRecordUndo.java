@@ -40,7 +40,7 @@ public class DeleteLayerRecordUndo extends AbstractUndoableEdit {
   protected void undoDo() {
     if (this.record == null && this.layer != null) {
       final LayerRecord newRecord = this.layer.newLayerRecord(this.originalValues);
-      this.layer.saveChanges(newRecord);
+      newRecord.saveChanges();
       this.record = newRecord;
     }
   }

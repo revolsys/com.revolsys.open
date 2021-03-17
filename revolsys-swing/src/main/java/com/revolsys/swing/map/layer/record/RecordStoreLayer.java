@@ -318,7 +318,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
   }
 
-  protected Identifier getId(final LayerRecord record) {
+  protected Identifier getId(final Record record) {
     if (isLayerRecord(record)) {
       return record.getIdentifier();
     } else {
@@ -425,7 +425,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     "unchecked", "rawtypes"
   })
   @Override
-  public <R extends LayerRecord> List<R> getRecords(BoundingBox boundingBox) {
+  public <R extends Record> List<R> getRecords(BoundingBox boundingBox) {
     if (hasGeometryField()) {
       boundingBox = convertBoundingBox(boundingBox);
       if (Property.hasValue(boundingBox)) {
@@ -446,8 +446,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public <R extends LayerRecord> List<R> getRecords(final Geometry geometry,
-    final double distance) {
+  public <R extends Record> List<R> getRecords(final Geometry geometry, final double distance) {
     if (Property.isEmpty(geometry) || !hasGeometryField()) {
       return Collections.emptyList();
     } else {
@@ -788,7 +787,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  protected boolean removeRecordFromCache(final LayerRecord record) {
+  protected boolean removeRecordFromCache(final Record record) {
     final boolean removed = super.removeRecordFromCache(record);
     if (removed) {
       final Identifier identifier = record.getIdentifier();
@@ -892,7 +891,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   public void setRecordsToCache(final RecordCache recordCache,
-    final Iterable<? extends LayerRecord> records) {
+    final Iterable<? extends Record> records) {
     synchronized (getSync()) {
       recordCache.setRecords(records);
     }
@@ -916,13 +915,13 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public void showForm(final LayerRecord record, final String fieldName) {
+  public void showForm(final Record record, final String fieldName) {
     if (record != null) {
       final Identifier identifier = getId(record);
       if (identifier != null) {
         this.recordCacheForm.addRecord(record);
       }
-      final LayerRecord proxyRecord = record.getRecordProxy();
+      final LayerRecord proxyRecord = ((LayerRecord)record).getRecordProxy();
       super.showForm(proxyRecord, fieldName);
     }
   }

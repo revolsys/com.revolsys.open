@@ -28,7 +28,7 @@ public class RecordCacheCollection extends AbstractRecordCache<AbstractRecordLay
   }
 
   @Override
-  public boolean containsRecordDo(final LayerRecord record) {
+  public boolean containsRecordDo(final Record record) {
     if (this.records.isEmpty()) {
       return false;
     } else {
