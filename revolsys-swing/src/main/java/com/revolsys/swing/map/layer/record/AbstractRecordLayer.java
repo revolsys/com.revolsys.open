@@ -1639,7 +1639,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return getRecords(boundingBox);
   }
 
-  public <R extends LayerRecord> List<R> getRecordsChanged() {
+  public <R extends Record> List<R> getRecordsChanged() {
     synchronized (getSync()) {
       final List<R> records = new ArrayList<>();
       records.addAll(getRecordsNew());
