@@ -30,7 +30,16 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
   @Override
   public synchronized void close() throws IOException {
     if (!this.closed) {
-      this.out.close();
+      this.closed = true;
+      try {
+        if (this.out != null) {
+          this.out.close();
+        }
+      } finally {
+        if (this.file != null) {
+          Files.deleteIfExists(this.file);
+        }
+      }
       this.out = null;
     }
   }
