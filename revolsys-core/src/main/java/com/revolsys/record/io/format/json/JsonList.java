@@ -197,7 +197,7 @@ public interface JsonList extends List<Object>, JsonType {
         } else {
           appendable.append(',');
         }
-        JsonAppender.appendValue(appendable, value);
+        JsonWriterUtil.appendValue(appendable, value);
       }
       appendable.append(']');
       return appendable;
