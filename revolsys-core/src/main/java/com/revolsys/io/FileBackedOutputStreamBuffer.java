@@ -65,6 +65,7 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
 
   @Override
   public synchronized void write(final byte[] b, final int off, final int len) throws IOException {
+
     if (this.closed) {
       throw new IOException("Closed");
     } else {
