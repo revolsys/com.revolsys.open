@@ -19,6 +19,8 @@ public class Join implements QueryValue {
 
   private Condition condition = Condition.ALL;
 
+  private String alias;
+
   public Join(final JoinType joinType) {
     this.joinType = joinType;
   }
@@ -34,7 +36,11 @@ public class Join implements QueryValue {
     sql.append(' ');
     sql.append(this.joinType);
     sql.append(' ');
-    this.table.appendFromWithAlias(sql);
+    if (this.alias == null) {
+      this.table.appendFromWithAlias(sql);
+    } else {
+      this.table.appendFromWithAlias(sql, this.alias);
+    }
     if (this.condition != null) {
       sql.append(" ON ");
       this.condition.appendSql(query, recordStore, sql);
@@ -134,6 +140,11 @@ public class Join implements QueryValue {
   public Join recordDefinition(final RecordDefinitionProxy recordDefinition) {
     this.table = recordDefinition.getRecordDefinition();
     this.tablePath = this.table.getTablePath();
+    return this;
+  }
+
+  public Join setAlias(final String alias) {
+    this.alias = alias;
     return this;
   }
 

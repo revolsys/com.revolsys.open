@@ -43,9 +43,13 @@ public interface TableReference extends From {
 
   @Override
   default void appendFromWithAlias(final Appendable sql) {
+    final String tableAlias = getTableAlias();
+    appendFromWithAlias(sql, tableAlias);
+  }
+
+  default void appendFromWithAlias(final Appendable sql, final String tableAlias) {
     try {
       appendFrom(sql);
-      final String tableAlias = getTableAlias();
       if (tableAlias != null) {
         sql.append(" ");
         sql.append(tableAlias);
