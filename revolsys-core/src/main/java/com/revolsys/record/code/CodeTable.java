@@ -201,7 +201,7 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object>, Bas
     }
   }
 
-  default void setLoadMissingCodes(final boolean loadMissingCodes) {
+  default CodeTable setLoadMissingCodes(final boolean loadMissingCodes) {
     throw new UnsupportedOperationException("setLoadMissingNodes");
   }
 }

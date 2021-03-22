@@ -62,7 +62,7 @@ public class CleanableProxy<R> implements BaseCloseable {
         final Consumer<? super R> closeAction = this.closeAction;
         this.cleaner = MemoryCleaner.register(proxy, () -> closeAction.accept(newResource));
         this.proxy = new WeakReference<>(proxy);
-        return newResource;
+        return proxy;
       }
     }
     return resource;

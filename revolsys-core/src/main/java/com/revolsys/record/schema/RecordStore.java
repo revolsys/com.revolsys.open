@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.date.Dates;
@@ -197,6 +198,8 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
       addCodeTable(codeTable);
     }
   }
+
+  RecordStore addRecordDefinitionInitializer(PathName tableName, Consumer<RecordDefinition> action);
 
   default void addStatistic(final String statisticName, final Record object) {
     final CategoryLabelCountMap statistics = getStatistics();
