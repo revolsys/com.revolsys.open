@@ -22,6 +22,7 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.property.RecordDefinitionProperty;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.TableReference;
@@ -52,6 +53,8 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
   }
 
   void addDefaultValue(String fieldName, Object defaultValue);
+
+  void addProperty(RecordDefinitionProperty property);
 
   @Override
   default void appendQueryValue(final Query query, final StringBuilder sql,

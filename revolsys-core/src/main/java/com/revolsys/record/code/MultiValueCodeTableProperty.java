@@ -422,49 +422,62 @@ public class MultiValueCodeTableProperty extends AbstractMultiValueCodeTable
     }
   }
 
-  public void setAllowNullValues(final boolean allowNullValues) {
+  public MultiValueCodeTableProperty setAllowNullValues(final boolean allowNullValues) {
     this.allowNullValues = allowNullValues;
+    return this;
   }
 
-  public void setCreateMissingCodes(final boolean createMissingCodes) {
+  public MultiValueCodeTableProperty setCreateMissingCodes(final boolean createMissingCodes) {
     this.createMissingCodes = createMissingCodes;
+    return this;
   }
 
-  public void setCreationTimestampFieldName(final String creationTimestampFieldName) {
+  public MultiValueCodeTableProperty setCreationTimestampFieldName(
+    final String creationTimestampFieldName) {
     this.creationTimestampFieldName = creationTimestampFieldName;
+    return this;
   }
 
-  public void setFieldAliases(final String... fieldNameAliases) {
+  public MultiValueCodeTableProperty setFieldAliases(final String... fieldNameAliases) {
     setFieldNameAliases(Lists.newArray(fieldNameAliases));
+    return this;
   }
 
-  public void setFieldNameAliases(final List<String> fieldNameAliases) {
+  public MultiValueCodeTableProperty setFieldNameAliases(final List<String> fieldNameAliases) {
     this.fieldNameAliases = new ArrayList<>(fieldNameAliases);
+    return this;
   }
 
-  public void setIdFieldName(final String idFieldName) {
+  public MultiValueCodeTableProperty setIdFieldName(final String idFieldName) {
     this.idFieldName = idFieldName;
+    return this;
   }
 
-  public void setLoadAll(final boolean loadAll) {
+  public MultiValueCodeTableProperty setLoadAll(final boolean loadAll) {
     this.loadAll = loadAll;
+    return this;
   }
 
   @Override
-  public void setLoadMissingCodes(final boolean loadMissingCodes) {
+  public MultiValueCodeTableProperty setLoadMissingCodes(final boolean loadMissingCodes) {
     this.loadMissingCodes = loadMissingCodes;
+    return this;
   }
 
-  public void setModificationTimestampFieldName(final String modificationTimestampFieldName) {
+  public MultiValueCodeTableProperty setModificationTimestampFieldName(
+    final String modificationTimestampFieldName) {
     this.modificationTimestampFieldName = modificationTimestampFieldName;
+    return this;
   }
 
-  public void setOrderBy(final List<String> orderBy) {
+  public MultiValueCodeTableProperty setOrderBy(final List<String> orderBy) {
     this.orderBy = new ArrayList<>(orderBy);
+    return this;
   }
 
-  public void setOrderByFieldName(final String orderBy) {
+  public MultiValueCodeTableProperty setOrderByFieldName(final String orderBy) {
     this.orderBy = Lists.newArray(orderBy);
+    return this;
   }
 
   @Override
@@ -493,19 +506,22 @@ public class MultiValueCodeTableProperty extends AbstractMultiValueCodeTable
     }
   }
 
-  public void setValueFieldName(final String valueColumns) {
+  public MultiValueCodeTableProperty setValueFieldName(final String valueColumns) {
     setValueFieldNames(valueColumns);
+    return this;
   }
 
-  public void setValueFieldNames(final List<String> valueColumns) {
+  public MultiValueCodeTableProperty setValueFieldNames(final List<String> valueColumns) {
     this.valueFieldNames = new ArrayList<>(valueColumns);
     if (this.orderBy == DEFAULT_FIELD_NAMES) {
       setOrderBy(valueColumns);
     }
+    return this;
   }
 
-  public void setValueFieldNames(final String... valueColumns) {
+  public MultiValueCodeTableProperty setValueFieldNames(final String... valueColumns) {
     setValueFieldNames(Arrays.asList(valueColumns));
+    return this;
   }
 
   @Override

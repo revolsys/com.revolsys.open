@@ -9,6 +9,7 @@ import com.revolsys.esri.filegdb.jni.Row;
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.record.Record;
 import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordStore;
 
 public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
 
@@ -28,12 +29,13 @@ public abstract class AbstractFileGdbFieldDefinition extends FieldDefinition {
     this.fieldNumber = fieldNumber;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public FileGdbRecordStore getRecordStore() {
+  public <R extends RecordStore> R getRecordStore() {
     if (this.recordStore == null) {
       return null;
     } else {
-      return this.recordStore.get();
+      return (R)this.recordStore.get();
     }
   }
 

@@ -131,16 +131,16 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
 
   @Override
   public String getIdFieldName() {
-    if (Property.hasValue(this.idFieldName)) {
+    if (this.idFieldName != null) {
       return this.idFieldName;
     } else if (this.recordDefinition == null) {
       return "";
     } else {
       final String idFieldName = this.recordDefinition.getIdFieldName();
-      if (Property.hasValue(idFieldName)) {
-        return idFieldName;
-      } else {
+      if (idFieldName == null) {
         return this.recordDefinition.getFieldName(0);
+      } else {
+        return idFieldName;
       }
     }
   }
@@ -394,24 +394,30 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
     }
   }
 
-  public void setAllowNullValues(final boolean allowNullValues) {
+  public SingleValueRecordStoreCodeTable setAllowNullValues(final boolean allowNullValues) {
     this.allowNullValues = allowNullValues;
+    return this;
   }
 
-  public void setCreateMissingCodes(final boolean createMissingCodes) {
+  public SingleValueRecordStoreCodeTable setCreateMissingCodes(final boolean createMissingCodes) {
     this.createMissingCodes = createMissingCodes;
+    return this;
   }
 
-  public void setCreationTimestampFieldName(final String creationTimestampFieldName) {
+  public SingleValueRecordStoreCodeTable setCreationTimestampFieldName(
+    final String creationTimestampFieldName) {
     this.creationTimestampFieldName = creationTimestampFieldName;
+    return this;
   }
 
-  public void setFieldAliases(final String... fieldNameAliases) {
+  public SingleValueRecordStoreCodeTable setFieldAliases(final String... fieldNameAliases) {
     setFieldNameAliases(Lists.newArray(fieldNameAliases));
+    return this;
   }
 
-  public void setFieldNameAliases(final List<String> fieldNameAliases) {
+  public SingleValueRecordStoreCodeTable setFieldNameAliases(final List<String> fieldNameAliases) {
     this.fieldNameAliases = new ArrayList<>(fieldNameAliases);
+    return this;
   }
 
   public SingleValueRecordStoreCodeTable setIdFieldName(final String idFieldName) {
@@ -425,16 +431,20 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
   }
 
   @Override
-  public void setLoadMissingCodes(final boolean loadMissingCodes) {
+  public SingleValueRecordStoreCodeTable setLoadMissingCodes(final boolean loadMissingCodes) {
     this.loadMissingCodes = loadMissingCodes;
+    return this;
   }
 
-  public void setModificationTimestampFieldName(final String modificationTimestampFieldName) {
+  public SingleValueRecordStoreCodeTable setModificationTimestampFieldName(
+    final String modificationTimestampFieldName) {
     this.modificationTimestampFieldName = modificationTimestampFieldName;
+    return this;
   }
 
-  public void setOrderByFieldName(final String orderByFieldName) {
+  public SingleValueRecordStoreCodeTable setOrderByFieldName(final String orderByFieldName) {
     this.orderBy = orderByFieldName;
+    return this;
   }
 
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
@@ -450,6 +460,9 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
         this.typePath = recordDefinition.getPathName();
         final String name = this.typePath.getName();
         setName(name);
+        if (this.idFieldName == null) {
+          this.idFieldName = recordDefinition.getIdFieldName();
+        }
         this.recordStore = this.recordDefinition.getRecordStore();
         setValueFieldDefinition(recordDefinition.getField(this.valueFieldName));
         setRecordDefinitionAfter(recordDefinition);
