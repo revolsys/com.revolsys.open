@@ -20,17 +20,16 @@ import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
+import com.revolsys.record.io.RecordIterator;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.count.LabelCounters;
 
-public class OgrQueryIterator extends AbstractIterator<Record> {
+public class OgrQueryIterator extends AbstractIterator<Record> implements RecordIterator {
 
   private int count;
 
   private GeometryFactory geometryFactory;
-
-  private final String idFieldName;
 
   private Layer layer;
 
@@ -61,7 +60,6 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
     this.limit = query.getLimit();
     this.labelCountMap = query.getStatistics();
     this.geometryFactory = this.recordDefinition.getGeometryFactory();
-    this.idFieldName = recordStore.getIdFieldName(this.recordDefinition);
   }
 
   @Override
@@ -215,6 +213,11 @@ public class OgrQueryIterator extends AbstractIterator<Record> {
         }
       }
     }
+  }
+
+  @Override
+  public RecordDefinition getRecordDefinition() {
+    return this.recordDefinition;
   }
 
   @Override

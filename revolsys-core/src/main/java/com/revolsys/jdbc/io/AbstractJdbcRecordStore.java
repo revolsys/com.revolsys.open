@@ -33,7 +33,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.revolsys.collection.ResultPager;
-import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.JdbcConnection;
@@ -47,6 +46,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.code.AbstractMultiValueCodeTable;
+import com.revolsys.record.io.RecordIterator;
 import com.revolsys.record.io.RecordStoreExtension;
 import com.revolsys.record.io.RecordStoreQueryReader;
 import com.revolsys.record.io.RecordWriter;
@@ -68,7 +68,7 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   implements JdbcRecordStore, RecordStoreExtension {
   public static final List<String> DEFAULT_PERMISSIONS = Arrays.asList("SELECT");
 
-  public static final AbstractIterator<Record> newJdbcIterator(final RecordStore recordStore,
+  public static final RecordIterator newJdbcIterator(final RecordStore recordStore,
     final Query query, final Map<String, Object> properties) {
     return new JdbcQueryIterator((AbstractJdbcRecordStore)recordStore, query, properties);
   }
