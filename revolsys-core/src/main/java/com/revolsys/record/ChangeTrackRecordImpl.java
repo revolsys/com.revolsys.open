@@ -11,7 +11,9 @@ public class ChangeTrackRecordImpl extends BaseRecord implements ChangeTrackReco
       throw new IllegalArgumentException("Original record cannot be null");
     } else {
       final ChangeTrackRecordImpl changeTrackRecord = new ChangeTrackRecordImpl(originalRecord);
+      changeTrackRecord.setState(RecordState.INITIALIZING);
       changeTrackRecord.setValues(changedValues);
+      changeTrackRecord.setState(RecordState.PERSISTED);
       return changeTrackRecord;
     }
   }
@@ -31,6 +33,11 @@ public class ChangeTrackRecordImpl extends BaseRecord implements ChangeTrackReco
   }
 
   @Override
+  public ChangeTrackRecordImpl clone() {
+    return (ChangeTrackRecordImpl)super.clone();
+  }
+
+  @Override
   public <T> T getOriginalValue(final int fieldIndex) {
     return this.originalRecord.getValue(fieldIndex);
   }
@@ -45,10 +52,14 @@ public class ChangeTrackRecordImpl extends BaseRecord implements ChangeTrackReco
   @SuppressWarnings("unchecked")
   @Override
   public synchronized <T> T getValue(final int fieldIndex) {
-    if (this.changedFlags[fieldIndex]) {
-      return (T)this.changedValues[fieldIndex];
+    if (fieldIndex >= 0) {
+      if (this.changedFlags[fieldIndex]) {
+        return (T)this.changedValues[fieldIndex];
+      }
+      return getOriginalValue(fieldIndex);
+    } else {
+      return null;
     }
-    return getOriginalValue(fieldIndex);
   }
 
   @Override
