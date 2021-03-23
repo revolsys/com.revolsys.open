@@ -382,6 +382,14 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
     return newRecord();
   }
 
+  default RecordDefinition setDefaultValue(final String fieldName, final Object value) {
+    final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
+    if (fieldDefinition != null) {
+      fieldDefinition.setDefaultValue(value);
+    }
+    return this;
+  }
+
   void setDefaultValues(Map<String, ? extends Object> defaultValues);
 
   void setGeometryFactory(com.revolsys.geometry.model.GeometryFactory geometryFactory);

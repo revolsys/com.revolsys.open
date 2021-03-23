@@ -54,6 +54,12 @@ public class ArrayChangeTrackRecord extends ArrayRecord implements ChangeTrackRe
   }
 
   @Override
+  public <T> T getOriginalValue(final int fieldIndex) {
+    final String fieldName = getFieldName(fieldIndex);
+    return getOriginalValue(fieldName);
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public synchronized <T> T getOriginalValue(final String name) {
     final Map<String, Object> originalValues = this.originalValues;
@@ -61,6 +67,12 @@ public class ArrayChangeTrackRecord extends ArrayRecord implements ChangeTrackRe
       return (T)originalValues.get(name);
     }
     return (T)getValue(name);
+  }
+
+  @Override
+  public boolean isModified(final int fieldIndex) {
+    final String fieldName = getFieldName(fieldIndex);
+    return isModified(fieldName);
   }
 
   @Override

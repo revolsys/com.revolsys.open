@@ -201,7 +201,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
   }
 
   @SuppressWarnings("unchecked")
-  public <R extends LayerRecord> void forEachRecordsPersisted(final Query query,
+  public <R extends Record> void forEachRecordsPersisted(final Query query,
     final Consumer<? super R> consumer) {
     if (query != null && isExists()) {
       final RecordStore recordStore = getRecordStore();
