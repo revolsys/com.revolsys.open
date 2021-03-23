@@ -1,6 +1,7 @@
 package com.revolsys.net.http;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -145,5 +146,8 @@ public class ApacheHttp {
     requestBuilder.setEntity(entity);
     return requestBuilder;
   }
+
+  public static final ContentType XML = ContentType.create("application/xml",
+  StandardCharsets.UTF_8);
 
 }
