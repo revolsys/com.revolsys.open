@@ -217,11 +217,11 @@ public class ShortestPathOverlay extends AbstractOverlay {
   }
 
   private LayerRecord getRecord(final AbstractRecordLayer layer, final BoundingBox boundingBox) {
-    for (final LayerRecord record : layer.getRecords(boundingBox)) {
+    for (final Record record : layer.getRecords(boundingBox)) {
       final Geometry geometry = record.getGeometry();
       if (geometry != null && !geometry.isEmpty()) {
         if (geometry instanceof Lineal) {
-          return record;
+          return (LayerRecord)record;
         }
       }
     }

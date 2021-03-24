@@ -37,7 +37,7 @@ public class RecordCacheRecordStoreLayer extends AbstractRecordCache<RecordStore
   }
 
   @Override
-  public void addRecords(final Iterable<? extends LayerRecord> records) {
+  public void addRecords(final Iterable<? extends Record> records) {
     super.addRecords(records);
     this.layer.rebuildReferenceCounts();
   }
@@ -54,7 +54,7 @@ public class RecordCacheRecordStoreLayer extends AbstractRecordCache<RecordStore
   }
 
   @Override
-  public boolean containsRecordDo(final LayerRecord record) {
+  public boolean containsRecordDo(final Record record) {
     final Identifier identifier = record.getIdentifier();
     if (identifier != null) {
       if (this.identifiers.contains(identifier)) {
@@ -116,7 +116,7 @@ public class RecordCacheRecordStoreLayer extends AbstractRecordCache<RecordStore
   }
 
   @Override
-  public void setRecords(final Iterable<? extends LayerRecord> records) {
+  public void setRecords(final Iterable<? extends Record> records) {
     super.setRecords(records);
     this.layer.rebuildReferenceCounts();
   }

@@ -325,6 +325,12 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     this.idFieldDefinitions.add(fieldDefinition);
   }
 
+  @Override
+  public void addProperty(final RecordDefinitionProperty property) {
+    final String name = property.getPropertyName();
+    addProperty(name, property);
+  }
+
   public void addRestriction(final String fieldPath, final Collection<Object> values) {
     this.restrictions.put(fieldPath, values);
   }

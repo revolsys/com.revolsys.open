@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.jeometry.common.function.Consumer3;
 import org.jeometry.common.io.PathName;
@@ -49,6 +50,8 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   private final Map<Class<?>, Consumer3<Query, StringBuilder, QueryValue>> sqlQueryAppenderByClass = new HashMap<>();
 
   private GeometryFactory geometryFactory;
+
+  private final Map<PathName, Set<Consumer<RecordDefinition>>> recordDefinitionInitializersByTableName = new HashMap<>();
 
   private boolean createMissingRecordStore = false;
 
@@ -122,6 +125,13 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
         }
       }
     }
+  }
+
+  @Override
+  public AbstractRecordStore addRecordDefinitionInitializer(final PathName tableName,
+    final Consumer<RecordDefinition> action) {
+    Maps.addToSet(this.recordDefinitionInitializersByTableName, tableName, action);
+    return this;
   }
 
   protected void addRecordDefinitionProperties(final RecordDefinitionImpl recordDefinition) {
@@ -312,6 +322,14 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   protected void initializePost() {
+  }
+
+  public void initializeRecordDefinition(final RecordDefinition recordDefinition) {
+    final PathName pathName = recordDefinition.getPathName();
+    for (final Consumer<RecordDefinition> action : this.recordDefinitionInitializersByTableName
+      .getOrDefault(pathName, Collections.emptySet())) {
+      action.accept(recordDefinition);
+    }
   }
 
   protected void initRecordDefinition(final RecordDefinition recordDefinition) {

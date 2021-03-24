@@ -51,6 +51,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement
         final RecordDefinition recordDefinition = (RecordDefinition)element;
         this.recordDefinitionsByPath.put(childPath, recordDefinition);
         final AbstractRecordStore recordStore = getRecordStore();
+        recordStore.initializeRecordDefinition(recordDefinition);
         recordStore.addRecordDefinitionProperties((RecordDefinitionImpl)recordDefinition);
       }
       if (element instanceof RecordStoreSchema) {

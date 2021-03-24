@@ -152,9 +152,9 @@ public interface JsonObject extends MapEx, JsonType {
         }
         final Object value = get(key);
         appendable.append('"');
-        JsonAppender.appendCharacters(appendable, key);
+        JsonWriterUtil.charSequence(appendable, key);
         appendable.append("\":");
-        JsonAppender.appendValue(appendable, value);
+        JsonWriterUtil.appendValue(appendable, value);
       }
       appendable.append('}');
       return appendable;

@@ -557,7 +557,7 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
           }
         } else if (layer instanceof AbstractRecordLayer) {
           final AbstractRecordLayer recordLayer = (AbstractRecordLayer)layer;
-          for (final LayerRecord record : recordLayer.getRecords(boundingBox)) {
+          for (final LayerRecord record : recordLayer.<LayerRecord> getRecords(boundingBox)) {
             if (recordLayer.isVisible(record)) {
               final Geometry geometry = record.getGeometry();
               if (geometry.intersects(geometry)) {

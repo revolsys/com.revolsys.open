@@ -43,64 +43,31 @@ public class JsonStringEncodingWriter extends Writer {
     final int endIndex = startIndex + length;
     for (int i = 0; i < endIndex; i++) {
       final char c = chars[i];
-      switch (c) {
-        case '\b':
+      if (c < JsonWriterUtil.CHARACTER_ESCAPE_END) {
+        out.write(chars, startIndex, count);
+        final String escape = JsonWriterUtil.CHARACTER_ESCAPE[c];
+        out.write(escape);
+        startIndex = i + 1;
+        count = 0;
+      } else if (c == '"') {
+        out.write(chars, startIndex, count);
+        out.write('\\');
+        out.write('"');
+        startIndex = i + 1;
+        count = 0;
+      } else if (c == '\\') {
+        out.write(chars, startIndex, count);
+        out.write('\\');
+        out.write('\\');
+        startIndex = i + 1;
+        count = 0;
+      } else {
+        if (count == 1024) {
           out.write(chars, startIndex, count);
-          out.write('\\');
-          out.write('b');
-          startIndex = i + 1;
+          startIndex = i;
           count = 0;
-        break;
-        case '\t':
-          out.write(chars, startIndex, count);
-          out.write('\\');
-          out.write('t');
-          startIndex = i + 1;
-          count = 0;
-        break;
-        case '\n':
-          out.write(chars, startIndex, count);
-          out.write('\\');
-          out.write('n');
-          startIndex = i + 1;
-          count = 0;
-        break;
-        case '\f':
-          out.write(chars, startIndex, count);
-          out.write('\\');
-          out.write('f');
-          startIndex = i + 1;
-          count = 0;
-        break;
-        case '\r':
-          out.write(chars, startIndex, count);
-          out.write('\\');
-          out.write('r');
-          startIndex = i + 1;
-          count = 0;
-        break;
-        case '"':
-          out.write(chars, startIndex, count);
-          out.write('\\');
-          out.write('"');
-          startIndex = i + 1;
-          count = 0;
-        break;
-        case '\\':
-          out.write(chars, startIndex, count);
-          out.write('\\');
-          out.write('\\');
-          startIndex = i + 1;
-          count = 0;
-        break;
-        default:
-          if (count == 1024) {
-            out.write(chars, startIndex, count);
-            startIndex = i;
-            count = 0;
-          }
-          count++;
-        break;
+        }
+        count++;
       }
     }
     out.write(chars, startIndex, count);
@@ -109,38 +76,14 @@ public class JsonStringEncodingWriter extends Writer {
   @Override
   public void write(final int c) throws IOException {
     final Writer out = this.out;
-    switch (c) {
-      case '\b':
-        out.write('\\');
-        out.write('b');
-      break;
-      case '\t':
-        out.write('\\');
-        out.write('t');
-      break;
-      case '\n':
-        out.write('\\');
-        out.write('n');
-      break;
-      case '\f':
-        out.write('\\');
-        out.write('f');
-      break;
-      case '\r':
-        out.write('\\');
-        out.write('r');
-      break;
-      case '"':
-        out.write('\\');
-        out.write('"');
-      break;
-      case '\\':
-        out.write('\\');
-        out.write('\\');
-      break;
-      default:
-        out.write(c);
-      break;
+    if (c < JsonWriterUtil.CHARACTER_ESCAPE_END) {
+      out.write(JsonWriterUtil.CHARACTER_ESCAPE[c]);
+    } else if (c == '"') {
+      out.write("\\\"");
+    } else if (c == '\\') {
+      out.write("\\\\");
+    } else {
+      out.write(c);
     }
   }
 
@@ -157,64 +100,31 @@ public class JsonStringEncodingWriter extends Writer {
     final int endIndex = startIndex + length;
     for (int i = 0; i < endIndex; i++) {
       final char c = string.charAt(i);
-      switch (c) {
-        case '\b':
+      if (c < JsonWriterUtil.CHARACTER_ESCAPE_END) {
+        out.write(string, startIndex, count);
+        final String escape = JsonWriterUtil.CHARACTER_ESCAPE[c];
+        out.write(escape);
+        startIndex = i + 1;
+        count = 0;
+      } else if (c == '"') {
+        out.write(string, startIndex, count);
+        out.write('\\');
+        out.write('"');
+        startIndex = i + 1;
+        count = 0;
+      } else if (c == '\\') {
+        out.write(string, startIndex, count);
+        out.write('\\');
+        out.write('\\');
+        startIndex = i + 1;
+        count = 0;
+      } else {
+        if (count == 1024) {
           out.write(string, startIndex, count);
-          out.write('\\');
-          out.write('b');
-          startIndex = i + 1;
+          startIndex = i;
           count = 0;
-        break;
-        case '\t':
-          out.write(string, startIndex, count);
-          out.write('\\');
-          out.write('t');
-          startIndex = i + 1;
-          count = 0;
-        break;
-        case '\n':
-          out.write(string, startIndex, count);
-          out.write('\\');
-          out.write('n');
-          startIndex = i + 1;
-          count = 0;
-        break;
-        case '\f':
-          out.write(string, startIndex, count);
-          out.write('\\');
-          out.write('f');
-          startIndex = i + 1;
-          count = 0;
-        break;
-        case '\r':
-          out.write(string, startIndex, count);
-          out.write('\\');
-          out.write('r');
-          startIndex = i + 1;
-          count = 0;
-        break;
-        case '"':
-          out.write(string, startIndex, count);
-          out.write('\\');
-          out.write('"');
-          startIndex = i + 1;
-          count = 0;
-        break;
-        case '\\':
-          out.write(string, startIndex, count);
-          out.write('\\');
-          out.write('\\');
-          startIndex = i + 1;
-          count = 0;
-        break;
-        default:
-          if (count == 1024) {
-            out.write(string, startIndex, count);
-            startIndex = i;
-            count = 0;
-          }
-          count++;
-        break;
+        }
+        count++;
       }
     }
     out.write(string, startIndex, count);

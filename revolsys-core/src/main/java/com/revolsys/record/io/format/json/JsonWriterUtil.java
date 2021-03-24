@@ -9,41 +9,42 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.number.Doubles;
 import org.jeometry.common.number.Numbers;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.io.StringPrinter;
+import com.revolsys.io.map.MapSerializer;
 
 public final class JsonWriterUtil {
-  public static void charSequence(final Writer out, final CharSequence string) throws IOException {
+  public static final String[] CHARACTER_ESCAPE;
+
+  public static char CHARACTER_ESCAPE_END = ' ';
+  static {
+    CHARACTER_ESCAPE = new String[32];
+    for (int i = 0; i < CHARACTER_ESCAPE_END; i++) {
+      CHARACTER_ESCAPE[i] = String.format("\\u%04x", i);
+    }
+    CHARACTER_ESCAPE['\b'] = "\\b";
+    CHARACTER_ESCAPE['\f'] = "\\f";
+    CHARACTER_ESCAPE['\n'] = "\\n";
+    CHARACTER_ESCAPE['\r'] = "\\r";
+    CHARACTER_ESCAPE['\t'] = "\\t";
+  }
+
+  public static void charSequence(final Appendable out, final CharSequence string)
+    throws IOException {
     for (int i = 0; i < string.length(); i++) {
       final char c = string.charAt(i);
-      switch (c) {
-        case '"':
-          out.write("\\\"");
-        break;
-        case '\\':
-          out.write("\\\\");
-        break;
-        case '\b':
-          out.write("\\b");
-        break;
-        case '\f':
-          out.write("\\f");
-        break;
-        case '\n':
-          out.write("\\n");
-        break;
-        case '\r':
-          out.write("\\r");
-        break;
-        case '\t':
-          out.write("\\t");
-        break;
-        default:
-          out.write(c);
-        break;
+      if (c < CHARACTER_ESCAPE_END) {
+        out.append(CHARACTER_ESCAPE[c]);
+      } else if (c == '"') {
+        out.append("\\\"");
+      } else if (c == '\\') {
+        out.append("\\\\");
+      } else {
+        out.append(c);
       }
     }
   }
@@ -197,6 +198,104 @@ public final class JsonWriterUtil {
   }
 
   private JsonWriterUtil() {
+  }
+
+  public static void appendList(final Appendable appendable,
+    final Collection<? extends Object> values) throws IOException {
+    appendable.append('[');
+    boolean first = true;
+    for (final Object value : values) {
+      if (first) {
+        first = false;
+      } else {
+        appendable.append(',');
+      }
+      JsonWriterUtil.appendValue(appendable, value);
+    }
+    appendable.append(']');
+  }
+
+  public static <K, V> void appendMap(final Appendable appendable, final Map<K, V> map)
+    throws IOException {
+    appendable.append('{');
+    boolean first = true;
+    for (final K key : map.keySet()) {
+      if (first) {
+        first = false;
+      } else {
+        appendable.append(',');
+      }
+      final V value = map.get(key);
+      appendable.append('"');
+      charSequence(appendable, key.toString());
+      appendable.append("\":");
+      JsonWriterUtil.appendValue(appendable, value);
+    }
+    appendable.append('}');
+  }
+
+  public static void appendText(final Appendable appendable, final Object value) {
+    try {
+      final String string = DataTypes.toString(value);
+      if (string == null) {
+        appendable.append("null");
+      } else {
+        appendable.append('"');
+      }
+      appendValue(appendable, string);
+      appendable.append('"');
+    } catch (final Exception e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public static void appendValue(final Appendable appendable, final Object value) {
+    try {
+      if (value == null) {
+        appendable.append("null");
+      } else if (value instanceof Boolean) {
+        if ((Boolean)value) {
+          appendable.append("true");
+        } else {
+          appendable.append("false");
+        }
+      } else if (value instanceof Number) {
+        final Number number = (Number)value;
+        final double doubleValue = number.doubleValue();
+        if (Double.isInfinite(doubleValue) || Double.isNaN(doubleValue)) {
+          appendable.append("null");
+        } else {
+          appendable.append(Doubles.toString(doubleValue));
+        }
+      } else if (value instanceof JsonType) {
+        final JsonType jsonType = (JsonType)value;
+        jsonType.appendJson(appendable);
+      } else if (value instanceof Jsonable) {
+        final JsonType json = ((MapSerializer)value).asJson();
+        if (json != null) {
+          json.appendJson(appendable);
+        }
+      } else if (value instanceof Collection) {
+        final Collection<? extends Object> list = (Collection<? extends Object>)value;
+        appendList(appendable, list);
+      } else if (value instanceof Map) {
+        final Map<Object, Object> map = (Map<Object, Object>)value;
+        appendMap(appendable, map);
+      } else if (value instanceof CharSequence) {
+        final CharSequence string = (CharSequence)value;
+        appendable.append('"');
+        charSequence(appendable, string);
+        appendable.append('"');
+      } else if (value.getClass().isArray()) {
+        final List<? extends Object> list = Lists.arrayToList(value);
+        appendList(appendable, list);
+      } else {
+        appendText(appendable, value);
+      }
+    } catch (final Exception e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
 }

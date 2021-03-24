@@ -1,6 +1,7 @@
 package com.revolsys.net.http;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -21,13 +22,10 @@ import com.revolsys.record.io.format.json.JsonParser;
 
 public class ApacheHttp {
 
-  public static void execute(final RequestBuilder requestBuilder,
-    final Consumer<HttpResponse> action) {
-    final HttpUriRequest request = requestBuilder.build();
+  public static void execute(final HttpUriRequest request, final Consumer<HttpResponse> action) {
     try (
       final CloseableHttpClient httpClient = newClient()) {
-
-      final HttpResponse response = getResponse(httpClient, requestBuilder);
+      final HttpResponse response = getResponse(httpClient, request);
       action.accept(response);
     } catch (final ApacheHttpException e) {
       throw e;
@@ -36,13 +34,11 @@ public class ApacheHttp {
     }
   }
 
-  public static <V> V execute(final RequestBuilder requestBuilder,
+  public static <V> V execute(final HttpUriRequest request,
     final Function<HttpResponse, V> action) {
-    final HttpUriRequest request = requestBuilder.build();
     try (
       final CloseableHttpClient httpClient = newClient()) {
-
-      final HttpResponse response = getResponse(httpClient, requestBuilder);
+      final HttpResponse response = getResponse(httpClient, request);
       return action.apply(response);
     } catch (final ApacheHttpException e) {
       throw e;
@@ -51,11 +47,22 @@ public class ApacheHttp {
     }
   }
 
-  public static InputStream getInputStream(final RequestBuilder requestBuilder) {
+  public static void execute(final RequestBuilder requestBuilder,
+    final Consumer<HttpResponse> action) {
     final HttpUriRequest request = requestBuilder.build();
+    execute(request, action);
+  }
+
+  public static <V> V execute(final RequestBuilder requestBuilder,
+    final Function<HttpResponse, V> action) {
+    final HttpUriRequest request = requestBuilder.build();
+    return execute(request, action);
+  }
+
+  public static InputStream getInputStream(final HttpUriRequest request) {
     final CloseableHttpClient httpClient = newClient();
     try {
-      final HttpResponse response = getResponse(httpClient, requestBuilder);
+      final HttpResponse response = getResponse(httpClient, request);
       final HttpEntity entity = response.getEntity();
       return new ApacheEntityInputStream(httpClient, entity);
     } catch (final ApacheHttpException e) {
@@ -65,6 +72,11 @@ public class ApacheHttp {
       FileUtil.closeSilent(httpClient);
       throw Exceptions.wrap(request.getURI().toString(), e);
     }
+  }
+
+  public static InputStream getInputStream(final RequestBuilder requestBuilder) {
+    final HttpUriRequest request = requestBuilder.build();
+    return getInputStream(request);
   }
 
   public static JsonObject getJson(final HttpResponse response) {
@@ -83,8 +95,7 @@ public class ApacheHttp {
   }
 
   public static HttpResponse getResponse(final CloseableHttpClient httpClient,
-    final RequestBuilder requestBuilder) {
-    final HttpUriRequest request = requestBuilder.build();
+    final HttpUriRequest request) {
     try {
       final HttpResponse response = httpClient.execute(request);
       final StatusLine statusLine = response.getStatusLine();
@@ -99,6 +110,12 @@ public class ApacheHttp {
     } catch (final Exception e) {
       throw Exceptions.wrap(request.getURI().toString(), e);
     }
+  }
+
+  public static HttpResponse getResponse(final CloseableHttpClient httpClient,
+    final RequestBuilder requestBuilder) {
+    final HttpUriRequest request = requestBuilder.build();
+    return getResponse(httpClient, request);
   }
 
   public static String getString(final HttpResponse response) {
@@ -122,22 +139,15 @@ public class ApacheHttp {
       .build();
   }
 
-  public static StringEntity newEntity(final JsonObject body) {
-    final String jsonString = body.toJsonString();
-    final StringEntity entity = new StringEntity(jsonString, ContentType.APPLICATION_JSON);
-    return entity;
-  }
-
   public static RequestBuilder setJsonBody(final RequestBuilder requestBuilder,
     final JsonObject body) {
-    final StringEntity entity = newEntity(body);
+    final String jsonString = body.toJsonString();
+    final StringEntity entity = new StringEntity(jsonString, ContentType.APPLICATION_JSON);
     requestBuilder.setEntity(entity);
     return requestBuilder;
   }
 
-  public static void setJsonEntity(final RequestBuilder request, final JsonObject record) {
-    final String jsonString = record.toJsonString();
-    final StringEntity entity = new StringEntity(jsonString, ContentType.APPLICATION_JSON);
-    request.setEntity(entity);
-  }
+  public static final ContentType XML = ContentType.create("application/xml",
+  StandardCharsets.UTF_8);
+
 }

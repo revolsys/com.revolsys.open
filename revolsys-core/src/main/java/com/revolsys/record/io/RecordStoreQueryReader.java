@@ -97,8 +97,7 @@ public class RecordStoreQueryReader extends IteratorReader<Record> implements Re
         F.envelopeIntersects(query, this.boundingBox);
       }
 
-      final RecordIterator iterator = this.recordStore.newIterator(query, getProperties());
-      return iterator;
+      return this.recordStore.newIterator(query, getProperties());
     }
     throw new NoSuchElementException();
   }

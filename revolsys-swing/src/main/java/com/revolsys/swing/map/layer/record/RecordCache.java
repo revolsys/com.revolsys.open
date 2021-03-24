@@ -11,13 +11,13 @@ import com.revolsys.record.Record;
 
 public interface RecordCache {
 
-  default boolean addRecord(final LayerRecord record) {
+  default boolean addRecord(final Record record) {
     throw new UnsupportedOperationException();
   }
 
-  default void addRecords(final Iterable<? extends LayerRecord> records) {
+  default void addRecords(final Iterable<? extends Record> records) {
     if (records != null) {
-      for (final LayerRecord record : records) {
+      for (final Record record : records) {
         addRecord(record);
       }
     }
@@ -26,7 +26,7 @@ public interface RecordCache {
   default void clearRecords() {
   }
 
-  default boolean containsRecord(final LayerRecord record) {
+  default boolean containsRecord(final Record record) {
     throw new UnsupportedOperationException();
   }
 
@@ -37,7 +37,7 @@ public interface RecordCache {
 
   Object getRecordCacheSync();
 
-  default <R extends LayerRecord> List<R> getRecords() {
+  default <R extends Record> List<R> getRecords() {
     final List<R> records = new ArrayList<>();
     final Consumer<R> action = records::add;
     forEachRecord(action);
@@ -56,22 +56,22 @@ public interface RecordCache {
     throw new UnsupportedOperationException("isCached");
   }
 
-  default boolean removeContainsRecord(final LayerRecord record) {
+  default boolean removeContainsRecord(final Record record) {
     throw new UnsupportedOperationException();
   }
 
-  boolean removeRecord(LayerRecord record);
+  boolean removeRecord(Record record);
 
-  default void removeRecords(final Collection<? extends LayerRecord> records) {
-    for (final LayerRecord record : records) {
+  default void removeRecords(final Collection<? extends Record> records) {
+    for (final Record record : records) {
       removeRecord(record);
     }
   }
 
-  default boolean replaceRecord(final LayerRecord record) {
+  default boolean replaceRecord(final Record record) {
     return false;
   }
 
-  void setRecords(final Iterable<? extends LayerRecord> records);
+  void setRecords(final Iterable<? extends Record> records);
 
 }
