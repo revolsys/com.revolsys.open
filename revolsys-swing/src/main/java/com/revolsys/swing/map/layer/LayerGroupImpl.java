@@ -49,7 +49,7 @@ import com.revolsys.util.UrlUtil;
 
 public class LayerGroupImpl extends AbstractLayer implements LayerGroup {
   static {
-    MenuFactory.addMenuInitializer(LayerGroup.class, menu -> {
+    MenuFactory.addMenuInitializer(LayerGroupImpl.class, menu -> {
       menu.addGroup(0, "group");
       menu.<LayerGroupImpl> addMenuItem("group", "Add Group",
         Icons.getIconWithBadge(PathTreeNode.getIconFolder(), "add"),
