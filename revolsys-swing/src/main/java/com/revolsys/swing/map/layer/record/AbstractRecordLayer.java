@@ -889,13 +889,13 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return true;
   }
 
-  public void deleteRecords(final Collection<? extends LayerRecord> records) {
+  public void deleteRecords(final Collection<? extends Record> records) {
     removeForms(records);
     final List<LayerRecord> recordsDeleted = new ArrayList<>();
-    processTasks("Delete Records", records, (final LayerRecord record) -> {
-      final boolean deleted = deleteSingleRecordDo(record);
+    processTasks("Delete Records", records, (final Record record) -> {
+      final boolean deleted = deleteSingleRecordDo((LayerRecord)record);
       if (deleted) {
-        final LayerRecord recordProxy = record.getRecordProxy();
+        final LayerRecord recordProxy = ((LayerRecord)record).getRecordProxy();
         recordsDeleted.add(recordProxy);
       }
     }, monitor -> {
@@ -2694,11 +2694,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     removeForms(records);
   }
 
-  protected void removeForms(final Iterable<? extends LayerRecord> records) {
+  protected void removeForms(final Iterable<? extends Record> records) {
     final List<LayerRecordForm> forms = new ArrayList<>();
     final List<Window> windows = new ArrayList<>();
     synchronized (this.formRecords) {
-      for (final LayerRecord record : records) {
+      for (final Record record : records) {
         final LayerRecord proxiedRecord = getProxiedRecord(record);
         if (proxiedRecord != null) {
           final int index = proxiedRecord.indexOf(this.formRecords);

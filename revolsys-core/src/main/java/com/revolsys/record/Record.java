@@ -681,7 +681,7 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
     final RecordDefinition recordDefinition = getRecordDefinition();
     final int idFieldCount = recordDefinition.getIdFieldCount();
     if (idFieldCount == 1) {
-      final Integer idFieldIndex = recordDefinition.getIdFieldCount();
+      final Integer idFieldIndex = recordDefinition.getIdFieldIndex();
       final Object idValue = getValue(idFieldIndex);
       if (idValue == null) {
         return null;
@@ -1194,14 +1194,16 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
    * Set the value of the primary geometry field.
    *
    * @param geometry The primary geometry.
+   * @return TODO
    */
 
-  default void setGeometryValue(final Geometry geometry) {
+  default Record setGeometryValue(final Geometry geometry) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     final int index = recordDefinition.getGeometryFieldIndex();
     if (index > -1) {
       setValue(index, geometry);
     }
+    return this;
   }
 
   default void setGeometryValue(final Record record) {

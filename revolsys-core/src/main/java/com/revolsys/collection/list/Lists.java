@@ -328,6 +328,20 @@ public interface Lists {
     return list;
   }
 
+  @SafeVarargs
+  static <IN, OUT> List<OUT> map(final Function<? super IN, OUT> converter, final IN... list) {
+    if (list == null) {
+      return Collections.emptyList();
+    } else {
+      final List<OUT> newList = new ArrayList<>();
+      for (final IN value : list) {
+        final OUT newValue = converter.apply(value);
+        newList.add(newValue);
+      }
+      return newList;
+    }
+  }
+
   static <IN, OUT> List<OUT> map(final Iterable<IN> list,
     final Function<? super IN, OUT> converter) {
     if (list == null) {

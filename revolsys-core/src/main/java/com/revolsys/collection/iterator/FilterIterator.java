@@ -6,11 +6,11 @@ import java.util.function.Predicate;
 
 public class FilterIterator<T> extends AbstractIterator<T> {
 
-  private Predicate<T> filter;
+  private Predicate<? super T> filter;
 
   private Iterator<T> iterator;
 
-  public FilterIterator(final Predicate<T> filter, final Iterator<T> iterator) {
+  public FilterIterator(final Predicate<? super T> filter, final Iterator<T> iterator) {
     this.filter = filter;
     this.iterator = iterator;
   }
@@ -26,7 +26,7 @@ public class FilterIterator<T> extends AbstractIterator<T> {
     this.iterator = null;
   }
 
-  protected Predicate<T> getFilter() {
+  protected Predicate<? super T> getFilter() {
     return this.filter;
   }
 

@@ -40,11 +40,12 @@ public class GeometryRecord extends BaseRecord {
   }
 
   @Override
-  public void setGeometryValue(final Geometry geometry) {
+  public Record setGeometryValue(final Geometry geometry) {
     if (!DataType.equal(geometry, this.geometry)) {
       setState(RecordState.MODIFIED);
     }
     this.geometry = geometry;
+    return this;
   }
 
   @Override

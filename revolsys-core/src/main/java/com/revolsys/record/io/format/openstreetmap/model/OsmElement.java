@@ -11,6 +11,7 @@ import org.jeometry.common.io.PathName;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.record.AbstractRecord;
+import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.record.schema.RecordDefinition;
@@ -253,12 +254,13 @@ public class OsmElement extends AbstractRecord implements OsmConstants {
   }
 
   @Override
-  public void setGeometryValue(final Geometry geometry) {
+  public Record setGeometryValue(final Geometry geometry) {
     if (geometry == null) {
       this.geometry = null;
     } else {
       this.geometry = geometry.convertGeometry(WGS84_2D, geometry.getAxisCount());
     }
+    return this;
   }
 
   public void setId(final long id) {

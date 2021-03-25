@@ -184,6 +184,10 @@ public class PointRecordMap {
     }
   }
 
+  public boolean isEmpty() {
+    return this.recordMap.isEmpty();
+  }
+
   public boolean isRemoveEmptyLists() {
     return this.removeEmptyLists;
   }
@@ -206,8 +210,9 @@ public class PointRecordMap {
     }
   }
 
-  public void setRemoveEmptyLists(final boolean removeEmptyLists) {
+  public PointRecordMap setRemoveEmptyLists(final boolean removeEmptyLists) {
     this.removeEmptyLists = removeEmptyLists;
+    return this;
   }
 
   public int size() {
