@@ -29,6 +29,12 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
     return microsoft("common");
   }
 
+  public static OpenIdConnectClient microsoftV1(final String tenantId) {
+    final String url = String
+      .format("https://login.microsoftonline.com/%s/.well-known/openid-configuration", tenantId);
+    return newClient(url);
+  }
+
   public static OpenIdConnectClient newClient(final ObjectFactoryConfig factoryConfig,
     final JsonObject config, final String defaultPrefix) {
     final String url = config.getString("wellKnownUrl");
