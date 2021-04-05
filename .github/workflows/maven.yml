@@ -3,7 +3,7 @@ name: Java CI
 on:
   push:
     branches:
-    - master
+    - main
 
 jobs:
   build:
@@ -21,7 +21,7 @@ jobs:
     - name: Checkout jeometry
       uses: actions/checkout@v2
       with:
-        ref: master
+        ref: main
         repository: jeometry-org/jeometry
         path: jeometry
 
