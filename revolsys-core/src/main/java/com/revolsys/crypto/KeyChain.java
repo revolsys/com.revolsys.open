@@ -22,7 +22,7 @@ public class KeyChain {
 
   private KeyStore store;
 
-  private final char[] masterPassword;
+  private final char[] password;
 
   private final Path path;
 
@@ -30,13 +30,13 @@ public class KeyChain {
 
   public KeyChain(final Path path, final String password) {
     this.path = path;
-    this.masterPassword = password.toCharArray();
-    this.passwordProtection = new PasswordProtection(this.masterPassword);
+    this.password = password.toCharArray();
+    this.passwordProtection = new PasswordProtection(this.password);
     try {
       this.store = KeyStore.getInstance(KEYSTORE_TYPE);
       if (Files.exists(path)) {
         final InputStream inputStream = Files.newInputStream(path);
-        this.store.load(inputStream, this.masterPassword);
+        this.store.load(inputStream, this.password);
       } else {
         this.store.load(null, null);
       }
@@ -69,7 +69,7 @@ public class KeyChain {
   private void save() {
     try {
       final OutputStream outputStream = Files.newOutputStream(this.path);
-      this.store.store(outputStream, this.masterPassword);
+      this.store.store(outputStream, this.password);
     } catch (final Throwable e) {
       Logs.error(this, "Cannot save keychain " + this.path, e);
     }
