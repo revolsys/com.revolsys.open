@@ -312,7 +312,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   default Record getRecord(final PathName typePath, final Condition condition,
     final LockMode lockMode) {
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
-       final Query query = new Query(recordDefinition)//
+    final Query query = new Query(recordDefinition)//
       .setWhereCondition(condition)
       .setLockMode(lockMode);
     return getRecord(query);
@@ -492,6 +492,8 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   }
 
   void initialize();
+
+  void initializeRecordDefinition(RecordDefinition recordDefinition);
 
   default Record insertRecord(final PathName pathName, final Object... values) {
     final RecordDefinition recordDefinition = getRecordDefinition(pathName);

@@ -324,6 +324,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   protected void initializePost() {
   }
 
+  @Override
   public void initializeRecordDefinition(final RecordDefinition recordDefinition) {
     final PathName pathName = recordDefinition.getPathName();
     for (final Consumer<RecordDefinition> action : this.recordDefinitionInitializersByTableName

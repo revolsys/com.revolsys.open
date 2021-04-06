@@ -45,7 +45,7 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
     }
   }
 
-  void addDefaultValue(String fieldName, Object defaultValue);
+  RecordDefinition addDefaultValue(String fieldName, Object defaultValue);
 
   void addProperty(RecordDefinitionProperty property);
 
@@ -307,14 +307,6 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
   @Override
   default Record newRecord(final RecordDefinition recordDefinition) {
     return newRecord();
-  }
-
-  default RecordDefinition setDefaultValue(final String fieldName, final Object value) {
-    final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
-    if (fieldDefinition != null) {
-      fieldDefinition.setDefaultValue(value);
-    }
-    return this;
   }
 
   void setDefaultValues(Map<String, ? extends Object> defaultValues);
