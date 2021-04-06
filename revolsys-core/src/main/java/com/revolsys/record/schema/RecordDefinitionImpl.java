@@ -228,8 +228,13 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   }
 
   @Override
-  public void addDefaultValue(final String fieldName, final Object defaultValue) {
+  public RecordDefinitionImpl addDefaultValue(final String fieldName, final Object defaultValue) {
     this.defaultValues.put(fieldName, defaultValue);
+    final FieldDefinition fieldDefinition = getFieldDefinition(fieldName);
+    if (fieldDefinition != null) {
+      fieldDefinition.setDefaultValue(defaultValue);
+    }
+    return this;
   }
 
   public synchronized void addField(final FieldDefinition field) {

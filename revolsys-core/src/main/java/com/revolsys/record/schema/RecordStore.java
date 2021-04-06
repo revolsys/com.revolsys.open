@@ -497,6 +497,8 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   void initialize();
 
+  void initializeRecordDefinition(RecordDefinition recordDefinition);
+
   default Record insertRecord(final PathName pathName, final Object... values) {
     final RecordDefinition recordDefinition = getRecordDefinition(pathName);
     final Record record = new ArrayRecord(recordDefinition, values);
