@@ -210,9 +210,9 @@ public final class JsonWriter implements BaseCloseable {
 
   public void startObject() {
     try {
-      if (!this.startAttribute) {
-        indent();
-      }
+      // if (!this.startAttribute) {
+      // indent();
+      // }
       this.out.write('{');
       newLine();
       this.depth++;

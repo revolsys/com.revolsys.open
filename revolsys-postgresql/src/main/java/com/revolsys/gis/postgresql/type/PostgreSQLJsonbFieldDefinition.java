@@ -28,7 +28,7 @@ public class PostgreSQLJsonbFieldDefinition extends JdbcFieldDefinition {
     if (value != null && internStrings) {
       value = value.intern();
     }
-    return value;
+    return toColumnType(value);
   }
 
   @Override

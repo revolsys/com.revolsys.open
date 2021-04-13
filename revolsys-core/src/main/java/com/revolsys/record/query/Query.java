@@ -305,6 +305,11 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return and(condition);
   }
 
+  public Query and(final CharSequence fieldName, final Object value) {
+    final Condition condition = newCondition(fieldName, Q.EQUAL, value);
+    return and(condition);
+  }
+
   public Query and(final Condition condition) {
     if (!Property.isEmpty(condition)) {
       Condition whereCondition = getWhereCondition();

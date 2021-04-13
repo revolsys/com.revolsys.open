@@ -23,6 +23,7 @@ import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.io.format.csv.Csv;
 import com.revolsys.record.io.format.csv.CsvRecordWriter;
 import com.revolsys.record.io.format.json.Json;
+import com.revolsys.record.io.format.json.JsonList;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.io.format.json.JsonRecordWriter;
@@ -330,6 +331,18 @@ public class AbstractTableRecordRestController {
     }
   }
 
+  protected void responseRecordsJson(final HttpServletResponse response, final JsonList records)
+    throws IOException {
+    setContentTypeJson(response);
+    response.setStatus(200);
+    try (
+      PrintWriter writer = response.getWriter()) {
+      final JsonObject result = JsonObject.hash("@odata.count", records.size())
+        .addValue("value", records);
+      writer.write(result.toJsonString(true));
+    }
+  }
+
   public void responseRecordsJson(final TableRecordStoreConnection connection,
     final HttpServletResponse response, final Query query, final Long count) throws IOException {
     try (
@@ -355,5 +368,4 @@ public class AbstractTableRecordRestController {
       jsonWriter.writeAll(reader);
     }
   }
-
 }

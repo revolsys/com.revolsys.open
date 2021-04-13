@@ -28,7 +28,8 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
     this.capitalizeWords = capitalizeWords;
   }
 
-  protected synchronized void addValue(final Identifier id, final Object value) {
+  protected synchronized AbstractSingleValueCodeTable addValue(final Identifier id,
+    final Object value) {
     if (id instanceof Number) {
       final Number number = (Number)id;
       updateMaxId(number);
@@ -39,6 +40,7 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
     addValueId(id, value);
 
     addIdentifier(id);
+    return this;
   }
 
   protected void addValueId(final Identifier id, final Object value) {

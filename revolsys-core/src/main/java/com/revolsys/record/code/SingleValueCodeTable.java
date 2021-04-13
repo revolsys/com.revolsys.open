@@ -22,12 +22,13 @@ public class SingleValueCodeTable extends AbstractSingleValueCodeTable {
   }
 
   @Override
-  public void addValue(final Identifier id, final Object value) {
+  public SingleValueCodeTable addValue(final Identifier id, final Object value) {
     super.addValue(id, value);
+    return this;
   }
 
-  public void addValue(final Object id, final Object value) {
-    super.addValue(Identifier.newIdentifier(id), value);
+  public SingleValueCodeTable addValue(final Object id, final Object value) {
+    return addValue(Identifier.newIdentifier(id), value);
   }
 
   @Override
