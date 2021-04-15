@@ -22,6 +22,9 @@ import com.revolsys.record.io.format.json.JsonParser;
 
 public class ApacheHttp {
 
+  public static final ContentType XML = ContentType.create("application/xml",
+    StandardCharsets.UTF_8);
+
   public static void execute(final HttpUriRequest request, final Consumer<HttpResponse> action) {
     try (
       final CloseableHttpClient httpClient = newClient()) {
@@ -39,7 +42,12 @@ public class ApacheHttp {
     try (
       final CloseableHttpClient httpClient = newClient()) {
       final HttpResponse response = getResponse(httpClient, request);
-      return action.apply(response);
+      try {
+        return action.apply(response);
+      } catch (final Exception e) {
+        throw Exceptions.wrap(request.getURI().toString() + "\n" + e.getMessage() + "\n"
+          + ApacheHttp.getString(response), e);
+      }
     } catch (final ApacheHttpException e) {
       throw e;
     } catch (final Exception e) {
@@ -146,8 +154,5 @@ public class ApacheHttp {
     requestBuilder.setEntity(entity);
     return requestBuilder;
   }
-
-  public static final ContentType XML = ContentType.create("application/xml",
-  StandardCharsets.UTF_8);
 
 }

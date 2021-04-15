@@ -335,11 +335,7 @@ public final class UrlUtil {
   }
 
   public static URI getUri(final String uri) {
-    try {
-      return new URI(uri);
-    } catch (final URISyntaxException e) {
-      throw new IllegalArgumentException("Unknown URI: " + uri, e);
-    }
+    return URI.create(uri);
   }
 
   public static URI getUri(final URL url) {
@@ -373,6 +369,16 @@ public final class UrlUtil {
         throw new IllegalArgumentException("Unknown URL", e);
       }
     }
+  }
+
+  public static URI appendPath(URI uri, String path) {
+    while (path.startsWith("/")) {
+      path = path.substring(1);
+    }
+    if (!uri.getPath().endsWith("/")) {
+      path = uri.getPath() + '/' + path;
+    }
+    return uri.resolve(path);
   }
 
   /**
@@ -624,7 +630,7 @@ public final class UrlUtil {
         return path.toUri();
       } else {
         final String string = DataTypes.toString(value);
-        return getUri(string);
+        return URI.create(string);
       }
     } catch (final Throwable e) {
       throw Exceptions.wrap(e);

@@ -20,6 +20,19 @@ public class OpenIdBearerToken extends BearerToken {
   private final OpenIdConnectClient client;
 
   public OpenIdBearerToken(final OpenIdConnectClient client, final JsonObject config,
+    final OpenIdResource resource) {
+    super(config, resource.getResource());
+    this.client = client;
+    this.refreshToken = config.getString("refresh_token");
+    this.idToken = config.getString("id_token");
+    final Integer expiresIn = config.getInteger("expires_in");
+    final long expireTime = System.currentTimeMillis() + expiresIn * 1000;
+    setExpireTime(expireTime);
+    final String returnedScope = config.getString("scope");
+    setScope(resource.getResource(), returnedScope);
+  }
+
+  public OpenIdBearerToken(final OpenIdConnectClient client, final JsonObject config,
     final String scope) {
     super(config, scope);
     this.client = client;

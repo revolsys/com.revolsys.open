@@ -170,7 +170,7 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
   public Map<String, Object> parseUrl(final String url) {
     final Map<String, Object> parameters = new LinkedHashMap<>();
     try {
-      final URI uri = UrlUtil.getUri(url);
+      final URI uri = URI.create(url);
       final File file = FileUtil.getFile(uri);
       if (file != null) {
         parameters.put("recordStoreType", getName());

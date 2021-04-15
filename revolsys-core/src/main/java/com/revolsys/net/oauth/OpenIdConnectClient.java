@@ -2,6 +2,7 @@ package com.revolsys.net.oauth;
 
 import java.net.URI;
 import java.util.Collection;
+import java.util.function.Function;
 
 import org.apache.http.client.methods.RequestBuilder;
 
@@ -33,6 +34,10 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
     final String url = String
       .format("https://login.microsoftonline.com/%s/.well-known/openid-configuration", tenantId);
     return newClient(url);
+  }
+
+  public static OpenIdConnectClient microsoftV1Common() {
+    return microsoftV1("common");
   }
 
   public static OpenIdConnectClient newClient(final ObjectFactoryConfig factoryConfig,
@@ -129,6 +134,15 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
     return builder;
   }
 
+  public Function<BearerToken, BearerToken> bearerTokenRefreshFactory(
+    final OpenIdResource resource) {
+    return bearerToken -> tokenClientCredentials(resource);
+  }
+
+  public Function<BearerToken, BearerToken> bearerTokenRefreshFactoryScope(final String scope) {
+    return bearerToken -> tokenClientCredentials(scope);
+  }
+
   public DeviceCodeResponse deviceCode(final String scope) {
     final RequestBuilder requestBuilder = RequestBuilder//
       .post(this.deviceAuthorizationEndpoint);
@@ -163,6 +177,12 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
 
   public String getIssuer() {
     return this.issuer;
+  }
+
+  private OpenIdBearerToken getOpenIdBearerToken(final RequestBuilder requestBuilder,
+    final OpenIdResource resource) {
+    final JsonObject response = ApacheHttp.getJson(requestBuilder);
+    return new OpenIdBearerToken(this, response, resource);
   }
 
   private OpenIdBearerToken getOpenIdBearerToken(final RequestBuilder requestBuilder,
@@ -226,20 +246,20 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
     return builder;
   }
 
+  public OpenIdBearerToken tokenClientCredentials(final OpenIdResource resource) {
+    final RequestBuilder requestBuilder = tokenBuilder("client_credentials", true);
+    if (resource != null) {
+      requestBuilder.addParameter("resource", resource.getResource());
+    }
+    return getOpenIdBearerToken(requestBuilder, resource);
+  }
+
   public OpenIdBearerToken tokenClientCredentials(final String scope) {
     final RequestBuilder requestBuilder = tokenBuilder("client_credentials", true);
     if (scope != null) {
       requestBuilder.addParameter("scope", scope);
     }
     return getOpenIdBearerToken(requestBuilder, scope);
-  }
-
-  public OpenIdBearerToken tokenClientCredentialsResource(final String resource) {
-    final RequestBuilder requestBuilder = tokenBuilder("client_credentials", true);
-    if (resource != null) {
-      requestBuilder.addParameter("resource", resource);
-    }
-    return getOpenIdBearerToken(requestBuilder, resource);
   }
 
   public OpenIdBearerToken tokenDeviceCode(final String deviceCode, final String scope) {
@@ -261,6 +281,15 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
     return getOpenIdBearerToken(requestBuilder, scope);
   }
 
+  public OpenIdBearerToken tokenRefresh(final String refreshToken, final OpenIdResource resource) {
+    final RequestBuilder requestBuilder = tokenBuilder("refresh_token", true);
+    requestBuilder.addParameter("refresh_token", refreshToken);
+    if (resource != null) {
+      requestBuilder.addParameter("resource", resource.getResource());
+    }
+    return getOpenIdBearerToken(requestBuilder, resource);
+  }
+
   public OpenIdBearerToken tokenRefresh(final String refreshToken, final String scope) {
     final RequestBuilder requestBuilder = tokenBuilder("refresh_token", true);
     requestBuilder //
@@ -269,15 +298,5 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
       requestBuilder.addParameter("scope", scope);
     }
     return getOpenIdBearerToken(requestBuilder, scope);
-  }
-
-  public OpenIdBearerToken tokenRefreshResource(final String refreshToken, final String resource) {
-    final RequestBuilder requestBuilder = tokenBuilder("refresh_token", true);
-    requestBuilder //
-      .addParameter("refresh_token", refreshToken);
-    if (resource != null) {
-      requestBuilder.addParameter("resource", resource);
-    }
-    return getOpenIdBearerToken(requestBuilder, resource);
   }
 }
