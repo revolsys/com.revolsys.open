@@ -45,8 +45,7 @@ public class ApacheHttp {
       try {
         return action.apply(response);
       } catch (final Exception e) {
-        throw Exceptions.wrap(request.getURI().toString() + "\n" + e.getMessage() + "\n"
-          + ApacheHttp.getString(response), e);
+        throw Exceptions.wrap(request.getURI().toString() + "\n" + e.getMessage(), e);
       }
     } catch (final ApacheHttpException e) {
       throw e;

@@ -358,7 +358,7 @@ public final class FileUtil {
       }
       return numBytes;
     } catch (final IOException e) {
-      throw new RuntimeException(e);
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -560,7 +560,7 @@ public final class FileUtil {
   }
 
   public static FileFilter filterFilename(final String fileName) {
-    return (file) -> {
+    return file -> {
       if (file == null || fileName == null) {
         return false;
       } else {

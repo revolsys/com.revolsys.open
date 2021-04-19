@@ -30,16 +30,6 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
     return microsoft("common");
   }
 
-  public static OpenIdConnectClient microsoftV1(final String tenantId) {
-    final String url = String
-      .format("https://login.microsoftonline.com/%s/.well-known/openid-configuration", tenantId);
-    return newClient(url);
-  }
-
-  public static OpenIdConnectClient microsoftV1Common() {
-    return microsoftV1("common");
-  }
-
   public static OpenIdConnectClient newClient(final ObjectFactoryConfig factoryConfig,
     final JsonObject config, final String defaultPrefix) {
     final String url = config.getString("wellKnownUrl");
@@ -134,12 +124,7 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
     return builder;
   }
 
-  public Function<BearerToken, BearerToken> bearerTokenRefreshFactory(
-    final OpenIdResource resource) {
-    return bearerToken -> tokenClientCredentials(resource);
-  }
-
-  public Function<BearerToken, BearerToken> bearerTokenRefreshFactoryScope(final String scope) {
+  public Function<BearerToken, BearerToken> bearerTokenRefreshFactory(final String scope) {
     return bearerToken -> tokenClientCredentials(scope);
   }
 
@@ -180,12 +165,6 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
   }
 
   private OpenIdBearerToken getOpenIdBearerToken(final RequestBuilder requestBuilder,
-    final OpenIdResource resource) {
-    final JsonObject response = ApacheHttp.getJson(requestBuilder);
-    return new OpenIdBearerToken(this, response, resource);
-  }
-
-  private OpenIdBearerToken getOpenIdBearerToken(final RequestBuilder requestBuilder,
     final String scope) {
     final JsonObject response = ApacheHttp.getJson(requestBuilder);
     return new OpenIdBearerToken(this, response, scope);
@@ -217,7 +196,7 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
     return this;
   }
 
-  private void setUrl(final String url) {
+  protected void setUrl(final String url) {
     this.url = url;
   }
 
@@ -246,14 +225,6 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
     return builder;
   }
 
-  public OpenIdBearerToken tokenClientCredentials(final OpenIdResource resource) {
-    final RequestBuilder requestBuilder = tokenBuilder("client_credentials", true);
-    if (resource != null) {
-      requestBuilder.addParameter("resource", resource.getResource());
-    }
-    return getOpenIdBearerToken(requestBuilder, resource);
-  }
-
   public OpenIdBearerToken tokenClientCredentials(final String scope) {
     final RequestBuilder requestBuilder = tokenBuilder("client_credentials", true);
     if (scope != null) {
@@ -279,15 +250,6 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
       requestBuilder.addParameter("scope", scope);
     }
     return getOpenIdBearerToken(requestBuilder, scope);
-  }
-
-  public OpenIdBearerToken tokenRefresh(final String refreshToken, final OpenIdResource resource) {
-    final RequestBuilder requestBuilder = tokenBuilder("refresh_token", true);
-    requestBuilder.addParameter("refresh_token", refreshToken);
-    if (resource != null) {
-      requestBuilder.addParameter("resource", resource.getResource());
-    }
-    return getOpenIdBearerToken(requestBuilder, resource);
   }
 
   public OpenIdBearerToken tokenRefresh(final String refreshToken, final String scope) {
