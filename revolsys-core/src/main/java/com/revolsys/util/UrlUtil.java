@@ -72,6 +72,35 @@ public final class UrlUtil {
 
   private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_RE);
 
+  public static URI appendPath(final URI uri, final String path) {
+    final String originalPath = uri.getPath();
+    final int length = path.length();
+    final StringBuilder pathBuilder = new StringBuilder(originalPath);
+    int startIndex = 0;
+    while (startIndex < length) {
+      if (path.charAt(startIndex) == '/') {
+        if (pathBuilder.charAt(pathBuilder.length() - 1) != '/') {
+          pathBuilder.append('/');
+        }
+        startIndex++;
+      } else {
+        final int endIndex = path.indexOf('/', startIndex);
+        String pathElement;
+        if (endIndex == -1) {
+          pathElement = path.substring(startIndex);
+          startIndex = length;
+        } else {
+          pathElement = path.substring(startIndex, endIndex);
+          startIndex = endIndex;
+        }
+        final String encoded = UrlUtil.encodePathSegment(pathElement);
+        pathBuilder.append(encoded);
+
+      }
+    }
+    return uri.resolve(pathBuilder.toString());
+  }
+
   public static void appendQuery(final StringBuilder query,
     final Map<String, ? extends Object> parameters) throws Error {
     if (parameters != null) {
@@ -369,16 +398,6 @@ public final class UrlUtil {
         throw new IllegalArgumentException("Unknown URL", e);
       }
     }
-  }
-
-  public static URI appendPath(URI uri, String path) {
-    while (path.startsWith("/")) {
-      path = path.substring(1);
-    }
-    if (!uri.getPath().endsWith("/")) {
-      path = uri.getPath() + '/' + path;
-    }
-    return uri.resolve(path);
   }
 
   /**
