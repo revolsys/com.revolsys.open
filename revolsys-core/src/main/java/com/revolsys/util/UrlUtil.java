@@ -93,6 +93,9 @@ public final class UrlUtil {
           pathElement = path.substring(startIndex, endIndex);
           startIndex = endIndex;
         }
+        if (pathBuilder.length() == 0 || pathBuilder.charAt(pathBuilder.length() - 1) != '/') {
+          pathBuilder.append('/');
+        }
         final String encoded = UrlUtil.encodePathSegment(pathElement);
         pathBuilder.append(encoded);
 
