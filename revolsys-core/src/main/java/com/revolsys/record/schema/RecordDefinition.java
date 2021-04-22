@@ -337,6 +337,12 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
   @Override
   <V extends RecordStore> V getRecordStore();
 
+  default String getTitle() {
+    final PathName typeName = getPathName();
+    final String name = typeName.getName();
+    return CaseConverter.toCapitalizedWords(name);
+  }
+
   /**
    * Check to see if the type has the specified field name.
    *
