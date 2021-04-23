@@ -11,7 +11,6 @@ import org.jeometry.common.io.PathName;
 
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonObject;
-import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.TableRecordStoreConnection;
 import com.revolsys.transaction.Transaction;
@@ -31,7 +30,7 @@ public class BaseTableRecordRestController extends AbstractTableRecordRestContro
     final HttpServletRequest request, final HttpServletResponse response, final String fieldName,
     final Object value) throws IOException {
     final Query query = newQuery(connection, request)//
-      .and(fieldName, Q.EQUAL, value);
+      .and(fieldName, value);
     handleGetRecord(connection, request, response, query);
   }
 

@@ -133,10 +133,10 @@ public class AbstractTableRecordRestController {
     final boolean returnCount = HttpServletUtils.getBooleanParameter(request, "$count");
     try (
       Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRES_NEW_READONLY);
-      final RecordReader records = connection.getRecordReader(query)) {
+      final RecordReader records = query.getRecordReader()) {
       Long count = null;
       if (returnCount) {
-        count = connection.getRecordCount(query);
+        count = query.getRecordCount();
       }
       responseRecords(connection, request, response, records, count);
     }
@@ -301,7 +301,7 @@ public class AbstractTableRecordRestController {
   protected void responseRecordJson(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final HttpServletResponse response, final Query query)
     throws IOException {
-    final Record record = connection.getRecord(query);
+    final Record record = query.getRecord();
     responseRecordJson(response, record);
   }
 
@@ -345,7 +345,7 @@ public class AbstractTableRecordRestController {
     final HttpServletResponse response, final Query query, final Long count) throws IOException {
     try (
       Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRES_NEW_READONLY);
-      final RecordReader records = connection.getRecordReader(query)) {
+      final RecordReader records = query.getRecordReader()) {
       responseRecordsJson(connection, response, records, count);
     }
   }

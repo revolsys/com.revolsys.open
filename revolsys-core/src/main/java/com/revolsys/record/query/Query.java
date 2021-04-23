@@ -520,6 +520,10 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return (R)getRecordDefinition().getRecord(this);
   }
 
+  public long getRecordCount() {
+    return getRecordDefinition().getRecordStore().getRecordCount(this);
+  }
+
   public RecordDefinition getRecordDefinition() {
     return this.table.getRecordDefinition();
   }

@@ -22,6 +22,10 @@ public class TableRecordStoreQuery extends Query {
     return this.recordStore.getRecord(this.connection, this);
   }
 
+  public long getRecordCount(final Query query) {
+    return this.recordStore.getRecordCount(this.connection, query);
+  }
+
   @Override
   public RecordReader getRecordReader() {
     return this.recordStore.getRecordReader(this.connection, this);
