@@ -48,8 +48,6 @@ public class AbstractTableRecordStore {
 
   protected Map<QueryValue, Boolean> defaultSortOrder = new LinkedHashMap<>();
 
-  private Query recordsQuery;
-
   private final Set<String> searchFieldNames = new LinkedHashSet<>();
 
   public AbstractTableRecordStore(final PathName typePath) {
@@ -186,16 +184,9 @@ public class AbstractTableRecordStore {
     return hasRecord(connection, query);
   }
 
-  public Record insertOrUpdateRecord(final TableRecordStoreConnection connection,
-    final Condition condition, final Supplier<Record> newRecordSupplier,
+  protected Record insertOrUpdateRecord(final TableRecordStoreConnection connection,
+    final Query query, final Supplier<Record> newRecordSupplier,
     final Consumer<Record> updateAction) {
-    final Query query = newQuery(connection)//
-      .and(condition);
-    return insertOrUpdateRecord(connection, query, newRecordSupplier, updateAction);
-  }
-
-  public Record insertOrUpdateRecord(final TableRecordStoreConnection connection, final Query query,
-    final Supplier<Record> newRecordSupplier, final Consumer<Record> updateAction) {
     query.setRecordFactory(ArrayChangeTrackRecord.FACTORY).setLockMode(LockMode.FOR_UPDATE);
 
     try (
@@ -216,10 +207,9 @@ public class AbstractTableRecordStore {
     }
   }
 
-  public Record insertRecord(final TableRecordStoreConnection connection, final Query query,
+  protected Record insertRecord(final TableRecordStoreConnection connection, final Query query,
     final Supplier<Record> newRecordSupplier) {
     query.setRecordFactory(ArrayChangeTrackRecord.FACTORY);
-
     final ChangeTrackRecord changeTrackRecord = query.getRecord();
     if (changeTrackRecord == null) {
       final Record newRecord = newRecordSupplier.get();
@@ -315,7 +305,6 @@ public class AbstractTableRecordStore {
     if (recordDefinition == null) {
       Logs.error(this, "Table doesn't exist\t" + getTypeName());
     } else {
-      this.recordsQuery = new Query(getRecordDefinition());
       setRecordDefinitionPost(recordDefinition);
     }
   }
@@ -341,16 +330,11 @@ public class AbstractTableRecordStore {
     return this;
   }
 
-  public Record updateRecord(final TableRecordStoreConnection connection, final Condition condition,
-    final Consumer<Record> updateAction) {
-    final Query query = newQuery(connection).and(condition);
-    return updateRecord(connection, query, updateAction);
-  }
-
   public Record updateRecord(final TableRecordStoreConnection connection, final Identifier id,
     final Consumer<Record> updateAction) {
-    final Condition condition = Q.equalId(getRecordDefinition().getIdFieldNames(), id);
-    return updateRecord(connection, condition, updateAction);
+    final Query query = newQuery(connection)
+      .and(Q.equalId(getRecordDefinition().getIdFieldNames(), id));
+    return query.updateRecord(updateAction);
   }
 
   public Record updateRecord(final TableRecordStoreConnection connection, final Identifier id,
@@ -358,7 +342,7 @@ public class AbstractTableRecordStore {
     return updateRecord(connection, id, record -> record.setValues(values));
   }
 
-  public Record updateRecord(final TableRecordStoreConnection connection, final Query query,
+  protected Record updateRecord(final TableRecordStoreConnection connection, final Query query,
     final Consumer<Record> updateAction) {
     try (
       Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED)) {

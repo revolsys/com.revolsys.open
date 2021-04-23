@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.jeometry.common.io.PathName;
 
@@ -21,6 +22,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.record.ChangeTrackRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.Records;
@@ -652,6 +654,40 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return !this.selectExpressions.isEmpty();
   }
 
+  public Record insertOrUpdateRecord(final Supplier<Record> newRecordSupplier,
+    final Consumer<Record> updateAction) {
+
+    final Record record = getRecord();
+    if (record == null) {
+      final Record newRecord = newRecordSupplier.get();
+      if (newRecord == null) {
+        return null;
+      } else {
+        getRecordDefinition().getRecordStore().insertRecord(newRecord);
+        return newRecord;
+      }
+    } else {
+      updateAction.accept(record);
+      getRecordDefinition().getRecordStore().updateRecord(record);
+      return record;
+    }
+  }
+
+  public Record insertRecord(final Supplier<Record> newRecordSupplier) {
+    final ChangeTrackRecord changeTrackRecord = getRecord();
+    if (changeTrackRecord == null) {
+      final Record newRecord = newRecordSupplier.get();
+      if (newRecord == null) {
+        return null;
+      } else {
+        getRecordDefinition().getRecordStore().insertRecord(newRecord);
+        return newRecord;
+      }
+    } else {
+      return changeTrackRecord.newRecord();
+    }
+  }
+
   public boolean isCustomResult() {
     if (!getJoins().isEmpty()) {
       return true;
@@ -1100,4 +1136,16 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
       return "";
     }
   }
+
+  public Record updateRecord(final Consumer<Record> updateAction) {
+    final Record record = getRecord();
+    if (record == null) {
+      return null;
+    } else {
+      updateAction.accept(record);
+      getRecordDefinition().getRecordStore().updateRecord(record);
+      return record;
+    }
+  }
+
 }

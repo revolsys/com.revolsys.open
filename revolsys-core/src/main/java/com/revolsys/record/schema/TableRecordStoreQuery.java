@@ -1,5 +1,8 @@
 package com.revolsys.record.schema;
 
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.query.Query;
@@ -45,4 +48,22 @@ public class TableRecordStoreQuery extends Query {
   public RecordReader getRecordReader() {
     return this.recordStore.getRecordReader(this.connection, this);
   }
+
+  @Override
+  public Record insertOrUpdateRecord(final Supplier<Record> newRecordSupplier,
+    final Consumer<Record> updateAction) {
+    return this.recordStore.insertOrUpdateRecord(this.connection, this, newRecordSupplier,
+      updateAction);
+  }
+
+  @Override
+  public Record insertRecord(final Supplier<Record> newRecordSupplier) {
+    return this.recordStore.insertRecord(this.connection, this, newRecordSupplier);
+  }
+
+  @Override
+  public Record updateRecord(final Consumer<Record> updateAction) {
+    return this.recordStore.updateRecord(this.connection, this, updateAction);
+  }
+
 }
