@@ -48,7 +48,7 @@ public class LabelCountMap extends AbstractLabelCounters {
       sb.append(this.message);
     }
     sb.append("\n");
-    for (final Entry<String, Counter> entry : this.counterByLabel.entrySet()) {
+    for (final Entry<String, Counter> entry : entrySet()) {
       sb.append(entry.getKey());
       sb.append("\t");
       final Counter counter = entry.getValue();
@@ -74,6 +74,10 @@ public class LabelCountMap extends AbstractLabelCounters {
       final String labelString = label.toString();
       this.counterByLabel.remove(labelString);
     }
+  }
+
+  public Set<Entry<String, Counter>> entrySet() {
+    return this.counterByLabel.entrySet();
   }
 
   @Override
@@ -123,13 +127,19 @@ public class LabelCountMap extends AbstractLabelCounters {
     this.counterByLabel.put(labelString, counter);
   }
 
+  public int size() {
+    return this.counterByLabel.size();
+  }
+
   public JsonObject toJson() {
     if (isEmpty()) {
       return JsonObject.EMPTY;
     } else {
       final JsonObject json = JsonObject.tree();
-      for (final String label : getLabels()) {
-        final long count = getCount(label);
+      for (final Entry<String, Counter> entry : entrySet()) {
+        final String label = entry.getKey();
+        final Counter counter = entry.getValue();
+        final long count = counter.get();
         json.add(label, count);
       }
       return json;

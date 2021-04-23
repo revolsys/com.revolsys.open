@@ -101,7 +101,7 @@ public class AbstractTableRecordStore {
   }
 
   public int deleteRecords(final TableRecordStoreConnection connection, final Condition condition) {
-    final Query query = newQuery().and(condition);
+    final Query query = newQuery(connection).and(condition);
     return deleteRecords(connection, query);
   }
 
@@ -130,13 +130,12 @@ public class AbstractTableRecordStore {
 
   public Record getRecord(final TableRecordStoreConnection connection, final CharSequence fieldName,
     final Object value) {
-    final Query query = newQuery(fieldName, value);
-    return getRecord(connection, query);
+    return newQuery(connection).and(fieldName, value).getRecord();
   }
 
   public <R extends Record> R getRecord(final TableRecordStoreConnection connection,
     final Condition condition) {
-    final Query query = newQuery().and(condition);
+    final Query query = newQuery(connection).and(condition);
     return getRecord(connection, query);
   }
 
@@ -170,7 +169,7 @@ public class AbstractTableRecordStore {
 
   public RecordReader getRecordReader(final TableRecordStoreConnection connection,
     final Condition condition) {
-    final Query query = newQuery().and(condition);
+    final Query query = newQuery(connection).and(condition);
     return getRecordReader(connection, query);
   }
 
@@ -200,7 +199,7 @@ public class AbstractTableRecordStore {
 
   public boolean hasRecord(final TableRecordStoreConnection connection,
     final CharSequence fieldName, final Object value) {
-    final Query query = newQuery(fieldName, value);
+    final Query query = newQuery(connection).and(fieldName, value);
     return hasRecord(connection, query);
   }
 
@@ -211,7 +210,7 @@ public class AbstractTableRecordStore {
   public Record insertOrUpdateRecord(final TableRecordStoreConnection connection,
     final Condition condition, final Supplier<Record> newRecordSupplier,
     final Consumer<Record> updateAction) {
-    final Query query = newQuery()//
+    final Query query = newQuery(connection)//
       .and(condition);
     return insertOrUpdateRecord(connection, query, newRecordSupplier, updateAction);
   }
@@ -222,7 +221,7 @@ public class AbstractTableRecordStore {
 
     try (
       Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED)) {
-      final ChangeTrackRecord changeTrackRecord = getRecord(connection, query);
+      final ChangeTrackRecord changeTrackRecord = query.getRecord();
       if (changeTrackRecord == null) {
         final Record newRecord = newRecordSupplier.get();
         if (newRecord == null) {
@@ -274,14 +273,8 @@ public class AbstractTableRecordStore {
     final Record record) {
   }
 
-  public Query newQuery() {
-    return getRecordDefinition().newQuery();
-  }
-
-  public Query newQuery(final CharSequence fieldName, final Object value) {
-    return newQuery() //
-      .and(fieldName, Q.EQUAL, value)//
-    ;
+  public Query newQuery(final TableRecordStoreConnection connection) {
+    return new TableRecordStoreQuery(this, connection);
   }
 
   public Record newRecord() {
@@ -371,7 +364,7 @@ public class AbstractTableRecordStore {
 
   public Record updateRecord(final TableRecordStoreConnection connection, final Condition condition,
     final Consumer<Record> updateAction) {
-    final Query query = newQuery().and(condition);
+    final Query query = newQuery(connection).and(condition);
     return updateRecord(connection, query, updateAction);
   }
 
@@ -383,7 +376,7 @@ public class AbstractTableRecordStore {
 
   public Record updateRecord(final TableRecordStoreConnection connection, final Identifier id,
     final JsonObject values) {
-    return updateRecord(connection, id, (record) -> record.setValues(values));
+    return updateRecord(connection, id, record -> record.setValues(values));
   }
 
   public Record updateRecord(final TableRecordStoreConnection connection, final Query query,

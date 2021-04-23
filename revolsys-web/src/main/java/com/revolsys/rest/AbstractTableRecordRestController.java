@@ -162,17 +162,15 @@ public class AbstractTableRecordRestController {
   protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
     final HttpServletResponse response, final CharSequence tablePath, final Identifier id,
     final Consumer<Record> updateAction) throws IOException {
-    handleUpdateRecordDo(connection, response, () -> {
-      return connection.updateRecord(tablePath, id, updateAction);
-    });
+    handleUpdateRecordDo(connection, response,
+      () -> connection.updateRecord(tablePath, id, updateAction));
   }
 
   protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
     final HttpServletResponse response, final CharSequence tablePath, final Identifier id,
     final JsonObject values) throws IOException {
-    handleUpdateRecordDo(connection, response, () -> {
-      return connection.updateRecord(tablePath, id, values);
-    });
+    handleUpdateRecordDo(connection, response,
+      () -> connection.updateRecord(tablePath, id, values));
   }
 
   protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
@@ -208,7 +206,7 @@ public class AbstractTableRecordRestController {
   protected Query newQuery(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final CharSequence tablePath, final int maxRecords) {
     final AbstractTableRecordStore recordStore = getTableRecordStore(connection, tablePath);
-    final Query query = recordStore.newQuery();
+    final Query query = recordStore.newQuery(connection);
     final String select = request.getParameter("$select");
     newQuerySelect(connection, query, select);
 

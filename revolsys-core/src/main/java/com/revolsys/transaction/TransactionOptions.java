@@ -18,7 +18,7 @@ public enum TransactionOptions implements TransactionOption {
   };
 
   public static TransactionOption[] REQUIRES_NEW_READONLY = {
-    Propagation.REQUIRED, READ_ONLY, ROLLBACK_ONLY,
+    Propagation.REQUIRES_NEW, READ_ONLY, ROLLBACK_ONLY,
   };
 
   public static TransactionOption[] REQUIRED = {

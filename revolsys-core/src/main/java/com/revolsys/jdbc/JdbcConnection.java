@@ -138,6 +138,20 @@ public class JdbcConnection implements Connection {
     return getConnection().createStruct(typeName, attributes);
   }
 
+  public int executeCall(final String sql, final Object... parameters) {
+    try {
+      final PreparedStatement statement = this.connection.prepareCall(sql);
+      try {
+        JdbcUtils.setParameters(statement, parameters);
+        return statement.executeUpdate();
+      } finally {
+        JdbcUtils.close(statement);
+      }
+    } catch (final SQLException e) {
+      throw getException("Update:\n" + sql, sql, e);
+    }
+  }
+
   public int executeUpdate(final String sql, final Object... parameters) {
     try {
       final PreparedStatement statement = this.connection.prepareStatement(sql);

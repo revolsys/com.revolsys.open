@@ -24,6 +24,7 @@ import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.Records;
+import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.LockMode;
@@ -306,15 +307,27 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
   }
 
   public Query and(final CharSequence fieldName, final Object value) {
-    final Condition condition = newCondition(fieldName, Q.EQUAL, value);
+    final ColumnReference left = this.table.getColumn(fieldName);
+    Condition condition;
+    if (value == null) {
+      condition = new IsNull(left);
+    } else {
+      QueryValue right;
+      if (value instanceof QueryValue) {
+        right = (QueryValue)value;
+      } else {
+        right = new Value(left, value);
+      }
+      condition = new Equal(left, right);
+    }
     return and(condition);
   }
 
   public Query and(final Condition condition) {
-    if (!Property.isEmpty(condition)) {
-      Condition whereCondition = getWhereCondition();
-      whereCondition = whereCondition.and(condition);
-      setWhereCondition(whereCondition);
+    if (condition != null && !condition.isEmpty()) {
+      final RecordDefinition recordDefinition = getRecordDefinition();
+      condition.changeRecordDefinition(recordDefinition, recordDefinition);
+      this.whereCondition = this.whereCondition.and(condition);
     }
     return this;
   }
@@ -439,7 +452,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
       if (filter == null) {
         records.forEach(consumer);
       } else {
-        records.forEach((record) -> {
+        records.forEach(record -> {
           if (filter.test(record)) {
             consumer.accept(record);
           }
@@ -502,6 +515,11 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public <R extends Record> R getRecord() {
+    return (R)getRecordDefinition().getRecord(this);
+  }
+
   public RecordDefinition getRecordDefinition() {
     return this.table.getRecordDefinition();
   }
@@ -509,6 +527,17 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
   @SuppressWarnings("unchecked")
   public <V extends Record> RecordFactory<V> getRecordFactory() {
     return (RecordFactory<V>)this.recordFactory;
+  }
+
+  public RecordReader getRecordReader() {
+    return getRecordDefinition().getRecordStore().getRecords(this);
+  }
+
+  public List<Record> getRecords() {
+    try (
+      RecordReader records = getRecordReader()) {
+      return records.toList();
+    }
   }
 
   public List<QueryValue> getSelect() {

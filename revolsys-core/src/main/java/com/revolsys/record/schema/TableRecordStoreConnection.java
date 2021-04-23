@@ -48,7 +48,7 @@ public interface TableRecordStoreConnection extends Transactionable {
 
   default RecordReader getRecordReader(final PathName tableName) {
     final AbstractTableRecordStore recordStore = getTableRecordStore(tableName);
-    final Query query = recordStore.newQuery();
+    final Query query = recordStore.newQuery(this);
     return recordStore.getRecordReader(this, query);
   }
 
@@ -109,7 +109,7 @@ public interface TableRecordStoreConnection extends Transactionable {
 
   default <TRS extends AbstractTableRecordStore> Record insertRecord(final CharSequence tablePath,
     final Function<TRS, Query> querySupplier, final Function<TRS, Record> newRecordSupplier) {
-    final Consumer<Record> updateAction = (record) -> {
+    final Consumer<Record> updateAction = record -> {
     };
     return insertOrUpdateRecord(tablePath, querySupplier, newRecordSupplier, updateAction);
   }
@@ -121,7 +121,7 @@ public interface TableRecordStoreConnection extends Transactionable {
 
   default Query newQuery(final CharSequence tablePath) {
     final AbstractTableRecordStore recordStore = getTableRecordStore(tablePath);
-    return recordStore.newQuery();
+    return recordStore.newQuery(this);
   }
 
   default Record newRecord(final CharSequence tablePath) {
