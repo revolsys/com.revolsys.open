@@ -31,6 +31,7 @@ import com.revolsys.record.schema.LockMode;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
+import com.revolsys.record.schema.TableRecordStoreConnection;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.CancellableProxy;
 import com.revolsys.util.Property;
@@ -206,7 +207,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
   }
 
   public Query(final TableReference table) {
-    this(table, null);
+    this.table = table;
   }
 
   public Query(final TableReference table, final Condition whereCondition) {
@@ -294,20 +295,7 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this;
   }
 
-  public Query and(final CharSequence fieldName,
-    final BiFunction<QueryValue, QueryValue, Condition> operator, final Object value) {
-    final Condition condition = newCondition(fieldName, operator, value);
-    return and(condition);
-  }
-
-  public Query and(final CharSequence fieldName,
-    final java.util.function.Function<QueryValue, Condition> operator) {
-    final Condition condition = newCondition(fieldName, operator);
-    return and(condition);
-  }
-
-  public Query and(final CharSequence fieldName, final Object value) {
-    final ColumnReference left = this.table.getColumn(fieldName);
+  public Query and(final ColumnReference left, final Object value) {
     Condition condition;
     if (value == null) {
       condition = new IsNull(left);
@@ -356,6 +344,35 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
       setWhereCondition(whereCondition);
     }
     return this;
+  }
+
+  public Query and(final String fieldName,
+    final BiFunction<QueryValue, QueryValue, Condition> operator, final Object value) {
+    final Condition condition = newCondition(fieldName, operator, value);
+    return and(condition);
+  }
+
+  public Query and(final String fieldName,
+    final java.util.function.Function<QueryValue, Condition> operator) {
+    final Condition condition = newCondition(fieldName, operator);
+    return and(condition);
+  }
+
+  public Query and(final String fieldName, final Object value) {
+    final ColumnReference left = this.table.getColumn(fieldName);
+    Condition condition;
+    if (value == null) {
+      condition = new IsNull(left);
+    } else {
+      QueryValue right;
+      if (value instanceof QueryValue) {
+        right = (QueryValue)value;
+      } else {
+        right = new Value(left, value);
+      }
+      condition = new Equal(left, right);
+    }
+    return and(condition);
   }
 
   public Query andEqualId(final Object id) {
@@ -441,6 +458,10 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
       clone.sql = null;
     }
     return clone;
+  }
+
+  public int deleteRecords(final TableRecordStoreConnection connection, final Query query) {
+    return getRecordDefinition().getRecordStore().deleteRecords(query);
   }
 
   @SuppressWarnings("unchecked")

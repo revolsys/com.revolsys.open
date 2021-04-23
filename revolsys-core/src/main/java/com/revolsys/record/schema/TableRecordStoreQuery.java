@@ -3,6 +3,8 @@ package com.revolsys.record.schema;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.query.Query;
+import com.revolsys.transaction.Transaction;
+import com.revolsys.transaction.TransactionOptions;
 
 public class TableRecordStoreQuery extends Query {
 
@@ -17,13 +19,26 @@ public class TableRecordStoreQuery extends Query {
     this.connection = connection;
   }
 
+  public int deleteRecords() {
+    try (
+      Transaction transaction = this.connection.newTransaction(TransactionOptions.REQUIRED)) {
+      return this.recordStore.getRecordStore().deleteRecords(this);
+    }
+  }
+
+  @Override
+  public int deleteRecords(final TableRecordStoreConnection connection, final Query query) {
+    return this.recordStore.deleteRecords(this.connection, this);
+  }
+
   @Override
   public <R extends Record> R getRecord() {
     return this.recordStore.getRecord(this.connection, this);
   }
 
-  public long getRecordCount(final Query query) {
-    return this.recordStore.getRecordCount(this.connection, query);
+  @Override
+  public long getRecordCount() {
+    return this.recordStore.getRecordCount(this.connection, this);
   }
 
   @Override

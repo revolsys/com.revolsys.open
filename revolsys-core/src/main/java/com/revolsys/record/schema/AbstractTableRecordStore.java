@@ -100,12 +100,7 @@ public class AbstractTableRecordStore {
     return query;
   }
 
-  public int deleteRecords(final TableRecordStoreConnection connection, final Condition condition) {
-    final Query query = newQuery(connection).and(condition);
-    return deleteRecords(connection, query);
-  }
-
-  public int deleteRecords(final TableRecordStoreConnection connection, final Query query) {
+  protected int deleteRecords(final TableRecordStoreConnection connection, final Query query) {
     try (
       Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED)) {
       return this.recordStore.deleteRecords(query);
@@ -128,19 +123,8 @@ public class AbstractTableRecordStore {
     return this.recordStore.getJdbcConnection();
   }
 
-  public Record getRecord(final TableRecordStoreConnection connection, final CharSequence fieldName,
-    final Object value) {
-    return newQuery(connection).and(fieldName, value).getRecord();
-  }
-
-  public <R extends Record> R getRecord(final TableRecordStoreConnection connection,
-    final Condition condition) {
-    final Query query = newQuery(connection).and(condition);
-    return getRecord(connection, query);
-  }
-
   @SuppressWarnings("unchecked")
-  public <R extends Record> R getRecord(final TableRecordStoreConnection connection,
+  protected <R extends Record> R getRecord(final TableRecordStoreConnection connection,
     final Query query) {
     try (
       Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED)) {
@@ -148,11 +132,16 @@ public class AbstractTableRecordStore {
     }
   }
 
+  public Record getRecord(final TableRecordStoreConnection connection, final String fieldName,
+    final Object value) {
+    return newQuery(connection).and(fieldName, value).getRecord();
+  }
+
   public Record getRecordById(final TableRecordStoreConnection connection, final UUID id) {
     return getRecord(connection, "id", id);
   }
 
-  public long getRecordCount(final TableRecordStoreConnection connection, final Query query) {
+  protected long getRecordCount(final TableRecordStoreConnection connection, final Query query) {
     try (
       Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED)) {
       return this.recordStore.getRecordCount(query);
@@ -163,17 +152,7 @@ public class AbstractTableRecordStore {
     return this.recordDefinition;
   }
 
-  public RecordReader getRecordReader(final TableRecordStoreConnection connection) {
-    return getRecordReader(connection, this.recordsQuery);
-  }
-
-  public RecordReader getRecordReader(final TableRecordStoreConnection connection,
-    final Condition condition) {
-    final Query query = newQuery(connection).and(condition);
-    return getRecordReader(connection, query);
-  }
-
-  public RecordReader getRecordReader(final TableRecordStoreConnection connection,
+  protected RecordReader getRecordReader(final TableRecordStoreConnection connection,
     final Query query) {
     final Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED);
     final RecordReader reader = this.recordStore.getRecords(query);
@@ -197,14 +176,14 @@ public class AbstractTableRecordStore {
     return this.typeName;
   }
 
-  public boolean hasRecord(final TableRecordStoreConnection connection,
-    final CharSequence fieldName, final Object value) {
-    final Query query = newQuery(connection).and(fieldName, value);
-    return hasRecord(connection, query);
+  public boolean hasRecord(final TableRecordStoreConnection connection, final Query query) {
+    return query.getRecordCount() > 0;
   }
 
-  public boolean hasRecord(final TableRecordStoreConnection connection, final Query query) {
-    return getRecordCount(connection, query) > 0;
+  public boolean hasRecord(final TableRecordStoreConnection connection, final String fieldName,
+    final Object value) {
+    final Query query = newQuery(connection).and(fieldName, value);
+    return hasRecord(connection, query);
   }
 
   public Record insertOrUpdateRecord(final TableRecordStoreConnection connection,
@@ -241,7 +220,7 @@ public class AbstractTableRecordStore {
     final Supplier<Record> newRecordSupplier) {
     query.setRecordFactory(ArrayChangeTrackRecord.FACTORY);
 
-    final ChangeTrackRecord changeTrackRecord = getRecord(connection, query);
+    final ChangeTrackRecord changeTrackRecord = query.getRecord();
     if (changeTrackRecord == null) {
       final Record newRecord = newRecordSupplier.get();
       if (newRecord == null) {
@@ -384,7 +363,7 @@ public class AbstractTableRecordStore {
     try (
       Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED)) {
       query.setRecordFactory(ArrayChangeTrackRecord.FACTORY);
-      final ChangeTrackRecord record = getRecord(connection, query);
+      final ChangeTrackRecord record = query.getRecord();
       if (record == null) {
         return null;
       } else {
