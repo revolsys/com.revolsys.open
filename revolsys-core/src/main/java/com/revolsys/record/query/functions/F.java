@@ -1,8 +1,11 @@
 package com.revolsys.record.query.functions;
 
+import java.util.List;
+
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.query.Column;
 import com.revolsys.record.query.ColumnReference;
 import com.revolsys.record.query.Query;
@@ -38,6 +41,28 @@ public class F {
       final Value value = Value.newValue(field, boundingBox);
       return new EnvelopeIntersects(field, value);
     }
+  }
+
+  public static EnvelopeIntersects envelopeIntersects(final List<QueryValue> values) {
+    final QueryValue left = values.get(0);
+    QueryValue right = values.get(1);
+    if (!(left instanceof ColumnReference)) {
+      throw new IllegalArgumentException(
+        "geo.intersections first argument must be a column reference");
+    }
+    final ColumnReference field = (ColumnReference)left;
+    if (right instanceof Value) {
+      final Value value = (Value)right;
+      final String text = value.getValue().toString();
+      final FieldDefinition fieldDefinition = field.getFieldDefinition();
+      final GeometryFactory geometryFactory = fieldDefinition.getGeometryFactory();
+      final Geometry geometry = geometryFactory.geometry(text);
+      right = Value.newValue(fieldDefinition, geometry);
+    } else {
+      throw new IllegalArgumentException(
+        "geo.intersections first argument must be a geometry: " + right);
+    }
+    return new EnvelopeIntersects(left, right);
   }
 
   public static EnvelopeIntersects envelopeIntersects(final Query query,

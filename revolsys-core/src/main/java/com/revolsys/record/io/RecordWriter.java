@@ -135,10 +135,13 @@ public interface RecordWriter extends Writer<Record>, RecordDefinitionProxy {
     write(record);
   }
 
-  default void writeAll(final Iterable<? extends Record> records) {
+  default int writeAll(final Iterable<? extends Record> records) {
+    int i = 0;
     for (final Record record : records) {
       write(record);
+      i++;
     }
+    return i;
   }
 
   default void writeNewRecord(final Record record) {
