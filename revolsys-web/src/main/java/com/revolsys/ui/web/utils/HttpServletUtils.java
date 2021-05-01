@@ -239,6 +239,21 @@ public final class HttpServletUtils {
 
   }
 
+  public static String getUrlWithParameters(final HttpServletRequest request) {
+    final String serverUrl = getServerUrl(request);
+    final String requestUri = getOriginatingRequestUri(request);
+    final StringBuilder url = new StringBuilder(serverUrl);
+    if (requestUri != null) {
+      url.append(requestUri);
+    }
+    final String queryString = request.getQueryString();
+    if (requestUri != null) {
+      url.append('?');
+      url.append(queryString);
+    }
+    return url.toString();
+  }
+
   public static boolean isApiCall() {
     final HttpServletRequest request = getRequest();
     return isApiCall(request);

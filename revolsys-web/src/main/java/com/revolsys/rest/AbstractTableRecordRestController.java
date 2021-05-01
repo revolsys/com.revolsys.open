@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -37,6 +39,7 @@ import com.revolsys.transaction.Transaction;
 import com.revolsys.transaction.TransactionOptions;
 import com.revolsys.ui.web.utils.HttpServletUtils;
 import com.revolsys.util.Property;
+import com.revolsys.util.UrlUtil;
 
 public class AbstractTableRecordRestController {
 
@@ -138,7 +141,7 @@ public class AbstractTableRecordRestController {
       if (returnCount) {
         count = query.getRecordCount();
       }
-      responseRecords(connection, request, response, records, count);
+      responseRecords(connection, request, response, query, records, count);
     }
   }
 
@@ -306,12 +309,12 @@ public class AbstractTableRecordRestController {
   }
 
   protected void responseRecords(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final HttpServletResponse response, final RecordReader reader,
-    final Long count) throws IOException {
+    final HttpServletRequest request, final HttpServletResponse response, final Query query,
+    final RecordReader reader, final Long count) throws IOException {
     if ("csv".equals(request.getParameter("format"))) {
       responseRecordsCsv(response, reader);
     } else {
-      responseRecordsJson(connection, response, reader, count);
+      responseRecordsJson(connection, request, response, query, reader, count);
     }
   }
 
@@ -342,17 +345,18 @@ public class AbstractTableRecordRestController {
   }
 
   public void responseRecordsJson(final TableRecordStoreConnection connection,
-    final HttpServletResponse response, final Query query, final Long count) throws IOException {
+    final HttpServletRequest request, final HttpServletResponse response, final Query query,
+    final Long count) throws IOException {
     try (
       Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRES_NEW_READONLY);
       final RecordReader records = query.getRecordReader()) {
-      responseRecordsJson(connection, response, records, count);
+      responseRecordsJson(connection, request, response, query, records, count);
     }
   }
 
   protected void responseRecordsJson(final TableRecordStoreConnection connection,
-    final HttpServletResponse response, final RecordReader reader, final Long count)
-    throws IOException {
+    final HttpServletRequest request, final HttpServletResponse response, final Query query,
+    final RecordReader reader, final Long count) throws IOException {
     reader.open();
     setContentTypeJson(response);
     response.setStatus(200);
@@ -363,7 +367,31 @@ public class AbstractTableRecordRestController {
         jsonWriter.setHeader(JsonObject.hash("@odata.count", count));
       }
       jsonWriter.setItemsPropertyName("value");
-      jsonWriter.writeAll(reader);
+      final int writeCount = jsonWriter.writeAll(reader);
+      final int index = query.getOffset() + writeCount;
+      boolean writeNext = false;
+      if (writeCount != 0) {
+        if (count == null) {
+          if (writeCount >= query.getLimit()) {
+            writeNext = true;
+          }
+        } else if (query.getOffset() + writeCount < count) {
+          writeNext = true;
+        }
+      }
+
+      if (writeNext) {
+        final String url = HttpServletUtils.getFullRequestUrl(request);
+        final StringBuilder uri = new StringBuilder(url).append('?');
+
+        final Map<String, String[]> parameters = new TreeMap<>(request.getParameterMap());
+        parameters.put("$skip", new String[] {
+          Integer.toString(index)
+        });
+        UrlUtil.appendQuery(uri, parameters);
+
+        jsonWriter.setFooter(JsonObject.hash("@odata.nextLink", uri.toString()));
+      }
     }
   }
 }

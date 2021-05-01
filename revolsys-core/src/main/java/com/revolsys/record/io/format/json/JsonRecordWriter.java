@@ -39,6 +39,8 @@ public class JsonRecordWriter extends AbstractRecordWriter {
 
   private JsonObject header;
 
+  private JsonObject footer;
+
   public JsonRecordWriter(final RecordDefinitionProxy recordDefinition, final Writer out) {
     super(recordDefinition);
     this.out = out;
@@ -59,16 +61,13 @@ public class JsonRecordWriter extends AbstractRecordWriter {
             writeHeader();
           }
           out.write("\n]");
-          boolean written = this.written;
+          writeExtraValues(this.footer, true);
+
           final MapEx extraProperties = getProperty("extraProperties", MapEx.EMPTY);
           for (final Entry<String, Object> entry : extraProperties.entrySet()) {
             final String name = entry.getKey();
             final Object value = entry.getValue();
-            if (written) {
-              this.out.write(",\n");
-            } else {
-              written = true;
-            }
+            this.out.write(",\n");
             label(name);
             value(null, value);
           }
@@ -160,6 +159,10 @@ public class JsonRecordWriter extends AbstractRecordWriter {
       value(null, value);
     }
     endList();
+  }
+
+  public void setFooter(final JsonObject footer) {
+    this.footer = footer;
   }
 
   public void setHeader(final JsonObject header) {
@@ -299,6 +302,26 @@ public class JsonRecordWriter extends AbstractRecordWriter {
     }
   }
 
+  private boolean writeExtraValues(final JsonObject values, boolean hasPrevious)
+    throws IOException {
+    final Writer out = this.out;
+    if (values != null) {
+      for (final String name : values.keySet()) {
+        if (hasPrevious) {
+          out.write(",\n");
+        } else {
+          hasPrevious = true;
+        }
+        final Object value = values.getValue(name);
+        label(name);
+
+        final DataType dataType = DataTypes.getDataType(value);
+        value(dataType, value);
+      }
+    }
+    return hasPrevious;
+  }
+
   private void writeHeader() throws IOException {
     final Writer out = this.out;
     final String callback = getProperty(IoConstants.JSONP_PROPERTY);
@@ -309,15 +332,8 @@ public class JsonRecordWriter extends AbstractRecordWriter {
     this.singleObject = Boolean.TRUE.equals(getProperty(IoConstants.SINGLE_OBJECT_PROPERTY));
     if (!this.singleObject) {
       out.write("{");
-      if (this.header != null) {
-        for (final String headerName : this.header.keySet()) {
-          final Object value = this.header.getValue(headerName);
-          label(headerName);
-
-          final DataType dataType = DataTypes.getDataType(value);
-          value(dataType, value);
-          out.write(",\n");
-        }
+      if (writeExtraValues(this.header, false)) {
+        out.write(",\n");
       }
       out.write('"');
       out.write(this.itemsPropertyName);

@@ -40,6 +40,7 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.Subtract;
 import com.revolsys.record.query.Value;
+import com.revolsys.record.query.functions.F;
 import com.revolsys.record.query.functions.Lower;
 import com.revolsys.record.query.functions.Upper;
 import com.revolsys.record.schema.FieldDefinition;
@@ -116,6 +117,8 @@ public class ODataParser {
     public static final String FLOOR = "floor";
 
     public static final String CEILING = "ceiling";
+
+    public static final String GEO_INTERSECTS = "geo.intersects";
   };
 
   public static class Token {
@@ -131,7 +134,7 @@ public class ODataParser {
 
     @Override
     public String toString() {
-      return "[" + this.value + "]";
+      return "[" + this.value + "] " + this.type;
     }
   }
 
@@ -143,12 +146,13 @@ public class ODataParser {
     Methods.STARTSWITH, Methods.SUBSTRINGOF, Methods.INDEXOF, Methods.REPLACE, Methods.TOLOWER,
     Methods.TOUPPER, Methods.TRIM, Methods.SUBSTRING, Methods.CONCAT, Methods.LENGTH, Methods.YEAR,
     Methods.MONTH, Methods.DAY, Methods.HOUR, Methods.MINUTE, Methods.SECOND, Methods.ROUND,
-    Methods.FLOOR, Methods.CEILING);
+    Methods.FLOOR, Methods.CEILING, Methods.GEO_INTERSECTS);
 
   private static final Map<String, Function<List<QueryValue>, QueryValue>> METHOD_FACTORIES = Maps
     .<String, Function<List<QueryValue>, QueryValue>> buildHash()//
     .add(Methods.TOUPPER, Upper::new)
     .add(Methods.TOLOWER, Lower::new)
+    .add(Methods.GEO_INTERSECTS, F::envelopeIntersects)
     .getMap();
 
   // Order by preference
@@ -372,19 +376,18 @@ public class ODataParser {
         if (k >= 0) {
           final Token methodNameToken = tokens.get(k);
           if (methodNameToken.type == TokenType.WORD) {
-            if (METHODS.contains(methodNameToken.value)) {
-              methodName = methodNameToken.value;
+            final String methodTokenValue = methodNameToken.value;
+            if (METHODS.contains(methodTokenValue)) {
+              methodName = methodTokenValue;
 
               // this isn't strictly correct. I think the parser has issues
               // with sequences of WORD, WHITESPACE, WORD, etc. I'm not sure
               // I've
               // ever seen a token type of WHITESPACE producer by a lexer..
-            } else if (methodNameToken.value.endsWith("/any")
-              || methodNameToken.value.endsWith("/all")) {
-              aggregateSource = methodNameToken.value.substring(0,
-                methodNameToken.value.length() - 4);
+            } else if (methodTokenValue.endsWith("/any") || methodTokenValue.endsWith("/all")) {
+              aggregateSource = methodTokenValue.substring(0, methodTokenValue.length() - 4);
               aggregateFunction = Enum.valueOf(AggregateFunction.class,
-                methodNameToken.value.substring(methodNameToken.value.length() - 3));
+                methodTokenValue.substring(methodTokenValue.length() - 3));
               // to get things rolling I'm going to lookahead and require a very
               // strict
               // sequence of tokens:
@@ -696,14 +699,15 @@ public class ODataParser {
       }
     }
     final List<Object> values = new ArrayList<>();
-    for (int i = 0; i < tokens.size(); i++) {
-      final Token token = tokens.get(i);
+    for (final Token token : tokens) {
       if (token.type == TokenType.WHITESPACE) {
       } else if (token.type == TokenType.SYMBOL && token.value.equals(",")) {
       } else if (token.type == TokenType.QUOTED_STRING) {
-        values.add(unquote(token.value));
+        final String value = unquote(token.value);
+        values.add(value);
       } else {
-        throw new RuntimeException("Unable to read expression with tokens: " + tokens);
+        throw new RuntimeException(
+          "Unable to read expression with tokens: " + token + ":" + tokens);
       }
     }
     return new CollectionValue(values);
