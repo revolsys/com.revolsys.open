@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Supplier;
 
 import org.jeometry.common.compare.CompareUtil;
 import org.jeometry.common.data.identifier.Identifier;
@@ -335,6 +336,15 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
     }
   }
 
+  default <T extends Object> T getValue(final CharSequence name, final Supplier<T> defaultValue) {
+    final T value = getValue(name);
+    if (value == null) {
+      return defaultValue.get();
+    } else {
+      return value;
+    }
+  }
+
   default <T extends Object> T getValue(final CharSequence name, final T defaultValue) {
     final T value = getValue(name);
     if (value == null) {
@@ -392,6 +402,15 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
   default <T extends Object> T removeValue(final CharSequence name, final DataType dataType) {
     final Object value = removeValue(name);
     return dataType.toObject(value);
+  }
+
+  default <V> V removeValue(final CharSequence name, final Supplier<V> defaultValue) {
+    final V value = removeValue(name);
+    if (value == null) {
+      return defaultValue.get();
+    } else {
+      return value;
+    }
   }
 
   default <V> V removeValue(final CharSequence name, final V defaultValue) {

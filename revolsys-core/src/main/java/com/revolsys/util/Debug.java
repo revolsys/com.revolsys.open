@@ -112,8 +112,11 @@ public class Debug {
 
   public static void time(final String message, final Runnable runnable) {
     final long startTime = System.currentTimeMillis();
-    runnable.run();
-    Dates.printEllapsedTime(message, startTime);
+    try {
+      runnable.run();
+    } finally {
+      Dates.printEllapsedTime(message, startTime);
+    }
   }
 
   public static void typePath(final Edge<?> edge, final String typePath) {

@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 
 public interface JsonList extends List<Object>, JsonType {
@@ -242,14 +243,32 @@ public interface JsonList extends List<Object>, JsonType {
   }
 
   default <V> void forEachType(final Consumer<V> action) {
-    List.super.forEach((value) -> {
+    List.super.forEach(value -> {
       action.accept((V)value);
     });
+  }
+
+  default Integer getInteger(final int index) {
+    return getValue(index, DataTypes.INT);
+  }
+
+  default int getInteger(final int index, final int defaultValue) {
+    final Integer value = getInteger(index);
+    if (value == null) {
+      return defaultValue;
+    } else {
+      return value;
+    }
   }
 
   @SuppressWarnings("unchecked")
   default <V> V getValue(final int index) {
     return (V)get(index);
+  }
+
+  default <T extends Object> T getValue(final int index, final DataType dataType) {
+    final Object value = get(index);
+    return dataType.toObject(value);
   }
 
   @SuppressWarnings({

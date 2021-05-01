@@ -24,11 +24,12 @@ import java.nio.charset.StandardCharsets;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.io.DelegatingInputStream;
 import com.revolsys.io.EndOfFileException;
 import com.revolsys.io.SeekableByteChannelInputStream;
 import com.revolsys.spring.resource.Resource;
 
-public class ChannelReader implements BaseCloseable {
+public class ChannelReader extends InputStream implements BaseCloseable {
 
   public static ChannelReader newChannelReader(final Object source) {
     final Resource resource = Resource.getResource(source);
@@ -45,7 +46,11 @@ public class ChannelReader implements BaseCloseable {
 
   private int available = 0;
 
-  private ByteBuffer tempBuffer = ByteBuffer.allocate(8);
+  protected ByteBuffer tempBuffer = ByteBuffer.allocate(8);
+
+  private InputStream wrapStream;
+
+  private long readPosition = 0;
 
   public ChannelReader() {
     this((ReadableByteChannel)null);
@@ -108,13 +113,16 @@ public class ChannelReader implements BaseCloseable {
   }
 
   public byte[] getBytes(final byte[] bytes) {
-    final int byteCount = bytes.length;
+    return getBytes(bytes, 0, bytes.length);
+  }
+
+  public byte[] getBytes(final byte[] bytes, final int offset, final int byteCount) {
     if (this.available < byteCount) {
-      int offset = this.available;
-      this.buffer.get(bytes, 0, offset);
+      int readOffset = this.available;
+      this.buffer.get(bytes, offset, readOffset);
       this.available = 0;
       do {
-        int bytesToRead = byteCount - offset;
+        int bytesToRead = byteCount - readOffset;
         final int limit = this.buffer.limit();
         if (bytesToRead > limit) {
           bytesToRead = limit;
@@ -124,9 +132,9 @@ public class ChannelReader implements BaseCloseable {
           bytesToRead = this.available;
         }
         this.available -= bytesToRead;
-        this.buffer.get(bytes, offset, bytesToRead);
-        offset += bytesToRead;
-      } while (offset < byteCount);
+        this.buffer.get(bytes, offset + readOffset, bytesToRead);
+        readOffset += bytesToRead;
+      } while (readOffset < byteCount);
     } else {
       this.available -= byteCount;
       this.buffer.get(bytes);
@@ -278,6 +286,17 @@ public class ChannelReader implements BaseCloseable {
     return getString(byteCount, StandardCharsets.US_ASCII);
   }
 
+  public InputStream getWrapStream() {
+    if (this.wrapStream == null) {
+      this.wrapStream = new DelegatingInputStream(this) {
+        @Override
+        public void close() throws IOException {
+        }
+      };
+    }
+    return this.wrapStream;
+  }
+
   public void init(final byte[] bytes) {
     this.available = 0;
     if (bytes == null) {
@@ -309,8 +328,31 @@ public class ChannelReader implements BaseCloseable {
         throw Exceptions.wrap(e);
       }
     } else {
+      return this.readPosition - this.available;
+    }
+  }
+
+  @Override
+  public int read() {
+    try {
+      final byte b = getByte();
+      return b & 0xff;
+    } catch (final EndOfFileException e) {
       return -1;
     }
+  }
+
+  @Override
+  public int read(final byte[] bytes, final int offset, int length) throws IOException {
+    if (this.available == 0) {
+      read(1);
+    }
+    if (length > this.available) {
+      length = this.available;
+    }
+    this.buffer.get(bytes, offset, length);
+    this.available -= length;
+    return length;
   }
 
   private void read(final int minCount) {
@@ -324,6 +366,7 @@ public class ChannelReader implements BaseCloseable {
         if (readCount == -1) {
           throw new EndOfFileException();
         } else {
+          this.readPosition += readCount;
           available += readCount;
         }
       }
@@ -351,10 +394,10 @@ public class ChannelReader implements BaseCloseable {
     return buffer;
   }
 
-  private ByteBuffer readTempBytes(final int count) {
-    final ByteBuffer buffer = this.buffer;
+  protected ByteBuffer readTempBytes(final int count) {
     final ByteBuffer tempBuffer = this.tempBuffer;
     tempBuffer.clear();
+    final ByteBuffer buffer = this.buffer;
     if (this.available > 0) {
       tempBuffer.put(buffer);
     }
@@ -372,16 +415,20 @@ public class ChannelReader implements BaseCloseable {
 
   public void seek(final long position) {
     try {
+      final long currentPosition = position();
       if (this.channel instanceof SeekableByteChannel) {
-        final long currentPosition = position();
         if (position != currentPosition) {
           final SeekableByteChannel channel = (SeekableByteChannel)this.channel;
           channel.position(position);
           this.available = 0;
           this.buffer.clear();
         }
+      } else if (position >= currentPosition) {
+        final long offset = position - currentPosition;
+
+        skipBytes((int)offset);
       } else {
-        throw new IllegalArgumentException("Seek not supported");
+        throw new IllegalArgumentException("Seek backwards supported");
       }
     } catch (final IOException e) {
       throw Exceptions.wrap(e);

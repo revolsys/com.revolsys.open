@@ -258,6 +258,9 @@ public final class JsonWriter implements BaseCloseable {
       } else if (value.getClass().isArray()) {
         final List<? extends Object> list = Lists.arrayToList(value);
         write(list);
+      } else if (value instanceof Jsonable) {
+        final JsonType json = ((Jsonable)value).toJson();
+        value(json);
       } else {
         value(DataTypes.toString(value));
       }
