@@ -29,6 +29,7 @@ import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.StringWriter;
 import com.revolsys.io.ZipUtil;
 import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.io.format.html.HtmlWriter;
@@ -130,7 +131,7 @@ public class LasPointCloud extends BaseObjectWithProperties
   }
 
   protected void closeReader() {
-    final ChannelReader reader = this.reader;
+    final DataReader reader = this.reader;
     this.reader = null;
     if (reader != null) {
       reader.close();

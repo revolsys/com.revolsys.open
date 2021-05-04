@@ -18,7 +18,7 @@ import static java.lang.Integer.compareUnsigned;
 
 import org.jeometry.common.number.Longs;
 
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //                                                                           -
@@ -59,7 +59,7 @@ import com.revolsys.io.channels.ChannelReader;
 
 public class ArithmeticDecoder implements ArithmeticCodingCodec {
 
-  private ChannelReader in;
+  private DataReader in;
 
   private int value;
 
@@ -165,15 +165,15 @@ public class ArithmeticDecoder implements ArithmeticCodingCodec {
     return decodeSymbol(model);
   }
 
-  public ChannelReader getIn() {
+  public DataReader getIn() {
     return this.in;
   }
 
-  public void init(final ChannelReader in) {
+  public void init(final DataReader in) {
     init(in, true);
   }
 
-  public void init(final ChannelReader in, final boolean reallyInit) {
+  public void init(final DataReader in, final boolean reallyInit) {
     if (in != null) {
       this.in = in;
       this.length = AC__MaxLength;

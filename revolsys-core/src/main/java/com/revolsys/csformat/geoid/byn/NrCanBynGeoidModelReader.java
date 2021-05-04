@@ -13,7 +13,7 @@ import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 
@@ -35,7 +35,7 @@ public class NrCanBynGeoidModelReader extends BaseObjectWithProperties
 
   private boolean initialized = false;
 
-  private ChannelReader reader;
+  private DataReader reader;
 
   public NrCanBynGeoidModelReader(final Resource resource, final MapEx properties) {
     this.resource = resource;
@@ -83,7 +83,7 @@ public class NrCanBynGeoidModelReader extends BaseObjectWithProperties
   @Override
   public GriddedElevationModel read() {
     open();
-    final ChannelReader reader = this.reader;
+    final DataReader reader = this.reader;
     if (reader != null) {
       try {
         final int gridWidth = this.gridWidth;
@@ -112,7 +112,7 @@ public class NrCanBynGeoidModelReader extends BaseObjectWithProperties
 
   @SuppressWarnings("unused")
   private void readHeader() {
-    final ChannelReader reader = this.reader;
+    final DataReader reader = this.reader;
     reader.setByteOrder(ByteOrder.LITTLE_ENDIAN);
     final int minYSeconds = reader.getInt();
     final int maxYSeconds = reader.getInt();

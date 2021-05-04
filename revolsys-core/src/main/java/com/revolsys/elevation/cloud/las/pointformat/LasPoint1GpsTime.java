@@ -1,8 +1,8 @@
 package com.revolsys.elevation.cloud.las.pointformat;
 
 import com.revolsys.elevation.cloud.las.LasPointCloud;
-import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.record.io.format.json.JsonObject;
 
 public class LasPoint1GpsTime extends LasPoint0Core implements LasPointGpsTime {
@@ -26,7 +26,7 @@ public class LasPoint1GpsTime extends LasPoint0Core implements LasPointGpsTime {
   }
 
   @Override
-  public void read(final LasPointCloud pointCloud, final ChannelReader reader) {
+  public void read(final LasPointCloud pointCloud, final DataReader reader) {
     super.read(pointCloud, reader);
     this.gpsTime = reader.getDouble();
   }

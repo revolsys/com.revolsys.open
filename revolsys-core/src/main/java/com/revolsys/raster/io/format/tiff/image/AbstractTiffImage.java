@@ -24,7 +24,7 @@ import org.jeometry.common.number.Longs;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.raster.AbstractGeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageMapTile;
 import com.revolsys.raster.io.format.tiff.TiffDirectory;
@@ -88,7 +88,7 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
     @Override
     protected BufferedImage loadBuffferedImage() {
       try (
-        ChannelReader in = AbstractTiffImage.this.directory.newChannelReader()) {
+        DataReader in = AbstractTiffImage.this.directory.newChannelReader()) {
         final int tileIndex = this.tileY * AbstractTiffImage.this.tileCountX + this.tileX;
         final int actualTileWidth = getWidthPixels();
         final int actualTileHeight = getHeightPixels();
@@ -268,7 +268,7 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
     }
   }
 
-  private InputStream getInputStream(final ChannelReader in, final long[] offsets,
+  private InputStream getInputStream(final DataReader in, final long[] offsets,
     final long[] counts, final int index) {
     final long offset = offsets[index];
     final int byteCount = (int)counts[index];
@@ -344,7 +344,7 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
     if (image == null) {
       BufferedImage bufferedImage;
       try (
-        ChannelReader in = this.directory.newChannelReader()) {
+        DataReader in = this.directory.newChannelReader()) {
         if (isTiled()) {
           bufferedImage = newBufferedImageTiles(in);
         } else if (this.stripOffsets.length > 0) {
@@ -392,7 +392,7 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
 
   protected abstract BufferedImage newBufferedImage(int imageWidth, int imageHeight);
 
-  private BufferedImage newBufferedImageStrips(final ChannelReader in) {
+  private BufferedImage newBufferedImageStrips(final DataReader in) {
     final BufferedImage bufferedImage = newBufferedImage();
     final int imageWidth = getImageWidth();
     final int imageHeight = getImageHeight();
@@ -409,7 +409,7 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
     return bufferedImage;
   }
 
-  private BufferedImage newBufferedImageTiles(final ChannelReader in) {
+  private BufferedImage newBufferedImageTiles(final DataReader in) {
     final BufferedImage bufferedImage = newBufferedImage();
     final int imageWidth = getImageWidth();
     final int imageHeight = getImageHeight();
@@ -445,7 +445,7 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
     return bufferedImage;
   }
 
-  protected TiffDecompressor newPlanarDecompressor(final ChannelReader in, final long[] offsets,
+  protected TiffDecompressor newPlanarDecompressor(final DataReader in, final long[] offsets,
     final long[] counts, final int partIndex, final int sampleIndex) {
     if (sampleIndex < 0) {
       return null;
@@ -494,7 +494,7 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
     }
   }
 
-  protected TiffDecompressor newTiffDecompressor(final ChannelReader in, final long[] offsets,
+  protected TiffDecompressor newTiffDecompressor(final DataReader in, final long[] offsets,
     final long[] counts, final int partIndex) {
     final InputStream inputStream = getInputStream(in, offsets, counts, partIndex);
     return newTiffDecompressor(inputStream);
@@ -558,7 +558,7 @@ public abstract class AbstractTiffImage extends AbstractGeoreferencedImage imple
     return geometryFactory.newBoundingBox(minX, maxY, maxX, minY);
   }
 
-  protected void readImagePart(final ChannelReader in, final BufferedImage bufferedImage,
+  protected void readImagePart(final DataReader in, final BufferedImage bufferedImage,
     final long[] offsets, final long[] counts, final int partIndex, final int imageX,
     final int imageY, final int dataWidth, final int dataHeight, final int cropWidth) {
     try (

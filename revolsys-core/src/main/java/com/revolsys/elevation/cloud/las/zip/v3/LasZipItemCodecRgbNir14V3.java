@@ -19,8 +19,8 @@ import com.revolsys.elevation.cloud.las.zip.context.LasZipContextRgb;
 import com.revolsys.elevation.cloud.las.zip.context.LasZipContextRgbNir;
 import com.revolsys.elevation.cloud.las.zip.context.RgbUpperLower;
 import com.revolsys.elevation.cloud.las.zip.context.ShortUpperLower;
-import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingCodec;
 import com.revolsys.math.arithmeticcoding.ArithmeticDecoder;
 import com.revolsys.math.arithmeticcoding.ArithmeticEncoder;
@@ -116,13 +116,13 @@ public class LasZipItemCodecRgbNir14V3 implements LasZipItemCodec {
 
   @Override
   public void readChunkSizes() {
-    final ChannelReader in = this.decoder.getIn();
+    final DataReader in = this.decoder.getIn();
     this.rgbDecoder.readSize(in);
     this.nirDecoder.readSize(in);
   }
 
   public int readInit(final LasPoint point) {
-    final ChannelReader in = this.decoder.getIn();
+    final DataReader in = this.decoder.getIn();
 
     this.rgbChanged = this.rgbDecoder.readBytes(in);
 

@@ -104,8 +104,8 @@ import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.geometry.operation.union.CascadedPolygonUnion;
 import com.revolsys.geometry.util.RectangleUtil;
 import com.revolsys.io.StringWriter;
-import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonObjectHash;
@@ -818,7 +818,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
     }
   }
 
-  public static GeometryFactory readOffsetScaled3d(final ChannelReader reader) {
+  public static GeometryFactory readOffsetScaled3d(final DataReader reader) {
     final int coordinateSystemId = reader.getInt();
     final double offsetX = reader.getDouble();
     final double scaleX = reader.getDouble();

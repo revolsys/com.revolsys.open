@@ -22,6 +22,7 @@ import com.revolsys.gis.grid.RectangularMapGrid;
 import com.revolsys.io.Buffers;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.io.file.Paths;
 
 public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileElevationModel {
@@ -44,7 +45,7 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
 
   private FileChannel channel;
 
-  private ChannelReader reader;
+  private DataReader reader;
 
   private final Set<OpenOption> openOptions;
 
@@ -139,7 +140,7 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
     return this.channel;
   }
 
-  private ChannelReader getReader() throws IOException {
+  private DataReader getReader() throws IOException {
     getFileChannel();
     return this.reader;
   }
@@ -184,7 +185,7 @@ public class ScaledIntegerGriddedDigitalElevationModelFile extends DirectFileEle
 
   private void readHeader() {
     try {
-      final ChannelReader reader = getReader();
+      final DataReader reader = getReader();
 
       final byte[] fileTypeBytes = new byte[6];
       this.reader.getBytes(fileTypeBytes);

@@ -17,7 +17,7 @@ import org.jeometry.coordinatesystem.operation.gridshift.HorizontalShiftOperatio
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionBuilder;
@@ -54,7 +54,7 @@ public class GsbGridShiftFile {
 
   private final List<GsbGridShiftGrid> grids = new ArrayList<>();
 
-  private transient ChannelReader in;
+  private transient DataReader in;
 
   private GeographicCoordinateSystem fromCoordinateSystem;
 
@@ -70,7 +70,7 @@ public class GsbGridShiftFile {
   public GsbGridShiftFile(final Object source, final boolean loadAccuracy) {
     this.resource = Resource.getResource(source);
     try (
-      ChannelReader in = this.resource.newChannelReader()) {
+      DataReader in = this.resource.newChannelReader()) {
       this.in = in;
       in.setByteOrder(ByteOrder.LITTLE_ENDIAN);
       final String overviewHeaderCountId = in.getString(8, StandardCharsets.ISO_8859_1);

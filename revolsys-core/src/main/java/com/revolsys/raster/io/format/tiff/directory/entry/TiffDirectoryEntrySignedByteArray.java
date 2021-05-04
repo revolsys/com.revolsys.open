@@ -2,8 +2,8 @@ package com.revolsys.raster.io.format.tiff.directory.entry;
 
 import java.util.Arrays;
 
-import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
 
 public class TiffDirectoryEntrySignedByteArray extends AbstractTiffDirectoryEntry<byte[]> {
@@ -43,7 +43,7 @@ public class TiffDirectoryEntrySignedByteArray extends AbstractTiffDirectoryEntr
   }
 
   @Override
-  protected byte[] loadValueDo(final ChannelReader in, final int count) {
+  protected byte[] loadValueDo(final DataReader in, final int count) {
     final byte[] value = new byte[count];
     for (int i = 0; i < count; i++) {
       value[i] = in.getByte();

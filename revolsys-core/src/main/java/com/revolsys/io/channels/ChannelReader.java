@@ -1,16 +1,5 @@
-/*
- * Copyright 2007-2013, martin isenburg, rapidlasso - fast tools to catch reality
- *
- * This is free software; you can redistribute and/or modify it under the
- * terms of the GNU Lesser General Licence as published by the Free Software
- * Foundation. See the LICENSE.txt file for more information.
- *
- * This software is distributed WITHOUT ANY WARRANTY and without even the
- * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- */
 package com.revolsys.io.channels;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -18,39 +7,16 @@ import java.nio.ByteOrder;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.io.DelegatingInputStream;
 import com.revolsys.io.EndOfFileException;
 import com.revolsys.io.SeekableByteChannelInputStream;
-import com.revolsys.spring.resource.Resource;
 
-public class ChannelReader extends InputStream implements BaseCloseable {
+public class ChannelReader extends AbstractDataReader implements BaseCloseable {
 
-  public static ChannelReader newChannelReader(final Object source) {
-    final Resource resource = Resource.getResource(source);
-    if (resource == null) {
-      return null;
-    } else {
-      return resource.newChannelReader();
-    }
-  }
-
-  private ByteBuffer buffer;
-
-  private ReadableByteChannel channel;
-
-  private int available = 0;
-
-  protected ByteBuffer tempBuffer = ByteBuffer.allocate(8);
-
-  private InputStream wrapStream;
-
-  private long readPosition = 0;
+  private final ReadableByteChannel channel;
 
   public ChannelReader() {
     this((ReadableByteChannel)null);
@@ -65,14 +31,8 @@ public class ChannelReader extends InputStream implements BaseCloseable {
   }
 
   public ChannelReader(final ReadableByteChannel channel, final ByteBuffer buffer) {
+    super(buffer, channel instanceof SeekableByteChannel);
     this.channel = channel;
-    if (buffer == null) {
-      this.buffer = ByteBuffer.allocateDirect(8192);
-    } else {
-      this.buffer = buffer;
-      this.buffer.clear();
-    }
-    this.tempBuffer.order(this.buffer.order());
   }
 
   public ChannelReader(final ReadableByteChannel channel, final int capacity) {
@@ -87,71 +47,23 @@ public class ChannelReader extends InputStream implements BaseCloseable {
 
   @Override
   public void close() {
-    final ReadableByteChannel channel = this.channel;
-    this.channel = null;
-    if (channel != null) {
+    if (!isClosed()) {
       try {
-        channel.close();
+        this.channel.close();
       } catch (final IOException e) {
         throw Exceptions.wrap(e);
+      } finally {
+        super.close();
       }
     }
-    this.buffer = null;
-    this.tempBuffer = null;
   }
 
-  public byte getByte() {
-    if (this.available == 0) {
-      read(1);
-    }
-    this.available--;
-    return this.buffer.get();
-  }
-
-  public ByteOrder getByteOrder() {
-    return this.buffer.order();
-  }
-
-  public byte[] getBytes(final byte[] bytes) {
-    return getBytes(bytes, 0, bytes.length);
-  }
-
-  public byte[] getBytes(final byte[] bytes, final int offset, final int byteCount) {
-    if (this.available < byteCount) {
-      int readOffset = this.available;
-      this.buffer.get(bytes, offset, readOffset);
-      this.available = 0;
-      do {
-        int bytesToRead = byteCount - readOffset;
-        final int limit = this.buffer.limit();
-        if (bytesToRead > limit) {
-          bytesToRead = limit;
-        }
-        read(bytesToRead);
-        if (bytesToRead > this.available) {
-          bytesToRead = this.available;
-        }
-        this.available -= bytesToRead;
-        this.buffer.get(bytes, offset + readOffset, bytesToRead);
-        readOffset += bytesToRead;
-      } while (readOffset < byteCount);
-    } else {
-      this.available -= byteCount;
-      this.buffer.get(bytes);
-    }
-    return bytes;
-  }
-
-  public byte[] getBytes(final int byteCount) {
-    final byte[] bytes = new byte[byteCount];
-    return getBytes(bytes);
-  }
-
+  @Override
   public byte[] getBytes(final long offset, final int byteCount) {
-    if (this.channel instanceof SeekableByteChannel) {
+    if (isSeekable()) {
       final byte[] bytes = new byte[byteCount];
       try {
-        final SeekableByteChannel seekChannel = (SeekableByteChannel)this.channel;
+        final SeekableByteChannel seekChannel = (SeekableByteChannel)getChannel();
         seekChannel.position(offset);
         final ByteBuffer buffer = ByteBuffer.wrap(bytes);
         final int count = seekChannel.read(buffer);
@@ -168,7 +80,7 @@ public class ChannelReader extends InputStream implements BaseCloseable {
         throw Exceptions.wrap(e);
       }
     } else {
-      throw new IllegalArgumentException("Not supported");
+      return super.getBytes(offset, byteCount);
     }
   }
 
@@ -176,205 +88,27 @@ public class ChannelReader extends InputStream implements BaseCloseable {
     return this.channel;
   }
 
-  public double getDouble() {
-    if (this.available < 8) {
-      final ByteBuffer tempBuffer = readTempBytes(8);
-      return tempBuffer.getDouble();
-    } else {
-      this.available -= 8;
-      return this.buffer.getDouble();
-    }
-  }
-
-  public float getFloat() {
-    if (this.available < 4) {
-      final ByteBuffer tempBuffer = readTempBytes(4);
-      return tempBuffer.getFloat();
-    } else {
-      this.available -= 4;
-      return this.buffer.getFloat();
-    }
-  }
-
+  @Override
   public InputStream getInputStream(final long offset, final int size) {
-    if (this.channel instanceof SeekableByteChannel) {
-      final SeekableByteChannel seekableChannel = (SeekableByteChannel)this.channel;
+    if (isSeekable()) {
+      final SeekableByteChannel seekableChannel = (SeekableByteChannel)getChannel();
       return new SeekableByteChannelInputStream(seekableChannel, offset, size);
     } else {
-      throw new IllegalArgumentException("Channel not seekable");
+      return super.getInputStream(offset, size);
     }
   }
 
-  public int getInt() {
-    if (this.available < 4) {
-      final ByteBuffer tempBuffer = readTempBytes(4);
-      return tempBuffer.getInt();
-    } else {
-      this.available -= 4;
-      return this.buffer.getInt();
-    }
-  }
-
-  public long getLong() {
-    if (this.available < 8) {
-      final ByteBuffer tempBuffer = readTempBytes(8);
-      return tempBuffer.getLong();
-    } else {
-      this.available -= 8;
-      return this.buffer.getLong();
-    }
-  }
-
-  public short getShort() {
-    if (this.available < 2) {
-      final ByteBuffer tempBuffer = readTempBytes(2);
-      return tempBuffer.getShort();
-    } else {
-      this.available -= 2;
-      return this.buffer.getShort();
-    }
-  }
-
-  public String getString(final int byteCount, final Charset charset) {
-    final byte[] bytes = getBytes(byteCount);
-    int i = 0;
-    for (; i < bytes.length; i++) {
-      final byte character = bytes[i];
-      if (character == 0) {
-        return new String(bytes, 0, i, charset);
-      }
-    }
-    return new String(bytes, 0, i, charset);
-  }
-
-  public String getStringUtf8ByteCount() {
-    final int byteCount = getInt();
-    if (byteCount < 0) {
-      return null;
-    } else if (byteCount == 0) {
-      return "";
-    } else {
-      return getString(byteCount, StandardCharsets.UTF_8);
-    }
-  }
-
-  public short getUnsignedByte() {
-    final byte signedByte = getByte();
-    return (short)Byte.toUnsignedInt(signedByte);
-  }
-
-  public long getUnsignedInt() {
-    final int signedInt = getInt();
-    return Integer.toUnsignedLong(signedInt);
-  }
-
-  /**
-   * Unsigned longs don't actually work channel Java
-   * @return
-   */
-  public long getUnsignedLong() {
-    final long signedLong = getLong();
-    return signedLong;
-  }
-
-  public int getUnsignedShort() {
-    final short signedShort = getShort();
-    return Short.toUnsignedInt(signedShort);
-  }
-
-  public String getUsAsciiString(final int byteCount) {
-    return getString(byteCount, StandardCharsets.US_ASCII);
-  }
-
-  public InputStream getWrapStream() {
-    if (this.wrapStream == null) {
-      this.wrapStream = new DelegatingInputStream(this) {
-        @Override
-        public void close() throws IOException {
-        }
-      };
-    }
-    return this.wrapStream;
-  }
-
-  public void init(final byte[] bytes) {
-    this.available = 0;
-    if (bytes == null) {
-      this.channel = null;
-    } else {
-      this.channel = Channels.newChannel(new ByteArrayInputStream(bytes));
-    }
-  }
-
-  public void init(final byte[] bytes, final int length) {
-    this.available = 0;
-    if (bytes == null) {
-      this.channel = null;
-    } else {
-      this.channel = Channels.newChannel(new ByteArrayInputStream(bytes, 0, length));
-    }
-  }
-
-  public boolean isSeekable() {
-    return this.channel instanceof SeekableByteChannel;
-  }
-
+  @Override
   public long position() {
-    if (this.channel instanceof SeekableByteChannel) {
-      final SeekableByteChannel channel = (SeekableByteChannel)this.channel;
+    if (isSeekable()) {
+      final SeekableByteChannel channel = (SeekableByteChannel)getChannel();
       try {
-        return channel.position() - this.available;
+        return channel.position() - getAvailable();
       } catch (final IOException e) {
         throw Exceptions.wrap(e);
       }
     } else {
-      return this.readPosition - this.available;
-    }
-  }
-
-  @Override
-  public int read() {
-    try {
-      final byte b = getByte();
-      return b & 0xff;
-    } catch (final EndOfFileException e) {
-      return -1;
-    }
-  }
-
-  @Override
-  public int read(final byte[] bytes, final int offset, int length) throws IOException {
-    if (this.available == 0) {
-      read(1);
-    }
-    if (length > this.available) {
-      length = this.available;
-    }
-    this.buffer.get(bytes, offset, length);
-    this.available -= length;
-    return length;
-  }
-
-  private void read(final int minCount) {
-    final ReadableByteChannel channel = this.channel;
-    final ByteBuffer buffer = this.buffer;
-    int available = this.available;
-    try {
-      buffer.clear();
-      while (available < minCount) {
-        final int readCount = channel.read(buffer);
-        if (readCount == -1) {
-          throw new EndOfFileException();
-        } else {
-          this.readPosition += readCount;
-          available += readCount;
-        }
-      }
-      buffer.flip();
-    } catch (final IOException e) {
-      throw Exceptions.wrap(e);
-    } finally {
-      this.available = available;
+      return super.position();
     }
   }
 
@@ -384,7 +118,7 @@ public class ChannelReader extends InputStream implements BaseCloseable {
     seek(offset);
     do {
       try {
-        this.channel.read(buffer);
+        getChannel().read(buffer);
       } catch (final IOException e) {
         throw Exceptions.wrap(e);
       }
@@ -394,51 +128,34 @@ public class ChannelReader extends InputStream implements BaseCloseable {
     return buffer;
   }
 
-  protected ByteBuffer readTempBytes(final int count) {
-    final ByteBuffer tempBuffer = this.tempBuffer;
-    tempBuffer.clear();
-    final ByteBuffer buffer = this.buffer;
-    if (this.available > 0) {
-      tempBuffer.put(buffer);
-    }
-    final int readCount = count - this.available;
-    this.available = 0;
-    read(readCount);
-    this.available -= readCount;
-    for (int i = 0; i < readCount; i++) {
-      final byte b = buffer.get();
-      tempBuffer.put(b);
-    }
-    tempBuffer.flip();
-    return tempBuffer;
+  @Override
+  public int readInternal(final ByteBuffer buffer) throws IOException {
+    return getChannel().read(buffer);
   }
 
+  @Override
   public void seek(final long position) {
     try {
-      final long currentPosition = position();
-      if (this.channel instanceof SeekableByteChannel) {
+      if (isSeekable()) {
+        final long currentPosition = position();
         if (position != currentPosition) {
-          final SeekableByteChannel channel = (SeekableByteChannel)this.channel;
+          final SeekableByteChannel channel = (SeekableByteChannel)getChannel();
           channel.position(position);
-          this.available = 0;
-          this.buffer.clear();
+          afterSeek();
         }
-      } else if (position >= currentPosition) {
-        final long offset = position - currentPosition;
-
-        skipBytes((int)offset);
       } else {
-        throw new IllegalArgumentException("Seek backwards supported");
+        super.seek(position);
       }
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }
   }
 
+  @Override
   public void seekEnd(final long distance) {
     try {
-      if (this.channel instanceof SeekableByteChannel) {
-        final SeekableByteChannel channel = (SeekableByteChannel)this.channel;
+      if (isSeekable()) {
+        final SeekableByteChannel channel = (SeekableByteChannel)getChannel();
         final long position = channel.size() - distance;
         seek(position);
       } else {
@@ -447,21 +164,5 @@ public class ChannelReader extends InputStream implements BaseCloseable {
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }
-  }
-
-  public void setByteOrder(final ByteOrder byteOrder) {
-    this.buffer.order(byteOrder);
-    this.tempBuffer.order(byteOrder);
-  }
-
-  public void skipBytes(int count) {
-    while (count > this.available) {
-      count -= this.available;
-      this.available = 0;
-      read(count);
-    }
-    this.available -= count;
-    final int position = this.buffer.position();
-    this.buffer.position(position + count);
   }
 }

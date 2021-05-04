@@ -13,7 +13,7 @@ import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.math.arithmeticcoding.ArithmeticCodingInteger;
 import com.revolsys.math.arithmeticcoding.ArithmeticDecoder;
 import com.revolsys.properties.BaseObjectWithProperties;
@@ -27,7 +27,7 @@ public class CompressedScaledIntegerGriddedDigitalElevationModelReader
 
   private ByteBuffer byteBuffer;
 
-  private ChannelReader reader;
+  private DataReader reader;
 
   private GeometryFactory geometryFactory = GeometryFactory.DEFAULT_3D;
 
@@ -55,7 +55,7 @@ public class CompressedScaledIntegerGriddedDigitalElevationModelReader
   @Override
   public void close() {
     super.close();
-    final ChannelReader reader = this.reader;
+    final DataReader reader = this.reader;
     this.reader = null;
     if (reader != null) {
       reader.close();
@@ -111,7 +111,7 @@ public class CompressedScaledIntegerGriddedDigitalElevationModelReader
     init();
     if (this.exists) {
       try {
-        final ChannelReader reader = this.reader;
+        final DataReader reader = this.reader;
         final double minZ = this.boundingBox.getMinZ();
         final int minZInt = this.geometryFactory.toIntZ(minZ);
         final int nullInt = minZInt - 1;

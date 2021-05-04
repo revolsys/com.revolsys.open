@@ -2,8 +2,8 @@ package com.revolsys.raster.io.format.tiff.directory.entry;
 
 import org.jeometry.common.data.type.DataTypes;
 
-import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.raster.io.format.tiff.TiffDirectory;
 import com.revolsys.raster.io.format.tiff.TiffDirectoryEntry;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
@@ -68,10 +68,10 @@ public abstract class AbstractTiffDirectoryEntry<A> implements TiffDirectoryEntr
     return this.value != null;
   }
 
-  protected abstract A loadValueDo(ChannelReader in, int count);
+  protected abstract A loadValueDo(DataReader in, int count);
 
   @Override
-  public void readEntry(final TiffTag tag, final TiffDirectory directory, final ChannelReader in) {
+  public void readEntry(final TiffTag tag, final TiffDirectory directory, final DataReader in) {
     this.directory = directory;
     this.tag = tag;
     this.count = directory.readOffsetOrCount(in);
@@ -87,7 +87,7 @@ public abstract class AbstractTiffDirectoryEntry<A> implements TiffDirectoryEntr
   }
 
   @Override
-  public void readValue(final ChannelReader in) {
+  public void readValue(final DataReader in) {
     if (!isLoaded()) {
       in.seek(this.offset);
       this.value = loadValueDo(in, (int)this.count);

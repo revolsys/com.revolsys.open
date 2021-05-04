@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.raster.io.format.tiff.TiffDirectory;
 import com.revolsys.raster.io.format.tiff.TiffDirectoryEntry;
 import com.revolsys.raster.io.format.tiff.directory.entry.TiffDirectoryEntryAscii;
@@ -117,7 +117,7 @@ public enum TiffFieldType {
     }
   }
 
-  public static TiffFieldType readValue(final ChannelReader in) {
+  public static TiffFieldType readValue(final DataReader in) {
     final int tag = in.getUnsignedShort();
     return valueById(tag);
   }
@@ -153,7 +153,7 @@ public enum TiffFieldType {
   }
 
   public TiffDirectoryEntry newDirectoryEntry(final TiffTag tag, final TiffDirectory directory,
-    final ChannelReader in) {
+    final DataReader in) {
     final TiffDirectoryEntry entry = this.newDirectoryEntryFunction.get();
     entry.readEntry(tag, directory, in);
     return entry;

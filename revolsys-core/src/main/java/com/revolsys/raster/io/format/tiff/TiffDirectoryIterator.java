@@ -7,7 +7,7 @@ import java.util.NoSuchElementException;
 import java.util.Queue;
 
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.spring.resource.Resource;
 
 public class TiffDirectoryIterator
@@ -20,7 +20,7 @@ public class TiffDirectoryIterator
 
   private int index;
 
-  private final ChannelReader in;
+  private final DataReader in;
 
   private final Queue<TiffDirectoryEntry> entries = new LinkedList<>();
 
@@ -34,7 +34,7 @@ public class TiffDirectoryIterator
 
   public TiffDirectoryIterator(final Resource resource) {
     this.resource = resource;
-    final ChannelReader in = resource.newChannelReader();
+    final DataReader in = resource.newChannelReader();
     this.in = in;
     final byte b1 = in.getByte();
     final byte b2 = in.getByte();

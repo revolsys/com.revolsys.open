@@ -5,7 +5,7 @@ import org.jeometry.common.exception.Exceptions;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.elevation.cloud.las.LasPointCloudIterator;
 import com.revolsys.elevation.cloud.las.pointformat.LasPoint;
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.math.arithmeticcoding.ArithmeticDecoder;
 
 public class LasZipPointwiseIterator extends LasPointCloudIterator {
@@ -14,7 +14,7 @@ public class LasZipPointwiseIterator extends LasPointCloudIterator {
 
   private final LasZipItemCodec[] pointDecompressors;
 
-  public LasZipPointwiseIterator(final LasPointCloud pointCloud, final ChannelReader reader) {
+  public LasZipPointwiseIterator(final LasPointCloud pointCloud, final DataReader reader) {
     super(pointCloud, reader);
     this.decoder = new ArithmeticDecoder();
     final LasZipHeader lasZipHeader = LasZipHeader.getLasZipHeader(pointCloud);
@@ -26,7 +26,7 @@ public class LasZipPointwiseIterator extends LasPointCloudIterator {
     try {
       LasPoint point;
       if (this.index == 0) {
-        final ChannelReader reader = this.reader;
+        final DataReader reader = this.reader;
         point = this.pointFormat.readLasPoint(this.pointCloud, reader);
         for (final LasZipItemCodec pointDecompressor : this.pointDecompressors) {
           pointDecompressor.init(point, 0);

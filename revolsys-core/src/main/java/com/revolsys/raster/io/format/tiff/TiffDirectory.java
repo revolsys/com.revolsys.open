@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.raster.io.format.tiff.code.TiffBaselineTag;
 import com.revolsys.raster.io.format.tiff.code.TiffCompression;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
@@ -48,7 +48,7 @@ public class TiffDirectory {
 
   private final boolean bigTiff;
 
-  public TiffDirectory(final Resource resource, final ChannelReader in, final int index,
+  public TiffDirectory(final Resource resource, final DataReader in, final int index,
     final long offset, final boolean bigTiff) {
     this.resource = resource;
     this.bigTiff = bigTiff;
@@ -316,7 +316,7 @@ public class TiffDirectory {
     return this.bigTiff;
   }
 
-  public ChannelReader newChannelReader() {
+  public DataReader newChannelReader() {
     return this.resource.newChannelReader();
   }
 
@@ -352,7 +352,7 @@ public class TiffDirectory {
     }
   }
 
-  public void readDirectory(final ChannelReader in) {
+  public void readDirectory(final DataReader in) {
     in.seek(this.offset);
     long recordCount;
     int skipSize;
@@ -379,7 +379,7 @@ public class TiffDirectory {
     }
   }
 
-  public long readOffsetOrCount(final ChannelReader in) {
+  public long readOffsetOrCount(final DataReader in) {
     if (this.bigTiff) {
       return in.getUnsignedLong();
     } else {

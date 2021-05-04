@@ -2,8 +2,8 @@ package com.revolsys.elevation.cloud.las.pointformat;
 
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonObjectHash;
@@ -92,7 +92,7 @@ public interface LasPoint extends Point, MapSerializer {
 
   boolean isWithheld();
 
-  void read(LasPointCloud pointCloud, ChannelReader reader);
+  void read(LasPointCloud pointCloud, DataReader reader);
 
   default LasPoint setBlue(final int blue) {
     return this;

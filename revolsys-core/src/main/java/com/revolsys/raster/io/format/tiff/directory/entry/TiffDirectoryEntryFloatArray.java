@@ -2,8 +2,8 @@ package com.revolsys.raster.io.format.tiff.directory.entry;
 
 import java.util.Arrays;
 
-import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
 
 public class TiffDirectoryEntryFloatArray extends AbstractTiffDirectoryEntry<float[]> {
@@ -38,7 +38,7 @@ public class TiffDirectoryEntryFloatArray extends AbstractTiffDirectoryEntry<flo
   }
 
   @Override
-  protected float[] loadValueDo(final ChannelReader in, final int count) {
+  protected float[] loadValueDo(final DataReader in, final int count) {
     final float[] value = new float[count];
     for (int i = 0; i < count; i++) {
       value[i] = in.getFloat();

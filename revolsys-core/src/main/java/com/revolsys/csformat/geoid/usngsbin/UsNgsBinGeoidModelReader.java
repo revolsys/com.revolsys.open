@@ -12,7 +12,7 @@ import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 
@@ -34,7 +34,7 @@ public class UsNgsBinGeoidModelReader extends BaseObjectWithProperties
 
   private boolean initialized;
 
-  private ChannelReader reader;
+  private DataReader reader;
 
   public UsNgsBinGeoidModelReader(final Resource resource, final MapEx properties) {
     this.resource = resource;
@@ -72,7 +72,7 @@ public class UsNgsBinGeoidModelReader extends BaseObjectWithProperties
   @Override
   public GriddedElevationModel read() {
     open();
-    final ChannelReader reader = this.reader;
+    final DataReader reader = this.reader;
     if (reader != null) {
       try {
         final int gridWidth = this.gridWidth;
@@ -100,7 +100,7 @@ public class UsNgsBinGeoidModelReader extends BaseObjectWithProperties
 
   @SuppressWarnings("unused")
   private void readHeader() {
-    final ChannelReader reader = this.reader;
+    final DataReader reader = this.reader;
     double minY = reader.getDouble();
     if (Math.abs(minY) < 1e-10) {
       minY = Double.longBitsToDouble(Long.reverseBytes(Double.doubleToRawLongBits(minY)));

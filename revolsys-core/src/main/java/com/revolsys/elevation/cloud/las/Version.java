@@ -2,7 +2,7 @@ package com.revolsys.elevation.cloud.las;
 
 import java.io.IOException;
 
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 
 public class Version implements Comparable<Version> {
   private final short major;
@@ -11,7 +11,7 @@ public class Version implements Comparable<Version> {
 
   private final int revision;
 
-  public Version(final ChannelReader reader) throws IOException {
+  public Version(final DataReader reader) throws IOException {
     this.major = reader.getUnsignedByte();
     this.minor = reader.getUnsignedByte();
     this.revision = 0;

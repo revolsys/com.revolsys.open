@@ -1,8 +1,8 @@
 package com.revolsys.elevation.cloud.las.pointformat;
 
 import com.revolsys.elevation.cloud.las.LasPointCloud;
-import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.record.io.format.json.JsonObject;
 
 public class LasPoint8GpsTimeRgbNir extends LasPoint7GpsTimeRgb implements LasPointNir {
@@ -25,7 +25,7 @@ public class LasPoint8GpsTimeRgbNir extends LasPoint7GpsTimeRgb implements LasPo
   }
 
   @Override
-  public void read(final LasPointCloud pointCloud, final ChannelReader reader) {
+  public void read(final LasPointCloud pointCloud, final DataReader reader) {
     super.read(pointCloud, reader);
     this.nir = reader.getUnsignedShort();
   }

@@ -11,7 +11,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.EndOfFileException;
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 
@@ -25,7 +25,7 @@ public class ScaledIntegerTriangulatedIrregularNetworkReader extends BaseObjectW
 
   private BoundingBox boundingBox;
 
-  private ChannelReader in;
+  private DataReader in;
 
   private boolean closed = false;
 
@@ -55,7 +55,7 @@ public class ScaledIntegerTriangulatedIrregularNetworkReader extends BaseObjectW
   public void forEachTriangle(final TriangleConsumer action) {
     open();
     final GeometryFactory geometryFactory = this.geometryFactory;
-    final ChannelReader in = this.in;
+    final DataReader in = this.in;
     try {
       boolean hasMore = true;
       while (hasMore) {

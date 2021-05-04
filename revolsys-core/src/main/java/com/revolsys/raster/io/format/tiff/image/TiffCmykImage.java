@@ -6,7 +6,7 @@ import java.util.Arrays;
 
 import org.jeometry.common.exception.Exceptions;
 
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.raster.io.format.tiff.TiffDirectory;
 import com.revolsys.raster.io.format.tiff.code.TiffBaselineTag;
 import com.revolsys.raster.io.format.tiff.compression.TiffDecompressor;
@@ -51,7 +51,7 @@ public class TiffCmykImage extends AbstractTiffImage {
   }
 
   @Override
-  protected void readImagePart(final ChannelReader in, final BufferedImage bufferedImage,
+  protected void readImagePart(final DataReader in, final BufferedImage bufferedImage,
     final long[] offsets, final long[] counts, final int partIndex, final int imageX,
     final int imageY, final int dataWidth, final int height, final int width) {
     if (this.planarConfiguration == 2) {
@@ -90,7 +90,7 @@ public class TiffCmykImage extends AbstractTiffImage {
     }
   }
 
-  private void readImagePartPlanar(final ChannelReader in, final BufferedImage bufferedImage,
+  private void readImagePartPlanar(final DataReader in, final BufferedImage bufferedImage,
     final int partIndex, final long[] offsets, final long[] counts, final int imageX,
     final int imageY, final int dataWidth, final int dataHeight, final int cropWidth) {
     try (

@@ -8,7 +8,7 @@ import java.util.function.Consumer;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.number.Integers;
 
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.raster.io.format.tiff.TiffDirectory;
 import com.revolsys.raster.io.format.tiff.TiffDirectoryBuilder;
 import com.revolsys.raster.io.format.tiff.code.TiffBaselineTag;
@@ -84,7 +84,7 @@ public class TiffRgbFullColorImage extends AbstractTiffImage {
   }
 
   @Override
-  protected void readImagePart(final ChannelReader in, final BufferedImage bufferedImage,
+  protected void readImagePart(final DataReader in, final BufferedImage bufferedImage,
     final long[] offsets, final long[] counts, final int partIndex, final int imageX,
     final int imageY, final int dataWidth, final int height, final int width) {
     if (this.planarConfiguration == 2) {
@@ -130,7 +130,7 @@ public class TiffRgbFullColorImage extends AbstractTiffImage {
     }
   }
 
-  private void readImagePartPlanar(final ChannelReader in, final BufferedImage bufferedImage,
+  private void readImagePartPlanar(final DataReader in, final BufferedImage bufferedImage,
     final int partIndex, final long[] offsets, final long[] counts, final int imageX,
     final int imageY, final int dataWidth, final int dataHeight, final int cropWidth) {
     try (

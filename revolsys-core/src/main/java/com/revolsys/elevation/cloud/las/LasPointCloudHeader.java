@@ -25,7 +25,7 @@ import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.geometry.util.RectangleUtil;
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.record.io.format.html.HtmlWriter;
 import com.revolsys.record.io.format.json.JsonObject;
@@ -100,7 +100,7 @@ public class LasPointCloudHeader
   private final LasPointCloud pointCloud;
 
   @SuppressWarnings("unused")
-  public LasPointCloudHeader(final LasPointCloud pointCloud, final ChannelReader reader,
+  public LasPointCloudHeader(final LasPointCloud pointCloud, final DataReader reader,
     final GeometryFactory geometryFactory) {
     this.pointCloud = pointCloud;
     setGeometryFactory(geometryFactory);
@@ -395,7 +395,7 @@ public class LasPointCloudHeader
     return this.pointFormat.newLasPoint(lasPointCloud, x, y, z);
   }
 
-  private void readExtendedVariableLengthRecords(final ChannelReader reader, final long position,
+  private void readExtendedVariableLengthRecords(final DataReader reader, final long position,
     final long variableCount) throws IOException {
     if (variableCount != 0 && reader.isSeekable()) {
       final long currentPosition = reader.position();
@@ -426,7 +426,7 @@ public class LasPointCloudHeader
     }
   }
 
-  private int readVariableLengthRecords(final ChannelReader reader,
+  private int readVariableLengthRecords(final DataReader reader,
     final long numberOfVariableLengthRecords) throws IOException {
     int byteCount = 0;
     for (int i = 0; i < numberOfVariableLengthRecords; i++) {

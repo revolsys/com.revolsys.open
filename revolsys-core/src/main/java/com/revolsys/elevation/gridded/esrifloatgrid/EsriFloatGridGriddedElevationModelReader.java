@@ -16,7 +16,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.io.Readers;
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.spring.resource.Resource;
 
 public class EsriFloatGridGriddedElevationModelReader extends AbstractIterator<Point>
@@ -40,7 +40,7 @@ public class EsriFloatGridGriddedElevationModelReader extends AbstractIterator<P
 
   private double gridCellSize = 0;
 
-  private ChannelReader reader;
+  private DataReader reader;
 
   private int gridX = 0;
 
@@ -58,7 +58,7 @@ public class EsriFloatGridGriddedElevationModelReader extends AbstractIterator<P
 
   @Override
   protected void closeDo() {
-    final ChannelReader reader = this.reader;
+    final DataReader reader = this.reader;
     if (reader != null) {
       try {
         reader.close();
@@ -76,7 +76,7 @@ public class EsriFloatGridGriddedElevationModelReader extends AbstractIterator<P
       this.y + this.height * this.gridCellSize);
   }
 
-  protected ChannelReader getChannel() {
+  protected DataReader getChannel() {
     final Resource headerResource = this.resource.newResourceChangeExtension("hdr");
     readHeader(headerResource);
     this.reader = this.resource.newChannelReader();

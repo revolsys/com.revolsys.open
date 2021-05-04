@@ -12,7 +12,7 @@ import com.revolsys.elevation.gridded.IntArrayScaleGriddedElevationModel;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.IoFactory;
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.Resource;
 
@@ -47,7 +47,7 @@ public class NgaBinaryGeoidModelReader extends BaseObjectWithProperties
 
   private boolean initialized = false;
 
-  private ChannelReader reader;
+  private DataReader reader;
 
   public NgaBinaryGeoidModelReader(final Resource resource, final MapEx properties) {
     this.resource = resource;
@@ -87,7 +87,7 @@ public class NgaBinaryGeoidModelReader extends BaseObjectWithProperties
   @Override
   public GriddedElevationModel read() {
     open();
-    final ChannelReader reader = this.reader;
+    final DataReader reader = this.reader;
     if (reader != null) {
       final IntArrayScaleGriddedElevationModel grid = new IntArrayScaleGriddedElevationModel(
         this.geometryFactory, -180, -90.25, this.gridWidth, this.gridHeight, this.gridCellWidth,

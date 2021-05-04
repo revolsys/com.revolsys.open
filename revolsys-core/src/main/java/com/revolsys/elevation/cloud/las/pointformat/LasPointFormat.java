@@ -13,6 +13,7 @@ import com.revolsys.elevation.cloud.las.Version;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionBuilder;
 
@@ -202,7 +203,7 @@ public enum LasPointFormat implements Code {
     return builder.getRecordDefinition();
   }
 
-  public LasPoint readLasPoint(final LasPointCloud pointCloud, final ChannelReader reader) {
+  public LasPoint readLasPoint(final LasPointCloud pointCloud, final DataReader reader) {
     final LasPoint point = this.constructor.apply(pointCloud);
     point.read(pointCloud, reader);
     return point;

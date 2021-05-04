@@ -3,7 +3,7 @@ package com.revolsys.raster.io.format.tiff.code;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 
 public class TiffTags {
 
@@ -33,7 +33,7 @@ public class TiffTags {
     return tiffTag;
   }
 
-  public static TiffTag readTag(final ChannelReader in) {
+  public static TiffTag readTag(final DataReader in) {
     final int tag = in.getUnsignedShort();
     return getTag(tag);
   }

@@ -21,7 +21,7 @@ import com.revolsys.elevation.gridded.GriddedElevationModelReader;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.spring.resource.InputStreamResource;
 import com.revolsys.spring.resource.NoSuchResourceException;
@@ -38,7 +38,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
 
   private final Resource resource;
 
-  ChannelReader channel;
+  DataReader channel;
 
   private ImgEntry root;
 
@@ -103,7 +103,7 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
     return this.boundingBox;
   }
 
-  protected ChannelReader getChannel() {
+  protected DataReader getChannel() {
 
     final String fileExtension = this.resource.getFileNameExtension();
     try {

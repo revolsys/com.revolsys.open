@@ -11,7 +11,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.EndOfFileException;
-import com.revolsys.io.channels.ChannelReader;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionBuilder;
 import com.revolsys.spring.resource.Resource;
@@ -20,7 +20,7 @@ public class AbstractScaledIntegerPointCloudGeometryReader<G extends Geometry>
   extends AbstractIterator<G> {
   private final Resource resource;
 
-  private ChannelReader reader;
+  private DataReader reader;
 
   private GeometryFactory geometryFactory;
 
@@ -37,7 +37,7 @@ public class AbstractScaledIntegerPointCloudGeometryReader<G extends Geometry>
   @Override
   protected void closeDo() {
     super.closeDo();
-    final ChannelReader reader = this.reader;
+    final DataReader reader = this.reader;
     this.reader = null;
     if (reader != null) {
       reader.close();
@@ -51,7 +51,7 @@ public class AbstractScaledIntegerPointCloudGeometryReader<G extends Geometry>
   @SuppressWarnings("unchecked")
   @Override
   protected G getNext() {
-    final ChannelReader reader = this.reader;
+    final DataReader reader = this.reader;
     if (reader == null) {
       throw new NoSuchElementException();
     } else {
@@ -77,7 +77,7 @@ public class AbstractScaledIntegerPointCloudGeometryReader<G extends Geometry>
   @Override
   protected void initDo() {
     super.initDo();
-    final ChannelReader reader = this.resource.newChannelReader(this.byteBuffer);
+    final DataReader reader = this.resource.newChannelReader(this.byteBuffer);
     this.reader = reader;
     if (reader == null) {
       this.exists = false;

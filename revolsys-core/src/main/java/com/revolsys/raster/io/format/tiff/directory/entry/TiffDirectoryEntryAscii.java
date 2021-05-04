@@ -1,7 +1,7 @@
 package com.revolsys.raster.io.format.tiff.directory.entry;
 
-import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.raster.io.format.tiff.code.TiffFieldType;
 
 public class TiffDirectoryEntryAscii extends AbstractTiffDirectoryEntry<String> {
@@ -20,7 +20,7 @@ public class TiffDirectoryEntryAscii extends AbstractTiffDirectoryEntry<String> 
   }
 
   @Override
-  protected String loadValueDo(final ChannelReader in, final int count) {
+  protected String loadValueDo(final DataReader in, final int count) {
     return in.getUsAsciiString(count);
   }
 

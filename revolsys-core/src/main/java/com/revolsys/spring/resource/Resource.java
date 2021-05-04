@@ -45,6 +45,7 @@ import com.revolsys.io.FileNames;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.ChannelWriter;
+import com.revolsys.io.channels.DataReader;
 import com.revolsys.io.file.Paths;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.util.Property;
@@ -489,7 +490,7 @@ public interface Resource extends org.springframework.core.io.Resource, FileProx
     return new BufferedReader(in);
   }
 
-  default ChannelReader newChannelReader() {
+  default DataReader newChannelReader() {
     return newChannelReader(8192, ByteOrder.BIG_ENDIAN);
   }
 
@@ -502,11 +503,11 @@ public interface Resource extends org.springframework.core.io.Resource, FileProx
     }
   }
 
-  default ChannelReader newChannelReader(final int capacity) {
+  default DataReader newChannelReader(final int capacity) {
     return newChannelReader(capacity, ByteOrder.BIG_ENDIAN);
   }
 
-  default ChannelReader newChannelReader(final int capacity, final ByteOrder byteOrder) {
+  default DataReader newChannelReader(final int capacity, final ByteOrder byteOrder) {
     final ReadableByteChannel in = newReadableByteChannel();
     if (in == null) {
       return null;
