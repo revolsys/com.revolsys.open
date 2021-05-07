@@ -15,6 +15,8 @@ import com.revolsys.util.Debug;
 
 public abstract class AbstractDataReader extends InputStream implements DataReader {
 
+  public static final int DEFAULT_BUFFER_SIZE = 8192;
+
   private int available = 0;
 
   protected ByteBuffer buffer;
@@ -47,7 +49,7 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
 
   public AbstractDataReader(final ByteBuffer buffer, final boolean seekable) {
     if (buffer == null) {
-      this.inBuffer = ByteBuffer.allocate(8192);
+      this.inBuffer = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
     } else {
       this.inBuffer = buffer;
       this.inBuffer.clear();

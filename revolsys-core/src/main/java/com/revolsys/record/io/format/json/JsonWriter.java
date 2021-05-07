@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.jeometry.common.data.type.DataTypes;
@@ -302,27 +303,27 @@ public final class JsonWriter implements BaseCloseable {
     endList();
   }
 
-  public void write(final Map<String, ? extends Object> values) {
+  public <K, V> void write(final Map<K, V> values) {
     startObject();
     if (values != null) {
-      final Set<String> fields = values.keySet();
+      final Set<Entry<K, V>> entrySet = values.entrySet();
       int i = 0;
-      final int size = fields.size();
-      final Iterator<String> iterator = fields.iterator();
+      final int size = values.size();
+      final Iterator<Entry<K, V>> iterator = entrySet.iterator();
       while (i < size - 1) {
-        final Object keyObject = iterator.next();
-        final String key = keyObject.toString();
-        final Object value = values.get(key);
-        label(key);
+        final Entry<K, V> entry = iterator.next();
+        final K key = entry.getKey();
+        final Object value = entry.getValue();
+        label(key.toString());
         value(value);
         endAttribute();
         i++;
       }
       if (iterator.hasNext()) {
-        final Object keyObject = iterator.next();
-        final String key = keyObject.toString();
-        final Object value = values.get(key);
-        label(key);
+        final Entry<K, V> entry = iterator.next();
+        final K key = entry.getKey();
+        final Object value = entry.getValue();
+        label(key.toString());
         value(value);
       }
     }

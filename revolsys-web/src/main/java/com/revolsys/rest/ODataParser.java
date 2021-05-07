@@ -44,7 +44,6 @@ import com.revolsys.record.query.functions.F;
 import com.revolsys.record.query.functions.Lower;
 import com.revolsys.record.query.functions.Upper;
 import com.revolsys.record.schema.FieldDefinition;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Pair;
 import com.revolsys.util.Strings;
 
@@ -478,7 +477,6 @@ public class ODataParser {
               // tokensIncludingParens);
               // rt.subList(rt.size() - (i - k), rt.size()).clear();
               // rt.add(et);
-              Debug.noOp();
             } else {
 
               final List<Token> tokensIncludingParens = tokens.subList(i, j + 1);
