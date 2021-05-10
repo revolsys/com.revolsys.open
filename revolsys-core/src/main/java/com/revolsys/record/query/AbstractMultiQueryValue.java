@@ -97,8 +97,22 @@ public abstract class AbstractMultiQueryValue implements QueryValue {
     return this.values.length == 0;
   }
 
+  protected void removeValue(final int index) {
+    final QueryValue[] oldValues = this.values;
+    final QueryValue[] newValues = new QueryValue[oldValues.length - 1];
+    System.arraycopy(oldValues, 0, newValues, 0, index);
+    if (index < newValues.length) {
+      System.arraycopy(oldValues, index + 1, newValues, index, newValues.length - index);
+    }
+    this.values = newValues;
+  }
+
   public void setQueryValue(final int i, final QueryValue value) {
-    this.values[i] = value;
+    if (value == null) {
+      removeValue(i);
+    } else {
+      this.values[i] = value;
+    }
   }
 
   @SuppressWarnings("unchecked")

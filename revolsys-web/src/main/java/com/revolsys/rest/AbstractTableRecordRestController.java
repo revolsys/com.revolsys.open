@@ -32,6 +32,7 @@ import com.revolsys.record.io.format.json.JsonRecordWriter;
 import com.revolsys.record.io.format.json.JsonWriter;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.query.TableReference;
 import com.revolsys.record.schema.AbstractTableRecordStore;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.TableRecordStoreConnection;
@@ -233,26 +234,29 @@ public class AbstractTableRecordRestController {
     return query;
   }
 
+  public Condition newQueryFilterCondition(final HttpServletRequest request,
+    final TableReference table) {
+    Condition filterCondition = null;
+    final String filter = request.getParameter("$filter");
+    if (filter != null) {
+      filterCondition = (Condition)ODataParser.parseFilter(table, filter);
+    }
+    return filterCondition;
+  }
+
   private void newQueryFilterCondition(final TableRecordStoreConnection connection,
     final AbstractTableRecordStore recordStore, final Query query,
     final HttpServletRequest request) {
-    final String filter = request.getParameter("$filter");
-    if (filter != null) {
-      Condition condition = newQueryFilterConditionFilter(recordStore, query, filter);
-      condition = alterCondition(request, connection, recordStore, query, condition);
-      if (condition != null) {
-        query.and(condition.clone(null, query.getTable()));
-      }
+    final TableReference table = query.getTable();
+    Condition filterCondition = newQueryFilterCondition(request, table);
+    if (filterCondition != null) {
+      filterCondition = alterCondition(request, connection, recordStore, query, filterCondition);
+      query.and(filterCondition.clone(null, query.getTable()));
     }
     final String search = request.getParameter("$search");
     if (search != null && search.trim().length() > 0) {
       newQueryFilterConditionSearch(recordStore, query, search);
     }
-  }
-
-  protected Condition newQueryFilterConditionFilter(final AbstractTableRecordStore recordStore,
-    final Query query, final String filter) {
-    return (Condition)ODataParser.parseFilter(query, filter);
   }
 
   protected void newQueryFilterConditionSearch(final AbstractTableRecordStore recordStore,
