@@ -22,11 +22,13 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.properties.BaseObjectWithProperties;
+import com.revolsys.record.ArrayChangeTrackRecord;
 import com.revolsys.record.ChangeTrackRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.Records;
 import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.LockMode;
@@ -34,6 +36,8 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.TableRecordStoreConnection;
+import com.revolsys.transaction.Transaction;
+import com.revolsys.transaction.TransactionOptions;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.CancellableProxy;
 import com.revolsys.util.Property;
@@ -1148,4 +1152,24 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     }
   }
 
+  public int updateRecords(final Consumer<? super ChangeTrackRecord> updateAction) {
+    int i = 0;
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final RecordStore recordStore = recordDefinition.getRecordStore();
+    setRecordFactory(ArrayChangeTrackRecord.FACTORY);
+    try (
+      Transaction transaction = recordStore.newTransaction(TransactionOptions.REQUIRED);
+      RecordReader reader = getRecordReader();
+      RecordWriter writer = recordStore.newRecordWriter(recordDefinition)) {
+      for (final Record record : reader) {
+        final ChangeTrackRecord changeTrackRecord = (ChangeTrackRecord)record;
+        updateAction.accept(changeTrackRecord);
+        if (changeTrackRecord.isModified()) {
+          writer.write(changeTrackRecord);
+          i++;
+        }
+      }
+    }
+    return i;
+  }
 }

@@ -74,6 +74,11 @@ public final class UrlUtil {
 
   public static URI appendPath(final URI uri, final String path) {
     final String originalPath = uri.getPath();
+    String newPath = appendPath(originalPath, path);
+    return uri.resolve(newPath);
+  }
+
+  public static String appendPath(final String originalPath, final String path) {
     final int length = path.length();
     final StringBuilder pathBuilder = new StringBuilder(originalPath);
     int startIndex = 0;
@@ -101,7 +106,8 @@ public final class UrlUtil {
 
       }
     }
-    return uri.resolve(pathBuilder.toString());
+    String newPath = pathBuilder.toString();
+    return newPath;
   }
 
   public static void appendQuery(final StringBuilder query,

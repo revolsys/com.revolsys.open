@@ -1,6 +1,9 @@
 package com.revolsys.util;
 
 import java.io.PrintStream;
+import java.lang.Character.UnicodeBlock;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,10 +37,14 @@ public interface Strings {
     + "\u0150\u0170"//
   ;
 
-  static String cleanString(final String text) {
+  static final Pattern InCombiningDiacriticalMarks = Pattern
+    .compile("\\p{InCombiningDiacriticalMarks}+");
+
+  static String cleanString(String text) {
     if (text == null) {
       return "";
     } else {
+      text = normalizeNfc(text);
       int startIndex = 0;
       final int length = text.length();
       int endIndex = length;
@@ -336,6 +343,50 @@ public interface Strings {
     }
   }
 
+  // Normalize splitting chacters into base + combining mark
+  static String normalize(final CharSequence text) {
+    return Normalizer.normalize(text, Form.NFD);
+  }
+
+  // Normalize preffering combined characters
+  static String normalizeNfc(final CharSequence text) {
+    return Normalizer.normalize(text, Form.NFC);
+  }
+
+  static String normalizeNfd(final CharSequence text) {
+    return Normalizer.normalize(text, Form.NFD);
+  }
+
+  public static String normalizeToUsAscii(final CharSequence cs) {
+    if (cs == null) {
+      return null;
+    } else {
+      final String s = Normalizer.normalize(cs, Normalizer.Form.NFD);
+      final StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < s.length(); i++) {
+        char c = s.charAt(i);
+        if (c == '\u0141') {
+          c = 'L';
+        } else if (c == '\u0142') {
+          c = 'l';
+        } else {
+          final UnicodeBlock block = UnicodeBlock.of(c);
+          if (block == UnicodeBlock.COMBINING_DIACRITICAL_MARKS
+            || block == UnicodeBlock.COMBINING_DIACRITICAL_MARKS_EXTENDED
+            || block == UnicodeBlock.COMBINING_DIACRITICAL_MARKS_SUPPLEMENT) {
+            Debug.noOp();
+          } else if (' ' <= c && c <= '~') {
+            // US ASCII Visible characters
+            sb.append(c);
+          } else {
+            sb.append('_');
+          }
+        }
+      }
+      return sb.toString();
+    }
+  }
+
   static void print(final PrintStream out, final char separator, final Object... values) {
     if (values != null) {
       boolean first = true;
@@ -461,6 +512,32 @@ public interface Strings {
       return text.startsWith(prefix);
     } else {
       return false;
+    }
+  }
+
+  public static String stripAccents(String s) {
+    if (s == null) {
+      return null;
+    } else {
+      s = Normalizer.normalize(s, Normalizer.Form.NFD);
+      final StringBuilder sb = new StringBuilder(s);
+      for (int i = 0; i < s.length(); i++) {
+        char c = s.charAt(i);
+        if (c == '\u0141') {
+          c = 'L';
+        } else if (c == '\u0142') {
+          c = 'l';
+        } else {
+          final UnicodeBlock block = UnicodeBlock.of(c);
+          if (block == UnicodeBlock.COMBINING_DIACRITICAL_MARKS
+            || block == UnicodeBlock.COMBINING_DIACRITICAL_MARKS_EXTENDED
+            || block == UnicodeBlock.COMBINING_DIACRITICAL_MARKS_SUPPLEMENT) {
+          } else {
+            sb.append(c);
+          }
+        }
+      }
+      return sb.toString();
     }
   }
 
