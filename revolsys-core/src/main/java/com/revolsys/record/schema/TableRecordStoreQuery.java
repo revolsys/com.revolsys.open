@@ -51,6 +51,11 @@ public class TableRecordStoreQuery extends Query {
   }
 
   @Override
+  public RecordReader getRecordReader(final Transaction transaction) {
+    return this.recordStore.getRecordReader(this.connection, this, transaction);
+  }
+
+  @Override
   public Record insertOrUpdateRecord(final Supplier<Record> newRecordSupplier,
     final Consumer<Record> updateAction) {
     return this.recordStore.insertOrUpdateRecord(this.connection, this, newRecordSupplier,

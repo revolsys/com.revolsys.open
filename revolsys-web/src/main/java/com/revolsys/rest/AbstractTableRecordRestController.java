@@ -137,7 +137,7 @@ public class AbstractTableRecordRestController {
     final boolean returnCount = HttpServletUtils.getBooleanParameter(request, "$count");
     try (
       Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRES_NEW_READONLY);
-      final RecordReader records = query.getRecordReader()) {
+      final RecordReader records = query.getRecordReader(transaction)) {
       Long count = null;
       if (returnCount) {
         count = query.getRecordCount();
@@ -353,7 +353,7 @@ public class AbstractTableRecordRestController {
     final Long count) throws IOException {
     try (
       Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRES_NEW_READONLY);
-      final RecordReader records = query.getRecordReader()) {
+      final RecordReader records = query.getRecordReader(transaction)) {
       responseRecordsJson(connection, request, response, query, records, count);
     }
   }

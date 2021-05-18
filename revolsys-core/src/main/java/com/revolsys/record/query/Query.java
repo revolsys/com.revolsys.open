@@ -564,6 +564,10 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return getRecordDefinition().getRecordStore().getRecords(this);
   }
 
+  public RecordReader getRecordReader(final Transaction transaction) {
+    return getRecordDefinition().getRecordStore().getRecords(this);
+  }
+
   public List<Record> getRecords() {
     try (
       RecordReader records = getRecordReader()) {

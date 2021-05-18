@@ -158,6 +158,15 @@ public class AbstractTableRecordStore {
     return new TransactionRecordReader(reader, transaction);
   }
 
+  protected RecordReader getRecordReader(final TableRecordStoreConnection connection,
+    final Query query, final Transaction transaction) {
+    if (transaction == null) {
+      return getRecordReader(connection, query);
+    } else {
+      return this.recordStore.getRecords(query);
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public <R extends RecordStore> R getRecordStore() {
     return (R)this.recordStore;
@@ -383,7 +392,6 @@ public class AbstractTableRecordStore {
     final RecordStore recordStore = this.recordStore;
     query.setRecordFactory(ArrayChangeTrackRecord.FACTORY);
     try (
-      Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED);
       RecordReader reader = getRecordReader(connection, query);
       RecordWriter writer = recordStore.newRecordWriter(recordDefinition)) {
       for (final Record queryRecord : reader) {
