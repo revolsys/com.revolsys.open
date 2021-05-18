@@ -374,7 +374,6 @@ public interface Strings {
           if (block == UnicodeBlock.COMBINING_DIACRITICAL_MARKS
             || block == UnicodeBlock.COMBINING_DIACRITICAL_MARKS_EXTENDED
             || block == UnicodeBlock.COMBINING_DIACRITICAL_MARKS_SUPPLEMENT) {
-            Debug.noOp();
           } else if (' ' <= c && c <= '~') {
             // US ASCII Visible characters
             sb.append(c);
