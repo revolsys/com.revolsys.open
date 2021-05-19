@@ -298,6 +298,11 @@ public class AbstractTableRecordStore {
     }
   }
 
+  protected void setDefaultSortOrder(final String fieldName, final boolean ascending) {
+    this.defaultSortOrder.clear();
+    addDefaultSortOrder(fieldName, ascending);
+  }
+
   protected void setGeneratedFields(final String... fieldNames) {
     if (getRecordDefinition() != null) {
       for (final String fieldName : fieldNames) {
