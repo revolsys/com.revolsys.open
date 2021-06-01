@@ -22,6 +22,7 @@ import com.revolsys.record.ArrayChangeTrackRecord;
 import com.revolsys.record.ChangeTrackRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Cast;
 import com.revolsys.record.query.ColumnReference;
@@ -157,6 +158,15 @@ public class AbstractTableRecordStore {
     return new TransactionRecordReader(reader, transaction);
   }
 
+  protected RecordReader getRecordReader(final TableRecordStoreConnection connection,
+    final Query query, final Transaction transaction) {
+    if (transaction == null) {
+      return getRecordReader(connection, query);
+    } else {
+      return this.recordStore.getRecords(query);
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public <R extends RecordStore> R getRecordStore() {
     return (R)this.recordStore;
@@ -288,6 +298,11 @@ public class AbstractTableRecordStore {
     }
   }
 
+  protected void setDefaultSortOrder(final String fieldName, final boolean ascending) {
+    this.defaultSortOrder.clear();
+    addDefaultSortOrder(fieldName, ascending);
+  }
+
   protected void setGeneratedFields(final String... fieldNames) {
     if (getRecordDefinition() != null) {
       for (final String fieldName : fieldNames) {
@@ -373,6 +388,29 @@ public class AbstractTableRecordStore {
       this.recordStore.updateRecord(record);
       updateRecordAfter(connection, record);
     }
+  }
+
+  public int updateRecords(final TableRecordStoreConnection connection, final Query query,
+    final Consumer<? super ChangeTrackRecord> updateAction) {
+    int i = 0;
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final RecordStore recordStore = this.recordStore;
+    query.setRecordFactory(ArrayChangeTrackRecord.FACTORY);
+    try (
+      RecordReader reader = getRecordReader(connection, query);
+      RecordWriter writer = recordStore.newRecordWriter(recordDefinition)) {
+      for (final Record queryRecord : reader) {
+        final ChangeTrackRecord record = (ChangeTrackRecord)queryRecord;
+        updateAction.accept(record);
+        if (record.isModified()) {
+          updateRecordBefore(connection, record);
+          writer.write(record);
+          updateRecordAfter(connection, record);
+          i++;
+        }
+      }
+    }
+    return i;
   }
 
   public void validateRecord(final MapEx record) {

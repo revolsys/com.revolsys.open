@@ -3,6 +3,7 @@ package com.revolsys.record.schema;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import com.revolsys.record.ChangeTrackRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.query.Query;
@@ -50,6 +51,11 @@ public class TableRecordStoreQuery extends Query {
   }
 
   @Override
+  public RecordReader getRecordReader(final Transaction transaction) {
+    return this.recordStore.getRecordReader(this.connection, this, transaction);
+  }
+
+  @Override
   public Record insertOrUpdateRecord(final Supplier<Record> newRecordSupplier,
     final Consumer<Record> updateAction) {
     return this.recordStore.insertOrUpdateRecord(this.connection, this, newRecordSupplier,
@@ -66,4 +72,8 @@ public class TableRecordStoreQuery extends Query {
     return this.recordStore.updateRecord(this.connection, this, updateAction);
   }
 
+  @Override
+  public int updateRecords(final Consumer<? super ChangeTrackRecord> updateAction) {
+    return this.recordStore.updateRecords(this.connection, this, updateAction);
+  }
 }
