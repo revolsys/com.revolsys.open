@@ -9,14 +9,20 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.number.Doubles;
+import org.jeometry.common.number.Numbers;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.map.MapSerializer;
+import com.revolsys.record.Record;
+import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.util.Property;
 
 public final class JsonWriter implements BaseCloseable {
 
@@ -28,6 +34,8 @@ public final class JsonWriter implements BaseCloseable {
 
   private boolean startAttribute;
 
+  private final JsonStringEncodingWriter encodingOut;
+
   public JsonWriter(final Writer out) {
     this(out, true);
   }
@@ -35,6 +43,8 @@ public final class JsonWriter implements BaseCloseable {
   public JsonWriter(final Writer out, final boolean indent) {
     this.out = out;
     this.indent = indent;
+    this.encodingOut = new JsonStringEncodingWriter(out);
+
   }
 
   public void charSequence(final CharSequence string) {
@@ -223,6 +233,42 @@ public final class JsonWriter implements BaseCloseable {
     }
   }
 
+  public void string(final String string) throws IOException {
+    final Writer out = this.out;
+    out.write('"');
+    this.encodingOut.write(string);
+    out.write('"');
+  }
+
+  public void value(final DataType dataType, final Object value) throws IOException {
+    final Writer out = this.out;
+    if (value == null) {
+      out.write("null");
+    } else if (value instanceof Boolean) {
+      if ((Boolean)value) {
+        out.write("true");
+      } else {
+        out.write("false");
+      }
+    } else if (value instanceof Number) {
+      out.write(Numbers.toString((Number)value));
+    } else if (value instanceof List) {
+      final List<? extends Object> list = (List<? extends Object>)value;
+      list(list);
+    } else if (value instanceof Map) {
+      final Map<String, ? extends Object> map = (Map<String, ? extends Object>)value;
+      write(map);
+    } else if (value instanceof CharSequence) {
+      final CharSequence string = (CharSequence)value;
+      string(string.toString());
+    } else if (dataType == null) {
+      string(value.toString());
+    } else {
+      final String string = dataType.toString(value);
+      string(string);
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public void value(final Object value) {
     try {
@@ -328,5 +374,35 @@ public final class JsonWriter implements BaseCloseable {
       }
     }
     endObject();
+  }
+
+  public void writeRecord(final Record record) {
+    try {
+      final Writer out = this.out;
+      startObject();
+      boolean hasValue = false;
+      final RecordDefinition recordDefinition = record.getRecordDefinition();
+      final List<FieldDefinition> fieldDefinitions = recordDefinition.getFieldDefinitions();
+
+      for (final FieldDefinition field : fieldDefinitions) {
+        final int fieldIndex = field.getIndex();
+        final Object value = record.getValue(fieldIndex);
+        if (Property.hasValue(value)) {
+          if (hasValue) {
+            out.write(",\n");
+          } else {
+            hasValue = true;
+          }
+          final String name = field.getName();
+          label(name);
+
+          final DataType dataType = field.getDataType();
+          value(dataType, value);
+        }
+      }
+      endObject();
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 }

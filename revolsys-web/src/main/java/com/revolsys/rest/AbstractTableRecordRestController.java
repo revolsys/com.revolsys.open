@@ -107,17 +107,6 @@ public class AbstractTableRecordRestController {
   protected void handleGetRecord(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final HttpServletResponse response, final Query query)
     throws IOException {
-    final int offset = HttpServletUtils.getIntParameter(request, "$skip", 0);
-    if (offset > 0) {
-      query.setOffset(offset);
-    }
-
-    int limit = HttpServletUtils.getIntParameter(request, "$skip", query.getLimit());
-    if (limit > 0) {
-      limit = Math.min(limit, query.getLimit());
-      query.setLimit(limit);
-    }
-
     responseRecordJson(connection, request, response, query);
   }
 
