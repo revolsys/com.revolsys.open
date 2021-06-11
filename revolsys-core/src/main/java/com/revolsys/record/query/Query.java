@@ -16,6 +16,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.jeometry.common.io.PathName;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
@@ -38,12 +39,14 @@ import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.TableRecordStoreConnection;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.transaction.TransactionOptions;
+import com.revolsys.transaction.Transactionable;
 import com.revolsys.util.Cancellable;
 import com.revolsys.util.CancellableProxy;
 import com.revolsys.util.Property;
 import com.revolsys.util.count.LabelCounters;
 
-public class Query extends BaseObjectWithProperties implements Cloneable, CancellableProxy {
+public class Query extends BaseObjectWithProperties
+  implements Cloneable, CancellableProxy, Transactionable {
 
   private static void addFilter(final Query query, final RecordDefinition recordDefinition,
     final Map<String, ?> filter, final AbstractMultiCondition multipleCondition) {
@@ -636,6 +639,11 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return this.table.getTablePath();
   }
 
+  @Override
+  public PlatformTransactionManager getTransactionManager() {
+    return getRecordDefinition().getRecordStore().getTransactionManager();
+  }
+
   public String getWhere() {
     return this.whereCondition.toFormattedString();
   }
@@ -713,6 +721,10 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
 
   public boolean isDistinct() {
     return this.distinct;
+  }
+
+  public boolean isSelectEmpty() {
+    return this.selectExpressions.isEmpty();
   }
 
   public Join join(final TableReference table) {
@@ -952,6 +964,16 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
     return selectAlias(column, alias);
   }
 
+  public Query selectCsv(final String select) {
+    if (Property.hasValue(select)) {
+      for (String selectItem : select.split(",")) {
+        selectItem = selectItem.trim();
+        select(selectItem);
+      }
+    }
+    return this;
+  }
+
   public Query setCancellable(final Cancellable cancellable) {
     this.cancellable = cancellable;
     return this;
@@ -1013,7 +1035,9 @@ public class Query extends BaseObjectWithProperties implements Cloneable, Cancel
   }
 
   public Query setOffset(final int offset) {
-    this.offset = offset;
+    if (offset > 0) {
+      this.offset = offset;
+    }
     return this;
   }
 

@@ -1,5 +1,7 @@
 package com.revolsys.util;
 
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,7 +27,7 @@ public class PasswordUtil {
         final String algorithm = matcher.group(1);
         final String encryptedPassword = matcher.group(2);
         if (algorithm.equals("BASE64")) {
-          return Base64.decodeToString(encryptedPassword);
+          return Base64Util.decodeToString(encryptedPassword);
         }
       }
       return encryptedString;
@@ -45,9 +47,7 @@ public class PasswordUtil {
     System.arraycopy(result, 9, encryptedPassword, 0, encryptedPassword.length);
 
     final byte[] iv = new byte[8];
-    for (int i = 0; i < iv.length; i++) {
-      iv[i] = 0;
-    }
+    Arrays.fill(iv, (byte)0);
 
     try {
       final Cipher cipher = Cipher.getInstance("DES/CBC/PKCS5Padding");
@@ -94,7 +94,7 @@ public class PasswordUtil {
     if (Property.isEmpty(password)) {
       return null;
     } else {
-      return "{BASE64}" + Base64.encode(password);
+      return "{BASE64}" + Base64.getEncoder().encodeToString(password.getBytes());
     }
   }
 }

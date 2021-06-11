@@ -30,16 +30,13 @@ import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.io.format.json.JsonRecordWriter;
 import com.revolsys.record.io.format.json.JsonWriter;
-import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
-import com.revolsys.record.query.TableReference;
 import com.revolsys.record.schema.AbstractTableRecordStore;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.TableRecordStoreConnection;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.transaction.TransactionOptions;
 import com.revolsys.ui.web.utils.HttpServletUtils;
-import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 
 public class AbstractTableRecordRestController {
@@ -89,12 +86,6 @@ public class AbstractTableRecordRestController {
   public AbstractTableRecordRestController() {
   }
 
-  protected Condition alterCondition(final HttpServletRequest request,
-    final TableRecordStoreConnection connection, final AbstractTableRecordStore recordStore,
-    final Query query, final Condition condition) {
-    return condition;
-  }
-
   protected <RS extends AbstractTableRecordStore> RS getTableRecordStore(
     final TableRecordStoreConnection connection, final CharSequence tablePath) {
     final RS tableRecordStore = connection.getTableRecordStore(tablePath);
@@ -113,22 +104,11 @@ public class AbstractTableRecordRestController {
   protected void handleGetRecords(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final HttpServletResponse response, final Query query)
     throws IOException {
-    final int offset = HttpServletUtils.getIntParameter(request, "$skip", 0);
-    if (offset > 0) {
-      query.setOffset(offset);
-    }
-
-    int limit = HttpServletUtils.getIntParameter(request, "$limit", query.getLimit());
-    if (limit > 0) {
-      limit = Math.min(limit, query.getLimit());
-      query.setLimit(limit);
-    }
-    final boolean returnCount = HttpServletUtils.getBooleanParameter(request, "$count");
     try (
       Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRES_NEW_READONLY);
       final RecordReader records = query.getRecordReader(transaction)) {
       Long count = null;
-      if (returnCount) {
+      if (HttpServletUtils.getBooleanParameter(request, "$count")) {
         count = query.getRecordCount();
       }
       responseRecords(connection, request, response, query, records, count);
@@ -152,21 +132,21 @@ public class AbstractTableRecordRestController {
     responseRecordJson(response, record);
   }
 
-  protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
+  protected Record handleUpdateRecordDo(final TableRecordStoreConnection connection,
     final HttpServletResponse response, final CharSequence tablePath, final Identifier id,
     final Consumer<Record> updateAction) throws IOException {
-    handleUpdateRecordDo(connection, response,
+    return handleUpdateRecordDo(connection, response,
       () -> connection.updateRecord(tablePath, id, updateAction));
   }
 
-  protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
+  protected Record handleUpdateRecordDo(final TableRecordStoreConnection connection,
     final HttpServletResponse response, final CharSequence tablePath, final Identifier id,
     final JsonObject values) throws IOException {
-    handleUpdateRecordDo(connection, response,
+    return handleUpdateRecordDo(connection, response,
       () -> connection.updateRecord(tablePath, id, values));
   }
 
-  protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
+  protected Record handleUpdateRecordDo(final TableRecordStoreConnection connection,
     final HttpServletResponse response, final Supplier<Record> action) throws IOException {
     final Record record;
     try (
@@ -179,6 +159,7 @@ public class AbstractTableRecordRestController {
       }
     }
     responseRecordJson(response, record);
+    return record;
   }
 
   protected Record insertRecord(final TableRecordStoreConnection connection,
@@ -193,96 +174,8 @@ public class AbstractTableRecordRestController {
 
   protected Query newQuery(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final CharSequence tablePath) {
-    return newQuery(connection, request, tablePath, this.maxPageSize);
-  }
-
-  protected Query newQuery(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final CharSequence tablePath, final int maxRecords) {
     final AbstractTableRecordStore recordStore = getTableRecordStore(connection, tablePath);
-    final Query query = recordStore.newQuery(connection);
-    final String select = request.getParameter("$select");
-    newQuerySelect(connection, query, select);
-
-    final int offset = HttpServletUtils.getIntParameter(request, "$skip", 0);
-    if (offset < 0) {
-      throw new IllegalArgumentException("$skip must be > 0: " + offset);
-    }
-    if (offset > 0) {
-      query.setOffset(offset);
-    }
-
-    int limit = HttpServletUtils.getIntParameter(request, "$top", maxRecords);
-    if (limit <= 0) {
-      throw new IllegalArgumentException("$top must be > 1: " + limit);
-    }
-    limit = Math.min(limit, maxRecords);
-    query.setLimit(limit);
-    newQueryFilterCondition(connection, recordStore, query, request);
-    final String orderBy = request.getParameter("$orderby");
-    newQueryOrderBy(recordStore, query, orderBy);
-    return query;
-  }
-
-  public Condition newQueryFilterCondition(final HttpServletRequest request,
-    final TableReference table) {
-    Condition filterCondition = null;
-    final String filter = request.getParameter("$filter");
-    if (filter != null) {
-      filterCondition = (Condition)ODataParser.parseFilter(table, filter);
-    }
-    return filterCondition;
-  }
-
-  private void newQueryFilterCondition(final TableRecordStoreConnection connection,
-    final AbstractTableRecordStore recordStore, final Query query,
-    final HttpServletRequest request) {
-    final TableReference table = query.getTable();
-    Condition filterCondition = newQueryFilterCondition(request, table);
-    if (filterCondition != null) {
-      filterCondition = alterCondition(request, connection, recordStore, query, filterCondition);
-      query.and(filterCondition.clone(null, query.getTable()));
-    }
-    final String search = request.getParameter("$search");
-    if (search != null && search.trim().length() > 0) {
-      newQueryFilterConditionSearch(recordStore, query, search);
-    }
-  }
-
-  protected void newQueryFilterConditionSearch(final AbstractTableRecordStore recordStore,
-    final Query query, final String search) {
-    recordStore.applySearchCondition(query, search);
-  }
-
-  private void newQueryOrderBy(final AbstractTableRecordStore recordStore, final Query query,
-    final String orderBy) {
-    if (Property.hasValue(orderBy)) {
-      for (String orderClause : orderBy.split(",")) {
-        orderClause = orderClause.trim();
-        String fieldName;
-        boolean ascending = true;
-        final int spaceIndex = orderClause.indexOf(' ');
-        if (spaceIndex == -1) {
-          fieldName = orderClause;
-        } else {
-          fieldName = orderClause.substring(0, spaceIndex);
-          if ("desc".equalsIgnoreCase(orderClause.substring(spaceIndex + 1))) {
-            ascending = false;
-          }
-        }
-        query.addOrderBy(fieldName, ascending);
-      }
-    }
-    recordStore.applyDefaultSortOrder(query);
-  }
-
-  private void newQuerySelect(final TableRecordStoreConnection connection, final Query query,
-    final String select) {
-    if (Property.hasValue(select)) {
-      for (String selectItem : select.split(",")) {
-        selectItem = selectItem.trim();
-        query.select(selectItem);
-      }
-    }
+    return recordStore.newQuery(connection, request, Integer.MAX_VALUE);
   }
 
   public JsonObject readJsonBody(final HttpServletRequest request) throws IOException {

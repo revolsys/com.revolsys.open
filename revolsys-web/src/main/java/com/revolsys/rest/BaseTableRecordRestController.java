@@ -12,6 +12,7 @@ import org.jeometry.common.io.PathName;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.AbstractTableRecordStore;
 import com.revolsys.record.schema.TableRecordStoreConnection;
 import com.revolsys.transaction.Transaction;
 
@@ -24,6 +25,11 @@ public class BaseTableRecordRestController extends AbstractTableRecordRestContro
   public BaseTableRecordRestController(final PathName tablePath) {
     this.tablePath = tablePath;
     this.typeName = tablePath.getName();
+  }
+
+  protected <RS extends AbstractTableRecordStore> RS getTableRecordStore(
+    final TableRecordStoreConnection connection) {
+    return super.getTableRecordStore(connection, this.tablePath);
   }
 
   protected void handleGetRecord(final TableRecordStoreConnection connection,
@@ -39,10 +45,10 @@ public class BaseTableRecordRestController extends AbstractTableRecordRestContro
     handleInsertRecord(connection, request, response, this.tablePath);
   }
 
-  protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
+  protected Record handleUpdateRecordDo(final TableRecordStoreConnection connection,
     final HttpServletResponse response, final Identifier id, final Consumer<Record> updateAction)
     throws IOException {
-    handleUpdateRecordDo(connection, response, this.tablePath, id, updateAction);
+    return handleUpdateRecordDo(connection, response, this.tablePath, id, updateAction);
   }
 
   protected void handleUpdateRecordDo(final TableRecordStoreConnection connection,
@@ -58,12 +64,7 @@ public class BaseTableRecordRestController extends AbstractTableRecordRestContro
 
   protected Query newQuery(final TableRecordStoreConnection connection,
     final HttpServletRequest request) {
-    return newQuery(connection, request, this.maxPageSize);
-  }
-
-  protected Query newQuery(final TableRecordStoreConnection connection,
-    final HttpServletRequest request, final int maxRecords) {
-    return super.newQuery(connection, request, this.tablePath, maxRecords);
+    return super.newQuery(connection, request, this.tablePath);
   }
 
 }

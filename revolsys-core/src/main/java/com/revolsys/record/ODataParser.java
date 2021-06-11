@@ -1,4 +1,4 @@
-package com.revolsys.rest;
+package com.revolsys.record;
 
 import java.math.BigDecimal;
 import java.time.Instant;

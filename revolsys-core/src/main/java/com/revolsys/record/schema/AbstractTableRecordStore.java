@@ -9,6 +9,8 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
@@ -20,6 +22,7 @@ import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.ArrayChangeTrackRecord;
 import com.revolsys.record.ChangeTrackRecord;
+import com.revolsys.record.ODataParser;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordWriter;
@@ -75,24 +78,54 @@ public class AbstractTableRecordStore {
     }
   }
 
+  public void addQueryOrderBy(final Query query, final String orderBy) {
+    if (Property.hasValue(orderBy)) {
+      for (String orderClause : orderBy.split(",")) {
+        orderClause = orderClause.trim();
+        String fieldName;
+        boolean ascending = true;
+        final int spaceIndex = orderClause.indexOf(' ');
+        if (spaceIndex == -1) {
+          fieldName = orderClause;
+        } else {
+          fieldName = orderClause.substring(0, spaceIndex);
+          if ("desc".equalsIgnoreCase(orderClause.substring(spaceIndex + 1))) {
+            ascending = false;
+          }
+        }
+        query.addOrderBy(fieldName, ascending);
+      }
+    }
+    applyDefaultSortOrder(query);
+  }
+
+  protected void addSearchConditions(final Query query, final Or or, String search) {
+    search = '%' + search.trim().toLowerCase() + '%';
+    for (final String fieldName : this.searchFieldNames) {
+      final ColumnReference column = query.getTable().getColumn(fieldName);
+      QueryValue left = column;
+      if (column.getDataType() != DataTypes.STRING) {
+        left = new Cast(left, "text");
+      }
+      final Condition condition = query.newCondition(left, Q.ILIKE, search);
+      or.addCondition(condition);
+    }
+  }
+
+  protected Condition alterCondition(final HttpServletRequest request,
+    final TableRecordStoreConnection connection, final Query query, final Condition condition) {
+    return condition;
+  }
+
   public void applyDefaultSortOrder(final Query query) {
     query.addOrderBy(this.defaultSortOrder);
   }
 
-  public Query applySearchCondition(final Query query, String search) {
-    if (!this.searchFieldNames.isEmpty()) {
-      if (Property.hasValue(search)) {
-        final Or or = new Or();
-        search = '%' + search.trim().toLowerCase() + '%';
-        for (final String fieldName : this.searchFieldNames) {
-          final ColumnReference column = query.getTable().getColumn(fieldName);
-          QueryValue left = column;
-          if (column.getDataType() != DataTypes.STRING) {
-            left = new Cast(left, "text");
-          }
-          final Condition condition = query.newCondition(left, Q.ILIKE, search);
-          or.addCondition(condition);
-        }
+  public Query applySearchCondition(final Query query, final String search) {
+    if (search != null && search.trim().length() > 0) {
+      final Or or = new Or();
+      addSearchConditions(query, or, search);
+      if (!or.isEmpty()) {
         query.and(or);
       }
     }
@@ -252,8 +285,54 @@ public class AbstractTableRecordStore {
     final Record record) {
   }
 
+  public Condition newODataFilter(final String filter) {
+    if (Property.hasValue(filter)) {
+      final TableReference table = getTable();
+      return (Condition)ODataParser.parseFilter(table, filter);
+    } else {
+      return null;
+    }
+  }
+
   public Query newQuery(final TableRecordStoreConnection connection) {
     return new TableRecordStoreQuery(this, connection);
+  }
+
+  public Query newQuery(final TableRecordStoreConnection connection,
+    final HttpServletRequest request, final int maxSize) {
+    final String select = request.getParameter("$select");
+    final String filter = request.getParameter("$filter");
+    final String search = request.getParameter("$search");
+    final String orderBy = request.getParameter("$orderby");
+    int skip = 0;
+    try {
+      final String value = request.getParameter("$skip");
+      skip = Integer.parseInt(value);
+    } catch (final Exception e) {
+    }
+    int top = maxSize;
+    try {
+      final String value = request.getParameter("$top");
+      top = Math.min(Integer.parseInt(value), maxSize);
+      if (top <= 0) {
+        throw new IllegalArgumentException("$top must be > 1: " + top);
+      }
+    } catch (final Exception e) {
+    }
+
+    final Query query = newQuery(connection).selectCsv(select).setOffset(skip).setLimit(top);
+    Condition filterCondition = newODataFilter(filter);
+    if (filterCondition != null) {
+      filterCondition = alterCondition(request, connection, query, filterCondition);
+      query.and(filterCondition.clone(null, query.getTable()));
+    }
+    applySearchCondition(query, search);
+    addQueryOrderBy(query, orderBy);
+    return query;
+  }
+
+  protected void newQueryFilterConditionSearch(final Query query, final String search) {
+    applySearchCondition(query, search);
   }
 
   public Record newRecord() {

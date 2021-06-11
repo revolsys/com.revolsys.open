@@ -19,8 +19,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Vector;
 
-import com.revolsys.util.Base64InputStream;
-
 /**
  * Get file format, image resolution, number of bits per pixel and optionally
  * number of images, comments and physical resolution from
@@ -450,7 +448,7 @@ public class ImageInfo {
 
   /**
    * Call this method after you have provided an input stream or file
-   * using {@link #setInput(Base64InputStream)} or {@link #setInput(DataInput)}.
+   * using or {@link #setInput(DataInput)}.
    * If true is returned, the file format was known and information
    * on the file's content can be retrieved using the various getXyz methods.
    * @return if information could be retrieved from input

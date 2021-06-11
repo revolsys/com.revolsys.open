@@ -26,7 +26,7 @@ import com.revolsys.io.channels.ChannelReader;
 import com.revolsys.io.channels.HttpChannelReader;
 import com.revolsys.io.channels.HttpSeekableByteChannel;
 import com.revolsys.io.file.Paths;
-import com.revolsys.util.Base64;
+import com.revolsys.util.Base64Util;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 
@@ -576,12 +576,13 @@ public class UrlResource extends AbstractResource {
       } else {
         userpass = this.username + ":" + this.password;
       }
-      final String basicAuth = "Basic " + new String(Base64.encode(userpass));
+      final String basicAuth = "Basic " + Base64Util.encodeToString(userpass);
       connection.setRequestProperty("Authorization", basicAuth);
     } else {
       final String userInfo = url.getUserInfo();
       if (userInfo != null) {
-        connection.setRequestProperty("Authorization", "Basic " + Base64.encode(userInfo));
+        connection.setRequestProperty("Authorization",
+          "Basic " + Base64Util.encodeToString(userInfo));
       }
     }
   }

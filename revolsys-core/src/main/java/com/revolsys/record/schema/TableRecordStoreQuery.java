@@ -8,6 +8,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.query.Query;
 import com.revolsys.transaction.Transaction;
+import com.revolsys.transaction.TransactionOption;
 import com.revolsys.transaction.TransactionOptions;
 
 public class TableRecordStoreQuery extends Query {
@@ -65,6 +66,16 @@ public class TableRecordStoreQuery extends Query {
   @Override
   public Record insertRecord(final Supplier<Record> newRecordSupplier) {
     return this.recordStore.insertRecord(this.connection, this, newRecordSupplier);
+  }
+
+  @Override
+  public Transaction newTransaction() {
+    return this.connection.newTransaction();
+  }
+
+  @Override
+  public Transaction newTransaction(final TransactionOption... options) {
+    return this.connection.newTransaction(options);
   }
 
   @Override
