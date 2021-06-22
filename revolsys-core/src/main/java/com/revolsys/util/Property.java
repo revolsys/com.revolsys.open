@@ -678,6 +678,9 @@ public interface Property {
   static boolean hasValue(final Object value) {
     if (value == null) {
       return false;
+    } else if (value instanceof String) {
+      final String string = (String)value;
+      return hasValue(string);
     } else if (value instanceof CharSequence) {
       final CharSequence string = (CharSequence)value;
       return hasValue(string);
@@ -705,13 +708,7 @@ public interface Property {
 
   static boolean hasValue(final String string) {
     if (string != null) {
-      final int length = string.length();
-      for (int i = 0; i < length; i++) {
-        final char character = string.charAt(i);
-        if (!Character.isWhitespace(character)) {
-          return true;
-        }
-      }
+      return !string.isBlank();
     }
     return false;
   }
@@ -793,6 +790,9 @@ public interface Property {
   static boolean isEmpty(final Object value) {
     if (value == null) {
       return true;
+    } else if (value instanceof String) {
+      final String string = (String)value;
+      return !hasValue(string);
     } else if (value instanceof CharSequence) {
       final CharSequence string = (CharSequence)value;
       return !hasValue(string);
@@ -819,7 +819,11 @@ public interface Property {
   }
 
   static boolean isEmpty(final String string) {
-    return !hasValue(string);
+    if (string == null) {
+      return true;
+    } else {
+      return string.isBlank();
+    }
   }
 
   static <V> PropertyChangeListener newListener(final BiConsumer<String, V> consumer) {
