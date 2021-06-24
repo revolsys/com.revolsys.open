@@ -484,7 +484,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
    * fixed x, y &amp; fixed z precision models.
    * </p>
    *
-   * @param coordinateSystemId The <a href="http://spatialreference.org/ref/epsg/">EPSG
+   * @param coordinateSystemId The <a href="https://spatialreference.org/ref/epsg/">EPSG
    *          coordinate system id</a>.
    * @param axisCount The number of coordinate axis. 2 for 2D x &amp; y
    *          coordinates. 3 for 3D x, y &amp; z coordinates.
@@ -552,7 +552,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
    * floating precision model.
    * </p>
    *
-   * @param coordinateSystemId The <a href="http://spatialreference.org/ref/epsg/">EPSG
+   * @param coordinateSystemId The <a href="https://spatialreference.org/ref/epsg/">EPSG
    *          coordinate system id</a>.
    * @param axisCount The number of coordinate axis. 2 for 2D x &amp; y
    *          coordinates. 3 for 3D x, y &amp; z coordinates.
@@ -626,7 +626,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
    * and a floating precision models.
    * </p>
    *
-   * @param coordinateSystemId The <a href="http://spatialreference.org/ref/epsg/">EPSG
+   * @param coordinateSystemId The <a href="https://spatialreference.org/ref/epsg/">EPSG
    *          coordinate system id</a>.
    * @return The geometry factory.
    */
