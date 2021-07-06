@@ -11,10 +11,11 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.beans.Classes;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.record.Record;
+import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.json.JsonObject;
-import com.revolsys.record.io.format.mapguide.FeatureLayer;
+import com.revolsys.record.io.format.mapguide.MapGuideFeatureLayer;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.UrlResource;
@@ -26,7 +27,7 @@ import com.revolsys.util.Property;
 public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
   private static final String J_TYPE = "mapGuideWebServerRecordLayer";
 
-  private FeatureLayer webServiceLayer;
+  private MapGuideFeatureLayer webServiceLayer;
 
   private String url;
 
@@ -41,7 +42,7 @@ public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
     setReadOnly(true);
   }
 
-  public MapGuideWebServerRecordLayer(final FeatureLayer layerDescription) {
+  public MapGuideWebServerRecordLayer(final MapGuideFeatureLayer layerDescription) {
     this();
     setWebServiceLayer(layerDescription);
     setProperties(Collections.emptyMap());
@@ -55,8 +56,10 @@ public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
   @Override
   protected void forEachRecordInternal(final Query query,
     final Consumer<? super LayerRecord> consumer) {
+    final RecordFactory<Record> recordFactory = getRecordFactory();
+    query.setRecordFactory(recordFactory);
     try (
-      RecordReader reader = this.webServiceLayer.newRecordReader(this::newLayerRecord, query)) {
+      RecordReader reader = this.webServiceLayer.getRecordReader(query)) {
       for (final Record record : reader) {
         consumer.accept((LayerRecord)record);
       }
@@ -93,13 +96,13 @@ public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
     return this.url;
   }
 
-  public FeatureLayer getWebServiceLayer() {
+  public MapGuideFeatureLayer getWebServiceLayer() {
     return this.webServiceLayer;
   }
 
   @Override
   protected boolean initializeDo() {
-    FeatureLayer webServiceLayer = getWebServiceLayer();
+    MapGuideFeatureLayer webServiceLayer = getWebServiceLayer();
     if (webServiceLayer == null) {
       final String url = getUrl();
       final PathName layerPath = getLayerPath();
@@ -120,7 +123,7 @@ public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
         return false;
       }
       try {
-        webServiceLayer = server.getWebServiceResource(layerPath, FeatureLayer.class);
+        webServiceLayer = server.getWebServiceResource(layerPath, MapGuideFeatureLayer.class);
       } catch (final IllegalArgumentException e) {
         Logs.error(this, "Layer is not valid: " + getPath(), e);
         return false;
@@ -169,7 +172,7 @@ public class MapGuideWebServerRecordLayer extends AbstractRecordLayer {
     this.username = username;
   }
 
-  public void setWebServiceLayer(final FeatureLayer layerDescription) {
+  public void setWebServiceLayer(final MapGuideFeatureLayer layerDescription) {
     this.webServiceLayer = layerDescription;
     if (this.webServiceLayer != null) {
       final String name = this.webServiceLayer.getName();

@@ -10,6 +10,7 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.io.FileUtil;
+import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
@@ -52,11 +53,11 @@ public class MapGuideServerFeatureIterator extends AbstractIterator<Record>
 
   private final boolean supportsPaging;
 
-  private final FeatureLayer layer;
+  private final MapGuideFeatureLayer layer;
 
   private final String geometryFieldName;
 
-  public MapGuideServerFeatureIterator(final FeatureLayer layer,
+  public MapGuideServerFeatureIterator(final MapGuideFeatureLayer layer,
     final Map<String, Object> queryParameters, final int offset, final int limit,
     final RecordFactory<?> recordFactory) {
     this.layer = layer;
@@ -68,7 +69,11 @@ public class MapGuideServerFeatureIterator extends AbstractIterator<Record>
       this.serverLimit = this.queryLimit;
     }
     this.recordDefinition = layer.getRecordDefinition();
-    this.recordFacory = recordFactory;
+    if (recordFactory == null) {
+      this.recordFacory = ArrayRecord.FACTORY;
+    } else {
+      this.recordFacory = recordFactory;
+    }
     this.geometryFactory = this.recordDefinition.getGeometryFactory();
     this.geometryFieldName = this.recordDefinition.getGeometryFieldName();
     this.supportsPaging = false;

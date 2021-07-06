@@ -2,6 +2,7 @@ package com.revolsys.record.io.format.esri.rest.map;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.logging.Logs;
 
@@ -26,12 +28,14 @@ import com.revolsys.geometry.model.Polygon;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.net.urlcache.FileResponseCache;
+import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.io.AbstractRecordReader;
 import com.revolsys.record.io.format.json.JsonParser;
 import com.revolsys.record.io.format.json.JsonParser.EventType;
+import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
@@ -168,7 +172,11 @@ public class ArcGisRestServerFeatureReader extends AbstractRecordReader {
       this.pageSize = this.queryLimit;
     }
     this.recordDefinition = layer.getRecordDefinition();
-    this.recordFacory = recordFactory;
+    if (recordFactory == null) {
+      this.recordFacory = ArrayRecord.FACTORY;
+    } else {
+      this.recordFacory = recordFactory;
+    }
     if (this.recordDefinition.hasGeometryField()) {
       final DataType geometryType = this.recordDefinition.getGeometryField().getDataType();
       this.geometryConverter = GEOMETRY_CONVERTER_BY_TYPE.get(geometryType);
@@ -258,6 +266,16 @@ public class ArcGisRestServerFeatureReader extends AbstractRecordReader {
             if (this.pageByObjectId) {
               if (this.currentRecordId == -1) {
                 throw new NoSuchElementException();
+              }
+            }
+            for (final FieldDefinition field : getFieldDefinitions()) {
+              if (field.getDataType() == DataTypes.DATE_TIME) {
+                final String fieldName = field.getName();
+                final Long time = fieldValues.getLong(fieldName);
+                if (time != null) {
+                  final Date date = new Date(time);
+                  fieldValues.addValue(fieldName, date);
+                }
               }
             }
             record.setValues(fieldValues);
