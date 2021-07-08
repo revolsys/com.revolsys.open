@@ -12,6 +12,11 @@ import com.revolsys.spring.resource.UrlResource;
 public interface WebService<V>
   extends MapSerializer, Parent<V>, WebServiceResource, ObjectWithProperties {
 
+  @SuppressWarnings("unchecked")
+  default <FL extends WebServiceFeatureLayer> FL getFeatureLayer(final PathName pathName) {
+    return (FL)getWebServiceResource(pathName, WebServiceFeatureLayer.class);
+  }
+
   String getPassword();
 
   @Override
@@ -66,6 +71,22 @@ public interface WebService<V>
 
   default boolean isClosed() {
     return false;
+  }
+
+  @SuppressWarnings("unchecked")
+  default <Q extends WebServiceFeatureLayerQuery> Q newQuery(final PathName pathName) {
+    final WebServiceFeatureLayer layer = getWebServiceResource(pathName,
+      WebServiceFeatureLayer.class);
+    if (layer == null) {
+      throw new IllegalArgumentException("Layer not found:" + pathName);
+    } else {
+      return (Q)layer.newQuery();
+    }
+  }
+
+  default <Q extends WebServiceFeatureLayerQuery> Q newQuery(final String path) {
+    final PathName pathName = PathName.newPathName(path);
+    return newQuery(pathName);
   }
 
   void setName(String name);

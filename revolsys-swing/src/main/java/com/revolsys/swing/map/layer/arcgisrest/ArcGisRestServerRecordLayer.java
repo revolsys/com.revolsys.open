@@ -18,6 +18,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.record.Record;
+import com.revolsys.record.RecordFactory;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.map.FeatureLayer;
@@ -197,8 +198,10 @@ public class ArcGisRestServerRecordLayer extends AbstractRecordLayer {
   @Override
   protected void forEachRecordInternal(final Query query,
     final Consumer<? super LayerRecord> consumer) {
+    final RecordFactory<Record> recordFactory = getRecordFactory();
+    query.setRecordFactory(recordFactory);
     try (
-      RecordReader reader = this.layerDescription.newRecordReader(this::newLayerRecord, query)) {
+      RecordReader reader = this.layerDescription.getRecordReader(query)) {
       for (final Record record : reader) {
         consumer.accept((LayerRecord)record);
       }

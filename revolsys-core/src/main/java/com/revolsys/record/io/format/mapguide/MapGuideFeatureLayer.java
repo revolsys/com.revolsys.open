@@ -16,13 +16,14 @@ import com.revolsys.spring.resource.Resource;
 import com.revolsys.webservice.WebServiceFeatureLayer;
 import com.revolsys.webservice.WebServiceResource;
 
-public class FeatureLayer implements WebServiceFeatureLayer {
-  public static FeatureLayer getFeatureLayer(final String serverUrl, final PathName pathName) {
+public class MapGuideFeatureLayer implements WebServiceFeatureLayer {
+  public static MapGuideFeatureLayer getFeatureLayer(final String serverUrl,
+    final PathName pathName) {
     final MapGuideWebService webService = new MapGuideWebService(serverUrl);
-    return webService.getWebServiceResource(pathName, FeatureLayer.class);
+    return webService.getWebServiceResource(pathName, MapGuideFeatureLayer.class);
   }
 
-  public static FeatureLayer getFeatureLayer(final String serverUrl, final String path) {
+  public static MapGuideFeatureLayer getFeatureLayer(final String serverUrl, final String path) {
     final PathName pathName = PathName.newPathName(path);
     return getFeatureLayer(serverUrl, pathName);
   }
@@ -33,7 +34,8 @@ public class FeatureLayer implements WebServiceFeatureLayer {
 
   private final RecordDefinition recordDefinition;
 
-  public FeatureLayer(final FeatureSource featureSource, final RecordDefinition recordDefinition) {
+  public MapGuideFeatureLayer(final FeatureSource featureSource,
+    final RecordDefinition recordDefinition) {
     this.featureSource = featureSource;
     this.webService = featureSource.getWebService();
     this.recordDefinition = recordDefinition;
@@ -59,26 +61,9 @@ public class FeatureLayer implements WebServiceFeatureLayer {
     return this.recordDefinition;
   }
 
-  public Resource getResource(final Map<String, Object> queryParameters) {
-    final MapGuideWebService webService = getWebService();
-    return webService.getResource("SELECTFEATURES", "text/xml", queryParameters);
-  }
-
   @Override
-  public MapGuideWebService getWebService() {
-    return this.webService;
-  }
-
-  @Override
-  public <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,
-    final BoundingBox boundingBox) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,
-    final Query query) {
+  public RecordReader getRecordReader(final Query query) {
+    final RecordFactory<?> recordFactory = query.getRecordFactory();
     final MapEx queryParameters = new LinkedHashMapEx();
     final String resourceId = this.featureSource.getResourceId();
     queryParameters.put("RESOURCEID", resourceId);
@@ -91,6 +76,28 @@ public class FeatureLayer implements WebServiceFeatureLayer {
       limit = query.getLimit();
     }
     return new MapGuideServerFeatureIterator(this, queryParameters, offset, limit, recordFactory);
+  }
+
+  @Override
+  public <V extends Record> RecordReader getRecordReader(final RecordFactory<V> recordFactory,
+    final BoundingBox boundingBox) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public Resource getResource(final Map<String, Object> queryParameters) {
+    final MapGuideWebService webService = getWebService();
+    return webService.getResource("SELECTFEATURES", "text/xml", queryParameters);
+  }
+
+  @Override
+  public MapGuideWebService getWebService() {
+    return this.webService;
+  }
+
+  @Override
+  public Query newQuery() {
+    return new MapGuideFeatureLayerQuery(this);
   }
 
   @Override

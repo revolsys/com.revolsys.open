@@ -13,7 +13,6 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.jdbc.JdbcUtils;
-import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.SingleValueCodeTable;
@@ -184,6 +183,20 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
   }
 
   @Override
+  public RecordReader getRecordReader(final Query query) {
+    return newRecordReader(query, false);
+  }
+
+  @Override
+  public <V extends Record> RecordReader getRecordReader(final RecordFactory<V> recordFactory,
+    final BoundingBox boundingBox) {
+    final Map<String, Object> parameters = newQueryParameters(boundingBox);
+    final ArcGisRestServerFeatureReader reader = new ArcGisRestServerFeatureReader(this, parameters,
+      0, Integer.MAX_VALUE, recordFactory, !isSupportsPagination());
+    return reader;
+  }
+
+  @Override
   protected void initialize(final MapEx properties) {
     super.initialize(properties);
     this.boundingBox = ArcGisResponse.newBoundingBox(properties, "extent");
@@ -227,6 +240,11 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
 
   public boolean isSupportsPagination() {
     return this.supportsPagination;
+  }
+
+  @Override
+  public ArcGisRestFeatureLayerQuery newQuery() {
+    return new ArcGisRestFeatureLayerQuery(this);
   }
 
   public Map<String, Object> newQueryParameters(BoundingBox boundingBox) {
@@ -274,28 +292,8 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
     return parameters;
   }
 
-  public <V extends Record> RecordReader newRecordReader(final Query query,
-    final boolean pageByObjectId) {
-    return newRecordReader(ArrayRecord.FACTORY, query, pageByObjectId);
-  }
-
-  @Override
-  public <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,
-    final BoundingBox boundingBox) {
-    final Map<String, Object> parameters = newQueryParameters(boundingBox);
-    final ArcGisRestServerFeatureReader reader = new ArcGisRestServerFeatureReader(this, parameters,
-      0, Integer.MAX_VALUE, recordFactory, !isSupportsPagination());
-    return reader;
-  }
-
-  @Override
-  public <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,
-    final Query query) {
-    return newRecordReader(recordFactory, query, false);
-  }
-
-  public <V extends Record> RecordReader newRecordReader(final RecordFactory<V> recordFactory,
-    final Query query, final boolean pageByObjectId) {
+  public RecordReader newRecordReader(final Query query, final boolean pageByObjectId) {
+    final RecordFactory<?> recordFactory = query.getRecordFactory();
     refreshIfNeeded();
     final Map<String, Object> parameters = newQueryParameters(query);
     addDefaultRecordQueryParameters(parameters);
