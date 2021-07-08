@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -901,6 +902,21 @@ public class Query extends BaseObjectWithProperties
       addOrderBy(orderByItem);
     }
     return this;
+  }
+
+  public void removeSelect(final String name) {
+    for (final Iterator<QueryValue> iterator = this.selectExpressions.iterator(); iterator
+      .hasNext();) {
+      final QueryValue queryValue = iterator.next();
+      if (queryValue instanceof Column) {
+        final Column column = (Column)queryValue;
+        if (column.getName().equals(name)) {
+          iterator.remove();
+        }
+
+      }
+
+    }
   }
 
   public Query select(final Collection<?> selectExpressions) {
