@@ -1,6 +1,6 @@
 package com.revolsys.net.http.exception;
 
-public class AuthenticationException extends RuntimeException {
+public class AuthenticationException extends SecurityException {
 
   public AuthenticationException(final String message) {
     super(message);

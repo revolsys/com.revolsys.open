@@ -8,6 +8,8 @@ import org.apache.http.client.methods.RequestBuilder;
 
 import com.revolsys.io.map.ObjectFactoryConfig;
 import com.revolsys.net.http.ApacheHttp;
+import com.revolsys.net.http.ApacheHttpException;
+import com.revolsys.net.http.exception.AuthenticationException;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonParser;
@@ -166,8 +168,26 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
 
   private OpenIdBearerToken getOpenIdBearerToken(final RequestBuilder requestBuilder,
     final String scope) {
-    final JsonObject response = ApacheHttp.getJson(requestBuilder);
-    return new OpenIdBearerToken(this, response, scope);
+    try {
+      final JsonObject response = ApacheHttp.getJson(requestBuilder);
+      return new OpenIdBearerToken(this, response, scope);
+    } catch (final ApacheHttpException e) {
+      if (e.getStatusCode() == 400) {
+        JsonObject error = null;
+        try {
+          final String content = e.getContent();
+          error = JsonParser.read(content);
+        } catch (final Exception e2) {
+        }
+        if (error != null) {
+          final String errorDescription = error.getString("error_description");
+          if (errorDescription != null) {
+            throw new AuthenticationException(scope);
+          }
+        }
+      }
+      throw e;
+    }
   }
 
   public String getRevocationEndpoint() {
