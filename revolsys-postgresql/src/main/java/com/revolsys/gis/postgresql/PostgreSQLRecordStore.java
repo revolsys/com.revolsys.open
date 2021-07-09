@@ -144,7 +144,7 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
     final String[] path = jsonValue.getPath().split("\\.");
     for (int i = 1; i < path.length; i++) {
       final String propertyName = path[i];
-      sql.append(" -> '");
+      sql.append(" ->> '");
       sql.append(propertyName);
       sql.append("'");
     }

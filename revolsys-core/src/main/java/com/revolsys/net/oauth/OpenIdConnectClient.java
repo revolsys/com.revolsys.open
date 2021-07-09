@@ -180,9 +180,13 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
         } catch (final Exception e2) {
         }
         if (error != null) {
-          final String errorDescription = error.getString("error_description");
+          String errorDescription = error.getString("error_description");
           if (errorDescription != null) {
-            throw new AuthenticationException(scope);
+            final int index = errorDescription.indexOf("Trace ID:");
+            if (index != -1) {
+              errorDescription = errorDescription.substring(0, index).trim();
+            }
+            throw new AuthenticationException(errorDescription);
           }
         }
       }

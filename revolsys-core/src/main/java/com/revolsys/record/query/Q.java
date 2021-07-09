@@ -24,6 +24,8 @@ public class Q {
 
   public static BiFunction<QueryValue, QueryValue, Condition> EQUAL = Equal::new;
 
+  public static BiFunction<QueryValue, QueryValue, Condition> NOT_EQUAL = NotEqual::new;
+
   public static BiFunction<QueryValue, QueryValue, Condition> GREATER_THAN = GreaterThan::new;
 
   public static BiFunction<QueryValue, QueryValue, Condition> GREATER_THAN_EQUAL = GreaterThanEqual::new;
