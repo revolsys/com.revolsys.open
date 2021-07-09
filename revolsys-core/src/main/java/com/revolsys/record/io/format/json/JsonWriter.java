@@ -128,11 +128,43 @@ public final class JsonWriter implements BaseCloseable {
     value(value);
   }
 
+  public void list(final Iterable<?> values) throws IOException {
+    startList();
+    final Iterator<?> iterator = values.iterator();
+
+    if (iterator.hasNext()) {
+      if (this.indent) {
+        {
+          final Object value = iterator.next();
+          indent();
+          value(value);
+        }
+        while (iterator.hasNext()) {
+          endAttribute();
+          indent();
+          final Object value = iterator.next();
+          value(value);
+        }
+      } else {
+        {
+          final Object value = iterator.next();
+          value(value);
+        }
+        while (iterator.hasNext()) {
+          endAttribute();
+          final Object value = iterator.next();
+          value(value);
+        }
+      }
+    }
+    endList();
+  }
+
   public void list(final Object... values) throws IOException {
     startList();
     final int size = values.length;
 
-    if (size > 1) {
+    if (size > 0) {
       if (this.indent) {
         {
           final Object value = values[0];
