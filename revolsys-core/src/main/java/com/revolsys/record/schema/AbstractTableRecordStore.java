@@ -12,11 +12,13 @@ import java.util.function.Supplier;
 import javax.servlet.http.HttpServletRequest;
 
 import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStore;
@@ -24,8 +26,10 @@ import com.revolsys.record.ArrayChangeTrackRecord;
 import com.revolsys.record.ChangeTrackRecord;
 import com.revolsys.record.ODataParser;
 import com.revolsys.record.Record;
+import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.io.format.json.JsonList;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Cast;
 import com.revolsys.record.query.ColumnReference;
@@ -285,6 +289,10 @@ public class AbstractTableRecordStore {
     final Record record) {
   }
 
+  protected boolean isFieldReadonly(final String fieldName) {
+    return this.recordDefinition.isIdField(fieldName);
+  }
+
   public Condition newODataFilter(final String filter) {
     if (Property.hasValue(filter)) {
       final TableReference table = getTable();
@@ -360,6 +368,61 @@ public class AbstractTableRecordStore {
 
   public UUID newUUID() {
     return UUID.randomUUID();
+  }
+
+  public JsonObject schemaToJson() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final JsonList jsonFields = JsonList.array();
+    final String idFieldName = recordDefinition.getIdFieldName();
+    final JsonObject jsonSchema = JsonObject.hash()
+      .addValue("typeName", recordDefinition.getPathName())
+      .addValue("title", recordDefinition.getTitle())
+      .addValue("idFieldName", idFieldName)
+      .addValue("geometryFieldName", recordDefinition.getGeometryFieldName())
+      .addValue("fields", jsonFields);
+    final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
+    if (geometryFactory != null) {
+      final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
+      if (coordinateSystemId > 0) {
+        jsonSchema.addValue("srid", coordinateSystemId);
+      }
+    }
+    for (final FieldDefinition field : recordDefinition.getFields()) {
+      final String fieldName = field.getName();
+      final DataType dataType = field.getDataType();
+      String dataTypeString = dataType.toString();
+      if (dataTypeString.startsWith("List")) {
+        dataTypeString = dataTypeString.substring(4) + "[]";
+      }
+      final JsonObject jsonField = JsonObject.hash()
+        .addValue("name", fieldName)
+        .addNotEmpty("title", field.getTitle().replace(" Ind", ""))
+        .addNotEmpty("description", field.getDescription())
+        .addValue("dataType", dataTypeString)
+        .addValue("required", field.isRequired());
+      if (isFieldReadonly(fieldName)) {
+        jsonField.addValue("readonly", true);
+      }
+      final int length = field.getLength();
+      if (length > 0) {
+        jsonField.addValue("length", length);
+      }
+      final int scale = field.getScale();
+      if (scale > 0) {
+        jsonField.addValue("scale", scale);
+      }
+      jsonField//
+        .addNotEmpty("default", field.getDefaultValue())
+        .addNotEmpty("allowedValues", field.getAllowedValues())
+        .addNotEmpty("min", field.getMinValue())
+        .addNotEmpty("max", field.getMaxValue());
+      final CodeTable codeTable = field.getCodeTable();
+      if (codeTable != null) {
+        jsonField.addNotEmpty("codeTable", codeTable.getName());
+      }
+      jsonFields.add(jsonField);
+    }
+    return jsonSchema;
   }
 
   protected void setDefaultSortOrder(final Collection<String> fieldNames) {
