@@ -396,7 +396,7 @@ public class AbstractTableRecordStore {
       }
       final JsonObject jsonField = JsonObject.hash()
         .addValue("name", fieldName)
-        .addNotEmpty("title", field.getTitle().replace(" Ind", ""))
+        .addNotEmpty("title", field.getTitle().replace(" Ind", "").replace(" Code", ""))
         .addNotEmpty("description", field.getDescription())
         .addValue("dataType", dataTypeString)
         .addValue("required", field.isRequired());
