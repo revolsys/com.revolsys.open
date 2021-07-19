@@ -46,6 +46,57 @@ import com.revolsys.util.Property;
 
 public class AbstractTableRecordStore {
 
+  public static JsonObject schemaToJson(final RecordDefinition recordDefinition) {
+    final JsonList jsonFields = JsonList.array();
+    final String idFieldName = recordDefinition.getIdFieldName();
+    final JsonObject jsonSchema = JsonObject.hash()
+      .addValue("typeName", recordDefinition.getPathName())
+      .addValue("title", recordDefinition.getTitle())
+      .addValue("idFieldName", idFieldName)
+      .addValue("geometryFieldName", recordDefinition.getGeometryFieldName())
+      .addValue("fields", jsonFields);
+    final GeometryFactory geometryFactory = recordDefinition.getGeometryFactory();
+    if (geometryFactory != null) {
+      final int coordinateSystemId = geometryFactory.getHorizontalCoordinateSystemId();
+      if (coordinateSystemId > 0) {
+        jsonSchema.addValue("srid", coordinateSystemId);
+      }
+    }
+    for (final FieldDefinition field : recordDefinition.getFields()) {
+      final String fieldName = field.getName();
+      final DataType dataType = field.getDataType();
+      String dataTypeString = dataType.toString();
+      if (dataTypeString.startsWith("List")) {
+        dataTypeString = dataTypeString.substring(4) + "[]";
+      }
+      final JsonObject jsonField = JsonObject.hash()
+        .addValue("name", fieldName)
+        .addNotEmpty("title", field.getTitle().replace(" Ind", ""))
+        .addNotEmpty("description", field.getDescription())
+        .addValue("dataType", dataTypeString)
+        .addValue("required", field.isRequired());
+      final int length = field.getLength();
+      if (length > 0) {
+        jsonField.addValue("length", length);
+      }
+      final int scale = field.getScale();
+      if (scale > 0) {
+        jsonField.addValue("scale", scale);
+      }
+      jsonField//
+        .addNotEmpty("default", field.getDefaultValue())
+        .addNotEmpty("allowedValues", field.getAllowedValues())
+        .addNotEmpty("min", field.getMinValue())
+        .addNotEmpty("max", field.getMaxValue());
+      final CodeTable codeTable = field.getCodeTable();
+      if (codeTable != null) {
+        jsonField.addNotEmpty("codeTable", codeTable.getName());
+      }
+      jsonFields.add(jsonField);
+    }
+    return jsonSchema;
+  }
+
   private JdbcRecordStore recordStore;
 
   private final PathName tablePath;
