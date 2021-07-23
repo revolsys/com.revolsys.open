@@ -190,6 +190,11 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
       this.connectionProperties.clear();
       this.recordFactory = null;
       this.recordStoreExtensions.clear();
+      try {
+        throw new RuntimeException("Closed:" + this);
+      } catch (final Exception e) {
+        Logs.error(this, e);
+      }
       this.iteratorFactory = null;
       this.label = "deleted";
       if (this.statistics != null) {
