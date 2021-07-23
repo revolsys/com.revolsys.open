@@ -344,6 +344,10 @@ public class AbstractTableRecordStore {
     return this.recordDefinition.isIdField(fieldName);
   }
 
+  public void lockTable() {
+    this.recordStore.lockTable(this.tablePath);
+  }
+
   public Condition newODataFilter(final String filter) {
     if (Property.hasValue(filter)) {
       final TableReference table = getTable();

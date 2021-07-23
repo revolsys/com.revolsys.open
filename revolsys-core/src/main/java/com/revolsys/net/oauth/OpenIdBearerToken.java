@@ -1,11 +1,11 @@
 package com.revolsys.net.oauth;
 
 import java.text.ParseException;
+import java.util.Map;
 
 import org.jeometry.common.exception.Exceptions;
 
 import com.nimbusds.jwt.JWT;
-import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.JWTParser;
 import com.revolsys.record.io.format.json.JsonObject;
 
@@ -18,6 +18,8 @@ public class OpenIdBearerToken extends BearerToken {
   private final String idToken;
 
   private final OpenIdConnectClient client;
+
+  private Map<String, Object> claims;
 
   public OpenIdBearerToken(final OpenIdConnectClient client, final JsonObject config,
     final OpenIdResource resource) {
@@ -45,6 +47,17 @@ public class OpenIdBearerToken extends BearerToken {
     setScope(scope, returnedScope);
   }
 
+  private Map<String, Object> getClaims() {
+    if (this.claims == null) {
+      try {
+        this.claims = getJwt().getJWTClaimsSet().getClaims();
+      } catch (final ParseException e) {
+        throw Exceptions.wrap("idToken invalid", e);
+      }
+    }
+    return this.claims;
+  }
+
   public OpenIdConnectClient getClient() {
     return this.client;
   }
@@ -65,13 +78,7 @@ public class OpenIdBearerToken extends BearerToken {
   }
 
   public String getStringClaim(final String name) {
-    try {
-      final JWT jwt = getJwt();
-      final JWTClaimsSet claims = jwt.getJWTClaimsSet();
-      return claims.getStringClaim(name);
-    } catch (final ParseException e) {
-      throw Exceptions.wrap("idToken invalid", e);
-    }
+    return (String)getClaims().get(name);
   }
 
   public OpenIdBearerToken getValid() {
