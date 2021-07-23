@@ -68,6 +68,16 @@ public interface JdbcRecordStore extends RecordStore {
 
   boolean isIdFieldRowid(RecordDefinition recordDefinition);
 
+  default void lockTable(final PathName typeName) {
+    try (
+      final JdbcConnection connection = getJdbcConnection()) {
+      final StringBuilder sql = new StringBuilder("LOCK TABLE ");
+      getRecordDefinition(typeName).appendFrom(sql);
+      sql.append(" IN SHARE MODE");
+      connection.executeUpdate(sql.toString());
+    }
+  }
+
   default void lockTable(final String typePath) {
     try (
       final JdbcConnection connection = getJdbcConnection()) {
