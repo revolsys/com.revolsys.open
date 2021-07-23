@@ -499,6 +499,13 @@ public class AbstractTableRecordStore {
     return updateRecord(connection, id, record -> record.setValues(values));
   }
 
+  public Record updateRecord(final TableRecordStoreConnection connection, final Object id,
+    final Consumer<Record> updateAction) {
+    final Query query = newQuery(connection);
+    query.and(getRecordDefinition().getIdFieldName(), id);
+    return query.updateRecord(updateAction);
+  }
+
   protected Record updateRecord(final TableRecordStoreConnection connection, final Query query,
     final Consumer<Record> updateAction) {
     try (

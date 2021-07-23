@@ -4,9 +4,12 @@ import com.revolsys.record.schema.RecordDefinition;
 
 public abstract class BaseRecord extends AbstractRecord {
 
-  private transient RecordDefinition recordDefinition;
+  protected transient RecordDefinition recordDefinition;
 
   private RecordState state = RecordState.INITIALIZING;
+
+  public BaseRecord() {
+  }
 
   public BaseRecord(final RecordDefinition recordDefinition) {
     this.recordDefinition = recordDefinition;

@@ -92,6 +92,12 @@ public interface TableRecordStoreConnection extends Transactionable {
     return tableRecordStore.updateRecord(this, id, values);
   }
 
+  default Record updateRecord(final CharSequence tablePath, final Object id,
+    final Consumer<Record> updateAction) {
+    final AbstractTableRecordStore tableRecordStore = getTableRecordStore(tablePath);
+    return tableRecordStore.updateRecord(this, id, updateAction);
+  }
+
   default Record updateRecord(final Record record, final Consumer<Record> updateAction) {
     final PathName tablePath = record.getPathName();
     final Identifier id = record.getIdentifier();
