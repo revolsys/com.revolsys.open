@@ -261,6 +261,19 @@ public interface JsonList extends List<Object>, JsonType {
     }
   }
 
+  default String getString(final int index) {
+    return getValue(index, DataTypes.STRING);
+  }
+
+  default String getString(final int index, final String defaultValue) {
+    final String value = getString(index);
+    if (value == null) {
+      return defaultValue;
+    } else {
+      return value;
+    }
+  }
+
   @SuppressWarnings("unchecked")
   default <V> V getValue(final int index) {
     return (V)get(index);

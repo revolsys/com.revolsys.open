@@ -187,6 +187,16 @@ public class AbstractTableRecordStore {
     return query;
   }
 
+  public boolean canEditField(final String fieldName) {
+    if (!this.recordDefinition.hasField(fieldName)) {
+      return false;
+    }
+    if (this.recordDefinition.isIdField(fieldName)) {
+      return false;
+    }
+    return true;
+  }
+
   protected int deleteRecords(final TableRecordStoreConnection connection, final Query query) {
     try (
       Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED)) {
@@ -222,6 +232,10 @@ public class AbstractTableRecordStore {
   public Record getRecord(final TableRecordStoreConnection connection, final String fieldName,
     final Object value) {
     return newQuery(connection).and(fieldName, value).getRecord();
+  }
+
+  public Record getRecordById(final TableRecordStoreConnection connection, final Object id) {
+    return getRecord(connection, "id", id);
   }
 
   public Record getRecordById(final TableRecordStoreConnection connection, final UUID id) {
