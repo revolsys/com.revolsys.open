@@ -129,12 +129,33 @@ public class FileGdbRecordDefinition extends RecordDefinitionImpl {
       if (fieldDefinition != null) {
         final Domain domain = field.getDomain();
         if (domain != null) {
-          CodeTable codeTable = recordStore.getCodeTable(domain.getDomainName() + "_ID");
-          if (codeTable == null) {
-            codeTable = new FileGdbDomainCodeTable(recordStore, domain);
-            recordStore.addCodeTable(codeTable);
+          if (domain.hasCodedValues()) {
+            CodeTable codeTable = recordStore.getCodeTable(domain.getDomainName() + "_ID");
+            if (codeTable == null) {
+              codeTable = new FileGdbDomainCodeTable(recordStore, domain);
+              recordStore.addCodeTable(codeTable);
+            }
+            fieldDefinition.setCodeTable(codeTable);
+          } else {
+            final String minValue = domain.getMinValue();
+            if (minValue != null) {
+              try {
+                final Object min = fieldDefinition.toFieldValueException(minValue);
+                fieldDefinition.setMinValue(min);
+              } catch (final Exception e) {
+                Logs.error(this, "Invalid domain minValue=" + minValue);
+              }
+            }
+            final String maxValue = domain.getMaxValue();
+            if (maxValue != null) {
+              try {
+                final Object max = fieldDefinition.toFieldValueException(maxValue);
+                fieldDefinition.setMaxValue(max);
+              } catch (final Exception e) {
+                Logs.error(this, "Invalid domain minValue=" + maxValue);
+              }
+            }
           }
-          fieldDefinition.setCodeTable(codeTable);
         }
         fieldDefinition.setRecordStore(recordStore);
         addField(fieldDefinition);

@@ -79,7 +79,11 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object>, Bas
   }
 
   default Identifier getIdentifier(final Object value) {
-    return getIdentifier(Collections.singletonList(value));
+    if (value == null) {
+      return null;
+    } else {
+      return getIdentifier(Collections.singletonList(value));
+    }
   }
 
   default Identifier getIdentifier(final Object... values) {
