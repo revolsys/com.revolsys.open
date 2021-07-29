@@ -40,7 +40,8 @@ public class PostgreSQLJsonbFieldDefinition extends JdbcFieldDefinition {
     } else {
       final PGobject json = new PGobject();
       json.setType("jsonb");
-      json.setValue(value.toString());
+      final String string = Json.JSON_OBJECT.toString(value);
+      json.setValue(string);
       statement.setObject(parameterIndex, json);
     }
     return parameterIndex + 1;

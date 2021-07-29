@@ -299,7 +299,7 @@ public class AbstractTableRecordStore {
   protected Record insertOrUpdateRecord(final TableRecordStoreConnection connection,
     final Query query, final Supplier<Record> newRecordSupplier,
     final Consumer<Record> updateAction) {
-    query.setRecordFactory(ArrayChangeTrackRecord.FACTORY).setLockMode(LockMode.FOR_UPDATE);
+    query.setRecordFactory(ArrayChangeTrackRecord.FACTORY);
 
     try (
       Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED)) {
