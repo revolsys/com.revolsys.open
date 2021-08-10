@@ -4,6 +4,7 @@ import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 
 public class GeometryFieldDefinition extends FieldDefinition {
@@ -41,5 +42,10 @@ public class GeometryFieldDefinition extends FieldDefinition {
       geometry = geometryFactory.geometry(value.toString(), false);
     }
     return getDataType().toObject(geometry);
+  }
+
+  @Override
+  public <V> V toFieldValueException(final RecordState state, final Object value) {
+    return toFieldValueException(value);
   }
 }

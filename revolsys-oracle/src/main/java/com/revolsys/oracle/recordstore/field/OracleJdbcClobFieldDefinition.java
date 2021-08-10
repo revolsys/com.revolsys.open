@@ -12,6 +12,7 @@ import java.util.Collections;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.record.RecordState;
 import com.revolsys.record.query.ColumnIndexes;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.PathResource;
@@ -82,5 +83,10 @@ public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
     } else {
       return DataTypes.CLOB.toObject(value);
     }
+  }
+
+  @Override
+  public <V> V toFieldValueException(final RecordState state, final Object value) {
+    return toFieldValueException(value);
   }
 }

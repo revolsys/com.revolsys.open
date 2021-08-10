@@ -10,6 +10,7 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
@@ -188,6 +189,19 @@ public class Column implements QueryValue, ColumnReference {
         return (V)value;
       } else {
         return this.fieldDefinition.toFieldValueException(value);
+      }
+    }
+  }
+
+  @Override
+  public <V> V toFieldValueException(final RecordState state, final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      if (this.fieldDefinition == null) {
+        return (V)value;
+      } else {
+        return this.fieldDefinition.toFieldValueException(state, value);
       }
     }
   }

@@ -9,6 +9,7 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
@@ -155,6 +156,15 @@ public class ColumnAlias implements QueryValue, ColumnReference {
       return null;
     } else {
       return this.column.toFieldValueException(value);
+    }
+  }
+
+  @Override
+  public <V> V toFieldValueException(final RecordState state, final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      return this.column.toFieldValueException(state, value);
     }
   }
 

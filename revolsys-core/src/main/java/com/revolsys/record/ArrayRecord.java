@@ -159,7 +159,7 @@ public class ArrayRecord extends BaseRecord {
       final SingleIdentifier identifier = (SingleIdentifier)value;
       value = identifier.getValue(0);
     }
-    final Object newValue = fieldDefinition.toFieldValue(value);
+    final Object newValue = fieldDefinition.toFieldValue(getState(), value);
     final int index = fieldDefinition.getIndex();
     final Object oldValue = getValueInternal(index);
     if (!isInitializing() && !fieldDefinition.equals(oldValue, newValue)) {

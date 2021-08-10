@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
 
 public interface ColumnReference extends QueryValue {
@@ -70,6 +71,8 @@ public interface ColumnReference extends QueryValue {
   }
 
   <V> V toFieldValueException(final Object value);
+
+  <V> V toFieldValueException(RecordState state, Object value);
 
   String toString(Object value);
 }

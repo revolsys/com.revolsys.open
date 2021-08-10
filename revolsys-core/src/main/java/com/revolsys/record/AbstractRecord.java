@@ -44,7 +44,7 @@ public abstract class AbstractRecord implements Record, Cloneable {
 
   protected boolean setValue(final FieldDefinition fieldDefinition, Object value) {
     final String propertyName = fieldDefinition.getName();
-    value = fieldDefinition.toFieldValueException(value);
+    value = fieldDefinition.toFieldValueException(getState(), value);
     Property.setSimple(this, propertyName, value);
     return true;
   }
