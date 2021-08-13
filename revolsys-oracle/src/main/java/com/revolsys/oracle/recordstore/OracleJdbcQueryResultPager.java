@@ -7,13 +7,10 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import com.revolsys.jdbc.JdbcConnection;
-import com.revolsys.jdbc.io.JdbcQueryIterator;
 import com.revolsys.jdbc.io.JdbcQueryResultPager;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.Record;
-import com.revolsys.record.RecordFactory;
 import com.revolsys.record.query.Query;
-import com.revolsys.record.schema.RecordDefinition;
 
 public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
 
@@ -46,17 +43,13 @@ public class OracleJdbcQueryResultPager extends JdbcQueryResultPager {
 
         try (
           final JdbcConnection connection = recordStore.getJdbcConnection()) {
-          final RecordFactory<Record> recordFactory = getRecordFactory();
-          final RecordDefinition recordDefinition = getRecordDefinition();
-
           try (
             final PreparedStatement statement = connection.prepareStatement(sql);
-            final ResultSet resultSet = recordStore.getResultSet(statement, getQuery());) {
+            final ResultSet resultSet = createResultSet(statement);) {
             if (resultSet.next()) {
               int i = 0;
               do {
-                final Record record = JdbcQueryIterator.getNextRecord(recordStore, recordDefinition,
-                  this.selectExpressions, recordFactory, resultSet, this.internStrings);
+                final Record record = getNextRecord(resultSet);
                 results.add(record);
                 i++;
               } while (resultSet.next() && i < pageSize);
