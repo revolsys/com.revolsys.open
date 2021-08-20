@@ -155,15 +155,23 @@ public class AbstractTableRecordStore {
   }
 
   protected void addSearchConditions(final Query query, final Or or, String search) {
-    search = '%' + search.trim().toLowerCase() + '%';
+    final String searchText = search.trim().toLowerCase();
+    search = '%' + searchText + '%';
     for (final String fieldName : this.searchFieldNames) {
       final ColumnReference column = query.getTable().getColumn(fieldName);
       QueryValue left = column;
-      if (column.getDataType() != DataTypes.STRING) {
-        left = new Cast(left, "text");
+      final DataType dataType = column.getDataType();
+      if (dataType != DataTypes.STRING) {
+        if (!dataType.isNumeric() || dataType.isValid(searchText)) {
+          left = new Cast(left, "text");
+        } else {
+          left = null;
+        }
       }
-      final Condition condition = query.newCondition(left, Q.ILIKE, search);
-      or.addCondition(condition);
+      if (left != null) {
+        final Condition condition = query.newCondition(left, Q.ILIKE, search);
+        or.addCondition(condition);
+      }
     }
   }
 
