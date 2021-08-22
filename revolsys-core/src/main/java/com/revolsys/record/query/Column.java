@@ -104,7 +104,7 @@ public class Column implements QueryValue, ColumnReference {
   public boolean equals(final Object obj) {
     if (obj instanceof Column) {
       final ColumnReference value = (ColumnReference)obj;
-      return DataType.equal(value.getName(), this.getName());
+      return DataType.equal(value.getName(), getName());
     } else {
       return false;
     }
@@ -151,7 +151,11 @@ public class Column implements QueryValue, ColumnReference {
       return null;
     } else {
       final String name = getName();
-      return (V)record.getValue(name);
+      if (name.indexOf('.') == -1) {
+        return (V)record.getValue(name);
+      } else {
+        return (V)record.getValueByPath(name);
+      }
     }
   }
 

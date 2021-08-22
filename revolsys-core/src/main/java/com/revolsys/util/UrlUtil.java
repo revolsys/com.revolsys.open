@@ -72,19 +72,13 @@ public final class UrlUtil {
 
   private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_RE);
 
-  public static URI appendPath(final URI uri, final String path) {
-    final String originalPath = uri.getPath();
-    String newPath = appendPath(originalPath, path);
-    return uri.resolve(newPath);
-  }
-
   public static String appendPath(final String originalPath, final String path) {
     final int length = path.length();
     final StringBuilder pathBuilder = new StringBuilder(originalPath);
     int startIndex = 0;
     while (startIndex < length) {
       if (path.charAt(startIndex) == '/') {
-        if (pathBuilder.charAt(pathBuilder.length() - 1) != '/') {
+        if (pathBuilder.length() > 0 && pathBuilder.charAt(pathBuilder.length() - 1) != '/') {
           pathBuilder.append('/');
         }
         startIndex++;
@@ -106,8 +100,14 @@ public final class UrlUtil {
 
       }
     }
-    String newPath = pathBuilder.toString();
+    final String newPath = pathBuilder.toString();
     return newPath;
+  }
+
+  public static URI appendPath(final URI uri, final String path) {
+    final String originalPath = uri.getPath();
+    final String newPath = appendPath(originalPath, path);
+    return uri.resolve(newPath);
   }
 
   public static void appendQuery(final StringBuilder query,

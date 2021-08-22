@@ -15,10 +15,13 @@ import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypedValue;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.logging.Logs;
 
+import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.json.JsonList;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.util.Property;
 
 public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedValue {
   MapEx EMPTY = new MapEx() {
@@ -357,6 +360,42 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
   @SuppressWarnings("unchecked")
   default <T extends Object> T getValue(final String name) {
     return (T)get(name);
+  }
+
+  @SuppressWarnings("unchecked")
+  default <T> T getValueByPath(final CharSequence path) {
+    final String[] propertyPath = path.toString().split("\\.");
+    Object propertyValue = this;
+    for (int i = 0; i < propertyPath.length && propertyValue != null; i++) {
+      final String propertyName = propertyPath[i];
+      if (propertyValue instanceof Record) {
+        final Record record = (Record)propertyValue;
+
+        if (record.hasField(propertyName)) {
+          propertyValue = record.getValue(propertyName);
+          if (propertyValue == null) {
+            return null;
+          }
+        } else {
+          return null;
+        }
+      } else if (propertyValue instanceof Map) {
+        final Map<String, Object> map = (Map<String, Object>)propertyValue;
+        propertyValue = map.get(propertyName);
+        if (propertyValue == null) {
+          return null;
+        }
+      } else {
+        try {
+          final Object object = propertyValue;
+          propertyValue = Property.getSimple(object, propertyName);
+        } catch (final IllegalArgumentException e) {
+          Logs.debug(this, "Path does not exist " + path, e);
+          return null;
+        }
+      }
+    }
+    return (T)propertyValue;
   }
 
   default boolean hasValue(final CharSequence name) {
