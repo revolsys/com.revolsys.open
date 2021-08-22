@@ -1319,7 +1319,11 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
           final List list = (List)value;
           id = codeTable.getIdentifier(list.toArray());
         } else {
-          id = codeTable.getIdentifier(value);
+          if (getState().isInitializing()) {
+            id = null;
+          } else {
+            id = codeTable.getIdentifier(value);
+          }
         }
         if (id == null) {
           targetValue = value;

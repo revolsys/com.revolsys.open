@@ -83,7 +83,7 @@ public class ChangeTrackRecordImpl extends BaseRecord implements ChangeTrackReco
       final FieldDefinition field = getRecordDefinition().getField(fieldIndex);
       final Object changedValue = this.changedValues[fieldIndex];
       final Object originalValue = getOriginalValue(fieldIndex);
-      return field.equals(changedValue, originalValue);
+      return !field.equals(changedValue, originalValue);
     }
     return false;
   }

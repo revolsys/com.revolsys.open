@@ -11,6 +11,7 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.jdbc.ByteArrayBlob;
 
 import com.revolsys.jdbc.LocalBlob;
+import com.revolsys.record.RecordState;
 import com.revolsys.record.query.ColumnIndexes;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
@@ -75,5 +76,11 @@ public class JdbcBlobFieldDefinition extends JdbcFieldDefinition {
     } else {
       return (V)value;
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V> V toFieldValueException(final RecordState state, final Object value) {
+    return toFieldValueException(value);
   }
 }

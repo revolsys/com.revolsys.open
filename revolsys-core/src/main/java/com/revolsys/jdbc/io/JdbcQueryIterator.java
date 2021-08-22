@@ -34,7 +34,7 @@ import com.revolsys.util.count.LabelCounters;
 public class JdbcQueryIterator extends AbstractIterator<Record>
   implements RecordReader, RecordIterator {
   public static Record getNextRecord(final JdbcRecordStore recordStore,
-    final RecordDefinition recordDefinition, final List<QueryValue> selectExpression,
+    final RecordDefinition recordDefinition, final List<QueryValue> expressions,
     final RecordFactory<Record> recordFactory, final ResultSet resultSet,
     final boolean internStrings) {
     final Record record = recordFactory.newRecord(recordDefinition);
@@ -42,7 +42,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record>
       record.setState(RecordState.INITIALIZING);
       final ColumnIndexes indexes = new ColumnIndexes();
       int fieldIndex = 0;
-      for (final QueryValue expression : selectExpression) {
+      for (final QueryValue expression : expressions) {
         try {
           final Object value = expression.getValueFromResultSet(recordDefinition, resultSet,
             indexes, internStrings);

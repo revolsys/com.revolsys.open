@@ -28,6 +28,7 @@ import com.revolsys.geometry.operation.valid.IsValidOp;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.Record;
+import com.revolsys.record.RecordState;
 import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonObjectHash;
@@ -849,6 +850,23 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
     }
   }
 
+  /**
+   * Convert the object to a value that is valid for the field. If the value can't be converted then
+   * the original value will be returned. This can result in invalid values in the record but those can be picked up
+   * with validation. Otherwise invalid values would silently be removed.
+   *
+   * @param value
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  public <V> V toFieldValue(final RecordState state, final Object value) {
+    try {
+      return toFieldValueException(state, value);
+    } catch (final Throwable e) {
+      return (V)value;
+    }
+  }
+
   @Override
   public <V> V toFieldValueException(final Object value) {
     if (value == null) {
@@ -862,6 +880,38 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
           }
         }
         if (this.codeTable != null) {
+          final Identifier identifier = this.codeTable.getIdentifier(value);
+          if (identifier == null) {
+            throw new IllegalArgumentException(getName() + "='" + value
+              + "' cannot be found in code table " + this.codeTable.getName());
+          } else {
+            return identifier.toSingleValue();
+          }
+        }
+
+        final V fieldValue = this.type.toObject(value);
+        return fieldValue;
+      } catch (final IllegalArgumentException e) {
+        throw e;
+      } catch (final Throwable e) {
+        throw new IllegalArgumentException(
+          getName() + "='" + value + "' is not a valid " + getDataType().getValidationName(), e);
+      }
+    }
+  }
+
+  public <V> V toFieldValueException(final RecordState state, final Object value) {
+    if (value == null) {
+      return null;
+    } else {
+      try {
+        if (value instanceof String) {
+          final String string = (String)value;
+          if (!Property.hasValue(string)) {
+            return null;
+          }
+        }
+        if (this.codeTable != null && !state.isInitializing()) {
           final Identifier identifier = this.codeTable.getIdentifier(value);
           if (identifier == null) {
             throw new IllegalArgumentException(getName() + "='" + value

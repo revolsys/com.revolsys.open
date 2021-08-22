@@ -103,7 +103,7 @@ public class Debug {
   }
 
   public static void println(final Object... values) {
-    System.out.println(Strings.toString(",", values));
+    System.out.println(Strings.toString("\t", values));
   }
 
   public static void printTime() {

@@ -1,6 +1,7 @@
 package com.revolsys.oracle.recordstore;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -42,6 +43,7 @@ import com.revolsys.record.query.Column;
 import com.revolsys.record.query.ILike;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
+import com.revolsys.record.query.TableReference;
 import com.revolsys.record.query.Value;
 import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.query.functions.GeometryEqual2d;
@@ -49,6 +51,8 @@ import com.revolsys.record.query.functions.WithinDistance;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
+import com.revolsys.transaction.Transaction;
+import com.revolsys.transaction.TransactionOptions;
 import com.revolsys.util.Property;
 
 public class OracleRecordStore extends AbstractJdbcRecordStore {
@@ -307,6 +311,42 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
   public Identifier getNextPrimaryKey(final String sequenceName) {
     final String sql = "SELECT " + sequenceName + ".NEXTVAL FROM SYS.DUAL";
     return Identifier.newIdentifier(selectLong(sql));
+  }
+
+  @Override
+  public int getRecordCount(Query query) {
+    if (query == null) {
+      return 0;
+    } else {
+      final TableReference table = query.getTable();
+      query = query.clone(table, table);
+      query.setSql(null);
+      query.clearOrderBy();
+      final String sql = "select count(mainquery.rowid) from (" + query.getSelectSql()
+        + ") mainquery";
+      try (
+        Transaction transaction = newTransaction(TransactionOptions.REQUIRED);
+        JdbcConnection connection = getJdbcConnection()) {
+        try (
+          final PreparedStatement statement = connection.prepareStatement(sql)) {
+          setPreparedStatementParameters(statement, query);
+          try (
+            final ResultSet resultSet = statement.executeQuery()) {
+            if (resultSet.next()) {
+              final int rowCount = resultSet.getInt(1);
+              return rowCount;
+            } else {
+              return 0;
+            }
+          }
+        } catch (final SQLException e) {
+          throw connection.getException("getRecordCount", sql, e);
+        } catch (final IllegalArgumentException e) {
+          Logs.error(this, "Cannot get row count: " + query, e);
+          return 0;
+        }
+      }
+    }
   }
 
   @Override

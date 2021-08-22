@@ -2,6 +2,7 @@ package com.revolsys.jdbc.io;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
 
   protected final boolean internStrings;
 
-  protected final List<QueryValue> selectExpressions;
+  protected List<QueryValue> selectExpressions;
 
   public JdbcQueryResultPager(final JdbcRecordStore recordStore,
     final Map<String, Object> properties, final Query query) {
@@ -67,16 +68,8 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
 
     this.query = query;
 
-    final PathName tableName = query.getTablePath();
-    this.recordDefinition = query.getRecordDefinition();
-    if (this.recordDefinition == null) {
-      this.recordDefinition = recordStore.getRecordDefinition(tableName);
-      query.setRecordDefinition(this.recordDefinition);
-    }
-
     this.sql = query.getSelectSql();
     this.internStrings = (Boolean)properties.getOrDefault(properties, false);
-    this.selectExpressions = query.getSelectExpressions();
   }
 
   @Override
@@ -91,6 +84,42 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
     this.results = null;
     this.resultSet = null;
     this.statement = null;
+  }
+
+  protected ResultSet createResultSet(final PreparedStatement statement) throws SQLException {
+    final ResultSet resultSet = this.recordStore.getResultSet(statement, this.query);
+    final JdbcRecordStore recordStore = this.recordStore;
+    final PathName tableName = this.query.getTablePath();
+    this.recordDefinition = this.query.getRecordDefinition();
+    if (this.recordDefinition == null) {
+      this.recordDefinition = recordStore.getRecordDefinition(tableName);
+      this.query.setRecordDefinition(this.recordDefinition);
+    }
+
+    final ResultSetMetaData resultSetMetaData = this.resultSet.getMetaData();
+    String dbTableName;
+    if (this.recordDefinition == null) {
+      final PathName pathName = PathName.newPathName(tableName);
+      if (pathName == null) {
+        dbTableName = null;
+      } else {
+        dbTableName = pathName.getName();
+      }
+    } else {
+      dbTableName = this.recordDefinition.getDbTableName();
+    }
+    if (this.recordDefinition == null || recordStore != this.recordDefinition.getRecordStore()) {
+      this.recordDefinition = recordStore.getRecordDefinition(tableName, resultSetMetaData,
+        dbTableName);
+      this.query.setRecordDefinition(this.recordDefinition);
+    } else if (this.query.isCustomResult()) {
+      this.recordDefinition = this.recordStore.getRecordDefinition(this.query, resultSetMetaData);
+    }
+    this.selectExpressions = this.query.getSelectExpressions();
+    if (this.selectExpressions.isEmpty()) {
+      this.selectExpressions = (List)this.recordDefinition.getFieldDefinitions();
+    }
+    return resultSet;
   }
 
   @Override
@@ -134,6 +163,11 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
   @Override
   public int getNextPageNumber() {
     return this.pageNumber + 2;
+  }
+
+  protected Record getNextRecord(final ResultSet resultSet) {
+    return JdbcQueryIterator.getNextRecord(this.recordStore, this.recordDefinition,
+      this.selectExpressions, this.recordFactory, resultSet, this.internStrings);
   }
 
   /**
@@ -188,10 +222,6 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
 
   public Query getQuery() {
     return this.query;
-  }
-
-  public RecordDefinition getRecordDefinition() {
-    return this.recordDefinition;
   }
 
   public RecordFactory getRecordFactory() {
@@ -250,6 +280,9 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
         this.resultSet = this.recordStore.getResultSet(this.statement, this.query);
         this.resultSet.last();
         this.numResults = this.resultSet.getRow();
+
+        final ResultSetMetaData resultSetMetaData = this.resultSet.getMetaData();
+
       } catch (final SQLException e) {
         JdbcUtils.close(this.statement, this.resultSet);
         throw new RuntimeException("Error executing query:" + this.sql, e);
@@ -345,9 +378,7 @@ public class JdbcQueryResultPager implements ResultPager<Record> {
         if (this.resultSet.absolute(this.pageNumber * this.pageSize + 1)) {
           int i = 0;
           do {
-            final Record object = JdbcQueryIterator.getNextRecord(this.recordStore,
-              this.recordDefinition, this.selectExpressions, this.recordFactory, this.resultSet,
-              this.internStrings);
+            final Record object = getNextRecord(this.resultSet);
             this.results.add(object);
             i++;
           } while (this.resultSet.next() && i < this.pageSize);
