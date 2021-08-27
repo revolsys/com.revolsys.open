@@ -8,7 +8,9 @@
 	<ignoreVersions>
 		<ignoreVersion type="regex">.*-alpha.*</ignoreVersion>
 		<ignoreVersion type="regex">.*-beta.*</ignoreVersion>
-		<ignoreVersion type="regex">.*-MTEC.*</ignoreVersion>
+    <ignoreVersion type="regex">.*-MTEC.*</ignoreVersion>
+    <ignoreVersion type="regex">.*-rc.*</ignoreVersion>
+    <ignoreVersion type="regex">.*-RC.*</ignoreVersion>
 	</ignoreVersions>
 	<rules>
 		<rule groupId="org.jeometry" comparisonMethod="maven">

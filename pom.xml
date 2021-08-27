@@ -61,7 +61,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0-M3</version>
+        <version>3.0.0</version>
         <executions>
           <execution>
             <id>enforce-maven</id>
@@ -71,7 +71,7 @@
             <configuration>
               <rules>
                 <requireMavenVersion>
-                  <version>3.5.4</version>
+                  <version>3.8.2</version>
                 </requireMavenVersion>
                 <requireJavaVersion>
                   <version>11</version>
@@ -84,13 +84,11 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-clean-plugin</artifactId>
-        <version>3.1.0</version>
       </plugin>
 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
         <configuration>
           <release>11</release>
           <debug>true</debug>
@@ -121,7 +119,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.0</version>
         <configuration>
           <archive>
             <manifestEntries>
@@ -208,7 +205,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-install-plugin</artifactId>
-        <version>3.0.0-M1</version>
         <configuration>
           <createChecksum>true</createChecksum>
         </configuration>
@@ -216,7 +212,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-deploy-plugin</artifactId>
-        <version>3.0.0-M1</version>
         <configuration>
           <deployAtEnd>true</deployAtEnd>
         </configuration>
@@ -229,7 +224,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M5</version>
         <configuration>
           <argLine>
             --illegal-access=permit
@@ -239,7 +233,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>3.9.1</version>
         <executions>
           <execution>
             <id>attach-descriptor</id>
@@ -252,7 +245,7 @@
           <dependency>
             <groupId>org.apache.maven.doxia</groupId>
             <artifactId>doxia-module-markdown</artifactId>
-            <version>1.9.1</version>
+            <version>1.10</version>
           </dependency>
           <dependency>
             <groupId>lt.velykis.maven.skins</groupId>
@@ -542,7 +535,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.13.1</version>
+        <version>4.13.2</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
@@ -602,18 +595,18 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <ch.qos.logback.version>1.2.3</ch.qos.logback.version>
-    <com.fasterxml.jackson.version>2.12.1</com.fasterxml.jackson.version>
-    <org.apache.pdfbox.version>2.0.22</org.apache.pdfbox.version>
+    <ch.qos.logback.version>1.2.5</ch.qos.logback.version>
+    <com.fasterxml.jackson.version>2.12.5</com.fasterxml.jackson.version>
+    <org.apache.pdfbox.version>2.0.24</org.apache.pdfbox.version>
     <org.apache.xmlgraphics.batik.version>1.14</org.apache.xmlgraphics.batik.version>
     <org.apache.xmlgraphics.commons.version>2.6</org.apache.xmlgraphics.commons.version>
-    <org.docx4j.version>11.2.8</org.docx4j.version>
+    <org.docx4j.version>11.2.9</org.docx4j.version>
     <org.gdal.version>2.4.0</org.gdal.version>
-    <org.graalvm.version>21.0.0</org.graalvm.version>
+    <org.graalvm.version>21.2.0</org.graalvm.version>
     <org.jeometry.version>MAIN-SNAPSHOT</org.jeometry.version>
-    <org.slf4j.version>1.7.30</org.slf4j.version>
-    <org.springframework.version>5.3.8</org.springframework.version>
-    <org.springframework.security.version>5.5.0</org.springframework.security.version>
+    <org.slf4j.version>1.7.32</org.slf4j.version>
+    <org.springframework.version>5.3.9</org.springframework.version>
+    <org.springframework.security.version>5.5.1</org.springframework.security.version>
     <gpg.skip>true</gpg.skip>
     <github.global.server>github</github.global.server>
     <skipTests>true</skipTests>
