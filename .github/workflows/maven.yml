@@ -43,10 +43,10 @@ jobs:
 
 #### Build jeometry ####
     - name: Build jeometry
-      run: mvn install
+      run: mvn -B install
       working-directory: ./jeometry
 
 #### Build revolsys ####
     - name: Build revolsys
-      run: mvn install
+      run: mvn -B install
       working-directory: ./revolsys
