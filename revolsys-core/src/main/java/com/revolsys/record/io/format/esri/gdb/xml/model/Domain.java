@@ -42,6 +42,10 @@ public class Domain extends AbstractCodeTable implements Cloneable {
 
   private SplitPolicyType splitPolicy = SplitPolicyType.esriSPTDuplicate;
 
+  private String minValue;
+
+  private String maxValue;
+
   public Domain() {
   }
 
@@ -138,7 +142,9 @@ public class Domain extends AbstractCodeTable implements Cloneable {
 
   @Override
   public Identifier getIdentifier(final List<Object> values) {
-    if (values.size() == 1) {
+    if (this.codedValues.isEmpty()) {
+      return null;
+    } else if (values.size() == 1) {
       final Object value = values.get(0);
       if (value == null) {
         return null;
@@ -158,8 +164,12 @@ public class Domain extends AbstractCodeTable implements Cloneable {
 
   @Override
   public Identifier getIdentifier(final Map<String, ? extends Object> values) {
-    final Object name = getName(values);
-    return getIdentifier(name);
+    if (this.codedValues.isEmpty()) {
+      return null;
+    } else {
+      final Object name = getName(values);
+      return getIdentifier(name);
+    }
   }
 
   @Override
@@ -178,8 +188,16 @@ public class Domain extends AbstractCodeTable implements Cloneable {
     return Collections.singletonMap("NAME", value);
   }
 
+  public String getMaxValue() {
+    return this.maxValue;
+  }
+
   public MergePolicyType getMergePolicy() {
     return this.mergePolicy;
+  }
+
+  public String getMinValue() {
+    return this.minValue;
   }
 
   @Override
@@ -244,6 +262,10 @@ public class Domain extends AbstractCodeTable implements Cloneable {
     }
   }
 
+  public boolean hasCodedValues() {
+    return !this.idValueMap.isEmpty();
+  }
+
   @Override
   public boolean isEmpty() {
     return this.idValueMap.isEmpty();
@@ -302,8 +324,16 @@ public class Domain extends AbstractCodeTable implements Cloneable {
     this.fieldType = fieldType;
   }
 
+  public void setMaxValue(final String maxValue) {
+    this.maxValue = maxValue;
+  }
+
   public void setMergePolicy(final MergePolicyType mergePolicy) {
     this.mergePolicy = mergePolicy;
+  }
+
+  public void setMinValue(final String minValue) {
+    this.minValue = minValue;
   }
 
   public void setOwner(final String owner) {

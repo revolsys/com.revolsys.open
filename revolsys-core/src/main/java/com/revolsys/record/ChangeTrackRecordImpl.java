@@ -30,6 +30,7 @@ public class ChangeTrackRecordImpl extends BaseRecord implements ChangeTrackReco
     final int fieldCount = getFieldCount();
     this.changedFlags = new boolean[fieldCount];
     this.changedValues = new Object[fieldCount];
+    setState(RecordState.PERSISTED);
   }
 
   @Override
@@ -99,14 +100,12 @@ public class ChangeTrackRecordImpl extends BaseRecord implements ChangeTrackReco
     if (state.isDeleted()) {
       throw new IllegalStateException("Cannot modify a deleted record\n" + toString());
     } else {
-      final boolean updated = false;
       final int fieldIndex = field.getIndex();
 
       final Object newValue = field.toFieldValue(value);
       final Object oldValue = getValue(fieldIndex);
-      if (field.equals(oldValue, newValue)) {
+      if (!field.equals(oldValue, newValue)) {
 
-      } else {
         final Object originalValue = getOriginalValue(fieldIndex);
         final boolean valueEqual = field.equals(originalValue, newValue);
         this.changedFlags[fieldIndex] = !valueEqual;
@@ -118,8 +117,9 @@ public class ChangeTrackRecordImpl extends BaseRecord implements ChangeTrackReco
         if (getState() != RecordState.INITIALIZING) {
           setState(RecordState.MODIFIED);
         }
+        return true;
       }
-      return updated;
+      return false;
     }
   }
 }

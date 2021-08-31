@@ -223,9 +223,9 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
       } else if (DataTypes.UTIL_DATE.equals(fieldType)) {
         return Dates.getDate("9999-12-29 23:59:59.999");
       } else if (DataTypes.DATE_TIME.equals(fieldType)) {
-        return Dates.getTimestamp("9999-12-29 23:59:59.999");
+        return Dates.getTimestamp("9999-12-29T23:59:59.999Z");
       } else if (DataTypes.TIMESTAMP.equals(fieldType)) {
-        return Dates.getTimestamp("9999-12-29 23:59:59.999");
+        return Dates.getTimestamp("9999-12-29T23:59:59.999Z");
       } else if (Geometry.class.isAssignableFrom(fieldClass)) {
         return fieldType.getName();
       } else {
