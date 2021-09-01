@@ -1,0 +1,117 @@
+name: Build
+
+on:
+  push:
+    tags:
+    - '*'
+    branches:
+    - main
+    - '[0-9]+.[0-9]+.x'
+
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build'
+        required: false
+      branch:
+        description: 'Branch to build'
+        required: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions: 
+      contents: read
+      packages: write 
+
+    env:
+      JEOMETRY_REPO: 'jeometry-org/jeometry'
+      REVOLSYS_REPO: 'revolsys/com.revolsys.open'
+
+    steps:
+
+#### JAVA VERSION ####
+    - name: Set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+
+#### Initialize Environment ####
+    - name: Initialize Environment
+      run: |
+        TAG="${{github.event.inputs.tag}}"
+        BRANCH="${{github.event.inputs.branch}}"
+
+        if [[ -z "$TAG" && -z "$BRANCH" ]]; then
+          REF="$GITHUB_REF"
+           if [[ "$REF" =~ ^refs/heads/.* ]]; then
+            BRANCH="${REF/refs\/heads\//}"
+          elif [[ "$REF" =~ ^refs/tags/.* ]]; then
+            TAG="${REF/refs\/tags\//}"
+          else
+            echo "Ref must be a branch or tag '${REF}'"
+            exit -1
+          fi
+        fi
+        
+        if [[ ! -z "$TAG" ]]; then
+          REF=${TAG}
+          OTHER_REF=0.GBA-${TAG}
+        else
+          REF=${BRANCH}
+          OTHER_REF=$REF
+        fi
+        echo "REF=${REF}" >> $GITHUB_ENV
+        echo "OTHER_REF=${OTHER_REF}" >> $GITHUB_ENV
+
+#### Checkout jeometry ####
+    - name: Checkout jeometry
+      uses: actions/checkout@v2
+      with:
+        ref: ${{env.OTHER_REF}}
+        repository: ${{env.JEOMETRY_REPO}}
+        path: jeometry
+
+#### Checkout revolsys ####
+    - name: Checkout revolsys
+      uses: actions/checkout@v2
+      with:
+        ref: ${{env.OTHER_REF}}
+        repository: ${{env.REVOLSYS_REPO}}
+        path: revolsys
+
+#### MAVEN REPOSITORY CACHE ####
+    - uses: actions/cache@v2
+      with:
+        path: |
+          '~/.m2/repository'
+          '!~/.m2/repository/org/jeometry'
+          '!~/.m2/repository/com/revolsys/open'
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+#### Set Snapshot Version ####
+    - name: Set Snapshot Version
+      if: contains(env.PROJECT_VERSION, 'SNAPSHOT')
+      run: |
+        BASE_REF=$(echo "$REF" | tr '[:lower:]' '[:upper:]')
+        OTHER_VERSION="0.GBA-${BASE_REF}-SNAPSHOT"
+        VERSION="${BASE_REF}-SNAPSHOT"
+        sed -i "s/<org.jeometry.version>.*<\\/org.jeometry.version>/<org.jeometry.version>${OTHER_VERSION}<\\/org.jeometry.version>/g" ./revolsys/pom.xml
+        mvn -f ./jeometry/pom.xml -B -q versions:set "-DnewVersion=${OTHER_VERSION}" -DgenerateBackupPoms=false -DprocessDependencies=false
+        mvn -f ./revolsys/pom.xml -B -q versions:set "-DnewVersion=${VERSION}" -DgenerateBackupPoms=false -DprocessDependencies=false
+
+#### Build Jeometry ####
+    - name: Build
+      working-directory: ./jeometry
+      run: mvn -B install -DskipTests
+
+#### Build & Deploy ####
+    - name: Build
+      working-directory: ./revolsys
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: mvn -B deploy -DskipTests
