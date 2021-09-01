@@ -599,7 +599,7 @@
     <repository>
       <id>github-revolsys</id>
       <name>Github Revolsys</name>
-      <url>https://maven.pkg.github.com/revolsys/com.revolsys.open</url>
+      <url>https://maven.pkg.github.com/${gitHubRepo}</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -626,5 +626,6 @@
     <gpg.skip>true</gpg.skip>
     <github.global.server>github</github.global.server>
     <skipTests>true</skipTests>
+    <gitHubRepo>revolsys/com.revolsys.open</gitHubRepo>
   </properties>
 </project>
