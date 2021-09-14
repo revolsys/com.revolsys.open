@@ -172,6 +172,20 @@ public class Column implements QueryValue, ColumnReference {
   }
 
   @Override
+  public Object getValueFromResultSet(final RecordDefinition recordDefinition,
+    final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings,
+    final String alias) throws SQLException {
+    FieldDefinition field = this.fieldDefinition;
+    if (field == null) {
+      field = recordDefinition.getField(this.name);
+      if (field == null) {
+        field = recordDefinition.getField(alias);
+      }
+    }
+    return field.getValueFromResultSet(recordDefinition, resultSet, indexes, internStrings);
+  }
+
+  @Override
   public <V> V toColumnTypeException(final Object value) {
     if (value == null) {
       return null;

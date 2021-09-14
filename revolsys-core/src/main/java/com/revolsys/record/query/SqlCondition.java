@@ -1,6 +1,7 @@
 package com.revolsys.record.query;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +12,7 @@ import org.jeometry.common.data.type.DataType;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.field.JdbcFieldDefinitions;
 import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 
 // TODO accept (how?)
@@ -107,8 +109,8 @@ public class SqlCondition implements Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof SqlCondition) {
       final SqlCondition sqlCondition = (SqlCondition)obj;
-      if (DataType.equal(sqlCondition.getSql(), this.getSql())) {
-        if (DataType.equal(sqlCondition.getParameterValues(), this.getParameterValues())) {
+      if (DataType.equal(sqlCondition.getSql(), getSql())) {
+        if (DataType.equal(sqlCondition.getParameterValues(), getParameterValues())) {
           return true;
         }
       }
@@ -122,6 +124,13 @@ public class SqlCondition implements Condition {
 
   public String getSql() {
     return this.sql;
+  }
+
+  @Override
+  public Object getValueFromResultSet(final RecordDefinition recordDefinition,
+    final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
+    throws SQLException {
+    return resultSet.getString(indexes.incrementAndGet());
   }
 
   @Override

@@ -1,12 +1,15 @@
 package com.revolsys.record.query;
 
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.schema.FieldDefinition;
+import com.revolsys.record.schema.RecordDefinition;
 
 public interface ColumnReference extends QueryValue {
 
@@ -48,6 +51,12 @@ public interface ColumnReference extends QueryValue {
       final String name = getName();
       return (V)record.getValue(name);
     }
+  }
+
+  default Object getValueFromResultSet(final RecordDefinition recordDefinition,
+    final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings,
+    final String aliasName) throws SQLException {
+    return getValueFromResultSet(recordDefinition, resultSet, indexes, internStrings);
   }
 
   @SuppressWarnings("unchecked")

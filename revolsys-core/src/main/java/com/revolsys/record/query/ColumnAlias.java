@@ -86,7 +86,7 @@ public class ColumnAlias implements QueryValue, ColumnReference {
     if (obj instanceof ColumnAlias) {
       final ColumnAlias alias = (ColumnAlias)obj;
       if (this.column.equals(alias.column)) {
-        return DataType.equal(alias.getName(), this.getName());
+        return DataType.equal(alias.getName(), getName());
       }
     }
     return false;
@@ -138,7 +138,8 @@ public class ColumnAlias implements QueryValue, ColumnReference {
   public Object getValueFromResultSet(final RecordDefinition recordDefinition,
     final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
     throws SQLException {
-    return this.column.getValueFromResultSet(recordDefinition, resultSet, indexes, internStrings);
+    return this.column.getValueFromResultSet(recordDefinition, resultSet, indexes, internStrings,
+      this.alias);
   }
 
   @Override

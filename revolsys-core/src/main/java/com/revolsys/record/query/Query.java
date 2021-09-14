@@ -728,11 +728,16 @@ public class Query extends BaseObjectWithProperties
     return this.selectExpressions.isEmpty();
   }
 
+  public Join join(final JoinType joinType) {
+    final Join join = joinType.build();
+    this.joins.add(join);
+    return join;
+  }
+
   public Join join(final TableReference table) {
     final Join join = JoinType.JOIN.build(table);
     this.joins.add(join);
     return join;
-
   }
 
   public Condition newCondition(final CharSequence fieldName,

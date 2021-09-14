@@ -17,6 +17,8 @@ public class Join implements QueryValue {
 
   private TableReference table;
 
+  private QueryValue statement;
+
   private Condition condition = Condition.ALL;
 
   private String alias;
@@ -36,12 +38,21 @@ public class Join implements QueryValue {
     sql.append(' ');
     sql.append(this.joinType);
     sql.append(' ');
-    if (this.alias == null) {
-      this.table.appendFromWithAlias(sql);
-    } else {
-      this.table.appendFromWithAlias(sql, this.alias);
+    if (this.table != null) {
+      if (this.alias == null) {
+        this.table.appendFromWithAlias(sql);
+      } else {
+        this.table.appendFromWithAlias(sql, this.alias);
+      }
     }
-    if (this.condition != null) {
+    if (this.statement != null) {
+      this.statement.appendDefaultSelect(query, recordStore, sql);
+      if (this.alias != null) {
+        sql.append(" ");
+        sql.append(this.alias);
+      }
+    }
+    if (!this.condition.isEmpty()) {
       sql.append(" ON ");
       this.condition.appendSql(query, recordStore, sql);
     }
@@ -52,11 +63,16 @@ public class Join implements QueryValue {
     return this.condition.appendParameters(index, statement);
   }
 
-  public void appendSql(final StringBuilder sql) {
+  private void appendSql(final StringBuilder sql) {
     sql.append(' ');
     sql.append(this.joinType);
     sql.append(' ');
-    this.table.appendFromWithAlias(sql);
+    if (this.table != null) {
+      this.table.appendFromWithAlias(sql);
+    }
+    if (this.statement != null) {
+      this.statement.appendSql(null, null, sql);
+    }
     if (!this.condition.isEmpty()) {
       sql.append(" ON ");
       sql.append(this.condition);
@@ -145,6 +161,11 @@ public class Join implements QueryValue {
 
   public Join setAlias(final String alias) {
     this.alias = alias;
+    return this;
+  }
+
+  public Join statement(final QueryValue statement) {
+    this.statement = statement;
     return this;
   }
 
