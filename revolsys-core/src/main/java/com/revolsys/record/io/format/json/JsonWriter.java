@@ -3,11 +3,9 @@ package com.revolsys.record.io.format.json;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
@@ -353,29 +351,13 @@ public final class JsonWriter implements BaseCloseable {
 
   public void write(final Collection<? extends Object> values) throws IOException {
     startList();
-    int i = 0;
-    final int size = values.size();
-    final Iterator<? extends Object> iterator = values.iterator();
     if (this.indent) {
-      while (i < size - 1) {
-        final Object value = iterator.next();
+      for (final Object value : values) {
         indent();
-        value(value);
-        i++;
-      }
-      if (iterator.hasNext()) {
-        indent();
-        final Object value = iterator.next();
         value(value);
       }
     } else {
-      while (i < size - 1) {
-        final Object value = iterator.next();
-        value(value);
-        i++;
-      }
-      if (iterator.hasNext()) {
-        final Object value = iterator.next();
+      for (final Object value : values) {
         value(value);
       }
     }
@@ -385,20 +367,7 @@ public final class JsonWriter implements BaseCloseable {
   public <K, V> void write(final Map<K, V> values) {
     startObject();
     if (values != null) {
-      final Set<Entry<K, V>> entrySet = values.entrySet();
-      int i = 0;
-      final int size = values.size();
-      final Iterator<Entry<K, V>> iterator = entrySet.iterator();
-      while (i < size - 1) {
-        final Entry<K, V> entry = iterator.next();
-        final K key = entry.getKey();
-        final Object value = entry.getValue();
-        label(key.toString());
-        value(value);
-        i++;
-      }
-      if (iterator.hasNext()) {
-        final Entry<K, V> entry = iterator.next();
+      for (final Entry<K, V> entry : values.entrySet()) {
         final K key = entry.getKey();
         final Object value = entry.getValue();
         label(key.toString());
@@ -410,9 +379,7 @@ public final class JsonWriter implements BaseCloseable {
 
   public void writeRecord(final Record record) {
     try {
-      final Writer out = this.out;
       startObject();
-      boolean hasValue = false;
       final RecordDefinition recordDefinition = record.getRecordDefinition();
       final List<FieldDefinition> fieldDefinitions = recordDefinition.getFieldDefinitions();
 
@@ -420,11 +387,6 @@ public final class JsonWriter implements BaseCloseable {
         final int fieldIndex = field.getIndex();
         final Object value = record.getValue(fieldIndex);
         if (Property.hasValue(value)) {
-          if (hasValue) {
-            out.write(",\n");
-          } else {
-            hasValue = true;
-          }
           final String name = field.getName();
           label(name);
 
