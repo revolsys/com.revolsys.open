@@ -75,6 +75,39 @@ public interface Paths {
     return parent.resolve(newFileName);
   }
 
+  static void copyDirectory(final Path source, final Path target) {
+    try {
+      Files.walkFileTree(source, new SimpleFileVisitor<Path>() {
+        @Override
+        public FileVisitResult preVisitDirectory(final Path dir,
+          final BasicFileAttributes attributes) {
+          final Path path = source.relativize(dir);
+          final Path targetDir = target.resolve(path);
+          try {
+            Files.createDirectory(targetDir);
+          } catch (final IOException e) {
+            throw Exceptions.wrap("Error copying: " + dir + " -> " + targetDir, e);
+          }
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult visitFile(final Path file, final BasicFileAttributes attributes) {
+          final Path path = source.relativize(file);
+          final Path targetFile = target.resolve(path);
+          try {
+            Files.copy(file, targetFile);
+          } catch (final IOException e) {
+            throw Exceptions.wrap("Error copying: " + file + " -> " + targetFile, e);
+          }
+          return FileVisitResult.CONTINUE;
+        }
+      });
+    } catch (final IOException e) {
+      throw Exceptions.wrap("Error copying: " + source + " -> " + target, e);
+    }
+  }
+
   static Path createDirectories(final Path path) {
     try {
       return Files.createDirectories(path, FILE_ATTRIBUTES_NONE);
