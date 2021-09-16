@@ -25,6 +25,8 @@ public class CsvRecordReader extends AbstractRecordReader {
 
   private final StringBuilder sb = new StringBuilder(1024);
 
+  private List<String> fieldNames;
+
   public CsvRecordReader(final Resource resource) {
     this(resource, ArrayRecord.FACTORY, Csv.FIELD_SEPARATOR);
   }
@@ -74,7 +76,7 @@ public class CsvRecordReader extends AbstractRecordReader {
     try {
       final List<String> row = readNextRow();
       if (row != null && row.size() > 0) {
-        return parseRecord(row);
+        return parseRecord(this.fieldNames, row);
       } else {
         throw new NoSuchElementException();
       }
@@ -89,6 +91,7 @@ public class CsvRecordReader extends AbstractRecordReader {
     try {
       this.in = this.resource.newBufferedReader();
       final List<String> line = readNextRow();
+      this.fieldNames = new ArrayList<>(line);
       final String baseName = this.resource.getBaseName();
       if (getRecordDefinition() == null) {
         newRecordDefinition(baseName, line);

@@ -59,6 +59,8 @@ public class XlsxRecordReader extends AbstractRecordReader {
 
   private List<CTRst> sharedStringList = Collections.emptyList();
 
+  private List<String> fieldNames;
+
   public XlsxRecordReader(final Resource resource) {
     this(resource, ArrayRecord.FACTORY);
   }
@@ -81,7 +83,7 @@ public class XlsxRecordReader extends AbstractRecordReader {
   protected Record getNext() {
     final List<String> row = readNextRow();
     if (row != null && row.size() > 0) {
-      return parseRecord(row);
+      return parseRecord(this.fieldNames, row);
     } else {
       throw new NoSuchElementException();
     }
@@ -140,6 +142,7 @@ public class XlsxRecordReader extends AbstractRecordReader {
         final SheetData sheetData = worksheet.getSheetData();
         this.rows = sheetData.getRow();
         final List<String> line = readNextRow();
+        this.fieldNames = new ArrayList<>(line);
         final String baseName = this.resource.getBaseName();
         newRecordDefinition(baseName, line);
       }

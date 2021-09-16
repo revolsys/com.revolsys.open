@@ -216,17 +216,19 @@ public abstract class AbstractRecordReader extends AbstractIterator<Record>
    * the strings converted to the objects based on the attribute data type.
    *
    * @param values The record.
+   * @param row
    * @return The Record.
    */
-  protected Record parseRecord(final List<String> values) {
+  protected Record parseRecord(final List<String> fieldNames, final List<String> values) {
     final Record record = this.recordFactory.newRecord(this.recordDefinition);
     final int valueCount = values.size();
-    final int fieldCount = this.recordDefinition.getFieldCount();
+    final int fieldCount = fieldNames.size();
     final int count = Math.min(valueCount, fieldCount);
     for (int i = 0; i < count; i++) {
+      final String fieldName = fieldNames.get(i);
       final String valueString = values.get(i);
       if (valueString != null) {
-        record.setValue(i, valueString);
+        record.setValue(fieldName, valueString);
       }
     }
     if (this.hasPointFields) {
