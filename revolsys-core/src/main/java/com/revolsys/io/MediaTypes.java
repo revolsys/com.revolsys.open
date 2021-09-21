@@ -8,6 +8,7 @@ import java.io.Reader;
 import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,6 +29,8 @@ public class MediaTypes {
   private static Map<String, String> fileExtensionByMediaType = new HashMap<>();
 
   private static Map<String, Set<String>> fileExtensionsByMediaType = new HashMap<>();
+
+  private static Set<String> mediaTypeWithMultipleExtensions = new HashSet<>();
 
   public static String extension(final String mediaType) {
     init();
@@ -102,8 +105,13 @@ public class MediaTypes {
                   mediaTypeByFileExtension.put(fileExtension, mediaType);
                 }
                 Maps.addToSet(mediaTypesByFileExtension, fileExtension, mediaType);
-                if (!fileExtensionByMediaType.containsKey(mediaType)) {
-                  fileExtensionByMediaType.put(mediaType, fileExtension);
+                if (!mediaTypeWithMultipleExtensions.contains(mediaType)) {
+                  if (fileExtensionByMediaType.containsKey(mediaType)) {
+                    mediaTypeWithMultipleExtensions.add(mediaType);
+                    fileExtensionByMediaType.remove(mediaType);
+                  } else {
+                    fileExtensionByMediaType.put(mediaType, fileExtension);
+                  }
                 }
                 Maps.addToSet(fileExtensionsByMediaType, mediaType, fileExtension);
               }
