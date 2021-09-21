@@ -123,7 +123,7 @@ public final class JsonWriter implements BaseCloseable {
   }
 
   public void endAttribute() {
-    if (this.state != JsonState.END_ATTRIBUTE) {
+    if (this.state != JsonState.END_ATTRIBUTE && this.state != JsonState.START_DOCUMENT) {
       try {
         this.out.write(",");
         newLine();
