@@ -343,12 +343,12 @@ public interface Strings {
     }
   }
 
-  // Normalize splitting chacters into base + combining mark
+  // Normalize splitting characters into base + combining mark
   static String normalize(final CharSequence text) {
     return Normalizer.normalize(text, Form.NFD);
   }
 
-  // Normalize preffering combined characters
+  // Normalize preferring combined characters
   static String normalizeNfc(final CharSequence text) {
     return Normalizer.normalize(text, Form.NFC);
   }
