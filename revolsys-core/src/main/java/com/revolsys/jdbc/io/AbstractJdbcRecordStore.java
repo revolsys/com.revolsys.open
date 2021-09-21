@@ -52,6 +52,7 @@ import com.revolsys.record.io.RecordStoreQueryReader;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.property.GlobalIdProperty;
 import com.revolsys.record.query.ColumnIndexes;
+import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.TableReference;
@@ -398,7 +399,13 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
       query = query.clone(table, table);
       query.setSql(null);
       query.clearOrderBy();
-      final String sql = "select count(mainquery.*) from (" + query.getSelectSql() + ") mainquery";
+      final String sql;
+      if (query.isDistinct() || !query.getGroupBy().isEmpty()) {
+        sql = "select count(mainquery.*) from (" + query.getSelectSql() + ") mainquery";
+      } else {
+        query.setSelect(Q.sql("count(*)"));
+        sql = query.getSelectSql();
+      }
       try (
         Transaction transaction = newTransaction(TransactionOptions.REQUIRED);
         JdbcConnection connection = getJdbcConnection()) {
