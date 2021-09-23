@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.date.Dates;
@@ -28,7 +29,9 @@ import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.properties.ObjectWithProperties;
+import com.revolsys.record.ArrayChangeTrackRecord;
 import com.revolsys.record.ArrayRecord;
+import com.revolsys.record.ChangeTrackRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
@@ -46,6 +49,7 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.transaction.Propagation;
 import com.revolsys.transaction.Transaction;
+import com.revolsys.transaction.TransactionOptions;
 import com.revolsys.transaction.Transactionable;
 import com.revolsys.util.Property;
 import com.revolsys.util.count.CategoryLabelCountMap;
@@ -499,11 +503,52 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   void initializeRecordDefinition(RecordDefinition recordDefinition);
 
+  default Record insertOrUpdateRecord(final Query query, final Supplier<Record> newRecordSupplier,
+    final Consumer<Record> updateAction) {
+    query.setRecordFactory(ArrayChangeTrackRecord.FACTORY);
+
+    try (
+      Transaction transaction = newTransaction(TransactionOptions.REQUIRED)) {
+      final ChangeTrackRecord changeTrackRecord = query.getRecord();
+      if (changeTrackRecord == null) {
+        final Record newRecord = newRecordSupplier.get();
+        if (newRecord == null) {
+          return null;
+        } else {
+          insertRecord(newRecord);
+          return newRecord;
+        }
+      } else {
+        updateAction.accept(changeTrackRecord);
+        if (changeTrackRecord.isModified()) {
+          updateRecord(changeTrackRecord);
+        }
+        return changeTrackRecord.newRecord();
+      }
+    }
+  }
+
   default Record insertRecord(final PathName pathName, final Object... values) {
     final RecordDefinition recordDefinition = getRecordDefinition(pathName);
     final Record record = new ArrayRecord(recordDefinition, values);
     insertRecord(record);
     return record;
+  }
+
+  default Record insertRecord(final Query query, final Supplier<Record> newRecordSupplier) {
+    query.setRecordFactory(ArrayChangeTrackRecord.FACTORY);
+    final ChangeTrackRecord changeTrackRecord = query.getRecord();
+    if (changeTrackRecord == null) {
+      final Record newRecord = newRecordSupplier.get();
+      if (newRecord == null) {
+        return null;
+      } else {
+        insertRecord(newRecord);
+        return newRecord;
+      }
+    } else {
+      return changeTrackRecord.newRecord();
+    }
   }
 
   default void insertRecord(final Record record) {
@@ -576,6 +621,10 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
 
   default Identifier newPrimaryIdentifier(final PathName typePath) {
     return null;
+  }
+
+  default Query newQuery() {
+    return new RecordStoreQuery(this);
   }
 
   default Query newQuery(final PathName pathName) {
@@ -747,12 +796,48 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     }
   }
 
+  default Record updateRecord(final Query query, final Consumer<Record> updateAction) {
+    try (
+      Transaction transaction = newTransaction(TransactionOptions.REQUIRED)) {
+      query.setRecordFactory(ArrayChangeTrackRecord.FACTORY);
+      final ChangeTrackRecord record = query.getRecord();
+      if (record == null) {
+        return null;
+      } else {
+        updateAction.accept(record);
+        if (record.isModified()) {
+          updateRecord(record);
+        }
+        return record.newRecord();
+      }
+    }
+  }
+
   default void updateRecord(final Record record) {
     write(record, null);
   }
 
   default void updateRecords(final Iterable<? extends Record> records) {
     writeAll(records, null);
+  }
+
+  default int updateRecords(final Query query,
+    final Consumer<? super ChangeTrackRecord> updateAction) {
+    int i = 0;
+    query.setRecordFactory(ArrayChangeTrackRecord.FACTORY);
+    try (
+      RecordReader reader = getRecords(query);
+      RecordWriter writer = newRecordWriter()) {
+      for (final Record queryRecord : reader) {
+        final ChangeTrackRecord record = (ChangeTrackRecord)queryRecord;
+        updateAction.accept(record);
+        if (record.isModified()) {
+          writer.write(record);
+          i++;
+        }
+      }
+    }
+    return i;
   }
 
   default void write(final Record record, final RecordState state) {
