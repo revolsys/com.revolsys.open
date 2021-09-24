@@ -81,6 +81,12 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
 
   private List<Row> sheetRows = Collections.emptyList();
 
+  private int maxColumnSize = 40;
+
+  private boolean open = false;
+
+  private Worksheet worksheet;
+
   public XlsxRecordWriter(final RecordDefinitionProxy recordDefinition, final OutputStream out) {
     super(recordDefinition);
     try {
@@ -122,7 +128,7 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
       }
       final PartName spreadsheetPartName = new PartName("/xl/worksheets/sheet1.xml");
       this.sheet = this.spreadsheetPackage.createWorksheetPart(spreadsheetPartName, name, 1);
-      final Worksheet worksheet = this.sheet.getContents();
+      this.worksheet = this.sheet.getContents();
       // final CTTableParts tableParts = smlObjectFactory.createCTTableParts();
       // tableParts.setCount(1L);
       // final CTTablePart tablePart = smlObjectFactory.createCTTablePart();
@@ -130,10 +136,8 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
       // tableParts.getTablePart().add(tablePart);
       // worksheet.setTableParts(tableParts);
 
-      this.sheetData = worksheet.getSheetData();
+      this.sheetData = this.worksheet.getSheetData();
       this.sheetRows = this.sheetData.getRow();
-
-      addHeaderRow(worksheet, this.recordDefinition);
 
     } catch (final Docx4JException | JAXBException e) {
       throw Exceptions.wrap(e);
@@ -183,7 +187,7 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
       column.setMin(field.getIndex() + 1);
       column.setMax(field.getIndex() + 1);
       column.setBestFit(true);
-      final int textLength = Math.min(40,
+      final int textLength = Math.min(this.maxColumnSize,
         Math.max(fieldName.length() + 2, field.getMaxStringLength()));
       column.setWidth(textLength * 1.25);
       addCellInlineString(cells, fieldName);
@@ -258,8 +262,26 @@ public class XlsxRecordWriter extends AbstractRecordWriter {
   public void flush() {
   }
 
+  public int getMaxColumnSize() {
+    return this.maxColumnSize;
+  }
+
+  @Override
+  public void open() {
+    if (!this.open) {
+      this.open = true;
+      super.open();
+      addHeaderRow(this.worksheet, this.recordDefinition);
+    }
+  }
+
+  public void setMaxColumnSize(final int maxColumnSize) {
+    this.maxColumnSize = maxColumnSize;
+  }
+
   @Override
   public void write(final Record record) {
+    open();
     final Row recordRow = smlObjectFactory.createRow();
     this.sheetRows.add(recordRow);
     final List<Cell> cells = recordRow.getC();

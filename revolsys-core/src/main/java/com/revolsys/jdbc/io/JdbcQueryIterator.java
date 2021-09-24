@@ -231,7 +231,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record>
       final ResultSetMetaData resultSetMetaData = this.resultSet.getMetaData();
 
       if (this.recordDefinition == null || !query.getJoins().isEmpty()
-        || this.recordStore != this.recordDefinition.getRecordStore()) {
+        || this.recordStore != this.recordDefinition.getRecordStore() || query.getSql() != null) {
         this.recordDefinition = this.recordStore.getRecordDefinition(tableName, resultSetMetaData,
           dbTableName);
         query.setRecordDefinition(this.recordDefinition);

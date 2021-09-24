@@ -32,17 +32,11 @@ public class JsonMapIterator implements Iterator<JsonObject>, Closeable {
         if (this.parser.hasNext()) {
           event = this.parser.next();
           if (event == EventType.startObject) {
-            this.parser.getString();
+            this.parser.getLabel();
             if (this.parser.hasNext()) {
-              event = this.parser.next();
-              if (event == EventType.colon) {
-                if (this.parser.hasNext()) {
-                  event = this.parser.next();
-                  if (event == EventType.startArray) {
-                    this.hasNext = true;
-                    readNextRecord();
-                  }
-                }
+              if (this.parser.next() == EventType.startArray) {
+                this.hasNext = true;
+                readNextRecord();
               }
             }
           } else if (event == EventType.startArray) {
