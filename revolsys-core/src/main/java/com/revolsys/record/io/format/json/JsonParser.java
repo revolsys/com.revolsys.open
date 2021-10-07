@@ -368,7 +368,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
 
   @Override
   public boolean hasNext() {
-    return this.currentEvent != EventType.endDocument;
+    return this.currentEvent != EventType.endDocument && this.currentEvent != EventType.unknown;
   }
 
   public boolean isEvent(final EventType eventType) {

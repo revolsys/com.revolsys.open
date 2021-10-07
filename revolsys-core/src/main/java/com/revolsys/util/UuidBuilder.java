@@ -10,6 +10,10 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 
 public class UuidBuilder {
+  public static UUID fromString(final String string) {
+    return new UuidBuilder(string).newUuid();
+  }
+
   private MessageDigest digester;
 
   public UuidBuilder() {
