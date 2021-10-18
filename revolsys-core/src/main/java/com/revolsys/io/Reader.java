@@ -58,6 +58,14 @@ public interface Reader<T> extends Iterable<T>, ObjectWithProperties, BaseClosea
     return (Reader<V>)EMPTY;
   }
 
+  static <I, O> Reader<O> wrap(final Iterable<I> iterable, final Function<I, O> converter) {
+    return wrap(iterable.iterator(), converter);
+  }
+
+  static <V> Reader<V> wrap(final Iterable<V> iterable) {
+    return wrap(iterable.iterator());
+  }
+
   static <I, O> Reader<O> wrap(final Iterator<I> iterator, final Function<I, O> converter) {
     return new IteratorConvertReader<>(iterator, converter);
   }

@@ -14,6 +14,8 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 
+import com.revolsys.util.Property;
+
 public interface JsonList extends List<Object>, JsonType {
 
   JsonList EMPTY = new JsonList() {
@@ -298,6 +300,26 @@ public interface JsonList extends List<Object>, JsonType {
       objects.add(object);
     });
     return objects;
+  }
+
+  @Override
+  default boolean removeEmptyProperties() {
+    boolean removed = false;
+    for (final Iterator<Object> iterator = iterator(); iterator.hasNext();) {
+      final Object value = iterator.next();
+      if (value instanceof JsonType) {
+        final JsonType jsonValue = (JsonType)value;
+        jsonValue.removeEmptyProperties();
+        if (jsonValue.isEmpty()) {
+          iterator.remove();
+          removed = true;
+        }
+      } else if (!Property.hasValue(value)) {
+        iterator.remove();
+        removed = true;
+      }
+    }
+    return removed;
   }
 
   @Override

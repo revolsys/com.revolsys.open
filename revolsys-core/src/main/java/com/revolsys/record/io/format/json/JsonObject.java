@@ -196,16 +196,29 @@ public interface JsonObject extends MapEx, JsonType {
     return null;
   }
 
+  @Override
+  default boolean isEmpty() {
+    return MapEx.super.isEmpty();
+  }
+
   default <V> V mapTo(final Function<JsonObject, V> mapper) {
     return mapper.apply(this);
   }
 
+  @Override
   default boolean removeEmptyProperties() {
     boolean removed = false;
     final Collection<Object> entries = values();
     for (final Iterator<Object> iterator = entries.iterator(); iterator.hasNext();) {
       final Object value = iterator.next();
-      if (!Property.hasValue(value)) {
+      if (value instanceof JsonType) {
+        final JsonType jsonValue = (JsonType)value;
+        jsonValue.removeEmptyProperties();
+        if (jsonValue.isEmpty()) {
+          iterator.remove();
+          removed = true;
+        }
+      } else if (!Property.hasValue(value)) {
         iterator.remove();
         removed = true;
       }
