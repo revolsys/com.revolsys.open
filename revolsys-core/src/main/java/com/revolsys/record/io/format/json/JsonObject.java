@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.map.MapEx;
@@ -111,6 +112,13 @@ public interface JsonObject extends MapEx, JsonType {
   default JsonObject addNotEmpty(final String key, final Object value) {
     if (Property.hasValue(value)) {
       addValue(key, value);
+    }
+    return this;
+  }
+
+  default JsonObject addNotEmpty(final String key, final Object value, final DataType dataType) {
+    if (Property.hasValue(value)) {
+      addValue(key, dataType.toObject(value));
     }
     return this;
   }
