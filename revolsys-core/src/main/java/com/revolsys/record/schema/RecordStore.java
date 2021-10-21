@@ -615,7 +615,11 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
         }
       }
       final RecordStoreIteratorFactory iteratorFactory = getIteratorFactory();
-      return iteratorFactory.newIterator(this, query, properties);
+      if (iteratorFactory == null) {
+        return null;
+      } else {
+        return iteratorFactory.newIterator(this, query, properties);
+      }
     }
   }
 

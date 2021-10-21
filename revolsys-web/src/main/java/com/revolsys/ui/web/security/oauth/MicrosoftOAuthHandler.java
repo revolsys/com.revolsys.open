@@ -126,6 +126,7 @@ public class MicrosoftOAuthHandler {
 
   public void signOff(final HttpServletRequest request, final HttpServletResponse response)
     throws IOException {
+    request.getSession().invalidate();
     final String serverUrl = HttpServletUtils.getServerUrl(request);
     final String redirectUrl = this.oauthClient.endSessionUrl(serverUrl).toASCIIString();
     response.sendRedirect(redirectUrl);
