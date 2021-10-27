@@ -377,11 +377,11 @@ public class Q {
     return Q.like(left, right);
   }
 
-  private static Mod mod(final QueryValue left, final QueryValue right) {
+  public static Mod mod(final QueryValue left, final QueryValue right) {
     return new Mod(left, right);
   }
 
-  private static Multiply multiply(final QueryValue left, final QueryValue right) {
+  public static Multiply multiply(final QueryValue left, final QueryValue right) {
     return new Multiply(left, right);
   }
 
@@ -465,7 +465,7 @@ public class Q {
     return new SqlExpression(sql, dataType);
   }
 
-  private static Subtract subtract(final QueryValue left, final QueryValue right) {
+  public static Subtract subtract(final QueryValue left, final QueryValue right) {
     return new Subtract(left, right);
   }
 }

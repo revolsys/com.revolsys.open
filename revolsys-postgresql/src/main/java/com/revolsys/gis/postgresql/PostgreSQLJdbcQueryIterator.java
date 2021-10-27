@@ -17,10 +17,10 @@ public class PostgreSQLJdbcQueryIterator extends JdbcQueryIterator {
   protected String getSql(final Query query) {
     String sql = super.getSql(query);
     final int offset = query.getOffset();
-    final int limit = query.getLimit();
     if (offset > 0) {
       sql += " OFFSET " + offset;
     }
+    final int limit = query.getLimit();
     if (limit != Integer.MAX_VALUE) {
       sql += " LIMIT " + limit;
     }
