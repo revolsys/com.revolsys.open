@@ -5,6 +5,8 @@ import java.awt.Font;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
 import java.beans.PropertyChangeEvent;
@@ -12,6 +14,7 @@ import java.util.EventObject;
 import java.util.Map;
 
 import javax.swing.JComponent;
+import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.RowFilter;
 import javax.swing.RowSorter;
@@ -35,6 +38,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.dnd.ClipboardUtil;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
@@ -100,6 +104,7 @@ public class RecordLayerTable extends RecordRowTable {
     final TableColumnModelExt columnModel = (TableColumnModelExt)getColumnModel();
     columnModel.addColumnModelListener(new ColumnWidthListener());
     addNotQueryRecordHighlighter();
+    initActionMap();
   }
 
   @Override
@@ -283,6 +288,14 @@ public class RecordLayerTable extends RecordRowTable {
     } else {
       return selectionModel;
     }
+  }
+
+  protected void initActionMap() {
+    RunnableAction.addAction(this, //
+      "Zoom Selected", //
+      getLayer()::zoomToSelected, //
+      KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK)//
+    );
   }
 
   @Override

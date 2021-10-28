@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
 import org.jeometry.common.awt.WebColors;
@@ -155,6 +156,15 @@ public class SelectRecordsOverlay extends AbstractOverlay {
   @Override
   public void focusLost(final FocusEvent e) {
     cancel();
+  }
+
+  @Override
+  protected void initActionMap(final ProjectFrame frame) {
+    frame.addAction(//
+      "Zoom Selected", //
+      getMap()::zoomToSelected, //
+      KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.ALT_DOWN_MASK)//
+    );
   }
 
   protected boolean isSelectable(final AbstractLayer recordLayer) {

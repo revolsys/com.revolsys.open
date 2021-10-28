@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.util.function.Consumer;
 
+import javax.measure.Unit;
+import javax.measure.quantity.Length;
 import javax.swing.JLabel;
 
 import org.jeometry.common.data.type.DataTypes;
@@ -16,25 +18,30 @@ import com.revolsys.swing.component.BasePanel;
 import com.revolsys.swing.component.ValueField;
 import com.revolsys.swing.field.NumberTextField;
 
+import tech.units.indriya.ComparableQuantity;
+import tech.units.indriya.quantity.Quantities;
+
 public class RecordLayerActions {
 
   public static void generalize(final AbstractRecordLayer layer, final Integer recordCount,
     final Consumer<Consumer<LayerRecord>> forEachRecord) {
-    final Double distanceTolerance = generalizeGetDistance(layer);
+    final ComparableQuantity<Length> distanceTolerance = generalizeGetDistance(layer);
     if (distanceTolerance != null) {
       final Consumer<LayerRecord> action = record -> generalizeRecord(record, distanceTolerance);
       layer.processTasks("Generalize", recordCount, forEachRecord, action);
     }
   }
 
-  public static Double generalizeGetDistance(final AbstractRecordLayer layer) {
-    final double defaultValue = layer.getGeneralizeGeometryTolerance();
-    return getDistanceTolerance(layer, "Generalize Vertices", defaultValue);
+  public static ComparableQuantity<Length> generalizeGetDistance(final AbstractRecordLayer layer) {
+    final ComparableQuantity<Length> defaultValue = layer.getGeneralizeGeometryTolerance();
+    return getDistanceTolerance("Generalize Vertices", defaultValue);
   }
 
-  public static void generalizeRecord(final Record record, final double distanceTolerance) {
+  public static void generalizeRecord(final Record record,
+    final ComparableQuantity<Length> tolerance) {
     final Geometry geometry = record.getGeometry();
     if (geometry != null) {
+      final double distanceTolerance = tolerance.getValue().doubleValue();
       final Geometry newGeometry = DouglasPeuckerSimplifier.simplify(geometry, distanceTolerance,
         true);
       record.setGeometryValue(newGeometry);
@@ -46,22 +53,23 @@ public class RecordLayerActions {
     }
   }
 
-  public static Double getDistanceTolerance(final AbstractRecordLayer layer, final String title,
-    final double defaultValue) {
+  public static ComparableQuantity<Length> getDistanceTolerance(final String title,
+    final ComparableQuantity<Length> defaultValue) {
+    final Unit<Length> unit = defaultValue.getUnit();
     final ValueField dialog = new ValueField(new BorderLayout());
     dialog.setTitle(title);
 
     final NumberTextField distanceField = new NumberTextField(DataTypes.DOUBLE, 10, 2);
-    distanceField.setFieldValue(defaultValue);
+    distanceField.setFieldValue(defaultValue.getValue());
     dialog.add(distanceField);
-    final String unit = layer.getHorizontalCoordinateSystem().getLengthUnit().toString();
     final JLabel label = SwingUtil.newLabel("Distance Tolerance (" + unit + ")");
     final BasePanel fieldPanel = new BasePanel(new FlowLayout(), label, distanceField);
     dialog.add(fieldPanel, BorderLayout.CENTER);
 
     dialog.showDialog();
     if (dialog.isSaved()) {
-      return distanceField.getFieldValue();
+      final Double tolerance = distanceField.getFieldValue();
+      return Quantities.getQuantity(tolerance, unit);
     } else {
       return null;
     }

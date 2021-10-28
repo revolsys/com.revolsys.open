@@ -320,6 +320,12 @@ public class ProjectFrame extends BaseFrame {
     ScriptRunner.runScriptProcess(this, logDirectory, javaProcess);
   }
 
+  public void addAction(final String actionKey, final Runnable action,
+    final KeyStroke... keyStrokes) {
+    final JRootPane component = getRootPane();
+    RunnableAction.addAction(component, actionKey, action, keyStrokes);
+  }
+
   public void addBottomTab(final ProjectFramePanel panel, final MapEx config) {
     if (SwingUtilities.isEventDispatchThread()) {
       final TabbedPane tabs = getBottomTabs();

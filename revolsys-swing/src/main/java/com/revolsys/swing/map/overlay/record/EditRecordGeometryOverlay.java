@@ -22,8 +22,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
+import javax.measure.quantity.Length;
 import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
 import javax.swing.undo.UndoableEdit;
 
 import org.jeometry.common.awt.WebColors;
@@ -39,6 +43,7 @@ import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.editor.GeometryEditor;
 import com.revolsys.geometry.model.segment.LineSegment;
 import com.revolsys.geometry.model.vertex.Vertex;
@@ -49,6 +54,7 @@ import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
 import com.revolsys.swing.events.KeyEvents;
 import com.revolsys.swing.map.MapPanel;
+import com.revolsys.swing.map.ProjectFrame;
 import com.revolsys.swing.map.layer.AbstractLayer;
 import com.revolsys.swing.map.layer.Layer;
 import com.revolsys.swing.map.layer.LayerGroup;
@@ -56,8 +62,11 @@ import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.elevation.ElevationModelLayer;
 import com.revolsys.swing.map.layer.record.AbstractRecordLayer;
 import com.revolsys.swing.map.layer.record.LayerRecord;
+import com.revolsys.swing.map.layer.record.RecordLayerActions;
+import com.revolsys.swing.map.layer.record.component.recordmerge.MergeRecordsDialog;
 import com.revolsys.swing.map.layer.record.style.MarkerStyle;
 import com.revolsys.swing.map.layer.record.style.marker.MarkerRenderer;
+import com.revolsys.swing.map.layer.record.table.model.BlockDeleteRecords;
 import com.revolsys.swing.map.overlay.AbstractOverlay;
 import com.revolsys.swing.map.overlay.AddGeometryCompleteAction;
 import com.revolsys.swing.map.overlay.CloseLocation;
@@ -65,12 +74,16 @@ import com.revolsys.swing.map.overlay.VertexStyleRenderer;
 import com.revolsys.swing.map.overlay.ZoomOverlay;
 import com.revolsys.swing.map.overlay.record.geometryeditor.AppendVertexUndoEdit;
 import com.revolsys.swing.map.overlay.record.geometryeditor.DeleteVertexUndoEdit;
+import com.revolsys.swing.map.overlay.record.geometryeditor.GeneralizeVerticesGeometryUndoEdit;
 import com.revolsys.swing.map.overlay.record.geometryeditor.InsertVertexUndoEdit;
 import com.revolsys.swing.map.overlay.record.geometryeditor.MoveGeometryUndoEdit;
 import com.revolsys.swing.map.overlay.record.geometryeditor.SetVertexUndoEdit;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
 import com.revolsys.swing.undo.MultipleUndo;
+import com.revolsys.util.Pair;
+
+import tech.units.indriya.ComparableQuantity;
 
 public class EditRecordGeometryOverlay extends AbstractOverlay
   implements PropertyChangeListener, MouseListener, MouseMotionListener {
@@ -175,13 +188,12 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     }
   }
 
-  private void addEdit(final MultipleUndo allEdits, final Map<Layer, MultipleUndo> editsByLayer,
-    final AbstractRecordLayer layer, final UndoableEdit edit) {
+  private void addEdit(final Map<Layer, MultipleUndo> editsByLayer, final AbstractRecordLayer layer,
+    final UndoableEdit edit) {
     MultipleUndo layerEdits = editsByLayer.get(layer);
     if (layerEdits == null) {
       layerEdits = layer.newMultipleUndo();
       editsByLayer.put(layer, layerEdits);
-      allEdits.addEdit(layerEdits);
     }
     layerEdits.addEdit(edit);
   }
@@ -299,6 +311,82 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     repaint();
   }
 
+  private void deleteCloseSelectedRecords() {
+    boolean confirmDelete = false;
+    final List<LayerRecord> records = new ArrayList<>();
+    for (final CloseLocation location : getMouseOverLocations()) {
+      final AbstractRecordLayer layer = location.getLayer();
+      if (layer.isCanDeleteRecords()) {
+        if (layer.isConfirmDeleteRecords()) {
+          confirmDelete = true;
+        }
+        final LayerRecord record = location.getRecord();
+        records.add(record);
+      }
+    }
+
+    final Map<AbstractRecordLayer, List<LayerRecord>> deleteRecordByLayer = BlockDeleteRecords
+      .confirmDeleteRecords("", records, confirmDelete);
+
+    final Map<Layer, MultipleUndo> editsByLayer = new HashMap<>();
+    for (final AbstractRecordLayer layer : deleteRecordByLayer.keySet()) {
+      final List<LayerRecord> deleteRecords = deleteRecordByLayer.get(layer);
+      for (final LayerRecord deleteRecord : deleteRecords) {
+        final UndoableEdit undo = deleteRecord.deleteRecordUndo();
+        addEdit(editsByLayer, layer, undo);
+
+      }
+    }
+    if (!editsByLayer.isEmpty()) {
+      final MultipleUndo allEdits = new MultipleUndo();
+      allEdits.addEdits(editsByLayer.values());
+      allEdits.addEdit(new ClearXorUndoEdit());
+      addUndo(allEdits);
+    }
+    clearMouseOverLocations();
+  }
+
+  private void deleteVertices() {
+    final Map<Layer, MultipleUndo> editsByLayer = new HashMap<>();
+    for (final CloseLocation location : getMouseOverLocations()) {
+      final AbstractRecordLayer layer = location.getLayer();
+      if (layer.isCanEditRecords()) {
+        final Geometry geometry = location.getGeometry();
+        final int[] vertexId = location.getVertexId();
+        if (vertexId != null) {
+          try {
+            if (this.addGeometryEditor == null) {
+              final GeometryEditor<?> geometryEditor = geometry.newGeometryEditor();
+              geometryEditor.deleteVertex(vertexId);
+              if (geometryEditor.isModified()) {
+                final Geometry newGeometry = geometryEditor.newGeometry();
+                if (newGeometry.isEmpty()) {
+                  SwingUtil.beep();
+                } else {
+                  final UndoableEdit edit = setGeometry(location, newGeometry);
+                  addEdit(editsByLayer, layer, edit);
+                }
+              }
+            } else {
+              final DeleteVertexUndoEdit edit = new DeleteVertexUndoEdit(this.addGeometryEditor,
+                vertexId);
+              addEdit(editsByLayer, layer, edit);
+            }
+          } catch (final Exception t) {
+            SwingUtil.beep();
+          }
+        }
+      }
+    }
+    if (!editsByLayer.isEmpty()) {
+      final MultipleUndo allEdits = new MultipleUndo();
+      allEdits.addEdits(editsByLayer.values());
+      allEdits.addEdit(new ClearXorUndoEdit());
+      addUndo(allEdits);
+    }
+    clearMouseOverLocations();
+  }
+
   @Override
   public void destroy() {
     super.destroy();
@@ -310,6 +398,37 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       final ActionEvent actionEvent = new ActionEvent(this, this.actionId++, command);
       listener.actionPerformed(actionEvent);
     }
+  }
+
+  private void generalizeRecords(final boolean selected) {
+    final Predicate<AbstractRecordLayer> layerFilter = AbstractRecordLayer::isCanEditRecords;
+    final Predicate<LayerRecord> recordFilter = (record) -> {
+      final Geometry geometry = record.getGeometry();
+      return !geometry.isEmpty() && !(geometry instanceof Punctual);
+    };
+    recordAction("Generalize", selected, layerFilter, recordFilter, (result) -> {
+      final AbstractRecordLayer layer = result.getValue1();
+      final List<LayerRecord> records = result.getValue2();
+      if (layer == null || records.isEmpty()) {
+        SwingUtil.beep();
+      } else {
+        final ComparableQuantity<Length> tolerance = RecordLayerActions
+          .generalizeGetDistance(layer);
+        if (tolerance != null) {
+          final double distanceTolerance = tolerance.getValue().doubleValue();
+          final MultipleUndo edits = new MultipleUndo();
+          for (final LayerRecord record : records) {
+            final GeneralizeVerticesGeometryUndoEdit edit = new GeneralizeVerticesGeometryUndoEdit(
+              record, distanceTolerance);
+            edits.addEdit(edit);
+          }
+          edits.addEdit(new ClearXorUndoEdit());
+          addUndo(edits);
+        }
+      }
+
+      clearMouseOverLocations();
+    });
   }
 
   private GeometryEditor<?> geometryEdit(final CloseLocation location, final Point newPoint) {
@@ -345,6 +464,30 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   public AbstractLayer getAddLayer() {
     return this.addLayer;
+  }
+
+  private Pair<AbstractRecordLayer, List<LayerRecord>> getCloseRecords(final String title,
+    final Predicate<AbstractRecordLayer> layerFilter, final Predicate<LayerRecord> recordFilter) {
+    AbstractRecordLayer layer = null;
+    final List<LayerRecord> records = new ArrayList<>();
+    for (final CloseLocation location : getMouseOverLocations()) {
+      final AbstractRecordLayer recordLayer = location.getLayer();
+      if (layerFilter.test(recordLayer)) {
+        final LayerRecord record = location.getRecord();
+        if (recordFilter.test(record)) {
+          if (layer == null || layer == recordLayer) {
+            layer = recordLayer;
+            records.add(record);
+          } else {
+            JOptionPane.showMessageDialog(getMap(),
+              "Cannot " + title + " records from multiple layers", title + " Records",
+              JOptionPane.WARNING_MESSAGE);
+            return null;
+          }
+        }
+      }
+    }
+    return new Pair<>(layer, records);
   }
 
   public Point getClosestPoint(final GeometryFactory geometryFactory,
@@ -413,6 +556,30 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   public List<CloseLocation> getMouseOverLocations() {
     return this.mouseOverLocations;
+  }
+
+  private Pair<AbstractRecordLayer, List<LayerRecord>> getSelectedRecords(final String title,
+    final Predicate<AbstractRecordLayer> layerFilter, final Predicate<LayerRecord> recordFilter) {
+    AbstractRecordLayer layer = null;
+    final List<LayerRecord> records = new ArrayList<>();
+    for (final AbstractRecordLayer recordLayer : getMap().getSelectedRecordLayers()) {
+      if (layerFilter.test(recordLayer)) {
+        for (final LayerRecord record : recordLayer.getSelectedRecords()) {
+          if (recordFilter.test(record)) {
+            if (layer == null || layer == recordLayer) {
+              layer = recordLayer;
+              records.add(record);
+            } else {
+              JOptionPane.showMessageDialog(getMap(),
+                "Cannot " + title + " records from multiple layers", title + " Records",
+                JOptionPane.WARNING_MESSAGE);
+              return null;
+            }
+          }
+        }
+      }
+    }
+    return new Pair<>(layer, records);
   }
 
   @Override
@@ -502,6 +669,26 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     return !getMouseOverLocations().isEmpty();
   }
 
+  @Override
+  protected void initActionMap(final ProjectFrame frame) {
+    frame.addAction(//
+      "Delete Close Selected Records", //
+      this::deleteCloseSelectedRecords, //
+      KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.ALT_DOWN_MASK), //
+      KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, InputEvent.ALT_DOWN_MASK) //
+    );
+    frame.addAction(//
+      "Generalize Selected Records", //
+      () -> generalizeRecords(true), //
+      KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.ALT_DOWN_MASK) //
+    );
+    frame.addAction(//
+      "Merge Selected Records", //
+      () -> mergeRecords(true), //
+      KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.ALT_DOWN_MASK) //
+    );
+  }
+
   protected boolean isEditable(final AbstractRecordLayer recordLayer) {
     return recordLayer.isExists() && recordLayer.isVisible() && recordLayer.isCanEditRecords();
   }
@@ -562,43 +749,14 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       }
     } else if (keyCode == KeyEvent.VK_BACK_SPACE || keyCode == KeyEvent.VK_DELETE) {
       if (hasMouseOverLocation()) {
-        final MultipleUndo allEdits = new MultipleUndo();
-        final Map<Layer, MultipleUndo> editsByLayer = new HashMap<>();
-        for (final CloseLocation location : getMouseOverLocations()) {
-          final AbstractRecordLayer layer = location.getLayer();
-          final Geometry geometry = location.getGeometry();
-          final int[] vertexId = location.getVertexId();
-          if (vertexId != null) {
-            try {
-              if (this.addGeometryEditor == null) {
-                final GeometryEditor<?> geometryEditor = geometry.newGeometryEditor();
-                geometryEditor.deleteVertex(vertexId);
-                if (geometryEditor.isModified()) {
-                  final Geometry newGeometry = geometryEditor.newGeometry();
-                  if (newGeometry.isEmpty()) {
-                    SwingUtil.beep();
-                  } else {
-                    final UndoableEdit edit = setGeometry(location, newGeometry);
-                    addEdit(allEdits, editsByLayer, layer, edit);
-                  }
-                }
-              } else {
-                final DeleteVertexUndoEdit edit = new DeleteVertexUndoEdit(this.addGeometryEditor,
-                  vertexId);
-                addEdit(allEdits, editsByLayer, layer, edit);
-              }
-            } catch (final Exception t) {
-              SwingUtil.beep();
-            }
-          }
+        if (!e.isAltDown()) {
+          deleteVertices();
         }
-        if (!allEdits.isEmpty()) {
-          allEdits.addEdit(new ClearXorUndoEdit());
-          addUndo(allEdits);
-        }
-        clearMouseOverLocations();
+
       }
-    } else if (keyCode == KeyEvent.VK_F2 || KeyEvents.altKey(e, KeyEvent.VK_F)) {
+    } else if (keyCode == KeyEvent.VK_F2 || KeyEvents.altKey(e, KeyEvent.VK_F))
+
+    {
       clearMouseOverLocations();
       modeMoveGeometryClear();
       if (this.addCompleteAction != null) {
@@ -613,6 +771,25 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   @Override
   public void keyTyped(final KeyEvent e) {
     super.keyTyped(e);
+  }
+
+  private void mergeRecords(final boolean selected) {
+    final Predicate<LayerRecord> recordFilter = (record) -> {
+      final Geometry geometry = record.getGeometry();
+      return !geometry.isEmpty() && !(geometry instanceof Punctual);
+    };
+    recordAction("Merge", selected, AbstractRecordLayer::isCanMergeRecords, recordFilter,
+      (result) -> {
+        final AbstractRecordLayer layer = result.getValue1();
+        final List<LayerRecord> records = result.getValue2();
+        if (layer == null || records.isEmpty()) {
+          SwingUtil.beep();
+        } else {
+          MergeRecordsDialog.showDialog(layer);
+        }
+
+        clearMouseOverLocations();
+      });
   }
 
   protected void modeAddGeometryClear() {
@@ -756,7 +933,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
             final AbstractRecordLayer layer = location.getLayer();
             final AppendVertexUndoEdit edit = new AppendVertexUndoEdit(this.addGeometryEditor,
               this.addGeometryPartIndex, this.addGeometryPartDataType, location.getVertex());
-            addEdit(allEdits, editsByLayer, layer, edit);
+            addEdit(editsByLayer, layer, edit);
           } else {
             for (final CloseLocation location : locations) {
               final AbstractRecordLayer layer = location.getLayer();
@@ -774,7 +951,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
               } else {
                 locationEdit = new SetVertexUndoEdit(this.addGeometryEditor, vertexId, newPoint);
               }
-              addEdit(allEdits, editsByLayer, layer, locationEdit);
+              addEdit(editsByLayer, layer, locationEdit);
             }
           }
           if (!allEdits.isEmpty()) {
@@ -937,7 +1114,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
                 final Geometry newGeometry = geometryEditor.newGeometry();
                 final UndoableEdit geometryEdit = setGeometry(location, newGeometry);
                 final AbstractRecordLayer layer = location.getLayer();
-                addEdit(allEdits, editsByLayer, layer, geometryEdit);
+                addEdit(editsByLayer, layer, geometryEdit);
               }
             }
             if (!allEdits.isEmpty()) {
@@ -1034,7 +1211,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
                 final GeometryEditor<?> geometryEditor = (GeometryEditor<?>)geometry;
                 final MoveGeometryUndoEdit edit = new MoveGeometryUndoEdit(geometryEditor, deltaX,
                   deltaY);
-                addEdit(allEdits, editsByLayer, layer, edit);
+                addEdit(editsByLayer, layer, edit);
               } else {
                 final Geometry newGeometry = geometry.edit(editor -> {
                   editor.move(deltaX, deltaY);
@@ -1047,7 +1224,7 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
                   return editor;
                 });
                 final UndoableEdit edit = setGeometry(location, newGeometry);
-                addEdit(allEdits, editsByLayer, layer, edit);
+                addEdit(editsByLayer, layer, edit);
               }
             }
           }
@@ -1251,6 +1428,20 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
         // TODO update mouse over locations
         // clearMouseOverLocations();
       }
+    }
+  }
+
+  private void recordAction(final String title, final boolean selected,
+    final Predicate<AbstractRecordLayer> layerFilter, final Predicate<LayerRecord> recordFilter,
+    final Consumer<Pair<AbstractRecordLayer, List<LayerRecord>>> action) {
+    Pair<AbstractRecordLayer, List<LayerRecord>> result;
+    if (selected) {
+      result = getSelectedRecords(title, layerFilter, recordFilter);
+    } else {
+      result = getCloseRecords(title, layerFilter, recordFilter);
+    }
+    if (result != null) {
+      action.accept(result);
     }
   }
 

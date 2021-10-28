@@ -676,6 +676,10 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     return this.viewport.getScales();
   }
 
+  public List<AbstractRecordLayer> getSelectedRecordLayers() {
+    return this.selectedRecordLayers;
+  }
+
   public ToolBar getToolBar() {
     return this.toolBar;
   }
