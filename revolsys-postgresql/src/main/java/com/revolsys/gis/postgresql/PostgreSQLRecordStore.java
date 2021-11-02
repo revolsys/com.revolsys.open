@@ -364,15 +364,21 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   }
 
   @Override
+  protected PostgreSQLRecordStoreSchema newRootSchema() {
+    return new PostgreSQLRecordStoreSchema(this);
+  }
+
+  @Override
   protected JdbcFieldDefinition newRowIdFieldDefinition() {
     return new PostgreSQLOidFieldDefinition();
   }
 
   @Override
-  protected JdbcRecordStoreSchema newSchema(final JdbcRecordStoreSchema rootSchema,
+  protected PostgreSQLRecordStoreSchema newSchema(final JdbcRecordStoreSchema rootSchema,
     final String dbSchemaName, final PathName childSchemaPath) {
     final boolean quoteName = !dbSchemaName.equals(dbSchemaName.toLowerCase());
-    return new JdbcRecordStoreSchema(rootSchema, childSchemaPath, dbSchemaName, quoteName);
+    return new PostgreSQLRecordStoreSchema((PostgreSQLRecordStoreSchema)rootSchema, childSchemaPath,
+      dbSchemaName, quoteName);
   }
 
   @Override

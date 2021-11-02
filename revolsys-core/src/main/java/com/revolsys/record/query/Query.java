@@ -1176,9 +1176,17 @@ public class Query extends BaseObjectWithProperties
       if (this.sql == null) {
         final String sql = getSelectSql();
         string.append(sql);
+
+        if (this.offset > 0) {
+          string.append("\n OFFSET " + this.offset);
+        }
+        if (this.limit != Integer.MAX_VALUE) {
+          string.append("\n LIMIT " + this.limit);
+        }
       } else {
         string.append(this.sql);
       }
+
       if (!this.parameters.isEmpty()) {
         string.append(" ");
         string.append(this.parameters);
