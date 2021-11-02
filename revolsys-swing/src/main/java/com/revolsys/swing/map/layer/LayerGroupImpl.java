@@ -296,6 +296,13 @@ public class LayerGroupImpl extends AbstractLayer implements LayerGroup {
   }
 
   @Override
+  protected void addSelectedBoundingBoxDo(final BoundingBoxEditor boundingBox) {
+    for (final Layer layer : this) {
+      layer.addSelectedBoundingBox(boundingBox);
+    }
+  }
+
+  @Override
   public void clear() {
     final Layer[] layers = this.layers;
     this.layers = EMPTY_LAYER_ARRAY;
@@ -498,18 +505,6 @@ public class LayerGroupImpl extends AbstractLayer implements LayerGroup {
     } else {
       return Arrays.asList(this.layers);
     }
-  }
-
-  @Override
-  public BoundingBox getSelectedBoundingBox() {
-    final BoundingBoxEditor boundingBox = getGeometryFactory().bboxEditor();
-    if (isExists() && isVisible()) {
-      for (final Layer layer : this) {
-        final BoundingBox layerBoundingBox = layer.getSelectedBoundingBox();
-        boundingBox.addBbox(layerBoundingBox);
-      }
-    }
-    return boundingBox.newBoundingBox();
   }
 
   @Override

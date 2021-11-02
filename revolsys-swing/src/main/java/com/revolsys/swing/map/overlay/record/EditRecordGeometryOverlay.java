@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.events.KeyEvents;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
@@ -311,39 +313,28 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
     repaint();
   }
 
-  private void deleteCloseSelectedRecords() {
+  private void deleteSelectedRecords() {
     boolean confirmDelete = false;
-    final List<LayerRecord> records = new ArrayList<>();
-    for (final CloseLocation location : getMouseOverLocations()) {
-      final AbstractRecordLayer layer = location.getLayer();
-      if (layer.isCanDeleteRecords()) {
-        if (layer.isConfirmDeleteRecords()) {
-          confirmDelete = true;
-        }
-        final LayerRecord record = location.getRecord();
-        records.add(record);
+    final Predicate<LayerRecord> recordFilter = (record) -> {
+      final Geometry geometry = record.getGeometry();
+      return !geometry.isEmpty() && !(geometry instanceof Punctual);
+    };
+    Map<AbstractRecordLayer, List<LayerRecord>> recordsByLayer = getAllSelectedRecords(
+      AbstractRecordLayer::isCanDeleteRecords, recordFilter);
+    for (final AbstractRecordLayer layer : recordsByLayer.keySet()) {
+      if (layer.isConfirmDeleteRecords()) {
+        confirmDelete = true;
+        break;
       }
     }
 
     final Map<AbstractRecordLayer, List<LayerRecord>> deleteRecordByLayer = BlockDeleteRecords
-      .confirmDeleteRecords("", records, confirmDelete);
+      .confirmDeleteRecords("", recordsByLayer, confirmDelete);
 
-    final Map<Layer, MultipleUndo> editsByLayer = new HashMap<>();
     for (final AbstractRecordLayer layer : deleteRecordByLayer.keySet()) {
       final List<LayerRecord> deleteRecords = deleteRecordByLayer.get(layer);
-      for (final LayerRecord deleteRecord : deleteRecords) {
-        final UndoableEdit undo = deleteRecord.deleteRecordUndo();
-        addEdit(editsByLayer, layer, undo);
-
-      }
+      layer.deleteRecords(deleteRecords);
     }
-    if (!editsByLayer.isEmpty()) {
-      final MultipleUndo allEdits = new MultipleUndo();
-      allEdits.addEdits(editsByLayer.values());
-      allEdits.addEdit(new ClearXorUndoEdit());
-      addUndo(allEdits);
-    }
-    clearMouseOverLocations();
   }
 
   private void deleteVertices() {
@@ -464,6 +455,21 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
 
   public AbstractLayer getAddLayer() {
     return this.addLayer;
+  }
+
+  private Map<AbstractRecordLayer, List<LayerRecord>> getAllSelectedRecords(
+    final Predicate<AbstractRecordLayer> layerFilter, final Predicate<LayerRecord> recordFilter) {
+    Map<AbstractRecordLayer, List<LayerRecord>> recordsByLayer = new LinkedHashMap<>();
+    for (final AbstractRecordLayer layer : getMap().getSelectedRecordLayers()) {
+      if (layerFilter.test(layer)) {
+        for (final LayerRecord record : layer.getSelectedRecords()) {
+          if (recordFilter.test(record)) {
+            Maps.addToList(recordsByLayer, layer, record);
+          }
+        }
+      }
+    }
+    return recordsByLayer;
   }
 
   private Pair<AbstractRecordLayer, List<LayerRecord>> getCloseRecords(final String title,
@@ -672,21 +678,25 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
   @Override
   protected void initActionMap(final ProjectFrame frame) {
     frame.addAction(//
-      "Delete Close Selected Records", //
-      this::deleteCloseSelectedRecords, //
-      KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, InputEvent.ALT_DOWN_MASK), //
-      KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, InputEvent.ALT_DOWN_MASK) //
-    );
-    frame.addAction(//
-      "Generalize Selected Records", //
-      () -> generalizeRecords(true), //
-      KeyStroke.getKeyStroke(KeyEvent.VK_G, InputEvent.ALT_DOWN_MASK) //
-    );
-    frame.addAction(//
-      "Merge Selected Records", //
-      () -> mergeRecords(true), //
-      KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.ALT_DOWN_MASK) //
-    );
+      "Delete Selected Records", //
+      this::deleteSelectedRecords, //
+      KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_DOWN_MASK));
+
+    {
+      String actionKey = "Generalize Selected Records";
+      Runnable action = () -> generalizeRecords(true);
+      int key = KeyEvent.VK_G;
+      RunnableAction.addAction(getMap(), actionKey, action, KeyStroke.getKeyStroke(key, 0));
+      frame.addAction(actionKey, action, KeyStroke.getKeyStroke(key, InputEvent.ALT_DOWN_MASK));
+    }
+    {
+      // M will only work on map
+      String actionKey = "Merge Selected Records";
+      Runnable action = () -> mergeRecords(true);
+      int key = KeyEvent.VK_M;
+      RunnableAction.addAction(getMap(), actionKey, action, KeyStroke.getKeyStroke(key, 0));
+      frame.addAction(actionKey, action, KeyStroke.getKeyStroke(key, InputEvent.ALT_DOWN_MASK));
+    }
   }
 
   protected boolean isEditable(final AbstractRecordLayer recordLayer) {
@@ -924,7 +934,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       if (this.addGeometryEditVerticesStart && hasMouseOverLocation()) {
         if (button == MouseEvent.BUTTON1) {
           this.addGeometryEditVerticesStart = false;
-          final MultipleUndo allEdits = new MultipleUndo();
           final Map<Layer, MultipleUndo> editsByLayer = new HashMap<>();
           final List<CloseLocation> locations = getMouseOverLocations();
           if (this.addGeometryPartDataType == GeometryDataTypes.LINE_STRING && !this.dragged
@@ -954,7 +963,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
               addEdit(editsByLayer, layer, locationEdit);
             }
           }
-          if (!allEdits.isEmpty()) {
+          if (!editsByLayer.isEmpty()) {
+            final MultipleUndo allEdits = new MultipleUndo();
+            allEdits.addEdits(editsByLayer.values());
             allEdits.addEdit(new ClearXorUndoEdit());
             addUndo(allEdits);
           }
@@ -1104,7 +1115,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       if (event.getButton() == MouseEvent.BUTTON1) {
         if (this.dragged) {
           try {
-            final MultipleUndo allEdits = new MultipleUndo();
             final Map<Layer, MultipleUndo> editsByLayer = new HashMap<>();
             final List<CloseLocation> locations = getMouseOverLocations();
             for (final CloseLocation location : locations) {
@@ -1117,7 +1127,10 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
                 addEdit(editsByLayer, layer, geometryEdit);
               }
             }
-            if (!allEdits.isEmpty()) {
+            if (!editsByLayer.isEmpty()) {
+              final MultipleUndo allEdits = new MultipleUndo();
+              allEdits.addEdits(editsByLayer.values());
+              allEdits.addEdit(new ClearXorUndoEdit());
               addUndo(allEdits);
             }
           } finally {
@@ -1193,7 +1206,6 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       if (clearOverlayAction(ACTION_MOVE_GEOMETRY)) {
         clearOverlayAction(ACTION_ADD_GEOMETRY_EDIT_VERTICES);
         clearOverlayAction(ACTION_EDIT_GEOMETRY_VERTICES);
-        final MultipleUndo allEdits = new MultipleUndo();
         final Map<Layer, MultipleUndo> editsByLayer = new HashMap<>();
         final List<CloseLocation> moveGeometryLocations = this.moveGeometryLocations;
         if (moveGeometryLocations != null) {
@@ -1228,7 +1240,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
               }
             }
           }
-          if (!allEdits.isEmpty()) {
+          if (!editsByLayer.isEmpty()) {
+            final MultipleUndo allEdits = new MultipleUndo();
+            allEdits.addEdits(editsByLayer.values());
             allEdits.addEdit(new ClearXorUndoEdit());
             addUndo(allEdits);
           }

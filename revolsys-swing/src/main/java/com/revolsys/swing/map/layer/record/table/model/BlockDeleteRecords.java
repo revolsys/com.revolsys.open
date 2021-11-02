@@ -55,7 +55,51 @@ public class BlockDeleteRecords {
         return otherRecordsByLayer;
       }
     } else {
-      if (BlockDeleteRecords.showErrorDialog(blockedRecordsByLayer, otherRecordsByLayer)) {
+      if (showErrorDialog(blockedRecordsByLayer, otherRecordsByLayer)) {
+        return otherRecordsByLayer;
+      }
+    }
+    if (delete) {
+      for (final Iterator<List<LR>> iterator = otherRecordsByLayer.values().iterator(); iterator
+        .hasNext();) {
+        final List<LR> otherRecords = iterator.next();
+        if (otherRecords.isEmpty()) {
+          iterator.remove();
+        }
+      }
+      return otherRecordsByLayer;
+    } else {
+      return Collections.emptyMap();
+    }
+  }
+
+  public static <LR extends LayerRecord> Map<AbstractRecordLayer, List<LR>> confirmDeleteRecords(
+    final String suffix, final Map<AbstractRecordLayer, List<LR>> recordsByLayer,
+    final boolean confirmDeleteRecords) {
+    final Pair<Map<AbstractRecordLayer, List<LR>>, Map<AbstractRecordLayer, List<LR>>> deletedBlocked = getDeletedBlocked(
+      suffix, recordsByLayer);
+    final Map<AbstractRecordLayer, List<LR>> blockedRecordsByLayer = deletedBlocked.getValue1();
+    final Map<AbstractRecordLayer, List<LR>> otherRecordsByLayer = deletedBlocked.getValue2();
+    final boolean delete = false;
+    if (blockedRecordsByLayer.isEmpty()) {
+      if (AbstractRecordLayer.isGlobalConfirmDeleteRecords() || confirmDeleteRecords) {
+        int recordCount = 0;
+        for (List<LR> records : otherRecordsByLayer.values()) {
+          recordCount += records.size();
+        }
+        final String message = "Delete " + recordCount + " records" + suffix
+          + "? This action cannot be undone.";
+        final String title = "Delete Records" + suffix;
+        final int confirm = Dialogs.showConfirmDialog(message, title, JOptionPane.YES_NO_OPTION,
+          JOptionPane.ERROR_MESSAGE);
+        if (confirm == JOptionPane.YES_OPTION) {
+          return otherRecordsByLayer;
+        }
+      } else {
+        return otherRecordsByLayer;
+      }
+    } else {
+      if (showErrorDialog(blockedRecordsByLayer, otherRecordsByLayer)) {
         return otherRecordsByLayer;
       }
     }
@@ -84,6 +128,23 @@ public class BlockDeleteRecords {
         Maps.addToList(blockedRecords, layer, record);
       } else if (otherRecords != null) {
         Maps.addToList(otherRecords, layer, record);
+      }
+    }
+    return new Pair<>(blockedRecords, otherRecords);
+  }
+
+  public static <LR extends LayerRecord> Pair<Map<AbstractRecordLayer, List<LR>>, Map<AbstractRecordLayer, List<LR>>> getDeletedBlocked(
+    final String suffix, final Map<AbstractRecordLayer, List<LR>> recordsByLayer) {
+    final Map<AbstractRecordLayer, List<LR>> blockedRecords = new LinkedHashMap<>();
+    final Map<AbstractRecordLayer, List<LR>> otherRecords = new LinkedHashMap<>();
+    for (final AbstractRecordLayer layer : recordsByLayer.keySet()) {
+      for (final LR record : recordsByLayer.get(layer)) {
+        if (layer.isDeleteBlocked(suffix, record)) {
+          Maps.getList(otherRecords, layer);
+          Maps.addToList(blockedRecords, layer, record);
+        } else if (otherRecords != null) {
+          Maps.addToList(otherRecords, layer, record);
+        }
       }
     }
     return new Pair<>(blockedRecords, otherRecords);

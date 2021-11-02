@@ -34,6 +34,7 @@ import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.record.Record;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
+import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.map.ImageViewport;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
@@ -160,6 +161,9 @@ public class SelectRecordsOverlay extends AbstractOverlay {
 
   @Override
   protected void initActionMap(final ProjectFrame frame) {
+    RunnableAction.addAction(getMap(), "Zoom Selected", getMap()::zoomToSelected, //
+      KeyStroke.getKeyStroke(KeyEvent.VK_Z, 0));
+
     frame.addAction(//
       "Zoom Selected", //
       getMap()::zoomToSelected, //
