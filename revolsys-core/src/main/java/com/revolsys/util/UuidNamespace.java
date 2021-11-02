@@ -6,33 +6,44 @@ import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.number.Longs;
 
 public class UuidNamespace {
 
-  private static UUID fromBytes(final byte[] data) {
-    long msb = 0;
-    long lsb = 0;
-    assert data.length >= 16;
-    for (int i = 0; i < 8; i++) {
-      msb = msb << 8 | data[i] & 0xff;
-    }
-    for (int i = 8; i < 16; i++) {
-      lsb = lsb << 8 | data[i] & 0xff;
-    }
-    return new UUID(msb, lsb);
+  public static UUID toUuid(final byte[] bytes) {
+    final long l1 = Longs.toLong(bytes, 0);
+    final long l2 = Longs.toLong(bytes, 8);
+    return new UUID(l1, l2);
   }
 
-  private final byte[] bytes = new byte[16];
+  public static UUID toUuid(final int type, final byte[] bytes) {
+    bytes[6] &= 0x0f; // clear version
+    bytes[6] |= type << 4; // set to version
+    bytes[8] &= 0x3f; // clear variant
+    bytes[8] |= 0x80; // set to IETF variant
+    return toUuid(bytes);
+  }
+
+  private final byte[] namespaceBytes = new byte[16];
 
   private final UUID namespace;
 
-  public UuidNamespace(final String namespace) {
-    this(UUID.fromString(namespace));
+  private int type;
+
+  private String algorithm;
+
+  UuidNamespace(final int type, final String namespace) {
+    this(type, UUID.fromString(namespace));
   }
 
-  public UuidNamespace(final UUID namespace) {
+  UuidNamespace(final int type, final UUID namespace) {
+    if (type == 3) {
+      this.algorithm = "MD5";
+    } else if (type == 5) {
+      this.algorithm = "SHA-1";
+    }
     this.namespace = namespace;
-    final byte[] bytes = this.bytes;
+    final byte[] bytes = this.namespaceBytes;
     final long msb = namespace.getMostSignificantBits();
     final long lsb = namespace.getLeastSignificantBits();
     for (int i = 0; i < 8; i++) {
@@ -41,33 +52,62 @@ public class UuidNamespace {
     for (int i = 8; i < 16; i++) {
       bytes[i] = (byte)(lsb >> (15 - i) * 8 & 0xff);
     }
-
   }
 
-  public UUID newV5(final byte[] name) {
+  public UuidBuilder builder() {
     try {
-      final MessageDigest md = MessageDigest.getInstance("SHA-1");
-      md.update(this.bytes);
-      md.update(name);
-      final byte[] sha1Bytes = md.digest();
-      sha1Bytes[6] &= 0x0f; /* clear version */
-      sha1Bytes[6] |= 0x50; /* set to version 5 */
-      sha1Bytes[8] &= 0x3f; /* clear variant */
-      sha1Bytes[8] |= 0x80; /* set to IETF variant */
-      return fromBytes(sha1Bytes);
+      final MessageDigest digester = MessageDigest.getInstance(this.algorithm);
+      digester.update(this.namespaceBytes);
+      return new UuidBuilder(this.type, digester);
     } catch (final NoSuchAlgorithmException e) {
       throw Exceptions.wrap(e);
     }
-
-  }
-
-  public UUID newV5(final String name) {
-    return newV5(name.getBytes(StandardCharsets.UTF_8));
   }
 
   @Override
   public String toString() {
     return this.namespace.toString();
+  }
+
+  public UUID uuid(final byte[] name) {
+    try {
+      final MessageDigest digester = MessageDigest.getInstance(this.algorithm);
+      digester.update(this.namespaceBytes);
+      digester.update(name);
+      final byte[] digest = digester.digest();
+      return UuidNamespace.toUuid(this.type, digest);
+    } catch (final NoSuchAlgorithmException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  public UUID uuid(final Object name) {
+    if (name == null) {
+      return uuid("null");
+    } else if (name instanceof byte[]) {
+      return uuid((byte[])name);
+    } else {
+      return uuid(name.toString());
+
+    }
+
+  }
+
+  public UUID uuid(final String name) {
+    final byte[] bytes = name.getBytes(StandardCharsets.UTF_8);
+    return uuid(bytes);
+  }
+
+  public String uuidString(final byte[] name) {
+    return uuid(name).toString();
+  }
+
+  public String uuidString(final Object name) {
+    return uuid(name).toString();
+  }
+
+  public String uuidString(final String name) {
+    return uuid(name).toString();
   }
 
 }

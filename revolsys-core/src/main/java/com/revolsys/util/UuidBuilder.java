@@ -2,31 +2,20 @@ package com.revolsys.util;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataTypes;
-import org.jeometry.common.exception.Exceptions;
 
 public class UuidBuilder {
-  public static UUID fromString(final String string) {
-    return new UuidBuilder(string).newUuid();
-  }
 
-  private MessageDigest digester;
+  private final MessageDigest digester;
 
-  public UuidBuilder() {
-    try {
-      this.digester = MessageDigest.getInstance("SHA-1");
-    } catch (final NoSuchAlgorithmException e) {
-      Exceptions.throwUncheckedException(e);
-    }
-  }
+  private final int type;
 
-  public UuidBuilder(final String namespace) {
-    this();
-    append(namespace);
+  UuidBuilder(final int type, final MessageDigest digester) {
+    this.type = type;
+    this.digester = digester;
   }
 
   public UuidBuilder append(final byte[] bytes) {
@@ -56,14 +45,14 @@ public class UuidBuilder {
     return Identifier.newIdentifier(string);
   }
 
-  public UUID newUuid() {
+  public UUID build() {
     final byte[] digest = this.digester.digest();
-    return Uuid.toUuid(5, digest);
+    return UuidNamespace.toUuid(this.type, digest);
   }
 
   @Override
   public String toString() {
-    final UUID uuid = newUuid();
+    final UUID uuid = build();
     return uuid.toString();
   }
 }
