@@ -1786,31 +1786,33 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (recordDefinition.hasGeometryField()) {
       final EnableCheck editableEnableCheck = this::isEditable;
 
+      initFlipMenu(editMenu, editableEnableCheck);
       final DataType geometryDataType = recordDefinition.getGeometryField().getDataType();
-      if (geometryDataType == GeometryDataTypes.LINE_STRING
-        || geometryDataType == GeometryDataTypes.MULTI_LINE_STRING) {
-        final Consumer<Record> reverseGeometryConsumer = DirectionalFields::reverseGeometryRecord;
-        if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
-          editMenu.addMenuItemRecord("geometry", LayerRecordForm.FLIP_RECORD_NAME,
-            LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck, DirectionalFields::reverseRecord);
-
-          // editMenu.addMenuItemRecord("geometry",
-          // LayerRecordForm.FLIP_LINE_ORIENTATION_NAME,
-          // LayerRecordForm.FLIP_LINE_ORIENTATION_ICON, editableEnableCheck,
-          // reverseGeometryConsumer);
-
-          final Consumer<Record> reverseFieldValues = DirectionalFields::reverseFieldValuesRecord;
-          editMenu.addMenuItemRecord("geometry", LayerRecordForm.FLIP_FIELDS_NAME,
-            LayerRecordForm.FLIP_FIELDS_ICON, editableEnableCheck, reverseFieldValues);
-        } else {
-          editMenu.addMenuItemRecord("geometry", "Flip Geometry", "flip_line", editableEnableCheck,
-            reverseGeometryConsumer);
-        }
-      }
       if (!(geometryDataType == GeometryDataTypes.POINT
         || geometryDataType == GeometryDataTypes.MULTI_POINT)) {
         editMenu.addMenuItemRecords("geometry", "Generalize Vertices", "generalize_line",
           editableEnableCheck, RecordLayerActions::generalize);
+      }
+    }
+  }
+
+  protected void initFlipMenu(final EditRecordMenu editMenu,
+    final EnableCheck editableEnableCheck) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final DataType geometryDataType = recordDefinition.getGeometryField().getDataType();
+    if (geometryDataType == GeometryDataTypes.LINE_STRING
+      || geometryDataType == GeometryDataTypes.MULTI_LINE_STRING) {
+      final Consumer<Record> reverseGeometryConsumer = DirectionalFields::reverseGeometryRecord;
+      if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
+        editMenu.addMenuItemRecord("geometry", LayerRecordForm.FLIP_RECORD_NAME,
+          LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck, DirectionalFields::reverseRecord);
+
+        final Consumer<Record> reverseFieldValues = DirectionalFields::reverseFieldValuesRecord;
+        editMenu.addMenuItemRecord("geometry", LayerRecordForm.FLIP_FIELDS_NAME,
+          LayerRecordForm.FLIP_FIELDS_ICON, editableEnableCheck, reverseFieldValues);
+      } else {
+        editMenu.addMenuItemRecord("geometry", "Flip Geometry", "flip_line", editableEnableCheck,
+          reverseGeometryConsumer);
       }
     }
   }

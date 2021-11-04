@@ -134,7 +134,7 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     property.reverseFieldValuesAndGeometry(record);
   }
 
-  public static void setReverseFieldPair(final Record record, MapEx newValues,
+  public static void setSwapFieldValues(final Record record, MapEx newValues,
     final String fieldName1, final String fieldName2) {
     newValues.addFieldValue(fieldName1, record, fieldName2)
       .addFieldValue(fieldName2, record, fieldName1);

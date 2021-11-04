@@ -326,6 +326,21 @@ public class ProjectFrame extends BaseFrame {
     RunnableAction.addAction(component, actionKey, action, keyStrokes);
   }
 
+  /**
+   * Add an Alt-[Key] action to the panel and a [Key] action to the map panel.
+   *
+   * @param actionKey
+   * @param action
+   * @param keyCode
+   */
+  public void addActionAltAndMap(final String actionKey, final Runnable action, final int keyCode) {
+    final JRootPane component = getRootPane();
+    RunnableAction.addAction(component, actionKey, action,
+      KeyStroke.getKeyStroke(keyCode, KeyEvent.ALT_DOWN_MASK));
+    MapPanel mapPanel = getMapPanel();
+    RunnableAction.addAction(mapPanel, actionKey, action, KeyStroke.getKeyStroke(keyCode, 0));
+  }
+
   public void addBottomTab(final ProjectFramePanel panel, final MapEx config) {
     if (SwingUtilities.isEventDispatchThread()) {
       final TabbedPane tabs = getBottomTabs();
@@ -732,7 +747,8 @@ public class ProjectFrame extends BaseFrame {
   }
 
   protected MapPanel newMapPanel() {
-    final MapPanel mapPanel = new MapPanel(this, this.preferences, this.project);
+    this.mapPanel = new MapPanel(this, this.preferences, this.project);
+    mapPanel.initUi();
     if (OS.isMac()) {
       // Make border on right/bottom to match the JTabbedPane UI on a mac
       mapPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 9, 9));

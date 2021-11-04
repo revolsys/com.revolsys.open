@@ -53,7 +53,6 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.Dialogs;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.SwingUtil;
-import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.events.KeyEvents;
 import com.revolsys.swing.map.MapPanel;
 import com.revolsys.swing.map.ProjectFrame;
@@ -682,21 +681,9 @@ public class EditRecordGeometryOverlay extends AbstractOverlay
       this::deleteSelectedRecords, //
       KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_DOWN_MASK));
 
-    {
-      String actionKey = "Generalize Selected Records";
-      Runnable action = () -> generalizeRecords(true);
-      int key = KeyEvent.VK_G;
-      RunnableAction.addAction(getMap(), actionKey, action, KeyStroke.getKeyStroke(key, 0));
-      frame.addAction(actionKey, action, KeyStroke.getKeyStroke(key, InputEvent.ALT_DOWN_MASK));
-    }
-    {
-      // M will only work on map
-      String actionKey = "Merge Selected Records";
-      Runnable action = () -> mergeRecords(true);
-      int key = KeyEvent.VK_M;
-      RunnableAction.addAction(getMap(), actionKey, action, KeyStroke.getKeyStroke(key, 0));
-      frame.addAction(actionKey, action, KeyStroke.getKeyStroke(key, InputEvent.ALT_DOWN_MASK));
-    }
+    frame.addActionAltAndMap("Generalize Selected Records", () -> generalizeRecords(true),
+      KeyEvent.VK_G);
+    frame.addActionAltAndMap("Merge Selected Records", () -> mergeRecords(true), KeyEvent.VK_M);
   }
 
   protected boolean isEditable(final AbstractRecordLayer recordLayer) {
