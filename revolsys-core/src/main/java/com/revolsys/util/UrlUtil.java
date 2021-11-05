@@ -105,9 +105,13 @@ public final class UrlUtil {
   }
 
   public static URI appendPath(final URI uri, final String path) {
-    final String originalPath = uri.getPath();
-    final String newPath = appendPath(originalPath, path);
-    return uri.resolve(newPath);
+    if (path == null || path.length() == 0) {
+      return uri;
+    } else {
+      final String originalPath = uri.getPath();
+      final String newPath = appendPath(originalPath, path);
+      return uri.resolve(newPath);
+    }
   }
 
   public static void appendQuery(final StringBuilder query,
