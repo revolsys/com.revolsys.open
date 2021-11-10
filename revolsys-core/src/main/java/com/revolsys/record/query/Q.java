@@ -179,7 +179,8 @@ public class Q {
         Condition condition;
         if (value == null) {
           if (fieldKey instanceof FieldDefinition) {
-            condition = isNull((FieldDefinition)fieldKey);
+            final FieldDefinition field = (FieldDefinition)fieldKey;
+            condition = isNull(field);
           } else {
             condition = isNull(fieldKey.toString());
           }
@@ -286,6 +287,10 @@ public class Q {
   public static IsNotNull isNotNull(final FieldDefinition fieldDefinition) {
     final String name = fieldDefinition.getName();
     return isNotNull(name);
+  }
+
+  public static IsNotNull isNotNull(final QueryValue queryValue) {
+    return new IsNotNull(queryValue);
   }
 
   public static IsNotNull isNotNull(final String name) {

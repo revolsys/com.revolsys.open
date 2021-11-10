@@ -12,6 +12,7 @@ import javax.swing.JComponent;
 
 import org.jeometry.common.compare.CompareUtil;
 import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.refresh.Refreshable;
 
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
@@ -20,7 +21,8 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
 
-public interface CodeTable extends Emptyable, Cloneable, Comparator<Object>, BaseCloseable {
+public interface CodeTable
+  extends Emptyable, Cloneable, Comparator<Object>, BaseCloseable, Refreshable {
   static CodeTable newCodeTable(final Map<String, ? extends Object> config) {
     if (config.containsKey("valueFieldNames")) {
       return new MultiValueCodeTableProperty(config);
@@ -194,9 +196,11 @@ public interface CodeTable extends Emptyable, Cloneable, Comparator<Object>, Bas
     return false;
   }
 
+  @Override
   default void refresh() {
   }
 
+  @Override
   default void refreshIfNeeded() {
     synchronized (this) {
       if (!isLoaded() && !isLoading()) {

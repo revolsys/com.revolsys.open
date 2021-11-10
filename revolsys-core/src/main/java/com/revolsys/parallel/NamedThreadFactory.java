@@ -21,10 +21,10 @@ public class NamedThreadFactory implements ThreadFactory {
   private final AtomicInteger threadNumber = new AtomicInteger(1);
 
   public NamedThreadFactory() {
-    this(Thread.NORM_PRIORITY);
+    this(Thread.NORM_PRIORITY, null);
   }
 
-  public NamedThreadFactory(final int priority) {
+  public NamedThreadFactory(final int priority, final String namePrefix) {
     this.priority = priority;
     final SecurityManager securityManager = System.getSecurityManager();
     if (securityManager == null) {
@@ -33,7 +33,11 @@ public class NamedThreadFactory implements ThreadFactory {
     } else {
       this.parentGroup = securityManager.getThreadGroup();
     }
-    this.namePrefix = "pool-" + poolNumber.getAndIncrement();
+    if (namePrefix == null) {
+      this.namePrefix = "pool-" + poolNumber.getAndIncrement();
+    } else {
+      this.namePrefix = namePrefix;
+    }
   }
 
   public String getNamePrefix() {

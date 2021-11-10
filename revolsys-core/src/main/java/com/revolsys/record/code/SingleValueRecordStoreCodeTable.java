@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.identifier.ListIdentifier;
@@ -15,8 +16,6 @@ import org.jeometry.common.io.PathName;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.record.Record;
-import com.revolsys.record.comparator.RecordFieldComparator;
-import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.query.And;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
@@ -25,7 +24,6 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
-import com.revolsys.util.count.CategoryLabelCountMap;
 
 public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTable
   implements RecordDefinitionProxy {
@@ -76,7 +74,12 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
   }
 
   @Override
-  public void addValue(final Record code) {
+  public final void addValue(final Record code) {
+    addValueDo(code);
+    clearCaches();
+  }
+
+  protected void addValueDo(final Record code) {
     final String idFieldName = getIdFieldName();
     final Identifier id = code.getIdentifier(idFieldName);
     if (id == null) {
@@ -96,15 +99,12 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
     }
   }
 
-  protected void addValues(final Iterable<Record> allCodes) {
-    for (final Record code : allCodes) {
-      addValue(code);
-    }
-  }
-
   @Override
   protected int calculateValueFieldLength() {
     return this.recordDefinition.getFieldLength(this.valueFieldName);
+  }
+
+  protected void clearCaches() {
   }
 
   @Override
@@ -113,6 +113,13 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
     clone.recordDefinition = null;
     clone.fieldNameAliases = new ArrayList<>(this.fieldNameAliases);
     return clone;
+  }
+
+  public void forEachRecord(final Consumer<Record> action) {
+    final RecordStore recordStore = this.recordStore;
+    if (recordStore != null) {
+      newQuery().forEachRecord(action);
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -251,20 +258,8 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
         this.loading = true;
         try {
           if (this.recordStore != null) {
-            final RecordDefinition recordDefinition = this.recordStore
-              .getRecordDefinition(this.typePath);
-            final Query query = new Query(recordDefinition);
-            query.addOrderBy(this.orderBy);
-            try (
-              RecordReader reader = this.recordStore.getRecords(query)) {
-              final List<Record> codes = reader.toList();
-              final CategoryLabelCountMap statistics = this.recordStore.getStatistics();
-              if (statistics != null) {
-                statistics.getLabelCountMap("query").addCount(this.typePath, -codes.size());
-              }
-              Collections.sort(codes, new RecordFieldComparator(this.orderBy));
-              addValues(codes);
-            }
+            newQuery()//
+              .forEachRecord(this::addValueDo);
           }
         } finally {
           this.loading = false;
@@ -288,31 +283,20 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
       loadAll();
       id = getIdentifier(value, false);
     } else {
-      final Query query = new Query(this.typePath);
+      final Query query = this.recordStore.newQuery(this.typePath);
       final And and = new And();
       if (value == null) {
         and.and(Q.isNull(this.valueFieldName));
       } else {
-        final FieldDefinition fieldDefinition = this.recordDefinition.getField(this.valueFieldName);
-        and.and(Q.equal(fieldDefinition, value));
+        final FieldDefinition idField = this.recordDefinition.getField(this.idFieldName);
+        final FieldDefinition valueField = this.recordDefinition.getField(this.valueFieldName);
+        and.and(Q.or(Q.equal(idField, value), Q.equal(valueField, value)));
       }
       query.setWhereCondition(and);
-      final RecordReader reader = this.recordStore.getRecords(query);
-      try {
-        final List<Record> codes = reader.toList();
-        if (codes.size() > 0) {
-          final CategoryLabelCountMap statistics = this.recordStore.getStatistics();
-          if (statistics != null) {
-            statistics.getLabelCountMap("query").addCount(this.typePath, -codes.size());
-          }
+      query.forEachRecord(this::addValue);
 
-          addValues(codes);
-        }
-        id = getIdByValue(value);
-        Property.firePropertyChange(this, "valuesChanged", false, true);
-      } finally {
-        reader.close();
-      }
+      id = getIdByValue(value);
+      Property.firePropertyChange(this, "valuesChanged", false, true);
     }
     if (createId && id == null) {
       return newIdentifier(value);
@@ -379,7 +363,16 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
   }
 
   @Override
+  public Query newQuery() {
+    return this.recordStore//
+      .newQuery(this.typePath)
+      .select(this.idFieldName, this.valueFieldName)
+      .addOrderBy(this.orderBy);
+  }
+
+  @Override
   public synchronized void refresh() {
+    this.clearCaches();
     super.refresh();
     if (isLoadAll()) {
       this.loaded = false;

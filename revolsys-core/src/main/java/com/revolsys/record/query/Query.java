@@ -474,6 +474,13 @@ public class Query extends BaseObjectWithProperties
     return getRecordDefinition().getRecordStore().deleteRecords(query);
   }
 
+  public void forEachRecord(final Consumer<? super Record> action) {
+    try (
+      RecordReader reader = getRecordReader()) {
+      reader.forEach(action);
+    }
+  }
+
   @SuppressWarnings("unchecked")
   public <R extends MapEx> void forEachRecord(final Iterable<R> records,
     final Consumer<? super R> consumer) {
