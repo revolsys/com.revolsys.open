@@ -109,6 +109,35 @@ public interface JsonObject extends MapEx, JsonType {
     return this;
   }
 
+  default JsonObject addFieldValues(final JsonObject source, final DataType dataType,
+    final String... fieldNames) {
+    for (final String fieldName : fieldNames) {
+      final Object value = source.getValue(fieldName, dataType);
+      if (value == null) {
+        if (source.containsKey(fieldName)) {
+          removeValue(fieldName);
+        }
+      } else {
+        addValue(fieldName, value);
+      }
+    }
+    return this;
+  }
+
+  default JsonObject addFieldValues(final JsonObject source, final String... fieldNames) {
+    for (final String fieldName : fieldNames) {
+      final Object value = source.getValue(fieldName);
+      if (value == null) {
+        if (source.containsKey(fieldName)) {
+          removeValue(fieldName);
+        }
+      } else {
+        addValue(fieldName, value);
+      }
+    }
+    return this;
+  }
+
   default JsonObject addNotEmpty(final String key, final Object value) {
     if (Property.hasValue(value)) {
       addValue(key, value);
