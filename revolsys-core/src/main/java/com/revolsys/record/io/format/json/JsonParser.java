@@ -144,7 +144,11 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
 
   @SuppressWarnings("unchecked")
   public static <V> V read(final String in) {
-    return (V)read(new StringReader(in));
+    if (in == null) {
+      return (V)JsonObject.hash();
+    } else {
+      return (V)read(new StringReader(in));
+    }
   }
 
   private int currentCharacter;
