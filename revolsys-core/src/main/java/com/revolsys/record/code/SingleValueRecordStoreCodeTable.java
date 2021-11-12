@@ -293,7 +293,7 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
         and.and(Q.or(Q.equal(idField, value), Q.equal(valueField, value)));
       }
       query.setWhereCondition(and);
-      query.forEachRecord(this::addValue);
+      query.forEachRecord(this::addValueDo);
 
       id = getIdByValue(value);
       Property.firePropertyChange(this, "valuesChanged", false, true);

@@ -196,6 +196,10 @@ public interface CodeTable
     return false;
   }
 
+  default void loadAll() {
+
+  }
+
   @Override
   default void refresh() {
   }

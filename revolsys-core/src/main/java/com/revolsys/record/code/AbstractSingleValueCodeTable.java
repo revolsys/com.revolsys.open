@@ -89,10 +89,16 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
   protected Identifier getIdByValue(Object value) {
     value = processValue(value);
     Identifier id = this.valueIdCache.get(value);
-    if (id == null) {
-      final Object normalizedValue = getNormalizedValue(value);
-      id = this.valueIdCache.get(normalizedValue);
+    if (id != null) {
+      return id;
     }
+    id = this.stringIdMap.get(value.toString());
+    if (id != null) {
+      return id;
+    }
+
+    final Object normalizedValue = getNormalizedValue(value);
+    id = this.valueIdCache.get(normalizedValue);
     return id;
   }
 
@@ -122,6 +128,9 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
   }
 
   public Identifier getIdentifier(Object value, final boolean loadMissing) {
+    if (value == null) {
+      return null;
+    }
     refreshIfNeeded();
     final Identifier identifier = super.getIdentifierInternal(value);
     if (identifier != null) {
