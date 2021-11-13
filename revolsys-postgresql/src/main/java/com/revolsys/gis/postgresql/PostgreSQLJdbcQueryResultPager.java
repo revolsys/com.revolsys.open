@@ -8,13 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import com.revolsys.jdbc.JdbcConnection;
 import com.revolsys.jdbc.io.JdbcQueryResultPager;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.Record;
 import com.revolsys.record.query.Query;
-import com.revolsys.transaction.Propagation;
-import com.revolsys.transaction.Transaction;
 
 public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
 
@@ -38,25 +35,19 @@ public class PostgreSQLJdbcQueryResultPager extends JdbcQueryResultPager {
         final int startRowNum = (pageNumber - 1) * pageSize;
         sql = getSql() + " OFFSET " + startRowNum + " LIMIT " + pageSize;
 
-        final JdbcRecordStore recordStore = getRecordStore();
         try (
-          Transaction transaction = recordStore.newTransaction(Propagation.REQUIRED);
-          JdbcConnection connection = recordStore.getJdbcConnection()) {
-
-          try (
-            final PreparedStatement statement = connection.prepareStatement(sql);
-            final ResultSet resultSet = recordStore.getResultSet(statement, getQuery());) {
-            if (resultSet.next()) {
-              int i = 0;
-              do {
-                final Record record = getNextRecord(resultSet);
-                action.accept(record);
-                i++;
-              } while (resultSet.next() && i < pageSize);
-            }
-          } catch (final SQLException e) {
-            throw connection.getException("updateResults", sql, e);
+          final PreparedStatement statement = this.connection.prepareStatement(sql);
+          final ResultSet resultSet = createResultSet(statement);) {
+          if (resultSet.next()) {
+            int i = 0;
+            do {
+              final Record record = getNextRecord(resultSet);
+              action.accept(record);
+              i++;
+            } while (resultSet.next() && i < pageSize);
           }
+        } catch (final SQLException e) {
+          throw this.connection.getException("updateResults", sql, e);
         }
       }
 
