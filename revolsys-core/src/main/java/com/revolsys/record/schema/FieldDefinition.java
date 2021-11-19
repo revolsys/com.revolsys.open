@@ -24,6 +24,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.operation.valid.IsValidOp;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
@@ -900,6 +901,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
     }
   }
 
+  @Override
   public <V> V toFieldValueException(final RecordState state, final Object value) {
     if (value == null) {
       return null;
