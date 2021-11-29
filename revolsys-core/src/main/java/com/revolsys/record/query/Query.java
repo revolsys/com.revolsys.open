@@ -435,6 +435,10 @@ public class Query extends BaseObjectWithProperties
     this.orderBy.clear();
   }
 
+  public void clearSelect() {
+    this.selectExpressions.clear();
+  }
+
   @Override
   public Query clone() {
     final Query clone = (Query)super.clone();

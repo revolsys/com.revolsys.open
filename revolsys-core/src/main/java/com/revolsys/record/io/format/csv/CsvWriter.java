@@ -16,6 +16,10 @@ public class CsvWriter implements BaseCloseable {
 
   private String newLine = "\n";
 
+  private int maxFieldLength = Integer.MAX_VALUE;
+
+  private boolean useQuotes;
+
   /**
    * Constructs CSVReader with supplied separator and quote char.
    *
@@ -48,8 +52,16 @@ public class CsvWriter implements BaseCloseable {
     return this.newLine;
   }
 
+  public void setMaxFieldLength(final int maxFieldLength) {
+    this.maxFieldLength = maxFieldLength;
+  }
+
   public void setNewLine(final String newLine) {
     this.newLine = newLine;
+  }
+
+  public void setUseQuotes(final boolean useQuotes) {
+    this.useQuotes = useQuotes;
   }
 
   public void write(final Collection<? extends Object> values) {
@@ -62,15 +74,18 @@ public class CsvWriter implements BaseCloseable {
         final Object value = values[i];
         if (value != null) {
           final String string = value.toString();
-          this.out.write('"');
-          for (int j = 0; j < string.length(); j++) {
-            final char c = string.charAt(j);
-            if (c == '"') {
-              this.out.write('"');
+          final int length = string.length();
+          if (length > 0) {
+            this.out.write('"');
+            for (int j = 0; j < length; j++) {
+              final char c = string.charAt(j);
+              if (c == '"') {
+                this.out.write('"');
+              }
+              this.out.write(c);
             }
-            this.out.write(c);
+            this.out.write('"');
           }
-          this.out.write('"');
         }
         if (i < values.length - 1) {
           this.out.write(',');
