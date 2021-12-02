@@ -24,16 +24,12 @@ public class TableRecordStoreQuery extends Query {
     this.connection = connection;
   }
 
+  @Override
   public int deleteRecords() {
     try (
       Transaction transaction = this.connection.newTransaction(TransactionOptions.REQUIRED)) {
       return this.recordStore.getRecordStore().deleteRecords(this);
     }
-  }
-
-  @Override
-  public int deleteRecords(final TableRecordStoreConnection connection, final Query query) {
-    return this.recordStore.deleteRecords(this.connection, this);
   }
 
   @Override

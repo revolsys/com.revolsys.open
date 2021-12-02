@@ -20,16 +20,12 @@ public class RecordStoreQuery extends Query {
     this.recordStore = recordStore;
   }
 
+  @Override
   public int deleteRecords() {
     try (
       Transaction transaction = this.recordStore.newTransaction(TransactionOptions.REQUIRED)) {
       return this.recordStore.deleteRecords(this);
     }
-  }
-
-  @Override
-  public int deleteRecords(final TableRecordStoreConnection connection, final Query query) {
-    return this.recordStore.deleteRecords(this);
   }
 
   @SuppressWarnings("unchecked")

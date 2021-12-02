@@ -37,7 +37,6 @@ import com.revolsys.record.schema.LockMode;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
-import com.revolsys.record.schema.TableRecordStoreConnection;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.transaction.TransactionOptions;
 import com.revolsys.transaction.Transactionable;
@@ -470,8 +469,8 @@ public class Query extends BaseObjectWithProperties
     return clone;
   }
 
-  public int deleteRecords(final TableRecordStoreConnection connection, final Query query) {
-    return getRecordDefinition().getRecordStore().deleteRecords(query);
+  public int deleteRecords() {
+    return getRecordDefinition().getRecordStore().deleteRecords(this);
   }
 
   public void forEachRecord(final Consumer<? super Record> action) {
