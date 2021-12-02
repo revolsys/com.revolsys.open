@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import org.jeometry.common.compare.CompareUtil;
@@ -307,6 +308,10 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
     } else {
       return string.toUpperCase();
     }
+  }
+
+  default UUID getUUID(final CharSequence name) {
+    return getValue(name, DataTypes.UUID);
   }
 
   /**

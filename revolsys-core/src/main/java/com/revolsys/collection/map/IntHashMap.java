@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.AbstractCollection;
 import java.util.AbstractSet;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
@@ -50,6 +51,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
   }
 
   private class EntrySet extends AbstractSet<IntEntry<T>> {
+
     /**
      * @see java.util.AbstractCollection#clear()
      */
@@ -500,6 +502,11 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
     }
   }
 
+  public IntHashMap<T> addValue(final int key, final T value) {
+    put(key, value);
+    return this;
+  }
+
   // These methods are used when serializing HashSets
   int capacity() {
     return this.table.length;
@@ -512,9 +519,7 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
   public void clear() {
     this.modCount++;
     final IntEntry<T> tab[] = this.table;
-    for (int i = 0; i < tab.length; i++) {
-      tab[i] = null;
-    }
+    Arrays.fill(tab, null);
     this.size = 0;
   }
 
@@ -543,11 +548,11 @@ public class IntHashMap<T> implements Map<Integer, T>, Cloneable, Serializable {
   }
 
   /**
-   * Returns <tt>true</tt> if this map contains a mapping for the specified key.
-   *
-   * @param key The key whose presence in this map is to be tested
-   * @return <tt>true</tt> if this map contains a mapping for the specified key.
-   */
+  * Returns <tt>true</tt> if this map contains a mapping for the specified key.
+  *
+  * @param key The key whose presence in this map is to be tested
+  * @return <tt>true</tt> if this map contains a mapping for the specified key.
+  */
   public boolean containsKey(final int key) {
     final int i = indexFor(key, this.table.length);
     IntEntry<T> e = this.table[i];
