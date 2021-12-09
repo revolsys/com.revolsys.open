@@ -175,6 +175,10 @@ public class AbstractTableRecordStore {
     }
   }
 
+  protected void addSelect(final Query query, final String selectItem) {
+    query.select(selectItem);
+  }
+
   protected Condition alterCondition(final HttpServletRequest request,
     final TableRecordStoreConnection connection, final Query query, final Condition condition) {
     return condition;
@@ -405,7 +409,15 @@ public class AbstractTableRecordStore {
     } catch (final Exception e) {
     }
 
-    final Query query = newQuery(connection).selectCsv(select).setOffset(skip).setLimit(top);
+    final Query query = newQuery(connection).setOffset(skip).setLimit(top);
+
+    if (Property.hasValue(select)) {
+      for (String selectItem : select.split(",")) {
+        selectItem = selectItem.trim();
+        addSelect(query, selectItem);
+      }
+    }
+
     Condition filterCondition = newODataFilter(filter);
     if (filterCondition != null) {
       filterCondition = alterCondition(request, connection, query, filterCondition);
