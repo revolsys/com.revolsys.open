@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
@@ -145,6 +146,8 @@ public interface JsonList extends List<Object>, JsonType {
     }
 
   };
+
+  static Supplier<JsonList> ARRAY_SUPPLIER = () -> new JsonListArray();
 
   static JsonList array() {
     return new JsonListArray();

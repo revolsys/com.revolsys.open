@@ -14,6 +14,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.record.Record;
 import com.revolsys.record.Records;
 import com.revolsys.record.filter.RecordEqualsFilter;
@@ -25,6 +26,11 @@ public class RecordSpatialIndex<R extends Record> implements SpatialIndex<R> {
     final GeometryFactory geometryFactory) {
     final QuadTree<R2> spatialIndex = new QuadTree<>(geometryFactory);
     return new RecordSpatialIndex<>(spatialIndex);
+  }
+
+  public static <R2 extends Record> RecordSpatialIndex<R2> quadTree(
+    final GeometryFactoryProxy geometryFactory) {
+    return quadTree(geometryFactory.getGeometryFactory());
   }
 
   private final SpatialIndex<R> spatialIndex;
