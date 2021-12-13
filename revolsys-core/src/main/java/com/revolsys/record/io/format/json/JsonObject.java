@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.exception.Exceptions;
@@ -47,6 +48,8 @@ public interface JsonObject extends MapEx, JsonType {
       return "{}";
     }
   };
+
+  static Supplier<JsonObject> HASH_SUPPLIER = () -> hash();
 
   static JsonObject hash() {
     return new JsonObjectHash();

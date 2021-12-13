@@ -112,6 +112,24 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
     return CompareUtil.compare(value1, value2, nullsFirst);
   }
 
+  default <V> V ensureValue(final String key, final DataType dataType, final Supplier<V> supplier) {
+    V value = getValue(key, dataType);
+    if (value == null) {
+      value = supplier.get();
+      addValue(key, value);
+    }
+    return value;
+  }
+
+  default <V> V ensureValue(final String key, final Supplier<V> supplier) {
+    V value = getValue(key);
+    if (value == null) {
+      value = supplier.get();
+      addValue(key, value);
+    }
+    return value;
+  }
+
   @Override
   @SuppressWarnings("unchecked")
   default boolean equals(final Object object2,

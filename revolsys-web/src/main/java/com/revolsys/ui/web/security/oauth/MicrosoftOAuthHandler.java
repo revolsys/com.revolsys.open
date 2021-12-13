@@ -66,6 +66,7 @@ public class MicrosoftOAuthHandler {
       session.setAttribute("bearerToken", token);
       final Principal principal = this.principalFactory.apply(token);
       session.setAttribute("principal", principal);
+    } catch (final IllegalStateException e) {
     } catch (final Exception e) {
       Logs.error(this, "Login Error", e);
     }
