@@ -245,7 +245,7 @@
           <dependency>
             <groupId>org.apache.maven.doxia</groupId>
             <artifactId>doxia-module-markdown</artifactId>
-            <version>1.10</version>
+            <version>1.11.1</version>
           </dependency>
           <dependency>
             <groupId>lt.velykis.maven.skins</groupId>
@@ -387,7 +387,7 @@
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpcore</artifactId>
-        <version>4.4.14</version>
+        <version>4.4.15</version>
         <scope>compile</scope>
         <exclusions>
           <exclusion>
@@ -620,18 +620,18 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <ch.qos.logback.version>1.2.5</ch.qos.logback.version>
-    <com.fasterxml.jackson.version>2.12.5</com.fasterxml.jackson.version>
+    <ch.qos.logback.version>1.2.7</ch.qos.logback.version>
+    <com.fasterxml.jackson.version>2.13.0</com.fasterxml.jackson.version>
     <org.apache.pdfbox.version>2.0.24</org.apache.pdfbox.version>
     <org.apache.xmlgraphics.batik.version>1.14</org.apache.xmlgraphics.batik.version>
     <org.apache.xmlgraphics.commons.version>2.6</org.apache.xmlgraphics.commons.version>
-    <org.docx4j.version>11.2.9</org.docx4j.version>
+    <org.docx4j.version>11.3.2</org.docx4j.version>
     <org.gdal.version>2.4.0</org.gdal.version>
-    <org.graalvm.version>21.2.0</org.graalvm.version>
+    <org.graalvm.version>21.3.0</org.graalvm.version>
     <org.jeometry.version>MAIN-SNAPSHOT</org.jeometry.version>
     <org.slf4j.version>1.7.32</org.slf4j.version>
-    <org.springframework.version>5.3.9</org.springframework.version>
-    <org.springframework.security.version>5.5.2</org.springframework.security.version>
+    <org.springframework.version>5.3.13</org.springframework.version>
+    <org.springframework.security.version>5.6.0</org.springframework.security.version>
     <gpg.skip>true</gpg.skip>
     <github.global.server>github</github.global.server>
     <skipTests>true</skipTests>

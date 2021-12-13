@@ -11,6 +11,7 @@
     <ignoreVersion type="regex">.*-MTEC.*</ignoreVersion>
     <ignoreVersion type="regex">.*-rc.*</ignoreVersion>
     <ignoreVersion type="regex">.*-RC.*</ignoreVersion>
+   <ignoreVersion type="regex">.*-preview.*</ignoreVersion>
 	</ignoreVersions>
 	<rules>
 		<rule groupId="org.jeometry" comparisonMethod="maven">
