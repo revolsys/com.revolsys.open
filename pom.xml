@@ -99,9 +99,9 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>pl.project13.maven</groupId>
-        <artifactId>git-commit-id-plugin</artifactId>
-        <version>4.9.10</version>
+       <groupId>io.github.git-commit-id</groupId>
+        <artifactId>git-commit-id-maven-plugin</artifactId>
+        <version>5.0.0</version>
         <executions>
           <execution>
             <id>get-the-git-infos</id>
@@ -620,7 +620,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <ch.qos.logback.version>1.2.7</ch.qos.logback.version>
+    <ch.qos.logback.version>1.2.8</ch.qos.logback.version>
     <com.fasterxml.jackson.version>2.13.0</com.fasterxml.jackson.version>
     <org.apache.pdfbox.version>2.0.24</org.apache.pdfbox.version>
     <org.apache.xmlgraphics.batik.version>1.14</org.apache.xmlgraphics.batik.version>
