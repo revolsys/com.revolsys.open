@@ -22,8 +22,10 @@ public class JdbcBigIntegerFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public JdbcBigIntegerFieldDefinition clone() {
-    return new JdbcBigIntegerFieldDefinition(getDbName(), getName(), getSqlType(), getLength(),
-      isRequired(), getDescription(), getProperties());
+    final JdbcBigIntegerFieldDefinition clone = new JdbcBigIntegerFieldDefinition(getDbName(),
+      getName(), getSqlType(), getLength(), isRequired(), getDescription(), getProperties());
+    postClone(clone);
+    return clone;
   }
 
   @Override

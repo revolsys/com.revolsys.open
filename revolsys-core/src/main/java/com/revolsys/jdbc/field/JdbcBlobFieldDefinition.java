@@ -24,6 +24,14 @@ public class JdbcBlobFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
+  public JdbcBlobFieldDefinition clone() {
+    final JdbcBlobFieldDefinition clone = new JdbcBlobFieldDefinition(getDbName(), getName(),
+      getSqlType(), getLength(), isRequired(), getDescription(), getProperties());
+    postClone(clone);
+    return clone;
+  }
+
+  @Override
   public Object getValueFromResultSet(final RecordDefinition recordDefinition,
     final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
     throws SQLException {

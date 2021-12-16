@@ -18,8 +18,10 @@ public class JdbcDecimalFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public JdbcDecimalFieldDefinition clone() {
-    return new JdbcDecimalFieldDefinition(getDbName(), getName(), getSqlType(), getLength(),
-      getScale(), isRequired(), getDescription(), getProperties());
+    final JdbcDecimalFieldDefinition clone = new JdbcDecimalFieldDefinition(getDbName(), getName(),
+      getSqlType(), getLength(), getScale(), isRequired(), getDescription(), getProperties());
+    postClone(clone);
+    return clone;
   }
 
   @Override

@@ -28,6 +28,14 @@ public class OracleJdbcClobFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
+  public OracleJdbcClobFieldDefinition clone() {
+    final OracleJdbcClobFieldDefinition clone = new OracleJdbcClobFieldDefinition(getDbName(),
+      getName(), getSqlType(), isRequired(), getDescription());
+    postClone(clone);
+    return clone;
+  }
+
+  @Override
   public Object getValueFromResultSet(final RecordDefinition recordDefinition,
     final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
     throws SQLException {

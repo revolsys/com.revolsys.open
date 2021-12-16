@@ -18,8 +18,10 @@ public class JdbcShortFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public JdbcShortFieldDefinition clone() {
-    return new JdbcShortFieldDefinition(getDbName(), getName(), getSqlType(), isRequired(),
-      getDescription(), getProperties());
+    final JdbcShortFieldDefinition clone = new JdbcShortFieldDefinition(getDbName(), getName(),
+      getSqlType(), isRequired(), getDescription(), getProperties());
+    postClone(clone);
+    return clone;
   }
 
   @Override

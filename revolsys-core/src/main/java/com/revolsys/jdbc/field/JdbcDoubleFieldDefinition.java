@@ -18,8 +18,10 @@ public class JdbcDoubleFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public JdbcDoubleFieldDefinition clone() {
-    return new JdbcDoubleFieldDefinition(getDbName(), getName(), getSqlType(), isRequired(),
-      getDescription(), getProperties());
+    final JdbcDoubleFieldDefinition clone = new JdbcDoubleFieldDefinition(getDbName(), getName(),
+      getSqlType(), isRequired(), getDescription(), getProperties());
+    postClone(clone);
+    return clone;
   }
 
   @Override

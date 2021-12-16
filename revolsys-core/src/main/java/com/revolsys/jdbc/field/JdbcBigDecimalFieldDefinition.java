@@ -16,8 +16,11 @@ public class JdbcBigDecimalFieldDefinition extends JdbcDecimalFieldDefinition {
 
   @Override
   public JdbcBigDecimalFieldDefinition clone() {
-    return new JdbcBigDecimalFieldDefinition(getDbName(), getName(), getSqlType(), getLength(),
-      getScale(), isRequired(), getDescription(), getProperties());
+    final JdbcBigDecimalFieldDefinition clone = new JdbcBigDecimalFieldDefinition(getDbName(),
+      getName(), getSqlType(), getLength(), getScale(), isRequired(), getDescription(),
+      getProperties());
+    postClone(clone);
+    return clone;
   }
 
   @Override

@@ -26,6 +26,13 @@ public class PostgreSQLOidFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
+  public JdbcFieldDefinition clone() {
+    final PostgreSQLOidFieldDefinition clone = new PostgreSQLOidFieldDefinition();
+    postClone(clone);
+    return clone;
+  }
+
+  @Override
   public Object getValueFromResultSet(final RecordDefinition recordDefinition,
     final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
     throws SQLException {

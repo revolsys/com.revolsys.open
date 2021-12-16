@@ -21,8 +21,10 @@ public class JdbcTimestampFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public JdbcTimestampFieldDefinition clone() {
-    return new JdbcTimestampFieldDefinition(getDbName(), getName(), getSqlType(), isRequired(),
-      getDescription(), getProperties());
+    final JdbcTimestampFieldDefinition clone = new JdbcTimestampFieldDefinition(getDbName(),
+      getName(), getSqlType(), isRequired(), getDescription(), getProperties());
+    postClone(clone);
+    return clone;
   }
 
   @Override

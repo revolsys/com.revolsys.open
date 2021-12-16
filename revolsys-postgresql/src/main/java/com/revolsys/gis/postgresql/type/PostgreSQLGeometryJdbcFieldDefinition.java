@@ -34,9 +34,11 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   @Override
   public JdbcFieldDefinition clone() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return new PostgreSQLGeometryJdbcFieldDefinition(getDbName(), getName(), getDataType(),
-      getSqlType(), isRequired(), getDescription(), getProperties(), this.srid, this.axisCount,
-      geometryFactory);
+    final PostgreSQLGeometryJdbcFieldDefinition clone = new PostgreSQLGeometryJdbcFieldDefinition(
+      getDbName(), getName(), getDataType(), getSqlType(), isRequired(), getDescription(),
+      getProperties(), this.srid, this.axisCount, geometryFactory);
+    postClone(clone);
+    return clone;
   }
 
   public Object getInsertUpdateValue(final Object value) throws SQLException {

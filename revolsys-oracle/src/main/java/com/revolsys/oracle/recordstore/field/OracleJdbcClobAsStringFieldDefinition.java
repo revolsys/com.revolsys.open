@@ -15,6 +15,14 @@ public class OracleJdbcClobAsStringFieldDefinition extends OracleJdbcClobFieldDe
   }
 
   @Override
+  public OracleJdbcClobAsStringFieldDefinition clone() {
+    final OracleJdbcClobAsStringFieldDefinition clone = new OracleJdbcClobAsStringFieldDefinition(
+      getDbName(), getName(), getSqlType(), isRequired(), getDescription());
+    postClone(clone);
+    return clone;
+  }
+
+  @Override
   public Object getValueFromResultSet(final RecordDefinition recordDefinition,
     final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
     throws SQLException {

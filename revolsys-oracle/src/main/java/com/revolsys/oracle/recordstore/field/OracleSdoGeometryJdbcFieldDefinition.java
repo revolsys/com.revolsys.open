@@ -157,9 +157,11 @@ public class OracleSdoGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
   @Override
   public OracleSdoGeometryJdbcFieldDefinition clone() {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return new OracleSdoGeometryJdbcFieldDefinition(getDbName(), getName(), getDataType(),
-      getSqlType(), isRequired(), getDescription(), getProperties(), geometryFactory,
-      this.axisCount, this.oracleSrid);
+    final OracleSdoGeometryJdbcFieldDefinition clone = new OracleSdoGeometryJdbcFieldDefinition(
+      getDbName(), getName(), getDataType(), getSqlType(), isRequired(), getDescription(),
+      getProperties(), geometryFactory, this.axisCount, this.oracleSrid);
+    postClone(clone);
+    return clone;
   }
 
   private double[] getDoubleArray(final ResultSet resultSet, final ColumnIndexes indexes)

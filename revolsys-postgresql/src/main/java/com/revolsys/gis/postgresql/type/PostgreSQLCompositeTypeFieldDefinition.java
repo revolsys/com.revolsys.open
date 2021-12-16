@@ -36,6 +36,16 @@ public class PostgreSQLCompositeTypeFieldDefinition extends JdbcFieldDefinition 
   }
 
   @Override
+  public PostgreSQLCompositeTypeFieldDefinition clone() {
+    final PostgreSQLCompositeTypeFieldDefinition clone = new PostgreSQLCompositeTypeFieldDefinition(
+      getDbName(), getName(), (CollectionDataType)getDataType(), this.elementDbDataType,
+      getSqlType(), getLength(), getScale(), isRequired(), getDescription(), this.elementField,
+      getProperties());
+    postClone(clone);
+    return clone;
+  }
+
+  @Override
   public Object getValueFromResultSet(final RecordDefinition recordDefinition,
     final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
     throws SQLException {

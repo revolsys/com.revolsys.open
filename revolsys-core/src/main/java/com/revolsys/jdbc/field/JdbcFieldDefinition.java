@@ -131,6 +131,13 @@ public class JdbcFieldDefinition extends FieldDefinition {
     }
   }
 
+  protected void postClone(final JdbcFieldDefinition clone) {
+    clone.dbName = this.dbName;
+    clone.quoteName = this.quoteName;
+    clone.sqlType = this.sqlType;
+    clone.generated = this.generated;
+  }
+
   public JdbcFieldDefinition setGenerated(final boolean generated) {
     this.generated = generated;
     if (generated) {

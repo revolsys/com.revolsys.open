@@ -36,6 +36,15 @@ public class PostgreSQLArrayFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
+  public PostgreSQLArrayFieldDefinition clone() {
+    final PostgreSQLArrayFieldDefinition clone = new PostgreSQLArrayFieldDefinition(getDbName(),
+      getName(), (CollectionDataType)getDataType(), this.elementDbDataType, getSqlType(),
+      getLength(), getScale(), isRequired(), getDescription(), this.elementField, getProperties());
+    postClone(clone);
+    return clone;
+  }
+
+  @Override
   public Object getValueFromResultSet(final RecordDefinition recordDefinition,
     final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
     throws SQLException {

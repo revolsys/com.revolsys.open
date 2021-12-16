@@ -18,8 +18,10 @@ public class JdbcLongFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public JdbcLongFieldDefinition clone() {
-    return new JdbcLongFieldDefinition(getDbName(), getName(), getSqlType(), isRequired(),
-      getDescription(), getProperties());
+    final JdbcLongFieldDefinition clone = new JdbcLongFieldDefinition(getDbName(), getName(),
+      getSqlType(), isRequired(), getDescription(), getProperties());
+    postClone(clone);
+    return clone;
   }
 
   @Override

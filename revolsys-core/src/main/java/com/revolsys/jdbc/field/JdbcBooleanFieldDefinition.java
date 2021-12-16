@@ -19,8 +19,10 @@ public class JdbcBooleanFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public JdbcBooleanFieldDefinition clone() {
-    return new JdbcBooleanFieldDefinition(getDbName(), getName(), getSqlType(), getLength(),
-      isRequired(), getDescription(), getProperties());
+    final JdbcBooleanFieldDefinition clone = new JdbcBooleanFieldDefinition(getDbName(), getName(),
+      getSqlType(), getLength(), isRequired(), getDescription(), getProperties());
+    postClone(clone);
+    return clone;
   }
 
   @Override

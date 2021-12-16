@@ -18,8 +18,10 @@ public class JdbcFloatFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public JdbcFloatFieldDefinition clone() {
-    return new JdbcFloatFieldDefinition(getDbName(), getName(), getSqlType(), isRequired(),
-      getDescription(), getProperties());
+    final JdbcFloatFieldDefinition clone = new JdbcFloatFieldDefinition(getDbName(), getName(),
+      getSqlType(), isRequired(), getDescription(), getProperties());
+    postClone(clone);
+    return clone;
   }
 
   @Override

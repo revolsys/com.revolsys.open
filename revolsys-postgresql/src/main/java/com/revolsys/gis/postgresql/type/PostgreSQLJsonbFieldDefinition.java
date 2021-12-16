@@ -21,6 +21,15 @@ public class PostgreSQLJsonbFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
+  public JdbcFieldDefinition clone() {
+    final PostgreSQLJsonbFieldDefinition clone = new PostgreSQLJsonbFieldDefinition(getDbName(),
+      getName(), null, getSqlType(), getLength(), getScale(), isRequired(), getDescription(),
+      getProperties());
+    postClone(clone);
+    return clone;
+  }
+
+  @Override
   public Object getValueFromResultSet(final RecordDefinition recordDefinition,
     final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
     throws SQLException {

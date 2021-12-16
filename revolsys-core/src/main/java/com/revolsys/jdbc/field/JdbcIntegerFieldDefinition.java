@@ -18,8 +18,10 @@ public class JdbcIntegerFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public JdbcIntegerFieldDefinition clone() {
-    return new JdbcIntegerFieldDefinition(getDbName(), getName(), getSqlType(), isRequired(),
-      getDescription(), getProperties());
+    final JdbcIntegerFieldDefinition clone = new JdbcIntegerFieldDefinition(getDbName(), getName(),
+      getSqlType(), isRequired(), getDescription(), getProperties());
+    postClone(clone);
+    return clone;
   }
 
   @Override

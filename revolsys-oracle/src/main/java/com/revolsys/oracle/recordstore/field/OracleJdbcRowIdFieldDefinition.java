@@ -47,6 +47,13 @@ public class OracleJdbcRowIdFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
+  public OracleJdbcRowIdFieldDefinition clone() {
+    final OracleJdbcRowIdFieldDefinition clone = new OracleJdbcRowIdFieldDefinition();
+    postClone(clone);
+    return clone;
+  }
+
+  @Override
   public Object getValueFromResultSet(final RecordDefinition recordDefinition,
     final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
     throws SQLException {

@@ -21,8 +21,10 @@ public class JdbcDateFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public JdbcDateFieldDefinition clone() {
-    return new JdbcDateFieldDefinition(getDbName(), getName(), getSqlType(), isRequired(),
-      getDescription(), getProperties());
+    final JdbcDateFieldDefinition clone = new JdbcDateFieldDefinition(getDbName(), getName(),
+      getSqlType(), isRequired(), getDescription(), getProperties());
+    postClone(clone);
+    return clone;
   }
 
   @Override

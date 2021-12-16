@@ -23,8 +23,10 @@ public class JdbcStringFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public JdbcStringFieldDefinition clone() {
-    return new JdbcStringFieldDefinition(getDbName(), getName(), getSqlType(), getLength(),
-      isRequired(), getDescription(), getProperties());
+    final JdbcStringFieldDefinition clone = new JdbcStringFieldDefinition(getDbName(), getName(),
+      getSqlType(), getLength(), isRequired(), getDescription(), getProperties());
+    postClone(clone);
+    return clone;
   }
 
   @Override

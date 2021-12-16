@@ -18,8 +18,10 @@ public class JdbcByteFieldDefinition extends JdbcFieldDefinition {
 
   @Override
   public JdbcByteFieldDefinition clone() {
-    return new JdbcByteFieldDefinition(getDbName(), getName(), getSqlType(), isRequired(),
-      getDescription(), getProperties());
+    final JdbcByteFieldDefinition clone = new JdbcByteFieldDefinition(getDbName(), getName(),
+      getSqlType(), isRequired(), getDescription(), getProperties());
+    postClone(clone);
+    return clone;
   }
 
   @Override
