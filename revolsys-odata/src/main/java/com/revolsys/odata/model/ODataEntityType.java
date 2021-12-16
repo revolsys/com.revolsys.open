@@ -157,7 +157,7 @@ public class ODataEntityType extends CsdlEntityType {
     final String typeName, final PathName pathName) {
     setName(typeName);
     this.entitySet = entitySet;
-    this.connection = schema.getProvider().getTenantConnection();
+    this.connection = schema.getProvider().getTableRecordStoreConnection();
     this.schema = schema;
     if (pathName == null) {
       this.pathName = PathName.newPathName("cm").newChild(typeName);

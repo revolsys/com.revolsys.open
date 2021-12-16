@@ -129,7 +129,7 @@ public abstract class ODataEdmProvider extends CsdlAbstractEdmProvider {
     return this.serviceRoot;
   }
 
-  public abstract TableRecordStoreConnection getTenantConnection();
+  public abstract TableRecordStoreConnection getTableRecordStoreConnection();
 
   public void init() {
     for (final CsdlSchema schema : this.schemas) {
