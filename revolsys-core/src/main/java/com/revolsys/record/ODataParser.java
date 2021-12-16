@@ -151,7 +151,14 @@ public class ODataParser {
     .<String, Function<List<QueryValue>, QueryValue>> buildHash()//
     .add(Methods.TOUPPER, Upper::new)
     .add(Methods.TOLOWER, Lower::new)
-    .add(Methods.GEO_INTERSECTS, F::envelopeIntersects)
+    .add(Methods.GEO_INTERSECTS, (values) -> {
+      final QueryValue value2 = values.get(1);
+      if (value2 instanceof CollectionValue) {
+        final QueryValue newValue = ((CollectionValue)value2).getQueryValues().get(0);
+        values.set(1, newValue);
+      }
+      return F.envelopeIntersects(values);
+    })
     .getMap();
 
   // Order by preference
@@ -703,6 +710,12 @@ public class ODataParser {
       } else if (token.type == TokenType.QUOTED_STRING) {
         final String value = unquote(token.value);
         values.add(value);
+      } else if (token.type == TokenType.WORD) {
+        if ("geometry".equals(token.value)) {
+        } else if ("geography".equals(token.value)) {
+          throw new RuntimeException(
+            "Unable to read expression with tokens: " + token + ":" + tokens);
+        }
       } else {
         throw new RuntimeException(
           "Unable to read expression with tokens: " + token + ":" + tokens);
