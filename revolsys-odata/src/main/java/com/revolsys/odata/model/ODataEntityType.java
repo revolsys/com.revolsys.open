@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -25,6 +26,9 @@ import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.EdmProperty;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
+import org.apache.olingo.commons.api.edm.geo.Geospatial;
+import org.apache.olingo.commons.api.edm.geo.Geospatial.Dimension;
+import org.apache.olingo.commons.api.edm.geo.SRID;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntityType;
 import org.apache.olingo.commons.api.edm.provider.CsdlNavigationProperty;
 import org.apache.olingo.commons.api.edm.provider.CsdlProperty;
@@ -57,8 +61,20 @@ import org.jeometry.common.data.type.CollectionDataType;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
+import org.jeometry.coordinatesystem.model.CoordinateSystem;
+import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryCollection;
+import com.revolsys.geometry.model.GeometryDataTypes;
+import com.revolsys.geometry.model.LineString;
+import com.revolsys.geometry.model.LinearRing;
+import com.revolsys.geometry.model.MultiLineString;
+import com.revolsys.geometry.model.MultiPoint;
+import com.revolsys.geometry.model.MultiPolygon;
+import com.revolsys.geometry.model.Point;
+import com.revolsys.geometry.model.Polygon;
 import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.ODataParser;
 import com.revolsys.record.Record;
@@ -77,19 +93,53 @@ public class ODataEntityType extends CsdlEntityType {
 
   private static Map<DataType, EdmPrimitiveTypeKind> DATA_TYPE_MAP = new HashMap<>();
 
+  private static Map<DataType, EdmPrimitiveTypeKind> GEOMETRY_DATA_TYPE_MAP = new HashMap<>();
+
+  private static Map<DataType, EdmPrimitiveTypeKind> GEOGRAPHY_DATA_TYPE_MAP = new HashMap<>();
+
   static {
     DATA_TYPE_MAP.put(DataTypes.BOOLEAN, EdmPrimitiveTypeKind.Boolean);
     DATA_TYPE_MAP.put(DataTypes.BYTE, EdmPrimitiveTypeKind.Byte);
     DATA_TYPE_MAP.put(DataTypes.INT, EdmPrimitiveTypeKind.Int32);
+    DATA_TYPE_MAP.put(DataTypes.SHORT, EdmPrimitiveTypeKind.Int16);
     DATA_TYPE_MAP.put(DataTypes.LONG, EdmPrimitiveTypeKind.Int64);
     DATA_TYPE_MAP.put(DataTypes.FLOAT, EdmPrimitiveTypeKind.Double);
     DATA_TYPE_MAP.put(DataTypes.DOUBLE, EdmPrimitiveTypeKind.Double);
+    DATA_TYPE_MAP.put(DataTypes.DECIMAL, EdmPrimitiveTypeKind.Decimal);
     DATA_TYPE_MAP.put(DataTypes.STRING, EdmPrimitiveTypeKind.String);
     DATA_TYPE_MAP.put(DataTypes.SQL_DATE, EdmPrimitiveTypeKind.Date);
     DATA_TYPE_MAP.put(DataTypes.UTIL_DATE, EdmPrimitiveTypeKind.Date);
     DATA_TYPE_MAP.put(DataTypes.DATE_TIME, EdmPrimitiveTypeKind.Date);
     DATA_TYPE_MAP.put(DataTypes.TIMESTAMP, EdmPrimitiveTypeKind.Date);
     DATA_TYPE_MAP.put(DataTypes.UUID, EdmPrimitiveTypeKind.Guid);
+
+    GEOMETRY_DATA_TYPE_MAP.put(GeometryDataTypes.GEOMETRY, EdmPrimitiveTypeKind.Geometry);
+    GEOMETRY_DATA_TYPE_MAP.put(GeometryDataTypes.GEOMETRY_COLLECTION,
+      EdmPrimitiveTypeKind.GeometryCollection);
+    GEOMETRY_DATA_TYPE_MAP.put(GeometryDataTypes.POINT, EdmPrimitiveTypeKind.GeometryPoint);
+    GEOMETRY_DATA_TYPE_MAP.put(GeometryDataTypes.MULTI_POINT,
+      EdmPrimitiveTypeKind.GeometryMultiPoint);
+    GEOMETRY_DATA_TYPE_MAP.put(GeometryDataTypes.LINE_STRING,
+      EdmPrimitiveTypeKind.GeometryLineString);
+    GEOMETRY_DATA_TYPE_MAP.put(GeometryDataTypes.MULTI_LINE_STRING,
+      EdmPrimitiveTypeKind.GeometryMultiLineString);
+    GEOMETRY_DATA_TYPE_MAP.put(GeometryDataTypes.POLYGON, EdmPrimitiveTypeKind.GeometryPolygon);
+    GEOMETRY_DATA_TYPE_MAP.put(GeometryDataTypes.MULTI_POLYGON,
+      EdmPrimitiveTypeKind.GeometryMultiPolygon);
+
+    GEOGRAPHY_DATA_TYPE_MAP.put(GeometryDataTypes.GEOMETRY, EdmPrimitiveTypeKind.Geography);
+    GEOGRAPHY_DATA_TYPE_MAP.put(GeometryDataTypes.GEOMETRY_COLLECTION,
+      EdmPrimitiveTypeKind.GeographyCollection);
+    GEOGRAPHY_DATA_TYPE_MAP.put(GeometryDataTypes.POINT, EdmPrimitiveTypeKind.GeographyPoint);
+    GEOGRAPHY_DATA_TYPE_MAP.put(GeometryDataTypes.MULTI_POINT,
+      EdmPrimitiveTypeKind.GeographyMultiPoint);
+    GEOGRAPHY_DATA_TYPE_MAP.put(GeometryDataTypes.LINE_STRING,
+      EdmPrimitiveTypeKind.GeographyLineString);
+    GEOGRAPHY_DATA_TYPE_MAP.put(GeometryDataTypes.MULTI_LINE_STRING,
+      EdmPrimitiveTypeKind.GeographyMultiLineString);
+    GEOGRAPHY_DATA_TYPE_MAP.put(GeometryDataTypes.POLYGON, EdmPrimitiveTypeKind.GeographyPolygon);
+    GEOGRAPHY_DATA_TYPE_MAP.put(GeometryDataTypes.MULTI_POLYGON,
+      EdmPrimitiveTypeKind.GeographyMultiPolygon);
   }
 
   private static final List<String> AUDIT_FIELD_NAMES = Arrays.asList("deleted", "createTimestamp",
@@ -355,15 +405,19 @@ public class ODataEntityType extends CsdlEntityType {
     if (recordDefinition != null) {
       for (final FieldDefinition field : recordDefinition.getFieldDefinitions()) {
         final String name = field.getName();
-        final Object value = record.getValue(name);
+        Object value = record.getValue(name);
         ValueType valueType = ValueType.PRIMITIVE;
-        if (field.getDataType() instanceof CollectionDataType) {
+        final DataType dataType = field.getDataType();
+        if (dataType instanceof CollectionDataType) {
           valueType = ValueType.COLLECTION_PRIMITIVE;
+        } else if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
+          value = toGeometry(dataType, (Geometry)value);
         }
         final Property property = new Property(null, name, valueType, value);
         entity.addProperty(property);
       }
-      final Object idValue = record.getValue(recordDefinition.getIdFieldName());
+      final String idFieldName = recordDefinition.getIdFieldName();
+      final Object idValue = record.getValue(idFieldName);
       final URI id = createId(idValue);
       entity.setId(id);
     }
@@ -556,17 +610,27 @@ public class ODataEntityType extends CsdlEntityType {
           isCollection = true;
           final DataType contentType = collectionDataType.getContentType();
           fieldType = DATA_TYPE_MAP.get(contentType);
+        } else if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
+          if (recordDefinition.getGeometryFactory().isGeocentric()) {
+            fieldType = GEOGRAPHY_DATA_TYPE_MAP.get(dataType);
+          } else {
+            fieldType = GEOMETRY_DATA_TYPE_MAP.get(dataType);
+          }
         } else {
           fieldType = DATA_TYPE_MAP.get(dataType);
         }
         if (fieldType == null) {
-          // System.out.println(field + "\t" + dataType);
+          System.out.println(field + "\t" + dataType);
         } else {
-          addProperty(name, fieldType)//
+          final CsdlProperty property = addProperty(name, fieldType);
+          property//
             .setNullable(!field.isRequired()) //
-            .setDefaultValue(field.getDefaultValue()) //
             .setCollection(isCollection) //
           ;
+          final Object defaultValue = field.getDefaultValue();
+          if (defaultValue != null) {
+            property.setDefaultValue(defaultValue.toString());
+          }
         }
         if (recordDefinition.isIdField(name)) {
           final CsdlPropertyRef propertyRef = new CsdlPropertyRef() //
@@ -581,6 +645,7 @@ public class ODataEntityType extends CsdlEntityType {
         setKey(keys);
       }
     }
+
   }
 
   protected void sortFieldNames(final List<String> idFieldNames, final List<String> fieldNames) {
@@ -608,6 +673,138 @@ public class ODataEntityType extends CsdlEntityType {
         return 1;
       }
     });
+  }
+
+  private Geospatial toGeometry(final DataType dataType, final Geometry value) {
+    if (value == null) {
+      return null;
+    }
+    final CoordinateSystem coordinateSystem = value.getCoordinateSystem();
+    final Dimension dimension = coordinateSystem instanceof GeographicCoordinateSystem
+      ? Dimension.GEOGRAPHY
+      : Dimension.GEOMETRY;
+    final SRID srid = SRID.valueOf(Integer.toString(coordinateSystem.getCoordinateSystemId()));
+    final Geospatial geospatial = toGeometry(dimension, srid, value);
+    if (geospatial != null) {
+      if (GeometryDataTypes.MULTI_POINT == dataType) {
+        if (geospatial instanceof org.apache.olingo.commons.api.edm.geo.Point) {
+          return new org.apache.olingo.commons.api.edm.geo.MultiPoint(dimension, srid,
+            Collections.singletonList((org.apache.olingo.commons.api.edm.geo.Point)geospatial));
+        }
+      } else if (GeometryDataTypes.MULTI_LINE_STRING == dataType) {
+        if (geospatial instanceof org.apache.olingo.commons.api.edm.geo.LineString) {
+          return new org.apache.olingo.commons.api.edm.geo.MultiLineString(dimension, srid,
+            Collections
+              .singletonList((org.apache.olingo.commons.api.edm.geo.LineString)geospatial));
+        }
+      } else if (GeometryDataTypes.MULTI_POLYGON == dataType) {
+        if (geospatial instanceof org.apache.olingo.commons.api.edm.geo.Polygon) {
+          return new org.apache.olingo.commons.api.edm.geo.MultiPolygon(dimension, srid,
+            Collections.singletonList((org.apache.olingo.commons.api.edm.geo.Polygon)geospatial));
+        }
+      } else if (GeometryDataTypes.GEOMETRY_COLLECTION == dataType) {
+        if (!(geospatial instanceof org.apache.olingo.commons.api.edm.geo.GeospatialCollection)) {
+          return new org.apache.olingo.commons.api.edm.geo.GeospatialCollection(dimension, srid,
+            Collections.singletonList(geospatial));
+        }
+      }
+    }
+    return geospatial;
+  }
+
+  private Geospatial toGeometry(final Dimension dimension, final SRID srid, final Geometry value) {
+    if (value instanceof Point) {
+      return toPoint(dimension, srid, (Point)value);
+    } else if (value instanceof LineString) {
+      return toLineString(dimension, srid, (LineString)value);
+    } else if (value instanceof Polygon) {
+      return toPolygon(dimension, srid, (Polygon)value);
+    } else if (value instanceof MultiPoint) {
+      final MultiPoint point = (MultiPoint)value;
+      return toMultiPoint(dimension, srid, point);
+    } else if (value instanceof MultiLineString) {
+      return toMultiLineString(dimension, srid, (MultiLineString)value);
+    } else if (value instanceof MultiPolygon) {
+      return toMultiPolygon(dimension, srid, (MultiPolygon)value);
+    } else if (value instanceof GeometryCollection) {
+      return toGeometryCollection(dimension, srid, (GeometryCollection)value);
+    }
+    return null;
+  }
+
+  private org.apache.olingo.commons.api.edm.geo.GeospatialCollection toGeometryCollection(
+    final Dimension dimension, final SRID srid, final GeometryCollection geometryCollection) {
+    final List<org.apache.olingo.commons.api.edm.geo.Geospatial> geometries = new ArrayList<>();
+    for (final Geometry geometry : geometryCollection.geometries()) {
+      geometries.add(toGeometry(dimension, srid, geometry));
+    }
+    return new org.apache.olingo.commons.api.edm.geo.GeospatialCollection(dimension, srid,
+      geometries);
+  }
+
+  private org.apache.olingo.commons.api.edm.geo.LineString toLineString(final Dimension dimension,
+    final SRID srid, final LineString line) {
+    final List<org.apache.olingo.commons.api.edm.geo.Point> points = new ArrayList<>();
+    final int vertexCount = line.getVertexCount();
+    for (int i = 0; i < vertexCount; i++) {
+      final org.apache.olingo.commons.api.edm.geo.Point oPoint = new org.apache.olingo.commons.api.edm.geo.Point(
+        dimension, srid);
+      oPoint.setX(line.getX(i));
+      oPoint.setY(line.getY(i));
+      oPoint.setZ(line.getZ(i));
+      points.add(oPoint);
+    }
+    return new org.apache.olingo.commons.api.edm.geo.LineString(dimension, srid, points);
+  }
+
+  private org.apache.olingo.commons.api.edm.geo.MultiLineString toMultiLineString(
+    final Dimension dimension, final SRID srid, final MultiLineString multiLineString) {
+    final List<org.apache.olingo.commons.api.edm.geo.LineString> lines = new ArrayList<>();
+    for (final LineString line : multiLineString.lineStrings()) {
+      lines.add(toLineString(dimension, srid, line));
+    }
+    return new org.apache.olingo.commons.api.edm.geo.MultiLineString(dimension, srid, lines);
+  }
+
+  private org.apache.olingo.commons.api.edm.geo.MultiPoint toMultiPoint(final Dimension dimension,
+    final SRID srid, final MultiPoint multiPoint) {
+    final List<org.apache.olingo.commons.api.edm.geo.Point> points = new ArrayList<>();
+    for (final Point point : multiPoint.points()) {
+      points.add(toPoint(dimension, srid, point));
+    }
+    return new org.apache.olingo.commons.api.edm.geo.MultiPoint(dimension, srid, points);
+  }
+
+  private org.apache.olingo.commons.api.edm.geo.MultiPolygon toMultiPolygon(
+    final Dimension dimension, final SRID srid, final MultiPolygon multiPolygon) {
+    final List<org.apache.olingo.commons.api.edm.geo.Polygon> polygons = new ArrayList<>();
+    for (final Polygon polygon : multiPolygon.polygons()) {
+      polygons.add(toPolygon(dimension, srid, polygon));
+    }
+    return new org.apache.olingo.commons.api.edm.geo.MultiPolygon(dimension, srid, polygons);
+  }
+
+  private org.apache.olingo.commons.api.edm.geo.Point toPoint(final Dimension dimension,
+    final SRID srid, final Point point) {
+    final org.apache.olingo.commons.api.edm.geo.Point oPoint = new org.apache.olingo.commons.api.edm.geo.Point(
+      dimension, srid);
+    oPoint.setX(point.getX());
+    oPoint.setY(point.getY());
+    oPoint.setZ(point.getZ());
+    return oPoint;
+  }
+
+  private org.apache.olingo.commons.api.edm.geo.Polygon toPolygon(final Dimension dimension,
+    final SRID srid, final Polygon polygon) {
+    final List<org.apache.olingo.commons.api.edm.geo.LineString> interiorRings = new ArrayList<>();
+    final org.apache.olingo.commons.api.edm.geo.LineString exterior = toLineString(dimension, srid,
+      polygon.getShell());
+    for (int i = 0; i < polygon.getHoleCount(); i++) {
+      final LinearRing ring = polygon.getHole(i);
+      interiorRings.add(toLineString(dimension, srid, ring));
+    }
+    return new org.apache.olingo.commons.api.edm.geo.Polygon(dimension, srid, interiorRings,
+      exterior);
   }
 
   @Override

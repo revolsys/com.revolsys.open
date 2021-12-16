@@ -17,7 +17,7 @@
   <dependencies>
     <dependency>
       <groupId>com.revolsys.open</groupId>
-      <artifactId>revolsys-web</artifactId>
+      <artifactId>revolsys-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     
