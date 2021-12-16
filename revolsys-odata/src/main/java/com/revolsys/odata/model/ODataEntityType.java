@@ -209,14 +209,9 @@ public class ODataEntityType extends CsdlEntityType {
     this.entitySet = entitySet;
     this.connection = schema.getProvider().getTableRecordStoreConnection();
     this.schema = schema;
-    if (pathName == null) {
-      this.pathName = PathName.newPathName("cm").newChild(typeName);
-    } else {
-      this.pathName = pathName;
-    }
+    this.pathName = pathName;
     final RecordDefinition recordDefinition = getRecordStore().getRecordDefinition(this.pathName);
     setRecordDefinition(recordDefinition);
-    removeFieldNames("projectId");
   }
 
   void addLimits(final Query query, final UriInfo uriInfo) throws ODataApplicationException {

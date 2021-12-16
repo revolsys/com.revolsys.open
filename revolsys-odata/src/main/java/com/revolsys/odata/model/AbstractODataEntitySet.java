@@ -22,16 +22,9 @@ public class AbstractODataEntitySet extends CsdlEntitySet implements RecordDefin
 
   protected final FullQualifiedName typeName;
 
-  public AbstractODataEntitySet(final ODataSchema schema, final String name) {
-    this(schema, name, null);
-  }
-
   public AbstractODataEntitySet(final ODataSchema schema, final String typeName,
     final PathName pathName) {
-    this.entityType = new ODataEntityType(this, schema, typeName, pathName) //
-      .removeFieldNames("typeName")
-      .removeFieldNames("path")
-      .removeFieldNames("label");
+    this.entityType = new ODataEntityType(this, schema, typeName, pathName);
     this.schema = schema;
     this.name = typeName;
     this.typeName = schema.getQualifiedName(typeName);
