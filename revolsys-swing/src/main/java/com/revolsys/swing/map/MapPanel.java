@@ -261,15 +261,6 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
     Property.addListener(this.baseMapLayers, this);
     Property.addListener(project, this);
-
-    addMapOverlays();
-
-    newToolBar();
-
-    newStatusBar();
-
-    this.fileDropListener = new FileDropTargetListener(this);
-    this.undoManager.addKeyMap(this);
   }
 
   public void addBaseMap(final Layer layer) {
@@ -676,6 +667,10 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
     return this.viewport.getScales();
   }
 
+  public List<AbstractRecordLayer> getSelectedRecordLayers() {
+    return this.selectedRecordLayers;
+  }
+
   public ToolBar getToolBar() {
     return this.toolBar;
   }
@@ -702,6 +697,17 @@ public class MapPanel extends JPanel implements GeometryFactoryProxy, PropertyCh
 
   public boolean hasOverlayAction(final String overlayAction) {
     return this.overlayActionStack.contains(overlayAction);
+  }
+
+  protected void initUi() {
+    addMapOverlays();
+
+    newToolBar();
+
+    newStatusBar();
+
+    this.fileDropListener = new FileDropTargetListener(this);
+    this.undoManager.addKeyMap(this);
   }
 
   public boolean isInitializing() {

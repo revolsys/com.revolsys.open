@@ -33,6 +33,12 @@ public class MultipleUndo extends AbstractUndoableEdit {
     }
   }
 
+  public void addEdits(final Iterable<? extends UndoableEdit> edits) {
+    for (final UndoableEdit edit : edits) {
+      this.addEdit(edit);
+    }
+  }
+
   @Override
   public boolean canRedo() {
     for (final UndoableEdit edit : this.edits) {

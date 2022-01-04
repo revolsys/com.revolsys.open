@@ -4,10 +4,14 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import javax.swing.ActionMap;
 import javax.swing.Icon;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JMenuItem;
+import javax.swing.KeyStroke;
 
 import com.revolsys.i18n.I18nCharSequence;
 import com.revolsys.swing.Icons;
@@ -18,6 +22,16 @@ import com.revolsys.swing.parallel.Invoke;
 public class RunnableAction extends AbstractActionMainMenuItemFactory {
 
   private static final long serialVersionUID = -5339626097125548212L;
+
+  public static void addAction(final JComponent component, final String actionKey,
+    final Runnable action, final KeyStroke... keyStrokes) {
+    final ActionMap actionMap = component.getActionMap();
+    actionMap.put(actionKey, new RunnableAction(actionKey, action));
+    final InputMap inputMap = component.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    for (final KeyStroke keyStroke : keyStrokes) {
+      inputMap.put(keyStroke, actionKey);
+    }
+  }
 
   public static JButton newButton(final CharSequence name, final String toolTip, final Icon icon,
     final Runnable runnable) {
@@ -92,11 +106,11 @@ public class RunnableAction extends AbstractActionMainMenuItemFactory {
       });
 
     }
-  }
+  };
 
   public RunnableAction(final CharSequence name, final Icon icon, final Runnable runnable) {
     this(name, icon, false, runnable);
-  };
+  }
 
   public RunnableAction(final CharSequence name, final Runnable runnable) {
     this(name, null, false, runnable);

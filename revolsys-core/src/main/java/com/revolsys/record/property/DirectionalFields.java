@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.jeometry.common.data.type.DataType;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.model.End;
@@ -131,6 +132,12 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
   public static void reverseRecord(final Record record) {
     final DirectionalFields property = getProperty(record);
     property.reverseFieldValuesAndGeometry(record);
+  }
+
+  public static void setSwapFieldValues(final Record record, MapEx newValues,
+    final String fieldName1, final String fieldName2) {
+    newValues.addFieldValue(fieldName1, record, fieldName2)
+      .addFieldValue(fieldName2, record, fieldName1);
   }
 
   private final Map<String, Map<Object, Object>> directionalFieldValues = new HashMap<>();

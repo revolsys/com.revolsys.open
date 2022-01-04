@@ -48,6 +48,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.MapSerializerMap;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
@@ -114,7 +115,7 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   public static final String PLUGIN_TABLE_VIEW = "tableView";
 
   public static void initializeMenu() {
-    MenuFactory.addMenuInitializer(AbstractLayer.class, (menu) -> {
+    MenuFactory.addMenuInitializer(AbstractLayer.class, menu -> {
       menu.addMenuItem("zoom", -1, "Zoom to Layer", "magnifier",
         AbstractLayer::isZoomToLayerEnabled, AbstractLayer::zoomToLayer, true);
 
@@ -228,6 +229,16 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   public int addRenderer(final LayerRenderer<?> child, final int index) {
     setRenderer(child);
     return 0;
+  }
+
+  @Override
+  public final void addSelectedBoundingBox(final BoundingBoxEditor boundingBox) {
+    if (isExists() && isVisible()) {
+      addSelectedBoundingBoxDo(boundingBox);
+    }
+  }
+
+  protected void addSelectedBoundingBoxDo(BoundingBoxEditor boundingBox) {
   }
 
   public boolean canSaveSettings(final Path directory) {
@@ -466,16 +477,6 @@ public abstract class AbstractLayer extends BaseObjectWithProperties
   @Override
   public <L extends LayerRenderer<? extends Layer>> L getRenderer() {
     return (L)this.renderer;
-  }
-
-  @Override
-  public BoundingBox getSelectedBoundingBox() {
-    final GeometryFactory geometryFactory = getGeometryFactory();
-    if (geometryFactory == null) {
-      return BoundingBox.empty();
-    } else {
-      return geometryFactory.bboxEmpty();
-    }
   }
 
   public GeometryFactory getSelectedGeometryFactory() {

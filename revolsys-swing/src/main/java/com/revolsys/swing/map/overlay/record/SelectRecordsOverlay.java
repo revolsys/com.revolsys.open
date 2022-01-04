@@ -157,6 +157,11 @@ public class SelectRecordsOverlay extends AbstractOverlay {
     cancel();
   }
 
+  @Override
+  protected void initActionMap(final ProjectFrame frame) {
+    frame.addActionAltAndMap("Zoom Selected", getMap()::zoomToSelected, KeyEvent.VK_Z);
+  }
+
   protected boolean isSelectable(final AbstractLayer recordLayer) {
     return recordLayer.isSelectable();
   }

@@ -33,6 +33,8 @@ import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import javax.measure.Unit;
+import javax.measure.quantity.Length;
 import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -149,6 +151,9 @@ import com.revolsys.swing.undo.SetRecordFieldValueUndo;
 import com.revolsys.util.PreferenceKey;
 import com.revolsys.util.Preferences;
 import com.revolsys.util.Property;
+
+import tech.units.indriya.ComparableQuantity;
+import tech.units.indriya.quantity.Quantities;
 
 public abstract class AbstractRecordLayer extends AbstractLayer
   implements AddGeometryCompleteAction, RecordLayerProxy, RecordLayerFieldUiFactory {
@@ -300,6 +305,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public static final String PREFERENCE_PATH = "/com/revolsys/gis/layer/record";
 
+  public static PreferenceKey PREFERENCE_NEW_RECORD_SHOWS_FORM = new PreferenceKey(PREFERENCE_PATH,
+    "showFormOnAddRecord", DataTypes.BOOLEAN, false)//
+      .setCategoryTitle("Layers");
+
   public static final PreferenceKey PREFERENCE_CONFIRM_DELETE_RECORDS = new PreferenceKey(
     PREFERENCE_PATH, "confirmDeleteRecords", DataTypes.BOOLEAN, false)//
       .setCategoryTitle("Layers");
@@ -387,6 +396,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       menu.addMenuItem("layer", 0, "Layer Style", "palette", AbstractRecordLayer::isHasGeometry,
         (final AbstractRecordLayer layer) -> layer.showProperties("Style"), false);
 
+      PreferenceFields.addField("com.revolsys.gis", PREFERENCE_NEW_RECORD_SHOWS_FORM);
       PreferenceFields.addField("com.revolsys.gis", PREFERENCE_SHOW_ALL_RECORDS_ON_FILTER);
       PreferenceFields.addField("com.revolsys.gis", PREFERENCE_CONFIRM_DELETE_RECORDS);
       PreferenceFields.addField("com.revolsys.gis", PREFERENCE_GENERALIZE_GEOMETRY_TOLERANCE);
@@ -443,6 +453,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     final List<AbstractRecordLayer> layers = new ArrayList<>();
     addVisibleLayers(layers, group, scale);
     return layers;
+  }
+
+  public static Boolean isGlobalConfirmDeleteRecords() {
+    return Preferences.getValue("com.revolsys.gis", PREFERENCE_CONFIRM_DELETE_RECORDS);
+  }
+
+  public static Boolean isShowAddForm() {
+    return Preferences.getValue("com.revolsys.gis", PREFERENCE_NEW_RECORD_SHOWS_FORM);
   }
 
   private boolean canAddRecords = true;
@@ -547,11 +565,26 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   @Override
   public void addComplete(final AbstractOverlay overlay, final Geometry geometry) {
     if (geometry != null) {
-      final RecordDefinition recordDefinition = getRecordDefinition();
-      final String geometryFieldName = recordDefinition.getGeometryFieldName();
-      final Map<String, Object> parameters = new HashMap<>();
-      parameters.put(geometryFieldName, geometry);
-      showAddForm(parameters);
+      if (isCanAddRecords()) {
+        final RecordDefinition recordDefinition = getRecordDefinition();
+        final String geometryFieldName = recordDefinition.getGeometryFieldName();
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put(geometryFieldName, geometry);
+        boolean showAddForm = isShowAddForm();
+        if (recordDefinition.hasGeometryField() && recordDefinition.getFieldCount() == 1) {
+          showAddForm = false;
+        }
+        if (showAddForm) {
+          showAddForm(parameters);
+        } else {
+          addRecordShowTable(parameters);
+        }
+      }
+    } else {
+      Dialogs.showMessageDialog(
+        "Adding records is not enabled for the " + getPath()
+          + " layer. If possible make the layer editable",
+        "Cannot Add Record", JOptionPane.ERROR_MESSAGE);
     }
   }
 
@@ -611,6 +644,21 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return recordCache;
   }
 
+  private void addRecordShowTable(final Map<String, Object> parameters) {
+    final LayerRecord record = newLayerRecord(parameters);
+    final List<String> idFieldNames = this.recordDefinition.getIdFieldNames();
+    Identifier identifier = record.getIdentifier();
+    if (identifier == null && !idFieldNames.isEmpty()) {
+      identifier = getRecordStore().newPrimaryIdentifier(getPathName());
+      if (identifier != null) {
+        identifier.setIdentifier(record, idFieldNames);
+      }
+    }
+    saveChanges(record);
+    addSelectedRecords(record);
+    showRecordsTable(RecordLayerTableModel.MODE_RECORDS_SELECTED, true);
+  }
+
   @Override
   public int addRenderer(final LayerRenderer<?> child, final int index) {
     final AbstractRecordLayerRenderer oldRenderer = getRenderer();
@@ -630,6 +678,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       rendererGroup.addRenderer((AbstractRecordLayerRenderer)child);
       return rendererGroup.getRendererCount() - 1;
     }
+  }
+
+  @Override
+  protected void addSelectedBoundingBoxDo(final BoundingBoxEditor boundingBox) {
+    forEachSelectedRecord(boundingBox::addBbox);
   }
 
   public boolean addSelectedRecords(final BoundingBox boundingBox) {
@@ -752,52 +805,18 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   protected <LR extends LayerRecord> boolean confirmDeleteRecords(final String suffix,
     final List<LR> records, final Consumer<Collection<LR>> deleteAction) {
-
-    final Map<String, Condition> deleteRecordsBlockFilterByFieldName = getDeleteRecordsBlockFilterByFieldName();
-    if (!deleteRecordsBlockFilterByFieldName.isEmpty()) {
-      List<LR> blockedRecords = null;
-      List<LR> otherRecords = null;
-      int i = 0;
-      for (final LR record : records) {
-        if (isDeleteBlocked(suffix, record)) {
-          if (blockedRecords == null) {
-            blockedRecords = new ArrayList<>();
-            otherRecords = new ArrayList<>();
-
-            for (int j = 0; j < i; j++) {
-              final LR otherRecord = records.get(j);
-              otherRecords.add(otherRecord);
-            }
-          }
-          blockedRecords.add(record);
-        } else if (otherRecords != null) {
-          otherRecords.add(record);
-        }
-        i++;
-      }
-      if (blockedRecords != null) {
-        BlockDeleteRecords.showErrorDialog(this, blockedRecords, otherRecords, deleteAction);
-        return false;
-      }
-    }
-    boolean delete;
-    final int recordCount = records.size();
-    final boolean globalConfirmDeleteRecords = Preferences.getValue("com.revolsys.gis",
-      PREFERENCE_CONFIRM_DELETE_RECORDS);
-    if (globalConfirmDeleteRecords || this.confirmDeleteRecords) {
-      final String message = "Delete " + recordCount + " records" + suffix
-        + "? This action cannot be undone.";
-      final String title = "Delete Records" + suffix;
-      final int confirm = Dialogs.showConfirmDialog(message, title, JOptionPane.YES_NO_OPTION,
-        JOptionPane.ERROR_MESSAGE);
-      delete = confirm == JOptionPane.YES_OPTION;
+    final boolean confirmDeleteRecords = isGlobalConfirmDeleteRecords()
+      || this.confirmDeleteRecords;
+    final Map<AbstractRecordLayer, List<LR>> deleteRecordsByLayer = BlockDeleteRecords
+      .confirmDeleteRecords(suffix, records, confirmDeleteRecords);
+    if (deleteRecordsByLayer.isEmpty()) {
+      return false;
     } else {
-      delete = true;
+      for (final List<LR> deleteRecords : deleteRecordsByLayer.values()) {
+        deleteAction.accept(deleteRecords);
+      }
+      return true;
     }
-    if (delete) {
-      deleteAction.accept(records);
-    }
-    return delete;
   }
 
   public void copyRecordGeometry(final LayerRecord record) {
@@ -1158,8 +1177,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return this.filter;
   }
 
-  public double getGeneralizeGeometryTolerance() {
-    return getDefaultGeneralizeGeometryTolerance();
+  public ComparableQuantity<Length> getGeneralizeGeometryTolerance() {
+    final Unit<Length> unit = getHorizontalCoordinateSystem().getLengthUnit();
+    final double tolerance = getDefaultGeneralizeGeometryTolerance();
+    return Quantities.getQuantity(tolerance, unit);
   }
 
   public DataType getGeometryType() {
@@ -1240,10 +1261,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer
   }
 
   /**
-   * Get a record containing the values of the two records if they can be
-   * merged. The new record is not a layer data object so would need to be
-   * added, likewise the old records are not removed so they would need to be
-   * deleted.
+   * Get a record containing the values of the two records if they can be merged.
+   * The new record is not a layer data object so would need to be added, likewise
+   * the old records are not removed so they would need to be deleted.
    *
    * @param point
    * @param record1
@@ -1692,13 +1712,6 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return getRecords(boundingBox);
   }
 
-  @Override
-  public BoundingBox getSelectedBoundingBox() {
-    final BoundingBoxEditor boundingBox = super.getSelectedBoundingBox().bboxEditor();
-    forEachSelectedRecord(boundingBox::addBbox);
-    return boundingBox.getBoundingBox();
-  }
-
   public List<LayerRecord> getSelectedRecords() {
     return this.recordCacheSelected.getRecords();
   }
@@ -1773,31 +1786,33 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     if (recordDefinition != null && recordDefinition.hasGeometryField()) {
       final EnableCheck editableEnableCheck = this::isEditable;
 
+      initFlipMenu(editMenu, editableEnableCheck);
       final DataType geometryDataType = recordDefinition.getGeometryField().getDataType();
-      if (geometryDataType == GeometryDataTypes.LINE_STRING
-        || geometryDataType == GeometryDataTypes.MULTI_LINE_STRING) {
-        final Consumer<Record> reverseGeometryConsumer = DirectionalFields::reverseGeometryRecord;
-        if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
-          final Consumer<Record> reverse = DirectionalFields::reverseRecord;
-          editMenu.addMenuItemRecord("geometry", LayerRecordForm.FLIP_RECORD_NAME,
-            LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck, reverse);
-
-          editMenu.addMenuItemRecord("geometry", LayerRecordForm.FLIP_LINE_ORIENTATION_NAME,
-            LayerRecordForm.FLIP_LINE_ORIENTATION_ICON, editableEnableCheck,
-            reverseGeometryConsumer);
-
-          final Consumer<Record> reverseFieldValues = DirectionalFields::reverseFieldValuesRecord;
-          editMenu.addMenuItemRecord("geometry", LayerRecordForm.FLIP_FIELDS_NAME,
-            LayerRecordForm.FLIP_FIELDS_ICON, editableEnableCheck, reverseFieldValues);
-        } else {
-          editMenu.addMenuItemRecord("geometry", "Flip Line Orientation", "flip_line",
-            editableEnableCheck, reverseGeometryConsumer);
-        }
-      }
       if (!(geometryDataType == GeometryDataTypes.POINT
         || geometryDataType == GeometryDataTypes.MULTI_POINT)) {
         editMenu.addMenuItemRecords("geometry", "Generalize Vertices", "generalize_line",
           editableEnableCheck, RecordLayerActions::generalize);
+      }
+    }
+  }
+
+  protected void initFlipMenu(final EditRecordMenu editMenu,
+    final EnableCheck editableEnableCheck) {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    final DataType geometryDataType = recordDefinition.getGeometryField().getDataType();
+    if (geometryDataType == GeometryDataTypes.LINE_STRING
+      || geometryDataType == GeometryDataTypes.MULTI_LINE_STRING) {
+      final Consumer<Record> reverseGeometryConsumer = DirectionalFields::reverseGeometryRecord;
+      if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
+        editMenu.addMenuItemRecord("geometry", LayerRecordForm.FLIP_RECORD_NAME,
+          LayerRecordForm.FLIP_RECORD_ICON, editableEnableCheck, DirectionalFields::reverseRecord);
+
+        final Consumer<Record> reverseFieldValues = DirectionalFields::reverseFieldValuesRecord;
+        editMenu.addMenuItemRecord("geometry", LayerRecordForm.FLIP_FIELDS_NAME,
+          LayerRecordForm.FLIP_FIELDS_ICON, editableEnableCheck, reverseFieldValues);
+      } else {
+        editMenu.addMenuItemRecord("geometry", "Flip Geometry", "flip_line", editableEnableCheck,
+          reverseGeometryConsumer);
       }
     }
   }
@@ -2058,8 +2073,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return this.confirmDeleteRecords;
   }
 
-  protected boolean isDeleteBlocked(final String suffix, final LayerRecord record) {
-
+  public boolean isDeleteBlocked(final String suffix, final LayerRecord record) {
     if (checkBlockDeleteRecord(record)) {
       final Map<String, Condition> deleteRecordsBlockFilterByFieldName = getDeleteRecordsBlockFilterByFieldName();
       for (final String fieldName : deleteRecordsBlockFilterByFieldName.keySet()) {

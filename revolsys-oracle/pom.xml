@@ -26,6 +26,12 @@
 			<groupId>com.oracle.ojdbc</groupId>
 			<artifactId>xdb</artifactId>
 			<version>19.3.0.0</version>
+			<exclusions>
+			  <exclusion>
+			    <groupId>com.oracle.ojdbc</groupId>
+			    <artifactId>xmlparserv2</artifactId>
+			  </exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
