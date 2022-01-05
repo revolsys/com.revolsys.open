@@ -50,6 +50,7 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.collection.EmptyReference;
 import com.revolsys.collection.list.Lists;
@@ -78,6 +79,7 @@ import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.Records;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.io.ListRecordReader;
 import com.revolsys.record.io.RecordIo;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordWriter;
@@ -90,6 +92,7 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.spring.resource.ByteArrayResource;
 import com.revolsys.spring.resource.PathResource;
 import com.revolsys.spring.resource.Resource;
@@ -148,6 +151,7 @@ import com.revolsys.swing.preferences.PreferenceFields;
 import com.revolsys.swing.table.BaseJTable;
 import com.revolsys.swing.undo.MultipleUndo;
 import com.revolsys.swing.undo.SetRecordFieldValueUndo;
+import com.revolsys.transaction.Transactionable;
 import com.revolsys.util.PreferenceKey;
 import com.revolsys.util.Preferences;
 import com.revolsys.util.Property;
@@ -155,8 +159,8 @@ import com.revolsys.util.Property;
 import tech.units.indriya.ComparableQuantity;
 import tech.units.indriya.quantity.Quantities;
 
-public abstract class AbstractRecordLayer extends AbstractLayer
-  implements AddGeometryCompleteAction, RecordLayerProxy, RecordLayerFieldUiFactory {
+public abstract class AbstractRecordLayer extends AbstractLayer implements
+  AddGeometryCompleteAction, RecordLayerProxy, RecordLayerFieldUiFactory, Transactionable {
   private class RecordCacheIndex extends RecordCacheDelegating {
     private RecordSpatialIndex<Record> index;
 
@@ -1621,6 +1625,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer
     return null;
   }
 
+  public RecordReader getRecordReader(final Query query) {
+    final List<LayerRecord> records = getRecords(query);
+    return new ListRecordReader(this.recordDefinition, records);
+  }
+
   public List<LayerRecord> getRecords() {
     throw new UnsupportedOperationException();
   }
@@ -1726,6 +1735,16 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   public Collection<String> getSnapLayerPaths() {
     return getProperty("snapLayers", Collections.<String> emptyList());
+  }
+
+  @Override
+  public PlatformTransactionManager getTransactionManager() {
+    final RecordStore recordStore = getRecordStore();
+    if (recordStore == null) {
+      return null;
+    } else {
+      return recordStore.getTransactionManager();
+    }
   }
 
   public Collection<String> getUserReadOnlyFieldNames() {
@@ -2375,8 +2394,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
 
   @Override
   public Query newQuery() {
-    final RecordDefinition recordDefinition = getRecordDefinition();
-    return new Query(recordDefinition);
+    return new RecordLayerQuery(this);
   }
 
   protected final RecordCache newRecordCache(final String cacheId) {
@@ -3214,7 +3232,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer
       if (idField == null) {
         clearSelectedRecords();
       } else {
-        final Query query = Query.where(Q::equal, idField, id);
+        final Query query = recordDefinition.newQuery().and(idField, id);
         setSelectedRecords(query);
       }
     }
