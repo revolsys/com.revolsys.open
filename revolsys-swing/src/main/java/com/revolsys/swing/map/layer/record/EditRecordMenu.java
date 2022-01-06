@@ -1,5 +1,7 @@
 package com.revolsys.swing.map.layer.record;
 
+import java.util.Iterator;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -13,6 +15,7 @@ import com.revolsys.record.Record;
 import com.revolsys.swing.Icons;
 import com.revolsys.swing.action.RunnableAction;
 import com.revolsys.swing.action.enablecheck.EnableCheck;
+import com.revolsys.swing.component.ComponentFactory;
 import com.revolsys.swing.menu.BaseJPopupMenu;
 import com.revolsys.swing.menu.MenuFactory;
 
@@ -170,5 +173,18 @@ public class EditRecordMenu extends MenuFactory {
   public BaseJPopupMenu newJPopupMenu(final boolean forceEnable) {
     initMenu();
     return super.newJPopupMenu(forceEnable);
+  }
+
+  public void removeMenuItemRecord(String groupName, String name) {
+    List<ComponentFactory<?>> group = getGroup(groupName);
+    if (group != null) {
+      for (Iterator<ComponentFactory<?>> iterator = group.iterator(); iterator.hasNext();) {
+        ComponentFactory<?> componentFactory = iterator.next();
+        RunnableAction action = (RunnableAction)componentFactory;
+        if (action.getName().equals(name)) {
+          iterator.remove();
+        }
+      }
+    }
   }
 }

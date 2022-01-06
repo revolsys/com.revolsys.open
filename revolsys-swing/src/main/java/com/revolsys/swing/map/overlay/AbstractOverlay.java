@@ -117,6 +117,7 @@ public abstract class AbstractOverlay extends JComponent
     this.viewport = map.getViewport();
     this.view = this.viewport.newViewRenderer();
     map.addMapOverlay(this);
+    initActionMap(getProjectFrame());
   }
 
   protected void addOverlayAction(final String name, final Cursor cursor,
@@ -537,6 +538,9 @@ public abstract class AbstractOverlay extends JComponent
       }
     }
     return false;
+  }
+
+  protected void initActionMap(final ProjectFrame frame) {
   }
 
   public boolean isMouseInMap() {

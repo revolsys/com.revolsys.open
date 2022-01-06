@@ -103,7 +103,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
   FocusListener, PropertyChangeSupportProxy, WindowListener {
   public static final String FLIP_FIELDS_ICON = "flip_fields";
 
-  public static final String FLIP_FIELDS_NAME = "Flip Fields Orientation";
+  public static final String FLIP_FIELDS_NAME = "Flip All Directional Fields";
 
   public static final String FLIP_LINE_ORIENTATION_ICON = "flip_line_orientation";
 
@@ -111,7 +111,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
 
   public static final String FLIP_RECORD_ICON = "flip_orientation";
 
-  public static final String FLIP_RECORD_NAME = "Flip Record Orientation";
+  public static final String FLIP_RECORD_NAME = "Flip geometry (Fields same on map)";
 
   private static final long serialVersionUID = 1L;
 
@@ -557,8 +557,9 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
         if (DirectionalFields.getProperty(recordDefinition).hasDirectionalFields()) {
           this.toolBar.addButton("geometry", FLIP_RECORD_NAME, FLIP_RECORD_ICON, editable,
             this::flipRecordOrientation);
-          this.toolBar.addButton("geometry", FLIP_LINE_ORIENTATION_NAME, FLIP_LINE_ORIENTATION_ICON,
-            editable, this::flipLineOrientation);
+          // this.toolBar.addButton("geometry", FLIP_LINE_ORIENTATION_NAME,
+          // FLIP_LINE_ORIENTATION_ICON,
+          // editable, this::flipLineOrientation);
           this.toolBar.addButton("geometry", FLIP_FIELDS_NAME, FLIP_FIELDS_ICON, editable,
             this::flipFields);
         } else {

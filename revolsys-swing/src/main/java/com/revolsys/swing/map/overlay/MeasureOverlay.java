@@ -222,7 +222,7 @@ public class MeasureOverlay extends AbstractOverlay {
   public void initMenuTools(final MenuFactory tools) {
     final AbstractAction measureLengthAction = new RunnableAction("Measure Length",
       Icons.getIcon("ruler_line"), () -> toggleMeasureMode(GeometryDataTypes.LINE_STRING))
-        .setAcceleratorAltKey(KeyEvent.VK_M);
+        .setAcceleratorAltKey(KeyEvent.VK_L);
     tools.addCheckboxMenuItem("map", measureLengthAction,
       new ObjectPropertyEnableCheck(this, "measureDataType", GeometryDataTypes.LINE_STRING));
 

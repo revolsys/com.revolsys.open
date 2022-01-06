@@ -58,6 +58,9 @@ public interface Layer extends GeometryFactoryProxy, PropertyChangeSupportProxy,
     }
   }
 
+  default void addSelectedBoundingBox(BoundingBoxEditor boundingBox) {
+  }
+
   default void addVisibleBbox(final BoundingBoxEditor boundingBox) {
     if (isExists() && isVisible()) {
       boundingBox.addBbox(this);
@@ -125,7 +128,11 @@ public interface Layer extends GeometryFactoryProxy, PropertyChangeSupportProxy,
 
   <L extends LayerRenderer<? extends Layer>> L getRenderer();
 
-  BoundingBox getSelectedBoundingBox();
+  default BoundingBox getSelectedBoundingBox() {
+    final BoundingBoxEditor boundingBox = getGeometryFactory().bboxEditor();
+    addSelectedBoundingBox(boundingBox);
+    return boundingBox.newBoundingBox();
+  }
 
   String getType();
 
