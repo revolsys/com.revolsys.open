@@ -106,7 +106,7 @@ public class RecordStoreSchema extends AbstractRecordStoreSchemaElement
             if (schemaPath.isParentOf(path)) {
               childElement = this.elementsByPath.get(path);
               if (childElement == null) {
-                synchronized (this) {
+                synchronized (getRecordStore()) {
                   refreshIfNeeded();
                   childElement = this.elementsByPath.get(path);
                   if (childElement == null || childElement instanceof NonExistingSchemaElement) {
