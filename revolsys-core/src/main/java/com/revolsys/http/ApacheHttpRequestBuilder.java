@@ -79,6 +79,7 @@ public class ApacheHttpRequestBuilder {
 
   public HttpUriRequest build() {
     preBuild(this.builder);
+
     return this.builder.build();
   }
 

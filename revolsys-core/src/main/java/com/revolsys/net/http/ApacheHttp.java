@@ -5,15 +5,20 @@ import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import javax.net.ssl.SSLContext;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.io.FileUtil;
@@ -141,9 +146,20 @@ public class ApacheHttp {
   }
 
   public static CloseableHttpClient newClient() {
-    return HttpClientBuilder//
-      .create()
-      .build();
+    try {
+      final SSLContext sslContext = SSLContextBuilder.create()
+        .loadTrustMaterial(new TrustSelfSignedStrategy())
+        .build();
+      final SSLConnectionSocketFactory connectionFactory = new SSLConnectionSocketFactory(
+        sslContext, (hostname, session) -> true);
+      return HttpClientBuilder//
+        .create()
+        .setSSLSocketFactory(connectionFactory)
+        .build();
+    } catch (final Exception e) {
+      throw Exceptions.wrap(e);
+    }
+
   }
 
   public static RequestBuilder setJsonBody(final RequestBuilder requestBuilder,

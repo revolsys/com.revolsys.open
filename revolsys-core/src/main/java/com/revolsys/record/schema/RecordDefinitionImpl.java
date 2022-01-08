@@ -387,23 +387,23 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   @PreDestroy
   public void destroy() {
     super.close();
-    this.fieldIdMap.clear();
-    this.fieldMap.clear();
-    this.internalFieldNames.clear();
-    this.fields = Collections.emptyList();
-    this.internalFields.clear();
-    this.fieldNames = Collections.emptyList();
-    this.fieldNamesSet = Collections.emptySet();
-    this.codeTableByFieldNameMap.clear();
-    this.recordFactory = null;
-    this.recordDefinitionFactory = new RecordDefinitionFactoryImpl();
-    this.defaultValues.clear();
-    this.description = "";
-    this.geometryFieldDefinitionIndex = -1;
-    this.geometryFieldDefinitionIndexes.clear();
-    this.geometryFieldDefinitionNames.clear();
-    this.restrictions.clear();
-    this.superClasses.clear();
+    // this.fieldIdMap.clear();
+    // this.fieldMap.clear();
+    // this.internalFieldNames.clear();
+    // this.fields = Collections.emptyList();
+    // this.internalFields.clear();
+    // this.fieldNames = Collections.emptyList();
+    // this.fieldNamesSet = Collections.emptySet();
+    // this.codeTableByFieldNameMap.clear();
+    // this.recordFactory = null;
+    // this.recordDefinitionFactory = new RecordDefinitionFactoryImpl();
+    // this.defaultValues.clear();
+    // this.description = "";
+    // this.geometryFieldDefinitionIndex = -1;
+    // this.geometryFieldDefinitionIndexes.clear();
+    // this.geometryFieldDefinitionNames.clear();
+    // this.restrictions.clear();
+    // this.superClasses.clear();
   }
 
   @Override
