@@ -91,7 +91,7 @@ public class MapGuideWebService extends AbstractWebService<MapGuideResource> {
 
   public MapEx getJsonResponse(final String operation,
     final Map<String, ? extends Object> parameters) {
-    final Resource resource = getResource(operation, "application/json", parameters);
+    final Resource resource = getResource(operation, Json.MIME_TYPE, parameters);
     return Json.toMap(resource);
   }
 
