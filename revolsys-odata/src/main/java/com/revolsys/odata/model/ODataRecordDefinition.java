@@ -9,6 +9,7 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 
 import com.revolsys.geometry.model.GeometryDataTypes;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
@@ -66,6 +67,38 @@ public class ODataRecordDefinition extends RecordDefinitionImpl {
           final boolean required = !entityField.getBoolean("$Nullable", true);
           final FieldDefinition fieldDefinition = new FieldDefinition(fieldName, dataType,
             required);
+          final int length = entityField.getInteger("$MaxLength", 0);
+          if (length != 0) {
+            fieldDefinition.setLength(length);
+          }
+          final int precision = entityField.getInteger("$Precision", 0);
+          final int scale = entityField.getInteger("$Scale", 0);
+          if (scale == 0) {
+            if (precision > 0) {
+              fieldDefinition.setLength(precision);
+            }
+          } else {
+            if (precision > 0) {
+              fieldDefinition.setLength(precision - scale);
+            }
+            fieldDefinition.setScale(scale);
+          }
+
+          final int srid = entityField.getInteger("$SRID", 0);
+          if (srid != 0) {
+            final int axisCount = entityField.getJsonObject("@Geometry.axisCount", JsonObject.EMPTY)
+              .getInteger("$Int", 2);
+            final double scaleX = entityField.getJsonObject("@Geometry.scaleX", JsonObject.EMPTY)
+              .getDouble("$Float", 0);
+            final double scaleY = entityField.getJsonObject("@Geometry.scaleY", JsonObject.EMPTY)
+              .getDouble("$Float", 0);
+            final double scaleZ = entityField.getJsonObject("@Geometry.scaleZ", JsonObject.EMPTY)
+              .getDouble("$Float", 0);
+            final GeometryFactory geometryFactory = GeometryFactory.fixed(srid, axisCount, scaleX,
+              scaleY, scaleZ);
+
+            fieldDefinition.setGeometryFactory(geometryFactory);
+          }
           addField(fieldDefinition);
         }
       }

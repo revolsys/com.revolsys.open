@@ -1,6 +1,7 @@
 package com.revolsys.odata.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,18 +12,18 @@ import org.apache.olingo.commons.api.edm.provider.CsdlEntityContainer;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntityContainerInfo;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntitySet;
 import org.apache.olingo.commons.api.edm.provider.CsdlSchema;
+import org.apache.olingo.commons.api.edm.provider.CsdlTerm;
 import org.apache.olingo.commons.api.ex.ODataException;
 import org.apache.olingo.server.api.OData;
 import org.apache.olingo.server.api.ODataHttpHandler;
 import org.apache.olingo.server.api.ServiceMetadata;
 
 import com.revolsys.jdbc.io.JdbcRecordStore;
-import com.revolsys.record.schema.TableRecordStoreConnection;
-
 import com.revolsys.odata.service.processor.ODataEntityCollectionProcessor;
 import com.revolsys.odata.service.processor.ODataEntityProcessor;
 import com.revolsys.odata.service.processor.ODataPrimitiveProcessor;
 import com.revolsys.odata.service.processor.ODataServiceDocumentMetadataProcessor;
+import com.revolsys.record.schema.TableRecordStoreConnection;
 
 public abstract class ODataEdmProvider extends CsdlAbstractEdmProvider {
 
@@ -41,7 +42,13 @@ public abstract class ODataEdmProvider extends CsdlAbstractEdmProvider {
 
   private String serviceRoot;
 
+  private final Map<FullQualifiedName, CsdlTerm> termByName = new HashMap<>();
+
   public ODataEdmProvider() {
+    addTerm("Geometry", "axisCount", "Int");
+    addTerm("Geometry", "scaleX", "Float");
+    addTerm("Geometry", "scaleY", "Float");
+    addTerm("Geometry", "scaleZ", "Float");
   }
 
   protected ODataSchema addSchema(final String namespace) {
@@ -52,6 +59,12 @@ public abstract class ODataEdmProvider extends CsdlAbstractEdmProvider {
       this.defaultSchema = schema;
     }
     return schema;
+  }
+
+  private CsdlTerm addTerm(final String namespace, final String name, final String type) {
+    final CsdlTerm term = new CsdlTerm().setName(name).setType(type);
+    this.termByName.put(new FullQualifiedName(namespace, name), term);
+    return term;
   }
 
   public void close() {
@@ -130,6 +143,11 @@ public abstract class ODataEdmProvider extends CsdlAbstractEdmProvider {
   }
 
   public abstract TableRecordStoreConnection getTableRecordStoreConnection();
+
+  @Override
+  public CsdlTerm getTerm(final FullQualifiedName termName) throws ODataException {
+    return this.termByName.get(termName);
+  }
 
   public void init() {
     for (final CsdlSchema schema : this.schemas) {

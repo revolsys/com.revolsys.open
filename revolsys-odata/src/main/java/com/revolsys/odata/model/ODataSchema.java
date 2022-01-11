@@ -19,6 +19,7 @@ public class ODataSchema extends CsdlSchema {
     setNamespace(namespace);
     this.odataEntityContainer = new ODataEntityContainer(namespace);
     setEntityContainer(this.odataEntityContainer);
+
   }
 
   public void addEntitySet(final AbstractODataEntitySet entitySet) {

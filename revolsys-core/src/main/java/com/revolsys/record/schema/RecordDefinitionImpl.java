@@ -265,12 +265,17 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
       if (Geometry.class.isAssignableFrom(dataClass)) {
         this.geometryFieldDefinitionIndexes.add(index);
         this.geometryFieldDefinitionNames.add(name);
+        GeometryFactory geometryFactory = field.getGeometryFactory();
+        if (geometryFactory == null && this.geometryFactory != null) {
+          geometryFactory = this.geometryFactory;
+          field.setGeometryFactory(geometryFactory);
+        }
         if (this.geometryFieldDefinitionIndex == -1) {
           this.geometryFieldDefinitionIndex = index;
-          final GeometryFactory geometryFactory = field.getGeometryFactory();
-          if (geometryFactory == null && this.geometryFactory != null) {
-            field.setGeometryFactory(this.geometryFactory);
+          if (this.geometryFactory == null) {
+            this.geometryFactory = geometryFactory;
           }
+
         }
       }
     }

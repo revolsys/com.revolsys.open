@@ -29,10 +29,13 @@ import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.edm.geo.Geospatial;
 import org.apache.olingo.commons.api.edm.geo.Geospatial.Dimension;
 import org.apache.olingo.commons.api.edm.geo.SRID;
+import org.apache.olingo.commons.api.edm.provider.CsdlAnnotation;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntityType;
 import org.apache.olingo.commons.api.edm.provider.CsdlNavigationProperty;
 import org.apache.olingo.commons.api.edm.provider.CsdlProperty;
 import org.apache.olingo.commons.api.edm.provider.CsdlPropertyRef;
+import org.apache.olingo.commons.api.edm.provider.annotation.CsdlConstantExpression;
+import org.apache.olingo.commons.api.edm.provider.annotation.CsdlConstantExpression.ConstantExpressionType;
 import org.apache.olingo.commons.api.ex.ODataRuntimeException;
 import org.apache.olingo.commons.api.http.HttpStatusCode;
 import org.apache.olingo.server.api.ODataApplicationException;
@@ -63,11 +66,14 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import org.jeometry.coordinatesystem.model.GeographicCoordinateSystem;
+import org.jeometry.coordinatesystem.model.HorizontalCoordinateSystemProxy;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.collection.map.IntHashMap;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryCollection;
 import com.revolsys.geometry.model.GeometryDataTypes;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.MultiLineString;
@@ -96,6 +102,8 @@ public class ODataEntityType extends CsdlEntityType {
   private static Map<DataType, EdmPrimitiveTypeKind> GEOMETRY_DATA_TYPE_MAP = new HashMap<>();
 
   private static Map<DataType, EdmPrimitiveTypeKind> GEOGRAPHY_DATA_TYPE_MAP = new HashMap<>();
+
+  private static IntHashMap<SRID> SRID_BY_ID = new IntHashMap<>();
 
   static {
     DATA_TYPE_MAP.put(DataTypes.BOOLEAN, EdmPrimitiveTypeKind.Boolean);
@@ -174,6 +182,20 @@ public class ODataEntityType extends CsdlEntityType {
     return selected;
   }
 
+  public static SRID getSrid(final HorizontalCoordinateSystemProxy spatial) {
+    final int id = spatial.getHorizontalCoordinateSystemId();
+    if (id <= 0) {
+      return null;
+    }
+    SRID srid = SRID_BY_ID.get(id);
+    if (srid == null) {
+      final String idString = Integer.toString(id);
+      srid = SRID.valueOf(idString);
+      SRID_BY_ID.put(id, srid);
+    }
+    return srid;
+  }
+
   public static boolean hasSelect(final SelectOption select) {
     return select != null && select.getSelectItems() != null && !select.getSelectItems().isEmpty();
   }
@@ -212,6 +234,15 @@ public class ODataEntityType extends CsdlEntityType {
     this.pathName = pathName;
     final RecordDefinition recordDefinition = getRecordStore().getRecordDefinition(this.pathName);
     setRecordDefinition(recordDefinition);
+  }
+
+  private void addAnnotation(final List<CsdlAnnotation> annotations, final String term,
+    final ConstantExpressionType type, final Object value) {
+    if (value != null) {
+      final CsdlAnnotation axisCountAnnotation = new CsdlAnnotation().setTerm(term)
+        .setExpression(new CsdlConstantExpression(type, value.toString()));
+      annotations.add(axisCountAnnotation);
+    }
   }
 
   void addLimits(final Query query, final UriInfo uriInfo) throws ODataApplicationException {
@@ -308,16 +339,6 @@ public class ODataEntityType extends CsdlEntityType {
     return this.recordDefinition;
   }
 
-  public JdbcRecordStore getRecordStore() {
-    return this.schema.getRecordStore();
-  }
-
-  public Entity getRelatedEntity(final Entity entity,
-    final ODataNavigationProperty navigationProperty) throws ODataApplicationException {
-    final Condition where = navigationProperty.whereCondition(entity);
-    return readEntity(null, where);
-  }
-
   // public Entity getRelatedEntity(final Entity entity, final EdmEntityType
   // relatedEntityType,
   // final List<UriParameter> keyPredicates) {
@@ -393,6 +414,16 @@ public class ODataEntityType extends CsdlEntityType {
   //
   // return navigationTargetEntityCollection;
   // }
+
+  public JdbcRecordStore getRecordStore() {
+    return this.schema.getRecordStore();
+  }
+
+  public Entity getRelatedEntity(final Entity entity,
+    final ODataNavigationProperty navigationProperty) throws ODataApplicationException {
+    final Condition where = navigationProperty.whereCondition(entity);
+    return readEntity(null, where);
+  }
 
   public Entity newEntity(final Record record) {
     final Entity entity = new Entity();
@@ -596,6 +627,8 @@ public class ODataEntityType extends CsdlEntityType {
       for (final FieldDefinition field : this.recordDefinition.getFields()) {
         final String name = field.getName();
         final DataType dataType = field.getDataType();
+        final boolean isGeometry = Geometry.class.isAssignableFrom(dataType.getJavaClass());
+        final GeometryFactory geometryFactory = field.getGeometryFactory();
         final EdmPrimitiveTypeKind fieldType;
         boolean isCollection = false;
         if (dataType == Json.JSON_TYPE) {
@@ -605,8 +638,8 @@ public class ODataEntityType extends CsdlEntityType {
           isCollection = true;
           final DataType contentType = collectionDataType.getContentType();
           fieldType = DATA_TYPE_MAP.get(contentType);
-        } else if (Geometry.class.isAssignableFrom(dataType.getJavaClass())) {
-          if (recordDefinition.getGeometryFactory().isGeocentric()) {
+        } else if (isGeometry) {
+          if (geometryFactory.isGeocentric()) {
             fieldType = GEOGRAPHY_DATA_TYPE_MAP.get(dataType);
           } else {
             fieldType = GEOMETRY_DATA_TYPE_MAP.get(dataType);
@@ -617,16 +650,52 @@ public class ODataEntityType extends CsdlEntityType {
         if (fieldType == null) {
           System.out.println(field + "\t" + dataType);
         } else {
+          final List<CsdlAnnotation> annotations = new ArrayList<>();
           final CsdlProperty property = addProperty(name, fieldType);
           property//
             .setNullable(!field.isRequired()) //
             .setCollection(isCollection) //
           ;
+          if (isGeometry) {
+            final SRID srid = getSrid(field);
+            property.setSrid(srid);
+            final int axisCount = geometryFactory.getAxisCount();
+            addAnnotation(annotations, "Geometry.axisCount", ConstantExpressionType.Int, axisCount);
+            final double scaleX = geometryFactory.getScaleX();
+            if (scaleX != 0) {
+              addAnnotation(annotations, "Geometry.scaleX", ConstantExpressionType.Float, scaleX);
+            }
+            final double scaleY = geometryFactory.getScaleY();
+            if (scaleY != 0) {
+              addAnnotation(annotations, "Geometry.scaleY", ConstantExpressionType.Float, scaleY);
+            }
+            final double scaleZ = geometryFactory.getScaleY();
+            if (axisCount > 2 && scaleZ != 0) {
+              addAnnotation(annotations, "Geometry.scaleZ", ConstantExpressionType.Float, scaleZ);
+            }
+          }
+          final int length = field.getLength();
+          final int scale = field.getScale();
+          if (Number.class.isAssignableFrom(dataType.getJavaClass())) {
+            if (scale > 0) {
+              property.setPrecision(length + scale);
+              property.setScale(scale);
+            } else if (length > 0) {
+              property.setPrecision(length);
+            }
+          } else {
+            property.setMaxLength(length);
+          }
+
           final Object defaultValue = field.getDefaultValue();
           if (defaultValue != null) {
             property.setDefaultValue(defaultValue.toString());
           }
+          if (!annotations.isEmpty()) {
+            property.setAnnotations(annotations);
+          }
         }
+
         if (recordDefinition.isIdField(name)) {
           final CsdlPropertyRef propertyRef = new CsdlPropertyRef() //
             .setName(name)//
@@ -670,16 +739,16 @@ public class ODataEntityType extends CsdlEntityType {
     });
   }
 
-  private Geospatial toGeometry(final DataType dataType, final Geometry value) {
-    if (value == null) {
+  private Geospatial toGeometry(final DataType dataType, final Geometry geometry) {
+    if (geometry == null) {
       return null;
     }
-    final CoordinateSystem coordinateSystem = value.getCoordinateSystem();
+    final CoordinateSystem coordinateSystem = geometry.getCoordinateSystem();
     final Dimension dimension = coordinateSystem instanceof GeographicCoordinateSystem
       ? Dimension.GEOGRAPHY
       : Dimension.GEOMETRY;
-    final SRID srid = SRID.valueOf(Integer.toString(coordinateSystem.getCoordinateSystemId()));
-    final Geospatial geospatial = toGeometry(dimension, srid, value);
+    final SRID srid = getSrid(geometry);
+    final Geospatial geospatial = toGeometry(dimension, srid, geometry);
     if (geospatial != null) {
       if (GeometryDataTypes.MULTI_POINT == dataType) {
         if (geospatial instanceof org.apache.olingo.commons.api.edm.geo.Point) {
