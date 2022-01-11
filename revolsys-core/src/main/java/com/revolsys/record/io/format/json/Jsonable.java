@@ -1,5 +1,12 @@
 package com.revolsys.record.io.format.json;
 
+import java.io.IOException;
+import java.io.Writer;
+
+import org.jeometry.common.exception.Exceptions;
+
+import com.revolsys.spring.resource.Resource;
+
 public interface Jsonable {
   default Appendable appendJson(final Appendable appendable) {
     final JsonType json = asJson();
@@ -41,5 +48,15 @@ public interface Jsonable {
     } else {
       return json.toJsonString(indent);
     }
+  }
+
+  default void writeTo(final Object target) {
+    try (
+      Writer writer = Resource.getResource(target).newWriter()) {
+      appendJson(writer);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+
   }
 }

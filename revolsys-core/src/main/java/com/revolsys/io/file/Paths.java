@@ -265,7 +265,7 @@ public interface Paths {
       final List<Path> paths = new ArrayList<>();
       try (
         final Stream<Path> pathStream = Files.list(path)) {
-        pathStream.forEach((childPath) -> {
+        pathStream.forEach(childPath -> {
           if (Paths.hasFileNameExtension(childPath, fileExtensions)) {
             paths.add(childPath);
           }
@@ -375,13 +375,19 @@ public interface Paths {
 
   static List<Path> getPathsTree(final Path path, final String... fileExtensions) {
     final List<Path> paths = new ArrayList<>();
-    final Consumer<Path> action2 = (childPath) -> {
+    final Consumer<Path> action2 = childPath -> {
       if (hasFileNameExtension(childPath, fileExtensions)) {
         paths.add(childPath);
       }
     };
     forEachTree(path, action2);
     return paths;
+  }
+
+  static Path getWithExtension(final Path path, final String extension) {
+    final Path parent = path.getParent();
+    final String fileName = getFileName(path) + "." + extension;
+    return parent.resolve(fileName);
   }
 
   static boolean hasFileNameExtension(final Path path, final String... fileExtensions) {
