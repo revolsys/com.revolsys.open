@@ -621,7 +621,7 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<ch.qos.logback.version>1.2.8</ch.qos.logback.version>
+		<ch.qos.logback.version>1.2.10</ch.qos.logback.version>
 		<com.fasterxml.jackson.version>2.13.0</com.fasterxml.jackson.version>
 		<org.apache.olingo.version>4.8.0</org.apache.olingo.version>
 		<org.apache.pdfbox.version>2.0.24</org.apache.pdfbox.version>
