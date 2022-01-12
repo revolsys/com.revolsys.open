@@ -73,11 +73,6 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   implements JdbcRecordStore, RecordStoreExtension {
   public static final List<String> DEFAULT_PERMISSIONS = Arrays.asList("SELECT");
 
-  public static final RecordIterator newJdbcIterator(final RecordStore recordStore,
-    final Query query, final Map<String, Object> properties) {
-    return new JdbcQueryIterator((AbstractJdbcRecordStore)recordStore, query, properties);
-  }
-
   private final Set<String> allSchemaNames = new TreeSet<>();
 
   private boolean quoteNames = false;
@@ -151,7 +146,6 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
 
   public AbstractJdbcRecordStore(final RecordFactory<? extends Record> recordFactory) {
     super(recordFactory);
-    setIteratorFactory(new RecordStoreIteratorFactory(AbstractJdbcRecordStore::newJdbcIterator));
     addRecordStoreExtension(this);
   }
 
@@ -721,6 +715,11 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     } catch (final Throwable e) {
       throw Exceptions.wrap("Unable to get schema and table permissions: " + dbSchemaName, e);
     }
+  }
+
+  @Override
+  public RecordIterator newIterator(final Query query, final Map<String, Object> properties) {
+    return new JdbcQueryIterator(this, query, properties);
   }
 
   protected Identifier newPrimaryIdentifier(final JdbcRecordDefinition recordDefinition) {

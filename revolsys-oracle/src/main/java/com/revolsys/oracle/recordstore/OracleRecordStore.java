@@ -27,7 +27,6 @@ import com.revolsys.jdbc.field.JdbcFieldAdder;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
-import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.oracle.recordstore.esri.ArcSdeStGeometryFieldDefinition;
 import com.revolsys.oracle.recordstore.esri.ArcSdeStGeometryRecordStoreExtension;
 import com.revolsys.oracle.recordstore.field.OracleBlobFieldAdder;
@@ -38,6 +37,7 @@ import com.revolsys.oracle.recordstore.field.OracleSdoGeometryJdbcFieldDefinitio
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
+import com.revolsys.record.io.RecordIterator;
 import com.revolsys.record.property.ShortNameProperty;
 import com.revolsys.record.query.Column;
 import com.revolsys.record.query.ILike;
@@ -50,7 +50,6 @@ import com.revolsys.record.query.functions.GeometryEqual2d;
 import com.revolsys.record.query.functions.WithinDistance;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.record.schema.RecordStore;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.transaction.TransactionOptions;
 import com.revolsys.util.Property;
@@ -431,7 +430,6 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
 
   private void initSettings() {
     setExcludeTablePatterns(".*\\$.*");
-    setIteratorFactory(new RecordStoreIteratorFactory(this::newOracleIterator));
     addSqlQueryAppender(GeometryEqual2d.class, this::appendGeometryEqual2d);
     addSqlQueryAppender(EnvelopeIntersects.class, this::appendEnvelopeIntersects);
     addSqlQueryAppender(WithinDistance.class, this::appendWithinDistance);
@@ -470,9 +468,9 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
     return this.useSchemaSequencePrefix;
   }
 
-  private OracleJdbcQueryIterator newOracleIterator(final RecordStore recordStore,
-    final Query query, final Map<String, Object> properties) {
-    return new OracleJdbcQueryIterator((OracleRecordStore)recordStore, query, properties);
+  @Override
+  public RecordIterator newIterator(final Query query, final Map<String, Object> properties) {
+    return new OracleJdbcQueryIterator(this, query, properties);
   }
 
   @Override

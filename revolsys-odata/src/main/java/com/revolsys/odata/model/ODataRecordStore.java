@@ -4,9 +4,12 @@ import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.http.NameValuePair;
 import org.jeometry.common.io.PathName;
 
 import com.revolsys.http.ApacheHttpRequestBuilderFactory;
+import com.revolsys.net.http.SimpleNameValuePair;
+import com.revolsys.record.io.RecordIterator;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Query;
@@ -17,6 +20,7 @@ import com.revolsys.util.Debug;
 import com.revolsys.util.UrlUtil;
 
 public class ODataRecordStore extends AbstractRecordStore {
+  public static final NameValuePair FORMAT_JSON = new SimpleNameValuePair("$format", "json");
 
   private final ApacheHttpRequestBuilderFactory requestFactory;
 
@@ -25,6 +29,10 @@ public class ODataRecordStore extends AbstractRecordStore {
   public ODataRecordStore(final ApacheHttpRequestBuilderFactory requestFactory, final URI uri) {
     this.requestFactory = requestFactory;
     this.uri = uri;
+  }
+
+  JsonObject getJson(final URI uri) {
+    return this.requestFactory.get(uri).addParameter(FORMAT_JSON).getJson();
   }
 
   @Override
@@ -36,6 +44,15 @@ public class ODataRecordStore extends AbstractRecordStore {
   @Override
   public String getRecordStoreType() {
     return "OData";
+  }
+
+  public URI getUri() {
+    return this.uri;
+  }
+
+  @Override
+  public RecordIterator newIterator(final Query query, final Map<String, Object> properties) {
+    return new ODataQueryIterator(this, this.requestFactory, query, properties);
   }
 
   @Override
@@ -56,7 +73,7 @@ public class ODataRecordStore extends AbstractRecordStore {
     final PathName pathName = schema.getPathName();
     final String schemaName = pathName.toString().substring(1).replace('/', '.');
     final URI uri = UrlUtil.appendPath(this.uri, "$metadata");
-    final JsonObject json = this.requestFactory.get(uri).addParameter("$format", "json").getJson();
+    final JsonObject json = getJson(uri);
     int startIndex;
     if (PathName.ROOT.equals(pathName)) {
       startIndex = 0;

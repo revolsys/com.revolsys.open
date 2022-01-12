@@ -19,7 +19,6 @@ import org.jeometry.common.logging.Logs;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
@@ -56,8 +55,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   private boolean createMissingRecordStore = false;
 
   private boolean createMissingTables = false;
-
-  private RecordStoreIteratorFactory iteratorFactory = new RecordStoreIteratorFactory();
 
   private String label;
 
@@ -190,7 +187,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
       this.connectionProperties.clear();
       this.recordFactory = null;
       this.recordStoreExtensions.clear();
-      this.iteratorFactory = null;
       this.label = "deleted";
       if (this.statistics != null) {
         this.statistics.clear();
@@ -246,11 +242,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   @Override
   public GeometryFactory getGeometryFactory() {
     return this.geometryFactory;
-  }
-
-  @Override
-  public RecordStoreIteratorFactory getIteratorFactory() {
-    return this.iteratorFactory;
   }
 
   @Override
@@ -417,10 +408,6 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   public void setGeometryFactory(final GeometryFactory geometryFactory) {
     this.geometryFactory = geometryFactory;
-  }
-
-  public void setIteratorFactory(final RecordStoreIteratorFactory iteratorFactory) {
-    this.iteratorFactory = iteratorFactory;
   }
 
   @Override

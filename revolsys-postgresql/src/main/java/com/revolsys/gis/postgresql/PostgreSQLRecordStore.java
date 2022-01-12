@@ -36,10 +36,10 @@ import com.revolsys.jdbc.io.AbstractJdbcDatabaseFactory;
 import com.revolsys.jdbc.io.AbstractJdbcRecordStore;
 import com.revolsys.jdbc.io.JdbcRecordDefinition;
 import com.revolsys.jdbc.io.JdbcRecordStoreSchema;
-import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
+import com.revolsys.record.io.RecordIterator;
 import com.revolsys.record.property.ShortNameProperty;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
@@ -47,18 +47,12 @@ import com.revolsys.record.query.functions.EnvelopeIntersects;
 import com.revolsys.record.query.functions.JsonValue;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
 public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
 
   public static final List<String> POSTGRESQL_INTERNAL_SCHEMAS = Arrays.asList("information_schema",
     "pg_catalog", "pg_toast_temp_1");
-
-  private static final PostgreSQLJdbcQueryIterator newPostgreSQLIterator(
-    final RecordStore recordStore, final Query query, final Map<String, Object> properties) {
-    return new PostgreSQLJdbcQueryIterator((PostgreSQLRecordStore)recordStore, query, properties);
-  }
 
   private boolean useSchemaSequencePrefix = true;
 
@@ -302,8 +296,6 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
   }
 
   protected void initSettings() {
-    setIteratorFactory(
-      new RecordStoreIteratorFactory(PostgreSQLRecordStore::newPostgreSQLIterator));
     setExcludeTablePaths("/PUBLIC/GEOMETRY_COLUMNS", "/PUBLIC/GEOGRAPHY_COLUMNS",
       "/PUBLIC/PG_BUFFER_CACHE", "/PUBLIC/PG_STAT_STATEMENTS", "/PUBLIC/SPATIAL_REF_SYS");
     addSqlQueryAppender(EnvelopeIntersects.class, this::appendEnvelopeIntersects);
@@ -352,6 +344,11 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
 
   public boolean isUseSchemaSequencePrefix() {
     return this.useSchemaSequencePrefix;
+  }
+
+  @Override
+  public RecordIterator newIterator(final Query query, final Map<String, Object> properties) {
+    return new PostgreSQLJdbcQueryIterator(this, query, properties);
   }
 
   @Override

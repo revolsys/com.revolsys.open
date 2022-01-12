@@ -89,7 +89,6 @@ public class JdbcQueryIterator extends AbstractIterator<Record>
 
   public JdbcQueryIterator(final JdbcRecordStore recordStore, final Query query,
     final Map<String, Object> properties) {
-    super();
     Transaction.assertInTransaction();
 
     this.recordFactory = query.getRecordFactory();
@@ -256,9 +255,13 @@ public class JdbcQueryIterator extends AbstractIterator<Record>
 
   @Override
   protected void initDo() {
-    this.connection = this.recordStore.getJdbcConnection(this.autoCommit);
+    if (this.query == null) {
+      close();
+    } else {
+      this.connection = this.recordStore.getJdbcConnection(this.autoCommit);
 
-    this.resultSet = getResultSet();
+      this.resultSet = getResultSet();
+    }
   }
 
   public boolean isAutoCommit() {

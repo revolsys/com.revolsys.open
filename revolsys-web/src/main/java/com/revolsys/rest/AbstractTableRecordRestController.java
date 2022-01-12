@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -37,7 +35,6 @@ import com.revolsys.record.schema.TableRecordStoreConnection;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.transaction.TransactionOptions;
 import com.revolsys.ui.web.utils.HttpServletUtils;
-import com.revolsys.util.UrlUtil;
 
 public class AbstractTableRecordRestController {
 
@@ -254,7 +251,7 @@ public class AbstractTableRecordRestController {
       }
       jsonWriter.setItemsPropertyName("value");
       final int writeCount = jsonWriter.writeAll(reader);
-      final int index = query.getOffset() + writeCount;
+      final int nextSkip = query.getOffset() + writeCount;
       boolean writeNext = false;
       if (writeCount != 0) {
         if (count == null) {
@@ -267,16 +264,10 @@ public class AbstractTableRecordRestController {
       }
 
       if (writeNext) {
-        final String url = HttpServletUtils.getFullRequestUrl(request);
-        final StringBuilder uri = new StringBuilder(url).append('?');
-
-        final Map<String, String[]> parameters = new TreeMap<>(request.getParameterMap());
-        parameters.put("$skip", new String[] {
-          Integer.toString(index)
-        });
-        UrlUtil.appendQuery(uri, parameters);
-
-        jsonWriter.setFooter(JsonObject.hash("@odata.nextLink", uri.toString()));
+        final String nextLink = HttpServletUtils.getFullRequestUriBuilder(request)
+          .setParameter("$skip", nextSkip)
+          .buildString();
+        jsonWriter.setFooter(JsonObject.hash("@odata.nextLink", nextLink));
       }
     }
   }

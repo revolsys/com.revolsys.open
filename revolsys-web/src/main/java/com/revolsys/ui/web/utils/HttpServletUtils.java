@@ -23,6 +23,7 @@ import org.springframework.web.util.UrlPathHelper;
 import com.revolsys.io.FileUtil;
 import com.revolsys.ui.web.controller.PathAliasController;
 import com.revolsys.util.Property;
+import com.revolsys.util.UriBuilder;
 
 public final class HttpServletUtils {
   private static ThreadLocal<HttpServletRequest> REQUEST_LOCAL = new ThreadLocal<>();
@@ -83,6 +84,11 @@ public final class HttpServletUtils {
       return Boolean.parseBoolean(value);
     }
     return null;
+  }
+
+  public static UriBuilder getFullRequestUriBuilder(final HttpServletRequest request) {
+    final String uri = getFullRequestUrl(request);
+    return new UriBuilder(uri);
   }
 
   public static String getFullRequestUrl() {

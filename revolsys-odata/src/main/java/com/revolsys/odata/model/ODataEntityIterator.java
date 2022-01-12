@@ -18,6 +18,7 @@ import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.TableRecordStoreConnection;
 import com.revolsys.transaction.Transaction;
+import com.revolsys.util.UriBuilder;
 
 public class ODataEntityIterator extends EntityIterator implements BaseCloseable {
 
@@ -119,20 +120,8 @@ public class ODataEntityIterator extends EntityIterator implements BaseCloseable
       }
     }
 
-    String uri = this.request.getRawRequestUri();
-    uri = uri.replaceAll("\\$skip=\\d+", "");
-    uri = uri.replaceAll("\\?&", "?");
-    uri = uri.replaceAll("&&", "&");
-    final int length = uri.length();
-    final int qIndex = uri.indexOf('?');
-    if (qIndex == -1) {
-      uri += "?";
-    } else if (qIndex != length - 1 && !uri.endsWith("&")) {
-      uri += "&";
-    }
-    uri += "$skip=" + totalRead;
-    final String uri1 = uri;
-    return URI.create(uri1);
+    final String uri = this.request.getRawRequestUri();
+    return new UriBuilder(uri).setParameter("$skip", totalRead).build();
   }
 
   @Override

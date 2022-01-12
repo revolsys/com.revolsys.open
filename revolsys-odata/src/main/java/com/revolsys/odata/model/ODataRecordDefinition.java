@@ -8,8 +8,10 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
@@ -106,8 +108,19 @@ public class ODataRecordDefinition extends RecordDefinitionImpl {
       if (idFieldNames != null) {
         setIdFieldNames(idFieldNames);
       }
-      // TODO lengths defaults etc
     }
   }
 
+  @Override
+  public Record newRecord(final MapEx values) {
+    final Record record = newRecord();
+    for (final FieldDefinition field : getFields()) {
+      final String fieldName = field.getName();
+      if (values.hasValue(fieldName)) {
+        final Object value = values.getValue(field);
+        record.setValue(field, value);
+      }
+    }
+    return record;
+  }
 }

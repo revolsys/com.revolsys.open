@@ -27,7 +27,6 @@ import com.revolsys.geometry.model.GeometryFactoryProxy;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
-import com.revolsys.jdbc.io.RecordStoreIteratorFactory;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.record.ArrayChangeTrackRecord;
 import com.revolsys.record.ArrayRecord;
@@ -308,8 +307,6 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
   MapEx getConnectionProperties();
 
   String getConnectionTitle();
-
-  RecordStoreIteratorFactory getIteratorFactory();
 
   String getLabel();
 
@@ -595,33 +592,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     }
   }
 
-  default RecordIterator newIterator(final Query query, Map<String, Object> properties) {
-    if (properties == null) {
-      properties = Collections.emptyMap();
-    }
-    if (query == null) {
-      return null;
-    } else {
-      final RecordDefinition recordDefinition = query.getRecordDefinition();
-      if (recordDefinition != null) {
-        final RecordStoreIteratorFactory recordStoreIteratorFactory = recordDefinition
-          .getProperty("recordStoreIteratorFactory");
-        if (recordStoreIteratorFactory != null) {
-          final RecordIterator iterator = recordStoreIteratorFactory.newIterator(this, query,
-            properties);
-          if (iterator != null) {
-            return iterator;
-          }
-        }
-      }
-      final RecordStoreIteratorFactory iteratorFactory = getIteratorFactory();
-      if (iteratorFactory == null) {
-        return null;
-      } else {
-        return iteratorFactory.newIterator(this, query, properties);
-      }
-    }
-  }
+  RecordIterator newIterator(final Query query, Map<String, Object> properties);
 
   default Identifier newPrimaryIdentifier(final PathName typePath) {
     return null;

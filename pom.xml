@@ -575,16 +575,6 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>jcenter</id>
-			<url>https://jcenter.bintray.com/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
 			<id>revolsys external</id>
 			<releases>
 				<enabled>true</enabled>

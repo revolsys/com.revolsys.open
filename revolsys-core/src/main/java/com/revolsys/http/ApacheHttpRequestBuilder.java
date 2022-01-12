@@ -55,6 +55,15 @@ public class ApacheHttpRequestBuilder {
     return this;
   }
 
+  public ApacheHttpRequestBuilder addParameter(final String name, final Object value) {
+    if (value == null) {
+      this.builder.addParameter(name, null);
+    } else {
+      this.builder.addParameter(name, value.toString());
+    }
+    return this;
+  }
+
   public ApacheHttpRequestBuilder addParameter(final String name, final String value) {
     this.builder.addParameter(name, value);
     return this;
