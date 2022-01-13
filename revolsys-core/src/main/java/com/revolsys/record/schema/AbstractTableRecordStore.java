@@ -97,7 +97,7 @@ public class AbstractTableRecordStore {
     return jsonSchema;
   }
 
-  private JdbcRecordStore recordStore;
+  private RecordStore recordStore;
 
   private final PathName tablePath;
 
@@ -225,10 +225,15 @@ public class AbstractTableRecordStore {
 
   protected void executeUpdate(final TableRecordStoreConnection connection, final String sql,
     final Object... parameters) {
-    try (
-      Transaction transaction = connection.newTransaction()) {
-      this.recordStore.executeUpdate(sql, parameters);
+    if (this.recordStore instanceof JdbcRecordStore) {
+      final JdbcRecordStore jdbcRecordStore = (JdbcRecordStore)this.recordStore;
+      try (
+        Transaction transaction = connection.newTransaction()) {
+        jdbcRecordStore.executeUpdate(sql, parameters);
+      }
     }
+    throw new UnsupportedOperationException("Must be a JDBC connection");
+
   }
 
   public Map<QueryValue, Boolean> getDefaultSortOrder() {
@@ -236,7 +241,11 @@ public class AbstractTableRecordStore {
   }
 
   protected JdbcConnection getJdbcConnection() {
-    return this.recordStore.getJdbcConnection();
+    if (this.recordStore instanceof JdbcRecordStore) {
+      final JdbcRecordStore jdbcRecordStore = (JdbcRecordStore)this.recordStore;
+      return jdbcRecordStore.getJdbcConnection();
+    }
+    throw new UnsupportedOperationException("Must be a JDBC connection");
   }
 
   @SuppressWarnings("unchecked")
@@ -378,7 +387,10 @@ public class AbstractTableRecordStore {
   }
 
   public void lockTable() {
-    this.recordStore.lockTable(this.tablePath);
+    if (this.recordStore instanceof JdbcRecordStore) {
+      final JdbcRecordStore jdbcRecordStore = (JdbcRecordStore)this.recordStore;
+      jdbcRecordStore.lockTable(this.tablePath);
+    }
   }
 
   public Condition newODataFilter(final String filter) {
@@ -565,7 +577,7 @@ public class AbstractTableRecordStore {
   protected void setRecordDefinitionPost(final RecordDefinition recordDefinition) {
   }
 
-  protected void setRecordStore(final JdbcRecordStore recordStore) {
+  protected void setRecordStore(final RecordStore recordStore) {
     this.recordStore = recordStore;
     final RecordDefinition recordDefinition = this.recordStore.getRecordDefinition(this.tablePath);
     setRecordDefinition(recordDefinition);

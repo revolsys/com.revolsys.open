@@ -9,7 +9,6 @@ import org.jeometry.common.io.PathName;
 import org.jeometry.common.io.PathNameProxy;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Query;
@@ -25,7 +24,7 @@ public interface TableRecordStoreConnection extends Transactionable {
     return recordStore.getRecordDefinition();
   }
 
-  JdbcRecordStore getRecordStore();
+  RecordStore getRecordStore();
 
   <TRS extends AbstractTableRecordStore> TRS getTableRecordStore(CharSequence pathName);
 
@@ -40,7 +39,7 @@ public interface TableRecordStoreConnection extends Transactionable {
 
   @Override
   default PlatformTransactionManager getTransactionManager() {
-    final JdbcRecordStore recordStore = getRecordStore();
+    final RecordStore recordStore = getRecordStore();
     return recordStore.getTransactionManager();
   }
 

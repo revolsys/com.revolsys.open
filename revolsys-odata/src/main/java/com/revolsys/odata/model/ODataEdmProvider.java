@@ -18,11 +18,11 @@ import org.apache.olingo.server.api.OData;
 import org.apache.olingo.server.api.ODataHttpHandler;
 import org.apache.olingo.server.api.ServiceMetadata;
 
-import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.odata.service.processor.ODataEntityCollectionProcessor;
 import com.revolsys.odata.service.processor.ODataEntityProcessor;
 import com.revolsys.odata.service.processor.ODataPrimitiveProcessor;
 import com.revolsys.odata.service.processor.ODataServiceDocumentMetadataProcessor;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.TableRecordStoreConnection;
 
 public abstract class ODataEdmProvider extends CsdlAbstractEdmProvider {
@@ -32,7 +32,7 @@ public abstract class ODataEdmProvider extends CsdlAbstractEdmProvider {
 
   private ODataSchema defaultSchema;
 
-  private JdbcRecordStore recordStore;
+  private RecordStore recordStore;
 
   private final Map<String, ODataSchema> schemaByNamespace = new TreeMap<>();
 
@@ -124,7 +124,7 @@ public abstract class ODataEdmProvider extends CsdlAbstractEdmProvider {
     return this.handler;
   }
 
-  public JdbcRecordStore getRecordStore() {
+  public RecordStore getRecordStore() {
     return this.recordStore;
   }
 
@@ -165,7 +165,7 @@ public abstract class ODataEdmProvider extends CsdlAbstractEdmProvider {
     this.handler = handler;
   }
 
-  protected void setRecordStore(final JdbcRecordStore recordStore) {
+  protected void setRecordStore(final RecordStore recordStore) {
     this.recordStore = recordStore;
   }
 
