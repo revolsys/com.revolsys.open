@@ -9,7 +9,7 @@ import javax.swing.Icon;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -68,7 +68,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
     final MapEx properties) {
     MapEx filterDefinition = properties.getValue("filter");
     if (filterDefinition != null) {
-      filterDefinition = new LinkedHashMapEx(filterDefinition);
+      filterDefinition = JsonObject.hash(filterDefinition);
       final String type = MapObjectFactory.getType(filterDefinition);
       if ("valueFilter".equals(type)) {
         return new MultipleAttributeValuesFilter(filterDefinition);

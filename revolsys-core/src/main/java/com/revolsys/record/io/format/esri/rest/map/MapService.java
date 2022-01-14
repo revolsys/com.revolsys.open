@@ -9,7 +9,7 @@ import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.exception.WrappedException;
 import org.jeometry.common.io.PathName;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -96,7 +96,7 @@ public class MapService extends ArcGisRestAbstractLayerService {
 
   public String getExportUrl(final BoundingBox boundingBox, final int imageWidth,
     final int imageHeight) {
-    final MapEx parameters = new LinkedHashMapEx();
+    final MapEx parameters = JsonObject.hash();
     final String bbox = Strings.toString(",", boundingBox.getMinX(), boundingBox.getMinY(),
       boundingBox.getMaxX(), boundingBox.getMaxY());
     parameters.put("bbox", bbox);

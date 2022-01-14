@@ -24,7 +24,7 @@ public interface JsonObject extends MapEx, JsonType {
 
     @Override
     public Set<Entry<String, Object>> entrySet() {
-      return MapEx.EMPTY.entrySet();
+      return JsonObject.EMPTY.entrySet();
     }
 
     @Override

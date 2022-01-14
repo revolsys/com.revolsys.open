@@ -23,7 +23,7 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.PointCloud;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
@@ -469,15 +469,15 @@ public class LasTest {
         case Rgb:
         case GpsTime:
         case GpsTimeRgb:
-          writeVariations.put("v1", new LinkedHashMapEx("lasZipVersion", 1));
-          writeVariations.put("v2", new LinkedHashMapEx("lasZipVersion", 2));
+          writeVariations.put("v1", JsonObject.hash("lasZipVersion", 1));
+          writeVariations.put("v2", JsonObject.hash("lasZipVersion", 2));
         break;
 
         case ExtendedGpsTime:
         case ExtendedGpsTimeRgb:
         case ExtendedGpsTimeRgbNir:
-          writeVariations.put("v3", new LinkedHashMapEx("lasZipVersion", 3));
-          writeVariations.put("v4", new LinkedHashMapEx("lasZipVersion", 4));
+          writeVariations.put("v3", JsonObject.hash("lasZipVersion", 3));
+          writeVariations.put("v4", JsonObject.hash("lasZipVersion", 4));
         break;
         case GpsTimeWavePackets:
         case GpsTimeRgbWavePackets:
@@ -488,7 +488,7 @@ public class LasTest {
         default:
       }
     } else {
-      writeVariations.put("default", new LinkedHashMapEx());
+      writeVariations.put("default", JsonObject.hash());
     }
     return writeVariations;
   }

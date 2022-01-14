@@ -63,7 +63,7 @@ public class JsonRecordWriter extends AbstractRecordWriter {
           out.write("\n]");
           writeExtraValues(this.footer, true);
 
-          final MapEx extraProperties = getProperty("extraProperties", MapEx.EMPTY);
+          final MapEx extraProperties = getProperty("extraProperties", JsonObject.EMPTY);
           for (final Entry<String, Object> entry : extraProperties.entrySet()) {
             final String name = entry.getKey();
             final Object value = entry.getValue();

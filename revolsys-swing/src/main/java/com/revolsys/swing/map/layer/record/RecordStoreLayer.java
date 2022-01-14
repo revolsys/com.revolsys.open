@@ -550,7 +550,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         return false;
       } else {
         final MapEx recordDefinitionProperties = getProperty("recordDefinitionProperties",
-          MapEx.EMPTY);
+          JsonObject.EMPTY);
         recordDefinition.setProperties(recordDefinitionProperties);
         setRecordDefinition(recordDefinition);
       }

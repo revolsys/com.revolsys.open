@@ -28,7 +28,7 @@ import org.w3c.dom.NodeList;
 
 import com.revolsys.beans.AbstractPropertyChangeSupportProxy;
 import com.revolsys.collection.PropertyChangeArrayList;
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.Point;
@@ -373,7 +373,7 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
         try {
           settings = Json.toMap(settingsFile);
         } catch (final Throwable e) {
-          settings = new LinkedHashMapEx();
+          settings = JsonObject.hash();
         }
         final String boundingBoxWkt = (String)settings.get("boundingBox");
         if (Property.hasValue(boundingBoxWkt)) {

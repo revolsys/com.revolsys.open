@@ -11,7 +11,7 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 
 import com.revolsys.collection.Parent;
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.GeometryDataTypes;
@@ -202,7 +202,7 @@ public class FeatureSource extends ResourceDocument implements Parent<MapGuideFe
 
   @Override
   protected void refreshDo() {
-    final MapEx properties = new LinkedHashMapEx();
+    final MapEx properties = JsonObject.hash();
     final String resourceId = getResourceId();
     properties.put("RESOURCEID", resourceId);
     final MapGuideWebService webService = getWebService();

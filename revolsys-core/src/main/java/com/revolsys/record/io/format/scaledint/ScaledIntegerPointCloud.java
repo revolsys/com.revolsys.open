@@ -8,6 +8,7 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.io.GeometryWriterFactory;
 import com.revolsys.geometry.io.PointReaderFactory;
 import com.revolsys.record.io.GeometryRecordReaderFactory;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.OutputStreamResource;
 import com.revolsys.spring.resource.Resource;
 
@@ -66,7 +67,7 @@ public class ScaledIntegerPointCloud extends GeometryRecordReaderFactory
   public ScaledIntegerPointCloudGeometryWriter newGeometryWriter(final String baseName,
     final OutputStream out, final Charset charset) {
     final OutputStreamResource resource = new OutputStreamResource(baseName, out);
-    return newGeometryWriter(resource, MapEx.EMPTY);
+    return newGeometryWriter(resource, JsonObject.EMPTY);
   }
 
   @Override

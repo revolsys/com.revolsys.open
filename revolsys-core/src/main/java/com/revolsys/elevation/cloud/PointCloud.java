@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.cloud.las.LasPointCloud;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
@@ -47,12 +47,12 @@ public interface PointCloud<P extends Point>
   }
 
   static <P extends Point, PC extends PointCloud<P>> PC newPointCloud(final Object source) {
-    return newPointCloud(source, MapEx.EMPTY);
+    return newPointCloud(source, (MapEx)JsonObject.EMPTY);
   }
 
   static <P extends Point, PC extends PointCloud<P>> PC newPointCloud(final Object source,
     final GeometryFactory defaultGeometryFactory) {
-    final MapEx properties = new LinkedHashMapEx("geometryFactory", defaultGeometryFactory);
+    final MapEx properties = JsonObject.hash("geometryFactory", defaultGeometryFactory);
     return newPointCloud(source, properties);
   }
 
@@ -147,7 +147,7 @@ public interface PointCloud<P extends Point>
   String toHtml();
 
   default boolean writePointCloud(final Object target) {
-    return writePointCloud(target, MapEx.EMPTY);
+    return writePointCloud(target, (MapEx)JsonObject.EMPTY);
   }
 
   default boolean writePointCloud(final Object target, final MapEx properties) {

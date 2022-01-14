@@ -7,11 +7,11 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 
 public class JdbcRecordStoreFactoryBean extends AbstractFactoryBean<JdbcRecordStore> {
-  private MapEx config = new LinkedHashMapEx();
+  private MapEx config = JsonObject.hash();
 
   private DataSource dataSource;
 

@@ -22,6 +22,7 @@ import java.util.prefs.Preferences;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.util.BaseCloneable;
 import com.revolsys.util.Property;
 
@@ -762,7 +763,7 @@ public interface Maps {
   }
 
   static MapEx newLinkedHashEx(final Map<String, ? extends Object> map) {
-    final MapEx copy = new LinkedHashMapEx();
+    final MapEx copy = JsonObject.hash();
     if (map != null) {
       copy.putAll(map);
     }

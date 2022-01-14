@@ -96,7 +96,7 @@ class ImgEntry implements MapEx, MapSerializer {
 
   private MapEx getFieldValues() {
     if (this.type == null) {
-      return MapEx.EMPTY;
+      return JsonObject.EMPTY;
     } else if (this.fieldValues == null) {
       if (this.dataPosition > 0) {
         this.reader.seek(this.dataPosition);

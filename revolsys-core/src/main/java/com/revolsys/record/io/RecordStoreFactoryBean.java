@@ -5,12 +5,12 @@ import java.util.Map;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.RecordStore;
 
 public class RecordStoreFactoryBean extends AbstractFactoryBean<RecordStore> {
-  private MapEx config = new LinkedHashMapEx();
+  private MapEx config = JsonObject.hash();
 
   private Map<String, Object> properties = new LinkedHashMap<>();
 

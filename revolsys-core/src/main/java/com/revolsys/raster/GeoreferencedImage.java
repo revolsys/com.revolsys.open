@@ -24,6 +24,7 @@ import com.revolsys.geometry.model.impl.PointDoubleXY;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.math.matrix.Matrix;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Cancellable;
 
@@ -377,7 +378,7 @@ public interface GeoreferencedImage
   }
 
   default void writeImage(final Object target) {
-    writeImage(target, MapEx.EMPTY);
+    writeImage(target, JsonObject.EMPTY);
   }
 
   default void writeImage(final Object target, final MapEx properties) {

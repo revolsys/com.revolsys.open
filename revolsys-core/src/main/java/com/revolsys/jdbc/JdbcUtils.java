@@ -32,7 +32,7 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.exception.JdbcExceptionTranslator;
@@ -300,7 +300,7 @@ public final class JdbcUtils {
   }
 
   public static MapEx readMap(final ResultSet rs) throws SQLException {
-    final MapEx values = new LinkedHashMapEx();
+    final MapEx values = JsonObject.hash();
     final ResultSetMetaData metaData = rs.getMetaData();
     for (int i = 1; i <= metaData.getColumnCount(); i++) {
       final String name = metaData.getColumnName(i);

@@ -54,7 +54,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.collection.EmptyReference;
 import com.revolsys.collection.list.Lists;
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.set.Sets;
@@ -1413,7 +1413,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   public MapEx getPasteNewValues(final Record sourceRecord) {
     final RecordDefinition recordDefinition = getRecordDefinition();
     final Set<String> ignoreFieldNames = getIgnorePasteFieldNames();
-    final MapEx newValues = new LinkedHashMapEx();
+    final MapEx newValues = JsonObject.hash();
     for (final FieldDefinition field : recordDefinition.getFields()) {
       final String fieldName = field.getName();
       if (!ignoreFieldNames.contains(fieldName)) {
@@ -3401,7 +3401,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   public void showRecordsTable(final String fieldFilterMode, final boolean selectTab) {
-    final MapEx config = new LinkedHashMapEx("fieldFilterMode", fieldFilterMode);
+    final MapEx config = JsonObject.hash("fieldFilterMode", fieldFilterMode);
     if (!selectTab) {
       config.put("selectTab", false);
     }

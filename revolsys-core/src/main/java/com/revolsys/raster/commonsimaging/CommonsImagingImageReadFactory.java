@@ -12,11 +12,11 @@ import org.apache.commons.imaging.common.bytesource.ByteSourceFile;
 import org.apache.commons.imaging.common.bytesource.ByteSourceInputStream;
 import org.jeometry.common.exception.Exceptions;
 
-import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.raster.BufferedImageReadFactory;
 import com.revolsys.raster.GeoreferencedImage;
 import com.revolsys.raster.GeoreferencedImageReadFactory;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.Resource;
 
 public class CommonsImagingImageReadFactory extends AbstractIoFactory
@@ -60,7 +60,7 @@ public class CommonsImagingImageReadFactory extends AbstractIoFactory
         final String filename = resource.getFilename();
         byteSource = new ByteSourceInputStream(in, filename);
       }
-      return this.imageParser.getBufferedImage(byteSource, MapEx.EMPTY);
+      return this.imageParser.getBufferedImage(byteSource, JsonObject.EMPTY);
     } catch (final ImageReadException | IOException e) {
       throw Exceptions.wrap("Unable to open: " + resource, e);
     }

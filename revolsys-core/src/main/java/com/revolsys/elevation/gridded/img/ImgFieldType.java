@@ -3,7 +3,7 @@ package com.revolsys.elevation.gridded.img;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 
 class ImgFieldType {
@@ -29,7 +29,7 @@ class ImgFieldType {
   }
 
   public MapEx readFieldValues(final ImgGriddedElevationReader reader) {
-    final MapEx fieldValues = new LinkedHashMapEx();
+    final MapEx fieldValues = JsonObject.hash();
     for (final ImgField field : this.fields) {
       final String name = field.getName();
       final Object value = field.readValue(reader);

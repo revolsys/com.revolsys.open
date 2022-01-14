@@ -3,6 +3,7 @@ package com.revolsys.geometry.io;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.FileIoFactory;
 import com.revolsys.io.ReadIoFactory;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.Resource;
 
 public interface PointReaderFactory extends FileIoFactory, ReadIoFactory {
@@ -12,7 +13,7 @@ public interface PointReaderFactory extends FileIoFactory, ReadIoFactory {
   }
 
   default PointReader newPointReader(final Resource resource) {
-    return newPointReader(resource, MapEx.EMPTY);
+    return newPointReader(resource, JsonObject.EMPTY);
   }
 
   PointReader newPointReader(final Resource resource, MapEx properties);

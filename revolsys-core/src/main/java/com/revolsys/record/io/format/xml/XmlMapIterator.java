@@ -8,7 +8,7 @@ import javax.xml.stream.XMLStreamConstants;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.collection.map.NamedLinkedHashMapEx;
+import com.revolsys.collection.map.NamedJsonObject;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
@@ -74,7 +74,7 @@ public class XmlMapIterator extends AbstractIterator<MapEx> {
   @SuppressWarnings("unchecked")
   private Object readElement() {
     final String name = this.in.getLocalName();
-    final MapEx map = new NamedLinkedHashMapEx(name);
+    final MapEx map = new NamedJsonObject(name);
     int textIndex = 0;
     int elementIndex = 0;
     while (this.in.next() != XMLStreamConstants.END_ELEMENT) {
@@ -130,7 +130,7 @@ public class XmlMapIterator extends AbstractIterator<MapEx> {
   @SuppressWarnings("unchecked")
   private MapEx readMap() {
     final String name = this.in.getLocalName();
-    final MapEx map = new NamedLinkedHashMapEx(name);
+    final MapEx map = new NamedJsonObject(name);
     int textIndex = 0;
     while (this.in.next() != XMLStreamConstants.END_ELEMENT) {
       switch (this.in.getEventType()) {

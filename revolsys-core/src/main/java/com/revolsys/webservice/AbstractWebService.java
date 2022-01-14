@@ -2,7 +2,7 @@ package com.revolsys.webservice;
 
 import java.util.Map;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.properties.BaseObjectWithProperties;
 import com.revolsys.record.io.format.json.JsonObject;
@@ -42,7 +42,7 @@ public abstract class AbstractWebService<V> extends BaseObjectWithProperties
   }
 
   public MapEx getConnectionProperties() {
-    return new LinkedHashMapEx().add("name", this.name);
+    return JsonObject.hash().add("name", this.name);
   }
 
   @Override

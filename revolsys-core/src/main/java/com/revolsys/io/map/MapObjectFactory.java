@@ -9,7 +9,7 @@ import java.util.function.BiConsumer;
 
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.properties.ObjectWithProperties;
@@ -77,7 +77,7 @@ public interface MapObjectFactory {
       return null;
     } else {
       // final long startTime = System.currentTimeMillis();
-      final MapEx objectMap = new LinkedHashMapEx();
+      final MapEx objectMap = JsonObject.hash();
       for (final Entry<String, ? extends Object> entry : map.entrySet()) {
         final String key = entry.getKey();
         Object value = entry.getValue();

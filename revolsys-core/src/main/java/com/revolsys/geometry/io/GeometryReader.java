@@ -1,6 +1,6 @@
 package com.revolsys.geometry.io;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
@@ -24,12 +24,12 @@ public interface GeometryReader extends Reader<Geometry> {
   }
 
   static GeometryReader newGeometryReader(final Object source) {
-    return newGeometryReader(source, MapEx.EMPTY);
+    return newGeometryReader(source, JsonObject.EMPTY);
   }
 
   static GeometryReader newGeometryReader(final Object source,
     final GeometryFactory geometryFactory) {
-    final MapEx properties = new LinkedHashMapEx("geometryFactory", geometryFactory);
+    final MapEx properties = JsonObject.hash("geometryFactory", geometryFactory);
     return newGeometryReader(source, properties);
   }
 

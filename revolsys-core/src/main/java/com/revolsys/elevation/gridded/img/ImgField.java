@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 
 class ImgField {
   private static final int BIT = 0;
@@ -248,7 +249,7 @@ class ImgField {
             return values;
           }
         } else {
-          return MapEx.EMPTY;
+          return JsonObject.EMPTY;
         }
 
       default:

@@ -10,6 +10,7 @@ import org.jeometry.common.io.PathName;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.http.ApacheHttpRequestBuilderFactory;
+import com.revolsys.http.ConfigurableRequestBuilderFactory;
 import com.revolsys.net.http.SimpleNameValuePair;
 import com.revolsys.record.io.RecordIterator;
 import com.revolsys.record.io.RecordWriter;
@@ -33,7 +34,7 @@ public class ODataRecordStore extends AbstractRecordStore {
     this.uri = uri;
   }
 
-  public ODataRecordStore(final OData databaseFactory, final MapEx connectionProperties) {
+  ODataRecordStore(final OData databaseFactory, final MapEx connectionProperties) {
     final URI uri = connectionProperties.getValue("url", DataTypes.ANY_URI);
     if (uri.getScheme().equals("odata")) {
       final String serviceUrl = uri.getSchemeSpecificPart();
@@ -41,7 +42,12 @@ public class ODataRecordStore extends AbstractRecordStore {
     } else {
       this.uri = uri;
     }
-    this.requestFactory = null; // TODO fix
+    final String apiKey = connectionProperties.getString("apiKey");
+    if (apiKey == null) {
+      throw new IllegalArgumentException("No login config");
+    } else {
+      this.requestFactory = new ConfigurableRequestBuilderFactory().addParameter("ApiKey", apiKey);
+    }
   }
 
   JsonObject getJson(final URI uri) {
