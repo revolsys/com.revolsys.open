@@ -2450,7 +2450,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     return values1;
   }
 
-  public RecordLayerTablePanel newTablePanel(final Map<String, Object> config) {
+  public RecordLayerTablePanel newTablePanel(final MapEx config) {
     final RecordLayerTable table = RecordLayerTableModel.newTable(this);
     if (table == null) {
       return null;
@@ -2460,7 +2460,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   @Override
-  protected Component newTableViewComponent(final Map<String, Object> config) {
+  protected Component newTableViewComponent(final MapEx config) {
     return newTablePanel(config);
   }
 
@@ -3128,7 +3128,8 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       }
     }
     super.setProperties(properties);
-    final Predicate<MapEx> predicate = AbstractRecordLayerRenderer.getFilter(this, properties);
+    final Predicate<MapEx> predicate = AbstractRecordLayerRenderer.getFilter(this,
+      (MapEx)properties);
     if (predicate instanceof RecordDefinitionSqlFilter) {
       final RecordDefinitionSqlFilter sqlFilter = (RecordDefinitionSqlFilter)predicate;
       setWhere(sqlFilter.getQuery());

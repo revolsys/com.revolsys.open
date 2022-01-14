@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.record.io.format.directory.DirectoryRecordStore;
 import com.revolsys.record.schema.RecordStore;
@@ -49,7 +50,7 @@ public abstract class AbstractRecordIoFactory extends AbstractIoFactory
   }
 
   @Override
-  public RecordStore newRecordStore(final Map<String, ? extends Object> connectionProperties) {
+  public RecordStore newRecordStore(final MapEx connectionProperties) {
     final String url = (String)connectionProperties.get("url");
     final Resource resource = Resource.getResource(url);
     final File directory = resource.getFile();

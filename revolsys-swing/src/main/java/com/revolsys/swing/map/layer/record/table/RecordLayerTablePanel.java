@@ -31,6 +31,7 @@ import javax.swing.table.TableCellEditor;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.comparator.StringNumberComparator;
 import com.revolsys.io.map.MapSerializer;
@@ -90,7 +91,7 @@ public class RecordLayerTablePanel extends TablePanel
   private final PropertyChangeListener viewportListener;
 
   public RecordLayerTablePanel(final AbstractRecordLayer layer, final RecordLayerTable table,
-    final Map<String, Object> config) {
+    final MapEx config) {
     super(table);
     this.layer = layer;
     this.tableModel = getTableModel();
@@ -98,7 +99,7 @@ public class RecordLayerTablePanel extends TablePanel
       this::setTableRecordsMode);
     Property.addListenerNewValueSource(this.tableModel, "geometryFilterMode",
       this::setGeometryFilterMode);
-    final Map<String, Object> pluginConfig = layer.getPluginConfig(AbstractLayer.PLUGIN_TABLE_VIEW);
+    final MapEx pluginConfig = layer.getPluginConfig(AbstractLayer.PLUGIN_TABLE_VIEW);
 
     table.getTableCellEditor().addMouseListener(this);
     table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
@@ -332,7 +333,7 @@ public class RecordLayerTablePanel extends TablePanel
     }
   }
 
-  protected void newToolBar(final Map<String, Object> pluginConfig) {
+  protected void newToolBar(final MapEx pluginConfig) {
     final ToolBar toolBar = getToolBar();
 
     final RecordDefinition recordDefinition = getRecordDefinition();

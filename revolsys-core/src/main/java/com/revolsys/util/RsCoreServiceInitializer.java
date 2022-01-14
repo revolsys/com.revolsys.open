@@ -5,6 +5,7 @@ import java.util.Map;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.data.type.ObjectDataType;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.GriddedElevationModel;
 import com.revolsys.elevation.tin.TriangulatedIrregularNetwork;
 import com.revolsys.geometry.model.GeometryDataTypes;
@@ -31,8 +32,7 @@ public class RsCoreServiceInitializer implements ServiceInitializer {
     DataTypes.registerDataTypes(GeometryDataTypes.class);
     ObjectDataType.setToObjectFunction(value -> {
       if (value instanceof Map<?, ?>) {
-        @SuppressWarnings("unchecked")
-        final Map<String, ? extends Object> map = (Map<String, ? extends Object>)value;
+        final MapEx map = (MapEx)value;
         final String type = MapObjectFactory.getType(map);
         if (type != null) {
           final Object object = MapObjectFactory.toObject(map);

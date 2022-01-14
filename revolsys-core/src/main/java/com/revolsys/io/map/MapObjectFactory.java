@@ -24,7 +24,7 @@ public interface MapObjectFactory {
 
   static String TYPE_CLASS = "j:typeClass";
 
-  static String getType(final Map<String, ? extends Object> map) {
+  static String getType(final MapEx map) {
     String type = Maps.getString(map, TYPE);
     if (type == null) {
       type = Maps.getString(map, "type");
@@ -36,7 +36,7 @@ public interface MapObjectFactory {
     return getType(map.getProperties());
   }
 
-  static String getTypeClass(final Map<String, ? extends Object> map) {
+  static String getTypeClass(final MapEx map) {
     String type = Maps.getString(map, TYPE_CLASS);
     if (type == null) {
       type = Maps.getString(map, "typeClass");
@@ -72,7 +72,7 @@ public interface MapObjectFactory {
   }
 
   @SuppressWarnings("unchecked")
-  static <V> V toObject(final Map<String, ? extends Object> map) {
+  static <V> V toObject(final MapEx map) {
     if (map == null) {
       return null;
     } else {
@@ -181,5 +181,5 @@ public interface MapObjectFactory {
 
   String getTypeName();
 
-  <V> V mapToObject(Map<String, ? extends Object> map);
+  <V> V mapToObject(MapEx map);
 }

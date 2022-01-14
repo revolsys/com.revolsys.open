@@ -1,10 +1,10 @@
 package com.revolsys.collection.map;
 
-import java.util.Map;
+import java.util.Set;
 
 import com.revolsys.io.map.MapSerializer;
 
-public class MapSerializerMap extends DelegatingMap<String, Object> {
+public class MapSerializerMap implements MapEx {
 
   private final MapSerializer serializer;
 
@@ -13,12 +13,13 @@ public class MapSerializerMap extends DelegatingMap<String, Object> {
   }
 
   @Override
-  public Map<String, Object> getMap() {
-    return this.serializer.toMap();
+  public MapEx clone() {
+    return this;
   }
 
   @Override
-  public void setMap(final Map<String, Object> map) {
-    throw new UnsupportedOperationException("Cannot change the underlying map as it is not used.");
+  public Set<Entry<String, Object>> entrySet() {
+    return this.serializer.toMap().entrySet();
   }
+
 }

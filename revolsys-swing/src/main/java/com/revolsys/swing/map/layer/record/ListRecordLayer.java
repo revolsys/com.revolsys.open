@@ -205,7 +205,7 @@ public class ListRecordLayer extends AbstractRecordLayer {
   }
 
   @Override
-  public RecordLayerTablePanel newTablePanel(final Map<String, Object> config) {
+  public RecordLayerTablePanel newTablePanel(final MapEx config) {
     final RecordLayerTable table = ListRecordLayerTableModel.newTable(this);
     return new RecordLayerTablePanel(this, table, config);
   }

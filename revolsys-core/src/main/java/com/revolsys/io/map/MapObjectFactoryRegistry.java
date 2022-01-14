@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.util.CaseConverter;
 import com.revolsys.util.ServiceInitializer;
 
@@ -27,12 +28,12 @@ public class MapObjectFactoryRegistry {
   }
 
   public static void newFactory(final String typeName,
-    final Function<Map<String, ? extends Object>, Object> function) {
+    final Function<MapEx, Object> function) {
     newFactory(typeName, CaseConverter.toCapitalizedWords(typeName), function);
   }
 
   public static void newFactory(final String typeName, final String description,
-    final Function<Map<String, ? extends Object>, Object> function) {
+    final Function<MapEx, Object> function) {
     final FunctionMapObjectFactory factory = new FunctionMapObjectFactory(typeName, description,
       function);
     TYPE_NAME_TO_FACTORY.put(typeName, factory);

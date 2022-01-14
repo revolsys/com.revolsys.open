@@ -285,7 +285,7 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory
 
   @Override
   public GeoPackageRecordStore newRecordStore(
-    final Map<String, ? extends Object> connectionProperties) {
+    final MapEx connectionProperties) {
     return new GeoPackageRecordStore(this, connectionProperties);
   }
 

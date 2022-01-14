@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 import org.jeometry.common.logging.Logs;
 import org.jeometry.common.number.Doubles;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -312,7 +313,7 @@ public class GeoreferencedImageLayer extends AbstractLayer {
   }
 
   @Override
-  protected TiePointsPanel newTableViewComponent(final Map<String, Object> config) {
+  protected TiePointsPanel newTableViewComponent(final MapEx config) {
     if (getImage() == null) {
       return null;
     } else {

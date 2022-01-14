@@ -5,7 +5,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,7 +12,6 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.jeometry.common.data.identifier.Identifier;
-import org.jeometry.common.date.Dates;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.io.PathNameProxy;
 import org.springframework.beans.DirectFieldAccessor;
@@ -42,6 +40,7 @@ import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.record.io.RecordStoreFactory;
 import com.revolsys.record.io.RecordStoreQueryReader;
 import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
@@ -90,8 +89,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
    * @return
    */
   @SuppressWarnings("unchecked")
-  static <T extends RecordStore> T newRecordStore(
-    final Map<String, ? extends Object> connectionProperties) {
+  static <T extends RecordStore> T newRecordStore(final MapEx connectionProperties) {
     final String url = (String)connectionProperties.get("url");
     final RecordStoreFactory factory = recordStoreFactory(url);
     if (factory == null) {
@@ -111,8 +109,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     if (factory == null) {
       throw new IllegalArgumentException("Record Store Factory not found for " + url);
     } else {
-      final Map<String, Object> connectionProperties = new HashMap<>();
-      connectionProperties.put("url", url);
+      final JsonObject connectionProperties = JsonObject.hash("url", url);
       return (T)factory.newRecordStore(connectionProperties);
     }
   }
@@ -124,29 +121,24 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     if (factory == null) {
       throw new IllegalArgumentException("Record Store Factory not found for " + url);
     } else {
-      final Map<String, Object> connectionProperties = new HashMap<>();
-      connectionProperties.put("url", url);
-      connectionProperties.put("user", user);
-      connectionProperties.put("password", password);
+      final JsonObject connectionProperties = JsonObject.hash()
+        .addValue("url", url)
+        .addValue("user", user)
+        .addValue("password", password);
       return (T)factory.newRecordStore(connectionProperties);
     }
   }
 
   @SuppressWarnings("unchecked")
-  static <T extends RecordStore> T newRecordStoreInitialized(
-    final Map<String, ? extends Object> config) {
-    final Map<String, Object> connectionProperties = (Map<String, Object>)config.get("connection");
+  static <T extends RecordStore> T newRecordStoreInitialized(final MapEx config) {
+    final MapEx connectionProperties = (MapEx)config.get("connection");
     if (Property.isEmpty(connectionProperties)) {
       throw new IllegalArgumentException(
         "Record store must include a 'connection' map property: " + config);
     } else {
-      long startTime = System.currentTimeMillis();
       final RecordStore recordStore = RecordStore.newRecordStore(connectionProperties);
-      Dates.debugEllapsedTime(RecordStore.class, "new", startTime);
       recordStore.setProperties(config);
-      Dates.debugEllapsedTime(RecordStore.class, "setProperties", startTime);
       recordStore.initialize();
-      startTime = Dates.debugEllapsedTime(RecordStore.class, "init", startTime);
       return (T)recordStore;
     }
   }

@@ -201,7 +201,7 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
   JdbcRecordStore newRecordStore(DataSource dataSource);
 
   @Override
-  JdbcRecordStore newRecordStore(Map<String, ? extends Object> connectionProperties);
+  JdbcRecordStore newRecordStore(MapEx connectionProperties);
 
   DataAccessException translateException(String message, String sql, SQLException exception);
 }
