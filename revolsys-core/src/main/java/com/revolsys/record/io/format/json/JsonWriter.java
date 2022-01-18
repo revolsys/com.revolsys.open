@@ -96,7 +96,7 @@ public final class JsonWriter implements BaseCloseable {
 
   public void charSequence(final CharSequence string) {
     try {
-      JsonWriterUtil.charSequence(this.out, string);
+      this.encodingOut.append(string);
     } catch (final Exception e) {
       throw Exceptions.wrap(e);
     }
@@ -362,10 +362,15 @@ public final class JsonWriter implements BaseCloseable {
       } else if (value instanceof Map) {
         final Map<String, ? extends Object> map = (Map<String, ? extends Object>)value;
         write(map);
+      } else if (value instanceof String) {
+        final String string = (String)value;
+        this.out.write('"');
+        this.encodingOut.write(string);
+        this.out.write('"');
       } else if (value instanceof CharSequence) {
         final CharSequence string = (CharSequence)value;
         this.out.write('"');
-        charSequence(string);
+        this.encodingOut.append(string);
         this.out.write('"');
       } else if (value.getClass().isArray()) {
         final List<? extends Object> list = Lists.arrayToList(value);

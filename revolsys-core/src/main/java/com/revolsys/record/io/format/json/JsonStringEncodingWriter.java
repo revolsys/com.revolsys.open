@@ -14,6 +14,51 @@ public class JsonStringEncodingWriter extends Writer {
   }
 
   @Override
+  public Writer append(final CharSequence string) throws IOException {
+    final int length = string.length();
+    return append(string, 0, length);
+  }
+
+  @Override
+  public Writer append(final CharSequence string, int startIndex, final int length)
+    throws IOException {
+    final Writer out = this.out;
+    int count = 0;
+    final int endIndex = startIndex + length;
+    for (int i = 0; i < endIndex; i++) {
+      final char c = string.charAt(i);
+      if (c < JsonWriterUtil.CHARACTER_ESCAPE_END) {
+        out.append(string, startIndex, count);
+        final String escape = JsonWriterUtil.CHARACTER_ESCAPE[c];
+        out.write(escape);
+        startIndex = i + 1;
+        count = 0;
+      } else if (c == '"') {
+        out.append(string, startIndex, count);
+        out.write('\\');
+        out.write('"');
+        startIndex = i + 1;
+        count = 0;
+      } else if (c == '\\') {
+        out.append(string, startIndex, count);
+        out.write('\\');
+        out.write('\\');
+        startIndex = i + 1;
+        count = 0;
+      } else {
+        if (count == 1024) {
+          out.append(string, startIndex, count);
+          startIndex = i;
+          count = 0;
+        }
+        count++;
+      }
+    }
+    out.append(string, startIndex, count);
+    return this;
+  }
+
+  @Override
   public void close() {
     FileUtil.closeSilent(this.out);
     this.out = null;

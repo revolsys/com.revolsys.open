@@ -49,7 +49,7 @@ public interface JsonObject extends MapEx, JsonType {
     }
   };
 
-  static Supplier<JsonObject> HASH_SUPPLIER = () -> hash();
+  static Supplier<JsonObject> HASH_SUPPLIER = JsonObject::hash;
 
   static JsonObject hash() {
     return new JsonObjectHash();
@@ -164,6 +164,16 @@ public interface JsonObject extends MapEx, JsonType {
   default JsonObject addValueClone(final String key, Object value) {
     value = JsonType.toJsonClone(value);
     return addValue(key, value);
+  }
+
+  default JsonObject addValues(final MapEx values) {
+    if (values != null) {
+      for (final String name : values.keySet()) {
+        final Object value = values.getValue(name);
+        addValue(name, value);
+      }
+    }
+    return this;
   }
 
   default JsonObject addValuesClone(final MapEx values) {

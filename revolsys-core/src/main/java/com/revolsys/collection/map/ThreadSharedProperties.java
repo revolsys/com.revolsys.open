@@ -45,7 +45,7 @@ public class ThreadSharedProperties {
   public static Map<String, Object> getProperties() {
     final Map<Object, Object> properties = getLocalProperties();
     synchronized (properties) {
-      final HashMap<String, Object> map = new HashMap<>();
+      final Map<String, Object> map = new HashMap<>();
       for (final Entry<Object, Object> entry : properties.entrySet()) {
         final Object key = entry.getKey();
         if (key instanceof String) {

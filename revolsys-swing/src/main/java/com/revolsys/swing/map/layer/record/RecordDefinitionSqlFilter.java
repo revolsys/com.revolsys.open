@@ -1,6 +1,7 @@
 package com.revolsys.swing.map.layer.record;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.function.Predicate;
@@ -40,7 +41,7 @@ public class RecordDefinitionSqlFilter implements Predicate<MapEx>, MapSerialize
           this.initialized = true;
           try {
             final Properties properties = System.getProperties();
-            final HashMap<String, Object> uriVariables = new HashMap<>();
+            final Map<String, Object> uriVariables = new HashMap<>();
             for (final Entry<Object, Object> entry : properties.entrySet()) {
               final String key = (String)entry.getKey();
               final Object value = entry.getValue();

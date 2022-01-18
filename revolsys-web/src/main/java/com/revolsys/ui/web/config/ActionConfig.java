@@ -16,6 +16,7 @@
 package com.revolsys.ui.web.config;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import com.revolsys.ui.web.exception.ActionInitException;
 
@@ -27,7 +28,7 @@ public class ActionConfig {
   private final Config config;
 
   /** The initialization parameters for the action. */
-  private final HashMap parameters = new HashMap();
+  private final Map parameters = new HashMap();
 
   /** The name of the IafAction subclass. */
   private String type;

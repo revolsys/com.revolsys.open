@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -37,7 +38,7 @@ public class Component {
 
   private String area;
 
-  private final HashMap fields = new HashMap();
+  private final Map fields = new HashMap();
 
   private String file;
 

@@ -26,7 +26,9 @@ public class UuidBuilder {
   }
 
   public UuidBuilder append(final Object value) {
-    if (value instanceof String) {
+    if (value == null) {
+      append("null");
+    } else if (value instanceof String) {
       append((String)value);
     } else if (value != null) {
       final String string = DataTypes.toString(value);
@@ -40,14 +42,14 @@ public class UuidBuilder {
     return append(bytes);
   }
 
-  public Identifier newStringIdentifier() {
-    final String string = toString();
-    return Identifier.newIdentifier(string);
-  }
-
   public UUID build() {
     final byte[] digest = this.digester.digest();
     return UuidNamespace.toUuid(this.type, digest);
+  }
+
+  public Identifier newStringIdentifier() {
+    final String string = toString();
+    return Identifier.newIdentifier(string);
   }
 
   @Override

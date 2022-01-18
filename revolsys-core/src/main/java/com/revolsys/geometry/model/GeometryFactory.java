@@ -459,7 +459,7 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
 
   private static final IntHashMap<GeometryFactories> INSTANCES_BY_COORDINATE_SYSTEM_ID = new IntHashMap<>();
 
-  private static final HashMap<CoordinateSystem, GeometryFactories> INSTANCES_BY_COORDINATE_SYSTEM = new HashMap<>();
+  private static final Map<CoordinateSystem, GeometryFactories> INSTANCES_BY_COORDINATE_SYSTEM = new HashMap<>();
 
   public static final GeometryFactory DEFAULT_2D = floating(0, 2);
 

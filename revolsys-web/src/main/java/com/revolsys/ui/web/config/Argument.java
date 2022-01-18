@@ -18,6 +18,7 @@ package com.revolsys.ui.web.config;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ public class Argument {
   private final String name;
 
   /** The initialization parameters for the argument. */
-  private final HashMap parameters = new HashMap();
+  private final Map parameters = new HashMap();
 
   private final boolean required;
 

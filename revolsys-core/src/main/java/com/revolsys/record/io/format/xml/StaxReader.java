@@ -479,6 +479,23 @@ public class StaxReader extends StreamReaderDelegate implements BaseCloseable {
     return true;
   }
 
+  public boolean skipToStartElement(final int depth) {
+    try {
+      while (this.depth >= depth) {
+        next();
+        if (this.depth < depth) {
+          return false;
+        } else if (getEventType() == END_DOCUMENT) {
+          return false;
+        } else if (getEventType() == START_ELEMENT) {
+          return true;
+        }
+      }
+    } catch (final NoSuchElementException e) {
+    }
+    return false;
+  }
+
   public boolean skipToStartElement(final int depth, final QName elementName) {
     while (this.depth >= depth) {
       next();

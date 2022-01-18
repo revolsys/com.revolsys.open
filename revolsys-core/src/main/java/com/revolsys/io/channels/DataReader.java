@@ -67,6 +67,16 @@ public interface DataReader extends BaseCloseable {
 
   boolean isByte(char expected);
 
+  default boolean isBytes(final byte[] bytes) {
+    for (final byte e : bytes) {
+      final byte a = getByte();
+      if (a != e) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   boolean isClosed();
 
   default boolean isEof() {
