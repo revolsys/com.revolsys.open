@@ -12,10 +12,10 @@ import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.queryoption.CountOption;
 
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.TableRecordStoreConnection;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.UriBuilder;
@@ -88,7 +88,7 @@ public class ODataEntityIterator extends EntityIterator implements BaseCloseable
       this.countLoaded = true;
       try (
         Transaction transaction = this.connection.newTransaction()) {
-        final JdbcRecordStore recordStore = this.entityType.getRecordStore();
+        final RecordStore recordStore = this.entityType.getRecordStore();
         final Integer count = recordStore.getRecordCount(this.countQuery);
         setCount(count);
       }
@@ -99,7 +99,7 @@ public class ODataEntityIterator extends EntityIterator implements BaseCloseable
   private Iterator<Record> getIterator() {
     if (this.reader == null) {
       this.transaction = this.connection.newTransaction();
-      final JdbcRecordStore recordStore = this.entityType.getRecordStore();
+      final RecordStore recordStore = this.entityType.getRecordStore();
       this.reader = recordStore.getRecords(this.query);
       this.iterator = this.reader.iterator();
     }

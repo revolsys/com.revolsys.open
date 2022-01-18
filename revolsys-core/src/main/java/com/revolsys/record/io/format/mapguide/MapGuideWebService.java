@@ -10,7 +10,7 @@ import java.util.function.Function;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.record.io.format.json.Json;
@@ -97,7 +97,7 @@ public class MapGuideWebService extends AbstractWebService<MapGuideResource> {
 
   public Resource getResource(final String operation, final String format,
     final Map<String, ? extends Object> parameters) throws Error {
-    final MapEx newParameters = new LinkedHashMapEx(parameters);
+    final MapEx newParameters = JsonObject.hash(parameters);
     newParameters.put("VERSION", "1.0.0");
     newParameters.put("OPERATION", operation);
     newParameters.put("format", format);
@@ -109,7 +109,7 @@ public class MapGuideWebService extends AbstractWebService<MapGuideResource> {
   }
 
   public Map<PathName, MapGuideResource> getResources(final String path) {
-    final MapEx parameters = new LinkedHashMapEx();
+    final MapEx parameters = JsonObject.hash();
     parameters.put("RESOURCEID", "Library:/" + path);
     parameters.put("COMPUTECHILDREN", "1");
     parameters.put("DEPTH", "-1");

@@ -17,7 +17,7 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import com.revolsys.collection.EmptyReference;
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.properties.ObjectWithProperties;
 import com.revolsys.swing.menu.MenuFactory;
@@ -39,7 +39,7 @@ public class BaseTree extends JTree implements ObjectWithProperties {
     BaseTree.menuNode = new WeakReference<>(menuNode);
   }
 
-  private final MapEx properties = new LinkedHashMapEx();
+  private final MapEx properties = JsonObject.hash();
 
   private boolean menuEnabled = true;
 

@@ -2,7 +2,7 @@ package com.revolsys.swing.tree.node;
 
 import org.jeometry.common.io.PathName;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.connection.ConnectionRegistry;
 import com.revolsys.gis.wms.WmsClient;
@@ -98,7 +98,7 @@ public class WebServiceConnectionTrees extends ConnectionManagerTrees {
         final String name = nameField.getText();
         final String username = usernameField.getText();
         final String password = passwordField.getText();
-        final MapEx config = new LinkedHashMapEx();
+        final MapEx config = JsonObject.hash();
         config.put("j:type", type);
         config.put("name", name);
         config.put("serviceUrl", url);

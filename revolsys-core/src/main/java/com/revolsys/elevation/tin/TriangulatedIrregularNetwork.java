@@ -24,6 +24,7 @@ import com.revolsys.geometry.model.segment.LineSegmentDoubleGF;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.predicate.Predicates;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.Resource;
 
 public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
@@ -48,7 +49,7 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
   }
 
   static boolean forEachTriangle(final Object source, final TriangleConsumer action) {
-    return forEachTriangle(source, MapEx.EMPTY, action);
+    return forEachTriangle(source, JsonObject.EMPTY, action);
   }
 
   /**
@@ -64,7 +65,7 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
   }
 
   static TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(final Object source) {
-    return newTriangulatedIrregularNetwork(source, MapEx.EMPTY);
+    return newTriangulatedIrregularNetwork(source, JsonObject.EMPTY);
   }
 
   static TriangulatedIrregularNetwork newTriangulatedIrregularNetwork(final Object source,
@@ -313,7 +314,7 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
   }
 
   default boolean writeTriangulatedIrregularNetwork() {
-    return writeTriangulatedIrregularNetwork(MapEx.EMPTY);
+    return writeTriangulatedIrregularNetwork((MapEx)JsonObject.EMPTY);
   }
 
   default boolean writeTriangulatedIrregularNetwork(final MapEx properties) {
@@ -327,7 +328,7 @@ public interface TriangulatedIrregularNetwork extends GeometryFactoryProxy {
   }
 
   default void writeTriangulatedIrregularNetwork(final Object target) {
-    writeTriangulatedIrregularNetwork(target, MapEx.EMPTY);
+    writeTriangulatedIrregularNetwork(target, JsonObject.EMPTY);
   }
 
   default void writeTriangulatedIrregularNetwork(final Object target, final MapEx properties) {

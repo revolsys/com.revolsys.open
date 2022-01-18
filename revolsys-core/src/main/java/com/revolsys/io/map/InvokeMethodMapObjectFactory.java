@@ -1,11 +1,11 @@
 package com.revolsys.io.map;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 
 import org.apache.commons.beanutils.MethodUtils;
 import org.jeometry.common.exception.Exceptions;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonObjectHash;
 
@@ -24,7 +24,7 @@ public class InvokeMethodMapObjectFactory extends AbstractMapObjectFactory
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V> V mapToObject(final Map<String, ? extends Object> properties) {
+  public <V> V mapToObject(final MapEx properties) {
     try {
       final Class<?> clazz = this.typeClass;
       return (V)MethodUtils.invokeStaticMethod(clazz, this.methodName, properties);

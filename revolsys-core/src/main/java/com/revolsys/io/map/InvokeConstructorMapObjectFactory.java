@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.jeometry.common.exception.Exceptions;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonObjectHash;
 
@@ -29,7 +30,7 @@ public class InvokeConstructorMapObjectFactory extends AbstractMapObjectFactory
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V> V mapToObject(final Map<String, ? extends Object> properties) {
+  public <V> V mapToObject(final MapEx properties) {
     try {
       return (V)this.constructor.newInstance(properties);
     } catch (InstantiationException | IllegalArgumentException | IllegalAccessException e) {

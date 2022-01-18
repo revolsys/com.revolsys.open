@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 import org.gdal.ogr.ogr;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.gdal.Gdal;
 import com.revolsys.io.FileUtil;
@@ -152,7 +153,7 @@ public class OgrRecordStoreFactory implements FileRecordStoreFactory {
   }
 
   @Override
-  public OgrRecordStore newRecordStore(final Map<String, ? extends Object> connectionProperties) {
+  public OgrRecordStore newRecordStore(final MapEx connectionProperties) {
     final Map<String, Object> properties = new LinkedHashMap<>(connectionProperties);
     final String url = (String)properties.remove("url");
     final File file = FileUtil.getUrlFile(url);

@@ -23,7 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.collection.map.NamedLinkedHashMapEx;
+import com.revolsys.collection.map.NamedJsonObject;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
 import com.revolsys.io.IoFactory;
@@ -70,7 +70,7 @@ public class PageInfoHttpMessageConverter extends AbstractHttpMessageConverter<P
   }
 
   private Map<String, Object> getMap(final String url, final PageInfo pageInfo) {
-    final MapEx pageMap = new NamedLinkedHashMapEx("resource");
+    final MapEx pageMap = new NamedJsonObject("resource");
     pageMap.put("resourceUri", url);
     pageMap.put("title", pageInfo.getTitle());
     final String description = pageInfo.getDescription();

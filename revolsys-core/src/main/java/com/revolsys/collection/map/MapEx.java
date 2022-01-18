@@ -4,7 +4,6 @@ import java.sql.Clob;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -25,29 +24,11 @@ import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.util.Property;
 
 public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedValue {
-  MapEx EMPTY = new MapEx() {
-    @Override
-    public MapEx clone() {
-      return this;
-    }
-
-    @Override
-    public Set<Entry<String, Object>> entrySet() {
-      final Map<String, Object> emptyMap = Collections.emptyMap();
-      return emptyMap.entrySet();
-    }
-
-    @Override
-    public String toString() {
-      return "{}";
-    }
-  };
-
   static MapEx asEx(final Map<String, ? extends Object> map) {
     if (map instanceof MapEx) {
       return (MapEx)map;
     } else {
-      return new LinkedHashMapEx();
+      return JsonObject.hash();
     }
   }
 

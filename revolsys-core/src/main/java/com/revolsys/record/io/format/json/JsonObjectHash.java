@@ -1,10 +1,9 @@
 package com.revolsys.record.io.format.json;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
-
-public class JsonObjectHash extends LinkedHashMapEx implements JsonObject {
+public class JsonObjectHash extends LinkedHashMap<String, Object> implements JsonObject {
 
   private static final long serialVersionUID = 1L;
 

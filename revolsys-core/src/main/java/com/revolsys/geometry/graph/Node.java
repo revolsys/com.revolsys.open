@@ -17,7 +17,7 @@ import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.graph.attribute.NodeProperties;
@@ -510,12 +510,12 @@ public class Node<T> extends PointDoubleXY implements ObjectWithProperties, Exte
   @Override
   public MapEx getProperties() {
     if (this.graph == null) {
-      return MapEx.EMPTY;
+      return JsonObject.EMPTY;
     } else {
       final Map<Integer, MapEx> propertiesById = this.graph.getNodePropertiesById();
       MapEx properties = propertiesById.get(this.id);
       if (properties == null) {
-        properties = new LinkedHashMapEx();
+        properties = JsonObject.hash();
         propertiesById.put(this.id, properties);
       }
       return properties;

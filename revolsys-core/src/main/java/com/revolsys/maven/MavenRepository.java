@@ -15,6 +15,7 @@ import java.util.WeakHashMap;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.map.MapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.xml.Xml;
 import com.revolsys.spring.resource.DefaultResourceLoader;
 import com.revolsys.spring.resource.PathResource;
@@ -104,7 +105,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
         throw e;
       }
     } else {
-      return MapEx.EMPTY;
+      return JsonObject.EMPTY;
     }
 
   }
@@ -257,7 +258,7 @@ public class MavenRepository implements URLStreamHandlerFactory {
   protected Pair<Long, String> getSnapshotVersion(final String groupId, final String artifactId,
     final String version, final String type, final String classifier, final String algorithm) {
     final MapEx mavenMetadata = getMavenMetadata(groupId, artifactId, version);
-    if (mavenMetadata == MapEx.EMPTY) {
+    if (mavenMetadata == JsonObject.EMPTY) {
       return null;
     } else {
       String specificVersion = version;

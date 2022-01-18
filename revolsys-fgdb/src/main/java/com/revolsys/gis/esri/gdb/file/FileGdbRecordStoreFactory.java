@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
@@ -154,7 +155,7 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
 
   @Override
   public FileGdbRecordStore newRecordStore(
-    final Map<String, ? extends Object> connectionProperties) {
+    final MapEx connectionProperties) {
     final Map<String, Object> properties = new LinkedHashMap<>(connectionProperties);
     final String url = (String)properties.remove("url");
     final File file = FileUtil.getUrlFile(url);

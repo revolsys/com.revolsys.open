@@ -10,7 +10,7 @@ import java.util.Map;
 import org.jeometry.common.number.Doubles;
 import org.jeometry.coordinatesystem.model.systems.EpsgId;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -325,6 +325,6 @@ public class BingClient {
   }
 
   private MapEx newParameterMap() {
-    return new LinkedHashMapEx("key", this.bingMapsKey);
+    return JsonObject.hash("key", this.bingMapsKey);
   }
 }

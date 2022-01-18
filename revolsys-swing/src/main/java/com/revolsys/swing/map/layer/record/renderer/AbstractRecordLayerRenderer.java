@@ -1,6 +1,5 @@
 package com.revolsys.swing.map.layer.record.renderer;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -10,6 +9,7 @@ import javax.swing.Icon;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -65,11 +65,10 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   private static Predicate<MapEx> DEFAULT_FILTER = Predicates.all();
 
   public static Predicate<MapEx> getFilter(final RecordDefinitionProxy recordDefinitionProxy,
-    final Map<String, ? extends Object> properties) {
-    @SuppressWarnings("unchecked")
-    Map<String, Object> filterDefinition = (Map<String, Object>)properties.get("filter");
+    final MapEx properties) {
+    MapEx filterDefinition = properties.getValue("filter");
     if (filterDefinition != null) {
-      filterDefinition = new LinkedHashMap<>(filterDefinition);
+      filterDefinition = JsonObject.hash(filterDefinition);
       final String type = MapObjectFactory.getType(filterDefinition);
       if ("valueFilter".equals(type)) {
         return new MultipleAttributeValuesFilter(filterDefinition);
@@ -262,7 +261,7 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
   @Override
   public void setProperties(final Map<String, ? extends Object> properties) {
     super.setProperties(properties);
-    final Predicate<MapEx> filter = getFilter(this, properties);
+    final Predicate<MapEx> filter = getFilter(this, (MapEx)properties);
     setFilter(filter);
   }
 

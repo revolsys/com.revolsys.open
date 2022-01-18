@@ -2,7 +2,7 @@ package com.revolsys.geometry.io;
 
 import java.util.function.Consumer;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -35,11 +35,11 @@ public interface PointReader extends Reader<Point>, GeometryFactoryProxy {
   }
 
   static PointReader newPointReader(final Object source) {
-    return newPointReader(source, MapEx.EMPTY);
+    return newPointReader(source, JsonObject.EMPTY);
   }
 
   static PointReader newPointReader(final Object source, final GeometryFactory geometryFactory) {
-    final MapEx properties = new LinkedHashMapEx("geometryFactory", geometryFactory);
+    final MapEx properties = JsonObject.hash("geometryFactory", geometryFactory);
     return newPointReader(source, properties);
   }
 

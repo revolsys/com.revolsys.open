@@ -4,7 +4,7 @@ import java.util.Map;
 
 import org.jeometry.common.io.PathName;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.record.Record;
@@ -64,7 +64,7 @@ public class MapGuideFeatureLayer implements WebServiceFeatureLayer {
   @Override
   public RecordReader getRecordReader(final Query query) {
     final RecordFactory<?> recordFactory = query.getRecordFactory();
-    final MapEx queryParameters = new LinkedHashMapEx();
+    final MapEx queryParameters = JsonObject.hash();
     final String resourceId = this.featureSource.getResourceId();
     queryParameters.put("RESOURCEID", resourceId);
     final String name = this.recordDefinition.getName();

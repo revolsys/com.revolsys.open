@@ -1,6 +1,6 @@
 package com.revolsys.geometry.io;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -14,12 +14,12 @@ public interface GeometryWriter extends Writer<Geometry> {
   }
 
   static <GW extends GeometryWriter> GW newGeometryWriter(final Object target) {
-    return newGeometryWriter(target, MapEx.EMPTY);
+    return newGeometryWriter(target, (MapEx)JsonObject.EMPTY);
   }
 
   static <GW extends GeometryWriter> GW newGeometryWriter(final Object target,
     final GeometryFactory geometryFactory) {
-    final MapEx properties = new LinkedHashMapEx("geometryFactory", geometryFactory);
+    final MapEx properties = JsonObject.hash("geometryFactory", geometryFactory);
     return newGeometryWriter(target, properties);
   }
 

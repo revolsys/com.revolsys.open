@@ -5,6 +5,7 @@ import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.IoFactory;
 import com.revolsys.properties.ObjectWithProperties;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.Resource;
 
 public interface GriddedElevationModelReader
@@ -15,7 +16,7 @@ public interface GriddedElevationModelReader
 
   static <R extends GriddedElevationModelReader> R newGriddedElevationModelReader(
     final Object source) {
-    final MapEx properties = MapEx.EMPTY;
+    final MapEx properties = JsonObject.EMPTY;
     return newGriddedElevationModelReader(source, properties);
   }
 

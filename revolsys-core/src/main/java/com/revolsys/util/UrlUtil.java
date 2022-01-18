@@ -41,7 +41,7 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.net.UrlProxy;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.FileUtil;
 import com.revolsys.spring.resource.Resource;
@@ -349,7 +349,7 @@ public final class UrlUtil {
 
   @SuppressWarnings("unchecked")
   public static Map<String, Object> getQueryStringMap(final String queryString) {
-    final MapEx map = new LinkedHashMapEx();
+    final MapEx map = JsonObject.hash();
     if (Property.hasValue(queryString)) {
       for (final String part : queryString.split("\\&")) {
         final int equalsIndex = part.indexOf("=");

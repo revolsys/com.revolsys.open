@@ -17,6 +17,7 @@ import com.revolsys.io.map.MapReaderFactory;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 import com.revolsys.util.SupplierWithProperties;
@@ -155,7 +156,7 @@ public interface RecordReaderFactory extends GeometryReaderFactory, MapReaderFac
   default RecordReader newRecordReader(final Object source,
     final RecordFactory<? extends Record> factory) {
     final Resource resource = Resource.getResource(source);
-    return newRecordReader(resource, factory, MapEx.EMPTY);
+    return newRecordReader(resource, factory, JsonObject.EMPTY);
   }
 
   RecordReader newRecordReader(Resource resource, RecordFactory<? extends Record> factory,

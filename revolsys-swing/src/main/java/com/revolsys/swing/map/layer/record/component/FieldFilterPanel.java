@@ -9,7 +9,6 @@ import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Predicate;
 
 import javax.swing.BorderFactory;
@@ -194,7 +193,7 @@ public class FieldFilterPanel extends JComponent implements PropertyChangeListen
   }
 
   public FieldFilterPanel(final TablePanel tablePanel, final RecordLayerTableModel tableModel,
-    final Map<String, Object> config) {
+    final MapEx config) {
     this(tablePanel, tableModel);
 
     if (!this.fieldNames.isEmpty()) {

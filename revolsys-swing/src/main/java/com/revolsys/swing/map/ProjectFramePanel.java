@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.properties.ObjectWithProperties;
 
 public interface ProjectFramePanel extends ObjectWithProperties {
@@ -19,5 +20,5 @@ public interface ProjectFramePanel extends ObjectWithProperties {
 
   String getPath();
 
-  Component newPanelComponent(Map<String, Object> config);
+  Component newPanelComponent(MapEx config);
 }

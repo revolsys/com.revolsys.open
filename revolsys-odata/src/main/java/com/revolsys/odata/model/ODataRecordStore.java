@@ -5,9 +5,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.http.NameValuePair;
+import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathName;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.http.ApacheHttpRequestBuilderFactory;
+import com.revolsys.http.ConfigurableRequestBuilderFactory;
 import com.revolsys.net.http.SimpleNameValuePair;
 import com.revolsys.record.io.RecordIterator;
 import com.revolsys.record.io.RecordWriter;
@@ -29,6 +32,22 @@ public class ODataRecordStore extends AbstractRecordStore {
   public ODataRecordStore(final ApacheHttpRequestBuilderFactory requestFactory, final URI uri) {
     this.requestFactory = requestFactory;
     this.uri = uri;
+  }
+
+  ODataRecordStore(final OData databaseFactory, final MapEx connectionProperties) {
+    final URI uri = connectionProperties.getValue("url", DataTypes.ANY_URI);
+    if (uri.getScheme().equals("odata")) {
+      final String serviceUrl = uri.getSchemeSpecificPart();
+      this.uri = URI.create(serviceUrl);
+    } else {
+      this.uri = uri;
+    }
+    final String apiKey = connectionProperties.getString("apiKey");
+    if (apiKey == null) {
+      throw new IllegalArgumentException("No login config");
+    } else {
+      this.requestFactory = new ConfigurableRequestBuilderFactory().addParameter("ApiKey", apiKey);
+    }
   }
 
   JsonObject getJson(final URI uri) {

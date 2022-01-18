@@ -7,7 +7,6 @@ import java.util.TreeMap;
 
 import org.jeometry.common.data.identifier.Identifier;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.GeometryFactory;
@@ -17,6 +16,7 @@ import com.revolsys.io.Reader;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.zip.ZipRecordReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
@@ -53,7 +53,7 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
   }
 
   static RecordReader newRecordReader(final Object source, final GeometryFactory geometryFactory) {
-    final LinkedHashMapEx properties = new LinkedHashMapEx("geometryFactory", geometryFactory);
+    final JsonObject properties = JsonObject.hash("geometryFactory", geometryFactory);
     return newRecordReader(source, ArrayRecord.FACTORY, properties);
   }
 
@@ -77,7 +77,7 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
    */
   static RecordReader newRecordReader(final Object source,
     final RecordFactory<? extends Record> recordFactory) {
-    return newRecordReader(source, recordFactory, MapEx.EMPTY);
+    return newRecordReader(source, recordFactory, JsonObject.EMPTY);
   }
 
   static RecordReader newRecordReader(final Object source,

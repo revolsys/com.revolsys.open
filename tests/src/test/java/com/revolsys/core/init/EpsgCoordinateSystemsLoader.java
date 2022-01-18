@@ -17,7 +17,7 @@ import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems.EpsgCoo
 import org.jeometry.coordinatesystem.model.unit.UnitOfMeasure;
 
 import com.revolsys.collection.map.IntHashMap;
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.BoundingBox;
@@ -97,7 +97,7 @@ public final class EpsgCoordinateSystemsLoader {
   private MapEx getCoordinateReferenceSystemById(final int id) {
     MapEx coordinateReferenceSystem = this.coordinateReferenceSystemById.get(id);
     if (coordinateReferenceSystem == null) {
-      coordinateReferenceSystem = new LinkedHashMapEx() //
+      coordinateReferenceSystem = JsonObject.hash() //
         .add("id", id);
       this.coordinateReferenceSystemById.put(id, coordinateReferenceSystem);
     }
@@ -167,7 +167,7 @@ public final class EpsgCoordinateSystemsLoader {
         final double maxY = writeDouble(writer, record, "area_north_bound_lat");
         writeDeprecated(writer, record);
         final String bbox = BoundingBox.bboxToWkt(minX, minY, maxX, maxY);
-        this.areaById.put(id, new LinkedHashMapEx() //
+        this.areaById.put(id, JsonObject.hash() //
           .add("id", id) //
           .add("name", name) //
           .add("bbox", bbox) //
@@ -190,7 +190,7 @@ public final class EpsgCoordinateSystemsLoader {
         final String abbreviation = record.getValue("coord_axis_abbreviation");
         writer.putByte((byte)abbreviation.charAt(0));
         final int uomId = writeInt(writer, record, "uom_code");
-        final MapEx axis = new LinkedHashMapEx() //
+        final MapEx axis = JsonObject.hash() //
           .add("name", this.axisNameById.get(axisNameId))//
           .add("abbreviation", abbreviation)//
           .add("orientation", orientation)//
@@ -288,7 +288,7 @@ public final class EpsgCoordinateSystemsLoader {
           EpsgCoordinateSystemType.TYPE_NAMES);
         writeDeprecated(writer, record);
 
-        final MapEx coordinateSystem = new LinkedHashMapEx() //
+        final MapEx coordinateSystem = JsonObject.hash() //
           .add("id", id) //
           .add("name", record.get("coord_sys_name")) //
           .add("type", type) //
@@ -317,14 +317,14 @@ public final class EpsgCoordinateSystemsLoader {
         writeInt(writer, record, "area_of_use", 0);
         writeDouble(writer, record, "coord_op_accuracy");
         writeDeprecated(writer, record);
-        final LinkedHashMapEx parameters = new LinkedHashMapEx();
+        final JsonObject parameters = JsonObject.hash();
         final List<String> parameterNames = this.coordinateOperationMethodParamNames.get(methodId);
         if (parameterNames != null) {
           for (final String parameterName : parameterNames) {
             parameters.put(parameterName, null);
           }
         }
-        final MapEx coordinateOperation = new LinkedHashMapEx() //
+        final MapEx coordinateOperation = JsonObject.hash() //
           .add("id", id) //
           .add("name", name) //
           .add("type", type);
@@ -487,7 +487,7 @@ public final class EpsgCoordinateSystemsLoader {
         final int areaId = writeInt(writer, record, "area_of_use_code");
         writeDeprecated(writer, record);
 
-        final MapEx datum = new LinkedHashMapEx() //
+        final MapEx datum = JsonObject.hash() //
           .add("id", id) //
           .add("name", name) //
           .add("type", type) //
@@ -519,7 +519,7 @@ public final class EpsgCoordinateSystemsLoader {
         final double inverseFlattening = writeDouble(writer, record, "inv_flattening");
         writeByte(writer, record, "ellipsoid_shape");
         writeDeprecated(writer, record);
-        final MapEx ellipsoid = new LinkedHashMapEx() //
+        final MapEx ellipsoid = JsonObject.hash() //
           .add("id", id) //
           .add("name", name) //
           .add("units", this.unitOfMeasureNameById.get(uomId))//
@@ -550,7 +550,7 @@ public final class EpsgCoordinateSystemsLoader {
         final int uomId = writeInt(writer, record, "uom_code");
         final double longitude = writeDouble(writer, record, "greenwich_longitude");
 
-        final MapEx primeMeridan = new LinkedHashMapEx() //
+        final MapEx primeMeridan = JsonObject.hash() //
           .add("id", id) //
           .add("name", name) //
           .add("units", this.unitOfMeasureNameById.get(uomId))//

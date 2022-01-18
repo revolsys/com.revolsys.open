@@ -17,7 +17,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.DelegatingLineString;
 import com.revolsys.geometry.model.Direction;
@@ -491,12 +491,12 @@ public class Edge<T> implements DelegatingLineString, ObjectWithProperties, Exte
   @Override
   public MapEx getProperties() {
     if (this.graph == null) {
-      return MapEx.EMPTY;
+      return JsonObject.EMPTY;
     } else {
       final Map<Integer, MapEx> propertiesById = this.graph.getEdgePropertiesById();
       MapEx properties = propertiesById.get(this.id);
       if (properties == null) {
-        properties = new LinkedHashMapEx();
+        properties = JsonObject.hash();
         propertiesById.put(this.id, properties);
       }
       return properties;

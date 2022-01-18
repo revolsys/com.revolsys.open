@@ -22,7 +22,7 @@ import org.sqlite.SQLiteDataSource;
 import org.sqlite.SQLiteJDBCLoader;
 import org.sqlite.SQLiteOpenMode;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.FileUtil;
@@ -81,7 +81,7 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory
   }
 
   public static GeoPackageRecordStore createRecordStore(final Object source) {
-    return createRecordStore(source, MapEx.EMPTY);
+    return createRecordStore(source, JsonObject.EMPTY);
   }
 
   public static GeoPackageRecordStore createRecordStore(final Object source,
@@ -96,7 +96,7 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory
   }
 
   public static GeoPackageRecordStore openRecordStore(final Object source) {
-    return openRecordStore(source, MapEx.EMPTY);
+    return openRecordStore(source, JsonObject.EMPTY);
   }
 
   public static GeoPackageRecordStore openRecordStore(final Object source, final MapEx properties) {
@@ -105,7 +105,7 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory
     } else {
       final Resource resource = Resource.getResource(source);
       final String fileName = resource.getOrDownloadFile().toPath().toAbsolutePath().toString();
-      final MapEx properties2 = new LinkedHashMapEx().add("url", JDBC_PREFIX + fileName);
+      final MapEx properties2 = JsonObject.hash().add("url", JDBC_PREFIX + fileName);
       return new GeoPackage().newRecordStore(properties2);
     }
   }
@@ -223,7 +223,7 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory
 
   @Override
   public DataSource newDataSource(final Map<String, ? extends Object> config) {
-    final MapEx newConfig = new LinkedHashMapEx(config);
+    final MapEx newConfig = JsonObject.hash(config);
     String url = (String)newConfig.remove("url");
     if (!Property.hasValue(url)) {
       throw new IllegalArgumentException("jdbc url required");
@@ -285,7 +285,7 @@ public class GeoPackage extends AbstractJdbcDatabaseFactory
 
   @Override
   public GeoPackageRecordStore newRecordStore(
-    final Map<String, ? extends Object> connectionProperties) {
+    final MapEx connectionProperties) {
     return new GeoPackageRecordStore(this, connectionProperties);
   }
 

@@ -24,8 +24,10 @@ import java.util.TreeSet;
 import org.jeometry.common.data.type.AbstractDataType;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.data.type.FunctionDataType;
 import org.jeometry.common.exception.Exceptions;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.AbstractIoFactory;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoConstants;
@@ -260,6 +262,36 @@ public class Json extends AbstractIoFactory
       }
     }
   }
+
+  @SuppressWarnings({
+    "rawtypes", "unchecked"
+  })
+  public static final DataType TREE_MAP_TYPE = new FunctionDataType("TreeMap", JsonObjectTree.class,
+    true, value -> {
+      if (value instanceof JsonObjectTree) {
+        return (JsonObjectTree)value;
+      } else if (value instanceof Map) {
+        return new JsonObjectTree((Map)value);
+      } else if (value instanceof String) {
+        final MapEx map = Json.toObjectMap((String)value);
+        if (map == null) {
+          return null;
+        } else {
+          return new JsonObjectTree(map);
+        }
+      } else {
+        return value;
+      }
+    }, (value) -> {
+      if (value instanceof Map) {
+        return Json.toString((Map)value);
+      } else if (value == null) {
+        return null;
+      } else {
+        return value.toString();
+      }
+
+    }, FunctionDataType.MAP_EQUALS, FunctionDataType.MAP_EQUALS_EXCLUDES);
 
   public static final String FILE_EXTENSION = "json";
 

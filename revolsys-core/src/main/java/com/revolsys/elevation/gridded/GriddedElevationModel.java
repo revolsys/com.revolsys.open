@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.jeometry.common.function.BiFunctionDoubleDouble;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.elevation.gridded.esriascii.EsriAsciiGriddedElevation;
 import com.revolsys.elevation.gridded.esrifloatgrid.EsriFloatGridGriddedElevation;
@@ -64,13 +64,13 @@ public interface GriddedElevationModel extends Grid {
   }
 
   static GriddedElevationModel newGriddedElevationModel(final Object source) {
-    final MapEx properties = MapEx.EMPTY;
+    final MapEx properties = JsonObject.EMPTY;
     return newGriddedElevationModel(source, properties);
   }
 
   static GriddedElevationModel newGriddedElevationModel(final Object source,
     final GeometryFactory defaultGeometryFactory) {
-    final MapEx properties = new LinkedHashMapEx("geometryFactory", defaultGeometryFactory);
+    final MapEx properties = JsonObject.hash("geometryFactory", defaultGeometryFactory);
     return newGriddedElevationModel(source, properties);
   }
 
@@ -414,7 +414,7 @@ public interface GriddedElevationModel extends Grid {
   void setResource(Resource resource);
 
   default boolean writeGriddedElevationModel() {
-    return writeGriddedElevationModel(MapEx.EMPTY);
+    return writeGriddedElevationModel((MapEx)JsonObject.EMPTY);
   }
 
   default boolean writeGriddedElevationModel(final Map<String, ? extends Object> properties) {

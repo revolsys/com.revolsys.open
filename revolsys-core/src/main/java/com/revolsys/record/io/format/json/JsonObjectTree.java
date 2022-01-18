@@ -1,10 +1,9 @@
 package com.revolsys.record.io.format.json;
 
 import java.util.Map;
+import java.util.TreeMap;
 
-import com.revolsys.collection.map.TreeMapEx;
-
-public class JsonObjectTree extends TreeMapEx implements JsonObject {
+public class JsonObjectTree extends TreeMap<String, Object> implements JsonObject {
 
   private static final long serialVersionUID = 1L;
 

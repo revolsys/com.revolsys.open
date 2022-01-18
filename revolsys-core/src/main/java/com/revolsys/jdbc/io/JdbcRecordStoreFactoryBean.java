@@ -7,8 +7,11 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
+import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.collection.map.MapEx;
+
 public class JdbcRecordStoreFactoryBean extends AbstractFactoryBean<JdbcRecordStore> {
-  private Map<String, Object> config = new LinkedHashMap<>();
+  private MapEx config = JsonObject.hash();
 
   private DataSource dataSource;
 
@@ -55,7 +58,7 @@ public class JdbcRecordStoreFactoryBean extends AbstractFactoryBean<JdbcRecordSt
     return this.properties;
   }
 
-  public void setConfig(final Map<String, Object> config) {
+  public void setConfig(final MapEx config) {
     this.config = config;
   }
 

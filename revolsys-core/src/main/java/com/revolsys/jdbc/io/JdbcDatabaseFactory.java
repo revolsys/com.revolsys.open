@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 import org.jeometry.common.logging.Logs;
 import org.springframework.dao.DataAccessException;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.IoFactory;
 import com.revolsys.jdbc.JdbcUtils;
@@ -140,7 +140,7 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
 
   default DataSource newDataSource(final Map<String, ? extends Object> config) {
     try {
-      final MapEx newConfig = new LinkedHashMapEx(config);
+      final MapEx newConfig = JsonObject.hash(config);
       final String url = (String)newConfig.remove("url");
       final String user = (String)newConfig.remove("user");
       String password = (String)newConfig.remove("password");
@@ -201,7 +201,7 @@ public interface JdbcDatabaseFactory extends RecordStoreFactory {
   JdbcRecordStore newRecordStore(DataSource dataSource);
 
   @Override
-  JdbcRecordStore newRecordStore(Map<String, ? extends Object> connectionProperties);
+  JdbcRecordStore newRecordStore(MapEx connectionProperties);
 
   DataAccessException translateException(String message, String sql, SQLException exception);
 }

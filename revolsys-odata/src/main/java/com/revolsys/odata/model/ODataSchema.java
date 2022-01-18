@@ -7,7 +7,7 @@ import org.apache.olingo.commons.api.edm.provider.CsdlEntityContainerInfo;
 import org.apache.olingo.commons.api.edm.provider.CsdlEntityType;
 import org.apache.olingo.commons.api.edm.provider.CsdlSchema;
 
-import com.revolsys.jdbc.io.JdbcRecordStore;
+import com.revolsys.record.schema.RecordStore;
 
 public class ODataSchema extends CsdlSchema {
   private final ODataEntityContainer odataEntityContainer;
@@ -71,7 +71,7 @@ public class ODataSchema extends CsdlSchema {
     return new FullQualifiedName(namespace, name);
   }
 
-  public JdbcRecordStore getRecordStore() {
+  public RecordStore getRecordStore() {
     return this.provider.getRecordStore();
   }
 }

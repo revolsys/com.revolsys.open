@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.spring.resource.Resource;
 
@@ -63,7 +63,7 @@ public class CsvMapIterator implements Iterator<MapEx> {
   }
 
   private MapEx parseMap(final List<String> record) {
-    final MapEx map = new LinkedHashMapEx();
+    final MapEx map = JsonObject.hash();
     for (int i = 0; i < this.fieldNames.size() && i < record.size(); i++) {
       final String fieldName = this.fieldNames.get(i);
       final String value = record.get(i);

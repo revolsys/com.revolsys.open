@@ -23,6 +23,7 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
 
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.jdbc.io.AbstractJdbcDatabaseFactory;
 import com.revolsys.jdbc.io.JdbcRecordStore;
@@ -190,7 +191,7 @@ public class Oracle extends AbstractJdbcDatabaseFactory {
   }
 
   @Override
-  public JdbcRecordStore newRecordStore(final Map<String, ? extends Object> connectionProperties) {
+  public JdbcRecordStore newRecordStore(final MapEx connectionProperties) {
     return new OracleRecordStore(this, connectionProperties);
   }
 

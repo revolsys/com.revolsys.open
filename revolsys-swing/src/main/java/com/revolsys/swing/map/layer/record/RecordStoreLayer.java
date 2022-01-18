@@ -523,8 +523,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
             + getPath());
         return false;
       } else {
-        final Map<String, Object> config = new HashMap<>();
-        config.put("connection", connectionProperties);
+        final JsonObject config = JsonObject.hash("connection", connectionProperties);
         recordStore = RecordStoreConnectionManager.getRecordStore(config);
 
         if (recordStore == null) {
@@ -551,7 +550,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         return false;
       } else {
         final MapEx recordDefinitionProperties = getProperty("recordDefinitionProperties",
-          MapEx.EMPTY);
+          JsonObject.EMPTY);
         recordDefinition.setProperties(recordDefinitionProperties);
         setRecordDefinition(recordDefinition);
       }

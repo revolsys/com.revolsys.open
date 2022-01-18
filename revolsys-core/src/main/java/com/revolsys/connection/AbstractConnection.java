@@ -6,7 +6,7 @@ import java.util.Map;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.FileUtil;
 import com.revolsys.properties.BaseObjectWithProperties;
@@ -74,7 +74,7 @@ public abstract class AbstractConnection<C extends Connection, R extends Connect
 
   @Override
   public MapEx getConfig() {
-    final MapEx config = new LinkedHashMapEx(this.config);
+    final MapEx config = JsonObject.hash(this.config);
     config.putAll(getProperties());
     return config;
   }

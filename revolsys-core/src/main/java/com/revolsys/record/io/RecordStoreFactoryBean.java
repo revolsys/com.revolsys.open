@@ -5,10 +5,12 @@ import java.util.Map;
 
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
+import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.RecordStore;
 
 public class RecordStoreFactoryBean extends AbstractFactoryBean<RecordStore> {
-  private Map<String, Object> config = new LinkedHashMap<>();
+  private MapEx config = JsonObject.hash();
 
   private Map<String, Object> properties = new LinkedHashMap<>();
 
@@ -27,7 +29,7 @@ public class RecordStoreFactoryBean extends AbstractFactoryBean<RecordStore> {
     this.config = null;
   }
 
-  public Map<String, Object> getConfig() {
+  public MapEx getConfig() {
     return this.config;
   }
 
@@ -40,7 +42,7 @@ public class RecordStoreFactoryBean extends AbstractFactoryBean<RecordStore> {
     return this.properties;
   }
 
-  public void setConfig(final Map<String, Object> config) {
+  public void setConfig(final MapEx config) {
     this.config = config;
   }
 

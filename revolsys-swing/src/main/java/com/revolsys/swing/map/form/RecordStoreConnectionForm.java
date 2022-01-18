@@ -17,7 +17,7 @@ import org.jeometry.common.awt.WebColors;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.collection.map.LinkedHashMapEx;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.IoFactory;
@@ -168,7 +168,7 @@ public final class RecordStoreConnectionForm extends Form {
       new CheckBox("savePassword") //
     );
     if (connection == null) {
-      this.config = new LinkedHashMapEx();
+      this.config = JsonObject.hash();
       setTitle("Add Record Store Connection");
     } else {
       final String name = connection.getName();

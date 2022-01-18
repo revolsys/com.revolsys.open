@@ -2,6 +2,7 @@ package com.revolsys.io;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.properties.ObjectWithProperties;
+import com.revolsys.record.io.format.json.JsonObject;
 
 public interface Writer<T> extends ObjectWithProperties, BaseCloseable {
   @Override
@@ -14,7 +15,7 @@ public interface Writer<T> extends ObjectWithProperties, BaseCloseable {
 
   @Override
   default MapEx getProperties() {
-    return MapEx.EMPTY;
+    return JsonObject.EMPTY;
   }
 
   default void open() {

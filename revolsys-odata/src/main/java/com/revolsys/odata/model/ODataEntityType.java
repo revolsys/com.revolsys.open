@@ -81,7 +81,6 @@ import com.revolsys.geometry.model.MultiPoint;
 import com.revolsys.geometry.model.MultiPolygon;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.jdbc.io.JdbcRecordStore;
 import com.revolsys.record.ODataParser;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
@@ -92,6 +91,7 @@ import com.revolsys.record.query.Query;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionBuilder;
+import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.TableRecordStoreConnection;
 import com.revolsys.transaction.Transaction;
 
@@ -415,7 +415,7 @@ public class ODataEntityType extends CsdlEntityType {
   // return navigationTargetEntityCollection;
   // }
 
-  public JdbcRecordStore getRecordStore() {
+  public RecordStore getRecordStore() {
     return this.schema.getRecordStore();
   }
 
@@ -536,7 +536,7 @@ public class ODataEntityType extends CsdlEntityType {
       query.select(propertyNames);
     }
 
-    final JdbcRecordStore recordStore = getRecordStore();
+    final RecordStore recordStore = getRecordStore();
     try (
       Transaction transaction = this.connection.newTransaction();
       RecordReader reader = recordStore.getRecords(query)) {
@@ -554,7 +554,7 @@ public class ODataEntityType extends CsdlEntityType {
     final Query query = newQuery(uriInfo);
 
     final EntityCollection entityCollection = new EntityCollection();
-    final JdbcRecordStore recordStore = getRecordStore();
+    final RecordStore recordStore = getRecordStore();
     try (
       Transaction transaction = this.connection.newTransaction()) {
       final CountOption countOption = uriInfo.getCountOption();
