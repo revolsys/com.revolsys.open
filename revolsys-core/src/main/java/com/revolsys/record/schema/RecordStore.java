@@ -449,6 +449,11 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     return reader;
   }
 
+  @SuppressWarnings("unchecked")
+  default <R extends RecordStore> R getRecordStore() {
+    return (R)this;
+  }
+
   RecordStoreConnection getRecordStoreConnection();
 
   String getRecordStoreType();

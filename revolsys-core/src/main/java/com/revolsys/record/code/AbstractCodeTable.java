@@ -103,6 +103,8 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
     } else if (value instanceof Number) {
       final Number number = (Number)value;
       return Numbers.toString(number);
+    } else if (this.caseSensitive) {
+      return value;
     } else {
       return value.toString().toLowerCase();
     }

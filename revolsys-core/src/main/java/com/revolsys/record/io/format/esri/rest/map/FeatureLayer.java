@@ -12,7 +12,6 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.code.SingleValueCodeTable;
@@ -24,8 +23,8 @@ import com.revolsys.record.io.format.esri.rest.ArcGisRestCatalog;
 import com.revolsys.record.io.format.esri.rest.CatalogElement;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.OrderBy;
 import com.revolsys.record.query.Query;
-import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
@@ -281,10 +280,10 @@ public class FeatureLayer extends LayerDescription implements WebServiceFeatureL
       }
 
       // ORDER BY
-      final Map<QueryValue, Boolean> orderBy = query.getOrderBy();
-      if (Property.hasValue(orderBy)) {
-        final String orderByFields = JdbcUtils
-          .appendOrderByFields(query, new StringBuilder(), this.recordDefinition, orderBy)
+      final List<OrderBy> orderBy = query.getOrderBy();
+      if (!orderBy.isEmpty()) {
+        final String orderByFields = query
+          .appendOrderByFields(new StringBuilder(), this.recordDefinition, orderBy)
           .toString();
         parameters.put("orderByFields", orderByFields);
       }

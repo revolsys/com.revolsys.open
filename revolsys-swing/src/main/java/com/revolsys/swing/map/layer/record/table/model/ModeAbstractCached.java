@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -21,8 +20,8 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.OrderBy;
 import com.revolsys.record.query.Query;
-import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionBuilder;
 import com.revolsys.spring.resource.PathResource;
@@ -215,7 +214,7 @@ public abstract class ModeAbstractCached implements TableRecordsMode {
   @Override
   public void forEachRecord(final Query query, final Consumer<? super LayerRecord> action) {
     final Condition filter = query.getWhereCondition();
-    final Map<QueryValue, Boolean> orderBy = query.getOrderBy();
+    final List<OrderBy> orderBy = query.getOrderBy();
     final AbstractRecordLayer layer = getLayer();
     final Iterable<LayerRecord> records = new ListByIndexIterator<>(this.records);
     layer.forEachRecord(records, filter, orderBy, action);

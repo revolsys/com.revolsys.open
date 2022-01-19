@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.management.ObjectName;
 import javax.sql.DataSource;
@@ -32,51 +30,21 @@ import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
 
-import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.PathUtil;
 import com.revolsys.jdbc.exception.JdbcExceptionTranslator;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
 import com.revolsys.jdbc.field.JdbcFieldDefinitions;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
-import com.revolsys.record.query.TableReference;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 import com.revolsys.util.Strings;
 
 public final class JdbcUtils {
-
-  public static void addOrderBy(final Query query, final StringBuilder sql,
-    final TableReference table, final Map<QueryValue, Boolean> orderBy) {
-    if (!orderBy.isEmpty()) {
-      sql.append(" ORDER BY ");
-      appendOrderByFields(query, sql, table, orderBy);
-    }
-  }
-
-  public static StringBuilder appendOrderByFields(final Query query, final StringBuilder sql,
-    final TableReference table, final Map<QueryValue, Boolean> orderBy) {
-    boolean first = true;
-    for (final Entry<QueryValue, Boolean> entry : orderBy.entrySet()) {
-      if (first) {
-        first = false;
-      } else {
-        sql.append(", ");
-      }
-
-      final QueryValue field = entry.getKey();
-      table.appendQueryValue(query, sql, field);
-
-      final Boolean ascending = entry.getValue();
-      if (!ascending) {
-        sql.append(" DESC");
-      }
-    }
-    return sql;
-  }
 
   public static void appendQueryValue(final StringBuilder sql, final Query query,
     final QueryValue queryValue) {

@@ -34,6 +34,7 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordWriter;
 import com.revolsys.record.query.ColumnReference;
+import com.revolsys.record.query.OrderBy;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.schema.FieldDefinition;
@@ -247,7 +248,7 @@ public interface Records {
    * @param orderBy
    */
   static <V extends Record> void filterAndSort(final List<V> records,
-    final Predicate<? super V> filter, final Map<QueryValue, Boolean> orderBy) {
+    final Predicate<? super V> filter, final List<OrderBy> orderBy) {
     // Filter records
     if (!Property.isEmpty(filter)) {
       Predicates.retain(records, filter);
@@ -573,19 +574,18 @@ public interface Records {
     };
   }
 
-  static <R extends MapEx> Comparator<R> newComparatorOrderBy(
-    final Map<QueryValue, Boolean> orderBy) {
+  static <R extends MapEx> Comparator<R> newComparatorOrderBy(final List<OrderBy> orderBy) {
     return (record1, record2) -> {
       if (record1 == record2) {
         return 0;
       } else {
         if (Property.hasValue(orderBy)) {
-          for (final Entry<QueryValue, Boolean> entry : orderBy.entrySet()) {
-            final QueryValue field = entry.getKey();
+          for (final OrderBy order : orderBy) {
+            final QueryValue field = order.getField();
             if (field instanceof ColumnReference) {
               final ColumnReference column = (ColumnReference)field;
               final String fieldName = column.getAliasName();
-              final Boolean ascending = entry.getValue();
+              final boolean ascending = order.isAscending();
               final Object value1 = record1.getValue(fieldName);
               final Object value2 = record2.getValue(fieldName);
               final int compare = CompareUtil.compare(value1, value2);

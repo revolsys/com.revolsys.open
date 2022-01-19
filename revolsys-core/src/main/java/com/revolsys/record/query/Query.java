@@ -5,10 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiFunction;
@@ -183,7 +182,7 @@ public class Query extends BaseObjectWithProperties
 
   private int offset = 0;
 
-  private Map<QueryValue, Boolean> orderBy = new LinkedHashMap<>();
+  private List<OrderBy> orderBy = new ArrayList<>();
 
   private List<Object> parameters = new ArrayList<>();
 
@@ -281,11 +280,29 @@ public class Query extends BaseObjectWithProperties
     } else {
       throw new IllegalArgumentException("Not a field name: " + field);
     }
+    OrderBy order = new OrderBy(queryValue, ascending);
+    return addOrderBy(order);
+  }
 
-    if (!this.orderBy.containsKey(queryValue)) {
-      this.orderBy.put(queryValue, ascending);
+  public Query addOrderBy(final OrderBy order) {
+    for (final ListIterator<OrderBy> iterator = this.orderBy.listIterator(); iterator.hasNext();) {
+      final OrderBy order2 = iterator.next();
+      if (order2.getField().equals(order.getField())) {
+        iterator.set(order);
+        return this;
+      }
     }
+
+    this.orderBy.add(order);
     return this;
+  }
+
+  public void addOrderBy(final StringBuilder sql, final TableReference table,
+    final List<OrderBy> orderBy) {
+    if (!orderBy.isEmpty()) {
+      sql.append(" ORDER BY ");
+      appendOrderByFields(sql, table, orderBy);
+    }
   }
 
   public Query addOrderById() {
@@ -405,6 +422,20 @@ public class Query extends BaseObjectWithProperties
     return this;
   }
 
+  public StringBuilder appendOrderByFields(final StringBuilder sql, final TableReference table,
+    final List<OrderBy> orderBy) {
+    boolean first = true;
+    for (final OrderBy order : orderBy) {
+      if (first) {
+        first = false;
+      } else {
+        sql.append(", ");
+      }
+      order.appendSql(this, table, sql);
+    }
+    return sql;
+  }
+
   public void appendSelect(final StringBuilder sql) {
     final TableReference table = this.table;
     final List<QueryValue> select = getSelect();
@@ -446,7 +477,7 @@ public class Query extends BaseObjectWithProperties
     clone.joins = new ArrayList<>(clone.joins);
     clone.selectExpressions = new ArrayList<>(clone.selectExpressions);
     clone.parameters = new ArrayList<>(this.parameters);
-    clone.orderBy = new HashMap<>(this.orderBy);
+    clone.orderBy = new ArrayList<>(this.orderBy);
     if (this.whereCondition != null) {
       clone.whereCondition = this.whereCondition.clone();
     }
@@ -463,7 +494,7 @@ public class Query extends BaseObjectWithProperties
       clone.selectExpressions);
     clone.joins = QueryValue.cloneQueryValues(oldTable, newTable, this.joins);
     clone.parameters = new ArrayList<>(this.parameters);
-    clone.orderBy = new HashMap<>(this.orderBy);
+    clone.orderBy = new ArrayList<>(this.orderBy);
     if (this.whereCondition != null) {
       clone.whereCondition = this.whereCondition.clone(oldTable, newTable);
     }
@@ -487,7 +518,7 @@ public class Query extends BaseObjectWithProperties
   @SuppressWarnings("unchecked")
   public <R extends MapEx> void forEachRecord(final Iterable<R> records,
     final Consumer<? super R> consumer) {
-    final Map<QueryValue, Boolean> orderBy = getOrderBy();
+    final List<OrderBy> orderBy = getOrderBy();
     final Predicate<R> filter = (Predicate<R>)getWhereCondition();
     if (orderBy.isEmpty()) {
       if (filter == null) {
@@ -540,8 +571,8 @@ public class Query extends BaseObjectWithProperties
     return this.offset;
   }
 
-  public Map<QueryValue, Boolean> getOrderBy() {
-    return this.orderBy;
+  public List<OrderBy> getOrderBy() {
+    return new ArrayList<>(this.orderBy);
   }
 
   public List<Object> getParameters() {
@@ -608,7 +639,7 @@ public class Query extends BaseObjectWithProperties
 
   public String getSelectSql() {
     String sql = getSql();
-    final Map<QueryValue, Boolean> orderBy = getOrderBy();
+    final List<OrderBy> orderBy = getOrderBy();
     final TableReference table = getTable();
     final RecordDefinition recordDefinition = getRecordDefinition();
     if (sql == null) {
@@ -626,9 +657,9 @@ public class Query extends BaseObjectWithProperties
         sql = newSql.toString();
       }
       if (!orderBy.isEmpty()) {
-        final StringBuilder buffer = new StringBuilder(sql);
-        JdbcUtils.addOrderBy(this, buffer, table, orderBy);
-        sql = buffer.toString();
+        final StringBuilder builder = new StringBuilder(sql);
+        addOrderBy(builder, table, orderBy);
+        sql = builder.toString();
       }
     }
     return sql;
@@ -673,8 +704,13 @@ public class Query extends BaseObjectWithProperties
     return this;
   }
 
-  public boolean hasOrderBy(final Object fieldName) {
-    return this.orderBy.containsKey(fieldName);
+  public boolean hasOrderBy(final String fieldName) {
+    for (final OrderBy order : this.orderBy) {
+      if (order.isField(fieldName)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public boolean hasSelect() {
@@ -832,7 +868,7 @@ public class Query extends BaseObjectWithProperties
     return operator.apply(column);
   }
 
-  public String newSelectSql(final Map<QueryValue, Boolean> orderBy, final TableReference table) {
+  public String newSelectSql(final List<OrderBy> orderBy, final TableReference table) {
 
     From from = getFrom();
     if (from == null) {
@@ -868,7 +904,7 @@ public class Query extends BaseObjectWithProperties
       }
     }
 
-    JdbcUtils.addOrderBy(this, sql, table, orderBy);
+    addOrderBy(sql, table, orderBy);
 
     lockMode.append(sql);
     return sql.toString();
@@ -912,7 +948,7 @@ public class Query extends BaseObjectWithProperties
   }
 
   public Query orderBy(final Object... orderBy) {
-    this.orderBy.clear();
+    clearOrderBy();
     for (final Object orderByItem : orderBy) {
       addOrderBy(orderByItem);
     }
@@ -1073,26 +1109,24 @@ public class Query extends BaseObjectWithProperties
   }
 
   public Query setOrderBy(final CharSequence field) {
-    this.orderBy.clear();
+    clearOrderBy();
     return addOrderBy(field);
   }
 
   public Query setOrderBy(final Map<?, Boolean> orderBy) {
-    if (orderBy != this.orderBy) {
-      this.orderBy.clear();
-      if (orderBy != null) {
-        for (final Entry<?, Boolean> entry : orderBy.entrySet()) {
-          final Object field = entry.getKey();
-          final Boolean ascending = entry.getValue();
-          addOrderBy(field, ascending);
-        }
+    clearOrderBy();
+    if (orderBy != null) {
+      for (final Entry<?, Boolean> entry : orderBy.entrySet()) {
+        final Object field = entry.getKey();
+        final Boolean ascending = entry.getValue();
+        addOrderBy(field, ascending);
       }
     }
     return this;
   }
 
   public Query setOrderByFieldNames(final List<? extends CharSequence> orderBy) {
-    this.orderBy.clear();
+    clearOrderBy();
     for (final CharSequence field : orderBy) {
       addOrderBy(field);
     }
@@ -1100,7 +1134,7 @@ public class Query extends BaseObjectWithProperties
   }
 
   public Query setOrderByFieldNames(final String... orderBy) {
-    this.orderBy.clear();
+    clearOrderBy();
     for (final CharSequence field : orderBy) {
       addOrderBy(field);
     }
@@ -1172,8 +1206,8 @@ public class Query extends BaseObjectWithProperties
   }
 
   public <V extends Record> void sort(final List<V> records) {
-    final Map<QueryValue, Boolean> orderBy = getOrderBy();
-    if (Property.hasValue(orderBy)) {
+    final List<OrderBy> orderBy = getOrderBy();
+    if (!orderBy.isEmpty()) {
       final Comparator<Record> comparator = Records.newComparatorOrderBy(orderBy);
       records.sort(comparator);
     }

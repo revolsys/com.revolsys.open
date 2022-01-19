@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
@@ -56,6 +55,7 @@ import com.revolsys.record.query.ColumnReference;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.ILike;
 import com.revolsys.record.query.Like;
+import com.revolsys.record.query.OrderBy;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.SqlCondition;
@@ -694,13 +694,13 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     }
     final String catalogPath = fileGdbRecordDefinition.getCatalogPath();
     final BoundingBox boundingBox = QueryValue.getBoundingBox(query);
-    final Map<QueryValue, Boolean> orderBy = query.getOrderBy();
+    final List<OrderBy> orderBy = query.getOrderBy();
     final StringBuilder whereClause = getWhereClause(query);
     StringBuilder sql = new StringBuilder();
     if (orderBy.isEmpty() || boundingBox != null) {
       if (!orderBy.isEmpty()) {
         Logs.error(this, "Unable to sort on " + fileGdbRecordDefinition.getPathName() + " "
-          + orderBy.keySet() + " as the ESRI library can't sort with a bounding box query");
+          + orderBy + " as the ESRI library can't sort with a bounding box query");
       }
       sql = whereClause;
     } else {
@@ -714,20 +714,20 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       }
       boolean useOrderBy = true;
       if (orderBy.size() == 1) {
-        final Entry<QueryValue, Boolean> entry = orderBy.entrySet().iterator().next();
-        final QueryValue field = entry.getKey();
+        final OrderBy order = orderBy.get(0);
+        final QueryValue field = order.getField();
         if (field instanceof ColumnReference) {
           final ColumnReference column = (ColumnReference)field;
           final String fieldName = column.getAliasName();
-          if (entry.getValue() == Boolean.TRUE && fieldName.toString().equals("OBJECTID")) {
+          if (order.isAscending() && fieldName.toString().equals("OBJECTID")) {
             useOrderBy = false;
           }
         }
       }
       if (useOrderBy) {
         boolean first = true;
-        for (final Entry<QueryValue, Boolean> entry : orderBy.entrySet()) {
-          final QueryValue field = entry.getKey();
+        for (final OrderBy order : orderBy) {
+          final QueryValue field = order.getField();
           if (field instanceof ColumnReference) {
             final ColumnReference column = (ColumnReference)field;
             final String fieldName = column.getAliasName();
@@ -745,7 +745,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
               } else {
                 sql.append(fieldName);
               }
-              final Boolean ascending = entry.getValue();
+              final boolean ascending = order.isAscending();
               if (!ascending) {
                 sql.append(" DESC");
               }

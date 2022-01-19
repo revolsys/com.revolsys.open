@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -41,6 +40,7 @@ import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.ILike;
 import com.revolsys.record.query.LeftUnaryCondition;
 import com.revolsys.record.query.Like;
+import com.revolsys.record.query.OrderBy;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.RightUnaryCondition;
@@ -440,7 +440,7 @@ public class OgrRecordStore extends AbstractRecordStore {
   protected String getSql(final Query query) {
     final RecordDefinition recordDefinition = query.getRecordDefinition();
     final String typePath = recordDefinition.getPath();
-    final Map<QueryValue, Boolean> orderBy = query.getOrderBy();
+    final List<OrderBy> orderBy = query.getOrderBy();
     final StringBuilder sql = new StringBuilder();
     sql.append("SELECT ");
     query.appendSelect(sql);
@@ -453,8 +453,8 @@ public class OgrRecordStore extends AbstractRecordStore {
       sql.append(whereClause);
     }
     boolean first = true;
-    for (final Entry<QueryValue, Boolean> entry : orderBy.entrySet()) {
-      final QueryValue field = entry.getKey();
+    for (final OrderBy entry : orderBy) {
+      final QueryValue field = entry.getField();
       if (first) {
         sql.append(" ORDER BY ");
         first = false;
@@ -462,7 +462,7 @@ public class OgrRecordStore extends AbstractRecordStore {
         sql.append(", ");
       }
       field.appendDefaultSql(query, null, sql);
-      final Boolean ascending = entry.getValue();
+      final boolean ascending = entry.isAscending();
       if (!ascending) {
         sql.append(" DESC");
       }

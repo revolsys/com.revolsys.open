@@ -226,10 +226,9 @@ public class AbstractTableRecordStore {
   protected void executeUpdate(final TableRecordStoreConnection connection, final String sql,
     final Object... parameters) {
     if (this.recordStore instanceof JdbcRecordStore) {
-      final JdbcRecordStore jdbcRecordStore = (JdbcRecordStore)this.recordStore;
       try (
         Transaction transaction = connection.newTransaction()) {
-        jdbcRecordStore.executeUpdate(sql, parameters);
+        this.recordStore.<JdbcRecordStore> getRecordStore().executeUpdate(sql, parameters);
       }
     }
     throw new UnsupportedOperationException("Must be a JDBC connection");
@@ -242,8 +241,7 @@ public class AbstractTableRecordStore {
 
   protected JdbcConnection getJdbcConnection() {
     if (this.recordStore instanceof JdbcRecordStore) {
-      final JdbcRecordStore jdbcRecordStore = (JdbcRecordStore)this.recordStore;
-      return jdbcRecordStore.getJdbcConnection();
+      return this.recordStore.<JdbcRecordStore> getRecordStore().getJdbcConnection();
     }
     throw new UnsupportedOperationException("Must be a JDBC connection");
   }
@@ -388,8 +386,7 @@ public class AbstractTableRecordStore {
 
   public void lockTable() {
     if (this.recordStore instanceof JdbcRecordStore) {
-      final JdbcRecordStore jdbcRecordStore = (JdbcRecordStore)this.recordStore;
-      jdbcRecordStore.lockTable(this.tablePath);
+      this.recordStore.<JdbcRecordStore> getRecordStore().lockTable(this.tablePath);
     }
   }
 
