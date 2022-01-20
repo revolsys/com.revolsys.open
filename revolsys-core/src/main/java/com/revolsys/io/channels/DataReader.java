@@ -6,6 +6,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.io.BaseCloseable;
 
 public interface DataReader extends BaseCloseable {
@@ -14,6 +16,33 @@ public interface DataReader extends BaseCloseable {
 
   @Override
   void close();
+
+  default int fillBuffer(final ByteBuffer buffer) {
+    try {
+      buffer.clear();
+      final int size = buffer.remaining();
+      int totalReadCount = 0;
+      while (totalReadCount < size) {
+        final int readCount = read(buffer);
+        if (readCount == -1) {
+          if (totalReadCount == 0) {
+            return -1;
+          } else {
+            final int bufferPosition = buffer.position();
+            buffer.flip();
+            return bufferPosition;
+          }
+        } else {
+          totalReadCount += readCount;
+        }
+      }
+      final int bufferPosition = buffer.position();
+      buffer.flip();
+      return bufferPosition;
+    } catch (final Exception e) {
+      throw Exceptions.wrap(e);
+    }
+  }
 
   int getAvailable();
 
