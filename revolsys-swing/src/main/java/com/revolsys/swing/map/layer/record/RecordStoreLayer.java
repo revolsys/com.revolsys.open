@@ -35,9 +35,9 @@ import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.In;
+import com.revolsys.record.query.OrderBy;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
-import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.query.functions.WithinDistance;
 import com.revolsys.record.schema.FieldDefinition;
@@ -144,7 +144,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         final RecordStore recordStore = getRecordStore();
         if (recordStore != null && query != null) {
           final Predicate<MapEx> filter = query.getWhereCondition();
-          final Map<QueryValue, Boolean> orderBy = query.getOrderBy();
+          final List<OrderBy> orderBy = query.getOrderBy();
 
           final List<LayerRecord> changedRecords = new ArrayList<>();
           changedRecords.addAll(getRecordsNew());

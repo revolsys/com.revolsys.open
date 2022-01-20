@@ -2,6 +2,7 @@ package com.revolsys.record.io.format.json;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ public interface JsonObject extends MapEx, JsonType {
 
     @Override
     public Set<Entry<String, Object>> entrySet() {
-      return JsonObject.EMPTY.entrySet();
+      return Collections.emptySet();
     }
 
     @Override

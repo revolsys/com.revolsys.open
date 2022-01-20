@@ -54,7 +54,6 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.collection.EmptyReference;
 import com.revolsys.collection.list.Lists;
-import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.set.Sets;
@@ -87,6 +86,7 @@ import com.revolsys.record.io.RecordWriterFactory;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.property.DirectionalFields;
 import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.OrderBy;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
@@ -958,7 +958,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
 
   public void exportRecords(final Iterable<LayerRecord> records,
     final Predicate<? super LayerRecord> filter, final Collection<String> fieldNames,
-    final Map<QueryValue, Boolean> orderBy, final Object target) {
+    final List<OrderBy> orderBy, final Object target) {
     if (Property.hasValue(records) && target != null) {
       final List<LayerRecord> exportRecords = Lists.toArray(records);
 
@@ -1028,7 +1028,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   public void forEachRecord(final Iterable<LayerRecord> records,
-    final Predicate<? super LayerRecord> filter, final Map<QueryValue, Boolean> orderBy,
+    final Predicate<? super LayerRecord> filter, final List<OrderBy> orderBy,
     final Consumer<? super LayerRecord> action) {
     try {
       if (Property.hasValue(records) && action != null) {
