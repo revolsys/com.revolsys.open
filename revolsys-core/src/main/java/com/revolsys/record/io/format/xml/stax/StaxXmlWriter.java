@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.revolsys.record.io.format.xml;
+package com.revolsys.record.io.format.xml.stax;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+
+import com.revolsys.record.io.format.xml.XmlWriter;
 
 /**
  * The StaxXmlWriter is a wrapper around an {@link XmlWriter} that implements

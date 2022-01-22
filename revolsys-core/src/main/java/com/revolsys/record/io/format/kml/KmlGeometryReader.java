@@ -19,7 +19,7 @@ import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.geometry.model.impl.PointDouble;
-import com.revolsys.record.io.format.xml.StaxReader;
+import com.revolsys.record.io.format.xml.stax.StaxReader;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 

@@ -37,6 +37,7 @@ import org.apache.commons.beanutils.converters.ShortConverter;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.beans.EnumConverter;
+import com.revolsys.record.io.format.xml.stax.StaxReader;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.CaseConverter;
 

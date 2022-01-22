@@ -27,7 +27,7 @@ import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.model.Punctual;
 import com.revolsys.geometry.model.impl.LineStringDouble;
 import com.revolsys.io.IoConstants;
-import com.revolsys.record.io.format.xml.StaxReader;
+import com.revolsys.record.io.format.xml.stax.StaxReader;
 import com.revolsys.spring.resource.Resource;
 
 public class GmlGeometryReader extends AbstractIterator<Geometry> implements GeometryReader {

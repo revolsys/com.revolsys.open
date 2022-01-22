@@ -13,7 +13,7 @@ import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.record.AbstractRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordState;
-import com.revolsys.record.io.format.xml.StaxReader;
+import com.revolsys.record.io.format.xml.stax.StaxReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.util.Property;

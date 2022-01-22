@@ -15,7 +15,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
 import com.revolsys.record.io.RecordReader;
-import com.revolsys.record.io.format.xml.StaxReader;
+import com.revolsys.record.io.format.xml.stax.StaxReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.spring.resource.Resource;
 

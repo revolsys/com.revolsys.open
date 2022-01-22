@@ -20,8 +20,8 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.enums.RelKeyType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.RelNotification;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.SplitPolicyType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.WorkspaceType;
-import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.record.io.format.xml.XmlProcessor;
+import com.revolsys.record.io.format.xml.stax.StaxReader;
 import com.revolsys.spring.resource.ByteArrayResource;
 import com.revolsys.spring.resource.Resource;
 

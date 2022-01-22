@@ -31,9 +31,9 @@ import javax.xml.stream.XMLStreamException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.revolsys.record.io.format.xml.StaxReader;
 import com.revolsys.record.io.format.xml.XmlProcessor;
 import com.revolsys.record.io.format.xml.XmlProcessorContext;
+import com.revolsys.record.io.format.xml.stax.StaxReader;
 import com.revolsys.ui.html.view.Script;
 import com.revolsys.ui.html.view.Style;
 import com.revolsys.ui.web.exception.PageNotFoundException;

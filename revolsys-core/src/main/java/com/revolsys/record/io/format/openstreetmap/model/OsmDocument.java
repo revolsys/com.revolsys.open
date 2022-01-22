@@ -11,7 +11,7 @@ import org.jeometry.common.data.identifier.Identifier;
 import com.revolsys.collection.map.LongHashMap;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.record.io.format.xml.StaxReader;
+import com.revolsys.record.io.format.xml.stax.StaxReader;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.spring.resource.UrlResource;
 import com.revolsys.util.Property;

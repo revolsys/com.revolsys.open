@@ -9,6 +9,7 @@ import javax.xml.stream.XMLStreamConstants;
 import com.revolsys.collection.iterator.AbstractIterator;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.NamedJsonObject;
+import com.revolsys.record.io.format.xml.stax.StaxReader;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
 
