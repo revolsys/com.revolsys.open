@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.http.Header;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.message.BasicHeader;
 
 import com.revolsys.net.http.SimpleNameValuePair;
@@ -46,16 +45,16 @@ public class ConfigurableRequestBuilderFactory extends ApacheHttpRequestBuilderF
   }
 
   @Override
-  protected ApacheHttpRequestBuilder newRequestBuilder(final RequestBuilder requestBuilder) {
-    return new ConfigurableRequestBuilder(this, requestBuilder);
+  protected ApacheHttpRequestBuilder newRequestBuilder() {
+    return new ConfigurableRequestBuilder(this);
   }
 
-  public void preBuild(final RequestBuilder builder) {
+  public void preBuild(final ConfigurableRequestBuilder requestBuilder) {
     for (final Header header : this.headers) {
-      builder.addHeader(header);
+      requestBuilder.addHeader(header);
     }
     for (final NameValuePair parameter : this.parameters) {
-      builder.addParameter(parameter);
+      requestBuilder.setParameter(parameter);
     }
   }
 }

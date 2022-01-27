@@ -3,9 +3,9 @@ package com.revolsys.geopackage.field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -55,12 +55,8 @@ public class GeoPackageDateTimeField extends JdbcFieldDefinition {
       final int sqlType = getSqlType();
       statement.setNull(parameterIndex, sqlType);
     } else {
-
-      final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-      dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-      final Timestamp date = Dates.getTimestamp(value);
-      final String dateString = dateFormat.format(date);
+      final Instant date = Dates.getInstant(value);
+      final String dateString = date.toString();
       statement.setString(parameterIndex, dateString);
     }
     return parameterIndex + 1;

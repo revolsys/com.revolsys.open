@@ -7,6 +7,7 @@ import java.nio.ByteOrder;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -152,7 +153,7 @@ public class XbaseRecordReader extends AbstractIterator<Record> implements Recor
     if (dateString.trim().length() == 0 || dateString.equals("0")) {
       return null;
     } else {
-      return new java.sql.Date(Dates.getDate("yyyyMMdd", dateString).getTime());
+      return java.sql.Date.valueOf(LocalDate.from(Dates.yyyyMMdd.parse(dateString)));
     }
   }
 

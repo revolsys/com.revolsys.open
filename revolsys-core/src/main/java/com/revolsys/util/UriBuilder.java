@@ -351,7 +351,8 @@ public class UriBuilder {
       if (this.encodedQuery != null) {
         sb.append("?").append(this.encodedQuery);
       } else if (this.queryParams != null && !this.queryParams.isEmpty()) {
-        sb.append("?").append(encodeUrlForm(this.queryParams));
+        sb.append("?");
+        encodeUrlForm(sb, this.queryParams);
       } else if (this.query != null) {
         sb.append("?");
         appendUrlEncode(sb, this.query, PATHSAFE, false);
@@ -378,12 +379,14 @@ public class UriBuilder {
     return this;
   }
 
-  private String encodeUrlForm(final List<NameValuePair> params) {
-    final StringBuilder result = new StringBuilder();
+  private void encodeUrlForm(final StringBuilder result, final List<NameValuePair> params) {
+    boolean first = true;
     for (final NameValuePair parameter : params) {
       final String name = parameter.getName();
       final String value = parameter.getValue();
-      if (result.length() > 0) {
+      if (first) {
+        first = false;
+      } else {
         result.append('&');
       }
       if (name != null) {
@@ -391,10 +394,9 @@ public class UriBuilder {
       }
       if (value != null) {
         result.append("=");
-        appendUrlEncode(result, value, URLENCODER, true);
+        appendUrlEncode(result, value, URLENCODER, false);
       }
     }
-    return result.toString();
   }
 
   /**

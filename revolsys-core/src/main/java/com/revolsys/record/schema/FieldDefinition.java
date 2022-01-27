@@ -24,7 +24,6 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.operation.valid.IsValidOp;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
@@ -869,7 +868,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
   }
 
   @Override
-  public <V> V toFieldValueException(final Object value) {
+  public <V> V toFieldValueException(Object value) {
     if (value == null) {
       return null;
     } else {
@@ -882,11 +881,8 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
         }
         if (this.codeTable != null) {
           final Identifier identifier = this.codeTable.getIdentifier(value);
-          if (identifier == null) {
-            throw new IllegalArgumentException(getName() + "='" + value
-              + "' cannot be found in code table " + this.codeTable.getName());
-          } else {
-            return identifier.toSingleValue();
+          if (identifier != null) {
+            value = identifier.toSingleValue();
           }
         }
 

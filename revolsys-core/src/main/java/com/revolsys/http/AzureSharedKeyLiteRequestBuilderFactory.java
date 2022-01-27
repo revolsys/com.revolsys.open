@@ -8,8 +8,6 @@ import java.util.Base64;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.http.client.methods.RequestBuilder;
-
 import com.revolsys.io.map.ObjectFactoryConfig;
 import com.revolsys.record.io.format.json.JsonObject;
 
@@ -76,8 +74,8 @@ public class AzureSharedKeyLiteRequestBuilderFactory extends ApacheHttpRequestBu
   }
 
   @Override
-  protected ApacheHttpRequestBuilder newRequestBuilder(final RequestBuilder requestBuilder) {
-    return new AzureSharedKeyLiteRequestBuilder(this, requestBuilder);
+  protected ApacheHttpRequestBuilder newRequestBuilder() {
+    return new AzureSharedKeyLiteRequestBuilder(this);
   }
 
   private String sign(final StringBuilder data)

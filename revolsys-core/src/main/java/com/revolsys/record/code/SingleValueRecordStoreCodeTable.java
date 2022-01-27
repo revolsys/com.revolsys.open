@@ -1,6 +1,6 @@
 package com.revolsys.record.code;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -242,6 +242,7 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
     return this.loadMissingCodes;
   }
 
+  @Override
   public synchronized void loadAll() {
     final long time = System.currentTimeMillis();
     if (this.threadLoading.get() != Boolean.TRUE) {
@@ -347,7 +348,7 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
       code.setIdentifier(id);
       code.setValue(this.valueFieldName, value);
 
-      final Timestamp now = new Timestamp(System.currentTimeMillis());
+      final Instant now = Instant.now();
       if (this.creationTimestampFieldName != null) {
         code.setValue(this.creationTimestampFieldName, now);
       }

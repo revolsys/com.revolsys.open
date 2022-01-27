@@ -22,9 +22,9 @@ public class Q {
 
   public static Function<QueryValue, Condition> IS_NULL = IsNull::new;
 
-  public static BiFunction<QueryValue, QueryValue, Condition> EQUAL = Equal::new;
+  public static BiFunction<QueryValue, QueryValue, Condition> EQUAL = Q::equal;
 
-  public static BiFunction<QueryValue, QueryValue, Condition> NOT_EQUAL = NotEqual::new;
+  public static BiFunction<QueryValue, QueryValue, Condition> NOT_EQUAL = Q::notEqual;
 
   public static BiFunction<QueryValue, QueryValue, Condition> GREATER_THAN = GreaterThan::new;
 
@@ -100,7 +100,7 @@ public class Q {
     return binary((QueryValue)field, operator, queryValue);
   }
 
-  public static BinaryCondition binary(final QueryValue left, final String operator,
+  public static Condition binary(final QueryValue left, final String operator,
     final QueryValue right) {
     if ("=".equals(operator)) {
       return Q.equal(left, right);
@@ -149,7 +149,15 @@ public class Q {
     return new Equal(left, valueCondition);
   }
 
-  public static Equal equal(final QueryValue left, final QueryValue right) {
+  public static Condition equal(final QueryValue left, final QueryValue right) {
+    if (right == null) {
+      return new IsNull(left);
+    } else if (right instanceof Value) {
+      final Value value = (Value)right;
+      if (value.getValue() == null) {
+        return new IsNull(left);
+      }
+    }
     return new Equal(left, right);
   }
 
@@ -394,23 +402,31 @@ public class Q {
     return new Not(condition);
   }
 
-  public static NotEqual notEqual(final FieldDefinition fieldDefinition, final Object value) {
+  public static Condition notEqual(final FieldDefinition fieldDefinition, final Object value) {
     final String name = fieldDefinition.getName();
     final Value valueCondition = Value.newValue(fieldDefinition, value);
     return notEqual(name, valueCondition);
   }
 
-  public static NotEqual notEqual(final QueryValue left, final QueryValue right) {
+  public static Condition notEqual(final QueryValue left, final QueryValue right) {
+    if (right == null) {
+      return new IsNotNull(left);
+    } else if (right instanceof Value) {
+      final Value value = (Value)right;
+      if (value.getValue() == null) {
+        return new IsNotNull(left);
+      }
+    }
     return new NotEqual(left, right);
   }
 
-  public static NotEqual notEqual(final String name, final Object value) {
+  public static Condition notEqual(final String name, final Object value) {
     return notEqual(name, Value.newValue(value));
   }
 
-  public static NotEqual notEqual(final String name, final QueryValue right) {
-    final Column column = new Column(name);
-    return new NotEqual(column, right);
+  public static Condition notEqual(final String name, final QueryValue right) {
+    final QueryValue column = new Column(name);
+    return notEqual(column, right);
   }
 
   public static Or or(final Condition... conditions) {

@@ -1,15 +1,11 @@
 package com.revolsys.csformat.gridshift.nadcon5;
 
-import java.sql.Date;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jeometry.common.exception.Exceptions;
 import org.jeometry.coordinatesystem.operation.CoordinatesOperationPoint;
 
 import com.revolsys.geometry.model.BoundingBox;
@@ -61,9 +57,9 @@ public class Nadcon5Region {
 
   private final BoundingBox boundingBox;
 
-  private final Date date;
+  // private final Date date;
 
-  private String dateString;
+  private final String dateString;
 
   private final List<String> datumNames;
 
@@ -86,12 +82,12 @@ public class Nadcon5Region {
     final String... datumNames) {
     this.index = index;
     this.name = name;
-    try {
-      this.dateString = dateString;
-      this.date = new Date(new SimpleDateFormat("yyyyMMdd").parse(dateString).getTime());
-    } catch (final ParseException e) {
-      throw Exceptions.wrap("Invalid date " + dateString, e);
-    }
+    this.dateString = dateString;
+    // try {
+    // // this.date = Date.from(Instant.from(Dates.yyyyMMdd.parse(dateString)));
+    // } catch (final ParseException e) {
+    // throw Exceptions.wrap("Invalid date " + dateString, e);
+    // }
     this.minX = minX;
     this.minY = minY;
     this.maxX = maxX;
@@ -118,10 +114,6 @@ public class Nadcon5Region {
 
   public BoundingBox getBoundingBox() {
     return this.boundingBox;
-  }
-
-  public Date getDate() {
-    return this.date;
   }
 
   public String getDateString() {

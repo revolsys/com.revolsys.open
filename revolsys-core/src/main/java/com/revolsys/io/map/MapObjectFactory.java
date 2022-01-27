@@ -9,7 +9,6 @@ import java.util.function.BiConsumer;
 
 import org.jeometry.common.logging.Logs;
 
-import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.properties.ObjectWithProperties;
@@ -60,6 +59,7 @@ public interface MapObjectFactory {
         return (V)newList;
       }
     } catch (final Throwable e) {
+      e.printStackTrace();
       Logs.debug(MapObjectFactory.class, "Unable to convert:" + value, e);
     }
     return (V)value;
@@ -72,7 +72,7 @@ public interface MapObjectFactory {
   }
 
   @SuppressWarnings("unchecked")
-  static <V> V toObject(final MapEx map) {
+  static <V> V toObject(final Map<String, ? extends Object> map) {
     if (map == null) {
       return null;
     } else {

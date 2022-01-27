@@ -1,6 +1,6 @@
 package com.revolsys.record.code;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -252,6 +252,7 @@ public class MultiValueCodeTableProperty extends AbstractMultiValueCodeTable
     return this.loadMissingCodes;
   }
 
+  @Override
   public synchronized void loadAll() {
     final long time = System.currentTimeMillis();
     if (this.threadLoading.get() != Boolean.TRUE) {
@@ -391,7 +392,7 @@ public class MultiValueCodeTableProperty extends AbstractMultiValueCodeTable
         code.setValue(name, value);
       }
 
-      final Timestamp now = new Timestamp(System.currentTimeMillis());
+      final Instant now = Instant.now();
       if (this.creationTimestampFieldName != null) {
         code.setValue(this.creationTimestampFieldName, now);
       }

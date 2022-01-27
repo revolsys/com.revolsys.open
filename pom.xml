@@ -549,6 +549,58 @@
 				<version>${com.fasterxml.jackson.version}</version>
 			</dependency>
 		</dependencies>
+		 <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-codec-http</artifactId>
+      <version>${io.netty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-handler</artifactId>
+      <version>${io.netty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-handler-proxy</artifactId>
+      <version>${io.netty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-buffer</artifactId>
+      <version>${io.netty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-codec-http2</artifactId>
+      <version>${io.netty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>
+          netty-transport-native-unix-common
+        </artifactId>
+      <version>${io.netty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-transport-native-epoll</artifactId>
+      <version>${io.netty.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-transport-native-kqueue</artifactId>
+      <version>${io.netty.version}</version>
+    </dependency>
+     <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-resolver</artifactId>
+      <version>${io.netty.version}</version>
+    </dependency>
+       <dependency>
+      <groupId>io.netty</groupId>
+      <artifactId>netty-resolver-dns</artifactId>
+      <version>${io.netty.version}</version>
+    </dependency>
 	</dependencyManagement>
 
 	<distributionManagement>
@@ -624,6 +676,7 @@
 		<org.slf4j.version>1.7.32</org.slf4j.version>
 		<org.springframework.version>5.3.15</org.springframework.version>
 		<org.springframework.security.version>5.6.1</org.springframework.security.version>
+		<io.netty.version>4.1.72.Final</io.netty.version>
 		<gpg.skip>true</gpg.skip>
 		<github.global.server>github</github.global.server>
 		<skipTests>true</skipTests>

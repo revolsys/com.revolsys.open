@@ -2,7 +2,7 @@ package com.revolsys.swing.logging;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -125,7 +125,7 @@ public class LoggingTableModel extends AbstractTableModel {
   public void addLoggingEvent(final ILoggingEvent event) {
     if (event != null) {
       final long time = event.getTimeStamp();
-      final Timestamp timestamp = new Timestamp(time);
+      final Instant timestamp = Instant.ofEpochMilli(time);
       final Level level = event.getLevel();
       final String loggerName = event.getLoggerName();
 

@@ -1,7 +1,8 @@
 package com.revolsys.record.io.format.esri.gdb.xml;
 
 import java.io.Writer;
-import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.UUID;
 
 import org.jeometry.common.data.type.DataType;
@@ -166,11 +167,11 @@ public class EsriGeodatabaseXmlRecordWriter extends AbstractRecordWriter
     this.out.text(UUID.randomUUID().toString().toUpperCase());
     this.out.text("}</MetaID>");
     this.out.text("<CreaDate>");
-    final Timestamp date = new Timestamp(System.currentTimeMillis());
-    this.out.text(Dates.format("yyyyMMdd", date));
+    final Instant date = Instant.now();
+    this.out.text(Dates.yyyyMMdd.withZone(ZoneId.systemDefault()).format(date));
     this.out.text("</CreaDate>");
     this.out.text("<CreaTime>");
-    this.out.text(Dates.format("HHmmssSS", date));
+    this.out.text(Dates.HHmmssSS.withZone(ZoneId.systemDefault()).format(date));
     this.out.text("</CreaTime>");
     this.out.text("<SyncOnce>TRUE</SyncOnce>");
     this.out.text("</Esri>");

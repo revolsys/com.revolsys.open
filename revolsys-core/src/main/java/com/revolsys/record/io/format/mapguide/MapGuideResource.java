@@ -1,6 +1,6 @@
 package com.revolsys.record.io.format.mapguide;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 import org.jeometry.common.io.PathName;
@@ -24,9 +24,9 @@ public class MapGuideResource extends BaseObjectWithProperties implements WebSer
 
   private String owner;
 
-  private Timestamp createdDate;
+  private Instant createdDate;
 
-  private Timestamp modifiedDate;
+  private Instant modifiedDate;
 
   private PathName path;
 
@@ -51,7 +51,7 @@ public class MapGuideResource extends BaseObjectWithProperties implements WebSer
     return super.equals(obj);
   }
 
-  public Timestamp getCreatedDate() {
+  public Instant getCreatedDate() {
     return this.createdDate;
   }
 
@@ -64,7 +64,7 @@ public class MapGuideResource extends BaseObjectWithProperties implements WebSer
     return "file";
   }
 
-  public Timestamp getModifiedDate() {
+  public Instant getModifiedDate() {
     return this.modifiedDate;
   }
 
@@ -128,7 +128,7 @@ public class MapGuideResource extends BaseObjectWithProperties implements WebSer
     }
   }
 
-  public void setCreatedDate(final Timestamp createdDate) {
+  public void setCreatedDate(final Instant createdDate) {
     this.createdDate = createdDate;
   }
 
@@ -136,7 +136,7 @@ public class MapGuideResource extends BaseObjectWithProperties implements WebSer
     this.depth = depth;
   }
 
-  public void setModifiedDate(final Timestamp modifiedDate) {
+  public void setModifiedDate(final Instant modifiedDate) {
     this.modifiedDate = modifiedDate;
   }
 

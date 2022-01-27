@@ -2,7 +2,7 @@ package com.revolsys.record.io.format.moep;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.Date;
+import java.time.LocalDate;
 
 import org.jeometry.common.date.Dates;
 
@@ -18,13 +18,13 @@ import com.revolsys.spring.resource.Resource;
 
 public class MoepDirectoryReader extends RecordDirectoryReader implements RecordDefinitionFactory {
 
-  private Date integrationDate;
+  private LocalDate integrationDate;
 
   private String revisionKey;
 
   private String specificationsRelease;
 
-  private Date submissionDate;
+  private LocalDate submissionDate;
 
   public MoepDirectoryReader() {
     setFileExtensions("bin");
@@ -35,7 +35,7 @@ public class MoepDirectoryReader extends RecordDirectoryReader implements Record
     setDirectory(directory);
   }
 
-  public Date getIntegrationDate() {
+  public LocalDate getIntegrationDate() {
     return this.integrationDate;
   }
 
@@ -56,7 +56,7 @@ public class MoepDirectoryReader extends RecordDirectoryReader implements Record
     return this.specificationsRelease;
   }
 
-  public Date getSubmissionDate() {
+  public LocalDate getSubmissionDate() {
     return this.submissionDate;
   }
 
@@ -84,10 +84,9 @@ public class MoepDirectoryReader extends RecordDirectoryReader implements Record
         final String text = supData.getValue(MoepConstants.TEXT);
         final String[] versionFields = text.split(" ");
 
-        final String dateString = versionFields[2];
-        this.submissionDate = new Date(Dates.getDate("yyyyMMdd", dateString).getTime());
+        this.submissionDate = LocalDate.from(Dates.yyyyMMdd.parse(versionFields[2]));
         this.revisionKey = versionFields[3];
-        this.integrationDate = new Date(Dates.getDate("yyyyMMdd", versionFields[4]).getTime());
+        this.integrationDate = LocalDate.from(Dates.yyyyMMdd.parse(versionFields[4]));
         this.specificationsRelease = versionFields[5];
       }
     }
