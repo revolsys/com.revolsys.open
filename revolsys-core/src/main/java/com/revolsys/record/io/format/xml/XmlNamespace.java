@@ -21,7 +21,7 @@ public class XmlNamespace {
 
   private final String namespaceUri;
 
-  private final Map<String, XmlElementName> elementByName = new HashMap<>();
+  private final Map<String, XmlName> nameByLocalPart = new HashMap<>();
 
   public XmlNamespace(final String namespaceUri) {
     this.namespaceUri = namespaceUri;
@@ -40,11 +40,11 @@ public class XmlNamespace {
     }
   }
 
-  public synchronized XmlElementName getElementName(final String name) {
-    XmlElementName element = this.elementByName.get(name);
+  public synchronized XmlName getName(final String name) {
+    XmlName element = this.nameByLocalPart.get(name);
     if (element == null) {
-      element = new XmlElementName(this.namespaceUri, name);
-      this.elementByName.put(name, element);
+      element = new XmlName(this, name);
+      this.nameByLocalPart.put(name, element);
     }
     return element;
   }

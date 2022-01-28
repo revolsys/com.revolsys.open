@@ -1,23 +1,22 @@
 package com.revolsys.record.io.format.xml.stax;
 
-import java.util.function.Function;
+import com.revolsys.record.io.format.xml.XmlName;
+import com.revolsys.record.io.format.xml.XmlNameProxy;
+import com.revolsys.record.io.format.xml.XmlSimpleType;
 
-import com.revolsys.record.io.format.xml.XmlElementName;
-import com.revolsys.record.io.format.xml.XmlElementNameProxy;
+public class StaxAttributeReader implements XmlNameProxy {
 
-public class StaxAttributeReader implements XmlElementNameProxy {
-
-  private final XmlElementName elementName;
+  private final XmlName elementName;
 
   private final String name;
 
-  private final Function<String, ? extends Object> converter;
+  private final XmlSimpleType type;
 
-  public StaxAttributeReader(final XmlElementName elementName, final String name,
-    final Function<String, ? extends Object> converter) {
+  public StaxAttributeReader(final XmlName elementName, final String name,
+    final XmlSimpleType type) {
     this.elementName = elementName;
     this.name = name;
-    this.converter = converter;
+    this.type = type;
   }
 
   public Object getAttributeValue(final StaxReader in, final int attributeIndex) {
@@ -25,17 +24,17 @@ public class StaxAttributeReader implements XmlElementNameProxy {
     if (value == null) {
       return null;
     } else {
-      return this.converter.apply(value);
+      return this.type.toValue(value);
     }
-  }
-
-  @Override
-  public XmlElementName getElementName() {
-    return this.elementName;
   }
 
   public String getName() {
     return this.name;
+  }
+
+  @Override
+  public XmlName getXmlName() {
+    return this.elementName;
   }
 
 }

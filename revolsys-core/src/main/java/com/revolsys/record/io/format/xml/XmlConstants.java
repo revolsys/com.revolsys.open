@@ -25,6 +25,8 @@ import javax.xml.namespace.QName;
  */
 public interface XmlConstants {
 
+  XmlNamespace XSD = XmlNamespace.forUri("http://www.w3.org/2001/XMLSchema");
+
   /** The XML Namespace prefix for XML Namespaces. */
   String XMLNS_NS_PREFIX = "xmlns";
 

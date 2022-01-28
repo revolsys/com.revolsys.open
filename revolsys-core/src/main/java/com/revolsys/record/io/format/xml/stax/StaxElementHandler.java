@@ -4,38 +4,50 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
 
-import com.revolsys.record.io.format.xml.XmlElementName;
-import com.revolsys.record.io.format.xml.XmlElementNameProxy;
+import org.jeometry.common.data.type.DataTypes;
+
+import com.revolsys.record.io.format.xml.XmlConstants;
+import com.revolsys.record.io.format.xml.XmlName;
+import com.revolsys.record.io.format.xml.XmlNameProxy;
 import com.revolsys.record.io.format.xml.XmlNamespace;
+import com.revolsys.record.io.format.xml.XmlSimpleType;
+import com.revolsys.record.io.format.xml.XmlSimpleTypeDataType;
 import com.revolsys.util.Debug;
 
-public class StaxElementHandler<V> implements XmlElementNameProxy {
+public class StaxElementHandler<V> implements XmlNameProxy {
 
-  public static Function<String, ? extends Object> TO_STRING = value -> value;
+  public static XmlSimpleType XSD_STRING = new XmlSimpleTypeDataType(XmlConstants.XSD, "string",
+    DataTypes.STRING);
+
+  public static XmlSimpleType XSD_DATE_TIME = new XmlSimpleTypeDataType(XmlConstants.XSD,
+    "dateTime", DataTypes.INSTANT);
+
+  public static XmlSimpleType XSD_INTEGER = new XmlSimpleTypeDataType(XmlConstants.XSD, "dateTime",
+    DataTypes.INT);
+
+  public static XmlSimpleType XSD_UNSIGNED_LONG = new XmlSimpleTypeDataType(XmlConstants.XSD,
+    "dateTime", DataTypes.LONG);
+
+  // TODO hexBinary
 
   private final Map<QName, StaxProperty> elements = new HashMap<>();
 
   private final Map<QName, StaxAttributeReader> attributes = new HashMap<>();
 
-  private final StaxElementFunction<?> reader;
+  private final StaxElementToObject<?> reader;
 
   private String propertyName;
 
   private XmlNamespace namespace;
 
-  private XmlElementName elementName;
+  private XmlName elementName;
 
   private final Set<String> unhandled = new HashSet<>();
-
-  public StaxElementHandler(final XmlNamespace namespace, final String localPart,
-    final StaxElementFunction<V> reader) {
-    this(namespace, localPart, localPart, reader);
-  }
 
   public StaxElementHandler(final XmlNamespace namespace, final String localPart,
     final StaxElementFunctionFactory reader) {
@@ -43,153 +55,150 @@ public class StaxElementHandler<V> implements XmlElementNameProxy {
   }
 
   public StaxElementHandler(final XmlNamespace namespace, final String localPart,
-    final String propertyName, final Function<StaxReader, V> reader) {
-    this.elementName = namespace.getElementName(localPart);
-    this.namespace = namespace;
-    this.propertyName = propertyName;
-    this.reader = (in, callback) -> reader.apply(in);
-  }
-
-  public StaxElementHandler(final XmlNamespace namespace, final String localPart,
-    final String propertyName, final StaxElementFunction<V> reader) {
-    this.elementName = namespace.getElementName(localPart);
-    this.namespace = namespace;
-    this.propertyName = propertyName;
-    this.reader = reader;
+    final StaxElementToObject<V> reader) {
+    this(namespace, localPart, localPart, reader);
   }
 
   public StaxElementHandler(final XmlNamespace namespace, final String localPart,
     final String propertyName, final StaxElementFunctionFactory factory) {
-    this.elementName = namespace.getElementName(localPart);
+    this.elementName = namespace.getName(localPart);
     this.namespace = namespace;
     this.propertyName = propertyName;
     this.reader = factory.getFunction(this);
   }
 
+  public StaxElementHandler(final XmlNamespace namespace, final String localPart,
+    final String propertyName, final StaxElementToObject<V> reader) {
+    this.elementName = namespace.getName(localPart);
+    this.namespace = namespace;
+    this.propertyName = propertyName;
+    this.reader = reader;
+  }
+
   public final StaxElementHandler<V> addAttribute(final String localPart) {
-    final XmlElementNameProxy elementName = this.namespace.getElementName(localPart);
+    final XmlNameProxy elementName = this.namespace.getName(localPart);
     return addAttribute(elementName);
   }
 
-  public final StaxElementHandler<V> addAttribute(final String localPart,
-    final Function<String, ? extends Object> handler) {
-    final XmlElementNameProxy elementName = this.namespace.getElementName(localPart);
-    return addAttribute(elementName, handler);
-  }
-
   public final StaxElementHandler<V> addAttribute(final String localPart, final String name) {
-    final XmlElementNameProxy elementName = this.namespace.getElementName(localPart);
+    final XmlNameProxy elementName = this.namespace.getName(localPart);
     return addAttribute(elementName, name);
   }
 
   public final StaxElementHandler<V> addAttribute(final String localPart, final String name,
-    final Function<String, ? extends Object> handler) {
-    final XmlElementNameProxy elementName = this.namespace.getElementName(localPart);
-    return addAttribute(elementName, name, handler);
+    final XmlSimpleType type) {
+    final XmlNameProxy elementName = this.namespace.getName(localPart);
+    return addAttribute(elementName, name, type);
   }
 
-  public final StaxElementHandler<V> addAttribute(final XmlElementNameProxy elementName) {
-    return addAttribute(elementName, TO_STRING);
+  public final StaxElementHandler<V> addAttribute(final String localPart,
+    final XmlSimpleType type) {
+    final XmlNameProxy elementName = this.namespace.getName(localPart);
+    return addAttribute(elementName, type);
   }
 
-  public final StaxElementHandler<V> addAttribute(final XmlElementNameProxy elementName,
-    final Function<String, ? extends Object> handler) {
-    final String name = elementName.getLocalPart();
-    return addAttribute(elementName, name, handler);
+  public final StaxElementHandler<V> addAttribute(final XmlNameProxy elementName) {
+    return addAttribute(elementName, XSD_STRING);
   }
 
-  public final StaxElementHandler<V> addAttribute(final XmlElementNameProxy elementName,
+  public final StaxElementHandler<V> addAttribute(final XmlNameProxy elementName,
     final String name) {
-    return addAttribute(elementName, name, TO_STRING);
+    return addAttribute(elementName, name, XSD_STRING);
   }
 
-  public final StaxElementHandler<V> addAttribute(final XmlElementNameProxy element,
-    final String name, final Function<String, ? extends Object> handler) {
-    final XmlElementName elementName = element.getElementName();
-    final StaxAttributeReader attribute = new StaxAttributeReader(elementName, name, handler);
+  public final StaxElementHandler<V> addAttribute(final XmlNameProxy element, final String name,
+    final XmlSimpleType type) {
+    final XmlName elementName = element.getXmlName();
+    final StaxAttributeReader attribute = new StaxAttributeReader(elementName, name, type);
     this.attributes.put(elementName, attribute);
     return this;
   }
 
+  public final StaxElementHandler<V> addAttribute(final XmlNameProxy elementName,
+    final XmlSimpleType type) {
+    final String name = elementName.getLocalPart();
+    return addAttribute(elementName, name, type);
+  }
+
   public final StaxElementHandler<V> addAttribute(final XmlNamespace namespace,
-    final String localPart, final Function<String, ? extends Object> handler) {
-    final XmlElementNameProxy elementName = namespace.getElementName(localPart);
-    return addAttribute(elementName, handler);
+    final String localPart, final XmlSimpleType type) {
+    final XmlNameProxy elementName = namespace.getName(localPart);
+    return addAttribute(elementName, type);
   }
 
   public final StaxElementHandler<V> addElement(final StaxElementHandler<?> element) {
-    final XmlElementNameProxy elementName = element.getElementName();
+    final XmlNameProxy elementName = element.getXmlName();
     final String propertyName = element.propertyName;
-    final StaxElementFunction<?> handler = element.reader;
+    final StaxElementToObject<?> handler = element.reader;
     return addElement(elementName, propertyName, handler, false);
   }
 
   public final StaxElementHandler<V> addElement(final String localPart,
-    final StaxElementFunction<?> handler) {
-    final XmlElementNameProxy elementName = this.namespace.getElementName(localPart);
+    final StaxElementToObject<?> handler) {
+    final XmlNameProxy elementName = this.namespace.getName(localPart);
     return addElement(elementName, handler);
   }
 
   public final StaxElementHandler<V> addElement(final String localPart, final String name,
-    final StaxElementFunction<?> handler) {
-    final XmlElementNameProxy elementName = this.namespace.getElementName(localPart);
+    final StaxElementToObject<?> handler) {
+    final XmlNameProxy elementName = this.namespace.getName(localPart);
     return addElement(elementName, name, handler);
   }
 
-  public final StaxElementHandler<V> addElement(final XmlElementNameProxy element,
-    final StaxElementFunction<?> handler) {
-    final XmlElementName elementName = element.getElementName();
+  public final StaxElementHandler<V> addElement(final XmlNameProxy element,
+    final StaxElementToObject<?> handler) {
+    final XmlName elementName = element.getXmlName();
     final String name = elementName.getLocalPart();
     return addElement(elementName, name, handler);
   }
 
-  public final StaxElementHandler<V> addElement(final XmlElementNameProxy elementName,
-    final String name, final StaxElementFunction<? extends Object> handler) {
+  public final StaxElementHandler<V> addElement(final XmlNameProxy elementName, final String name,
+    final StaxElementToObject<? extends Object> handler) {
     return addElement(elementName, name, handler, false);
   }
 
-  private StaxElementHandler<V> addElement(final XmlElementNameProxy element, final String name,
-    final StaxElementFunction<? extends Object> handler, final boolean list) {
-    final XmlElementName elementName = element.getElementName();
+  private StaxElementHandler<V> addElement(final XmlNameProxy element, final String name,
+    final StaxElementToObject<? extends Object> handler, final boolean list) {
+    final XmlName elementName = element.getXmlName();
     final StaxProperty property = new StaxProperty(elementName, name, handler, list);
     this.elements.put(elementName, property);
     return this;
   }
 
   public final StaxElementHandler<V> addElement(final XmlNamespace namespace,
-    final String localPart, final StaxElementFunction<?> handler) {
-    final XmlElementNameProxy elementName = namespace.getElementName(localPart);
+    final String localPart, final StaxElementToObject<?> handler) {
+    final XmlNameProxy elementName = namespace.getName(localPart);
     return addElement(elementName, handler);
   }
 
   public final StaxElementHandler<V> addElement(final XmlNamespace namespace,
-    final String localPart, final String name, final StaxElementFunction<?> handler) {
-    final XmlElementNameProxy elementName = namespace.getElementName(localPart);
+    final String localPart, final String name, final StaxElementToObject<?> handler) {
+    final XmlNameProxy elementName = namespace.getName(localPart);
     return addElement(elementName, name, handler);
   }
 
   public final StaxElementHandler<V> addElementList(final StaxElementHandler<?> element) {
-    final XmlElementNameProxy elementName = element.getElementName();
+    final XmlNameProxy elementName = element.getXmlName();
     final String propertyName = element.propertyName;
-    final StaxElementFunction<?> handler = element.reader;
+    final StaxElementToObject<?> handler = element.reader;
     return addElement(elementName, propertyName, handler, true);
   }
 
   public final StaxElementHandler<V> addElementList(final StaxElementHandler<?> element,
     final String name) {
-    final XmlElementNameProxy elementName = element.getElementName();
-    final StaxElementFunction<?> handler = element.reader;
+    final XmlNameProxy elementName = element.getXmlName();
+    final StaxElementToObject<?> handler = element.reader;
     return addElementList(elementName, name, handler);
   }
 
-  public final StaxElementHandler<V> addElementList(final XmlElementNameProxy elementName,
-    final StaxElementFunction<? extends Object> handler) {
+  public final StaxElementHandler<V> addElementList(final XmlNameProxy elementName,
+    final StaxElementToObject<? extends Object> handler) {
     final String name = elementName.getLocalPart();
     return addElementList(elementName, name, handler);
   }
 
-  public final StaxElementHandler<V> addElementList(final XmlElementNameProxy elementName,
-    final String name, final StaxElementFunction<? extends Object> handler) {
+  public final StaxElementHandler<V> addElementList(final XmlNameProxy elementName,
+    final String name, final StaxElementToObject<? extends Object> handler) {
     return addElement(elementName, name, handler, true);
   }
 
@@ -216,13 +225,13 @@ public class StaxElementHandler<V> implements XmlElementNameProxy {
   }
 
   @Override
-  public XmlElementName getElementName() {
-    return this.elementName;
+  public String getLocalPart() {
+    return this.elementName.getLocalPart();
   }
 
   @Override
-  public String getLocalPart() {
-    return this.elementName.getLocalPart();
+  public XmlName getXmlName() {
+    return this.elementName;
   }
 
   private void handleAttributes(final StaxReader in, final StaxElementCallback callback) {
@@ -245,10 +254,16 @@ public class StaxElementHandler<V> implements XmlElementNameProxy {
 
   @SuppressWarnings("unchecked")
   public V handleElement(final StaxReader in) {
-    return (V)this.reader.handle(in, null);
+    return (V)this.reader.toObject(in);
   }
 
   public void handleElement(final StaxReader in, final StaxElementCallback callback) {
+    if (in.getEventType() != XMLStreamConstants.START_ELEMENT) {
+      in.skipToStartElement();
+      if (in.getEventType() != XMLStreamConstants.START_ELEMENT) {
+        return;
+      }
+    }
     handleAttributes(in, callback);
     handleElements(in, callback);
   }
@@ -269,9 +284,9 @@ public class StaxElementHandler<V> implements XmlElementNameProxy {
     }
   }
 
-  public <J extends StaxJsonObject> StaxElementFunction<J> jsonFactory(
+  public <J extends StaxJsonObject> StaxElementToObject<J> jsonFactory(
     final Supplier<J> constructor) {
-    return (in, callback) -> {
+    return in -> {
       final J json = constructor.get();
       json.initFromElementHandler(in, this);
       return json;
