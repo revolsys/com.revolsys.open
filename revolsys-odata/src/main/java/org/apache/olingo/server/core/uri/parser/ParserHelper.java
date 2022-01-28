@@ -114,8 +114,7 @@ public class ParserHelper {
 
     // To validate that each key predicate is exactly specified once, we use a
     // list to pick from.
-    final List<String> remainingKeyNames = new ArrayList<>(
-      edmEntityType.getKeyPredicateNames());
+    final List<String> remainingKeyNames = new ArrayList<>(edmEntityType.getKeyPredicateNames());
 
     // At least one key predicate is mandatory. Try to fetch all.
     boolean hasComma = false;

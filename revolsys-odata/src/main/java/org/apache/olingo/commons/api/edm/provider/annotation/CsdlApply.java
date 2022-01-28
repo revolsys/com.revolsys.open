@@ -66,7 +66,7 @@ public class CsdlApply extends CsdlDynamicExpression implements CsdlAnnotatable 
 
   @Override
   public boolean equals(final Object obj) {
-    if ((obj == null) || !(obj instanceof CsdlApply)) {
+    if (obj == null || !(obj instanceof CsdlApply)) {
       return false;
     }
     final CsdlApply annotApply = (CsdlApply)obj;

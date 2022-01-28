@@ -52,7 +52,7 @@ public class CsdlUrlRef extends CsdlDynamicExpression implements CsdlAnnotatable
 
   @Override
   public boolean equals(final Object obj) {
-    if ((obj == null) || !(obj instanceof CsdlUrlRef)) {
+    if (obj == null || !(obj instanceof CsdlUrlRef)) {
       return false;
     }
     final CsdlUrlRef csdlUrlRef = (CsdlUrlRef)obj;

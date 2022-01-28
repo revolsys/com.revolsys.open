@@ -68,7 +68,7 @@ public class CsdlEntityContainer implements CsdlAbstractEdmItem, CsdlNamed, Csdl
    * @return action imports.
    */
   public List<CsdlActionImport> getActionImports(final String name) {
-    List<CsdlActionImport> actionImports = getActionImports();
+    final List<CsdlActionImport> actionImports = getActionImports();
     return getAllByName(name, actionImports);
   }
 

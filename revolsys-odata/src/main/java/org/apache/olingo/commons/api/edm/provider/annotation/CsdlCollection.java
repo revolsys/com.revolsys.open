@@ -48,7 +48,7 @@ public class CsdlCollection extends CsdlDynamicExpression {
 
   @Override
   public boolean equals(final Object obj) {
-    if ((obj == null) || !(obj instanceof CsdlCollection)) {
+    if (obj == null || !(obj instanceof CsdlCollection)) {
       return false;
     }
     final CsdlCollection annotColl = (CsdlCollection)obj;

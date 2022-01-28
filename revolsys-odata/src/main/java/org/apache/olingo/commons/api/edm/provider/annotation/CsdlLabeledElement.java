@@ -54,7 +54,7 @@ public class CsdlLabeledElement extends CsdlDynamicExpression implements CsdlAnn
 
   @Override
   public boolean equals(final Object obj) {
-    if ((obj == null) || !(obj instanceof CsdlLabeledElement)) {
+    if (obj == null || !(obj instanceof CsdlLabeledElement)) {
       return false;
     }
     final CsdlLabeledElement csdlLabelledEle = (CsdlLabeledElement)obj;

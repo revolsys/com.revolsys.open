@@ -63,7 +63,7 @@ public class CsdlCast extends CsdlDynamicExpression implements CsdlAnnotatable {
 
   @Override
   public boolean equals(final Object obj) {
-    if ((obj == null) || !(obj instanceof CsdlCast)) {
+    if (obj == null || !(obj instanceof CsdlCast)) {
       return false;
     }
     final CsdlCast csdlCast = (CsdlCast)obj;

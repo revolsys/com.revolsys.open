@@ -63,7 +63,7 @@ public class CsdlIsOf extends CsdlDynamicExpression implements CsdlAnnotatable {
 
   @Override
   public boolean equals(final Object obj) {
-    if ((obj == null) || !(obj instanceof CsdlIsOf)) {
+    if (obj == null || !(obj instanceof CsdlIsOf)) {
       return false;
     }
     final CsdlIsOf csdlIsOf = (CsdlIsOf)obj;

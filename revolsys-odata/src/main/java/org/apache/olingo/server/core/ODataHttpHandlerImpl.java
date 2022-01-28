@@ -236,10 +236,6 @@ public class ODataHttpHandlerImpl implements ODataHttpHandler {
     }
   }
 
-  private String getIntAsString(final int number) {
-    return number == 0 ? "unknown" : Integer.toString(number);
-  }
-
   private ODataResponse handleException(final ODataRequest odRequest, final Exception e) {
     final ODataResponse resp = new ODataResponse();
     ODataServerError serverError;

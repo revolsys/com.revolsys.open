@@ -27,7 +27,7 @@ public class CsdlAnnotationPath extends CsdlDynamicExpression {
 
   @Override
   public boolean equals(final Object obj) {
-    if ((obj == null) || !(obj instanceof CsdlAnnotationPath)) {
+    if (obj == null || !(obj instanceof CsdlAnnotationPath)) {
       return false;
     }
     final CsdlAnnotationPath csdlAnnotPath = (CsdlAnnotationPath)obj;

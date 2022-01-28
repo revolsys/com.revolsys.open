@@ -49,7 +49,7 @@ public class CsdlNull extends CsdlDynamicExpression implements CsdlAnnotatable {
 
   @Override
   public boolean equals(final Object obj) {
-    if ((obj == null) || !(obj instanceof CsdlNull)) {
+    if (obj == null || !(obj instanceof CsdlNull)) {
       return false;
     }
     final CsdlNull csdlNull = (CsdlNull)obj;

@@ -55,7 +55,7 @@ public class CsdlIf extends CsdlDynamicExpression implements CsdlAnnotatable {
 
   @Override
   public boolean equals(final Object obj) {
-    if ((obj == null) || !(obj instanceof CsdlIf)) {
+    if (obj == null || !(obj instanceof CsdlIf)) {
       return false;
     }
     final CsdlIf csdlIf = (CsdlIf)obj;

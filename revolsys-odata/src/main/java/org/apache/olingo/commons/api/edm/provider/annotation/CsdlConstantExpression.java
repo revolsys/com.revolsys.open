@@ -105,7 +105,7 @@ public class CsdlConstantExpression extends CsdlExpression {
 
   @Override
   public boolean equals(final Object obj) {
-    if ((obj == null) || !(obj instanceof CsdlConstantExpression)) {
+    if (obj == null || !(obj instanceof CsdlConstantExpression)) {
       return false;
     }
     final CsdlConstantExpression csdlConstExp = (CsdlConstantExpression)obj;

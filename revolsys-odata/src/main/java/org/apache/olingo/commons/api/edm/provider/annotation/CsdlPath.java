@@ -29,7 +29,7 @@ public class CsdlPath extends CsdlDynamicExpression {
 
   @Override
   public boolean equals(final Object obj) {
-    if ((obj == null) || !(obj instanceof CsdlPath)) {
+    if (obj == null || !(obj instanceof CsdlPath)) {
       return false;
     }
     final CsdlPath csdlPath = (CsdlPath)obj;

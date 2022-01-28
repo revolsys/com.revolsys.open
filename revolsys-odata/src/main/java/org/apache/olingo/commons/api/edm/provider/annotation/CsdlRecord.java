@@ -70,7 +70,7 @@ public class CsdlRecord extends CsdlDynamicExpression implements CsdlAnnotatable
 
   @Override
   public boolean equals(final Object obj) {
-    if ((obj == null) || !(obj instanceof CsdlRecord)) {
+    if (obj == null || !(obj instanceof CsdlRecord)) {
       return false;
     }
     final CsdlRecord csdlRecord = (CsdlRecord)obj;

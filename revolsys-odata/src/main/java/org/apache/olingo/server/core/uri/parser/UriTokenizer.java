@@ -831,7 +831,8 @@ public class UriTokenizer {
             }
           }
           if (hasNumber || nextIntegerValue(false)) {
-            if ((nextCharacter('.') && !nextIntegerValue(false)) || !(nextCharacter('S') || nextCharacter('s'))) {
+            if (nextCharacter('.') && !nextIntegerValue(false)
+              || !(nextCharacter('S') || nextCharacter('s'))) {
               return false;
             }
           }

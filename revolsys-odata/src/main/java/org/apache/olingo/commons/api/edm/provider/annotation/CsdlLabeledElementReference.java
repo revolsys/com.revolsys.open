@@ -28,7 +28,7 @@ public class CsdlLabeledElementReference extends CsdlDynamicExpression {
 
   @Override
   public boolean equals(final Object obj) {
-    if ((obj == null) || !(obj instanceof CsdlLabeledElementReference)) {
+    if (obj == null || !(obj instanceof CsdlLabeledElementReference)) {
       return false;
     }
     final CsdlLabeledElementReference csdlLabelledEleRef = (CsdlLabeledElementReference)obj;

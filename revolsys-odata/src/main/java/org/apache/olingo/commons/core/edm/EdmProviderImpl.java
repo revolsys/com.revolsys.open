@@ -729,8 +729,7 @@ public class EdmProviderImpl extends AbstractEdm {
     final List<CsdlProperty> properties = this.provider.getEntityType(parameter.getTypeFQN())
       .getProperties();
     for (final CsdlProperty property : properties) {
-      final String paramPropertyTypeName = property.getTypeName()
-        .getFullQualifiedNameAsString();
+      final String paramPropertyTypeName = property.getTypeName().getFullQualifiedNameAsString();
       if (complexType != null && complexType.getBaseType() != null
         && complexType.getBaseTypeFQN().getFullQualifiedNameAsString().equals(paramPropertyTypeName)
         || paramPropertyTypeName.equals(bindingParameterTypeName.getFullQualifiedNameAsString())

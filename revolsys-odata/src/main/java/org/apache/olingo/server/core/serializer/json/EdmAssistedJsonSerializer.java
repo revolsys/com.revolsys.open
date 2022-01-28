@@ -60,8 +60,7 @@ import org.apache.olingo.server.core.serializer.utils.CircleStreamBuffer;
 import org.apache.olingo.server.core.serializer.utils.ContentTypeHelper;
 import org.apache.olingo.server.core.serializer.utils.ContextURLBuilder;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
+import com.revolsys.record.io.format.json.JsonWriter;
 
 public class EdmAssistedJsonSerializer implements EdmAssistedSerializer {
 
@@ -89,11 +88,11 @@ public class EdmAssistedJsonSerializer implements EdmAssistedSerializer {
     this.constants = constants;
   }
 
-  private void collection(final JsonGenerator json, final EdmType itemType, final String typeName,
+  private void collection(final JsonWriter json, final EdmType itemType, final String typeName,
     final EdmProperty edmProperty, final ValueType valueType, final List<?> value)
     throws IOException, SerializerException {
 
-    json.writeStartArray();
+    json.startList();
 
     for (final Object item : value) {
       switch (valueType) {
@@ -114,15 +113,15 @@ public class EdmAssistedJsonSerializer implements EdmAssistedSerializer {
       }
     }
 
-    json.writeEndArray();
+    json.endList();
   }
 
-  private void complexValue(final JsonGenerator json, final EdmComplexType valueType,
+  private void complexValue(final JsonWriter json, final EdmComplexType valueType,
     final String typeName, final ComplexValue value) throws IOException, SerializerException {
-    json.writeStartObject();
+    json.startObject();
 
     if (typeName != null && this.isODataMetadataFull) {
-      json.writeStringField(this.constants.getType(), typeName);
+      json.labelValue(this.constants.getType(), typeName);
     }
 
     for (final Property property : value.getValue()) {
@@ -135,7 +134,7 @@ public class EdmAssistedJsonSerializer implements EdmAssistedSerializer {
     }
     links(value, null, json);
 
-    json.writeEndObject();
+    json.endObject();
   }
 
   private String constructTypeExpression(final String typeName) {
@@ -160,22 +159,21 @@ public class EdmAssistedJsonSerializer implements EdmAssistedSerializer {
 
   protected void doSerialize(final EdmEntityType entityType,
     final AbstractEntityCollection entityCollection, final String contextURLString,
-    final String metadataETag, final JsonGenerator json) throws IOException, SerializerException {
+    final String metadataETag, final JsonWriter json) throws IOException, SerializerException {
 
-    json.writeStartObject();
+    json.startObject();
 
     metadata(contextURLString, metadataETag, null, null, entityCollection.getId(), false, json);
 
     if (entityCollection.getCount() != null) {
       if (this.isIEEE754Compatible) {
-        json.writeStringField(this.constants.getCount(),
-          Integer.toString(entityCollection.getCount()));
+        json.labelValue(this.constants.getCount(), Integer.toString(entityCollection.getCount()));
       } else {
-        json.writeNumberField(this.constants.getCount(), entityCollection.getCount());
+        json.labelValue(this.constants.getCount(), entityCollection.getCount());
       }
     }
     if (entityCollection.getDeltaLink() != null) {
-      json.writeStringField(this.constants.getDeltaLink(),
+      json.labelValue(this.constants.getDeltaLink(),
         entityCollection.getDeltaLink().toASCIIString());
     }
 
@@ -183,25 +181,25 @@ public class EdmAssistedJsonSerializer implements EdmAssistedSerializer {
       valuable(json, annotation, '@' + annotation.getTerm(), null, null);
     }
 
-    json.writeArrayFieldStart(Constants.VALUE);
+    json.label(Constants.VALUE);
+    json.startList();
     for (final Entity entity : entityCollection) {
       doSerialize(entityType, entity, null, null, json);
     }
-    json.writeEndArray();
+    json.endList();
 
     if (entityCollection.getNext() != null) {
-      json.writeStringField(this.constants.getNextLink(),
-        entityCollection.getNext().toASCIIString());
+      json.labelValue(this.constants.getNextLink(), entityCollection.getNext().toASCIIString());
     }
 
-    json.writeEndObject();
+    json.endObject();
   }
 
   protected void doSerialize(final EdmEntityType entityType, final Entity entity,
-    final String contextURLString, final String metadataETag, final JsonGenerator json)
+    final String contextURLString, final String metadataETag, final JsonWriter json)
     throws IOException, SerializerException {
 
-    json.writeStartObject();
+    json.startObject();
 
     final String typeName = entity.getType() == null ? null
       : new EdmTypeInfo.Builder().setTypeExpression(entity.getType()).build().external();
@@ -223,17 +221,17 @@ public class EdmAssistedJsonSerializer implements EdmAssistedSerializer {
 
     if (!this.isODataMetadataNone && entity.getEditLink() != null
       && entity.getEditLink().getHref() != null) {
-      json.writeStringField(this.constants.getEditLink(), entity.getEditLink().getHref());
+      json.labelValue(this.constants.getEditLink(), entity.getEditLink().getHref());
 
       if (entity.isMediaEntity()) {
-        json.writeStringField(this.constants.getMediaReadLink(),
+        json.labelValue(this.constants.getMediaReadLink(),
           entity.getEditLink().getHref() + "/$value");
       }
     }
 
     links(entity, entityType, json);
 
-    json.writeEndObject();
+    json.endObject();
   }
 
   public SerializerResult entity(final ServiceMetadata metadata, final EdmEntityType entityType,
@@ -250,7 +248,7 @@ public class EdmAssistedJsonSerializer implements EdmAssistedSerializer {
       options == null ? null : options.getContextURL());
   }
 
-  private void links(final Linked linked, final EdmEntityType entityType, final JsonGenerator json)
+  private void links(final Linked linked, final EdmEntityType entityType, final JsonWriter json)
     throws IOException, SerializerException {
 
     for (final Link link : linked.getNavigationLinks()) {
@@ -263,47 +261,48 @@ public class EdmAssistedJsonSerializer implements EdmAssistedSerializer {
         || entityType.getNavigationProperty(name) == null ? null
           : entityType.getNavigationProperty(name).getType();
       if (link.getInlineEntity() != null) {
-        json.writeFieldName(name);
+        json.label(name);
         doSerialize(targetType, link.getInlineEntity(), null, null, json);
       } else if (link.getInlineEntitySet() != null) {
-        json.writeArrayFieldStart(name);
+        json.label(name);
+        json.startList();
         for (final Entity subEntry : link.getInlineEntitySet().getEntities()) {
           doSerialize(targetType, subEntry, null, null, json);
         }
-        json.writeEndArray();
+        json.endList();
       }
     }
   }
 
   private void metadata(final String contextURLString, final String metadataETag, final String eTag,
-    final String type, final URI id, final boolean writeNullId, final JsonGenerator json)
+    final String type, final URI id, final boolean writeNullId, final JsonWriter json)
     throws IOException, SerializerException {
     if (!this.isODataMetadataNone) {
       if (contextURLString != null) {
-        json.writeStringField(this.constants.getContext(), contextURLString);
+        json.labelValue(this.constants.getContext(), contextURLString);
       }
       if (metadataETag != null) {
-        json.writeStringField(this.constants.getMetadataEtag(), metadataETag);
+        json.labelValue(this.constants.getMetadataEtag(), metadataETag);
       }
       if (eTag != null) {
-        json.writeStringField(this.constants.getEtag(), eTag);
+        json.labelValue(this.constants.getEtag(), eTag);
       }
       if (this.isODataMetadataFull) {
         if (type != null) {
-          json.writeStringField(this.constants.getType(), type);
+          json.labelValue(this.constants.getType(), type);
         }
         if (id == null) {
           if (writeNullId) {
-            json.writeNullField(this.constants.getId());
+            json.labelValue(this.constants.getId(), null);
           }
         } else {
-          json.writeStringField(this.constants.getId(), id.toASCIIString());
+          json.labelValue(this.constants.getId(), id.toASCIIString());
         }
       }
     }
   }
 
-  protected void primitiveValue(final JsonGenerator json, final EdmPrimitiveType valueType,
+  protected void primitiveValue(final JsonWriter json, final EdmPrimitiveType valueType,
     final String typeName, final EdmProperty edmProperty, final Object value)
     throws IOException, SerializerException {
 
@@ -320,7 +319,7 @@ public class EdmAssistedJsonSerializer implements EdmAssistedSerializer {
       throw new SerializerException("The primitive type could not be determined.",
         MessageKeys.INCONSISTENT_PROPERTY_TYPE, "");
     } else if (type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Boolean)) {
-      json.writeBoolean((Boolean)value);
+      json.value(value);
     } else {
       String serialized = null;
       try {
@@ -352,9 +351,9 @@ public class EdmAssistedJsonSerializer implements EdmAssistedSerializer {
           && type != EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Int32)
           && type != EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Int64)
           && type != EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Decimal)) {
-        json.writeString(serialized);
+        json.value(serialized);
       } else {
-        json.writeNumber(serialized);
+        json.value(serialized);
       }
     }
   }
@@ -373,7 +372,7 @@ public class EdmAssistedJsonSerializer implements EdmAssistedSerializer {
     final CircleStreamBuffer buffer = new CircleStreamBuffer();
     outputStream = buffer.getOutputStream();
     try (
-      JsonGenerator json = new JsonFactory().createGenerator(outputStream)) {
+      JsonWriter json = new JsonWriter(outputStream, true)) {
       if (obj instanceof AbstractEntityCollection) {
         doSerialize(entityType, (AbstractEntityCollection)obj, contextURLString, metadataETag,
           json);
@@ -403,7 +402,7 @@ public class EdmAssistedJsonSerializer implements EdmAssistedSerializer {
     }
   }
 
-  protected void valuable(final JsonGenerator json, final Valuable valuable, final String name,
+  protected void valuable(final JsonWriter json, final Valuable valuable, final String name,
     final EdmType type, final EdmProperty edmProperty) throws IOException, SerializerException {
 
     if (this.isODataMetadataFull && !(valuable instanceof Annotation) && !valuable.isComplex()) {
@@ -428,7 +427,7 @@ public class EdmAssistedJsonSerializer implements EdmAssistedSerializer {
       }
 
       if (typeName != null) {
-        json.writeStringField(name + this.constants.getType(), constructTypeExpression(typeName));
+        json.labelValue(name + this.constants.getType(), constructTypeExpression(typeName));
       }
     }
 
@@ -436,11 +435,11 @@ public class EdmAssistedJsonSerializer implements EdmAssistedSerializer {
       valuable(json, annotation, name + '@' + annotation.getTerm(), null, null);
     }
 
-    json.writeFieldName(name);
+    json.label(name);
     value(json, valuable, type, edmProperty);
   }
 
-  private void value(final JsonGenerator json, final Valuable value, final EdmType type,
+  private void value(final JsonWriter json, final Valuable value, final EdmType type,
     final EdmProperty edmProperty) throws IOException, SerializerException {
     final String typeName = value.getType() == null ? null
       : new EdmTypeInfo.Builder().setTypeExpression(value.getType()).build().external();

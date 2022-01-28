@@ -28,80 +28,82 @@ import org.apache.olingo.commons.api.ex.ODataError;
 import org.apache.olingo.commons.api.ex.ODataErrorDetail;
 import org.apache.olingo.server.api.serializer.SerializerException;
 
-import com.fasterxml.jackson.core.JsonGenerator;
+import com.revolsys.record.io.format.json.JsonWriter;
 
 public class ODataErrorSerializer {
 
-  public void writeErrorDocument(final JsonGenerator json, final ODataError error)
+  public void writeErrorDocument(final JsonWriter json, final ODataError error)
     throws IOException, SerializerException {
     if (error == null) {
       throw new SerializerException("ODataError object MUST NOT be null!",
         SerializerException.MessageKeys.NULL_INPUT);
     }
-    json.writeStartObject();
-    json.writeFieldName(Constants.JSON_ERROR);
+    json.startObject();
+    json.label(Constants.JSON_ERROR);
 
-    json.writeStartObject();
+    json.startObject();
     writeODataError(json, error.getCode(), error.getMessage(), error.getTarget());
     writeODataAdditionalProperties(json, error.getAdditionalProperties());
 
     if (error.getDetails() != null) {
-      json.writeArrayFieldStart(Constants.ERROR_DETAILS);
+      json.label(Constants.ERROR_DETAILS);
+      json.startObject();
       for (final ODataErrorDetail detail : error.getDetails()) {
-        json.writeStartObject();
+        json.startObject();
         writeODataError(json, detail.getCode(), detail.getMessage(), detail.getTarget());
         writeODataAdditionalProperties(json, detail.getAdditionalProperties());
-        json.writeEndObject();
+        json.endObject();
       }
-      json.writeEndArray();
+      json.endList();
     }
 
-    json.writeEndObject();
-    json.writeEndObject();
+    json.endObject();
+    json.endObject();
   }
 
   @SuppressWarnings("unchecked")
-  private void writeODataAdditionalProperties(final JsonGenerator json,
+  private void writeODataAdditionalProperties(final JsonWriter json,
     final Map<String, Object> additionalProperties) throws IOException {
     if (additionalProperties != null) {
       for (final Entry<String, Object> additionalProperty : additionalProperties.entrySet()) {
         final Object value = additionalProperty.getValue();
         if (value instanceof List) {
           final List<Map<String, Object>> list = (List<Map<String, Object>>)value;
-          json.writeArrayFieldStart(additionalProperty.getKey());
+          json.label(additionalProperty.getKey());
+          json.startObject();
           for (final Map<String, Object> entry : list) {
-            json.writeStartObject();
+            json.startObject();
             writeODataAdditionalProperties(json, entry);
-            json.writeEndObject();
+            json.endObject();
           }
-          json.writeEndArray();
+          json.endList();
         } else if (value instanceof Map) {
           writeODataAdditionalProperties(json, (Map<String, Object>)value);
         } else {
-          json.writeObjectField(additionalProperty.getKey(), value);
+          json.labelValue(additionalProperty.getKey(), value);
         }
       }
     }
   }
 
-  private void writeODataError(final JsonGenerator json, final String code, final String message,
+  private void writeODataError(final JsonWriter json, final String code, final String message,
     final String target) throws IOException {
-    json.writeFieldName(Constants.ERROR_CODE);
+    json.label(Constants.ERROR_CODE);
     if (code == null) {
       json.writeNull();
     } else {
-      json.writeString(code);
+      json.value(code);
     }
 
-    json.writeFieldName(Constants.ERROR_MESSAGE);
+    json.label(Constants.ERROR_MESSAGE);
     if (message == null) {
       json.writeNull();
     } else {
-      json.writeString(message);
+      json.value(message);
     }
 
     if (target != null) {
-      json.writeStringField(Constants.ERROR_TARGET, target);
+      json.labelValue(Constants.ERROR_TARGET, target);
     }
   }
 }

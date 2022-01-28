@@ -28,7 +28,7 @@ public class CsdlNavigationPropertyPath extends CsdlDynamicExpression {
 
   @Override
   public boolean equals(final Object obj) {
-    if ((obj == null) || !(obj instanceof CsdlNavigationPropertyPath)) {
+    if (obj == null || !(obj instanceof CsdlNavigationPropertyPath)) {
       return false;
     }
     final CsdlNavigationPropertyPath csdlNavPropPath = (CsdlNavigationPropertyPath)obj;

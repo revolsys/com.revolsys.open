@@ -118,7 +118,7 @@ public class CsdlLogicalOrComparisonExpression extends CsdlDynamicExpression
 
   @Override
   public boolean equals(final Object obj) {
-    if ((obj == null) || !(obj instanceof CsdlLogicalOrComparisonExpression)) {
+    if (obj == null || !(obj instanceof CsdlLogicalOrComparisonExpression)) {
       return false;
     }
     final CsdlLogicalOrComparisonExpression csdlLogComp = (CsdlLogicalOrComparisonExpression)obj;

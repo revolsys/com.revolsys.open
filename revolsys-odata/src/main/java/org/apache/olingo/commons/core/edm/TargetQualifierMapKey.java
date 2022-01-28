@@ -40,7 +40,7 @@ public class TargetQualifierMapKey {
     if (this == obj) {
       return true;
     }
-    if ((obj == null) || !(obj instanceof TargetQualifierMapKey)) {
+    if (obj == null || !(obj instanceof TargetQualifierMapKey)) {
       return false;
     }
     final TargetQualifierMapKey other = (TargetQualifierMapKey)obj;

@@ -241,8 +241,7 @@ public class UriInfoImpl implements UriInfo {
 
   @Override
   public List<SystemQueryOption> getSystemQueryOptions() {
-    return Collections
-      .unmodifiableList(new ArrayList<>(this.systemQueryOptions.values()));
+    return Collections.unmodifiableList(new ArrayList<>(this.systemQueryOptions.values()));
   }
 
   @Override

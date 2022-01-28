@@ -82,7 +82,8 @@ public final class SRID implements Serializable {
 
     final SRID srid = (SRID)o;
 
-    if ((this.dimension != srid.dimension) || (this.value != null ? !this.value.equals(srid.value) : srid.value != null)) {
+    if (this.dimension != srid.dimension
+      || (this.value != null ? !this.value.equals(srid.value) : srid.value != null)) {
       return false;
     }
     return !(this.variable != null ? !this.variable.equals(srid.variable) : srid.variable != null);

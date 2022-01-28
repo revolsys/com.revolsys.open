@@ -1,6 +1,8 @@
 package com.revolsys.record.io.format.json;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,6 +68,10 @@ public final class JsonWriter implements BaseCloseable {
   private JsonState state = JsonState.START_DOCUMENT;
 
   private final JsonStringEncodingWriter encodingOut;
+
+  public JsonWriter(final OutputStream out, final boolean indent) {
+    this(new OutputStreamWriter(out), indent);
+  }
 
   public JsonWriter(final Writer out) {
     this(out, true);
@@ -431,6 +437,11 @@ public final class JsonWriter implements BaseCloseable {
       }
     }
     endObject();
+  }
+
+  public void writeNull() throws IOException {
+    valuePre();
+    this.out.write("null");
   }
 
   public void writeRecord(final Record record) {
