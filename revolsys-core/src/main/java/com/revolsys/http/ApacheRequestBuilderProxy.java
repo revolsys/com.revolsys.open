@@ -27,7 +27,7 @@ public interface ApacheRequestBuilderProxy {
     return this;
   }
 
-  default ApacheRequestBuilderProxy addParameter(final String name, final String value) {
+  default ApacheRequestBuilderProxy addParameter(final String name, final Object value) {
     getRequestBuilder().addParameter(name, value);
     return this;
   }
@@ -100,6 +100,16 @@ public interface ApacheRequestBuilderProxy {
 
   default ApacheRequestBuilderProxy setEntity(final HttpEntity entity) {
     getRequestBuilder().setEntity(entity);
+    return this;
+  }
+
+  default ApacheRequestBuilderProxy setParameter(final NameValuePair nvp) {
+    getRequestBuilder().setParameter(nvp);
+    return this;
+  }
+
+  default ApacheRequestBuilderProxy setParameter(final String name, final Object value) {
+    getRequestBuilder().setParameter(name, value);
     return this;
   }
 

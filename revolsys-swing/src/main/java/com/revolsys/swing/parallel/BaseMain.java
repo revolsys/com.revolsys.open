@@ -3,7 +3,7 @@ package com.revolsys.swing.parallel;
 import java.awt.Image;
 import java.io.File;
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -59,7 +59,7 @@ public class BaseMain implements UncaughtExceptionHandler {
 
   public void logError(final Throwable e) {
     try {
-      final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+      final Instant timestamp = Instant.now();
       final String threadName = Thread.currentThread().getName();
       final String stackTrace = e.getMessage() + "\n" + Strings.toString("\n", e.getStackTrace());
       LoggingEventPanel.showDialog(timestamp, Level.ERROR, getClass().getName(),

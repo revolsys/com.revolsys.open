@@ -2,8 +2,6 @@ package com.revolsys.http;
 
 import java.util.function.Supplier;
 
-import org.apache.http.client.methods.RequestBuilder;
-
 import com.revolsys.io.map.ObjectFactoryConfig;
 import com.revolsys.record.io.format.json.JsonObject;
 
@@ -29,7 +27,7 @@ public class AzureTableSasRequestBuilderFactory extends ApacheHttpRequestBuilder
     this.tokenRefesh = tokenRefesh;
   }
 
-  void applyToken(final RequestBuilder builder) {
+  void applyToken(final AzureTableSasRequestBuilder builder) {
     if (this.token == null || this.token.isExpired()) {
       this.token = this.tokenRefesh.get();
     }
@@ -39,7 +37,7 @@ public class AzureTableSasRequestBuilderFactory extends ApacheHttpRequestBuilder
   }
 
   @Override
-  protected ApacheHttpRequestBuilder newRequestBuilder(final RequestBuilder requestBuilder) {
-    return new AzureTableSasRequestBuilder(this, requestBuilder);
+  protected AzureTableSasRequestBuilder newRequestBuilder() {
+    return new AzureTableSasRequestBuilder(this);
   }
 }

@@ -22,20 +22,17 @@ import com.revolsys.record.query.CollectionValue;
 import com.revolsys.record.query.Column;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Divide;
-import com.revolsys.record.query.Equal;
 import com.revolsys.record.query.GreaterThan;
 import com.revolsys.record.query.GreaterThanEqual;
 import com.revolsys.record.query.In;
-import com.revolsys.record.query.IsNotNull;
-import com.revolsys.record.query.IsNull;
 import com.revolsys.record.query.LessThan;
 import com.revolsys.record.query.LessThanEqual;
 import com.revolsys.record.query.Mod;
 import com.revolsys.record.query.Multiply;
 import com.revolsys.record.query.Negate;
 import com.revolsys.record.query.Not;
-import com.revolsys.record.query.NotEqual;
 import com.revolsys.record.query.Or;
+import com.revolsys.record.query.Q;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.Subtract;
 import com.revolsys.record.query.TableReference;
@@ -126,9 +123,21 @@ public class ODataParser {
 
     public final String value;
 
+    private int end;
+
     public Token(final TokenType type, final String value) {
       this.type = type;
       this.value = value;
+    }
+
+    public Token(final TokenType type, final String value, final int end) {
+      this.type = type;
+      this.value = value;
+      this.end = end;
+    }
+
+    public int getEnd() {
+      return this.end;
     }
 
     @Override
@@ -162,28 +171,12 @@ public class ODataParser {
     .getMap();
 
   // Order by preference
-  private static final Map<String, BiFunction<QueryValue, QueryValue, QueryValue>> BINARY_OPERATOR_FACTORIES = Maps
-    .<String, BiFunction<QueryValue, QueryValue, QueryValue>> buildLinkedHash()//
+  private static final Map<String, BiFunction<QueryValue, QueryValue, ? extends QueryValue>> BINARY_OPERATOR_FACTORIES = Maps
+    .<String, BiFunction<QueryValue, QueryValue, ? extends QueryValue>> buildLinkedHash()//
     .add("or", Or::new)
     .add("and", And::new)
-    .add("eq", (left, right) -> {
-      if (right instanceof Value) {
-        final Value value = (Value)right;
-        if (value.getValue() == null) {
-          return new IsNull(left);
-        }
-      }
-      return new Equal(left, right);
-    })
-    .add("ne", (left, right) -> {
-      if (right instanceof Value) {
-        final Value value = (Value)right;
-        if (value.getValue() == null) {
-          return new IsNotNull(left);
-        }
-      }
-      return new NotEqual(left, right);
-    })
+    .add("eq", Q.EQUAL)
+    .add("ne", Q.NOT_EQUAL)
     .add("lt", LessThan::new)
     .add("gt", GreaterThan::new)
     .add("le", LessThanEqual::new)
@@ -347,7 +340,7 @@ public class ODataParser {
           && tokens.get(i + 1).type == TokenType.WORD) {
           final Token wordToken = tokens.get(i + 1);
           if (wordToken.value.equals(op)) {
-            final BiFunction<QueryValue, QueryValue, QueryValue> fn = BINARY_OPERATOR_FACTORIES
+            final BiFunction<QueryValue, QueryValue, ? extends QueryValue> fn = BINARY_OPERATOR_FACTORIES
               .get(op);
             final QueryValue lhs = readExpression(table, tokens.subList(0, i));
             final QueryValue rhs = readExpression(table, tokens.subList(i + 3, ts));
@@ -531,12 +524,29 @@ public class ODataParser {
     return null;
   }
 
-  private static int readDigits(final String value, final int start) {
+  private static Token readDigits(final String text, final int start) {
     int rt = start;
-    while (rt < value.length() && Character.isDigit(value.charAt(rt))) {
-      rt++;
+    boolean wasDigits = true;
+    while (rt < text.length()) {
+      final char c = text.charAt(rt);
+      if (Character.isDigit(c)) {
+        rt++;
+      } else if ('A' <= c && c <= 'F' || 'a' <= c && c <= 'f' || c == '-') {
+        rt++;
+        wasDigits = false;
+      } else {
+        break;
+      }
     }
-    return rt;
+    final int end = rt;
+    final String token = text.substring(start, end);
+    if ("-".equals(token)) {
+      return new Token(TokenType.SYMBOL, token, end);
+    } else if (wasDigits) {
+      return new Token(TokenType.NUMBER, token, end);
+    } else {
+      return new Token(TokenType.QUOTED_STRING, "'" + token + "'", end);
+    }
   }
 
   private static QueryValue readExpression(final TableReference table, List<Token> tokens) {
@@ -745,14 +755,36 @@ public class ODataParser {
     return rt;
   }
 
-  private static int readWord(final String value, final int start) {
+  private static int readWord(final String text, final int start) {
     int rt = start;
-    while (rt < value.length()
-      && (Character.isLetterOrDigit(value.charAt(rt)) || value.charAt(rt) == '/'
-        || value.charAt(rt) == '_' || value.charAt(rt) == '.' || value.charAt(rt) == '*')) {
-      rt++;
+    boolean instring = false;
+    int singleQuoteCount = 0;
+    while (rt < text.length()) {
+      final char c = text.charAt(rt);
+      if (instring) {
+        if (c == '\'') {
+          if (singleQuoteCount == 0) {
+            singleQuoteCount++;
+          } else if (singleQuoteCount == 1) {
+            singleQuoteCount = 0;
+          }
+        } else if (singleQuoteCount == 1) {
+          instring = false;
+        } else {
+          singleQuoteCount = 0;
+          rt++;
+        }
+      } else if (c == '\'') {
+        instring = true;
+        singleQuoteCount = 0;
+      } else if (instring || Character.isLetterOrDigit(c) || c == '/' || c == '_' || c == '.'
+        || c == '*') {
+        rt++;
+      } else {
+        return rt;
+      }
     }
-    return rt;
+    return rt - 1;
   }
 
   // tokenizer
@@ -777,27 +809,19 @@ public class ODataParser {
       } else if (Character.isLetter(c) || c == '*') {
         end = readWord(value, current + 1);
         final String tokenString = value.substring(current, end);
+
         rt.add(new Token(TokenType.WORD, tokenString));
         current = end;
-      } else if (Character.isDigit(c)) {
-        end = readDigits(value, current + 1);
-        rt.add(new Token(TokenType.NUMBER, value.substring(current, end)));
-        current = end;
+      } else if (Character.isDigit(c) || 'c' == '-') {
+        final Token token = readDigits(value, current);
+        rt.add(token);
+        current = token.getEnd();
       } else if (c == '(') {
         rt.add(new Token(TokenType.OPENPAREN, Character.toString(c)));
         current++;
       } else if (c == ')') {
         rt.add(new Token(TokenType.CLOSEPAREN, Character.toString(c)));
         current++;
-      } else if (c == '-') {
-        if (Character.isDigit(value.charAt(current + 1))) {
-          end = readDigits(value, current + 1);
-          rt.add(new Token(TokenType.NUMBER, value.substring(current, end)));
-          current = end;
-        } else {
-          rt.add(new Token(TokenType.SYMBOL, Character.toString(c)));
-          current++;
-        }
       } else if (",.+=:".indexOf(c) > -1) {
         rt.add(new Token(TokenType.SYMBOL, Character.toString(c)));
         current++;

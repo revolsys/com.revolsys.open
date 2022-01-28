@@ -12,7 +12,7 @@ import java.util.TreeSet;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.jeometry.common.exception.Exceptions;
 
 public class AzureSharedKeyLiteRequestBuilder extends ApacheHttpRequestBuilder {
@@ -28,32 +28,26 @@ public class AzureSharedKeyLiteRequestBuilder extends ApacheHttpRequestBuilder {
   private static final List<String> STANDARD_HEADERS = Arrays.asList("Content-MD5", "Content-Type",
     "Date");
 
-  public AzureSharedKeyLiteRequestBuilder(final AzureSharedKeyLiteRequestBuilderFactory factory,
-    final RequestBuilder requestBuilder) {
-    super(factory, requestBuilder);
+  public AzureSharedKeyLiteRequestBuilder(final ApacheHttpRequestBuilderFactory factory) {
+    super(factory);
   }
 
   @Override
-  public AzureSharedKeyLiteRequestBuilderFactory getFactory() {
-    return (AzureSharedKeyLiteRequestBuilderFactory)super.getFactory();
-  }
-
-  @Override
-  protected void preBuild(final RequestBuilder builder) {
+  public HttpUriRequest build() {
     final String accountName = getFactory().getAccountName();
     try {
       final Instant now = Instant.now();
       final String date = AzureSharedKeyRequestBuilder.DATE_FORMAT.withZone(ZoneOffset.UTC)
         .format(now);
-      builder.setHeader("Date", date);
+      setHeader("Date", date);
 
       final StringBuilder data = new StringBuilder();
-      final String method = builder.getMethod();
+      final String method = getMethod();
       data.append(method);
       data.append(NEWLINE);
 
       for (final String name : STANDARD_HEADERS) {
-        Header header = builder.getFirstHeader(name);
+        Header header = getFirstHeader(name);
         if (header == null) {
           if ("Content-Type".equals(name)) {
             final HttpEntity entity = getEntity();
@@ -81,10 +75,10 @@ public class AzureSharedKeyLiteRequestBuilder extends ApacheHttpRequestBuilder {
       }
       data.append(SLASH);
       data.append(accountName);
-      final String path = builder.getUri().getRawPath();
+      final String path = getUri().getRawPath();
       data.append(path);
       final Map<String, Set<String>> parameters = new TreeMap<>();
-      for (final NameValuePair parameter : builder.getParameters()) {
+      for (final NameValuePair parameter : getParameters()) {
         final String name = parameter.getName().toLowerCase();
         final String value = parameter.getValue();
         Set<String> values = parameters.get(name);
@@ -110,10 +104,16 @@ public class AzureSharedKeyLiteRequestBuilder extends ApacheHttpRequestBuilder {
         }
       }
       final String authorization = getFactory().getSharedKeyLiteAuthorization(data);
-      builder.setHeader("Authorization", authorization);
+      setHeader("Authorization", authorization);
     } catch (final Exception e) {
       throw Exceptions.wrap(e);
     }
+    return super.build();
+  }
+
+  @Override
+  public AzureSharedKeyLiteRequestBuilderFactory getFactory() {
+    return (AzureSharedKeyLiteRequestBuilderFactory)super.getFactory();
   }
 
 }

@@ -26,6 +26,15 @@ public class PostgreSQLJdbcBlobFieldDefinition extends JdbcBlobFieldDefinition {
     super(dbName, name, sqlType, length, required, description, properties);
   }
 
+  @Override
+  public PostgreSQLJdbcBlobFieldDefinition clone() {
+    final PostgreSQLJdbcBlobFieldDefinition clone = new PostgreSQLJdbcBlobFieldDefinition(
+      getDbName(), getName(), null, getSqlType(), getLength(), getScale(), isRequired(),
+      getDescription(), getProperties());
+    postClone(clone);
+    return clone;
+  }
+
   private InputStream openInputStream(final Object value) {
     if (value instanceof InputStream) {
       return (InputStream)value;

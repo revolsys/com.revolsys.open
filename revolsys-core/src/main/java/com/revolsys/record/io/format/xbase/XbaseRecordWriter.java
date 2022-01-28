@@ -12,6 +12,7 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -373,7 +374,8 @@ public class XbaseRecordWriter extends AbstractRecordWriter {
         case XBaseFieldDefinition.DATE_TYPE:
           if (value instanceof Date) {
             final Date date = (Date)value;
-            final String dateString = Dates.format("yyyyMMdd", date);
+            final String dateString = Dates.yyyyMMdd.withZone(ZoneId.systemDefault())
+              .format(date.toInstant());
             this.recordBuffer.put(dateString.getBytes());
 
           } else if (value == null) {

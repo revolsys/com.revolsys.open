@@ -366,8 +366,26 @@ public class WktParser {
       }
       Geometry geometry = null;
       switch (character) {
+        case 'g':
+          if (hasText(reader, "eometry'")) {
+            geometry = parseGeometry(geometryFactory, useAxisCountFromGeometryFactory, reader);
+            if (!hasText(reader, "'")) {
+              throw new IllegalArgumentException(
+                "Invalid ODATA geometry type must end with a ' :" + FileUtil.getString(reader, 50));
+            }
+          } else if (hasText(reader, "eography'")) {
+            geometry = parseGeometry(geometryFactory, useAxisCountFromGeometryFactory, reader);
+            if (!hasText(reader, "'")) {
+              throw new IllegalArgumentException(
+                "Invalid ODATA geometry type must end with a ' :" + FileUtil.getString(reader, 50));
+            }
+          } else {
+            throw new IllegalArgumentException(
+              "Invalid WKT geometry type: g" + FileUtil.getString(reader, 50));
+          }
+        break;
         case 'G':
-          if (hasText(reader, "EOMETRYCOLLECTION")) {
+          if (hasText(reader, "EOMETRYCOLLECTION") || hasText(reader, "eometryCollection")) {
             geometry = parseGeometryCollection(geometryFactory, useAxisCountFromGeometryFactory,
               reader);
           } else {
@@ -376,7 +394,7 @@ public class WktParser {
           }
         break;
         case 'L':
-          if (hasText(reader, "INESTRING")) {
+          if (hasText(reader, "INESTRING") || hasText(reader, "LineString")) {
             geometry = parseLineString(geometryFactory, useAxisCountFromGeometryFactory, reader);
           } else if (hasText(reader, "INEARRING")) {
             geometry = parseLinearRing(geometryFactory, useAxisCountFromGeometryFactory, reader);
@@ -386,13 +404,13 @@ public class WktParser {
           }
         break;
         case 'M':
-          if (hasText(reader, "ULTI")) {
-            if (hasText(reader, "POINT")) {
+          if (hasText(reader, "ULTI") || hasText(reader, "ulti")) {
+            if (hasText(reader, "POINT") || hasText(reader, "Point")) {
               geometry = parseMultiPoint(geometryFactory, useAxisCountFromGeometryFactory, reader);
-            } else if (hasText(reader, "LINESTRING")) {
+            } else if (hasText(reader, "LINESTRING") || hasText(reader, "LineString")) {
               geometry = parseMultiLineString(geometryFactory, useAxisCountFromGeometryFactory,
                 reader);
-            } else if (hasText(reader, "POLYGON")) {
+            } else if (hasText(reader, "POLYGON") || hasText(reader, "Polygon")) {
               geometry = parseMultiPolygon(geometryFactory, useAxisCountFromGeometryFactory,
                 reader);
             } else {
@@ -405,9 +423,9 @@ public class WktParser {
           }
         break;
         case 'P':
-          if (hasText(reader, "OINT")) {
+          if (hasText(reader, "OINT") || hasText(reader, "point")) {
             geometry = parsePoint(geometryFactory, useAxisCountFromGeometryFactory, reader);
-          } else if (hasText(reader, "OLYGON")) {
+          } else if (hasText(reader, "OLYGON") || hasText(reader, "olygon")) {
             geometry = parsePolygon(geometryFactory, useAxisCountFromGeometryFactory, reader);
           } else {
             throw new IllegalArgumentException(

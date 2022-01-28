@@ -4,7 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.io.PrintWriter;
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -119,7 +119,7 @@ public class LoggingEventPanel extends JPanel {
 
   public static void showDialog(final ILoggingEvent event) {
     final long time = event.getTimeStamp();
-    final Timestamp timestamp = new Timestamp(time);
+    final Instant timestamp = Instant.ofEpochMilli(time);
 
     final String stackTrace = getStackTrace(event);
 
@@ -130,8 +130,21 @@ public class LoggingEventPanel extends JPanel {
     showDialog(timestamp, level, loggerName, message, threadName, stackTrace);
   }
 
+  public static void showDialog(final Instant timestamp, final Level level, final String loggerName,
+    final Object message, final String threadName, final String stackTrace) {
+    if (SwingUtilities.isEventDispatchThread()) {
+      final LoggingEventPanel panel = new LoggingEventPanel(timestamp, level, loggerName,
+        threadName, message, stackTrace);
+      panel.showDialog("Application Log Details");
+    } else {
+      Invoke.later(() -> {
+        showDialog(timestamp, level, loggerName, message, threadName, stackTrace);
+      });
+    }
+  }
+
   public static void showDialog(final List<Object> event) {
-    final Timestamp timestamp = (Timestamp)event.get(0);
+    final Instant timestamp = (Instant)event.get(0);
     final Level level = (Level)event.get(1);
     final String loggerName = (String)event.get(2);
     final String message = (String)event.get(3);
@@ -157,20 +170,6 @@ public class LoggingEventPanel extends JPanel {
 
   public static void showDialog(final String message, final Throwable e) {
     showDialog("Error", message, e);
-  }
-
-  public static void showDialog(final Timestamp timestamp, final Level level,
-    final String loggerName, final Object message, final String threadName,
-    final String stackTrace) {
-    if (SwingUtilities.isEventDispatchThread()) {
-      final LoggingEventPanel panel = new LoggingEventPanel(timestamp, level, loggerName,
-        threadName, message, stackTrace);
-      panel.showDialog("Application Log Details");
-    } else {
-      Invoke.later(() -> {
-        showDialog(timestamp, level, loggerName, message, threadName, stackTrace);
-      });
-    }
   }
 
   private static void subjoinExceptionMessage(final StringBuilder buf, final IThrowableProxy tp) {
@@ -216,7 +215,7 @@ public class LoggingEventPanel extends JPanel {
 
   private final StringBuilder copyText = new StringBuilder();
 
-  public LoggingEventPanel(final Timestamp time, final Object level, final String loggerName,
+  public LoggingEventPanel(final Instant time, final Object level, final String loggerName,
     final String threadName, final Object message, final Object stackTrace) {
     setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
     addField(this, "Timestamp", time, false);

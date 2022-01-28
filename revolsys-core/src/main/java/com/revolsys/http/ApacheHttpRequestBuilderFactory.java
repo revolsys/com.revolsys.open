@@ -4,23 +4,19 @@ import java.io.InputStream;
 import java.net.URI;
 
 import org.apache.http.HttpRequest;
-import org.apache.http.client.methods.RequestBuilder;
 
 public class ApacheHttpRequestBuilderFactory {
 
   public ApacheHttpRequestBuilder copy(final HttpRequest request) {
-    final RequestBuilder requestBuilder = RequestBuilder.copy(request);
-    return newRequestBuilder(requestBuilder);
+    return newRequestBuilder().setRequest(request);
   }
 
   public ApacheHttpRequestBuilder create(final HttpMethod method, final String uri) {
-    final RequestBuilder requestBuilder = RequestBuilder.create(method.name()).setUri(uri);
-    return newRequestBuilder(requestBuilder);
+    return create(method, URI.create(uri));
   }
 
   public ApacheHttpRequestBuilder create(final HttpMethod method, final URI uri) {
-    final RequestBuilder requestBuilder = RequestBuilder.create(method.name()).setUri(uri);
-    return newRequestBuilder(requestBuilder);
+    return newRequestBuilder().setMethod(method).setUri(uri);
   }
 
   public ApacheHttpRequestBuilder delete(final String uri) {
@@ -57,8 +53,8 @@ public class ApacheHttpRequestBuilderFactory {
     return create(HttpMethod.HEAD, uri);
   }
 
-  protected ApacheHttpRequestBuilder newRequestBuilder(final RequestBuilder requestBuilder) {
-    return new ApacheHttpRequestBuilder(this, requestBuilder);
+  protected ApacheHttpRequestBuilder newRequestBuilder() {
+    return new ApacheHttpRequestBuilder(this);
   }
 
   public ApacheHttpRequestBuilder post(final String uri) {

@@ -83,7 +83,7 @@ public class RecordWriterPerformanceTest {
     record.setValue("dateTime", dateTime);
 
     calendar.set(Calendar.MILLISECOND, index % 1000);
-    final Timestamp timestamp = new Timestamp(calendar.getTimeInMillis());
+    final Instant timestamp = Instant.now();
     record.setValue("timestamp", timestamp);
 
     record.setValue("geometry", new PointDoubleXY(index, index * 2));

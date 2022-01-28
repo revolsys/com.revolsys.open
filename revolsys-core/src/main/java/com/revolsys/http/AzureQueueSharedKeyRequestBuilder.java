@@ -13,7 +13,7 @@ import java.util.TreeSet;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.methods.RequestBuilder;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.jeometry.common.exception.Exceptions;
 
 public class AzureQueueSharedKeyRequestBuilder extends ApacheHttpRequestBuilder {
@@ -28,31 +28,25 @@ public class AzureQueueSharedKeyRequestBuilder extends ApacheHttpRequestBuilder 
 
   private static final List<String> HEADERS = Arrays.asList("Content-MD5", "Content-Type", "Date");
 
-  public AzureQueueSharedKeyRequestBuilder(final AzureQueueSharedKeyRequestBuilderFactory factory,
-    final RequestBuilder requestBuilder) {
-    super(factory, requestBuilder);
+  public AzureQueueSharedKeyRequestBuilder(final ApacheHttpRequestBuilderFactory factory) {
+    super(factory);
   }
 
   @Override
-  public AzureQueueSharedKeyRequestBuilderFactory getFactory() {
-    return (AzureQueueSharedKeyRequestBuilderFactory)super.getFactory();
-  }
-
-  @Override
-  protected void preBuild(final RequestBuilder builder) {
+  public HttpUriRequest build() {
     final String accountName = getFactory().getAccountName();
     try {
       final String date = DateTimeFormatter.RFC_1123_DATE_TIME.withZone(ZoneOffset.UTC)
         .format(Instant.now());
-      builder.setHeader("Date", date);
+      setHeader("Date", date);
 
       final StringBuilder data = new StringBuilder();
-      final String method = builder.getMethod();
+      final String method = getMethod();
       data.append(method);
       data.append(NEWLINE);
 
       for (final String name : HEADERS) {
-        Header header = builder.getFirstHeader(name);
+        Header header = getFirstHeader(name);
         if (header == null) {
           if ("Content-Type".equals(name)) {
             final HttpEntity entity = getEntity();
@@ -80,10 +74,10 @@ public class AzureQueueSharedKeyRequestBuilder extends ApacheHttpRequestBuilder 
       }
       data.append(SLASH);
       data.append(accountName);
-      final String path = builder.getUri().getRawPath();
+      final String path = getUri().getRawPath();
       data.append(path);
       final Map<String, Set<String>> parameters = new TreeMap<>();
-      for (final NameValuePair parameter : builder.getParameters()) {
+      for (final NameValuePair parameter : getParameters()) {
         final String name = parameter.getName().toLowerCase();
         final String value = parameter.getValue();
         Set<String> values = parameters.get(name);
@@ -109,10 +103,16 @@ public class AzureQueueSharedKeyRequestBuilder extends ApacheHttpRequestBuilder 
         }
       }
       final String authorization = getFactory().getSharedKeyAuthorization(data);
-      builder.setHeader("Authorization", authorization);
+      setHeader("Authorization", authorization);
     } catch (final Exception e) {
       throw Exceptions.wrap(e);
     }
+    return super.build();
+  }
+
+  @Override
+  public AzureQueueSharedKeyRequestBuilderFactory getFactory() {
+    return (AzureQueueSharedKeyRequestBuilderFactory)super.getFactory();
   }
 
 }

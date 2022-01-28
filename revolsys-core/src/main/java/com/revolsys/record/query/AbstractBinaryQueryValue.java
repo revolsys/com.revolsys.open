@@ -19,6 +19,12 @@ public abstract class AbstractBinaryQueryValue implements QueryValue {
   public AbstractBinaryQueryValue(final QueryValue left, final QueryValue right) {
     this.left = left;
     this.right = right;
+    if (left instanceof ColumnReference && right instanceof Value) {
+      final ColumnReference column = (ColumnReference)left;
+      final Value value = (Value)right;
+      final FieldDefinition fieldDefinition = column.getFieldDefinition();
+      value.setFieldDefinition(fieldDefinition);
+    }
   }
 
   protected void appendLeft(final StringBuilder sql, final Query query,

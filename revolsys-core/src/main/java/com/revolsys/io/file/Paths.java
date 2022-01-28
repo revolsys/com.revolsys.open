@@ -22,7 +22,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.DosFileAttributes;
 import java.nio.file.attribute.FileAttribute;
 import java.nio.file.attribute.FileTime;
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -456,11 +455,11 @@ public interface Paths {
     }
   }
 
-  static Timestamp lastModifiedTimestamp(final Path path) {
+  static Instant lastModifiedTimestamp(final Path path) {
     try {
-      return new Timestamp(Files.getLastModifiedTime(path).toMillis());
+      return Files.getLastModifiedTime(path).toInstant();
     } catch (final IOException e) {
-      return new Timestamp(0);
+      return Instant.EPOCH;
     }
   }
 

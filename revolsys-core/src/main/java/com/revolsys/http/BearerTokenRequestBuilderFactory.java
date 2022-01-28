@@ -2,8 +2,6 @@ package com.revolsys.http;
 
 import java.util.function.Function;
 
-import org.apache.http.client.methods.RequestBuilder;
-
 import com.revolsys.net.oauth.BearerToken;
 
 public class BearerTokenRequestBuilderFactory extends ApacheHttpRequestBuilderFactory {
@@ -33,7 +31,7 @@ public class BearerTokenRequestBuilderFactory extends ApacheHttpRequestBuilderFa
   }
 
   @Override
-  protected ApacheHttpRequestBuilder newRequestBuilder(final RequestBuilder requestBuilder) {
-    return new BearerTokenRequestBuilder(this, requestBuilder);
+  protected ApacheHttpRequestBuilder newRequestBuilder() {
+    return new BearerTokenRequestBuilder(this);
   }
 }

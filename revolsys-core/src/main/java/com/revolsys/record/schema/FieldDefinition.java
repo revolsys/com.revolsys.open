@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import org.jeometry.common.compare.NumericComparator;
 import org.jeometry.common.data.identifier.Code;
 import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.CollectionDataType;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypeProxy;
 import org.jeometry.common.data.type.DataTypes;
@@ -24,7 +25,6 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.Polygonal;
 import com.revolsys.geometry.operation.valid.IsValidOp;
 import com.revolsys.io.map.MapSerializer;
 import com.revolsys.properties.BaseObjectWithProperties;
@@ -614,6 +614,10 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
     }
   }
 
+  public boolean isDataTypeCollection() {
+    return this.type instanceof CollectionDataType;
+  }
+
   public boolean isGenerated() {
     return false;
   }
@@ -869,7 +873,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
   }
 
   @Override
-  public <V> V toFieldValueException(final Object value) {
+  public <V> V toFieldValueException(Object value) {
     if (value == null) {
       return null;
     } else {
@@ -882,11 +886,8 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
         }
         if (this.codeTable != null) {
           final Identifier identifier = this.codeTable.getIdentifier(value);
-          if (identifier == null) {
-            throw new IllegalArgumentException(getName() + "='" + value
-              + "' cannot be found in code table " + this.codeTable.getName());
-          } else {
-            return identifier.toSingleValue();
+          if (identifier != null) {
+            value = identifier.toSingleValue();
           }
         }
 

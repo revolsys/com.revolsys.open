@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.NameValuePair;
-import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.client.utils.URLEncodedUtils;
 
 public class SasToken {
@@ -28,9 +27,9 @@ public class SasToken {
     }
   }
 
-  public void applyTo(final RequestBuilder requestBuilder) {
+  public void applyTo(final ApacheHttpRequestBuilder requestBuilder) {
     for (final NameValuePair param : this.params) {
-      requestBuilder.addParameter(param);
+      requestBuilder.setParameter(param);
     }
   }
 
