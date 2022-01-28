@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -27,26 +27,27 @@ import org.apache.olingo.commons.api.edm.provider.annotation.CsdlUrlRef;
 public class EdmUrlRefImpl extends AbstractEdmAnnotatableDynamicExpression implements EdmUrlRef {
 
   private final CsdlUrlRef csdlExp;
+
   private EdmExpression value;
 
-  public EdmUrlRefImpl(Edm edm, CsdlUrlRef csdlExp) {
+  public EdmUrlRefImpl(final Edm edm, final CsdlUrlRef csdlExp) {
     super(edm, "UrlRef", csdlExp);
     this.csdlExp = csdlExp;
   }
 
   @Override
-  public EdmExpression getValue() {
-    if (value == null) {
-      if (csdlExp.getValue() == null) {
-        throw new EdmException("URLRef expressions require an expression value.");
-      }
-      value = getExpression(edm, csdlExp.getValue());
-    }
-    return value;
-  }
-  
-  @Override
   public EdmExpressionType getExpressionType() {
     return EdmExpressionType.UrlRef;
+  }
+
+  @Override
+  public EdmExpression getValue() {
+    if (this.value == null) {
+      if (this.csdlExp.getValue() == null) {
+        throw new EdmException("URLRef expressions require an expression value.");
+      }
+      this.value = getExpression(this.edm, this.csdlExp.getValue());
+    }
+    return this.value;
   }
 }

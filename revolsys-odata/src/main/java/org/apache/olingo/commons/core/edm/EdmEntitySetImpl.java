@@ -25,16 +25,17 @@ import org.apache.olingo.commons.api.edm.provider.CsdlEntitySet;
 
 public class EdmEntitySetImpl extends AbstractEdmBindingTarget implements EdmEntitySet {
 
-  private CsdlEntitySet entitySet;
+  private final CsdlEntitySet entitySet;
 
-  public EdmEntitySetImpl(final Edm edm, final EdmEntityContainer container, final CsdlEntitySet entitySet) {
+  public EdmEntitySetImpl(final Edm edm, final EdmEntityContainer container,
+    final CsdlEntitySet entitySet) {
     super(edm, container, entitySet);
     this.entitySet = entitySet;
   }
 
   @Override
   public boolean isIncludeInServiceDocument() {
-    return entitySet.isIncludeInServiceDocument();
+    return this.entitySet.isIncludeInServiceDocument();
   }
 
 }

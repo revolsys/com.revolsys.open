@@ -30,20 +30,20 @@ public class MultiLineString extends ComposedGeospatial<LineString> {
 
   /**
    * Creates a new MultiLineString
-   * 
+   *
    * @param dimension     Dimension of the MultiLineString
    * @param srid          SRID value
    * @param lineStrings   List of lineStrings
    */
-  public MultiLineString(final Dimension dimension, final SRID srid, final List<LineString> lineStrings) {
+  public MultiLineString(final Dimension dimension, final SRID srid,
+    final List<LineString> lineStrings) {
     super(dimension, Type.MULTILINESTRING, srid, lineStrings);
   }
 
   @Override
   public EdmPrimitiveTypeKind getEdmPrimitiveTypeKind() {
-    return dimension == Dimension.GEOGRAPHY ?
-        EdmPrimitiveTypeKind.GeographyMultiLineString :
-        EdmPrimitiveTypeKind.GeometryMultiLineString;
+    return this.dimension == Dimension.GEOGRAPHY ? EdmPrimitiveTypeKind.GeographyMultiLineString
+      : EdmPrimitiveTypeKind.GeometryMultiLineString;
   }
 
 }

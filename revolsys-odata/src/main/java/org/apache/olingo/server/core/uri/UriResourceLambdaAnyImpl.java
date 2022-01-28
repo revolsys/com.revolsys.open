@@ -28,12 +28,28 @@ import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
 public class UriResourceLambdaAnyImpl extends UriResourceTypedImpl implements UriResourceLambdaAny {
 
   private final String lambdaVariable;
+
   private final Expression expression;
 
   public UriResourceLambdaAnyImpl(final String lambdaVariable, final Expression expression) {
     super(UriResourceKind.lambdaAny);
     this.lambdaVariable = lambdaVariable;
     this.expression = expression;
+  }
+
+  @Override
+  public Expression getExpression() {
+    return this.expression;
+  }
+
+  @Override
+  public String getLambdaVariable() {
+    return this.lambdaVariable;
+  }
+
+  @Override
+  public String getSegmentValue() {
+    return "any";
   }
 
   @Override
@@ -44,20 +60,5 @@ public class UriResourceLambdaAnyImpl extends UriResourceTypedImpl implements Ur
   @Override
   public boolean isCollection() {
     return false;
-  }
-
-  @Override
-  public String getLambdaVariable() {
-    return lambdaVariable;
-  }
-
-  @Override
-  public Expression getExpression() {
-    return expression;
-  }
-
-  @Override
-  public String getSegmentValue() {
-    return "any";
   }
 }

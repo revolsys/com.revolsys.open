@@ -23,7 +23,7 @@ import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.server.api.ServiceMetadata;
 
 public interface EdmDeltaSerializer {
-  
+
   /**
    * Writes collection of delta-response into an InputStream.
    * Information from the EDM is used in addition to information from the data and preferred,
@@ -35,6 +35,6 @@ public interface EdmDeltaSerializer {
    * @param options              options for the serializer
    */
   SerializerResult entityCollection(ServiceMetadata metadata, EdmEntityType referencedEntityType,
-      Delta delta, EntityCollectionSerializerOptions options) throws SerializerException;
+    Delta delta, EntityCollectionSerializerOptions options) throws SerializerException;
 
 }

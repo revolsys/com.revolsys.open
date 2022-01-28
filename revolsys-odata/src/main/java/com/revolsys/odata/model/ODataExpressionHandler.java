@@ -9,6 +9,7 @@ import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.EdmProperty;
 import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
+import org.apache.olingo.commons.core.edm.EdmPropertyImpl;
 import org.apache.olingo.server.api.uri.UriInfoResource;
 import org.apache.olingo.server.api.uri.UriResource;
 import org.apache.olingo.server.api.uri.UriResourcePrimitiveProperty;
@@ -97,7 +98,7 @@ public class ODataExpressionHandler {
         final FullQualifiedName typeName = literalType.getFullQualifiedName();
         final EdmPrimitiveTypeKind primitiveKind = EdmPrimitiveTypeKind.valueOfFQN(typeName);
         if (primitiveKind != null) {
-          final Object value = ODataEntityType.toValue(primitiveKind, text);
+          final Object value = EdmPropertyImpl.toValue(primitiveKind, text);
           return Value.newValue(value);
         }
 

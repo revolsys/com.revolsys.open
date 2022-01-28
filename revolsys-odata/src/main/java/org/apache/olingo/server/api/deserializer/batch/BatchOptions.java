@@ -24,35 +24,48 @@ package org.apache.olingo.server.api.deserializer.batch;
  * String, BatchOptions)
  */
 public final class BatchOptions {
-  private boolean isStrict = true;
-  private String rawBaseUri = "";
-  private String rawServiceResolutionUri = "";
-
-  private BatchOptions() {}
-
   /**
-   * Returns if the batch parsing is strict.
-   * Default is true.
-   * @return true if parsing is strict
+   * BatchOptions builder
    */
-  public boolean isStrict() {
-    return isStrict;
-  }
+  public static class Builder {
+    private final BatchOptions options;
 
-  /**
-   * Gets raw base URI.
-   * @see org.apache.olingo.server.api.ODataRequest#getRawBaseUri()
-   */
-  public String getRawBaseUri() {
-    return rawBaseUri;
-  }
+    /** Initializes the options builder. */
+    public Builder() {
+      this.options = new BatchOptions();
+    }
 
-  /**
-   * Gets raw service resolution URI.
-   * @see org.apache.olingo.server.api.ODataRequest#getRawServiceResolutionUri()
-   */
-  public String getRawServiceResolutionUri() {
-    return rawServiceResolutionUri;
+    /**
+     * Creates a new BatchOptions instance.
+     * @return new BatchOptions instance
+     */
+    public BatchOptions build() {
+      return this.options;
+    }
+
+    /**
+     * @see BatchOptions#isStrict()
+     */
+    public Builder isStrict(final boolean isStrict) {
+      this.options.isStrict = isStrict;
+      return this;
+    }
+
+    /**
+     * @see org.apache.olingo.server.api.ODataRequest#getRawBaseUri()
+     */
+    public Builder rawBaseUri(final String baseUri) {
+      this.options.rawBaseUri = baseUri;
+      return this;
+    }
+
+    /**
+     * @see org.apache.olingo.server.api.ODataRequest#getRawServiceResolutionUri()
+     */
+    public Builder rawServiceResolutionUri(final String serviceResolutionUri) {
+      this.options.rawServiceResolutionUri = serviceResolutionUri;
+      return this;
+    }
   }
 
   /**
@@ -63,47 +76,37 @@ public final class BatchOptions {
     return new Builder();
   }
 
+  private boolean isStrict = true;
+
+  private String rawBaseUri = "";
+
+  private String rawServiceResolutionUri = "";
+
+  private BatchOptions() {
+  }
+
   /**
-   * BatchOptions builder
+   * Gets raw base URI.
+   * @see org.apache.olingo.server.api.ODataRequest#getRawBaseUri()
    */
-  public static class Builder {
-    private BatchOptions options;
+  public String getRawBaseUri() {
+    return this.rawBaseUri;
+  }
 
-    /** Initializes the options builder. */
-    public Builder() {
-      options = new BatchOptions();
-    }
+  /**
+   * Gets raw service resolution URI.
+   * @see org.apache.olingo.server.api.ODataRequest#getRawServiceResolutionUri()
+   */
+  public String getRawServiceResolutionUri() {
+    return this.rawServiceResolutionUri;
+  }
 
-    /**
-     * @see BatchOptions#isStrict()
-     */
-    public Builder isStrict(final boolean isStrict) {
-      options.isStrict = isStrict;
-      return this;
-    }
-
-    /**
-     * @see org.apache.olingo.server.api.ODataRequest#getRawBaseUri()
-     */
-    public Builder rawBaseUri(final String baseUri) {
-      options.rawBaseUri = baseUri;
-      return this;
-    }
-
-    /**
-     * @see org.apache.olingo.server.api.ODataRequest#getRawServiceResolutionUri()
-     */
-    public Builder rawServiceResolutionUri(final String serviceResolutionUri) {
-      options.rawServiceResolutionUri = serviceResolutionUri;
-      return this;
-    }
-
-    /**
-     * Creates a new BatchOptions instance.
-     * @return new BatchOptions instance
-     */
-    public BatchOptions build() {
-      return options;
-    }
+  /**
+   * Returns if the batch parsing is strict.
+   * Default is true.
+   * @return true if parsing is strict
+   */
+  public boolean isStrict() {
+    return this.isStrict;
   }
 }

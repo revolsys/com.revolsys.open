@@ -34,6 +34,6 @@ public abstract class Annotatable {
    * @return annotations
    */
   public List<Annotation> getAnnotations() {
-    return annotations;
+    return this.annotations;
   }
 }

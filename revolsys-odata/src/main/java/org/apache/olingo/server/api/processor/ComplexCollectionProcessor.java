@@ -32,6 +32,19 @@ import org.apache.olingo.server.api.uri.UriInfo;
 public interface ComplexCollectionProcessor extends Processor {
 
   /**
+   * Deletes complex-type collection from an entity and puts the status into the response.
+   * Deletion for complex-type collection is equal to
+   * set the content to <code>EMPTY</code>.
+   * @param request OData request object containing raw HTTP information
+   * @param response OData response object for collecting response data
+   * @param uriInfo information of a parsed OData URI
+   * @throws ODataApplicationException if the service implementation encounters a failure
+   * @throws ODataLibraryException
+   */
+  void deleteComplexCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo)
+    throws ODataApplicationException, ODataLibraryException;
+
+  /**
    * Reads complex-type collection.
    * If it is not available, for example due to permissions, the service responds with 404 Not Found.
    * @param request OData request object containing raw HTTP information
@@ -41,8 +54,8 @@ public interface ComplexCollectionProcessor extends Processor {
    * @throws ODataApplicationException if the service implementation encounters a failure
    * @throws ODataLibraryException
    */
-  void readComplexCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat)
-      throws ODataApplicationException, ODataLibraryException;
+  void readComplexCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo,
+    ContentType responseFormat) throws ODataApplicationException, ODataLibraryException;
 
   /**
    * Update (replace) complex-type collection with send data in the persistence and
@@ -58,18 +71,6 @@ public interface ComplexCollectionProcessor extends Processor {
    * @throws ODataLibraryException
    */
   void updateComplexCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo,
-      ContentType requestFormat, ContentType responseFormat) throws ODataApplicationException, ODataLibraryException;
-
-  /**
-   * Deletes complex-type collection from an entity and puts the status into the response.
-   * Deletion for complex-type collection is equal to
-   * set the content to <code>EMPTY</code>.
-   * @param request OData request object containing raw HTTP information
-   * @param response OData response object for collecting response data
-   * @param uriInfo information of a parsed OData URI
-   * @throws ODataApplicationException if the service implementation encounters a failure
-   * @throws ODataLibraryException
-   */
-  void deleteComplexCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo)
-      throws ODataApplicationException, ODataLibraryException;
+    ContentType requestFormat, ContentType responseFormat)
+    throws ODataApplicationException, ODataLibraryException;
 }

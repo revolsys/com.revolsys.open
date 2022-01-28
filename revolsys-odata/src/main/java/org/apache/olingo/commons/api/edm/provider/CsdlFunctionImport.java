@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -37,30 +37,13 @@ public class CsdlFunctionImport extends CsdlOperationImport {
    */
   private String title;
 
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public CsdlFunctionImport setName(final String name) {
-    this.name = name;
-    return this;
-  }
-
-  @Override
-  public CsdlFunctionImport setEntitySet(final String entitySet) {
-    this.entitySet = entitySet;
-    return this;
-  }
-
   /**
    * Gets function.
    *
    * @return the function
    */
   public String getFunction() {
-    return function.getFullQualifiedNameAsString();
+    return this.function.getFullQualifiedNameAsString();
   }
 
   /**
@@ -69,7 +52,37 @@ public class CsdlFunctionImport extends CsdlOperationImport {
    * @return the function fQN
    */
   public FullQualifiedName getFunctionFQN() {
-    return function;
+    return this.function;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
+  }
+
+  public String getTitle() {
+    return this.title;
+  }
+
+  /**
+   * Is include in service document.
+   *
+   * @return the boolean
+   */
+  public boolean isIncludeInServiceDocument() {
+    return this.includeInServiceDocument;
+  }
+
+  @Override
+  public CsdlFunctionImport setAnnotations(final List<CsdlAnnotation> annotations) {
+    this.annotations = annotations;
+    return this;
+  }
+
+  @Override
+  public CsdlFunctionImport setEntitySet(final String entitySet) {
+    this.entitySet = entitySet;
+    return this;
   }
 
   /**
@@ -95,15 +108,6 @@ public class CsdlFunctionImport extends CsdlOperationImport {
   }
 
   /**
-   * Is include in service document.
-   *
-   * @return the boolean
-   */
-  public boolean isIncludeInServiceDocument() {
-    return includeInServiceDocument;
-  }
-
-  /**
    * Sets include in service document.
    *
    * @param includeInServiceDocument the include in service document
@@ -115,13 +119,9 @@ public class CsdlFunctionImport extends CsdlOperationImport {
   }
 
   @Override
-  public CsdlFunctionImport setAnnotations(final List<CsdlAnnotation> annotations) {
-    this.annotations = annotations;
+  public CsdlFunctionImport setName(final String name) {
+    this.name = name;
     return this;
-  }
-  
-  public String getTitle() {
-    return title;
   }
 
   /**
@@ -129,7 +129,7 @@ public class CsdlFunctionImport extends CsdlOperationImport {
    * @param title
    * @return this instance
    */
-  public CsdlFunctionImport setTitle(String title) {
+  public CsdlFunctionImport setTitle(final String title) {
     this.title = title;
     return this;
   }

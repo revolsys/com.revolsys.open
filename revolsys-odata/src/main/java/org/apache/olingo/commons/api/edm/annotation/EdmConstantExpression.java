@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -30,28 +30,28 @@ public interface EdmConstantExpression extends EdmExpression {
   // TODO: Is methods
 
   /**
-   * The value object of this expression or null if it is of type enum or geospatial.
-   * @return a value object or null
-   */
-  Object asPrimitive();
-
-  /**
    * A list of enum members or empty list if this expression is of type primitive or geospatial.
    * @return a list of all enum members or empty list
    */
   List<String> asEnumMembers();
 
   /**
-   * Return the Enum type name or null if this expression is of type primitive or geospatial.
-   * @return enum type name or null
-   */
-  String getEnumTypeName();
-
-  /**
    * Return the geospatial object or null if this expression is of type primitive or enum.
    * @return geospatial object or null
    */
   Geospatial asGeospatial();
+
+  /**
+   * The value object of this expression or null if it is of type enum or geospatial.
+   * @return a value object or null
+   */
+  Object asPrimitive();
+
+  /**
+   * Return the Enum type name or null if this expression is of type primitive or geospatial.
+   * @return enum type name or null
+   */
+  String getEnumTypeName();
 
   /**
    * Returns the value of the expression as String.

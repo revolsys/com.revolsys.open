@@ -35,11 +35,101 @@ import org.apache.olingo.server.api.prefer.Preferences.Return;
  */
 public final class PreferencesApplied {
 
+  /** Builder of OData serializer options. */
+  public static final class Builder {
+
+    private final PreferencesApplied preferencesApplied;
+
+    private Builder() {
+      this.preferencesApplied = new PreferencesApplied();
+    }
+
+    private void add(final String name, final String value) {
+      if (!this.preferencesApplied.applied.containsKey(name)) {
+        this.preferencesApplied.applied.put(name, value);
+      }
+    }
+
+    /** Sets <code>odata.allow-entityreferences</code>. */
+    public Builder allowEntityReferences() {
+      add(PreferenceName.ALLOW_ENTITY_REFERENCES.getName(), null);
+      return this;
+    }
+
+    /** Builds the applied preferences. */
+    public PreferencesApplied build() {
+      return this.preferencesApplied;
+    }
+
+    /** Sets <code>odata.callback</code>. */
+    public Builder callback() {
+      add(PreferenceName.CALLBACK.getName(), null);
+      return this;
+    }
+
+    /** Sets <code>odata.continue-on-error</code>. */
+    public Builder continueOnError() {
+      add(PreferenceName.CONTINUE_ON_ERROR.getName(), null);
+      return this;
+    }
+
+    /** Sets the value of the applied preference <code>odata.maxpagesize</code>. */
+    public Builder maxPageSize(final Integer maxPageSize) {
+      add(PreferenceName.MAX_PAGE_SIZE.getName(), Integer.toString(maxPageSize));
+      return this;
+    }
+
+    /**
+     * Sets an arbitrary preference as applied.
+     * The preference name is converted to lowercase.
+     * The value of this preference may be <code>null</code>.
+     * Name and value are not checked for validity.
+     * @param name preference name
+     * @param value preference value
+     */
+    public Builder preference(final String name, final String value) {
+      if (name != null) {
+        add(name.toLowerCase(Locale.ROOT), value);
+      }
+      return this;
+    }
+
+    /** Sets <code>odata.respond-async</code>. */
+    public Builder respondAsync() {
+      add(PreferenceName.RESPOND_ASYNC.getName(), null);
+      return this;
+    }
+
+    /** Sets the value of the applied preference <code>return</code>. */
+    public Builder returnRepresentation(final Return returnRepresentation) {
+      add(PreferenceName.RETURN.getName(), returnRepresentation.name().toLowerCase(Locale.ROOT));
+      return this;
+    }
+
+    /** Sets <code>odata.track-changes</code>. */
+    public Builder trackChanges() {
+      add(PreferenceName.TRACK_CHANGES.getName(), null);
+      return this;
+    }
+
+    /** Sets the value of the applied preference <code>wait</code>. */
+    public Builder waitPreference(final Integer wait) {
+      add(PreferenceName.WAIT.getName(), Integer.toString(wait));
+      return this;
+    }
+  }
+
   private static final Set<String> SAFE_PREFERENCE_NAMES = new HashSet<>();
-  private Map<String, String> applied;
+
+  /** Initializes the builder. */
+  public static Builder with() {
+    return new Builder();
+  }
+
+  private final Map<String, String> applied;
 
   private PreferencesApplied() {
-    applied = new LinkedHashMap<>();
+    this.applied = new LinkedHashMap<>();
   }
 
   /**
@@ -47,27 +137,7 @@ public final class PreferencesApplied {
    * @return a map from preference names to preference values
    */
   public Map<String, String> getAppliedPreferences() {
-    return Collections.unmodifiableMap(applied);
-  }
-
-  /** Returns a string representation that can be used as value of a Preference-Applied HTTP response header. */
-  public String toValueString() {
-    StringBuilder result = new StringBuilder();
-    for (final Map.Entry<String, String> entry : applied.entrySet()) {
-      if (result.length() > 0) {
-        result.append(',').append(' ');
-      }
-      final String key = entry.getKey();
-      result.append(key);
-      if (entry.getValue() != null) {
-        final boolean safe = isSafe(key);
-        result.append('=')
-        .append(safe ? "" : '"')
-        .append(entry.getValue().replaceAll("\\\\|\"", "\\\\$0"))
-        .append(safe ? "" : '"');
-      }
-    }
-    return result.toString();
+    return Collections.unmodifiableMap(this.applied);
   }
 
   private boolean isSafe(final String key) {
@@ -89,92 +159,23 @@ public final class PreferencesApplied {
     return toValueString();
   }
 
-  /** Initializes the builder. */
-  public static Builder with() {
-    return new Builder();
-  }
-
-  /** Builder of OData serializer options. */
-  public static final class Builder {
-
-    private final PreferencesApplied preferencesApplied;
-
-    private Builder() {
-      preferencesApplied = new PreferencesApplied();
-    }
-
-    /** Sets <code>odata.allow-entityreferences</code>. */
-    public Builder allowEntityReferences() {
-      add(PreferenceName.ALLOW_ENTITY_REFERENCES.getName(), null);
-      return this;
-    }
-
-    /** Sets <code>odata.callback</code>. */
-    public Builder callback() {
-      add(PreferenceName.CALLBACK.getName(), null);
-      return this;
-    }
-
-    /** Sets <code>odata.continue-on-error</code>. */
-    public Builder continueOnError() {
-      add(PreferenceName.CONTINUE_ON_ERROR.getName(), null);
-      return this;
-    }
-
-    /** Sets the value of the applied preference <code>odata.maxpagesize</code>. */
-    public Builder maxPageSize(final Integer maxPageSize) {
-      add(PreferenceName.MAX_PAGE_SIZE.getName(), Integer.toString(maxPageSize));
-      return this;
-    }
-
-    /** Sets <code>odata.track-changes</code>. */
-    public Builder trackChanges() {
-      add(PreferenceName.TRACK_CHANGES.getName(), null);
-      return this;
-    }
-
-    /** Sets the value of the applied preference <code>return</code>. */
-    public Builder returnRepresentation(final Return returnRepresentation) {
-      add(PreferenceName.RETURN.getName(), returnRepresentation.name().toLowerCase(Locale.ROOT));
-      return this;
-    }
-
-    /** Sets <code>odata.respond-async</code>. */
-    public Builder respondAsync() {
-      add(PreferenceName.RESPOND_ASYNC.getName(), null);
-      return this;
-    }
-
-    /** Sets the value of the applied preference <code>wait</code>. */
-    public Builder waitPreference(final Integer wait) {
-      add(PreferenceName.WAIT.getName(), Integer.toString(wait));
-      return this;
-    }
-
-    /**
-     * Sets an arbitrary preference as applied.
-     * The preference name is converted to lowercase.
-     * The value of this preference may be <code>null</code>.
-     * Name and value are not checked for validity.
-     * @param name preference name
-     * @param value preference value
-     */
-    public Builder preference(final String name, final String value) {
-      if (name != null) {
-        add(name.toLowerCase(Locale.ROOT), value);
+  /** Returns a string representation that can be used as value of a Preference-Applied HTTP response header. */
+  public String toValueString() {
+    final StringBuilder result = new StringBuilder();
+    for (final Map.Entry<String, String> entry : this.applied.entrySet()) {
+      if (result.length() > 0) {
+        result.append(',').append(' ');
       }
-      return this;
-    }
-
-    /** Builds the applied preferences. */
-    public PreferencesApplied build() {
-      return preferencesApplied;
-    }
-
-    private void add(final String name, final String value) {
-      if (!preferencesApplied.applied.containsKey(name)) {
-        preferencesApplied.applied.put(name, value);
+      final String key = entry.getKey();
+      result.append(key);
+      if (entry.getValue() != null) {
+        final boolean safe = isSafe(key);
+        result.append('=')
+          .append(safe ? "" : '"')
+          .append(entry.getValue().replaceAll("\\\\|\"", "\\\\$0"))
+          .append(safe ? "" : '"');
       }
     }
+    return result.toString();
   }
 }

@@ -26,58 +26,41 @@ import org.apache.olingo.server.api.uri.UriParameter;
 import org.apache.olingo.server.api.uri.UriResourceKind;
 import org.apache.olingo.server.api.uri.UriResourcePartTyped;
 
-public abstract class UriResourceWithKeysImpl extends UriResourceImpl implements UriResourcePartTyped {
+public abstract class UriResourceWithKeysImpl extends UriResourceImpl
+  implements UriResourcePartTyped {
 
   private EdmType collectionTypeFilter = null;
+
   protected List<UriParameter> keyPredicates = null;
+
   private EdmType entryTypeFilter = null;
 
   public UriResourceWithKeysImpl(final UriResourceKind kind) {
     super(kind);
   }
 
-  public EdmType getTypeFilterOnCollection() {
-    return collectionTypeFilter;
-  }
-
-  public EdmType getTypeFilterOnEntry() {
-    return entryTypeFilter;
+  private String getFQN(final EdmType type) {
+    return type.getFullQualifiedName().getFullQualifiedNameAsString();
   }
 
   public List<UriParameter> getKeyPredicates() {
-    return keyPredicates == null ?
-        Collections.<UriParameter> emptyList() :
-        Collections.unmodifiableList(keyPredicates);
-  }
-
-  public UriResourceWithKeysImpl setKeyPredicates(final List<UriParameter> list) {
-    keyPredicates = list;
-    return this;
-  }
-
-  public UriResourceWithKeysImpl setEntryTypeFilter(final EdmType entryTypeFilter) {
-    this.entryTypeFilter = entryTypeFilter;
-    return this;
-  }
-
-  public UriResourceWithKeysImpl setCollectionTypeFilter(final EdmType collectionTypeFilter) {
-    this.collectionTypeFilter = collectionTypeFilter;
-    return this;
+    return this.keyPredicates == null ? Collections.<UriParameter> emptyList()
+      : Collections.unmodifiableList(this.keyPredicates);
   }
 
   @Override
   public String getSegmentValue(final boolean includeFilters) {
     if (includeFilters) {
-      StringBuilder tmp = new StringBuilder();
-      if (collectionTypeFilter != null) {
-        tmp.append(getFQN(collectionTypeFilter));
+      final StringBuilder tmp = new StringBuilder();
+      if (this.collectionTypeFilter != null) {
+        tmp.append(getFQN(this.collectionTypeFilter));
       }
 
-      if (entryTypeFilter != null) {
+      if (this.entryTypeFilter != null) {
         if (tmp.length() == 0) {
-          tmp.append(getFQN(entryTypeFilter));
+          tmp.append(getFQN(this.entryTypeFilter));
         } else {
-          tmp.append("/()").append(getFQN(entryTypeFilter));
+          tmp.append("/()").append(getFQN(this.entryTypeFilter));
         }
       }
 
@@ -89,13 +72,32 @@ public abstract class UriResourceWithKeysImpl extends UriResourceImpl implements
     return getSegmentValue();
   }
 
+  public EdmType getTypeFilterOnCollection() {
+    return this.collectionTypeFilter;
+  }
+
+  public EdmType getTypeFilterOnEntry() {
+    return this.entryTypeFilter;
+  }
+
+  public UriResourceWithKeysImpl setCollectionTypeFilter(final EdmType collectionTypeFilter) {
+    this.collectionTypeFilter = collectionTypeFilter;
+    return this;
+  }
+
+  public UriResourceWithKeysImpl setEntryTypeFilter(final EdmType entryTypeFilter) {
+    this.entryTypeFilter = entryTypeFilter;
+    return this;
+  }
+
+  public UriResourceWithKeysImpl setKeyPredicates(final List<UriParameter> list) {
+    this.keyPredicates = list;
+    return this;
+  }
+
   @Override
   public String toString(final boolean includeFilters) {
     return getSegmentValue(includeFilters);
-  }
-
-  private String getFQN(final EdmType type) {
-    return type.getFullQualifiedName().getFullQualifiedNameAsString();
   }
 
 }

@@ -27,26 +27,60 @@ import org.apache.olingo.server.api.deserializer.batch.BatchDeserializerExceptio
 
 public class BatchBodyPart implements BatchPart {
   private final String boundary;
+
   private final boolean isStrict;
+
   private final List<Line> remainingMessage = new LinkedList<>();
 
   private Header headers;
+
   private boolean isChangeSet;
+
   private List<BatchQueryOperation> requests;
 
   public BatchBodyPart(final List<Line> message, final String boundary, final boolean isStrict) {
     this.boundary = boundary;
     this.isStrict = isStrict;
-    remainingMessage.addAll(message);
+    this.remainingMessage.addAll(message);
   }
 
-  public BatchBodyPart parse() throws BatchDeserializerException {
-    headers = BatchParserCommon.consumeHeaders(remainingMessage);
-    BatchParserCommon.consumeBlankLine(remainingMessage, isStrict);
-    isChangeSet = isChangeSet(headers);
-    requests = consumeRequest(remainingMessage);
+  private List<BatchQueryOperation> consumeChangeSet(final List<Line> remainingMessage)
+    throws BatchDeserializerException {
+    final List<List<Line>> changeRequests = splitChangeSet(remainingMessage);
+    final List<BatchQueryOperation> requestList = new LinkedList<>();
 
-    return this;
+    for (final List<Line> changeRequest : changeRequests) {
+      requestList.add(new BatchChangeSetPart(changeRequest, this.isStrict).parse());
+    }
+
+    return requestList;
+  }
+
+  private List<BatchQueryOperation> consumeQueryOperation(final List<Line> remainingMessage)
+    throws BatchDeserializerException {
+    final List<BatchQueryOperation> requestList = new LinkedList<>();
+    requestList.add(new BatchQueryOperation(remainingMessage, this.isStrict).parse());
+
+    return requestList;
+  }
+
+  private List<BatchQueryOperation> consumeRequest(final List<Line> remainingMessage)
+    throws BatchDeserializerException {
+    return this.isChangeSet ? consumeChangeSet(remainingMessage)
+      : consumeQueryOperation(remainingMessage);
+  }
+
+  @Override
+  public Header getHeaders() {
+    return this.headers;
+  }
+
+  public List<BatchQueryOperation> getRequests() {
+    return this.requests;
+  }
+
+  public boolean isChangeSet() {
+    return this.isChangeSet;
   }
 
   private boolean isChangeSet(final Header headers) throws BatchDeserializerException {
@@ -54,61 +88,17 @@ public class BatchBodyPart implements BatchPart {
 
     if (contentTypes.isEmpty()) {
       throw new BatchDeserializerException("Missing content type",
-          BatchDeserializerException.MessageKeys.MISSING_CONTENT_TYPE,
-          Integer.toString(headers.getLineNumber()));
+        BatchDeserializerException.MessageKeys.MISSING_CONTENT_TYPE,
+        Integer.toString(headers.getLineNumber()));
     }
 
     boolean changeSet = false;
-    for (String contentType : contentTypes) {
+    for (final String contentType : contentTypes) {
       if (isContentTypeMultiPartMixed(contentType)) {
         changeSet = true;
       }
     }
     return changeSet;
-  }
-
-  private List<BatchQueryOperation> consumeRequest(final List<Line> remainingMessage)
-      throws BatchDeserializerException {
-    return isChangeSet ? consumeChangeSet(remainingMessage) : consumeQueryOperation(remainingMessage);
-  }
-
-  private List<BatchQueryOperation> consumeChangeSet(final List<Line> remainingMessage)
-      throws BatchDeserializerException {
-    final List<List<Line>> changeRequests = splitChangeSet(remainingMessage);
-    final List<BatchQueryOperation> requestList = new LinkedList<>();
-
-    for (List<Line> changeRequest : changeRequests) {
-      requestList.add(new BatchChangeSetPart(changeRequest, isStrict).parse());
-    }
-
-    return requestList;
-  }
-
-  private List<List<Line>> splitChangeSet(final List<Line> remainingMessage) throws BatchDeserializerException {
-
-    final HeaderField contentTypeField = headers.getHeaderField(HttpHeader.CONTENT_TYPE);
-    final String changeSetBoundary = BatchParserCommon.getBoundary(contentTypeField.getValue(),
-        contentTypeField.getLineNumber());
-    validateChangeSetBoundary(changeSetBoundary, headers);
-
-    return BatchParserCommon.splitMessageByBoundary(remainingMessage, changeSetBoundary);
-  }
-
-  private void validateChangeSetBoundary(final String changeSetBoundary, final Header header)
-      throws BatchDeserializerException {
-    if (changeSetBoundary.equals(boundary)) {
-      throw new BatchDeserializerException("Change set boundary is equals to batch request boundary",
-          BatchDeserializerException.MessageKeys.INVALID_BOUNDARY,
-          Integer.toString(header.getHeaderField(HttpHeader.CONTENT_TYPE).getLineNumber()));
-    }
-  }
-
-  private List<BatchQueryOperation> consumeQueryOperation(final List<Line> remainingMessage)
-      throws BatchDeserializerException {
-    final List<BatchQueryOperation> requestList = new LinkedList<>();
-    requestList.add(new BatchQueryOperation(remainingMessage, isStrict).parse());
-
-    return requestList;
   }
 
   private boolean isContentTypeMultiPartMixed(final String contentType) {
@@ -121,20 +111,37 @@ public class BatchBodyPart implements BatchPart {
   }
 
   @Override
-  public Header getHeaders() {
-    return headers;
-  }
-
-  @Override
   public boolean isStrict() {
-    return isStrict;
+    return this.isStrict;
   }
 
-  public boolean isChangeSet() {
-    return isChangeSet;
+  public BatchBodyPart parse() throws BatchDeserializerException {
+    this.headers = BatchParserCommon.consumeHeaders(this.remainingMessage);
+    BatchParserCommon.consumeBlankLine(this.remainingMessage, this.isStrict);
+    this.isChangeSet = isChangeSet(this.headers);
+    this.requests = consumeRequest(this.remainingMessage);
+
+    return this;
   }
 
-  public List<BatchQueryOperation> getRequests() {
-    return requests;
+  private List<List<Line>> splitChangeSet(final List<Line> remainingMessage)
+    throws BatchDeserializerException {
+
+    final HeaderField contentTypeField = this.headers.getHeaderField(HttpHeader.CONTENT_TYPE);
+    final String changeSetBoundary = BatchParserCommon.getBoundary(contentTypeField.getValue(),
+      contentTypeField.getLineNumber());
+    validateChangeSetBoundary(changeSetBoundary, this.headers);
+
+    return BatchParserCommon.splitMessageByBoundary(remainingMessage, changeSetBoundary);
+  }
+
+  private void validateChangeSetBoundary(final String changeSetBoundary, final Header header)
+    throws BatchDeserializerException {
+    if (changeSetBoundary.equals(this.boundary)) {
+      throw new BatchDeserializerException(
+        "Change set boundary is equals to batch request boundary",
+        BatchDeserializerException.MessageKeys.INVALID_BOUNDARY,
+        Integer.toString(header.getHeaderField(HttpHeader.CONTENT_TYPE).getLineNumber()));
+    }
   }
 }

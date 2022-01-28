@@ -26,7 +26,7 @@ import org.apache.olingo.commons.api.edm.FullQualifiedName;
 /**
  * The type Csdl navigation property.
  */
-public class CsdlNavigationProperty extends CsdlAbstractEdmItem implements CsdlNamed, CsdlAnnotatable {
+public class CsdlNavigationProperty implements CsdlAbstractEdmItem, CsdlNamed, CsdlAnnotatable {
 
   private String name;
 
@@ -38,18 +38,71 @@ public class CsdlNavigationProperty extends CsdlAbstractEdmItem implements CsdlN
 
   private boolean containsTarget = false;
 
-  private List<CsdlReferentialConstraint> referentialConstraints = new ArrayList<CsdlReferentialConstraint>();
+  private List<CsdlReferentialConstraint> referentialConstraints = new ArrayList<>();
 
   // Facets
   private boolean nullable = true;
 
   private CsdlOnDelete onDelete;
 
-  private List<CsdlAnnotation> annotations = new ArrayList<CsdlAnnotation>();
+  private List<CsdlAnnotation> annotations = new ArrayList<>();
+
+  @Override
+  public List<CsdlAnnotation> getAnnotations() {
+    return this.annotations;
+  }
 
   @Override
   public String getName() {
-    return name;
+    return this.name;
+  }
+
+  /**
+   * Gets on delete.
+   *
+   * @return the on delete
+   */
+  public CsdlOnDelete getOnDelete() {
+    return this.onDelete;
+  }
+
+  /**
+   * Gets partner.
+   *
+   * @return the partner
+   */
+  public String getPartner() {
+    return this.partner;
+  }
+
+  /**
+   * Gets referential constraints.
+   *
+   * @return the referential constraints
+   */
+  public List<CsdlReferentialConstraint> getReferentialConstraints() {
+    return this.referentialConstraints;
+  }
+
+  /**
+   * Gets type.
+   *
+   * @return the type
+   */
+  public String getType() {
+    if (this.type != null) {
+      return this.type.getFullQualifiedNameAsString();
+    }
+    return null;
+  }
+
+  /**
+   * Gets type fQN.
+   *
+   * @return the type fQN
+   */
+  public FullQualifiedName getTypeFQN() {
+    return this.type;
   }
 
   /**
@@ -58,7 +111,35 @@ public class CsdlNavigationProperty extends CsdlAbstractEdmItem implements CsdlN
    * @return the boolean
    */
   public boolean isCollection() {
-    return isCollection;
+    return this.isCollection;
+  }
+
+  /**
+   * Is contains target.
+   *
+   * @return the boolean
+   */
+  public boolean isContainsTarget() {
+    return this.containsTarget;
+  }
+
+  /**
+   * Is nullable.
+   *
+   * @return the boolean
+   */
+  public Boolean isNullable() {
+    return this.nullable;
+  }
+
+  /**
+   * Sets a list of annotations
+   * @param annotations list of annotations
+   * @return this instance
+   */
+  public CsdlNavigationProperty setAnnotations(final List<CsdlAnnotation> annotations) {
+    this.annotations = annotations;
+    return this;
   }
 
   /**
@@ -69,6 +150,17 @@ public class CsdlNavigationProperty extends CsdlAbstractEdmItem implements CsdlN
    */
   public CsdlNavigationProperty setCollection(final boolean isCollection) {
     this.isCollection = isCollection;
+    return this;
+  }
+
+  /**
+   * Sets contains target.
+   *
+   * @param containsTarget the contains target
+   * @return the contains target
+   */
+  public CsdlNavigationProperty setContainsTarget(final boolean containsTarget) {
+    this.containsTarget = containsTarget;
     return this;
   }
 
@@ -84,24 +176,48 @@ public class CsdlNavigationProperty extends CsdlAbstractEdmItem implements CsdlN
   }
 
   /**
-   * Gets type fQN.
+   * Sets nullable.
    *
-   * @return the type fQN
+   * @param nullable the nullable
+   * @return the nullable
    */
-  public FullQualifiedName getTypeFQN() {
-    return type;
+  public CsdlNavigationProperty setNullable(final Boolean nullable) {
+    this.nullable = nullable;
+    return this;
   }
 
   /**
-   * Gets type.
+   * Sets on delete.
    *
-   * @return the type
+   * @param onDelete the on delete
+   * @return the on delete
    */
-  public String getType() {
-    if (type != null) {
-      return type.getFullQualifiedNameAsString();
-    }
-    return null;
+  public CsdlNavigationProperty setOnDelete(final CsdlOnDelete onDelete) {
+    this.onDelete = onDelete;
+    return this;
+  }
+
+  /**
+   * Sets partner.
+   *
+   * @param partner the partner
+   * @return the partner
+   */
+  public CsdlNavigationProperty setPartner(final String partner) {
+    this.partner = partner;
+    return this;
+  }
+
+  /**
+   * Sets referential constraints.
+   *
+   * @param referentialConstraints the referential constraints
+   * @return the referential constraints
+   */
+  public CsdlNavigationProperty setReferentialConstraints(
+    final List<CsdlReferentialConstraint> referentialConstraints) {
+    this.referentialConstraints = referentialConstraints;
+    return this;
   }
 
   /**
@@ -123,122 +239,6 @@ public class CsdlNavigationProperty extends CsdlAbstractEdmItem implements CsdlN
    */
   public CsdlNavigationProperty setType(final String type) {
     this.type = new FullQualifiedName(type);
-    return this;
-  }
-
-  /**
-   * Gets partner.
-   *
-   * @return the partner
-   */
-  public String getPartner() {
-    return partner;
-  }
-
-  /**
-   * Sets partner.
-   *
-   * @param partner the partner
-   * @return the partner
-   */
-  public CsdlNavigationProperty setPartner(final String partner) {
-    this.partner = partner;
-    return this;
-  }
-
-  /**
-   * Is contains target.
-   *
-   * @return the boolean
-   */
-  public boolean isContainsTarget() {
-    return containsTarget;
-  }
-
-  /**
-   * Sets contains target.
-   *
-   * @param containsTarget the contains target
-   * @return the contains target
-   */
-  public CsdlNavigationProperty setContainsTarget(final boolean containsTarget) {
-    this.containsTarget = containsTarget;
-    return this;
-  }
-
-  /**
-   * Gets referential constraints.
-   *
-   * @return the referential constraints
-   */
-  public List<CsdlReferentialConstraint> getReferentialConstraints() {
-    return referentialConstraints;
-  }
-
-  /**
-   * Sets referential constraints.
-   *
-   * @param referentialConstraints the referential constraints
-   * @return the referential constraints
-   */
-  public CsdlNavigationProperty setReferentialConstraints(
-      final List<CsdlReferentialConstraint> referentialConstraints) {
-    this.referentialConstraints = referentialConstraints;
-    return this;
-  }
-
-  /**
-   * Is nullable.
-   *
-   * @return the boolean
-   */
-  public Boolean isNullable() {
-    return nullable;
-  }
-
-  /**
-   * Sets nullable.
-   *
-   * @param nullable the nullable
-   * @return the nullable
-   */
-  public CsdlNavigationProperty setNullable(final Boolean nullable) {
-    this.nullable = nullable;
-    return this;
-  }
-
-  /**
-   * Gets on delete.
-   *
-   * @return the on delete
-   */
-  public CsdlOnDelete getOnDelete() {
-    return onDelete;
-  }
-
-  /**
-   * Sets on delete.
-   *
-   * @param onDelete the on delete
-   * @return the on delete
-   */
-  public CsdlNavigationProperty setOnDelete(final CsdlOnDelete onDelete) {
-    this.onDelete = onDelete;
-    return this;
-  }
-
-  @Override
-  public List<CsdlAnnotation> getAnnotations() {
-    return annotations;
-  }
-  
-  /**
-   * Sets a list of annotations
-   * @param annotations list of annotations
-   * @return this instance
-   */
-  public CsdlNavigationProperty setAnnotations(final List<CsdlAnnotation> annotations) {
-    this.annotations = annotations;
     return this;
   }
 }

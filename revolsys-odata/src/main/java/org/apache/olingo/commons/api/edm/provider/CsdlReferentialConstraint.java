@@ -24,13 +24,18 @@ import java.util.List;
 /**
  * The type Csdl referential constraint.
  */
-public class CsdlReferentialConstraint extends CsdlAbstractEdmItem implements CsdlAnnotatable {
+public class CsdlReferentialConstraint implements CsdlAbstractEdmItem, CsdlAnnotatable {
 
   private String property;
 
   private String referencedProperty;
 
-  private List<CsdlAnnotation> annotations = new ArrayList<CsdlAnnotation>();
+  private List<CsdlAnnotation> annotations = new ArrayList<>();
+
+  @Override
+  public List<CsdlAnnotation> getAnnotations() {
+    return this.annotations;
+  }
 
   /**
    * Gets property.
@@ -38,7 +43,26 @@ public class CsdlReferentialConstraint extends CsdlAbstractEdmItem implements Cs
    * @return the property
    */
   public String getProperty() {
-    return property;
+    return this.property;
+  }
+
+  /**
+   * Gets referenced property.
+   *
+   * @return the referenced property
+   */
+  public String getReferencedProperty() {
+    return this.referencedProperty;
+  }
+
+  /**
+   * Sets a list of annotations
+   * @param annotations list of annotations
+   * @return this instance
+   */
+  public CsdlReferentialConstraint setAnnotations(final List<CsdlAnnotation> annotations) {
+    this.annotations = annotations;
+    return this;
   }
 
   /**
@@ -53,15 +77,6 @@ public class CsdlReferentialConstraint extends CsdlAbstractEdmItem implements Cs
   }
 
   /**
-   * Gets referenced property.
-   *
-   * @return the referenced property
-   */
-  public String getReferencedProperty() {
-    return referencedProperty;
-  }
-
-  /**
    * Sets referenced property.
    *
    * @param referencedProperty the referenced property
@@ -69,21 +84,6 @@ public class CsdlReferentialConstraint extends CsdlAbstractEdmItem implements Cs
    */
   public CsdlReferentialConstraint setReferencedProperty(final String referencedProperty) {
     this.referencedProperty = referencedProperty;
-    return this;
-  }
-
-  @Override
-  public List<CsdlAnnotation> getAnnotations() {
-    return annotations;
-  }
-  
-  /**
-   * Sets a list of annotations
-   * @param annotations list of annotations
-   * @return this instance
-   */
-  public CsdlReferentialConstraint setAnnotations(final List<CsdlAnnotation> annotations) {
-    this.annotations = annotations;
     return this;
   }
 }

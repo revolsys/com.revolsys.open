@@ -30,6 +30,7 @@ import org.apache.olingo.server.api.ODataResponse;
  */
 public class ODataResponsePart {
   private final List<ODataResponse> responses;
+
   private final boolean isChangeSet;
 
   /**
@@ -58,7 +59,7 @@ public class ODataResponsePart {
    * @param isChangeSet whether this ODataResponsePart represents a change set
    */
   public ODataResponsePart(final ODataResponse response, final boolean isChangeSet) {
-    responses = Arrays.asList(response);
+    this.responses = Arrays.asList(response);
     this.isChangeSet = isChangeSet;
   }
 
@@ -69,7 +70,7 @@ public class ODataResponsePart {
    * @return a list of {@link ODataResponse}
    */
   public List<ODataResponse> getResponses() {
-    return responses;
+    return this.responses;
   }
 
   /**
@@ -77,6 +78,6 @@ public class ODataResponsePart {
    * @return true or false
    */
   public boolean isChangeSet() {
-    return isChangeSet;
+    return this.isChangeSet;
   }
 }

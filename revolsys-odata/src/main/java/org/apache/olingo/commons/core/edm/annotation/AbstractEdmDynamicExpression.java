@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -45,21 +45,132 @@ import org.apache.olingo.commons.api.edm.annotation.EdmPropertyValue;
 import org.apache.olingo.commons.api.edm.annotation.EdmRecord;
 import org.apache.olingo.commons.api.edm.annotation.EdmUrlRef;
 
-public abstract class AbstractEdmDynamicExpression extends AbstractEdmExpression implements EdmDynamicExpression {
+public abstract class AbstractEdmDynamicExpression extends AbstractEdmExpression
+  implements EdmDynamicExpression {
 
-  public AbstractEdmDynamicExpression(Edm edm, String name) {
+  public AbstractEdmDynamicExpression(final Edm edm, final String name) {
     super(edm, name);
   }
 
   @Override
-  public boolean isNot() {
-    return this instanceof EdmNot;
+  public EdmAnd asAnd() {
+    return isAnd() ? (EdmAnd)this : null;
+  }
+
+  @Override
+  public EdmAnnotationPath asAnnotationPath() {
+    return isAnnotationPath() ? (EdmAnnotationPath)this : null;
+  }
+
+  @Override
+  public EdmApply asApply() {
+    return isApply() ? (EdmApply)this : null;
+  }
+
+  @Override
+  public EdmCast asCast() {
+    return isCast() ? (EdmCast)this : null;
+  }
+
+  @Override
+  public EdmCollection asCollection() {
+    return isCollection() ? (EdmCollection)this : null;
+  }
+
+  @Override
+  public EdmEq asEq() {
+    return isEq() ? (EdmEq)this : null;
+  }
+
+  @Override
+  public EdmGe asGe() {
+    return isGe() ? (EdmGe)this : null;
+  }
+
+  @Override
+  public EdmGt asGt() {
+    return isGt() ? (EdmGt)this : null;
+  }
+
+  @Override
+  public EdmIf asIf() {
+    return isIf() ? (EdmIf)this : null;
+  }
+
+  @Override
+  public EdmIsOf asIsOf() {
+    return isIsOf() ? (EdmIsOf)this : null;
+  }
+
+  @Override
+  public EdmLabeledElement asLabeledElement() {
+    return isLabeledElement() ? (EdmLabeledElement)this : null;
+  }
+
+  @Override
+  public EdmLabeledElementReference asLabeledElementReference() {
+    return isLabeledElementReference() ? (EdmLabeledElementReference)this : null;
+  }
+
+  @Override
+  public EdmLe asLe() {
+    return isLe() ? (EdmLe)this : null;
+  }
+
+  @Override
+  public EdmLt asLt() {
+    return isLt() ? (EdmLt)this : null;
+  }
+
+  @Override
+  public EdmNavigationPropertyPath asNavigationPropertyPath() {
+    return isNavigationPropertyPath() ? (EdmNavigationPropertyPath)this : null;
+  }
+
+  @Override
+  public EdmNe asNe() {
+    return isNe() ? (EdmNe)this : null;
   }
 
   @Override
   public EdmNot asNot() {
-    return isNot() ? (EdmNot) this : null;
+    return isNot() ? (EdmNot)this : null;
 
+  }
+
+  @Override
+  public EdmNull asNull() {
+    return isNull() ? (EdmNull)this : null;
+  }
+
+  @Override
+  public EdmOr asOr() {
+    return isOr() ? (EdmOr)this : null;
+  }
+
+  @Override
+  public EdmPath asPath() {
+    return isPath() ? (EdmPath)this : null;
+  }
+
+  @Override
+  public EdmPropertyPath asPropertyPath() {
+    return isPropertyPath() ? (EdmPropertyPath)this : null;
+  }
+
+  @Override
+  public EdmPropertyValue asPropertyValue() {
+    return isPropertyValue() ? (EdmPropertyValue)this : null;
+  }
+
+  @Override
+  public EdmRecord asRecord() {
+    return isRecord() ? (EdmRecord)this : null;
+  }
+
+  @Override
+  public EdmUrlRef asUrlRef() {
+    return isUrlRef() ? (EdmUrlRef)this : null;
   }
 
   @Override
@@ -68,88 +179,8 @@ public abstract class AbstractEdmDynamicExpression extends AbstractEdmExpression
   }
 
   @Override
-  public EdmAnd asAnd() {
-    return isAnd() ? (EdmAnd) this : null;
-  }
-
-  @Override
-  public boolean isOr() {
-    return this instanceof EdmOr;
-  }
-
-  @Override
-  public EdmOr asOr() {
-    return isOr() ? (EdmOr) this : null;
-  }
-
-  @Override
-  public boolean isEq() {
-    return this instanceof EdmEq;
-  }
-
-  @Override
-  public EdmEq asEq() {
-    return isEq() ? (EdmEq) this : null;
-  }
-
-  @Override
-  public boolean isNe() {
-    return this instanceof EdmNe;
-  }
-
-  @Override
-  public EdmNe asNe() {
-    return isNe() ? (EdmNe) this : null;
-  }
-
-  @Override
-  public boolean isGt() {
-    return this instanceof EdmGt;
-  }
-
-  @Override
-  public EdmGt asGt() {
-    return isGt() ? (EdmGt) this : null;
-  }
-
-  @Override
-  public boolean isGe() {
-    return this instanceof EdmGe;
-  }
-
-  @Override
-  public EdmGe asGe() {
-    return isGe() ? (EdmGe) this : null;
-  }
-
-  @Override
-  public boolean isLt() {
-    return this instanceof EdmLt;
-  }
-
-  @Override
-  public EdmLt asLt() {
-    return isLt() ? (EdmLt) this : null;
-  }
-
-  @Override
-  public boolean isLe() {
-    return this instanceof EdmLe;
-  }
-
-  @Override
-  public EdmLe asLe() {
-    return isLe() ? (EdmLe) this : null;
-  }
-
-  @Override
   public boolean isAnnotationPath() {
     return this instanceof EdmAnnotationPath;
-  }
-
-  @Override
-  public EdmAnnotationPath asAnnotationPath() {
-    return isAnnotationPath() ? (EdmAnnotationPath) this : null;
   }
 
   @Override
@@ -158,18 +189,8 @@ public abstract class AbstractEdmDynamicExpression extends AbstractEdmExpression
   }
 
   @Override
-  public EdmApply asApply() {
-    return isApply() ? (EdmApply) this : null;
-  }
-
-  @Override
   public boolean isCast() {
     return this instanceof EdmCast;
-  }
-
-  @Override
-  public EdmCast asCast() {
-    return isCast() ? (EdmCast) this : null;
   }
 
   @Override
@@ -178,8 +199,18 @@ public abstract class AbstractEdmDynamicExpression extends AbstractEdmExpression
   }
 
   @Override
-  public EdmCollection asCollection() {
-    return isCollection() ? (EdmCollection) this : null;
+  public boolean isEq() {
+    return this instanceof EdmEq;
+  }
+
+  @Override
+  public boolean isGe() {
+    return this instanceof EdmGe;
+  }
+
+  @Override
+  public boolean isGt() {
+    return this instanceof EdmGt;
   }
 
   @Override
@@ -188,18 +219,8 @@ public abstract class AbstractEdmDynamicExpression extends AbstractEdmExpression
   }
 
   @Override
-  public EdmIf asIf() {
-    return isIf() ? (EdmIf) this : null;
-  }
-
-  @Override
   public boolean isIsOf() {
     return this instanceof EdmIsOf;
-  }
-
-  @Override
-  public EdmIsOf asIsOf() {
-    return isIsOf() ? (EdmIsOf) this : null;
   }
 
   @Override
@@ -208,28 +229,18 @@ public abstract class AbstractEdmDynamicExpression extends AbstractEdmExpression
   }
 
   @Override
-  public EdmLabeledElement asLabeledElement() {
-    return isLabeledElement() ? (EdmLabeledElement) this : null;
-  }
-
-  @Override
   public boolean isLabeledElementReference() {
     return this instanceof EdmLabeledElementReference;
   }
 
   @Override
-  public EdmLabeledElementReference asLabeledElementReference() {
-    return isLabeledElementReference() ? (EdmLabeledElementReference) this : null;
+  public boolean isLe() {
+    return this instanceof EdmLe;
   }
 
   @Override
-  public boolean isNull() {
-    return this instanceof EdmNull;
-  }
-
-  @Override
-  public EdmNull asNull() {
-    return isNull() ? (EdmNull) this : null;
+  public boolean isLt() {
+    return this instanceof EdmLt;
   }
 
   @Override
@@ -238,8 +249,23 @@ public abstract class AbstractEdmDynamicExpression extends AbstractEdmExpression
   }
 
   @Override
-  public EdmNavigationPropertyPath asNavigationPropertyPath() {
-    return isNavigationPropertyPath() ? (EdmNavigationPropertyPath) this : null;
+  public boolean isNe() {
+    return this instanceof EdmNe;
+  }
+
+  @Override
+  public boolean isNot() {
+    return this instanceof EdmNot;
+  }
+
+  @Override
+  public boolean isNull() {
+    return this instanceof EdmNull;
+  }
+
+  @Override
+  public boolean isOr() {
+    return this instanceof EdmOr;
   }
 
   @Override
@@ -248,18 +274,8 @@ public abstract class AbstractEdmDynamicExpression extends AbstractEdmExpression
   }
 
   @Override
-  public EdmPath asPath() {
-    return isPath() ? (EdmPath) this : null;
-  }
-
-  @Override
   public boolean isPropertyPath() {
     return this instanceof EdmPropertyPath;
-  }
-
-  @Override
-  public EdmPropertyPath asPropertyPath() {
-    return isPropertyPath() ? (EdmPropertyPath) this : null;
   }
 
   @Override
@@ -268,28 +284,13 @@ public abstract class AbstractEdmDynamicExpression extends AbstractEdmExpression
   }
 
   @Override
-  public EdmPropertyValue asPropertyValue() {
-    return isPropertyValue() ? (EdmPropertyValue) this : null;
-  }
-
-  @Override
   public boolean isRecord() {
     return this instanceof EdmRecord;
   }
 
   @Override
-  public EdmRecord asRecord() {
-    return isRecord() ? (EdmRecord) this : null;
-  }
-
-  @Override
   public boolean isUrlRef() {
     return this instanceof EdmUrlRef;
-  }
-
-  @Override
-  public EdmUrlRef asUrlRef() {
-    return isUrlRef() ? (EdmUrlRef) this : null;
   }
 
 }

@@ -28,28 +28,21 @@ import org.apache.olingo.commons.api.edm.geo.SRID;
 public interface EdmProperty extends EdmElement, EdmMappable, EdmAnnotatable {
 
   /**
-   * Gets the related MIME type for the property.
-   *
-   * @return MIME type as String
+   * @return the default value as a String or null if not specified
    */
-  String getMimeType();
-
-  /**
-   * Gets the info if the property is a primitive property.
-   *
-   * @return true, if it is a primitive property
-   */
-  boolean isPrimitive();
-
-  /**
-   * @return true if nullable or not specified
-   */
-  boolean isNullable();
+  String getDefaultValue();
 
   /**
    * @return the maximum length as an Integer or null if not specified
    */
   Integer getMaxLength();
+
+  /**
+   * Gets the related MIME type for the property.
+   *
+   * @return MIME type as String
+   */
+  String getMimeType();
 
   /**
    * @return the precision as an Integer or null if not specified
@@ -72,19 +65,26 @@ public interface EdmProperty extends EdmElement, EdmMappable, EdmAnnotatable {
   SRID getSrid();
 
   /**
-   * @return true if unicode or not specified
-   */
-  boolean isUnicode();
-
-  /**
-   * @return the default value as a String or null if not specified
-   */
-  String getDefaultValue();
-  
-  /**
    * See {@link EdmType} for more information about possible types.
    *
    * @return {@link EdmType}
    */
   EdmType getTypeWithAnnotations();
+
+  /**
+   * @return true if nullable or not specified
+   */
+  boolean isNullable();
+
+  /**
+   * Gets the info if the property is a primitive property.
+   *
+   * @return true, if it is a primitive property
+   */
+  boolean isPrimitive();
+
+  /**
+   * @return true if unicode or not specified
+   */
+  boolean isUnicode();
 }

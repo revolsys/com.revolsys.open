@@ -24,6 +24,11 @@ package org.apache.olingo.commons.api.edm;
 public interface EdmOperationImport extends EdmNamed, EdmAnnotatable {
 
   /**
+   * @return {@link EdmEntityContainer} of this EdmOperationImport
+   */
+  EdmEntityContainer getEntityContainer();
+
+  /**
    * @return {@link FullQualifiedName} of this OperationImport
    */
   FullQualifiedName getFullQualifiedName();
@@ -32,10 +37,5 @@ public interface EdmOperationImport extends EdmNamed, EdmAnnotatable {
    * @return {@link EdmEntitySet} of this OperationImport
    */
   EdmEntitySet getReturnedEntitySet();
-
-  /**
-   * @return {@link EdmEntityContainer} of this EdmOperationImport
-   */
-  EdmEntityContainer getEntityContainer();
 
 }

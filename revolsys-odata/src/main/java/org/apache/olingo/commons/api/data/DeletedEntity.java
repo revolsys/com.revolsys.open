@@ -23,8 +23,8 @@ import java.net.URI;
 /**
  * A deleted entity contains the reason for deletion and the id.
  */
-public class DeletedEntity extends Entity{
-  
+public class DeletedEntity extends Entity {
+
   /**
    * Reason of the removal from the list
    */
@@ -36,22 +36,16 @@ public class DeletedEntity extends Entity{
   }
 
   private URI id;
+
   private Reason reason;
 
   /**
    * Get id.
    * @return id
    */
+  @Override
   public URI getId() {
-    return id;
-  }
-
-  /**
-   * Set id.
-   * @param id id
-   */
-  public void setId(final URI id) {
-    this.id = id;
+    return this.id;
   }
 
   /**
@@ -59,7 +53,16 @@ public class DeletedEntity extends Entity{
    * @return reason for deletion
    */
   public Reason getReason() {
-    return reason;
+    return this.reason;
+  }
+
+  /**
+   * Set id.
+   * @param id id
+   */
+  @Override
+  public void setId(final URI id) {
+    this.id = id;
   }
 
   /**

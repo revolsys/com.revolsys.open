@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -24,32 +24,33 @@ import java.util.List;
 /**
  * The type Csdl annotations.
  */
-public class CsdlAnnotations extends CsdlAbstractEdmItem implements CsdlAnnotatable {
+public class CsdlAnnotations implements CsdlAbstractEdmItem, CsdlAnnotatable {
 
-  private List<CsdlAnnotation> annotations = new ArrayList<CsdlAnnotation>();
+  private List<CsdlAnnotation> annotations = new ArrayList<>();
 
   private String target;
 
   private String qualifier;
 
   /**
-   * Gets target.
+   * Gets annotation.
    *
-   * @return the target
+   * @param term the term
+   * @return the annotation
    */
-  public String getTarget() {
-    return target;
+  public CsdlAnnotation getAnnotation(final String term) {
+    CsdlAnnotation result = null;
+    for (final CsdlAnnotation annotation : getAnnotations()) {
+      if (term.equals(annotation.getTerm())) {
+        result = annotation;
+      }
+    }
+    return result;
   }
 
-  /**
-   * Sets target.
-   *
-   * @param target the target
-   * @return the target
-   */
-  public CsdlAnnotations setTarget(final String target) {
-    this.target = target;
-    return this;
+  @Override
+  public List<CsdlAnnotation> getAnnotations() {
+    return this.annotations;
   }
 
   /**
@@ -58,7 +59,26 @@ public class CsdlAnnotations extends CsdlAbstractEdmItem implements CsdlAnnotata
    * @return the qualifier
    */
   public String getQualifier() {
-    return qualifier;
+    return this.qualifier;
+  }
+
+  /**
+   * Gets target.
+   *
+   * @return the target
+   */
+  public String getTarget() {
+    return this.target;
+  }
+
+  /**
+   * Sets a list of annotations
+   * @param annotations list of annotations
+   * @return this instance
+   */
+  public CsdlAnnotations setAnnotations(final List<CsdlAnnotation> annotations) {
+    this.annotations = annotations;
+    return this;
   }
 
   /**
@@ -72,34 +92,14 @@ public class CsdlAnnotations extends CsdlAbstractEdmItem implements CsdlAnnotata
     return this;
   }
 
-  @Override
-  public List<CsdlAnnotation> getAnnotations() {
-    return annotations;
-  }
-
   /**
-   * Sets a list of annotations
-   * @param annotations list of annotations
-   * @return this instance
-   */
-  public CsdlAnnotations setAnnotations(final List<CsdlAnnotation> annotations) {
-    this.annotations = annotations;
-    return this;
-  }
-  
-  /**
-   * Gets annotation.
+   * Sets target.
    *
-   * @param term the term
-   * @return the annotation
+   * @param target the target
+   * @return the target
    */
-  public CsdlAnnotation getAnnotation(final String term) {
-    CsdlAnnotation result = null;
-    for (CsdlAnnotation annotation : getAnnotations()) {
-      if (term.equals(annotation.getTerm())) {
-        result = annotation;
-      }
-    }
-    return result;
+  public CsdlAnnotations setTarget(final String target) {
+    this.target = target;
+    return this;
   }
 }

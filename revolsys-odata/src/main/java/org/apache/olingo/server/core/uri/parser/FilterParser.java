@@ -34,6 +34,7 @@ import org.apache.olingo.server.core.uri.validator.UriValidationException;
 public class FilterParser {
 
   private final Edm edm;
+
   private final OData odata;
 
   public FilterParser(final Edm edm, final OData odata) {
@@ -41,18 +42,19 @@ public class FilterParser {
     this.odata = odata;
   }
 
-  public FilterOption parse(UriTokenizer tokenizer, final EdmType referencedType,
-      final Collection<String> crossjoinEntitySetNames, final Map<String, AliasQueryOption> aliases)
-      throws UriParserException, UriValidationException {
-    final Expression filterExpression = new ExpressionParser(edm, odata)
-        .parse(tokenizer, referencedType, crossjoinEntitySetNames, aliases);
+  public FilterOption parse(final UriTokenizer tokenizer, final EdmType referencedType,
+    final Collection<String> crossjoinEntitySetNames, final Map<String, AliasQueryOption> aliases)
+    throws UriParserException, UriValidationException {
+    final Expression filterExpression = new ExpressionParser(this.edm, this.odata).parse(tokenizer,
+      referencedType, crossjoinEntitySetNames, aliases);
     final EdmType type = ExpressionParser.getType(filterExpression);
-    if (type == null || type.equals(odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Boolean))) {
+    if (type == null
+      || type.equals(this.odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Boolean))) {
       return new FilterOptionImpl().setExpression(filterExpression);
     } else {
       throw new UriParserSemanticException("Filter expressions must be boolean.",
-          UriParserSemanticException.MessageKeys.TYPES_NOT_COMPATIBLE,
-          "Edm.Boolean", type.getFullQualifiedName().getFullQualifiedNameAsString());
+        UriParserSemanticException.MessageKeys.TYPES_NOT_COMPATIBLE, "Edm.Boolean",
+        type.getFullQualifiedName().getFullQualifiedNameAsString());
     }
   }
 }

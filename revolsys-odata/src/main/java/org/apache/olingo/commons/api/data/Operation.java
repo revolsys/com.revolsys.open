@@ -24,8 +24,10 @@ import java.net.URI;
  * Data representation for an operation.
  */
 public class Operation {
-  public enum Type {ACTION, FUNCTION};
-  
+  public enum Type {
+    ACTION, FUNCTION
+  }
+
   private String metadataAnchor;
 
   private String title;
@@ -33,14 +35,40 @@ public class Operation {
   private URI target;
 
   private Type type;
-  
+
   /**
    * Gets metadata anchor.
    *
    * @return metadata anchor.
    */
   public String getMetadataAnchor() {
-    return metadataAnchor;
+    return this.metadataAnchor;
+  }
+
+  /**
+   * Gets target.
+   *
+   * @return target.
+   */
+  public URI getTarget() {
+    return this.target;
+  }
+
+  /**
+   * Gets title.
+   *
+   * @return title.
+   */
+  public String getTitle() {
+    return this.title;
+  }
+
+  /**
+   * Gets the Operation Type
+   * @return
+   */
+  public Type getType() {
+    return this.type;
   }
 
   /**
@@ -53,12 +81,12 @@ public class Operation {
   }
 
   /**
-   * Gets title.
+   * Sets target.
    *
-   * @return title.
+   * @param target target.
    */
-  public String getTitle() {
-    return title;
+  public void setTarget(final URI target) {
+    this.target = target;
   }
 
   /**
@@ -71,36 +99,10 @@ public class Operation {
   }
 
   /**
-   * Gets target.
-   *
-   * @return target.
-   */
-  public URI getTarget() {
-    return target;
-  }
-
-  /**
-   * Sets target.
-   *
-   * @param target target.
-   */
-  public void setTarget(final URI target) {
-    this.target = target;
-  }
-  
-  /**
-   * Gets the Operation Type 
-   * @return
-   */
-  public Type getType() {
-    return type;
-  }
-
-  /**
    * Set the Operation type
    * @param type
    */
-  public void setType(Type type) {
+  public void setType(final Type type) {
     this.type = type;
   }
 }

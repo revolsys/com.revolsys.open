@@ -23,27 +23,27 @@ import java.io.InputStream;
 import org.apache.olingo.server.api.serializer.SerializerResult;
 
 public class SerializerResultImpl implements SerializerResult {
-  private InputStream content;
+  public static class SerializerResultBuilder {
+    private final SerializerResultImpl result = new SerializerResultImpl();
 
-  @Override
-  public InputStream getContent() {
-    return content;
+    public SerializerResult build() {
+      return this.result;
+    }
+
+    public SerializerResultBuilder content(final InputStream input) {
+      this.result.content = input;
+      return this;
+    }
   }
 
   public static SerializerResultBuilder with() {
     return new SerializerResultBuilder();
   }
 
-  public static class SerializerResultBuilder {
-    private SerializerResultImpl result = new SerializerResultImpl();
+  private InputStream content;
 
-    public SerializerResultBuilder content(final InputStream input) {
-      result.content = input;
-      return this;
-    }
-
-    public SerializerResult build() {
-      return result;
-    }
+  @Override
+  public InputStream getContent() {
+    return this.content;
   }
 }

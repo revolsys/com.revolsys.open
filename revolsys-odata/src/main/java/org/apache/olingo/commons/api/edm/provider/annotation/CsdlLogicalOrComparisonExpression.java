@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -24,16 +24,8 @@ import java.util.List;
 import org.apache.olingo.commons.api.edm.provider.CsdlAnnotatable;
 import org.apache.olingo.commons.api.edm.provider.CsdlAnnotation;
 
-public class CsdlLogicalOrComparisonExpression extends CsdlDynamicExpression implements CsdlAnnotatable {
-
-  private final LogicalOrComparisonExpressionType type;
-  private CsdlExpression left;
-  private CsdlExpression right;
-  private List<CsdlAnnotation> annotations = new ArrayList<CsdlAnnotation>();
-
-  public CsdlLogicalOrComparisonExpression(LogicalOrComparisonExpressionType type) {
-    this.type = type;
-  }
+public class CsdlLogicalOrComparisonExpression extends CsdlDynamicExpression
+  implements CsdlAnnotatable {
 
   /**
    * Type of the constant expression
@@ -89,88 +81,31 @@ public class CsdlLogicalOrComparisonExpression extends CsdlDynamicExpression imp
       LogicalOrComparisonExpressionType result = null;
       try {
         result = valueOf(value);
-      } catch (IllegalArgumentException e) {
+      } catch (final IllegalArgumentException e) {
         // ignore
       }
       return result;
     }
   }
 
-  @Override
-  public List<CsdlAnnotation> getAnnotations() {
-    return annotations;
+  private final LogicalOrComparisonExpressionType type;
+
+  private CsdlExpression left;
+
+  private CsdlExpression right;
+
+  private List<CsdlAnnotation> annotations = new ArrayList<>();
+
+  public CsdlLogicalOrComparisonExpression(final LogicalOrComparisonExpressionType type) {
+    this.type = type;
   }
 
-  public CsdlLogicalOrComparisonExpression setAnnotations(List<CsdlAnnotation> annotations) {
-    this.annotations = annotations;
-    return this;
-  }
-
-  /**
-   * Returns the type of the logical expression
-   * @return type of the logical expression
-   */
-  public LogicalOrComparisonExpressionType getType() {
-    return type;
-  }
-
-  /**
-   * The left expression. In case this is of type Edm.Not the left expression will be the same as the right expression.
-   * @return The left expression.
-   */
-  public CsdlExpression getLeft() {
-    return left;
-  }
-
-  public CsdlLogicalOrComparisonExpression setLeft(CsdlExpression left) {
-    this.left = left;
-    if (getType() == LogicalOrComparisonExpressionType.Not) {
-      this.right = left;
-    }
-    return this;
-  }
-
-  /**
-   * The right expression. In case this is of type Edm.Not the left expression will be the same as the right expression.
-   * @return The right expression.
-   */
-  public CsdlExpression getRight() {
-    return right;
-  }
-
-  public CsdlLogicalOrComparisonExpression setRight(CsdlExpression right) {
-    this.right = right;
-    if (getType() == LogicalOrComparisonExpressionType.Not) {
-      this.left = right;
-    }
-    return this;
-  }
-  
-  @Override
-  public boolean equals (Object obj) {
-    if (obj == null) {
-      return false;
-    }
-    if (!(obj instanceof CsdlLogicalOrComparisonExpression)) {
-      return false;
-    }
-    CsdlLogicalOrComparisonExpression csdlLogComp = (CsdlLogicalOrComparisonExpression) obj;
-    return (this.getLeft() == null ? csdlLogComp.getLeft() == null :
-      this.getLeft().equals(csdlLogComp.getLeft()))
-        && (this.getRight() == null ? csdlLogComp.getRight() == null : 
-          this.getRight().equals(csdlLogComp.getRight()))
-        && (this.getType() == null ? csdlLogComp.getType() == null : 
-          this.getType().equals(csdlLogComp.getType()))
-        && (this.getAnnotations() == null ? csdlLogComp.getAnnotations() == null : 
-            checkAnnotations(csdlLogComp.getAnnotations()));
-  }
-  
-  private boolean checkAnnotations(List<CsdlAnnotation> csdlLogCompAnnot) {
+  private boolean checkAnnotations(final List<CsdlAnnotation> csdlLogCompAnnot) {
     if (csdlLogCompAnnot == null) {
       return false;
     }
     if (this.getAnnotations().size() == csdlLogCompAnnot.size()) {
-      for (int i = 0; i < this.getAnnotations().size() ; i++) {
+      for (int i = 0; i < this.getAnnotations().size(); i++) {
         if (!this.getAnnotations().get(i).equals(csdlLogCompAnnot.get(i))) {
           return false;
         }
@@ -182,14 +117,79 @@ public class CsdlLogicalOrComparisonExpression extends CsdlDynamicExpression imp
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    if ((obj == null) || !(obj instanceof CsdlLogicalOrComparisonExpression)) {
+      return false;
+    }
+    final CsdlLogicalOrComparisonExpression csdlLogComp = (CsdlLogicalOrComparisonExpression)obj;
+    return (this.getLeft() == null ? csdlLogComp.getLeft() == null
+      : this.getLeft().equals(csdlLogComp.getLeft()))
+      && (this.getRight() == null ? csdlLogComp.getRight() == null
+        : this.getRight().equals(csdlLogComp.getRight()))
+      && (this.getType() == null ? csdlLogComp.getType() == null
+        : this.getType().equals(csdlLogComp.getType()))
+      && (this.getAnnotations() == null ? csdlLogComp.getAnnotations() == null
+        : checkAnnotations(csdlLogComp.getAnnotations()));
+  }
+
+  @Override
+  public List<CsdlAnnotation> getAnnotations() {
+    return this.annotations;
+  }
+
+  /**
+   * The left expression. In case this is of type Edm.Not the left expression will be the same as the right expression.
+   * @return The left expression.
+   */
+  public CsdlExpression getLeft() {
+    return this.left;
+  }
+
+  /**
+   * The right expression. In case this is of type Edm.Not the left expression will be the same as the right expression.
+   * @return The right expression.
+   */
+  public CsdlExpression getRight() {
+    return this.right;
+  }
+
+  /**
+   * Returns the type of the logical expression
+   * @return type of the logical expression
+   */
+  public LogicalOrComparisonExpressionType getType() {
+    return this.type;
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((type == null) ? 0 : type.hashCode());
-    result = prime * result + ((left == null) ? 0 : left.hashCode());
-    result = prime * result + ((right == null) ? 0 : right.hashCode());
-    result = prime * result + ((annotations == null) ? 0 : 
-      annotations.hashCode());
+    result = prime * result + (this.type == null ? 0 : this.type.hashCode());
+    result = prime * result + (this.left == null ? 0 : this.left.hashCode());
+    result = prime * result + (this.right == null ? 0 : this.right.hashCode());
+    result = prime * result + (this.annotations == null ? 0 : this.annotations.hashCode());
     return result;
+  }
+
+  public CsdlLogicalOrComparisonExpression setAnnotations(final List<CsdlAnnotation> annotations) {
+    this.annotations = annotations;
+    return this;
+  }
+
+  public CsdlLogicalOrComparisonExpression setLeft(final CsdlExpression left) {
+    this.left = left;
+    if (getType() == LogicalOrComparisonExpressionType.Not) {
+      this.right = left;
+    }
+    return this;
+  }
+
+  public CsdlLogicalOrComparisonExpression setRight(final CsdlExpression right) {
+    this.right = right;
+    if (getType() == LogicalOrComparisonExpressionType.Not) {
+      this.left = right;
+    }
+    return this;
   }
 }

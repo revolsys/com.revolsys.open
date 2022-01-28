@@ -35,6 +35,7 @@ import org.apache.olingo.server.core.uri.UriResourceWithKeysImpl;
 public class MemberImpl implements Member {
 
   private final UriInfoResource path;
+
   private final EdmType startTypeFilter;
 
   public MemberImpl(final UriInfoResource path, final EdmType startTypeFilter) {
@@ -43,27 +44,28 @@ public class MemberImpl implements Member {
   }
 
   @Override
-  public UriInfoResource getResourcePath() {
-    return path;
-  }
-
-  @Override
-  public EdmType getStartTypeFilter() {
-    return startTypeFilter;
-  }
-
-  @Override
-  public <T> T accept(final ExpressionVisitor<T> visitor) throws ExpressionVisitException, ODataApplicationException {
+  public <T> T accept(final ExpressionVisitor<T> visitor)
+    throws ExpressionVisitException, ODataApplicationException {
     return visitor.visitMember(this);
   }
 
   @Override
+  public UriInfoResource getResourcePath() {
+    return this.path;
+  }
+
+  @Override
+  public EdmType getStartTypeFilter() {
+    return this.startTypeFilter;
+  }
+
+  @Override
   public EdmType getType() {
-    UriInfoImpl uriInfo = (UriInfoImpl) path;
-    UriResourceImpl lastResourcePart = (UriResourceImpl) uriInfo.getLastResourcePart();
+    final UriInfoImpl uriInfo = (UriInfoImpl)this.path;
+    final UriResourceImpl lastResourcePart = (UriResourceImpl)uriInfo.getLastResourcePart();
 
     if (lastResourcePart instanceof UriResourceWithKeysImpl) {
-      UriResourceWithKeysImpl lastKeyPred = (UriResourceWithKeysImpl) lastResourcePart;
+      final UriResourceWithKeysImpl lastKeyPred = (UriResourceWithKeysImpl)lastResourcePart;
       if (lastKeyPred.getTypeFilterOnEntry() != null) {
         return lastKeyPred.getTypeFilterOnEntry();
       } else if (lastKeyPred.getTypeFilterOnCollection() != null) {
@@ -71,14 +73,14 @@ public class MemberImpl implements Member {
       }
       return lastKeyPred.getType();
     } else if (lastResourcePart instanceof UriResourceTypedImpl) {
-      UriResourceTypedImpl lastTyped = (UriResourceTypedImpl) lastResourcePart;
-      EdmType type = lastTyped.getTypeFilter();
+      final UriResourceTypedImpl lastTyped = (UriResourceTypedImpl)lastResourcePart;
+      final EdmType type = lastTyped.getTypeFilter();
       if (type != null) {
         return type;
       }
       return lastTyped.getType();
     } else if (lastResourcePart instanceof UriResourceActionImpl) {
-      return ((UriResourceActionImpl) lastResourcePart).getType();
+      return ((UriResourceActionImpl)lastResourcePart).getType();
     } else {
       return null;
     }
@@ -86,15 +88,16 @@ public class MemberImpl implements Member {
 
   @Override
   public boolean isCollection() {
-    UriInfoImpl uriInfo = (UriInfoImpl) path;
-    UriResource lastResourcePart = uriInfo.getLastResourcePart();
-    return lastResourcePart instanceof UriResourcePartTyped ?
-        ((UriResourcePartTyped) lastResourcePart).isCollection() :
-        false;
+    final UriInfoImpl uriInfo = (UriInfoImpl)this.path;
+    final UriResource lastResourcePart = uriInfo.getLastResourcePart();
+    return lastResourcePart instanceof UriResourcePartTyped
+      ? ((UriResourcePartTyped)lastResourcePart).isCollection()
+      : false;
   }
 
   @Override
   public String toString() {
-    return path.getUriResourceParts().toString() + (startTypeFilter == null ? "" : startTypeFilter);
+    return this.path.getUriResourceParts().toString()
+      + (this.startTypeFilter == null ? "" : this.startTypeFilter);
   }
 }

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -35,14 +35,14 @@ public interface GroupByItem {
   List<UriResource> getPath();
 
   /**
-   * Whether a nested rollup clause contains the special value '$all'.
-   * @return <code>true</code> if '$all' has been given in rollup, <code>false</code> otherwise
-   */
-  boolean isRollupAll();
-
-  /**
    * Gets the rollup.
    * @return a (potentially empty) list of grouping items (and never <code>null</code>)
    */
   List<GroupByItem> getRollup();
+
+  /**
+   * Whether a nested rollup clause contains the special value '$all'.
+   * @return <code>true</code> if '$all' has been given in rollup, <code>false</code> otherwise
+   */
+  boolean isRollupAll();
 }

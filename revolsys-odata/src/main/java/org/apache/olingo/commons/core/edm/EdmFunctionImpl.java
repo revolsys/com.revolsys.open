@@ -36,17 +36,17 @@ public class EdmFunctionImpl extends AbstractEdmOperation implements EdmFunction
   }
 
   @Override
-  public boolean isComposable() {
-    return function.isComposable();
-  }
-
-  @Override
   public EdmReturnType getReturnType() {
     final EdmReturnType returnType = super.getReturnType();
     if (returnType == null) {
       throw new EdmException("ReturnType for a function must not be null");
     }
     return returnType;
+  }
+
+  @Override
+  public boolean isComposable() {
+    return this.function.isComposable();
   }
 
 }

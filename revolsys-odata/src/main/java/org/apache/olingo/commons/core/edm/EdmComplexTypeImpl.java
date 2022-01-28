@@ -28,7 +28,8 @@ import org.apache.olingo.commons.api.edm.provider.CsdlComplexType;
 
 public class EdmComplexTypeImpl extends AbstractEdmStructuredType implements EdmComplexType {
 
-  public EdmComplexTypeImpl(final Edm edm, final FullQualifiedName name, final CsdlComplexType complexType) {
+  public EdmComplexTypeImpl(final Edm edm, final FullQualifiedName name,
+    final CsdlComplexType complexType) {
     super(edm, name, EdmTypeKind.COMPLEX, complexType);
   }
 
@@ -36,25 +37,25 @@ public class EdmComplexTypeImpl extends AbstractEdmStructuredType implements Edm
   protected EdmStructuredType buildBaseType(final FullQualifiedName baseTypeName) {
     EdmComplexType baseType = null;
     if (baseTypeName != null) {
-      baseType = edm.getComplexType(baseTypeName);
+      baseType = this.edm.getComplexType(baseTypeName);
       if (baseType == null) {
-        throw new EdmException("Can't find base type with name: " + baseTypeName + " for complex type: "
-            + getName());
+        throw new EdmException(
+          "Can't find base type with name: " + baseTypeName + " for complex type: " + getName());
       }
     }
     return baseType;
   }
 
   @Override
-  public EdmComplexType getBaseType() {
-    checkBaseType();
-    return (EdmComplexType) baseType;
+  protected void checkBaseType() {
+    if (this.baseTypeName != null && this.baseType == null) {
+      this.baseType = buildBaseType(this.baseTypeName);
+    }
   }
 
   @Override
-  protected void checkBaseType() {
-    if (baseTypeName != null && baseType == null) {
-      baseType = buildBaseType(baseTypeName);
-    }
+  public EdmComplexType getBaseType() {
+    checkBaseType();
+    return (EdmComplexType)this.baseType;
   }
 }

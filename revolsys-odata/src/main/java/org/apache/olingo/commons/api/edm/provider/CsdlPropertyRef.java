@@ -21,27 +21,11 @@ package org.apache.olingo.commons.api.edm.provider;
 /**
  * The type Csdl property ref.
  */
-public class CsdlPropertyRef extends CsdlAbstractEdmItem implements CsdlNamed {
+public class CsdlPropertyRef implements CsdlAbstractEdmItem, CsdlNamed {
 
   private String name;
 
   private String alias;
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  /**
-   * Sets name.
-   *
-   * @param name the name
-   * @return the name
-   */
-  public CsdlPropertyRef setName(final String name) {
-    this.name = name;
-    return this;
-  }
 
   /**
    * Gets alias.
@@ -49,7 +33,12 @@ public class CsdlPropertyRef extends CsdlAbstractEdmItem implements CsdlNamed {
    * @return the alias
    */
   public String getAlias() {
-    return alias;
+    return this.alias;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
   }
 
   /**
@@ -60,6 +49,17 @@ public class CsdlPropertyRef extends CsdlAbstractEdmItem implements CsdlNamed {
    */
   public CsdlPropertyRef setAlias(final String alias) {
     this.alias = alias;
+    return this;
+  }
+
+  /**
+   * Sets name.
+   *
+   * @param name the name
+   * @return the name
+   */
+  public CsdlPropertyRef setName(final String name) {
+    this.name = name;
     return this;
   }
 }

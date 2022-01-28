@@ -31,4 +31,3 @@
  * start providing your service from there.</p>
  */
 package org.apache.olingo.server.api;
-

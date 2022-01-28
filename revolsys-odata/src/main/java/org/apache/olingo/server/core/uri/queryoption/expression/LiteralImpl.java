@@ -27,6 +27,7 @@ import org.apache.olingo.server.api.uri.queryoption.expression.Literal;
 public class LiteralImpl implements Literal {
 
   private final String text;
+
   private final EdmType type;
 
   public LiteralImpl(final String text, final EdmType type) {
@@ -35,22 +36,23 @@ public class LiteralImpl implements Literal {
   }
 
   @Override
-  public String getText() {
-    return text;
-  }
-
-  @Override
-  public EdmType getType() {
-    return type;
-  }
-
-  @Override
-  public <T> T accept(final ExpressionVisitor<T> visitor) throws ExpressionVisitException, ODataApplicationException {
+  public <T> T accept(final ExpressionVisitor<T> visitor)
+    throws ExpressionVisitException, ODataApplicationException {
     return visitor.visitLiteral(this);
   }
 
   @Override
+  public String getText() {
+    return this.text;
+  }
+
+  @Override
+  public EdmType getType() {
+    return this.type;
+  }
+
+  @Override
   public String toString() {
-    return text == null ? "" : text;
+    return this.text == null ? "" : this.text;
   }
 }

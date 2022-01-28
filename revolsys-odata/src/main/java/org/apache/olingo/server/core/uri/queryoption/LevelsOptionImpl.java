@@ -23,31 +23,32 @@ import org.apache.olingo.server.api.uri.queryoption.SystemQueryOptionKind;
 
 public class LevelsOptionImpl extends SystemQueryOptionImpl implements LevelsExpandOption {
   private boolean isMax;
+
   private int value;
 
   public LevelsOptionImpl() {
     setKind(SystemQueryOptionKind.LEVELS);
   }
 
-  public LevelsOptionImpl setValue(final int value) {
-    this.value = value;
-    return this;
+  @Override
+  public int getValue() {
+    return this.value;
   }
 
   @Override
   public boolean isMax() {
-    return isMax;
+    return this.isMax;
   }
 
   public LevelsOptionImpl setMax() {
-    isMax = true;
+    this.isMax = true;
     return this;
 
   }
 
-  @Override
-  public int getValue() {
-    return value;
+  public LevelsOptionImpl setValue(final int value) {
+    this.value = value;
+    return this;
   }
 
 }

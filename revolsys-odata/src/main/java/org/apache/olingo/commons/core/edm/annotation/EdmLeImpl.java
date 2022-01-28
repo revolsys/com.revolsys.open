@@ -24,7 +24,7 @@ import org.apache.olingo.commons.api.edm.provider.annotation.CsdlLogicalOrCompar
 
 public class EdmLeImpl extends AbstractEdmLogicalOrComparisonExpression implements EdmLe {
 
-  public EdmLeImpl(Edm edm, CsdlLogicalOrComparisonExpression csdlExp) {
+  public EdmLeImpl(final Edm edm, final CsdlLogicalOrComparisonExpression csdlExp) {
     super(edm, csdlExp);
   }
 }

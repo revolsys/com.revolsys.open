@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -29,24 +29,12 @@ public class CsdlActionImport extends CsdlOperationImport {
 
   private FullQualifiedName action;
 
-  @Override
-  public CsdlActionImport setName(final String name) {
-    this.name = name;
-    return this;
-  }
-
-  @Override
-  public CsdlActionImport setEntitySet(final String entitySet) {
-    this.entitySet = entitySet;
-    return this;
-  }
-
   /**
    * Returns the full qualified name of the action as string
    * @return full qualified name
    */
   public String getAction() {
-    return action.getFullQualifiedNameAsString();
+    return this.action.getFullQualifiedNameAsString();
   }
 
   /**
@@ -54,17 +42,7 @@ public class CsdlActionImport extends CsdlOperationImport {
    * @return full qualified name
    */
   public FullQualifiedName getActionFQN() {
-    return action;
-  }
-
-  /**
-   * Sets the full qualified name of the action as string
-   * @param action full qualified name
-   * @return this instance
-   */
-  public CsdlActionImport setAction(final String action) {
-    this.action = new FullQualifiedName(action);
-    return this;
+    return this.action;
   }
 
   /**
@@ -77,9 +55,31 @@ public class CsdlActionImport extends CsdlOperationImport {
     return this;
   }
 
+  /**
+   * Sets the full qualified name of the action as string
+   * @param action full qualified name
+   * @return this instance
+   */
+  public CsdlActionImport setAction(final String action) {
+    this.action = new FullQualifiedName(action);
+    return this;
+  }
+
   @Override
   public CsdlActionImport setAnnotations(final List<CsdlAnnotation> annotations) {
     this.annotations = annotations;
+    return this;
+  }
+
+  @Override
+  public CsdlActionImport setEntitySet(final String entitySet) {
+    this.entitySet = entitySet;
+    return this;
+  }
+
+  @Override
+  public CsdlActionImport setName(final String name) {
+    this.name = name;
     return this;
   }
 }

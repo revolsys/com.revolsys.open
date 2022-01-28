@@ -31,7 +31,7 @@ public class CountOptionImpl extends SystemQueryOptionImpl implements CountOptio
 
   @Override
   public boolean getValue() {
-    return count;
+    return this.count;
   }
 
   public CountOptionImpl setValue(final boolean count) {

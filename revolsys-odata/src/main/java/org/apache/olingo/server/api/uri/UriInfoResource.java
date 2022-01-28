@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -42,9 +42,24 @@ import org.apache.olingo.server.api.uri.queryoption.TopOption;
 public interface UriInfoResource {
 
   /**
+   * @return information about the $apply option
+   */
+  ApplyOption getApplyOption();
+
+  /**
+   * @return Object containing information of the $count option
+   */
+  CountOption getCountOption();
+
+  /**
    * @return List of custom query options used in the URI (without alias definitions)
    */
   List<CustomQueryOption> getCustomQueryOptions();
+
+  /**
+   * @return Object containing information of the $deltatoken option
+   */
+  DeltaTokenOption getDeltaTokenOption();
 
   /**
    * @return Object containing information of the $expand option
@@ -66,16 +81,6 @@ public interface UriInfoResource {
    */
   IdOption getIdOption();
 
-  /**
-   * @return Object containing information of the $count option
-   */
-  CountOption getCountOption();
-  
-  /**
-   * @return Object containing information of the $deltatoken option
-   */
-  DeltaTokenOption getDeltaTokenOption();
-  
   /**
    * @return Object containing information of the $orderby option
    */
@@ -105,11 +110,6 @@ public interface UriInfoResource {
    * @return Object containing information of the $top option
    */
   TopOption getTopOption();
-
-  /**
-   * @return information about the $apply option
-   */
-  ApplyOption getApplyOption();
 
   /**
    * The path segments behind the service root define which resources are

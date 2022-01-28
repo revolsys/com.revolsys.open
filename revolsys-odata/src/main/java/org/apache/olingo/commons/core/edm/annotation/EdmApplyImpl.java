@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -31,43 +31,44 @@ import org.apache.olingo.commons.api.edm.provider.annotation.CsdlExpression;
 
 public class EdmApplyImpl extends AbstractEdmAnnotatableDynamicExpression implements EdmApply {
 
-  private CsdlApply csdlExp;
+  private final CsdlApply csdlExp;
 
   private String function;
+
   private List<EdmExpression> parameters;
 
-  public EdmApplyImpl(Edm edm, CsdlApply csdlExp) {
+  public EdmApplyImpl(final Edm edm, final CsdlApply csdlExp) {
     super(edm, "Apply", csdlExp);
     this.csdlExp = csdlExp;
   }
 
   @Override
+  public EdmExpressionType getExpressionType() {
+    return EdmExpressionType.Apply;
+  }
+
+  @Override
   public String getFunction() {
-    if (function == null) {
-      if (csdlExp.getFunction() == null) {
+    if (this.function == null) {
+      if (this.csdlExp.getFunction() == null) {
         throw new EdmException("An Apply expression must specify a function.");
       }
-      function = csdlExp.getFunction();
+      this.function = this.csdlExp.getFunction();
     }
-    return function;
+    return this.function;
   }
 
   @Override
   public List<EdmExpression> getParameters() {
-    if (parameters == null) {
-      List<EdmExpression> localParameters = new ArrayList<>();
-      if (csdlExp.getParameters() != null) {
-        for (CsdlExpression param : csdlExp.getParameters()) {
-          localParameters.add(getExpression(edm, param));
+    if (this.parameters == null) {
+      final List<EdmExpression> localParameters = new ArrayList<>();
+      if (this.csdlExp.getParameters() != null) {
+        for (final CsdlExpression param : this.csdlExp.getParameters()) {
+          localParameters.add(getExpression(this.edm, param));
         }
       }
-      parameters = Collections.unmodifiableList(localParameters);
+      this.parameters = Collections.unmodifiableList(localParameters);
     }
-    return parameters;
-  }
-
-  @Override
-  public EdmExpressionType getExpressionType() {
-    return EdmExpressionType.Apply;
+    return this.parameters;
   }
 }

@@ -28,11 +28,6 @@ import org.apache.olingo.commons.api.edm.geo.SRID;
 public interface EdmTypeDefinition extends EdmPrimitiveType, EdmAnnotatable {
 
   /**
-   * @return {@link EdmPrimitiveType} this type definition is based upon
-   */
-  EdmPrimitiveType getUnderlyingType();
-
-  /**
    * @return the maximum length as an Integer or null if not specified
    */
   Integer getMaxLength();
@@ -51,6 +46,11 @@ public interface EdmTypeDefinition extends EdmPrimitiveType, EdmAnnotatable {
    * @return a non-negative integer or the special value <tt>variable</tt>
    */
   SRID getSrid();
+
+  /**
+   * @return {@link EdmPrimitiveType} this type definition is based upon
+   */
+  EdmPrimitiveType getUnderlyingType();
 
   /**
    * @return true if unicode or null if not specified

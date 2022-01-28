@@ -35,8 +35,8 @@ public final class EdmDouble extends SingletonPrimitiveType {
 
   protected static final String NaN = "NaN";
 
-  private static final Pattern PATTERN = Pattern.compile(
-      "(?:\\+|-)?\\p{Digit}+(?:\\.\\p{Digit}+)?(?:(?:E|e)(?:\\+|-)?\\p{Digit}{1,3})?");
+  private static final Pattern PATTERN = Pattern
+    .compile("(?:\\+|-)?\\p{Digit}+(?:\\.\\p{Digit}+)?(?:(?:E|e)(?:\\+|-)?\\p{Digit}{1,3})?");
 
   private static final EdmDouble INSTANCE = new EdmDouble();
 
@@ -45,25 +45,14 @@ public final class EdmDouble extends SingletonPrimitiveType {
   }
 
   @Override
-  public boolean isCompatible(final EdmPrimitiveType primitiveType) {
-    return primitiveType instanceof EdmByte
-        || primitiveType instanceof EdmSByte
-        || primitiveType instanceof EdmInt16
-        || primitiveType instanceof EdmInt32
-        || primitiveType instanceof EdmInt64
-        || primitiveType instanceof EdmSingle
-        || primitiveType instanceof EdmDouble;
-  }
-
-  @Override
   public Class<?> getDefaultType() {
     return Double.class;
   }
 
   @Override
-  protected <T> T internalValueOfString(final String value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode, final Class<T> returnType) throws EdmPrimitiveTypeException {
+  protected <T> T internalValueOfString(final String value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode,
+    final Class<T> returnType) throws EdmPrimitiveTypeException {
 
     Double result = null;
     BigDecimal bigDecimalValue = null;
@@ -80,10 +69,12 @@ public final class EdmDouble extends SingletonPrimitiveType {
         throw new EdmPrimitiveTypeException("The literal '" + value + "' has illegal content.");
       }
 
-      // The number format is checked above, so we don't have to catch NumberFormatException.
+      // The number format is checked above, so we don't have to catch
+      // NumberFormatException.
       bigDecimalValue = new BigDecimal(value);
       result = bigDecimalValue.doubleValue();
-      // "Real" infinite values have been treated already above, so we can throw an exception
+      // "Real" infinite values have been treated already above, so we can throw
+      // an exception
       // if the conversion to a double results in an infinite value.
       if (result.isInfinite()) {
         throw new EdmPrimitiveTypeException("The literal '" + value + "' has illegal content.");
@@ -96,27 +87,28 @@ public final class EdmDouble extends SingletonPrimitiveType {
       if (returnType.isAssignableFrom(Float.class)) {
         return returnType.cast(result.floatValue());
       } else {
-        throw new EdmPrimitiveTypeException("The literal '" + value
-            + "' cannot be converted to value type " + returnType + ".");
+        throw new EdmPrimitiveTypeException(
+          "The literal '" + value + "' cannot be converted to value type " + returnType + ".");
       }
     } else {
       try {
         return EdmDecimal.convertDecimal(bigDecimalValue, returnType);
       } catch (final IllegalArgumentException e) {
-        throw new EdmPrimitiveTypeException("The literal '" + value
-            + "' cannot be converted to value type " + returnType + ".", e);
+        throw new EdmPrimitiveTypeException(
+          "The literal '" + value + "' cannot be converted to value type " + returnType + ".", e);
       } catch (final ClassCastException e) {
-        throw new EdmPrimitiveTypeException("The value type " + returnType + " is not supported.", e);
+        throw new EdmPrimitiveTypeException("The value type " + returnType + " is not supported.",
+          e);
       }
     }
   }
 
   @Override
-  protected <T> String internalValueToString(final T value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode) throws EdmPrimitiveTypeException {
+  protected <T> String internalValueToString(final T value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode)
+    throws EdmPrimitiveTypeException {
     if (value instanceof Long) {
-      if (Math.abs((Long) value) < 1L << 51) {
+      if (Math.abs((Long)value) < 1L << 51) {
         return value.toString();
       } else {
         throw new EdmPrimitiveTypeException("The value '" + value + "' is not valid.");
@@ -124,20 +116,30 @@ public final class EdmDouble extends SingletonPrimitiveType {
     } else if (value instanceof Integer || value instanceof Short || value instanceof Byte) {
       return value.toString();
     } else if (value instanceof Double) {
-      return (Double) value == Double.NEGATIVE_INFINITY ? NEGATIVE_INFINITY
-          : (Double) value == Double.POSITIVE_INFINITY ? POSITIVE_INFINITY : value.toString();
+      return (Double)value == Double.NEGATIVE_INFINITY ? NEGATIVE_INFINITY
+        : (Double)value == Double.POSITIVE_INFINITY ? POSITIVE_INFINITY : value.toString();
     } else if (value instanceof Float) {
-      return (Float) value == Float.NEGATIVE_INFINITY ? NEGATIVE_INFINITY
-          : (Float) value == Float.POSITIVE_INFINITY ? POSITIVE_INFINITY : value.toString();
+      return (Float)value == Float.NEGATIVE_INFINITY ? NEGATIVE_INFINITY
+        : (Float)value == Float.POSITIVE_INFINITY ? POSITIVE_INFINITY : value.toString();
     } else if (value instanceof BigDecimal) {
-      final double doubleValue = ((BigDecimal) value).doubleValue();
-      if (!Double.isInfinite(doubleValue) && BigDecimal.valueOf(doubleValue).compareTo((BigDecimal) value) == 0) {
+      final double doubleValue = ((BigDecimal)value).doubleValue();
+      if (!Double.isInfinite(doubleValue)
+        && BigDecimal.valueOf(doubleValue).compareTo((BigDecimal)value) == 0) {
         return value.toString();
       } else {
         throw new EdmPrimitiveTypeException("The value '" + value + "' is not valid.");
       }
     } else {
-      throw new EdmPrimitiveTypeException("The value type " + value.getClass() + " is not supported.");
+      throw new EdmPrimitiveTypeException(
+        "The value type " + value.getClass() + " is not supported.");
     }
+  }
+
+  @Override
+  public boolean isCompatible(final EdmPrimitiveType primitiveType) {
+    return primitiveType instanceof EdmByte || primitiveType instanceof EdmSByte
+      || primitiveType instanceof EdmInt16 || primitiveType instanceof EdmInt32
+      || primitiveType instanceof EdmInt64 || primitiveType instanceof EdmSingle
+      || primitiveType instanceof EdmDouble;
   }
 }

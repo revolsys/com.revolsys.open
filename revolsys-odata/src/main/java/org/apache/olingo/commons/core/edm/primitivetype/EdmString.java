@@ -31,13 +31,21 @@ public final class EdmString extends SingletonPrimitiveType {
 
   private static final EdmString INSTANCE = new EdmString();
 
-  {
-    uriPrefix = "'";
-    uriSuffix = "'";
-  }
-
   public static EdmString getInstance() {
     return INSTANCE;
+  }
+
+  {
+    this.uriPrefix = "'";
+    this.uriSuffix = "'";
+  }
+
+  @Override
+  public String fromUriLiteral(String literal) throws EdmPrimitiveTypeException {
+    if (literal != null && literal.equalsIgnoreCase("null")) {
+      literal = "'" + literal + "'";
+    }
+    return literal == null ? null : super.fromUriLiteral(literal).replace("''", "'");
   }
 
   @Override
@@ -46,13 +54,14 @@ public final class EdmString extends SingletonPrimitiveType {
   }
 
   @Override
-  protected <T> T internalValueOfString(final String value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode, final Class<T> returnType) throws EdmPrimitiveTypeException {
+  protected <T> T internalValueOfString(final String value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode,
+    final Class<T> returnType) throws EdmPrimitiveTypeException {
 
     if (isUnicode != null && !isUnicode && !PATTERN_ASCII.matcher(value).matches()
-        || maxLength != null && maxLength < value.length()) {
-      throw new EdmPrimitiveTypeException("The literal '" + value + "' does not match the facets' constraints.");
+      || maxLength != null && maxLength < value.length()) {
+      throw new EdmPrimitiveTypeException(
+        "The literal '" + value + "' does not match the facets' constraints.");
     }
 
     if (returnType.isAssignableFrom(String.class)) {
@@ -63,15 +72,16 @@ public final class EdmString extends SingletonPrimitiveType {
   }
 
   @Override
-  protected <T> String internalValueToString(final T value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode) throws EdmPrimitiveTypeException {
+  protected <T> String internalValueToString(final T value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode)
+    throws EdmPrimitiveTypeException {
 
-    final String result = value instanceof String ? (String) value : String.valueOf(value);
+    final String result = value instanceof String ? (String)value : String.valueOf(value);
 
     if (isUnicode != null && !isUnicode && !PATTERN_ASCII.matcher(result).matches()
-        || maxLength != null && maxLength < result.length()) {
-      throw new EdmPrimitiveTypeException("The value '" + value + "' does not match the facets' constraints.");
+      || maxLength != null && maxLength < result.length()) {
+      throw new EdmPrimitiveTypeException(
+        "The value '" + value + "' does not match the facets' constraints.");
     }
 
     return result;
@@ -86,7 +96,7 @@ public final class EdmString extends SingletonPrimitiveType {
     final int length = literal.length();
 
     final StringBuilder uriLiteral = new StringBuilder(length + 2);
-    uriLiteral.append(uriPrefix);
+    uriLiteral.append(this.uriPrefix);
     for (int i = 0; i < length; i++) {
       final char c = literal.charAt(i);
       if (c == '\'') {
@@ -94,15 +104,7 @@ public final class EdmString extends SingletonPrimitiveType {
       }
       uriLiteral.append(c);
     }
-    uriLiteral.append(uriSuffix);
+    uriLiteral.append(this.uriSuffix);
     return uriLiteral.toString();
-  }
-
-  @Override
-  public String fromUriLiteral(String literal) throws EdmPrimitiveTypeException {
-	  if (literal != null && literal.equalsIgnoreCase("null")) {
-		  literal = "'" + literal + "'";
-	  }
-    return literal == null ? null : super.fromUriLiteral(literal).replace("''", "'");
   }
 }

@@ -27,25 +27,6 @@ import java.util.List;
 public interface EdmBindingTarget extends EdmNamed, EdmAnnotatable, EdmMappable {
 
   /**
-   * Returns a human readable title or null if not set.
-   * @return a human readable title or null
-   */
-  String getTitle();
-  
-  /**
-   * Returns the target for a given path.
-   *
-   * @param path path for which the target is returned
-   * @return {@link EdmBindingTarget}
-   */
-  EdmBindingTarget getRelatedBindingTarget(String path);
-
-  /**
-   * @return all navigation property bindings
-   */
-  List<EdmNavigationPropertyBinding> getNavigationPropertyBindings();
-
-  /**
    * Returns the entity container this target is contained in.
    *
    * @return {@link EdmEntityContainer}
@@ -58,11 +39,30 @@ public interface EdmBindingTarget extends EdmNamed, EdmAnnotatable, EdmMappable 
    * @return {@link EdmEntityType}
    */
   EdmEntityType getEntityType();
-  
+
   /**
    * Get the entity type with annotations defined in external file.
    *
    * @return {@link EdmEntityType}
    */
   EdmEntityType getEntityTypeWithAnnotations();
+
+  /**
+   * @return all navigation property bindings
+   */
+  List<EdmNavigationPropertyBinding> getNavigationPropertyBindings();
+
+  /**
+   * Returns the target for a given path.
+   *
+   * @param path path for which the target is returned
+   * @return {@link EdmBindingTarget}
+   */
+  EdmBindingTarget getRelatedBindingTarget(String path);
+
+  /**
+   * Returns a human readable title or null if not set.
+   * @return a human readable title or null
+   */
+  String getTitle();
 }

@@ -28,14 +28,10 @@ import org.apache.olingo.commons.api.edm.geo.SRID;
 public interface EdmTerm extends EdmNamed, EdmAnnotatable {
 
   /**
-   * @return type of value returned by the expression contained in an annotation using this term
+   * @return list of CSDL element that this term can be applied to; if no value is supplied, the term is not restricted
+   * in its application.
    */
-  EdmType getType();
-
-  /**
-   * @return the fully qualified name of this term
-   */
-  FullQualifiedName getFullQualifiedName();
+  List<TargetType> getAppliesTo();
 
   /**
    * When applying a term with a base term,the base term MUST also be applied with the same qualifier, and so on until a
@@ -46,15 +42,14 @@ public interface EdmTerm extends EdmNamed, EdmAnnotatable {
   EdmTerm getBaseTerm();
 
   /**
-   * @return list of CSDL element that this term can be applied to; if no value is supplied, the term is not restricted
-   * in its application.
+   * @return the default value as a String or null if not specified
    */
-  List<TargetType> getAppliesTo();
+  String getDefaultValue();
 
   /**
-   * @return true if nullable
+   * @return the fully qualified name of this term
    */
-  boolean isNullable();
+  FullQualifiedName getFullQualifiedName();
 
   /**
    * @return the maximum length as an Integer or null if not specified
@@ -77,8 +72,13 @@ public interface EdmTerm extends EdmNamed, EdmAnnotatable {
   SRID getSrid();
 
   /**
-   * @return the default value as a String or null if not specified
+   * @return type of value returned by the expression contained in an annotation using this term
    */
-  String getDefaultValue();
+  EdmType getType();
+
+  /**
+   * @return true if nullable
+   */
+  boolean isNullable();
 
 }

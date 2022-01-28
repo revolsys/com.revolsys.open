@@ -35,47 +35,42 @@ public class PreconditionsValidator {
   private final EdmBindingTarget affectedEntitySetOrSingleton;
 
   public PreconditionsValidator(final UriInfo uriInfo) throws PreconditionException {
-    affectedEntitySetOrSingleton = extractInformation(uriInfo);
-  }
-
-  public boolean mustValidatePreconditions(final CustomETagSupport customETagSupport, final boolean isMediaValue) {
-    return affectedEntitySetOrSingleton != null
-        && (isMediaValue ?
-            customETagSupport.hasMediaETag(affectedEntitySetOrSingleton) :
-              customETagSupport.hasETag(affectedEntitySetOrSingleton));
+    this.affectedEntitySetOrSingleton = extractInformation(uriInfo);
   }
 
   private EdmBindingTarget extractInformation(final UriInfo uriInfo) throws PreconditionException {
     EdmBindingTarget lastFoundEntitySetOrSingleton = null;
     int counter = 0;
-    for (UriResource uriResourcePart : uriInfo.getUriResourceParts()) {
+    for (final UriResource uriResourcePart : uriInfo.getUriResourceParts()) {
       switch (uriResourcePart.getKind()) {
-      case function:
-        lastFoundEntitySetOrSingleton = getEntitySetFromFunctionImport((UriResourceFunction) uriResourcePart);
+        case function:
+          lastFoundEntitySetOrSingleton = getEntitySetFromFunctionImport(
+            (UriResourceFunction)uriResourcePart);
         break;
-      case singleton:
-        lastFoundEntitySetOrSingleton = ((UriResourceSingleton) uriResourcePart).getSingleton();
+        case singleton:
+          lastFoundEntitySetOrSingleton = ((UriResourceSingleton)uriResourcePart).getSingleton();
         break;
-      case entitySet:
-        lastFoundEntitySetOrSingleton = getEntitySet((UriResourceEntitySet) uriResourcePart);
+        case entitySet:
+          lastFoundEntitySetOrSingleton = getEntitySet((UriResourceEntitySet)uriResourcePart);
         break;
-      case navigationProperty:
-        lastFoundEntitySetOrSingleton = getEntitySetFromNavigation(lastFoundEntitySetOrSingleton,
-            (UriResourceNavigation) uriResourcePart);
+        case navigationProperty:
+          lastFoundEntitySetOrSingleton = getEntitySetFromNavigation(lastFoundEntitySetOrSingleton,
+            (UriResourceNavigation)uriResourcePart);
         break;
-      case primitiveProperty:
-      case complexProperty:
+        case primitiveProperty:
+        case complexProperty:
         break;
-      case value:
-      case action:
-        // This should not be possible since the URI Parser validates this but to be sure we throw an exception.
-        if (counter != uriInfo.getUriResourceParts().size() - 1) {
-          throw new PreconditionException("$value or Action must be the last segment in the URI.",
+        case value:
+        case action:
+          // This should not be possible since the URI Parser validates this but
+          // to be sure we throw an exception.
+          if (counter != uriInfo.getUriResourceParts().size() - 1) {
+            throw new PreconditionException("$value or Action must be the last segment in the URI.",
               PreconditionException.MessageKeys.INVALID_URI);
-        }
+          }
         break;
-      default:
-        lastFoundEntitySetOrSingleton = null;
+        default:
+          lastFoundEntitySetOrSingleton = null;
         break;
       }
       if (lastFoundEntitySetOrSingleton == null) {
@@ -87,25 +82,34 @@ public class PreconditionsValidator {
     return lastFoundEntitySetOrSingleton;
   }
 
-  private EdmBindingTarget getEntitySetFromFunctionImport(final UriResourceFunction uriResourceFunction) {
-    EdmFunctionImport functionImport = uriResourceFunction.getFunctionImport();
+  private EdmBindingTarget getEntitySet(final UriResourceEntitySet uriResourceEntitySet) {
+    return uriResourceEntitySet.isCollection() ? null : uriResourceEntitySet.getEntitySet();
+  }
+
+  private EdmBindingTarget getEntitySetFromFunctionImport(
+    final UriResourceFunction uriResourceFunction) {
+    final EdmFunctionImport functionImport = uriResourceFunction.getFunctionImport();
     if (functionImport != null && functionImport.getReturnedEntitySet() != null
-        && !uriResourceFunction.isCollection()) {
+      && !uriResourceFunction.isCollection()) {
       return functionImport.getReturnedEntitySet();
     }
     return null;
   }
 
-  private EdmBindingTarget getEntitySet(final UriResourceEntitySet uriResourceEntitySet) {
-    return uriResourceEntitySet.isCollection() ? null : uriResourceEntitySet.getEntitySet();
-  }
-
-  private EdmBindingTarget getEntitySetFromNavigation(final EdmBindingTarget lastFoundEntitySetOrSingleton,
-      final UriResourceNavigation uriResourceNavigation) {
+  private EdmBindingTarget getEntitySetFromNavigation(
+    final EdmBindingTarget lastFoundEntitySetOrSingleton,
+    final UriResourceNavigation uriResourceNavigation) {
     if (lastFoundEntitySetOrSingleton != null && !uriResourceNavigation.isCollection()) {
-      EdmNavigationProperty navProp = uriResourceNavigation.getProperty();
+      final EdmNavigationProperty navProp = uriResourceNavigation.getProperty();
       return lastFoundEntitySetOrSingleton.getRelatedBindingTarget(navProp.getName());
     }
     return null;
+  }
+
+  public boolean mustValidatePreconditions(final CustomETagSupport customETagSupport,
+    final boolean isMediaValue) {
+    return this.affectedEntitySetOrSingleton != null
+      && (isMediaValue ? customETagSupport.hasMediaETag(this.affectedEntitySetOrSingleton)
+        : customETagSupport.hasETag(this.affectedEntitySetOrSingleton));
   }
 }

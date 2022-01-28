@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -28,7 +28,7 @@ public enum BinaryOperatorKind {
    * OData has operator used for OData enumerations
    */
   HAS("has"),
-  
+
   /**
    * In operator
    */
@@ -99,6 +99,20 @@ public enum BinaryOperatorKind {
    */
   OR("or");
 
+  /**
+   * URI syntax to enumeration value
+   * @param operator Operator in the syntax used in the URI
+   * @return Operator kind which represents the given syntax
+   */
+  public static BinaryOperatorKind get(final String operator) {
+    for (final BinaryOperatorKind op : BinaryOperatorKind.values()) {
+      if (op.toString().equals(operator)) {
+        return op;
+      }
+    }
+    return null;
+  }
+
   private String syntax;
 
   /**
@@ -110,25 +124,11 @@ public enum BinaryOperatorKind {
   }
 
   /**
-   * URI syntax to enumeration value
-   * @param operator Operator in the syntax used in the URI
-   * @return Operator kind which represents the given syntax
-   */
-  public static BinaryOperatorKind get(final String operator) {
-    for (BinaryOperatorKind op : BinaryOperatorKind.values()) {
-      if (op.toString().equals(operator)) {
-        return op;
-      }
-    }
-    return null;
-  }
-
-  /**
    * @return URI syntax for that operator kind
    */
   @Override
   public String toString() {
-    return syntax;
+    return this.syntax;
   }
 
 }

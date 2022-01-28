@@ -29,37 +29,41 @@ import org.apache.olingo.server.api.uri.queryoption.expression.UnaryOperatorKind
 public class UnaryImpl implements Unary {
 
   private final UnaryOperatorKind operator;
+
   private final Expression expression;
+
   private final EdmType type;
 
-  public UnaryImpl(final UnaryOperatorKind operator, final Expression expression, final EdmType type) {
+  public UnaryImpl(final UnaryOperatorKind operator, final Expression expression,
+    final EdmType type) {
     this.operator = operator;
     this.expression = expression;
     this.type = type;
   }
 
   @Override
-  public UnaryOperatorKind getOperator() {
-    return operator;
+  public <T> T accept(final ExpressionVisitor<T> visitor)
+    throws ExpressionVisitException, ODataApplicationException {
+    final T operand = this.expression.accept(visitor);
+    return visitor.visitUnaryOperator(this.operator, operand);
   }
 
   @Override
   public Expression getOperand() {
-    return expression;
-  }
-
-  public EdmType getType() {
-    return type;
+    return this.expression;
   }
 
   @Override
-  public <T> T accept(final ExpressionVisitor<T> visitor) throws ExpressionVisitException, ODataApplicationException {
-    T operand = expression.accept(visitor);
-    return visitor.visitUnaryOperator(operator, operand);
+  public UnaryOperatorKind getOperator() {
+    return this.operator;
+  }
+
+  public EdmType getType() {
+    return this.type;
   }
 
   @Override
   public String toString() {
-    return "{" + operator.name() + " " + expression + '}';
+    return "{" + this.operator.name() + " " + this.expression + '}';
   }
 }

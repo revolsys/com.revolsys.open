@@ -28,71 +28,54 @@ import java.util.List;
 public class Entity extends Linked {
 
   private String eTag;
+
   private String type;
 
   private Link readLink;
+
   private Link editLink;
 
-  private final List<Link> mediaEditLinks = new ArrayList<Link>();
-  private final List<Operation> operations = new ArrayList<Operation>();
+  private final List<Link> mediaEditLinks = new ArrayList<>();
 
-  private final List<Property> properties = new ArrayList<Property>();
+  private final List<Operation> operations = new ArrayList<>();
+
+  private final List<Property> properties = new ArrayList<>();
 
   private URI mediaContentSource;
+
   private String mediaContentType;
+
   private String mediaETag;
 
   /**
-   * Gets ETag.
+   * Add property to this Entity.
    *
-   * @return ETag.
+   * @param property property which is added
+   * @return this Entity for fluid/flow adding
    */
-  public String getETag() {
-    return eTag;
-  }
-  
-  /**
-   * Sets ETag
-   * @param eTag ETag
-   */
-  public void setETag(final String eTag) {
-    this.eTag = eTag;
+  public Entity addProperty(final Property property) {
+    this.properties.add(property);
+    return this;
   }
 
-  /**
-   * Gets entity type.
-   *
-   * @return entity type.
-   */
-  public String getType() {
-    return type;
-  }
-
-  /**
-   * Sets entity type.
-   *
-   * @param type entity type.
-   */
-  public void setType(final String type) {
-    this.type = type;
-  }
-
-  /**
-   * Gets entity self link.
-   *
-   * @return self link.
-   */
-  public Link getSelfLink() {
-    return readLink;
-  }
-
-  /**
-   * Sets entity self link.
-   *
-   * @param selfLink self link.
-   */
-  public void setSelfLink(final Link selfLink) {
-    readLink = selfLink;
+  @Override
+  public boolean equals(final Object o) {
+    return super.equals(o)
+      && (this.eTag == null ? ((Entity)o).eTag == null : this.eTag.equals(((Entity)o).eTag))
+      && (this.type == null ? ((Entity)o).type == null : this.type.equals(((Entity)o).type))
+      && (this.readLink == null ? ((Entity)o).readLink == null
+        : this.readLink.equals(((Entity)o).readLink))
+      && (this.editLink == null ? ((Entity)o).editLink == null
+        : this.editLink.equals(((Entity)o).editLink))
+      && this.mediaEditLinks.equals(((Entity)o).mediaEditLinks)
+      && this.operations.equals(((Entity)o).operations)
+      && this.properties.equals(((Entity)o).properties)
+      && (this.mediaContentSource == null ? ((Entity)o).mediaContentSource == null
+        : this.mediaContentSource.equals(((Entity)o).mediaContentSource))
+      && (this.mediaContentType == null ? ((Entity)o).mediaContentType == null
+        : this.mediaContentType.equals(((Entity)o).mediaContentType))
+      && (this.mediaETag == null ? ((Entity)o).mediaETag == null
+        : this.mediaETag.equals(((Entity)o).mediaETag));
   }
 
   /**
@@ -101,7 +84,133 @@ public class Entity extends Linked {
    * @return edit link.
    */
   public Link getEditLink() {
-    return editLink;
+    return this.editLink;
+  }
+
+  /**
+   * Gets ETag.
+   *
+   * @return ETag.
+   */
+  public String getETag() {
+    return this.eTag;
+  }
+
+  /**
+   * Gets media content resource.
+   *
+   * @return media content resource.
+   */
+  public URI getMediaContentSource() {
+    return this.mediaContentSource;
+  }
+
+  /**
+   * Gets media content type.
+   *
+   * @return media content type.
+   */
+  public String getMediaContentType() {
+    return this.mediaContentType;
+  }
+
+  /**
+   * Gets media entity links.
+   *
+   * @return links.
+   */
+  public List<Link> getMediaEditLinks() {
+    return this.mediaEditLinks;
+  }
+
+  /**
+   * ETag of the binary stream represented by this media entity or named stream property.
+   *
+   * @return media ETag value
+   */
+  public String getMediaETag() {
+    return this.mediaETag;
+  }
+
+  /**
+   * Gets operations.
+   *
+   * @return operations.
+   */
+  public List<Operation> getOperations() {
+    return this.operations;
+  }
+
+  /**
+   * Gets properties.
+   *
+   * @return properties.
+   */
+  public List<Property> getProperties() {
+    return this.properties;
+  }
+
+  /**
+   * Gets property with given name.
+   *
+   * @param name property name
+   * @return property with given name if found, null otherwise
+   */
+  public Property getProperty(final String name) {
+    Property result = null;
+
+    for (final Property property : this.properties) {
+      if (name.equals(property.getName())) {
+        result = property;
+        break;
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Gets entity self link.
+   *
+   * @return self link.
+   */
+  public Link getSelfLink() {
+    return this.readLink;
+  }
+
+  /**
+   * Gets entity type.
+   *
+   * @return entity type.
+   */
+  public String getType() {
+    return this.type;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (this.eTag == null ? 0 : this.eTag.hashCode());
+    result = 31 * result + (this.type == null ? 0 : this.type.hashCode());
+    result = 31 * result + (this.readLink == null ? 0 : this.readLink.hashCode());
+    result = 31 * result + (this.editLink == null ? 0 : this.editLink.hashCode());
+    result = 31 * result + this.mediaEditLinks.hashCode();
+    result = 31 * result + this.operations.hashCode();
+    result = 31 * result + this.properties.hashCode();
+    result = 31 * result
+      + (this.mediaContentSource == null ? 0 : this.mediaContentSource.hashCode());
+    result = 31 * result + (this.mediaContentType == null ? 0 : this.mediaContentType.hashCode());
+    result = 31 * result + (this.mediaETag == null ? 0 : this.mediaETag.hashCode());
+    return result;
+  }
+
+  /**
+   * Checks if the current entity is a media entity.
+   *
+   * @return 'TRUE' if is a media entity; 'FALSE' otherwise.
+   */
+  public boolean isMediaEntity() {
+    return this.mediaContentSource != null;
   }
 
   /**
@@ -114,87 +223,11 @@ public class Entity extends Linked {
   }
 
   /**
-   * Gets media entity links.
-   *
-   * @return links.
+   * Sets ETag
+   * @param eTag ETag
    */
-  public List<Link> getMediaEditLinks() {
-    return mediaEditLinks;
-  }
-
-  /**
-   * Gets operations.
-   *
-   * @return operations.
-   */
-  public List<Operation> getOperations() {
-    return operations;
-  }
-
-  /**
-   * Add property to this Entity.
-   *
-   * @param property property which is added
-   * @return this Entity for fluid/flow adding
-   */
-  public Entity addProperty(final Property property) {
-    properties.add(property);
-    return this;
-  }
-
-  /**
-   * Gets properties.
-   *
-   * @return properties.
-   */
-  public List<Property> getProperties() {
-    return properties;
-  }
-
-  /**
-   * Gets property with given name.
-   *
-   * @param name property name
-   * @return property with given name if found, null otherwise
-   */
-  public Property getProperty(final String name) {
-    Property result = null;
-
-    for (Property property : properties) {
-      if (name.equals(property.getName())) {
-        result = property;
-        break;
-      }
-    }
-
-    return result;
-  }
-
-  /**
-   * Gets media content type.
-   *
-   * @return media content type.
-   */
-  public String getMediaContentType() {
-    return mediaContentType;
-  }
-
-  /**
-   * Set media content type.
-   *
-   * @param mediaContentType media content type.
-   */
-  public void setMediaContentType(final String mediaContentType) {
-    this.mediaContentType = mediaContentType;
-  }
-
-  /**
-   * Gets media content resource.
-   *
-   * @return media content resource.
-   */
-  public URI getMediaContentSource() {
-    return mediaContentSource;
+  public void setETag(final String eTag) {
+    this.eTag = eTag;
   }
 
   /**
@@ -207,12 +240,12 @@ public class Entity extends Linked {
   }
 
   /**
-   * ETag of the binary stream represented by this media entity or named stream property.
+   * Set media content type.
    *
-   * @return media ETag value
+   * @param mediaContentType media content type.
    */
-  public String getMediaETag() {
-    return mediaETag;
+  public void setMediaContentType(final String mediaContentType) {
+    this.mediaContentType = mediaContentType;
   }
 
   /**
@@ -221,55 +254,29 @@ public class Entity extends Linked {
    * @param eTag media ETag value
    */
   public void setMediaETag(final String eTag) {
-    mediaETag = eTag;
+    this.mediaETag = eTag;
   }
 
   /**
-   * Checks if the current entity is a media entity.
+   * Sets entity self link.
    *
-   * @return 'TRUE' if is a media entity; 'FALSE' otherwise.
+   * @param selfLink self link.
    */
-  public boolean isMediaEntity() {
-    return mediaContentSource != null;
+  public void setSelfLink(final Link selfLink) {
+    this.readLink = selfLink;
   }
 
-  @Override
-  public boolean equals(final Object o) {
-    return super.equals(o)
-        && (eTag == null ? ((Entity) o).eTag == null : eTag.equals(((Entity) o).eTag))
-        && (type == null ? ((Entity) o).type == null : type.equals(((Entity) o).type))
-        && (readLink == null ? ((Entity) o).readLink == null : readLink.equals(((Entity) o).readLink))
-        && (editLink == null ? ((Entity) o).editLink == null : editLink.equals(((Entity) o).editLink))
-        && mediaEditLinks.equals(((Entity) o).mediaEditLinks)
-        && operations.equals(((Entity) o).operations)
-        && properties.equals(((Entity) o).properties)
-        && (mediaContentSource == null ?
-            ((Entity) o).mediaContentSource == null :
-            mediaContentSource.equals(((Entity) o).mediaContentSource))
-        && (mediaContentType == null ?
-            ((Entity) o).mediaContentType == null :
-            mediaContentType.equals(((Entity) o).mediaContentType))
-        && (mediaETag == null ? ((Entity) o).mediaETag == null : mediaETag.equals(((Entity) o).mediaETag));
-  }
-
-  @Override
-  public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + (eTag == null ? 0 : eTag.hashCode());
-    result = 31 * result + (type == null ? 0 : type.hashCode());
-    result = 31 * result + (readLink == null ? 0 : readLink.hashCode());
-    result = 31 * result + (editLink == null ? 0 : editLink.hashCode());
-    result = 31 * result + mediaEditLinks.hashCode();
-    result = 31 * result + operations.hashCode();
-    result = 31 * result + properties.hashCode();
-    result = 31 * result + (mediaContentSource == null ? 0 : mediaContentSource.hashCode());
-    result = 31 * result + (mediaContentType == null ? 0 : mediaContentType.hashCode());
-    result = 31 * result + (mediaETag == null ? 0 : mediaETag.hashCode());
-    return result;
+  /**
+   * Sets entity type.
+   *
+   * @param type entity type.
+   */
+  public void setType(final String type) {
+    this.type = type;
   }
 
   @Override
   public String toString() {
-    return properties.toString();
+    return this.properties.toString();
   }
 }

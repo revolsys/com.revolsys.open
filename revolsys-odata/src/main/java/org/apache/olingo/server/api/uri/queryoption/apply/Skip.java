@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -25,9 +25,9 @@ import org.apache.olingo.server.api.uri.queryoption.SkipOption;
  * Represents the skip transformation.
  */
 public interface Skip extends ApplyItem {
-	/**
-	   * Gets the skip option.
-	   * @return a {@link SkipOption} (but never <code>null</code>)
-	   */
-	  SkipOption getSkipOption();
+  /**
+     * Gets the skip option.
+     * @return a {@link SkipOption} (but never <code>null</code>)
+     */
+  SkipOption getSkipOption();
 }

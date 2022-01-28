@@ -36,11 +36,12 @@ public final class EdmGeometryLineString extends AbstractGeospatialType<LineStri
   }
 
   @Override
-  protected <T> T internalValueOfString(final String value, final Boolean isNullable, final Integer maxLength,
-      final Integer precision, final Integer scale, final Boolean isUnicode,
-      final Class<T> returnType) throws EdmPrimitiveTypeException {
+  protected <T> T internalValueOfString(final String value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode,
+    final Class<T> returnType) throws EdmPrimitiveTypeException {
 
-    final LineString lineString = stringToLineString(value, isNullable, maxLength, precision, scale, isUnicode);
+    final LineString lineString = stringToLineString(value, isNullable, maxLength, precision, scale,
+      isUnicode);
     if (returnType.isAssignableFrom(LineString.class)) {
       return returnType.cast(lineString);
     } else {
@@ -49,13 +50,15 @@ public final class EdmGeometryLineString extends AbstractGeospatialType<LineStri
   }
 
   @Override
-  protected <T> String internalValueToString(final T value, final Boolean isNullable, final Integer maxLength,
-      final Integer precision, final Integer scale, final Boolean isUnicode) throws EdmPrimitiveTypeException {
+  protected <T> String internalValueToString(final T value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode)
+    throws EdmPrimitiveTypeException {
 
     if (value instanceof LineString) {
-      return toString((LineString) value, isNullable, maxLength, precision, scale, isUnicode);
+      return toString((LineString)value, isNullable, maxLength, precision, scale, isUnicode);
     }
 
-    throw new EdmPrimitiveTypeException("The value type " + value.getClass() + " is not supported.");
+    throw new EdmPrimitiveTypeException(
+      "The value type " + value.getClass() + " is not supported.");
   }
 }

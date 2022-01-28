@@ -22,7 +22,8 @@ import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmReferentialConstraint;
 import org.apache.olingo.commons.api.edm.provider.CsdlReferentialConstraint;
 
-public class EdmReferentialConstraintImpl extends AbstractEdmAnnotatable implements EdmReferentialConstraint {
+public class EdmReferentialConstraintImpl extends AbstractEdmAnnotatable
+  implements EdmReferentialConstraint {
 
   private final CsdlReferentialConstraint constraint;
 
@@ -33,11 +34,11 @@ public class EdmReferentialConstraintImpl extends AbstractEdmAnnotatable impleme
 
   @Override
   public String getPropertyName() {
-    return constraint.getProperty();
+    return this.constraint.getProperty();
   }
 
   @Override
   public String getReferencedPropertyName() {
-    return constraint.getReferencedProperty();
+    return this.constraint.getReferencedProperty();
   }
 }

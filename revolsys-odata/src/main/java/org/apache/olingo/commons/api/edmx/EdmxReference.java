@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -29,12 +29,16 @@ import org.apache.olingo.commons.api.edm.provider.CsdlAnnotation;
 /**
  * POJO for Edmx Reference.
  */
-public class EdmxReference implements CsdlAnnotatable{
+public class EdmxReference implements CsdlAnnotatable {
 
   private final URI uri;
+
   private final List<EdmxReferenceInclude> edmxIncludes;
+
   private final List<EdmxReferenceIncludeAnnotation> edmxIncludeAnnotations;
-  private List<CsdlAnnotation> annotations = new ArrayList<CsdlAnnotation>();
+
+  private List<CsdlAnnotation> annotations = new ArrayList<>();
+
   /**
    * Create reference with given uri
    *
@@ -42,25 +46,8 @@ public class EdmxReference implements CsdlAnnotatable{
    */
   public EdmxReference(final URI uri) {
     this.uri = uri;
-    edmxIncludes = new ArrayList<EdmxReferenceInclude>();
-    edmxIncludeAnnotations = new ArrayList<EdmxReferenceIncludeAnnotation>();
-  }
-
-  /**
-   * Get URI for the reference
-   * @return uri for the reference
-   */
-  public URI getUri() {
-    return uri;
-  }
-
-  /**
-   * edmx:Include elements that specify the schemas to include from the target document
-   *
-   * @return list of {@link EdmxReferenceInclude} in reference or null if none specified
-   */
-  public List<EdmxReferenceInclude> getIncludes() {
-    return Collections.unmodifiableList(edmxIncludes);
+    this.edmxIncludes = new ArrayList<>();
+    this.edmxIncludeAnnotations = new ArrayList<>();
   }
 
   /**
@@ -70,17 +57,8 @@ public class EdmxReference implements CsdlAnnotatable{
    * @return this EdmxReference object
    */
   public EdmxReference addInclude(final EdmxReferenceInclude include) {
-    edmxIncludes.add(include);
+    this.edmxIncludes.add(include);
     return this;
-  }
-
-  /**
-   * edmx:IncludeAnnotations elements that specify the annotations to include from the target document.
-   *
-   * @return List of {@link EdmxReferenceIncludeAnnotation} or null if none specified
-   */
-  public List<EdmxReferenceIncludeAnnotation> getIncludeAnnotations() {
-    return Collections.unmodifiableList(edmxIncludeAnnotations);
   }
 
   /**
@@ -89,14 +67,41 @@ public class EdmxReference implements CsdlAnnotatable{
    * @param includeAnnotation to be added
    * @return this EdmxReference object
    */
-  public EdmxReference addIncludeAnnotation(final EdmxReferenceIncludeAnnotation includeAnnotation) {
-    edmxIncludeAnnotations.add(includeAnnotation);
+  public EdmxReference addIncludeAnnotation(
+    final EdmxReferenceIncludeAnnotation includeAnnotation) {
+    this.edmxIncludeAnnotations.add(includeAnnotation);
     return this;
   }
-  
+
   @Override
   public List<CsdlAnnotation> getAnnotations() {
-    return annotations;
+    return this.annotations;
+  }
+
+  /**
+   * edmx:IncludeAnnotations elements that specify the annotations to include from the target document.
+   *
+   * @return List of {@link EdmxReferenceIncludeAnnotation} or null if none specified
+   */
+  public List<EdmxReferenceIncludeAnnotation> getIncludeAnnotations() {
+    return Collections.unmodifiableList(this.edmxIncludeAnnotations);
+  }
+
+  /**
+   * edmx:Include elements that specify the schemas to include from the target document
+   *
+   * @return list of {@link EdmxReferenceInclude} in reference or null if none specified
+   */
+  public List<EdmxReferenceInclude> getIncludes() {
+    return Collections.unmodifiableList(this.edmxIncludes);
+  }
+
+  /**
+   * Get URI for the reference
+   * @return uri for the reference
+   */
+  public URI getUri() {
+    return this.uri;
   }
 
   /**
@@ -108,5 +113,5 @@ public class EdmxReference implements CsdlAnnotatable{
   public EdmxReference setAnnotations(final List<CsdlAnnotation> annotations) {
     this.annotations = annotations;
     return this;
-  }  
+  }
 }

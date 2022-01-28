@@ -40,9 +40,8 @@ public class MultiPoint extends ComposedGeospatial<Point> {
 
   @Override
   public EdmPrimitiveTypeKind getEdmPrimitiveTypeKind() {
-    return dimension == Dimension.GEOGRAPHY ?
-        EdmPrimitiveTypeKind.GeographyMultiPoint :
-        EdmPrimitiveTypeKind.GeometryMultiPoint;
+    return this.dimension == Dimension.GEOGRAPHY ? EdmPrimitiveTypeKind.GeographyMultiPoint
+      : EdmPrimitiveTypeKind.GeometryMultiPoint;
   }
 
 }

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -39,67 +39,31 @@ import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitor
 public class AggregateExpressionImpl implements AggregateExpression {
 
   private UriInfo path;
+
   private Expression expression;
+
   private StandardMethod standardMethod;
+
   private FullQualifiedName customMethod;
+
   private String alias;
+
   private AggregateExpression inlineAggregateExpression;
-  private List<AggregateExpression> from = new ArrayList<>();
-  private Set<String> dynamicProperties = new HashSet<>();
+
+  private final List<AggregateExpression> from = new ArrayList<>();
+
+  private final Set<String> dynamicProperties = new HashSet<>();
 
   @Override
-  public List<UriResource> getPath() {
-    return path == null ? Collections.<UriResource> emptyList() : path.getUriResourceParts();
-  }
-
-  public AggregateExpressionImpl setPath(final UriInfo uriInfo) {
-    path = uriInfo;
-    return this;
-  }
-
-  @Override
-  public Expression getExpression() {
-    return expression;
-  }
-
-  public AggregateExpressionImpl setExpression(final Expression expression) {
-    this.expression = expression;
-    return this;
+  public <T> T accept(final ExpressionVisitor<T> visitor)
+    throws ExpressionVisitException, ODataApplicationException {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   @Override
-  public StandardMethod getStandardMethod() {
-    return standardMethod;
-  }
-
-  public AggregateExpressionImpl setStandardMethod(final StandardMethod standardMethod) {
-    this.standardMethod = standardMethod;
-    return this;
-  }
-
-  @Override
-  public FullQualifiedName getCustomMethod() {
-    return customMethod;
-  }
-
-  public AggregateExpressionImpl setCustomMethod(final FullQualifiedName customMethod) {
-    this.customMethod = customMethod;
-    return this;
-  }
-
-  @Override
-  public AggregateExpression getInlineAggregateExpression() {
-    return inlineAggregateExpression;
-  }
-
-  public AggregateExpressionImpl setInlineAggregateExpression(final AggregateExpression aggregateExpression) {
-    inlineAggregateExpression = aggregateExpression;
-    return this;
-  }
-
-  @Override
-  public List<AggregateExpression> getFrom() {
-    return Collections.unmodifiableList(from);
+  public void addDynamicProperty(final String name) {
+    this.dynamicProperties.add(name);
   }
 
   public AggregateExpressionImpl addFrom(final AggregateExpression from) {
@@ -109,7 +73,43 @@ public class AggregateExpressionImpl implements AggregateExpression {
 
   @Override
   public String getAlias() {
-    return alias;
+    return this.alias;
+  }
+
+  @Override
+  public FullQualifiedName getCustomMethod() {
+    return this.customMethod;
+  }
+
+  @Override
+  public Set<String> getDynamicProperties() {
+    return Collections.unmodifiableSet(this.dynamicProperties);
+  }
+
+  @Override
+  public Expression getExpression() {
+    return this.expression;
+  }
+
+  @Override
+  public List<AggregateExpression> getFrom() {
+    return Collections.unmodifiableList(this.from);
+  }
+
+  @Override
+  public AggregateExpression getInlineAggregateExpression() {
+    return this.inlineAggregateExpression;
+  }
+
+  @Override
+  public List<UriResource> getPath() {
+    return this.path == null ? Collections.<UriResource> emptyList()
+      : this.path.getUriResourceParts();
+  }
+
+  @Override
+  public StandardMethod getStandardMethod() {
+    return this.standardMethod;
   }
 
   public AggregateExpressionImpl setAlias(final String alias) {
@@ -117,19 +117,29 @@ public class AggregateExpressionImpl implements AggregateExpression {
     return this;
   }
 
-  @Override
-  public <T> T accept(ExpressionVisitor<T> visitor) throws ExpressionVisitException, ODataApplicationException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  
-  @Override
-  public Set<String> getDynamicProperties() {
-    return Collections.unmodifiableSet(dynamicProperties);
+  public AggregateExpressionImpl setCustomMethod(final FullQualifiedName customMethod) {
+    this.customMethod = customMethod;
+    return this;
   }
 
-  @Override
-  public void addDynamicProperty(String name) {
-    dynamicProperties.add(name);
+  public AggregateExpressionImpl setExpression(final Expression expression) {
+    this.expression = expression;
+    return this;
+  }
+
+  public AggregateExpressionImpl setInlineAggregateExpression(
+    final AggregateExpression aggregateExpression) {
+    this.inlineAggregateExpression = aggregateExpression;
+    return this;
+  }
+
+  public AggregateExpressionImpl setPath(final UriInfo uriInfo) {
+    this.path = uriInfo;
+    return this;
+  }
+
+  public AggregateExpressionImpl setStandardMethod(final StandardMethod standardMethod) {
+    this.standardMethod = standardMethod;
+    return this;
   }
 }

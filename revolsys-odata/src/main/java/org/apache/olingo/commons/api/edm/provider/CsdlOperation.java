@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * The type Csdl operation.
  */
-public abstract class CsdlOperation extends CsdlAbstractEdmItem implements CsdlNamed, CsdlAnnotatable {
+public abstract class CsdlOperation implements CsdlAbstractEdmItem, CsdlNamed, CsdlAnnotatable {
 
   /**
    * The Name.
@@ -44,7 +44,7 @@ public abstract class CsdlOperation extends CsdlAbstractEdmItem implements CsdlN
   /**
    * The Parameters.
    */
-  protected List<CsdlParameter> parameters = new ArrayList<CsdlParameter>();
+  protected List<CsdlParameter> parameters = new ArrayList<>();
 
   /**
    * The Return type.
@@ -54,22 +54,53 @@ public abstract class CsdlOperation extends CsdlAbstractEdmItem implements CsdlN
   /**
    * The Annotations.
    */
-  protected List<CsdlAnnotation> annotations = new ArrayList<CsdlAnnotation>();
+  protected List<CsdlAnnotation> annotations = new ArrayList<>();
 
   @Override
-  public String getName() {
-    return name;
+  public List<CsdlAnnotation> getAnnotations() {
+    return this.annotations;
   }
 
   /**
-   * Sets name.
+   * Gets entity set path.
+   *
+   * @return the entity set path
+   */
+  public String getEntitySetPath() {
+    return this.entitySetPath;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
+  }
+
+  /**
+   * Gets parameter.
    *
    * @param name the name
-   * @return the name
+   * @return the parameter
    */
-  public CsdlOperation setName(final String name) {
-    this.name = name;
-    return this;
+  public CsdlParameter getParameter(final String name) {
+    return getOneByName(name, getParameters());
+  }
+
+  /**
+   * Gets parameters.
+   *
+   * @return the parameters
+   */
+  public List<CsdlParameter> getParameters() {
+    return this.parameters;
+  }
+
+  /**
+   * Gets return type.
+   *
+   * @return the return type
+   */
+  public CsdlReturnType getReturnType() {
+    return this.returnType;
   }
 
   /**
@@ -78,7 +109,17 @@ public abstract class CsdlOperation extends CsdlAbstractEdmItem implements CsdlN
    * @return the boolean
    */
   public boolean isBound() {
-    return isBound;
+    return this.isBound;
+  }
+
+  /**
+   * Sets a list of annotations
+   * @param annotations list of annotations
+   * @return this instance
+   */
+  public CsdlOperation setAnnotations(final List<CsdlAnnotation> annotations) {
+    this.annotations = annotations;
+    return this;
   }
 
   /**
@@ -93,15 +134,6 @@ public abstract class CsdlOperation extends CsdlAbstractEdmItem implements CsdlN
   }
 
   /**
-   * Gets entity set path.
-   *
-   * @return the entity set path
-   */
-  public String getEntitySetPath() {
-    return entitySetPath;
-  }
-
-  /**
    * Sets entity set path.
    *
    * @param entitySetPath the entity set path
@@ -113,22 +145,14 @@ public abstract class CsdlOperation extends CsdlAbstractEdmItem implements CsdlN
   }
 
   /**
-   * Gets parameters.
-   *
-   * @return the parameters
-   */
-  public List<CsdlParameter> getParameters() {
-    return parameters;
-  }
-
-  /**
-   * Gets parameter.
+   * Sets name.
    *
    * @param name the name
-   * @return the parameter
+   * @return the name
    */
-  public CsdlParameter getParameter(final String name) {
-    return getOneByName(name, getParameters());
+  public CsdlOperation setName(final String name) {
+    this.name = name;
+    return this;
   }
 
   /**
@@ -143,15 +167,6 @@ public abstract class CsdlOperation extends CsdlAbstractEdmItem implements CsdlN
   }
 
   /**
-   * Gets return type.
-   *
-   * @return the return type
-   */
-  public CsdlReturnType getReturnType() {
-    return returnType;
-  }
-
-  /**
    * Sets return type.
    *
    * @param returnType the return type
@@ -159,21 +174,6 @@ public abstract class CsdlOperation extends CsdlAbstractEdmItem implements CsdlN
    */
   public CsdlOperation setReturnType(final CsdlReturnType returnType) {
     this.returnType = returnType;
-    return this;
-  }
-
-  @Override
-  public List<CsdlAnnotation> getAnnotations() {
-    return annotations;
-  }
-  
-  /**
-   * Sets a list of annotations
-   * @param annotations list of annotations
-   * @return this instance
-   */
-  public CsdlOperation setAnnotations(final List<CsdlAnnotation> annotations) {
-    this.annotations = annotations;
     return this;
   }
 }

@@ -27,19 +27,19 @@ import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeException;
 
 public class EdmDuration extends SingletonPrimitiveType {
 
-  private static final Pattern PATTERN = Pattern.compile(
-      "[-+]?P(?:(\\p{Digit}+)D)?(?:T(?:(\\p{Digit}+)H)?(?:(\\p{Digit}+)M)?"
-          + "(?:(\\p{Digit}+(?:\\.(?:\\p{Digit}+?)0*)?)S)?)?");
+  private static final Pattern PATTERN = Pattern
+    .compile("[-+]?P(?:(\\p{Digit}+)D)?(?:T(?:(\\p{Digit}+)H)?(?:(\\p{Digit}+)M)?"
+      + "(?:(\\p{Digit}+(?:\\.(?:\\p{Digit}+?)0*)?)S)?)?");
 
   private static final EdmDuration INSTANCE = new EdmDuration();
 
-  {
-    uriPrefix = "duration'";
-    uriSuffix = "'";
-  }
-
   public static EdmDuration getInstance() {
     return INSTANCE;
+  }
+
+  {
+    this.uriPrefix = "duration'";
+    this.uriSuffix = "'";
   }
 
   @Override
@@ -48,59 +48,62 @@ public class EdmDuration extends SingletonPrimitiveType {
   }
 
   @Override
-  protected <T> T internalValueOfString(final String value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode, final Class<T> returnType) throws EdmPrimitiveTypeException {
+  protected <T> T internalValueOfString(final String value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode,
+    final Class<T> returnType) throws EdmPrimitiveTypeException {
 
     final Matcher matcher = PATTERN.matcher(value);
-    if (!matcher.matches()
-        || matcher.group(1) == null && matcher.group(2) == null && matcher.group(3) == null
-        && matcher.group(4) == null) {
+    if (!matcher.matches() || matcher.group(1) == null && matcher.group(2) == null
+      && matcher.group(3) == null && matcher.group(4) == null) {
       throw new EdmPrimitiveTypeException("The literal '" + value + "' has illegal content.");
     }
 
     BigDecimal result = (matcher.group(1) == null ? BigDecimal.ZERO
-        : new BigDecimal(matcher.group(1)).multiply(BigDecimal.valueOf(24 * 60 * 60))).
-        add(matcher.group(2) == null ? BigDecimal.ZERO
-            : new BigDecimal(matcher.group(2)).multiply(BigDecimal.valueOf(60 * 60))).
-            add(matcher.group(3) == null ? BigDecimal.ZERO
-                : new BigDecimal(matcher.group(3)).multiply(BigDecimal.valueOf(60))).
-                add(matcher.group(4) == null ? BigDecimal.ZERO : new BigDecimal(matcher.group(4)));
+      : new BigDecimal(matcher.group(1)).multiply(BigDecimal.valueOf(24 * 60 * 60)))
+        .add(matcher.group(2) == null ? BigDecimal.ZERO
+          : new BigDecimal(matcher.group(2)).multiply(BigDecimal.valueOf(60 * 60)))
+        .add(matcher.group(3) == null ? BigDecimal.ZERO
+          : new BigDecimal(matcher.group(3)).multiply(BigDecimal.valueOf(60)))
+        .add(matcher.group(4) == null ? BigDecimal.ZERO : new BigDecimal(matcher.group(4)));
 
     if (result.scale() <= (precision == null ? 0 : precision)) {
       result = value.charAt(0) == '-' ? result.negate() : result;
     } else {
-      throw new EdmPrimitiveTypeException("The literal '" + value + "' does not match the facets' constraints.");
+      throw new EdmPrimitiveTypeException(
+        "The literal '" + value + "' does not match the facets' constraints.");
     }
 
     try {
       return EdmDecimal.convertDecimal(result, returnType);
     } catch (final IllegalArgumentException e) {
-      throw new EdmPrimitiveTypeException("The literal '" + value
-          + "' cannot be converted to value type " + returnType + ".", e);
+      throw new EdmPrimitiveTypeException(
+        "The literal '" + value + "' cannot be converted to value type " + returnType + ".", e);
     } catch (final ClassCastException e) {
       throw new EdmPrimitiveTypeException("The value type " + returnType + " is not supported.", e);
     }
   }
 
   @Override
-  protected <T> String internalValueToString(final T value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode) throws EdmPrimitiveTypeException {
+  protected <T> String internalValueToString(final T value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode)
+    throws EdmPrimitiveTypeException {
 
     BigDecimal valueDecimal;
     if (value instanceof BigDecimal) {
-      valueDecimal = (BigDecimal) value;
-    } else if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long) {
-      valueDecimal = BigDecimal.valueOf(((Number) value).longValue());
+      valueDecimal = (BigDecimal)value;
+    } else if (value instanceof Byte || value instanceof Short || value instanceof Integer
+      || value instanceof Long) {
+      valueDecimal = BigDecimal.valueOf(((Number)value).longValue());
     } else if (value instanceof BigInteger) {
-      valueDecimal = new BigDecimal((BigInteger) value);
+      valueDecimal = new BigDecimal((BigInteger)value);
     } else {
-      throw new EdmPrimitiveTypeException("The value type " + value.getClass() + " is not supported.");
+      throw new EdmPrimitiveTypeException(
+        "The value type " + value.getClass() + " is not supported.");
     }
 
     if (valueDecimal.scale() > (precision == null ? 0 : precision)) {
-      throw new EdmPrimitiveTypeException("The value '" + value + "' does not match the facets' constraints.");
+      throw new EdmPrimitiveTypeException(
+        "The value '" + value + "' does not match the facets' constraints.");
     }
 
     final StringBuilder result = new StringBuilder();

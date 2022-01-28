@@ -29,12 +29,13 @@ public class ActionMapKey {
 
   private final Boolean isBindingParameterCollection;
 
-  public ActionMapKey(final FullQualifiedName actionName, final FullQualifiedName bindingParameterTypeName,
-      final Boolean isBindingParameterCollection) {
+  public ActionMapKey(final FullQualifiedName actionName,
+    final FullQualifiedName bindingParameterTypeName, final Boolean isBindingParameterCollection) {
 
-    if (actionName == null || bindingParameterTypeName == null || isBindingParameterCollection == null) {
+    if (actionName == null || bindingParameterTypeName == null
+      || isBindingParameterCollection == null) {
       throw new EdmException("Action name, binding parameter type and binding parameter collection "
-          + "must not be null for bound actions");
+        + "must not be null for bound actions");
     }
     this.actionName = actionName;
     this.bindingParameterTypeName = bindingParameterTypeName;
@@ -42,26 +43,26 @@ public class ActionMapKey {
   }
 
   @Override
-  public int hashCode() {
-    final String forHash = actionName.toString()
-        + bindingParameterTypeName.toString()
-        + isBindingParameterCollection.toString();
-    return forHash.hashCode();
-  }
-
-  @Override
   public boolean equals(final Object obj) {
     if (this == obj) {
       return true;
     }
-    if ((obj == null) || !(obj instanceof ActionMapKey)) {
+    if (obj == null || !(obj instanceof ActionMapKey)) {
       return false;
     }
-    final ActionMapKey other = (ActionMapKey) obj;
-    if (actionName.equals(other.actionName) && bindingParameterTypeName.equals(other.bindingParameterTypeName)
-        && isBindingParameterCollection.equals(other.isBindingParameterCollection)) {
+    final ActionMapKey other = (ActionMapKey)obj;
+    if (this.actionName.equals(other.actionName)
+      && this.bindingParameterTypeName.equals(other.bindingParameterTypeName)
+      && this.isBindingParameterCollection.equals(other.isBindingParameterCollection)) {
       return true;
     }
     return false;
+  }
+
+  @Override
+  public int hashCode() {
+    final String forHash = this.actionName.toString() + this.bindingParameterTypeName.toString()
+      + this.isBindingParameterCollection.toString();
+    return forHash.hashCode();
   }
 }

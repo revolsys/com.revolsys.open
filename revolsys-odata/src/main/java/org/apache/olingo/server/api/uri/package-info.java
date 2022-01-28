@@ -25,4 +25,3 @@
  * application.
  */
 package org.apache.olingo.server.api.uri;
-

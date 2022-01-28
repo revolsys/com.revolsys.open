@@ -30,6 +30,7 @@ import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitor
 public class EnumerationImpl implements Enumeration {
 
   private final EdmEnumType type;
+
   private final List<String> values;
 
   public EnumerationImpl(final EdmEnumType type, final List<String> values) {
@@ -38,25 +39,25 @@ public class EnumerationImpl implements Enumeration {
   }
 
   @Override
+  public <T> T accept(final ExpressionVisitor<T> visitor)
+    throws ExpressionVisitException, ODataApplicationException {
+    return visitor.visitEnum(this.type, this.values);
+  }
+
+  @Override
   public EdmEnumType getType() {
-    return type;
+    return this.type;
   }
 
   @Override
   public List<String> getValues() {
-    return values == null ?
-        Collections.<String> emptyList() :
-        Collections.unmodifiableList(values);
-  }
-
-  @Override
-  public <T> T accept(final ExpressionVisitor<T> visitor) throws ExpressionVisitException, ODataApplicationException {
-    return visitor.visitEnum(type, values);
+    return this.values == null ? Collections.<String> emptyList()
+      : Collections.unmodifiableList(this.values);
   }
 
   @Override
   public String toString() {
-    return type == null ? "NULL" :
-      type.getFullQualifiedName().getFullQualifiedNameAsString() + getValues();
+    return this.type == null ? "NULL"
+      : this.type.getFullQualifiedName().getFullQualifiedNameAsString() + getValues();
   }
 }

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -33,6 +33,27 @@ import org.apache.olingo.server.api.uri.queryoption.apply.AggregateExpression;
 public interface ExpressionVisitor<T> {
 
   /**
+   * Called for each traversed {@link Alias} expression
+   * @param aliasName Name of the alias
+   * @return Application return value of type T
+   * @throws ExpressionVisitException Thrown if an exception while traversing occurred
+   * @throws ODataApplicationException Thrown by the application
+   */
+  T visitAlias(String aliasName) throws ExpressionVisitException, ODataApplicationException;
+
+  /**
+   * Called for each traversed {@link Binary} expression
+   * @param operator Operator kind
+   * @param left Application return value of left sub tree
+   * @param right Application return value of right sub tree
+   * @return Application return value of type T
+   * @throws ExpressionVisitException Thrown if an exception while traversing occurred
+   * @throws ODataApplicationException Thrown by the application
+   */
+  T visitBinaryOperator(BinaryOperatorKind operator, T left, List<T> right)
+    throws ExpressionVisitException, ODataApplicationException;
+
+  /**
    * Called for each traversed {@link Binary} expression
    * @param operator Operator kind
    * @param left Application return value of left sub tree
@@ -42,29 +63,30 @@ public interface ExpressionVisitor<T> {
    * @throws ODataApplicationException Thrown by the application
    */
   T visitBinaryOperator(BinaryOperatorKind operator, T left, T right)
-      throws ExpressionVisitException, ODataApplicationException;
+    throws ExpressionVisitException, ODataApplicationException;
 
   /**
-   * Called for each traversed {@link Unary} expression
-   * @param operator Operator kind
-   * @param operand return value of sub tree
+   * Called for each traversed {@link AggregateExpression}
+   * @param aggregateExpr the  aggregate expression
    * @return Application return value of type T
    * @throws ExpressionVisitException Thrown if an exception while traversing occurred
    * @throws ODataApplicationException Thrown by the application
    */
-  T visitUnaryOperator(UnaryOperatorKind operator, T operand)
-      throws ExpressionVisitException, ODataApplicationException;
+  default T visitComputeAggregate(final AggregateExpression aggregateExpr)
+    throws ExpressionVisitException, ODataApplicationException {
+    throw new UnsupportedOperationException();
+  }
 
   /**
-   * Called for each traversed {@link Method} expression
-   * @param methodCall Method
-   * @param parameters List of application return values created by visiting each method parameter
+   * Called for each traversed {@link Enumeration} expression
+   * @param type Type used in the URI before the enumeration values
+   * @param enumValues List of enumeration values
    * @return Application return value of type T
    * @throws ExpressionVisitException Thrown if an exception while traversing occurred
    * @throws ODataApplicationException Thrown by the application
    */
-  T visitMethodCall(MethodKind methodCall, List<T> parameters)
-      throws ExpressionVisitException, ODataApplicationException;
+  T visitEnum(EdmEnumType type, List<String> enumValues)
+    throws ExpressionVisitException, ODataApplicationException;
 
   /**
    * Called for each traversed lambda expression
@@ -76,7 +98,17 @@ public interface ExpressionVisitor<T> {
    * @throws ODataApplicationException Thrown by the application
    */
   T visitLambdaExpression(String lambdaFunction, String lambdaVariable, Expression expression)
-      throws ExpressionVisitException, ODataApplicationException;
+    throws ExpressionVisitException, ODataApplicationException;
+
+  /**
+   * Called for each traversed {@link LambdaRef}
+   * @param variableName Name of the used lambda variable
+   * @return Application return value of type T
+   * @throws ExpressionVisitException Thrown if an exception while traversing occurred
+   * @throws ODataApplicationException Thrown by the application
+   */
+  T visitLambdaReference(String variableName)
+    throws ExpressionVisitException, ODataApplicationException;
 
   /**
    * Called for each traversed {@link Literal} expression
@@ -98,13 +130,15 @@ public interface ExpressionVisitor<T> {
   T visitMember(Member member) throws ExpressionVisitException, ODataApplicationException;
 
   /**
-   * Called for each traversed {@link Alias} expression
-   * @param aliasName Name of the alias
+   * Called for each traversed {@link Method} expression
+   * @param methodCall Method
+   * @param parameters List of application return values created by visiting each method parameter
    * @return Application return value of type T
    * @throws ExpressionVisitException Thrown if an exception while traversing occurred
    * @throws ODataApplicationException Thrown by the application
    */
-  T visitAlias(String aliasName) throws ExpressionVisitException, ODataApplicationException;
+  T visitMethodCall(MethodKind methodCall, List<T> parameters)
+    throws ExpressionVisitException, ODataApplicationException;
 
   /**
    * Called for each traversed {@link TypeLiteral} expression
@@ -116,46 +150,14 @@ public interface ExpressionVisitor<T> {
   T visitTypeLiteral(EdmType type) throws ExpressionVisitException, ODataApplicationException;
 
   /**
-   * Called for each traversed {@link LambdaRef}
-   * @param variableName Name of the used lambda variable
-   * @return Application return value of type T
-   * @throws ExpressionVisitException Thrown if an exception while traversing occurred
-   * @throws ODataApplicationException Thrown by the application
-   */
-  T visitLambdaReference(String variableName) throws ExpressionVisitException, ODataApplicationException;
-
-  /**
-   * Called for each traversed {@link Enumeration} expression
-   * @param type Type used in the URI before the enumeration values
-   * @param enumValues List of enumeration values
-   * @return Application return value of type T
-   * @throws ExpressionVisitException Thrown if an exception while traversing occurred
-   * @throws ODataApplicationException Thrown by the application
-   */
-  T visitEnum(EdmEnumType type, List<String> enumValues) throws ExpressionVisitException, ODataApplicationException;
-  
-  /**
-   * Called for each traversed {@link Binary} expression
+   * Called for each traversed {@link Unary} expression
    * @param operator Operator kind
-   * @param left Application return value of left sub tree
-   * @param right Application return value of right sub tree
+   * @param operand return value of sub tree
    * @return Application return value of type T
    * @throws ExpressionVisitException Thrown if an exception while traversing occurred
    * @throws ODataApplicationException Thrown by the application
    */
-  T visitBinaryOperator(BinaryOperatorKind operator, T left, List<T> right)
-      throws ExpressionVisitException, ODataApplicationException;
-
-  /**
-   * Called for each traversed {@link AggregateExpression} 
-   * @param aggregateExpr the  aggregate expression
-   * @return Application return value of type T
-   * @throws ExpressionVisitException Thrown if an exception while traversing occurred
-   * @throws ODataApplicationException Thrown by the application
-   */
-  default T visitComputeAggregate(AggregateExpression aggregateExpr) 
-      throws ExpressionVisitException, ODataApplicationException {
-    throw new UnsupportedOperationException();
-  }
+  T visitUnaryOperator(UnaryOperatorKind operator, T operand)
+    throws ExpressionVisitException, ODataApplicationException;
 
 }

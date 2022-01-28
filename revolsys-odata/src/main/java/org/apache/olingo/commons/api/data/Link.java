@@ -27,49 +27,60 @@ import java.util.List;
 public class Link extends Annotatable {
 
   private String title;
+
   private String rel;
+
   private String href;
+
   private String type;
+
   private String mediaETag;
+
   private Entity entity;
+
   private EntityCollection entitySet;
+
   private String bindingLink;
-  private List<String> bindingLinks = new ArrayList<String>();
 
-  /**
-   * Gets title.
-   *
-   * @return title.
-   */
-  public String getTitle() {
-    return title;
+  private List<String> bindingLinks = new ArrayList<>();
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    final Link other = (Link)o;
+    return getAnnotations().equals(other.getAnnotations())
+      && (this.title == null ? other.title == null : this.title.equals(other.title))
+      && (this.rel == null ? other.rel == null : this.rel.equals(other.rel))
+      && (this.href == null ? other.href == null : this.href.equals(other.href))
+      && (this.type == null ? other.type == null : this.type.equals(other.type))
+      && (this.mediaETag == null ? other.mediaETag == null : this.mediaETag.equals(other.mediaETag))
+      && (this.entity == null ? other.entity == null : this.entity.equals(other.entity))
+      && (this.entitySet == null ? other.entitySet == null : this.entitySet.equals(other.entitySet))
+      && (this.bindingLink == null ? other.bindingLink == null
+        : this.bindingLink.equals(other.bindingLink))
+      && this.bindingLinks.equals(other.bindingLinks);
   }
 
   /**
-   * Sets title.
-   *
-   * @param title title.
+   * If this is a "toOne" relationship this method delivers the binding link or <tt>null</tt> if not set.
+   * @return String the binding link.
    */
-  public void setTitle(final String title) {
-    this.title = title;
+  public String getBindingLink() {
+    return this.bindingLink;
   }
 
   /**
-   * Gets rel info.
-   *
-   * @return rel info.
+   * If this is a "toMany" relationship this method delivers the binding links or <tt>emptyList</tt> if not set.
+   * @return a list of binding links.
    */
-  public String getRel() {
-    return rel;
-  }
-
-  /**
-   * Sets rel info.
-   *
-   * @param rel rel info.
-   */
-  public void setRel(final String rel) {
-    this.rel = rel;
+  public List<String> getBindingLinks() {
+    return this.bindingLinks;
   }
 
   /**
@@ -78,52 +89,7 @@ public class Link extends Annotatable {
    * @return href.
    */
   public String getHref() {
-    return href;
-  }
-
-  /**
-   * Sets href.
-   *
-   * @param href href.
-   */
-  public void setHref(final String href) {
-    this.href = href;
-  }
-
-  /**
-   * Gets type.
-   *
-   * @return type.
-   */
-  public String getType() {
-    return type;
-  }
-
-  /**
-   * Sets type.
-   *
-   * @param type type.
-   */
-  public void setType(final String type) {
-    this.type = type;
-  }
-
-  /**
-   * Gets Media ETag.
-   *
-   * @return media ETag
-   */
-  public String getMediaETag() {
-    return mediaETag;
-  }
-
-  /**
-   * Sets Media ETag.
-   *
-   * @param mediaETag media ETag
-   */
-  public void setMediaETag(final String mediaETag) {
-    this.mediaETag = mediaETag;
+    return this.href;
   }
 
   /**
@@ -132,16 +98,7 @@ public class Link extends Annotatable {
    * @return in-line entity.
    */
   public Entity getInlineEntity() {
-    return entity;
-  }
-
-  /**
-   * Sets in-line entity.
-   *
-   * @param entity entity.
-   */
-  public void setInlineEntity(final Entity entity) {
-    this.entity = entity;
+    return this.entity;
   }
 
   /**
@@ -150,32 +107,58 @@ public class Link extends Annotatable {
    * @return in-line entity set.
    */
   public EntityCollection getInlineEntitySet() {
-    return entitySet;
+    return this.entitySet;
   }
 
   /**
-   * Sets in-line entity set.
+   * Gets Media ETag.
    *
-   * @param entitySet entity set.
+   * @return media ETag
    */
-  public void setInlineEntitySet(final EntityCollection entitySet) {
-    this.entitySet = entitySet;
+  public String getMediaETag() {
+    return this.mediaETag;
   }
 
   /**
-   * If this is a "toOne" relationship this method delivers the binding link or <tt>null</tt> if not set.
-   * @return String the binding link.
+   * Gets rel info.
+   *
+   * @return rel info.
    */
-  public String getBindingLink() {
-    return bindingLink;
+  public String getRel() {
+    return this.rel;
   }
 
   /**
-   * If this is a "toMany" relationship this method delivers the binding links or <tt>emptyList</tt> if not set.
-   * @return a list of binding links.
+   * Gets title.
+   *
+   * @return title.
    */
-  public List<String> getBindingLinks() {
-    return bindingLinks;
+  public String getTitle() {
+    return this.title;
+  }
+
+  /**
+   * Gets type.
+   *
+   * @return type.
+   */
+  public String getType() {
+    return this.type;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = getAnnotations().hashCode();
+    result = 31 * result + (this.title == null ? 0 : this.title.hashCode());
+    result = 31 * result + (this.rel == null ? 0 : this.rel.hashCode());
+    result = 31 * result + (this.href == null ? 0 : this.href.hashCode());
+    result = 31 * result + (this.type == null ? 0 : this.type.hashCode());
+    result = 31 * result + (this.mediaETag == null ? 0 : this.mediaETag.hashCode());
+    result = 31 * result + (this.entity == null ? 0 : this.entity.hashCode());
+    result = 31 * result + (this.entitySet == null ? 0 : this.entitySet.hashCode());
+    result = 31 * result + (this.bindingLink == null ? 0 : this.bindingLink.hashCode());
+    result = 31 * result + this.bindingLinks.hashCode();
+    return result;
   }
 
   /**
@@ -194,40 +177,66 @@ public class Link extends Annotatable {
     this.bindingLinks = bindingLinks;
   }
 
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    final Link other = (Link) o;
-    return getAnnotations().equals(other.getAnnotations())
-        && (title == null ? other.title == null : title.equals(other.title))
-        && (rel == null ? other.rel == null : rel.equals(other.rel))
-        && (href == null ? other.href == null : href.equals(other.href))
-        && (type == null ? other.type == null : type.equals(other.type))
-        && (mediaETag == null ? other.mediaETag == null : mediaETag.equals(other.mediaETag))
-        && (entity == null ? other.entity == null : entity.equals(other.entity))
-        && (entitySet == null ? other.entitySet == null : entitySet.equals(other.entitySet))
-        && (bindingLink == null ? other.bindingLink == null : bindingLink.equals(other.bindingLink))
-        && bindingLinks.equals(other.bindingLinks);
+  /**
+   * Sets href.
+   *
+   * @param href href.
+   */
+  public void setHref(final String href) {
+    this.href = href;
   }
 
-  @Override
-  public int hashCode() {
-    int result = getAnnotations().hashCode();
-    result = 31 * result + (title == null ? 0 : title.hashCode());
-    result = 31 * result + (rel == null ? 0 : rel.hashCode());
-    result = 31 * result + (href == null ? 0 : href.hashCode());
-    result = 31 * result + (type == null ? 0 : type.hashCode());
-    result = 31 * result + (mediaETag == null ? 0 : mediaETag.hashCode());
-    result = 31 * result + (entity == null ? 0 : entity.hashCode());
-    result = 31 * result + (entitySet == null ? 0 : entitySet.hashCode());
-    result = 31 * result + (bindingLink == null ? 0 : bindingLink.hashCode());
-    result = 31 * result + bindingLinks.hashCode();
-    return result;
+  /**
+   * Sets in-line entity.
+   *
+   * @param entity entity.
+   */
+  public void setInlineEntity(final Entity entity) {
+    this.entity = entity;
+  }
+
+  /**
+   * Sets in-line entity set.
+   *
+   * @param entitySet entity set.
+   */
+  public void setInlineEntitySet(final EntityCollection entitySet) {
+    this.entitySet = entitySet;
+  }
+
+  /**
+   * Sets Media ETag.
+   *
+   * @param mediaETag media ETag
+   */
+  public void setMediaETag(final String mediaETag) {
+    this.mediaETag = mediaETag;
+  }
+
+  /**
+   * Sets rel info.
+   *
+   * @param rel rel info.
+   */
+  public void setRel(final String rel) {
+    this.rel = rel;
+  }
+
+  /**
+   * Sets title.
+   *
+   * @param title title.
+   */
+  public void setTitle(final String title) {
+    this.title = title;
+  }
+
+  /**
+   * Sets type.
+   *
+   * @param type type.
+   */
+  public void setType(final String type) {
+    this.type = type;
   }
 }

@@ -36,11 +36,12 @@ public final class EdmGeographyMultiPolygon extends AbstractGeospatialType<Multi
   }
 
   @Override
-  protected <T> T internalValueOfString(final String value, final Boolean isNullable, final Integer maxLength,
-      final Integer precision, final Integer scale, final Boolean isUnicode,
-      final Class<T> returnType) throws EdmPrimitiveTypeException {
+  protected <T> T internalValueOfString(final String value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode,
+    final Class<T> returnType) throws EdmPrimitiveTypeException {
 
-    final MultiPolygon multiPolygon = stringToMultiPolygon(value, isNullable, maxLength, precision, scale, isUnicode);
+    final MultiPolygon multiPolygon = stringToMultiPolygon(value, isNullable, maxLength, precision,
+      scale, isUnicode);
     if (returnType.isAssignableFrom(MultiPolygon.class)) {
       return returnType.cast(multiPolygon);
     } else {
@@ -49,13 +50,15 @@ public final class EdmGeographyMultiPolygon extends AbstractGeospatialType<Multi
   }
 
   @Override
-  protected <T> String internalValueToString(final T value, final Boolean isNullable, final Integer maxLength,
-      final Integer precision, final Integer scale, final Boolean isUnicode) throws EdmPrimitiveTypeException {
+  protected <T> String internalValueToString(final T value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode)
+    throws EdmPrimitiveTypeException {
 
     if (value instanceof MultiPolygon) {
-      return toString((MultiPolygon) value, isNullable, maxLength, precision, scale, isUnicode);
+      return toString((MultiPolygon)value, isNullable, maxLength, precision, scale, isUnicode);
     }
 
-    throw new EdmPrimitiveTypeException("The value type " + value.getClass() + " is not supported.");
+    throw new EdmPrimitiveTypeException(
+      "The value type " + value.getClass() + " is not supported.");
   }
 }

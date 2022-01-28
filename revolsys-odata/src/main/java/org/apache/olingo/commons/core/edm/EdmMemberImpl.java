@@ -33,6 +33,6 @@ public class EdmMemberImpl extends AbstractEdmNamed implements EdmMember {
 
   @Override
   public String getValue() {
-    return member.getValue();
+    return this.member.getValue();
   }
 }

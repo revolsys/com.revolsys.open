@@ -29,29 +29,30 @@ import org.apache.olingo.server.api.uri.queryoption.SystemQueryOptionKind;
 
 public class ApplyOptionImpl extends SystemQueryOptionImpl implements ApplyOption {
 
-  private List<ApplyItem> transformations = new ArrayList<ApplyItem>();
+  private final List<ApplyItem> transformations = new ArrayList<>();
+
   private EdmStructuredType edmStructuredType;
 
   public ApplyOptionImpl() {
     setKind(SystemQueryOptionKind.APPLY);
   }
 
-  @Override
-  public List<ApplyItem> getApplyItems() {
-    return Collections.unmodifiableList(transformations);
-  }
-
   public ApplyOptionImpl add(final ApplyItem transformation) {
-    transformations.add(transformation);
+    this.transformations.add(transformation);
     return this;
   }
 
-  public void setEdmStructuredType(EdmStructuredType referencedType) {
-    this.edmStructuredType = referencedType;
+  @Override
+  public List<ApplyItem> getApplyItems() {
+    return Collections.unmodifiableList(this.transformations);
   }
-  
+
   @Override
   public EdmStructuredType getEdmStructuredType() {
-    return edmStructuredType;
+    return this.edmStructuredType;
+  }
+
+  public void setEdmStructuredType(final EdmStructuredType referencedType) {
+    this.edmStructuredType = referencedType;
   }
 }

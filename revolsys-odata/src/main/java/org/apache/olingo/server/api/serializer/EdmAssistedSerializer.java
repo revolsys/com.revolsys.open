@@ -36,5 +36,6 @@ public interface EdmAssistedSerializer {
    * @param options              options for the serializer
    */
   SerializerResult entityCollection(ServiceMetadata metadata, EdmEntityType referencedEntityType,
-      AbstractEntityCollection entityCollection, EdmAssistedSerializerOptions options) throws SerializerException;
+    AbstractEntityCollection entityCollection, EdmAssistedSerializerOptions options)
+    throws SerializerException;
 }

@@ -24,86 +24,91 @@ import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 
 /** Options for the OData serializer. */
 public class EntitySerializerOptions {
-  private ContextURL contextURL;
-  private ExpandOption expand;
-  private SelectOption select;
-  private boolean writeOnlyReferences;
-  private String xml10InvalidCharReplacement;
-
-  /** Gets the {@link ContextURL}. */
-  public ContextURL getContextURL() {
-    return contextURL;
-  }
-
-  /** Gets the $expand system query option. */
-  public ExpandOption getExpand() {
-    return expand;
-  }
-
-  /** Gets the $select system query option. */
-  public SelectOption getSelect() {
-    return select;
-  }
-
-  /** only writes the references of the entities */
-  public boolean getWriteOnlyReferences() {
-    return writeOnlyReferences;
-  }
-
-  /** Gets the replacement string for unicode characters, that is not allowed in XML 1.0 */
-  public String xml10InvalidCharReplacement() {
-    return xml10InvalidCharReplacement;
-  }  
-
-  private EntitySerializerOptions() {}
-
-  /** Initializes the options builder. */
-  public static Builder with() {
-    return new Builder();
-  }
-
   /** Builder of OData serializer options. */
   public static final class Builder {
 
     private final EntitySerializerOptions options;
 
     private Builder() {
-      options = new EntitySerializerOptions();
+      this.options = new EntitySerializerOptions();
+    }
+
+    /** Builds the OData serializer options. */
+    public EntitySerializerOptions build() {
+      return this.options;
     }
 
     /** Sets the {@link ContextURL}. */
     public Builder contextURL(final ContextURL contextURL) {
-      options.contextURL = contextURL;
+      this.options.contextURL = contextURL;
       return this;
     }
 
     /** Sets the $expand system query option. */
     public Builder expand(final ExpandOption expand) {
-      options.expand = expand;
+      this.options.expand = expand;
       return this;
     }
 
     /** Sets the $select system query option. */
     public Builder select(final SelectOption select) {
-      options.select = select;
+      this.options.select = select;
       return this;
     }
 
     /** Sets to serialize only references */
     public Builder writeOnlyReferences(final boolean ref) {
-      options.writeOnlyReferences = ref;
+      this.options.writeOnlyReferences = ref;
       return this;
     }
-    
+
     /** set the replacement string for xml 1.0 unicode controlled characters that are not allowed */
     public Builder xml10InvalidCharReplacement(final String replacement) {
-      options.xml10InvalidCharReplacement = replacement;
+      this.options.xml10InvalidCharReplacement = replacement;
       return this;
-    } 
-    
-    /** Builds the OData serializer options. */
-    public EntitySerializerOptions build() {
-      return options;
     }
+  }
+
+  /** Initializes the options builder. */
+  public static Builder with() {
+    return new Builder();
+  }
+
+  private ContextURL contextURL;
+
+  private ExpandOption expand;
+
+  private SelectOption select;
+
+  private boolean writeOnlyReferences;
+
+  private String xml10InvalidCharReplacement;
+
+  private EntitySerializerOptions() {
+  }
+
+  /** Gets the {@link ContextURL}. */
+  public ContextURL getContextURL() {
+    return this.contextURL;
+  }
+
+  /** Gets the $expand system query option. */
+  public ExpandOption getExpand() {
+    return this.expand;
+  }
+
+  /** Gets the $select system query option. */
+  public SelectOption getSelect() {
+    return this.select;
+  }
+
+  /** only writes the references of the entities */
+  public boolean getWriteOnlyReferences() {
+    return this.writeOnlyReferences;
+  }
+
+  /** Gets the replacement string for unicode characters, that is not allowed in XML 1.0 */
+  public String xml10InvalidCharReplacement() {
+    return this.xml10InvalidCharReplacement;
   }
 }

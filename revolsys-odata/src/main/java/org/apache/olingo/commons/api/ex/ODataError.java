@@ -27,11 +27,24 @@ import java.util.Map;
 public class ODataError {
 
   private String code;
+
   private String message;
+
   private String target;
+
   private List<ODataErrorDetail> details;
+
   private Map<String, String> innerError;
+
   private Map<String, Object> additionalProperties;
+
+  /**
+   * Gets server defined additional properties.
+   * @return a pair representing server defined object.
+   */
+  public Map<String, Object> getAdditionalProperties() {
+    return this.additionalProperties;
+  }
 
   /**
    * The value for the code name/value pair is a language-independent string. Its value is a service-defined error code.
@@ -39,7 +52,53 @@ public class ODataError {
    * @return the error code as a string
    */
   public String getCode() {
-    return code;
+    return this.code;
+  }
+
+  /**
+   * Gets error details.
+   *
+   * @return ODataErrorDetail list.
+   */
+  public List<ODataErrorDetail> getDetails() {
+    return this.details;
+  }
+
+  /**
+   * Gets server defined key-value pairs for debug environment only.
+   *
+   * @return a pair representing server defined object. MAY be null.
+   */
+  public Map<String, String> getInnerError() {
+    return this.innerError;
+  }
+
+  /**
+   * The value for the message name/value pair MUST be a human-readable, language-dependent representation of the error.
+   * MUST not be null
+   * @return the message string
+   */
+  public String getMessage() {
+    return this.message;
+  }
+
+  /**
+   * The value for the target name/value pair is the target of the particular error (for example, the name of the
+   * property in error). MAY be null.
+   * @return the target string
+   */
+  public String getTarget() {
+    return this.target;
+  }
+
+  /**
+   * Sets server defined additional properties
+   * @param additionalProperties
+   * @return this for method chaining.
+   */
+  public ODataError setAdditionalProperties(final Map<String, Object> additionalProperties) {
+    this.additionalProperties = additionalProperties;
+    return this;
   }
 
   /**
@@ -54,12 +113,23 @@ public class ODataError {
   }
 
   /**
-   * The value for the message name/value pair MUST be a human-readable, language-dependent representation of the error.
-   * MUST not be null
-   * @return the message string
+   * Sets error details.
+   *
+   * @return this for method chaining.
    */
-  public String getMessage() {
-    return message;
+  public ODataError setDetails(final List<ODataErrorDetail> details) {
+    this.details = details;
+    return this;
+  }
+
+  /**
+   * Sets server defined key-value pairs for debug environment only.
+   *
+   * @return this for method chaining.
+   */
+  public ODataError setInnerError(final Map<String, String> innerError) {
+    this.innerError = innerError;
+    return this;
   }
 
   /**
@@ -76,76 +146,11 @@ public class ODataError {
   /**
    * The value for the target name/value pair is the target of the particular error (for example, the name of the
    * property in error). MAY be null.
-   * @return the target string
-   */
-  public String getTarget() {
-    return target;
-  }
-
-  /**
-   * The value for the target name/value pair is the target of the particular error (for example, the name of the
-   * property in error). MAY be null.
    * @param target target to which this error is related to
    * @return this for method chaining
    */
   public ODataError setTarget(final String target) {
     this.target = target;
     return this;
-  }
-
-  /**
-   * Gets error details.
-   *
-   * @return ODataErrorDetail list.
-   */
-  public List<ODataErrorDetail> getDetails() {
-    return details;
-  }
-
-  /**
-   * Sets error details.
-   *
-   * @return this for method chaining.
-   */
-  public ODataError setDetails(final List<ODataErrorDetail> details) {
-    this.details = details;
-    return this;
-  }
-
-  /**
-   * Gets server defined key-value pairs for debug environment only.
-   *
-   * @return a pair representing server defined object. MAY be null.
-   */
-  public Map<String, String> getInnerError() {
-    return innerError;
-  }
-
-  /**
-   * Sets server defined key-value pairs for debug environment only.
-   *
-   * @return this for method chaining.
-   */
-  public ODataError setInnerError(final Map<String, String> innerError) {
-    this.innerError = innerError;
-    return this;
-  }
-  
-  /**
-   * Sets server defined additional properties
-   * @param additionalProperties
-   * @return this for method chaining.
-   */
-  public ODataError setAdditionalProperties(final Map<String, Object> additionalProperties) {
-	  this.additionalProperties = additionalProperties;
-	  return this;
-  }
-  
-  /**
-   * Gets server defined additional properties.
-   * @return a pair representing server defined object.
-   */
-  public Map<String, Object> getAdditionalProperties() {
-	  return this.additionalProperties;
   }
 }

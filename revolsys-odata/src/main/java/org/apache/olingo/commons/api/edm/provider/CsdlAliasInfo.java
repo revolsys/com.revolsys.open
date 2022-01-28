@@ -28,29 +28,19 @@ public class CsdlAliasInfo {
   private String alias;
 
   /**
-   * Returns the namespace of the alias
-   * @return namespace of the alias
-   */
-  public String getNamespace() {
-    return namespace;
-  }
-
-  /**
-   * Sets the namespace of the alias
-   * @param namespace the namespace of the alias
-   * @return this instance
-   */
-  public CsdlAliasInfo setNamespace(final String namespace) {
-    this.namespace = namespace;
-    return this;
-  }
-
-  /**
    * Returns the alias of item
    * @return Alias alias
    */
   public String getAlias() {
-    return alias;
+    return this.alias;
+  }
+
+  /**
+   * Returns the namespace of the alias
+   * @return namespace of the alias
+   */
+  public String getNamespace() {
+    return this.namespace;
   }
 
   /**
@@ -60,6 +50,16 @@ public class CsdlAliasInfo {
    */
   public CsdlAliasInfo setAlias(final String alias) {
     this.alias = alias;
+    return this;
+  }
+
+  /**
+   * Sets the namespace of the alias
+   * @param namespace the namespace of the alias
+   * @return this instance
+   */
+  public CsdlAliasInfo setNamespace(final String namespace) {
+    this.namespace = namespace;
     return this;
   }
 

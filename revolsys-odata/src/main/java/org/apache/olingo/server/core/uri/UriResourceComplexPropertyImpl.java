@@ -24,7 +24,8 @@ import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.server.api.uri.UriResourceComplexProperty;
 import org.apache.olingo.server.api.uri.UriResourceKind;
 
-public class UriResourceComplexPropertyImpl extends UriResourceTypedImpl implements UriResourceComplexProperty {
+public class UriResourceComplexPropertyImpl extends UriResourceTypedImpl
+  implements UriResourceComplexProperty {
 
   private final EdmProperty property;
 
@@ -34,32 +35,32 @@ public class UriResourceComplexPropertyImpl extends UriResourceTypedImpl impleme
   }
 
   @Override
-  public EdmProperty getProperty() {
-    return property;
-  }
-
-  @Override
   public EdmComplexType getComplexType() {
-    return (EdmComplexType) getType();
+    return (EdmComplexType)getType();
   }
 
   @Override
   public EdmComplexType getComplexTypeFilter() {
-    return (EdmComplexType) getTypeFilter();
+    return (EdmComplexType)getTypeFilter();
   }
 
   @Override
-  public EdmType getType() {
-    return property.getType();
-  }
-
-  @Override
-  public boolean isCollection() {
-    return property.isCollection();
+  public EdmProperty getProperty() {
+    return this.property;
   }
 
   @Override
   public String getSegmentValue() {
-    return property.getName();
+    return this.property.getName();
+  }
+
+  @Override
+  public EdmType getType() {
+    return this.property.getType();
+  }
+
+  @Override
+  public boolean isCollection() {
+    return this.property.isCollection();
   }
 }

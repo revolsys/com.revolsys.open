@@ -24,35 +24,27 @@ import java.util.List;
 /**
  * The type Csdl operation import.
  */
-public abstract class CsdlOperationImport extends CsdlAbstractEdmItem implements CsdlNamed, CsdlAnnotatable {
+public abstract class CsdlOperationImport
+  implements CsdlAbstractEdmItem, CsdlNamed, CsdlAnnotatable {
 
   /**
    * The Name.
    */
   protected String name;
+
   /**
    * The Entity set.
    */
   protected String entitySet;
+
   /**
    * The Annotations.
    */
-  protected List<CsdlAnnotation> annotations = new ArrayList<CsdlAnnotation>();
+  protected List<CsdlAnnotation> annotations = new ArrayList<>();
 
   @Override
-  public String getName() {
-    return name;
-  }
-
-  /**
-   * Sets name.
-   *
-   * @param name the name
-   * @return the name
-   */
-  public CsdlOperationImport setName(final String name) {
-    this.name = name;
-    return this;
+  public List<CsdlAnnotation> getAnnotations() {
+    return this.annotations;
   }
 
   /**
@@ -61,7 +53,22 @@ public abstract class CsdlOperationImport extends CsdlAbstractEdmItem implements
    * @return the entity set
    */
   public String getEntitySet() {
-    return entitySet;
+    return this.entitySet;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
+  }
+
+  /**
+   * Sets a list of annotations
+   * @param annotations list of annotations
+   * @return this instance
+   */
+  public CsdlOperationImport setAnnotations(final List<CsdlAnnotation> annotations) {
+    this.annotations = annotations;
+    return this;
   }
 
   /**
@@ -75,18 +82,14 @@ public abstract class CsdlOperationImport extends CsdlAbstractEdmItem implements
     return this;
   }
 
-  @Override
-  public List<CsdlAnnotation> getAnnotations() {
-    return annotations;
-  }
-  
   /**
-   * Sets a list of annotations
-   * @param annotations list of annotations
-   * @return this instance
+   * Sets name.
+   *
+   * @param name the name
+   * @return the name
    */
-  public CsdlOperationImport setAnnotations(final List<CsdlAnnotation> annotations) {
-    this.annotations = annotations;
+  public CsdlOperationImport setName(final String name) {
+    this.name = name;
     return this;
   }
 }

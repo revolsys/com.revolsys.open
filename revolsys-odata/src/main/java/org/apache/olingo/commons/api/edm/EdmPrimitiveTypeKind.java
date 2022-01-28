@@ -27,45 +27,13 @@ import java.util.Map;
  */
 public enum EdmPrimitiveTypeKind {
 
-  Binary,
-  Boolean,
-  Byte,
-  SByte,
-  Date,
-  DateTimeOffset,
-  TimeOfDay,
-  Duration,
-  Decimal,
-  Single,
-  Double,
-  Guid,
-  Int16,
-  Int32,
-  Int64,
-  String,
-  Stream,
-  Geography,
-  GeographyPoint,
-  GeographyLineString,
-  GeographyPolygon,
-  GeographyMultiPoint,
-  GeographyMultiLineString,
-  GeographyMultiPolygon,
-  GeographyCollection,
-  Geometry,
-  GeometryPoint,
-  GeometryLineString,
-  GeometryPolygon,
-  GeometryMultiPoint,
-  GeometryMultiLineString,
-  GeometryMultiPolygon,
-  GeometryCollection;
+  Binary, Boolean, Byte, SByte, Date, DateTimeOffset, TimeOfDay, Duration, Decimal, Single, Double, Guid, Int16, Int32, Int64, String, Stream, Geography, GeographyPoint, GeographyLineString, GeographyPolygon, GeographyMultiPoint, GeographyMultiLineString, GeographyMultiPolygon, GeographyCollection, Geometry, GeometryPoint, GeometryLineString, GeometryPolygon, GeometryMultiPoint, GeometryMultiLineString, GeometryMultiPolygon, GeometryCollection;
 
   private static Map<String, EdmPrimitiveTypeKind> VALUES_BY_NAME;
 
   static {
-    Map<String, EdmPrimitiveTypeKind> valuesByName = new HashMap<java.lang.String, EdmPrimitiveTypeKind>();
-    for (EdmPrimitiveTypeKind value : values()) {
+    final Map<String, EdmPrimitiveTypeKind> valuesByName = new HashMap<>();
+    for (final EdmPrimitiveTypeKind value : values()) {
       valuesByName.put(value.name(), value);
     }
     VALUES_BY_NAME = Collections.unmodifiableMap(valuesByName);
@@ -77,26 +45,8 @@ public enum EdmPrimitiveTypeKind {
    * @param name The name.
    * @return The type kind or <tt>null</tt> if it does not exist.
    */
-  public static EdmPrimitiveTypeKind getByName(String name) {
+  public static EdmPrimitiveTypeKind getByName(final String name) {
     return VALUES_BY_NAME.get(name);
-  }
-
-  /**
-   * Checks if is a geospatial type.
-   *
-   * @return <tt>true</tt> if is geospatial type; <tt>false</tt> otherwise.
-   */
-  public boolean isGeospatial() {
-    return name().startsWith("Geo");
-  }
-
-  /**
-   * Returns the {@link FullQualifiedName} for this type kind.
-   *
-   * @return {@link FullQualifiedName}
-   */
-  public FullQualifiedName getFullQualifiedName() {
-    return new FullQualifiedName(EdmPrimitiveType.EDM_NAMESPACE, toString());
   }
 
   /**
@@ -123,6 +73,24 @@ public enum EdmPrimitiveTypeKind {
     }
 
     return valueOf(fqn.substring(4));
+  }
+
+  /**
+   * Returns the {@link FullQualifiedName} for this type kind.
+   *
+   * @return {@link FullQualifiedName}
+   */
+  public FullQualifiedName getFullQualifiedName() {
+    return new FullQualifiedName(EdmPrimitiveType.EDM_NAMESPACE, toString());
+  }
+
+  /**
+   * Checks if is a geospatial type.
+   *
+   * @return <tt>true</tt> if is geospatial type; <tt>false</tt> otherwise.
+   */
+  public boolean isGeospatial() {
+    return name().startsWith("Geo");
   }
 
 }

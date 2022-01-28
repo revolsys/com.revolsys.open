@@ -30,7 +30,7 @@ public class MultiPolygon extends ComposedGeospatial<Polygon> {
 
   /**
    * Creates a collection of polygons
-   * 
+   *
    * @param dimension   Dimension of the polygons
    * @param srid        SRID value
    * @param polygons    List of polygons
@@ -41,8 +41,7 @@ public class MultiPolygon extends ComposedGeospatial<Polygon> {
 
   @Override
   public EdmPrimitiveTypeKind getEdmPrimitiveTypeKind() {
-    return dimension == Dimension.GEOGRAPHY ?
-        EdmPrimitiveTypeKind.GeographyMultiPolygon :
-        EdmPrimitiveTypeKind.GeometryMultiPolygon;
+    return this.dimension == Dimension.GEOGRAPHY ? EdmPrimitiveTypeKind.GeographyMultiPolygon
+      : EdmPrimitiveTypeKind.GeometryMultiPolygon;
   }
 }

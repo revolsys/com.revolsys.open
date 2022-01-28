@@ -18,40 +18,47 @@
  */
 package org.apache.olingo.commons.api.data;
 
-import org.apache.olingo.commons.api.ex.ODataNotSupportedException;
-
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.olingo.commons.api.ex.ODataNotSupportedException;
 
 /**
  * Data representation as an Iterator for a collection of single entities.
  */
 public abstract class EntityIterator extends AbstractEntityCollection implements Iterator<Entity> {
-  
+
   private URI next;
-  
+
   private Integer count;
+
   /**
-   * {@inheritDoc}
+   * Gets count
+   *
    */
-  public abstract boolean hasNext();
-  /**
-   * {@inheritDoc}
-   * <p/>
-   * Which is an Entity for this type of iterator.
-   */
-  public abstract Entity next();
+  @Override
+  public Integer getCount() {
+    return this.count;
+  }
 
   /**
    * {@inheritDoc}
    * <p/>
-   * <b>ATTENTION:</b> <code>remove</code> is not supported by default.
+   * <b>ATTENTION:</b> <code>getDeltaLink</code> is not supported by default.
    */
   @Override
-  public void remove() {
-    //"Remove is not supported for iteration over Entities."
-    throw new ODataNotSupportedException("Entity Iterator does not support remove()");
+  public URI getDeltaLink() {
+    throw new ODataNotSupportedException("Entity Iterator does not support getDeltaLink()");
+  }
+
+  /**
+   * Gets next link.
+   *
+   */
+  @Override
+  public URI getNext() {
+    return this.next;
   }
 
   /**
@@ -61,9 +68,16 @@ public abstract class EntityIterator extends AbstractEntityCollection implements
    */
   @Override
   public List<Operation> getOperations() {
-    //"Remove is not supported for iteration over Entities."
-    throw new ODataNotSupportedException("Entity Iterator does not support getOperations() by default");
+    // "Remove is not supported for iteration over Entities."
+    throw new ODataNotSupportedException(
+      "Entity Iterator does not support getOperations() by default");
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public abstract boolean hasNext();
 
   /**
    * {@inheritDoc}
@@ -74,39 +88,24 @@ public abstract class EntityIterator extends AbstractEntityCollection implements
   }
 
   /**
-   * Gets count
-   * 
+   * {@inheritDoc}
+   * <p/>
+   * Which is an Entity for this type of iterator.
    */
-  public Integer getCount() {
-    return count;
-  }
-
-  /**
-   * Gets next link.
-   *
-   */
-  public URI getNext() {
-    return next;
-  }
+  @Override
+  public abstract Entity next();
 
   /**
    * {@inheritDoc}
    * <p/>
-   * <b>ATTENTION:</b> <code>getDeltaLink</code> is not supported by default.
+   * <b>ATTENTION:</b> <code>remove</code> is not supported by default.
    */
-  public URI getDeltaLink() {
-    throw new ODataNotSupportedException("Entity Iterator does not support getDeltaLink()");
+  @Override
+  public void remove() {
+    // "Remove is not supported for iteration over Entities."
+    throw new ODataNotSupportedException("Entity Iterator does not support remove()");
   }
-  
-  /**
-   * Sets next link.
-   *
-   * @param next next link.
-   */
-  public void setNext(final URI next) {
-    this.next = next;
-  }
-  
+
   /**
    * Sets count.
    *
@@ -114,5 +113,14 @@ public abstract class EntityIterator extends AbstractEntityCollection implements
    */
   public void setCount(final Integer count) {
     this.count = count;
+  }
+
+  /**
+   * Sets next link.
+   *
+   * @param next next link.
+   */
+  public void setNext(final URI next) {
+    this.next = next;
   }
 }

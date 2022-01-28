@@ -20,4 +20,3 @@
  * Contains representations for constants related to EDM objects.
  */
 package org.apache.olingo.commons.api.edm.constants;
-

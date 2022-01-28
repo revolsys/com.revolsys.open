@@ -51,12 +51,59 @@ public class Point extends Geospatial {
     super(dimension, Type.POINT, srid);
   }
 
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    final Point point = (Point)o;
+    return this.dimension == point.dimension
+      && (this.srid == null ? point.srid == null : this.srid.equals(point.srid))
+      && this.x == point.x && this.y == point.y && this.z == point.z;
+  }
+
+  @Override
+  public EdmPrimitiveTypeKind getEdmPrimitiveTypeKind() {
+    return this.dimension == Dimension.GEOGRAPHY ? EdmPrimitiveTypeKind.GeographyPoint
+      : EdmPrimitiveTypeKind.GeometryPoint;
+  }
+
   /**
    * Returns the x coordinate.
    * @return x coordinate
    */
   public double getX() {
-    return x;
+    return this.x;
+  }
+
+  /**
+   * Returns the y coordinate.
+   * @return y coordinate
+   */
+  public double getY() {
+    return this.y;
+  }
+
+  /**
+   * Returns the z coordinate.
+   * @return z coordinate
+   */
+  public double getZ() {
+    return this.z;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = this.dimension == null ? 0 : this.dimension.hashCode();
+    result = 31 * result + (this.srid == null ? 0 : this.srid.hashCode());
+    result = 31 * result + Double.valueOf(this.x).hashCode();
+    result = 31 * result + Double.valueOf(this.y).hashCode();
+    result = 31 * result + Double.valueOf(this.z).hashCode();
+    return result;
   }
 
   /**
@@ -68,27 +115,11 @@ public class Point extends Geospatial {
   }
 
   /**
-   * Returns the y coordinate.
-   * @return y coordinate
-   */
-  public double getY() {
-    return y;
-  }
-
-  /**
    * Sets the y coordinate.
    * @param y y coordinate
    */
   public void setY(final double y) {
     this.y = y;
-  }
-
-  /**
-   * Returns the z coordinate.
-   * @return z coordinate
-   */
-  public double getZ() {
-    return z;
   }
 
   /**
@@ -100,44 +131,9 @@ public class Point extends Geospatial {
   }
 
   @Override
-  public EdmPrimitiveTypeKind getEdmPrimitiveTypeKind() {
-    return dimension == Dimension.GEOGRAPHY ?
-        EdmPrimitiveTypeKind.GeographyPoint :
-        EdmPrimitiveTypeKind.GeometryPoint;
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    final Point point = (Point) o;
-    return dimension == point.dimension
-        && (srid == null ? point.srid == null : srid.equals(point.srid))
-        && x == point.x
-        && y == point.y
-        && z == point.z;
-  }
-
-  @Override
-  public int hashCode() {
-    int result = dimension == null ? 0 : dimension.hashCode();
-    result = 31 * result + (srid == null ? 0 : srid.hashCode());
-    result = 31 * result + Double.valueOf(x).hashCode();
-    result = 31 * result + Double.valueOf(y).hashCode();
-    result = 31 * result + Double.valueOf(z).hashCode();
-    return result;
-  }
-
-  @Override
   public String toString() {
-    return (dimension == null ? "" : dimension.name())
-        + '\''
-        + (srid == null ? "" : "SRID=" + srid.toString() + ';')
-        + "Point(" + x + ' ' + y + ")'";
+    return (this.dimension == null ? "" : this.dimension.name()) + '\''
+      + (this.srid == null ? "" : "SRID=" + this.srid.toString() + ';') + "Point(" + this.x + ' '
+      + this.y + ")'";
   }
 }

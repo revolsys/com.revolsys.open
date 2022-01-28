@@ -27,44 +27,123 @@ import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 /** Options for the OData serializer. */
 public class EntityCollectionSerializerOptions {
 
+  /** Builder of OData serializer options. */
+  public static final class Builder {
+
+    private final EntityCollectionSerializerOptions options;
+
+    private Builder() {
+      this.options = new EntityCollectionSerializerOptions();
+    }
+
+    /** Builds the OData serializer options. */
+    public EntityCollectionSerializerOptions build() {
+      return this.options;
+    }
+
+    /** Sets the {@link ContextURL}. */
+    public Builder contextURL(final ContextURL contextURL) {
+      this.options.contextURL = contextURL;
+      return this;
+    }
+
+    /** Sets the $count system query option. */
+    public Builder count(final CountOption count) {
+      this.options.count = count;
+      return this;
+    }
+
+    /** Sets the $expand system query option. */
+    public Builder expand(final ExpandOption expand) {
+      this.options.expand = expand;
+      return this;
+    }
+
+    /** Sets id of the collection */
+    public Builder id(final String id) {
+      this.options.id = id;
+      return this;
+    }
+
+    /** sets isFullRepresentation to represent inline entries**/
+    public Builder isFullRepresentation(final boolean isFullRepresentation) {
+      this.options.isFullRepresentation = isFullRepresentation;
+      return this;
+    }
+
+    /** Sets the $select system query option. */
+    public Builder select(final SelectOption select) {
+      this.options.select = select;
+      return this;
+    }
+
+    /**
+     * Set the callback which is used in case of an exception during
+     * write of the content.
+     *
+     * @param ODataContentWriteErrorCallback the callback
+     * @return the builder
+     */
+    public Builder writeContentErrorCallback(
+      final ODataContentWriteErrorCallback ODataContentWriteErrorCallback) {
+      this.options.odataContentWriteErrorCallback = ODataContentWriteErrorCallback;
+      return this;
+    }
+
+    /** Sets to serialize only references */
+    public Builder writeOnlyReferences(final boolean ref) {
+      this.options.writeOnlyReferences = ref;
+      return this;
+    }
+
+    /** set the replacement String for xml 1.0 unicode controlled characters that are not allowed */
+    public Builder xml10InvalidCharReplacement(final String replacement) {
+      this.options.xml10InvalidCharReplacement = replacement;
+      return this;
+    }
+  }
+
+  /** Initializes the options builder. */
+  public static Builder with() {
+    return new Builder();
+  }
+
   private ContextURL contextURL;
+
   private CountOption count;
+
   private ExpandOption expand;
+
   private SelectOption select;
+
   private boolean writeOnlyReferences;
+
   private String id;
+
   private ODataContentWriteErrorCallback odataContentWriteErrorCallback;
+
   private String xml10InvalidCharReplacement;
+
   private boolean isFullRepresentation = false;
 
   /** Gets the {@link ContextURL}. */
   public ContextURL getContextURL() {
-    return contextURL;
+    return this.contextURL;
   }
 
   /** Gets the $count system query option. */
   public CountOption getCount() {
-    return count;
+    return this.count;
   }
 
   /** Gets the $expand system query option. */
   public ExpandOption getExpand() {
-    return expand;
-  }
-
-  /** Gets the $select system query option. */
-  public SelectOption getSelect() {
-    return select;
-  }
-
-  /** only writes the references of the entities */
-  public boolean getWriteOnlyReferences() {
-    return writeOnlyReferences;
+    return this.expand;
   }
 
   /** Gets the id of the entity collection */
   public String getId() {
-    return id;
+    return this.id;
   }
 
   /**
@@ -76,95 +155,26 @@ public class EntityCollectionSerializerOptions {
    *
    */
   public ODataContentWriteErrorCallback getODataContentWriteErrorCallback() {
-    return odataContentWriteErrorCallback;
+    return this.odataContentWriteErrorCallback;
   }
+
+  /** Gets the $select system query option. */
+  public SelectOption getSelect() {
+    return this.select;
+  }
+
+  /** only writes the references of the entities */
+  public boolean getWriteOnlyReferences() {
+    return this.writeOnlyReferences;
+  }
+
+  /** Inline entries will not have @delta if representation is full **/
+  public boolean isFullRepresentation() {
+    return this.isFullRepresentation;
+  }
+
   /** Gets the replacement string for unicode characters, that is not allowed in XML 1.0 */
   public String xml10InvalidCharReplacement() {
-    return xml10InvalidCharReplacement;
-  }  
-  
-  /** Inline entries will not have @delta if representation is full **/ 
-  public boolean isFullRepresentation() {
-    return isFullRepresentation;
-  }
-
-  /** Initializes the options builder. */
-  public static Builder with() {
-    return new Builder();
-  }
-
-  /** Builder of OData serializer options. */
-  public static final class Builder {
-
-    private final EntityCollectionSerializerOptions options;
-
-    private Builder() {
-      options = new EntityCollectionSerializerOptions();
-    }
-
-    /** Sets the {@link ContextURL}. */
-    public Builder contextURL(final ContextURL contextURL) {
-      options.contextURL = contextURL;
-      return this;
-    }
-
-    /** Sets the $count system query option. */
-    public Builder count(final CountOption count) {
-      options.count = count;
-      return this;
-    }
-
-    /** Sets the $expand system query option. */
-    public Builder expand(final ExpandOption expand) {
-      options.expand = expand;
-      return this;
-    }
-
-    /** Sets the $select system query option. */
-    public Builder select(final SelectOption select) {
-      options.select = select;
-      return this;
-    }
-
-    /** Sets to serialize only references */
-    public Builder writeOnlyReferences(final boolean ref) {
-      options.writeOnlyReferences = ref;
-      return this;
-    }
-
-    /** Sets id of the collection */
-    public Builder id(final String id) {
-      options.id = id;
-      return this;
-    }
-
-    /**
-     * Set the callback which is used in case of an exception during
-     * write of the content.
-     *
-     * @param ODataContentWriteErrorCallback the callback
-     * @return the builder
-     */
-    public Builder writeContentErrorCallback(ODataContentWriteErrorCallback ODataContentWriteErrorCallback) {
-      options.odataContentWriteErrorCallback = ODataContentWriteErrorCallback;
-      return this;
-    }
-
-    /** set the replacement String for xml 1.0 unicode controlled characters that are not allowed */
-    public Builder xml10InvalidCharReplacement(final String replacement) {
-      options.xml10InvalidCharReplacement = replacement;
-      return this;
-    } 
-    
-    /** sets isFullRepresentation to represent inline entries**/
-    public Builder isFullRepresentation(boolean isFullRepresentation) {
-      options.isFullRepresentation = isFullRepresentation;
-      return this;
-    }
-    
-    /** Builds the OData serializer options. */
-    public EntityCollectionSerializerOptions build() {
-      return options;
-    }
+    return this.xml10InvalidCharReplacement;
   }
 }

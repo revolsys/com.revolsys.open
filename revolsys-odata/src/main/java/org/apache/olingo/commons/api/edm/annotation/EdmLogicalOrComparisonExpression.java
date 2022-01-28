@@ -30,7 +30,7 @@ public interface EdmLogicalOrComparisonExpression extends EdmDynamicExpression, 
    * @return Child expression
    */
   EdmExpression getLeftExpression();
-  
+
   /**
    * Returns the second expression (right child)
    * @return Child expression

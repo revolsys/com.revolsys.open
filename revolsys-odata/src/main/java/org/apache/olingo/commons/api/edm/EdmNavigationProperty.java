@@ -27,18 +27,12 @@ import java.util.List;
  */
 public interface EdmNavigationProperty extends EdmElement, EdmAnnotatable {
 
-  @Override
-  EdmEntityType getType();
-
-  /**
-   * @return true if nullable or not specified
-   */
-  boolean isNullable();
-
   /**
    * @return true if containsTarget
    */
   boolean containsTarget();
+
+  EdmOnDelete getOnDelete();
 
   /**
    * @return the partner navigation property
@@ -57,7 +51,13 @@ public interface EdmNavigationProperty extends EdmElement, EdmAnnotatable {
    * @return all referential constraints for this navigation property.
    */
   List<EdmReferentialConstraint> getReferentialConstraints();
-  
-  EdmOnDelete getOnDelete();
+
+  @Override
+  EdmEntityType getType();
+
+  /**
+   * @return true if nullable or not specified
+   */
+  boolean isNullable();
 
 }

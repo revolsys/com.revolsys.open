@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -33,85 +33,19 @@ import org.apache.olingo.commons.api.edm.geo.SRID;
 public class DynamicProperty implements EdmProperty {
 
   private final String name;
+
   private final EdmType propertyType;
+
   private Integer precision;
+
   private Integer scale;
+
   private String scaleAsString;
 
   /** Creates a dynamic property with a mandatory name and an optional type. */
   public DynamicProperty(final String name, final EdmType type) {
     this.name = name;
-    propertyType = type;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public EdmType getType() {
-    return propertyType;
-  }
-
-  @Override
-  public boolean isCollection() {
-    return false;
-  }
-
-  @Override
-  public EdmMapping getMapping() {
-    return null;
-  }
-
-  @Override
-  public String getMimeType() {
-    return null;
-  }
-
-  @Override
-  public boolean isNullable() {
-    return false;
-  }
-
-  @Override
-  public Integer getMaxLength() {
-    return null;
-  }
-
-  @Override
-  public Integer getPrecision() {
-    return precision;
-  }
-
-  @Override
-  public Integer getScale() {
-    return scale;
-  }
-
-  @Override
-  public String getScaleAsString() {
-    return scaleAsString;
-  }
-
-  @Override
-  public SRID getSrid() {
-    return null;
-  }
-
-  @Override
-  public boolean isUnicode() {
-    return true;
-  }
-
-  @Override
-  public String getDefaultValue() {
-    return null;
-  }
-
-  @Override
-  public boolean isPrimitive() {
-    return propertyType != null && propertyType.getKind() == EdmTypeKind.PRIMITIVE;
+    this.propertyType = type;
   }
 
   @Override
@@ -123,24 +57,94 @@ public class DynamicProperty implements EdmProperty {
   public List<EdmAnnotation> getAnnotations() {
     return Collections.emptyList();
   }
-  
+
+  @Override
+  public String getDefaultValue() {
+    return null;
+  }
+
+  @Override
+  public EdmMapping getMapping() {
+    return null;
+  }
+
+  @Override
+  public Integer getMaxLength() {
+    return null;
+  }
+
+  @Override
+  public String getMimeType() {
+    return null;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
+  }
+
+  @Override
+  public Integer getPrecision() {
+    return this.precision;
+  }
+
+  @Override
+  public Integer getScale() {
+    return this.scale;
+  }
+
+  @Override
+  public String getScaleAsString() {
+    return this.scaleAsString;
+  }
+
+  @Override
+  public SRID getSrid() {
+    return null;
+  }
+
+  @Override
+  public EdmType getType() {
+    return this.propertyType;
+  }
+
   @Override
   public EdmType getTypeWithAnnotations() {
-    return propertyType;
+    return this.propertyType;
   }
-  
-  public DynamicProperty setPrecision(Integer precision) {
+
+  @Override
+  public boolean isCollection() {
+    return false;
+  }
+
+  @Override
+  public boolean isNullable() {
+    return false;
+  }
+
+  @Override
+  public boolean isPrimitive() {
+    return this.propertyType != null && this.propertyType.getKind() == EdmTypeKind.PRIMITIVE;
+  }
+
+  @Override
+  public boolean isUnicode() {
+    return true;
+  }
+
+  public DynamicProperty setPrecision(final Integer precision) {
     this.precision = precision;
     return this;
   }
-  
-  public DynamicProperty setScale(Integer scale) {
+
+  public DynamicProperty setScale(final Integer scale) {
     this.scale = scale;
     return this;
   }
 
-  public DynamicProperty setScaleAsString(String scaleAsString) {
-	this.scaleAsString = scaleAsString;
-	return this;
+  public DynamicProperty setScaleAsString(final String scaleAsString) {
+    this.scaleAsString = scaleAsString;
+    return this;
   }
 }

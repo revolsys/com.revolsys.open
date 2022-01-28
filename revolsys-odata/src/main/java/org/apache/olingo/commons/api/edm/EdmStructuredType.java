@@ -28,6 +28,36 @@ import java.util.List;
 public interface EdmStructuredType extends EdmType, EdmAnnotatable {
 
   /**
+   * Checks if this type is convertible to parameter {@code targetType}
+   *
+   * @param targetType target type for which compatibility is checked
+   * @return true if this type is compatible to the testType (i.e., this type is a subtype of targetType)
+   */
+  boolean compatibleTo(EdmType targetType);
+
+  /**
+   * Base types are described in the OData protocol specification.
+   *
+   * @return {@link EdmStructuredType}
+   */
+  EdmStructuredType getBaseType();
+
+  /**
+   * Get navigation property by name.
+   *
+   * @param name name of navigation property
+   * @return navigation property as {@link EdmTyped}
+   */
+  EdmNavigationProperty getNavigationProperty(String name);
+
+  /**
+   * Get all navigation property names.
+   *
+   * @return navigation property names as type List&lt;String&gt;
+   */
+  List<String> getNavigationPropertyNames();
+
+  /**
    * Get property by name
    *
    * @param name name of property
@@ -51,34 +81,11 @@ public interface EdmStructuredType extends EdmType, EdmAnnotatable {
   EdmProperty getStructuralProperty(String name);
 
   /**
-   * Get navigation property by name.
+   * Indicates if the structured type is abstract.
    *
-   * @param name name of navigation property
-   * @return navigation property as {@link EdmTyped}
+   * @return <code>true</code> if the structured type is abstract
    */
-  EdmNavigationProperty getNavigationProperty(String name);
-
-  /**
-   * Get all navigation property names.
-   *
-   * @return navigation property names as type List&lt;String&gt;
-   */
-  List<String> getNavigationPropertyNames();
-
-  /**
-   * Base types are described in the OData protocol specification.
-   *
-   * @return {@link EdmStructuredType}
-   */
-  EdmStructuredType getBaseType();
-
-  /**
-   * Checks if this type is convertible to parameter {@code targetType}
-   *
-   * @param targetType target type for which compatibility is checked
-   * @return true if this type is compatible to the testType (i.e., this type is a subtype of targetType)
-   */
-  boolean compatibleTo(EdmType targetType);
+  boolean isAbstract();
 
   /**
    * Indicates if the structured type is an open type.
@@ -86,11 +93,4 @@ public interface EdmStructuredType extends EdmType, EdmAnnotatable {
    * @return <code>true</code> if the structured type is open
    */
   boolean isOpenType();
-
-  /**
-   * Indicates if the structured type is abstract.
-   *
-   * @return <code>true</code> if the structured type is abstract
-   */
-  boolean isAbstract();
 }

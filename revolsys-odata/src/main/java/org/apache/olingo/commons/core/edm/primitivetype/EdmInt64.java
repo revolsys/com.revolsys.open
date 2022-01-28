@@ -30,46 +30,6 @@ public final class EdmInt64 extends SingletonPrimitiveType {
 
   private static final EdmInt64 INSTANCE = new EdmInt64();
 
-  public static EdmInt64 getInstance() {
-    return INSTANCE;
-  }
-
-  @Override
-  public boolean isCompatible(final EdmPrimitiveType primitiveType) {
-    return primitiveType instanceof EdmByte
-        || primitiveType instanceof EdmSByte
-        || primitiveType instanceof EdmInt16
-        || primitiveType instanceof EdmInt32
-        || primitiveType instanceof EdmInt64;
-  }
-
-  @Override
-  public Class<?> getDefaultType() {
-    return Long.class;
-  }
-
-  @Override
-  protected <T> T internalValueOfString(final String value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode, final Class<T> returnType) throws EdmPrimitiveTypeException {
-
-    Long valueLong;
-    try {
-      valueLong = Long.parseLong(value);
-    } catch (final NumberFormatException e) {
-      throw new EdmPrimitiveTypeException("The literal '" + value + "' has illegal content.", e);
-    }
-
-    try {
-      return convertNumber(valueLong, returnType);
-    } catch (final IllegalArgumentException e) {
-      throw new EdmPrimitiveTypeException("The literal '" + value
-          + "' cannot be converted to value type " + returnType + ".", e);
-    } catch (final ClassCastException e) {
-      throw new EdmPrimitiveTypeException("The value type " + returnType + " is not supported.", e);
-    }
-  }
-
   /**
    * Converts a whole {@link Number} value into the requested return type if possible.
    *
@@ -81,7 +41,7 @@ public final class EdmInt64 extends SingletonPrimitiveType {
    * @throws ClassCastException if the return type is not allowed
    */
   public static <T> T convertNumber(final Number value, final Class<T> returnType)
-      throws IllegalArgumentException, ClassCastException {
+    throws IllegalArgumentException, ClassCastException {
 
     if (returnType.isAssignableFrom(Long.class)) {
       return returnType.cast(value.longValue());
@@ -110,21 +70,61 @@ public final class EdmInt64 extends SingletonPrimitiveType {
     }
   }
 
-  @Override
-  protected <T> String internalValueToString(final T value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode) throws EdmPrimitiveTypeException {
+  public static EdmInt64 getInstance() {
+    return INSTANCE;
+  }
 
-    if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long) {
+  @Override
+  public Class<?> getDefaultType() {
+    return Long.class;
+  }
+
+  @Override
+  protected <T> T internalValueOfString(final String value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode,
+    final Class<T> returnType) throws EdmPrimitiveTypeException {
+
+    Long valueLong;
+    try {
+      valueLong = Long.parseLong(value);
+    } catch (final NumberFormatException e) {
+      throw new EdmPrimitiveTypeException("The literal '" + value + "' has illegal content.", e);
+    }
+
+    try {
+      return convertNumber(valueLong, returnType);
+    } catch (final IllegalArgumentException e) {
+      throw new EdmPrimitiveTypeException(
+        "The literal '" + value + "' cannot be converted to value type " + returnType + ".", e);
+    } catch (final ClassCastException e) {
+      throw new EdmPrimitiveTypeException("The value type " + returnType + " is not supported.", e);
+    }
+  }
+
+  @Override
+  protected <T> String internalValueToString(final T value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode)
+    throws EdmPrimitiveTypeException {
+
+    if (value instanceof Byte || value instanceof Short || value instanceof Integer
+      || value instanceof Long) {
       return value.toString();
     } else if (value instanceof BigInteger) {
-      if (((BigInteger) value).bitLength() < Long.SIZE) {
+      if (((BigInteger)value).bitLength() < Long.SIZE) {
         return value.toString();
       } else {
         throw new EdmPrimitiveTypeException("The value '" + value + "' is not valid.");
       }
     } else {
-      throw new EdmPrimitiveTypeException("The value type " + value.getClass() + " is not supported.");
+      throw new EdmPrimitiveTypeException(
+        "The value type " + value.getClass() + " is not supported.");
     }
+  }
+
+  @Override
+  public boolean isCompatible(final EdmPrimitiveType primitiveType) {
+    return primitiveType instanceof EdmByte || primitiveType instanceof EdmSByte
+      || primitiveType instanceof EdmInt16 || primitiveType instanceof EdmInt32
+      || primitiveType instanceof EdmInt64;
   }
 }

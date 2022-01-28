@@ -19,6 +19,6 @@
 package org.apache.olingo.commons.api.edm;
 
 public interface EdmOnDelete extends EdmAnnotatable {
-  
+
   String getAction();
 }

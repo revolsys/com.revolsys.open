@@ -25,19 +25,19 @@ import java.util.List;
  */
 public interface EdmEntityType extends EdmStructuredType {
 
+  /*
+   * (non-Javadoc)
+   * @see org.apache.olingo.api.edm.EdmStructuralType#getBaseType()
+   */
+  @Override
+  EdmEntityType getBaseType();
+
   /**
    * Gets all key predicate names. In case an alias is defined for a key predicate this will be returned.
    *
    * @return collection of key property names of type List&lt;String&gt;
    */
   List<String> getKeyPredicateNames();
-
-  /**
-   * Get all key properties references as list of {@link EdmKeyPropertyRef}.
-   *
-   * @return collection of key properties of type List&lt;EdmKeyPropertyRef&gt;
-   */
-  List<EdmKeyPropertyRef> getKeyPropertyRefs();
 
   /**
    * Get a key property ref by its name.
@@ -48,17 +48,16 @@ public interface EdmEntityType extends EdmStructuredType {
   EdmKeyPropertyRef getKeyPropertyRef(String keyPredicateName);
 
   /**
+   * Get all key properties references as list of {@link EdmKeyPropertyRef}.
+   *
+   * @return collection of key properties of type List&lt;EdmKeyPropertyRef&gt;
+   */
+  List<EdmKeyPropertyRef> getKeyPropertyRefs();
+
+  /**
    * Indicates if the entity type is treated as Media Link Entry with associated Media Resource.
    *
    * @return <code>true</code> if the entity type is a Media Link Entry
    */
   boolean hasStream();
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.apache.olingo.api.edm.EdmStructuralType#getBaseType()
-   */
-  @Override
-  EdmEntityType getBaseType();
 }

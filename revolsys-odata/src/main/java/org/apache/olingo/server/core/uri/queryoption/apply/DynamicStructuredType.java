@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -38,6 +38,7 @@ import org.apache.olingo.commons.api.edm.constants.EdmTypeKind;
 public class DynamicStructuredType implements EdmStructuredType, Cloneable {
 
   private final EdmStructuredType startType;
+
   private Map<String, EdmProperty> properties;
 
   public DynamicStructuredType(final EdmStructuredType startType) {
@@ -45,101 +46,97 @@ public class DynamicStructuredType implements EdmStructuredType, Cloneable {
   }
 
   public DynamicStructuredType addProperty(final EdmProperty property) {
-    if (properties == null) {
-      properties = new LinkedHashMap<>();
+    if (this.properties == null) {
+      this.properties = new LinkedHashMap<>();
     }
-    properties.put(property.getName(), property);
+    this.properties.put(property.getName(), property);
     return this;
   }
 
   @Override
-  public EdmElement getProperty(final String name) {
-    final EdmElement property = startType.getProperty(name);
-    return property == null ?
-        properties == null ? null : properties.get(name) :
-        property;
+  public boolean compatibleTo(final EdmType targetType) {
+    return this.startType.compatibleTo(targetType);
   }
-  
-  public boolean hasStaticProperty(final String name) {
-	  return startType.getProperty(name) != null;
+
+  @Override
+  public EdmAnnotation getAnnotation(final EdmTerm term, final String qualifier) {
+    return this.startType.getAnnotation(term, qualifier);
+  }
+
+  @Override
+  public List<EdmAnnotation> getAnnotations() {
+    return this.startType.getAnnotations();
+  }
+
+  @Override
+  public EdmStructuredType getBaseType() {
+    return this.startType.getBaseType();
+  }
+
+  @Override
+  public FullQualifiedName getFullQualifiedName() {
+    return this.startType.getFullQualifiedName();
+  }
+
+  @Override
+  public EdmTypeKind getKind() {
+    return this.startType.getKind();
+  }
+
+  @Override
+  public String getName() {
+    return this.startType.getName();
+  }
+
+  @Override
+  public String getNamespace() {
+    return this.startType.getNamespace();
+  }
+
+  @Override
+  public EdmNavigationProperty getNavigationProperty(final String name) {
+    return this.startType.getNavigationProperty(name);
+  }
+
+  @Override
+  public List<String> getNavigationPropertyNames() {
+    return this.startType.getNavigationPropertyNames();
+  }
+
+  @Override
+  public EdmElement getProperty(final String name) {
+    final EdmElement property = this.startType.getProperty(name);
+    return property == null ? this.properties == null ? null : this.properties.get(name) : property;
   }
 
   @Override
   public List<String> getPropertyNames() {
-    if (properties == null || properties.isEmpty()) {
-      return startType.getPropertyNames();
+    if (this.properties == null || this.properties.isEmpty()) {
+      return this.startType.getPropertyNames();
     } else {
-      List<String> names = new ArrayList<>(startType.getPropertyNames());
-      names.addAll(properties.keySet());
+      final List<String> names = new ArrayList<>(this.startType.getPropertyNames());
+      names.addAll(this.properties.keySet());
       return Collections.unmodifiableList(names);
     }
   }
 
   @Override
   public EdmProperty getStructuralProperty(final String name) {
-    final EdmProperty property = startType.getStructuralProperty(name);
-    return property == null ?
-        properties == null ? null : properties.get(name) :
-        property;
+    final EdmProperty property = this.startType.getStructuralProperty(name);
+    return property == null ? this.properties == null ? null : this.properties.get(name) : property;
   }
 
-  @Override
-  public EdmNavigationProperty getNavigationProperty(final String name) {
-    return startType.getNavigationProperty(name);
-  }
-
-  @Override
-  public List<String> getNavigationPropertyNames() {
-    return startType.getNavigationPropertyNames();
-  }
-
-  @Override
-  public String getNamespace() {
-    return startType.getNamespace();
-  }
-
-  @Override
-  public String getName() {
-    return startType.getName();
-  }
-
-  @Override
-  public FullQualifiedName getFullQualifiedName() {
-    return startType.getFullQualifiedName();
-  }
-
-  @Override
-  public EdmTypeKind getKind() {
-    return startType.getKind();
-  }
-
-  @Override
-  public EdmAnnotation getAnnotation(final EdmTerm term, final String qualifier) {
-    return startType.getAnnotation(term, qualifier);
-  }
-
-  @Override
-  public List<EdmAnnotation> getAnnotations() {
-    return startType.getAnnotations();
-  }
-
-  @Override
-  public EdmStructuredType getBaseType() {
-    return startType.getBaseType();
-  }
-
-  @Override
-  public boolean compatibleTo(final EdmType targetType) {
-    return startType.compatibleTo(targetType);
-  }
-
-  @Override
-  public boolean isOpenType() {
-    return startType.isOpenType();
+  public boolean hasStaticProperty(final String name) {
+    return this.startType.getProperty(name) != null;
   }
 
   @Override
   public boolean isAbstract() {
-    return startType.isAbstract();
+    return this.startType.isAbstract();
+  }
+
+  @Override
+  public boolean isOpenType() {
+    return this.startType.isOpenType();
   }
 }

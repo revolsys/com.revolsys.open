@@ -28,12 +28,93 @@ import java.util.List;
  */
 public class EntityCollection extends AbstractEntityCollection {
 
-  private final List<Entity> entities = new ArrayList<Entity>();
+  private final List<Entity> entities = new ArrayList<>();
+
   private Integer count;
+
   private URI next;
+
   private URI deltaLink;
-  private final List<Operation> operations = new ArrayList<Operation>();
-  
+
+  private final List<Operation> operations = new ArrayList<>();
+
+  @Override
+  public boolean equals(final Object o) {
+    if (!super.equals(o)) {
+      return false;
+    }
+    final EntityCollection other = (EntityCollection)o;
+    return this.entities.equals(other.entities)
+      && (this.count == null ? other.count == null : this.count.equals(other.count))
+      && (this.next == null ? other.next == null : this.next.equals(other.next))
+      && (this.deltaLink == null ? other.deltaLink == null
+        : this.deltaLink.equals(other.deltaLink));
+  }
+
+  /**
+   * Gets number of entries - if it was required.
+   *
+   * @return number of entries into the entity set.
+   */
+  @Override
+  public Integer getCount() {
+    return this.count;
+  }
+
+  /**
+   * Gets delta link if exists.
+   *
+   * @return delta link if exists; null otherwise.
+   */
+  @Override
+  public URI getDeltaLink() {
+    return this.deltaLink;
+  }
+
+  /**
+   * Gets entities.
+   *
+   * @return entries.
+   */
+  public List<Entity> getEntities() {
+    return this.entities;
+  }
+
+  /**
+   * Gets next link if exists.
+   *
+   * @return next link if exists; null otherwise.
+   */
+  @Override
+  public URI getNext() {
+    return this.next;
+  }
+
+  /**
+   * Gets operations.
+   *
+   * @return operations.
+   */
+  @Override
+  public List<Operation> getOperations() {
+    return this.operations;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + this.entities.hashCode();
+    result = 31 * result + (this.count == null ? 0 : this.count.hashCode());
+    result = 31 * result + (this.next == null ? 0 : this.next.hashCode());
+    result = 31 * result + (this.deltaLink == null ? 0 : this.deltaLink.hashCode());
+    return result;
+  }
+
+  @Override
+  public Iterator<Entity> iterator() {
+    return this.entities.iterator();
+  }
+
   /**
    * Sets number of entries.
    *
@@ -44,22 +125,12 @@ public class EntityCollection extends AbstractEntityCollection {
   }
 
   /**
-   * Gets number of entries - if it was required.
+   * Sets delta link.
    *
-   * @return number of entries into the entity set.
+   * @param deltaLink delta link.
    */
-  @Override
-  public Integer getCount() {
-    return count;
-  }
-
-  /**
-   * Gets entities.
-   *
-   * @return entries.
-   */
-  public List<Entity> getEntities() {
-    return entities;
+  public void setDeltaLink(final URI deltaLink) {
+    this.deltaLink = deltaLink;
   }
 
   /**
@@ -71,74 +142,8 @@ public class EntityCollection extends AbstractEntityCollection {
     this.next = next;
   }
 
-  /**
-   * Gets next link if exists.
-   *
-   * @return next link if exists; null otherwise.
-   */
-  @Override
-  public URI getNext() {
-    return next;
-  }
-
-  /**
-   * Gets delta link if exists.
-   *
-   * @return delta link if exists; null otherwise.
-   */
-  @Override
-  public URI getDeltaLink() {
-    return deltaLink;
-  }
-
-  /**
-   * Sets delta link.
-   *
-   * @param deltaLink delta link.
-   */
-  public void setDeltaLink(final URI deltaLink) {
-    this.deltaLink = deltaLink;
-  }
-  
-  /**
-   * Gets operations.
-   *
-   * @return operations.
-   */
-  @Override
-  public List<Operation> getOperations() {
-    return operations;
-  }  
-
-  @Override
-  public Iterator<Entity> iterator() {
-    return this.entities.iterator();
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (!super.equals(o)) {
-      return false;
-    }
-    final EntityCollection other = (EntityCollection) o;
-    return entities.equals(other.entities)
-        && (count == null ? other.count == null : count.equals(other.count))
-        && (next == null ? other.next == null : next.equals(other.next))
-        && (deltaLink == null ? other.deltaLink == null : deltaLink.equals(other.deltaLink));
-  }
-
-  @Override
-  public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + entities.hashCode();
-    result = 31 * result + (count == null ? 0 : count.hashCode());
-    result = 31 * result + (next == null ? 0 : next.hashCode());
-    result = 31 * result + (deltaLink == null ? 0 : deltaLink.hashCode());
-    return result;
-  }
-
   @Override
   public String toString() {
-    return entities.toString();
+    return this.entities.toString();
   }
 }

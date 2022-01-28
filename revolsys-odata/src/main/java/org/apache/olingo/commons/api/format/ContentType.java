@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -46,82 +46,87 @@ import java.util.Map.Entry;
 public final class ContentType {
 
   private static final String APPLICATION = "application";
+
   private static final String TEXT = "text";
+
   private static final String MULTIPART = "multipart";
 
   public static final String PARAMETER_CHARSET = "charset";
+
   public static final String PARAMETER_IEEE754_COMPATIBLE = "IEEE754Compatible";
+
   public static final String PARAMETER_ODATA_METADATA = "odata.metadata";
 
   public static final String VALUE_ODATA_METADATA_NONE = "none";
+
   public static final String VALUE_ODATA_METADATA_MINIMAL = "minimal";
+
   public static final String VALUE_ODATA_METADATA_FULL = "full";
 
   public static final ContentType APPLICATION_JSON = new ContentType(APPLICATION, "json", null);
+
   public static final ContentType JSON = create(ContentType.APPLICATION_JSON,
-      PARAMETER_ODATA_METADATA, VALUE_ODATA_METADATA_MINIMAL);
+    PARAMETER_ODATA_METADATA, VALUE_ODATA_METADATA_MINIMAL);
+
   public static final ContentType JSON_NO_METADATA = create(ContentType.APPLICATION_JSON,
-      PARAMETER_ODATA_METADATA, VALUE_ODATA_METADATA_NONE);
+    PARAMETER_ODATA_METADATA, VALUE_ODATA_METADATA_NONE);
+
   public static final ContentType JSON_FULL_METADATA = create(ContentType.APPLICATION_JSON,
-      PARAMETER_ODATA_METADATA, VALUE_ODATA_METADATA_FULL);
+    PARAMETER_ODATA_METADATA, VALUE_ODATA_METADATA_FULL);
 
   public static final ContentType APPLICATION_XML = new ContentType(APPLICATION, "xml", null);
-  public static final ContentType APPLICATION_ATOM_XML = new ContentType(APPLICATION, "atom+xml", null);
-  public static final ContentType APPLICATION_ATOM_XML_ENTRY = create(APPLICATION_ATOM_XML, "type", "entry");
-  public static final ContentType APPLICATION_ATOM_XML_ENTRY_UTF8 = create(APPLICATION_ATOM_XML_ENTRY,
-      PARAMETER_CHARSET, "utf-8");
-  public static final ContentType APPLICATION_ATOM_XML_FEED = create(APPLICATION_ATOM_XML, "type", "feed");
+
+  public static final ContentType APPLICATION_ATOM_XML = new ContentType(APPLICATION, "atom+xml",
+    null);
+
+  public static final ContentType APPLICATION_ATOM_XML_ENTRY = create(APPLICATION_ATOM_XML, "type",
+    "entry");
+
+  public static final ContentType APPLICATION_ATOM_XML_ENTRY_UTF8 = create(
+    APPLICATION_ATOM_XML_ENTRY, PARAMETER_CHARSET, "utf-8");
+
+  public static final ContentType APPLICATION_ATOM_XML_FEED = create(APPLICATION_ATOM_XML, "type",
+    "feed");
+
   public static final ContentType APPLICATION_ATOM_XML_FEED_UTF8 = create(APPLICATION_ATOM_XML_FEED,
-      PARAMETER_CHARSET, "utf-8");
-  public static final ContentType APPLICATION_ATOM_SVC = new ContentType(APPLICATION, "atomsvc+xml", null);
+    PARAMETER_CHARSET, "utf-8");
 
-  public static final ContentType APPLICATION_OCTET_STREAM = new ContentType(APPLICATION, "octet-stream", null);
+  public static final ContentType APPLICATION_ATOM_SVC = new ContentType(APPLICATION, "atomsvc+xml",
+    null);
 
-  public static final ContentType APPLICATION_XHTML_XML = new ContentType(APPLICATION, "xhtml+xml", null);
+  public static final ContentType APPLICATION_OCTET_STREAM = new ContentType(APPLICATION,
+    "octet-stream", null);
+
+  public static final ContentType APPLICATION_XHTML_XML = new ContentType(APPLICATION, "xhtml+xml",
+    null);
+
   public static final ContentType TEXT_HTML = new ContentType(TEXT, "html", null);
+
   public static final ContentType TEXT_XML = new ContentType(TEXT, "xml", null);
+
   public static final ContentType TEXT_PLAIN = new ContentType(TEXT, "plain", null);
 
-  public static final ContentType APPLICATION_SVG_XML = new ContentType(APPLICATION, "svg+xml", null);
+  public static final ContentType APPLICATION_SVG_XML = new ContentType(APPLICATION, "svg+xml",
+    null);
 
-  public static final ContentType APPLICATION_FORM_URLENCODED =
-      new ContentType(APPLICATION, "x-www-form-urlencoded", null);
+  public static final ContentType APPLICATION_FORM_URLENCODED = new ContentType(APPLICATION,
+    "x-www-form-urlencoded", null);
 
   public static final ContentType APPLICATION_HTTP = new ContentType(APPLICATION, "http", null);
 
   public static final ContentType MULTIPART_MIXED = new ContentType(MULTIPART, "mixed", null);
-  public static final ContentType MULTIPART_FORM_DATA = new ContentType(MULTIPART, "form-data", null);
 
-  private final String type;
-  private final String subtype;
-  private final Map<String, String> parameters;
+  public static final ContentType MULTIPART_FORM_DATA = new ContentType(MULTIPART, "form-data",
+    null);
 
   /**
-   * Creates a content type from type, subtype, and parameters.
-   * @param type       type
-   * @param subtype    subtype
-   * @param parameters parameters as map from names to values
+   * Checks whether both strings are equal ignoring the case of the strings.
+   * @param first first string
+   * @param second second string
+   * @return <code>true</code> if both strings are equal (ignoring the case), otherwise <code>false</code>
    */
-  private ContentType(final String type, final String subtype, final Map<String, String> parameters) {
-    this.type = validateType(type);
-    this.subtype = validateType(subtype);
-
-    if (parameters == null) {
-      this.parameters = Collections.emptyMap();
-    } else {
-      this.parameters = TypeUtil.createParameterMap();
-      this.parameters.putAll(parameters);
-    }
-  }
-
-  private String validateType(final String type) throws IllegalArgumentException {
-    if (type == null || type.isEmpty() || "*".equals(type)) {
-      throw new IllegalArgumentException("Illegal type '" + type + "'.");
-    }
-    if (type.indexOf(TypeUtil.WHITESPACE_CHAR) >= 0) {
-      throw new IllegalArgumentException("Illegal whitespace found for type '" + type + "'.");
-    }
-    return type;
+  private static boolean areEqual(final String first, final String second) {
+    return first == null && second == null || first != null && first.equalsIgnoreCase(second);
   }
 
   /**
@@ -131,11 +136,12 @@ public final class ContentType {
    * @param parameterValue the value of the additional parameter
    * @return a new {@link ContentType} object
    */
-  public static ContentType create(final ContentType contentType,
-      final String parameterName, final String parameterValue) throws IllegalArgumentException {
+  public static ContentType create(final ContentType contentType, final String parameterName,
+    final String parameterValue) throws IllegalArgumentException {
     TypeUtil.validateParameterNameAndValue(parameterName, parameterValue);
 
-    ContentType type = new ContentType(contentType.type, contentType.subtype, contentType.parameters);
+    final ContentType type = new ContentType(contentType.type, contentType.subtype,
+      contentType.parameters);
     type.parameters.put(parameterName.toLowerCase(Locale.ROOT), parameterValue);
     return type;
   }
@@ -152,8 +158,8 @@ public final class ContentType {
     if (format == null) {
       throw new IllegalArgumentException("Parameter format MUST NOT be NULL.");
     }
-    List<String> typeSubtype = new ArrayList<String>();
-    Map<String, String> parameters = new HashMap<String, String>();
+    final List<String> typeSubtype = new ArrayList<>();
+    final Map<String, String> parameters = new HashMap<>();
     parse(format, typeSubtype, parameters);
     return new ContentType(typeSubtype.get(0), typeSubtype.get(1), parameters);
   }
@@ -170,16 +176,16 @@ public final class ContentType {
   public static ContentType parse(final String format) {
     try {
       return ContentType.create(format);
-    } catch (IllegalArgumentException e) {
+    } catch (final IllegalArgumentException e) {
       return null;
     }
   }
 
-  private static void parse(final String format, List<String> typeSubtype, Map<String, String> parameters)
-      throws IllegalArgumentException {
+  private static void parse(final String format, final List<String> typeSubtype,
+    final Map<String, String> parameters) throws IllegalArgumentException {
     final String[] typesAndParameters = format.split(TypeUtil.PARAMETER_SEPARATOR, 2);
     final String types = typesAndParameters[0];
-    final String params = (typesAndParameters.length > 1 ? typesAndParameters[1] : null);
+    final String params = typesAndParameters.length > 1 ? typesAndParameters[1] : null;
 
     if (types.contains(TypeUtil.TYPE_SUBTYPE_SEPARATOR)) {
       final String[] tokens = types.split(TypeUtil.TYPE_SUBTYPE_SEPARATOR);
@@ -194,47 +200,39 @@ public final class ContentType {
         }
       } else {
         throw new IllegalArgumentException(
-            "Too many '" + TypeUtil.TYPE_SUBTYPE_SEPARATOR + "' in format '" + format + "'.");
+          "Too many '" + TypeUtil.TYPE_SUBTYPE_SEPARATOR + "' in format '" + format + "'.");
       }
     } else {
       throw new IllegalArgumentException("No separator '" + TypeUtil.TYPE_SUBTYPE_SEPARATOR
-          + "' was found in format '" + format + "'.");
+        + "' was found in format '" + format + "'.");
     }
 
     TypeUtil.parseParameters(params, parameters);
   }
 
-  /** Gets the type of this content type. */
-  public String getType() {
-    return type;
-  }
+  private final String type;
 
-  /** Gets the subtype of this content type. */
-  public String getSubtype() {
-    return subtype;
-  }
+  private final String subtype;
+
+  private final Map<String, String> parameters;
 
   /**
-   * Gets the parameters of this content type.
-   * @return parameters of this {@link ContentType} as unmodifiable map
+   * Creates a content type from type, subtype, and parameters.
+   * @param type       type
+   * @param subtype    subtype
+   * @param parameters parameters as map from names to values
    */
-  public Map<String, String> getParameters() {
-    return Collections.unmodifiableMap(parameters);
-  }
+  private ContentType(final String type, final String subtype,
+    final Map<String, String> parameters) {
+    this.type = validateType(type);
+    this.subtype = validateType(subtype);
 
-  /**
-   * Returns the value of a given parameter.
-   * If the parameter does not exist the method returns null.
-   * @param name the name of the parameter to get (case-insensitive)
-   * @return the value of the parameter or <code>null</code> if the parameter is not present
-   */
-  public String getParameter(final String name) {
-    return parameters.get(name.toLowerCase(Locale.ROOT));
-  }
-
-  @Override
-  public int hashCode() {
-    return 1;
+    if (parameters == null) {
+      this.parameters = Collections.emptyMap();
+    } else {
+      this.parameters = TypeUtil.createParameterMap();
+      this.parameters.putAll(parameters);
+    }
   }
 
   /**
@@ -251,7 +249,7 @@ public final class ContentType {
       return false;
     }
 
-    final ContentType other = (ContentType) obj;
+    final ContentType other = (ContentType)obj;
 
     // type/subtype checks
     if (!isCompatible(other)) {
@@ -259,14 +257,13 @@ public final class ContentType {
     }
 
     // parameter checks
-    if (parameters.size() == other.parameters.size()) {
-      final Iterator<Entry<String, String>> entries = parameters.entrySet().iterator();
+    if (this.parameters.size() == other.parameters.size()) {
+      final Iterator<Entry<String, String>> entries = this.parameters.entrySet().iterator();
       final Iterator<Entry<String, String>> otherEntries = other.parameters.entrySet().iterator();
       while (entries.hasNext()) {
         final Entry<String, String> e = entries.next();
         final Entry<String, String> oe = otherEntries.next();
-        if (!areEqual(e.getKey(), oe.getKey())
-            || !areEqual(e.getValue(), oe.getValue())) {
+        if (!areEqual(e.getKey(), oe.getKey()) || !areEqual(e.getValue(), oe.getValue())) {
           return false;
         }
       }
@@ -277,6 +274,39 @@ public final class ContentType {
   }
 
   /**
+   * Returns the value of a given parameter.
+   * If the parameter does not exist the method returns null.
+   * @param name the name of the parameter to get (case-insensitive)
+   * @return the value of the parameter or <code>null</code> if the parameter is not present
+   */
+  public String getParameter(final String name) {
+    return this.parameters.get(name.toLowerCase(Locale.ROOT));
+  }
+
+  /**
+   * Gets the parameters of this content type.
+   * @return parameters of this {@link ContentType} as unmodifiable map
+   */
+  public Map<String, String> getParameters() {
+    return Collections.unmodifiableMap(this.parameters);
+  }
+
+  /** Gets the subtype of this content type. */
+  public String getSubtype() {
+    return this.subtype;
+  }
+
+  /** Gets the type of this content type. */
+  public String getType() {
+    return this.type;
+  }
+
+  @Override
+  public int hashCode() {
+    return 1;
+  }
+
+  /**
    * <p>{@link ContentType}s are <b>compatible</b>
    * if <code>type</code> and <code>subtype</code> have the same value.</p>
    * <p>The set <code>parameters</code> are <b>always</b> ignored
@@ -284,17 +314,7 @@ public final class ContentType {
    * @return <code>true</code> if both instances are compatible (see definition above), otherwise <code>false</code>.
    */
   public boolean isCompatible(final ContentType other) {
-    return type.equalsIgnoreCase(other.type) && subtype.equalsIgnoreCase(other.subtype);
-  }
-
-  /**
-   * Checks whether both strings are equal ignoring the case of the strings.
-   * @param first first string
-   * @param second second string
-   * @return <code>true</code> if both strings are equal (ignoring the case), otherwise <code>false</code>
-   */
-  private static boolean areEqual(final String first, final String second) {
-    return first == null && second == null || (first != null && first.equalsIgnoreCase(second));
+    return this.type.equalsIgnoreCase(other.type) && this.subtype.equalsIgnoreCase(other.subtype);
   }
 
   /**
@@ -305,11 +325,13 @@ public final class ContentType {
   public String toContentTypeString() {
     final StringBuilder sb = new StringBuilder();
 
-    sb.append(type).append(TypeUtil.TYPE_SUBTYPE_SEPARATOR).append(subtype);
+    sb.append(this.type).append(TypeUtil.TYPE_SUBTYPE_SEPARATOR).append(this.subtype);
 
-    for (Entry<String, String> entry : parameters.entrySet()) {
-      sb.append(TypeUtil.PARAMETER_SEPARATOR).append(entry.getKey())
-          .append(TypeUtil.PARAMETER_KEY_VALUE_SEPARATOR).append(entry.getValue());
+    for (final Entry<String, String> entry : this.parameters.entrySet()) {
+      sb.append(TypeUtil.PARAMETER_SEPARATOR)
+        .append(entry.getKey())
+        .append(TypeUtil.PARAMETER_KEY_VALUE_SEPARATOR)
+        .append(entry.getValue());
     }
     return sb.toString();
   }
@@ -317,5 +339,15 @@ public final class ContentType {
   @Override
   public String toString() {
     return toContentTypeString();
+  }
+
+  private String validateType(final String type) throws IllegalArgumentException {
+    if (type == null || type.isEmpty() || "*".equals(type)) {
+      throw new IllegalArgumentException("Illegal type '" + type + "'.");
+    }
+    if (type.indexOf(TypeUtil.WHITESPACE_CHAR) >= 0) {
+      throw new IllegalArgumentException("Illegal whitespace found for type '" + type + "'.");
+    }
+    return type;
   }
 }

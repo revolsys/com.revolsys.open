@@ -46,62 +46,9 @@ public enum ODataServiceVersion {
    */
   V401("4.01");
 
+  private static final Pattern DATASERVICEVERSIONPATTERN = Pattern
+    .compile("(\\p{Digit}+\\.\\p{Digit}+)(:?;.*)?");
 
-  private static final Pattern DATASERVICEVERSIONPATTERN = Pattern.compile("(\\p{Digit}+\\.\\p{Digit}+)(:?;.*)?");
-
-  /**
-   * Validates format and range of a data service version string.
-   *
-   * @param version version string
-   * @return <code>true</code> for a valid version
-   */
-  public static boolean validateDataServiceVersion(final String version) {
-    final Matcher matcher = DATASERVICEVERSIONPATTERN.matcher(version);
-    if (matcher.matches()) {
-      final String possibleDataServiceVersion = matcher.group(1);
-      return V10.toString().equals(possibleDataServiceVersion)
-          || V20.toString().equals(possibleDataServiceVersion)
-          || V30.toString().equals(possibleDataServiceVersion)
-          || V40.toString().equals(possibleDataServiceVersion)
-          || V401.toString().equals(possibleDataServiceVersion);
-    } else {
-      throw new IllegalArgumentException(version);
-    }
-  }
-
-  /**
-   * Check if <code>firstValue</code> is bigger then  <code>secondValue</code>
-   *
-   * @param firstValue first value which is compared
-   * @param secondValue second value which is compared
-   * @return <code>true</code> if firstValue is bigger than secondValue
-   */
-  public static boolean isBiggerThan(final String firstValue, final String secondValue) {
-    if (!validateDataServiceVersion(secondValue) || !validateDataServiceVersion(firstValue)) {
-      throw new IllegalArgumentException("Illegal arguments: " + secondValue + " and " + firstValue);
-    }
-
-    final double me = Double.parseDouble(extractDataServiceVersionString(firstValue));
-    final double other = Double.parseDouble(extractDataServiceVersionString(secondValue));
-
-    return me > other;
-  }
-
-  public static boolean isValidODataVersion(String value) {
-    final double version4 = Double.parseDouble(extractDataServiceVersionString(ODataServiceVersion.V40.toString()));
-    final double version401 = Double.parseDouble(extractDataServiceVersionString(ODataServiceVersion.V401.toString()));
-    final double other = Double.parseDouble(extractDataServiceVersionString(value));
-    
-    return (Double.compare(other, version4) == 0) || (Double.compare(other, version401) == 0);
-  }
-  
-  public static boolean isValidMaxODataVersion(String value) {
-    final double version4 = Double.parseDouble(extractDataServiceVersionString(ODataServiceVersion.V40.toString()));
-    final double other = Double.parseDouble(extractDataServiceVersionString(value));
-    
-    return other >= version4;
-  }
-  
   /**
    * Extract data service version and return it.
    *
@@ -117,6 +64,63 @@ public enum ODataServiceVersion {
     return null;
   }
 
+  /**
+   * Check if <code>firstValue</code> is bigger then  <code>secondValue</code>
+   *
+   * @param firstValue first value which is compared
+   * @param secondValue second value which is compared
+   * @return <code>true</code> if firstValue is bigger than secondValue
+   */
+  public static boolean isBiggerThan(final String firstValue, final String secondValue) {
+    if (!validateDataServiceVersion(secondValue) || !validateDataServiceVersion(firstValue)) {
+      throw new IllegalArgumentException(
+        "Illegal arguments: " + secondValue + " and " + firstValue);
+    }
+
+    final double me = Double.parseDouble(extractDataServiceVersionString(firstValue));
+    final double other = Double.parseDouble(extractDataServiceVersionString(secondValue));
+
+    return me > other;
+  }
+
+  public static boolean isValidMaxODataVersion(final String value) {
+    final double version4 = Double
+      .parseDouble(extractDataServiceVersionString(ODataServiceVersion.V40.toString()));
+    final double other = Double.parseDouble(extractDataServiceVersionString(value));
+
+    return other >= version4;
+  }
+
+  public static boolean isValidODataVersion(final String value) {
+    final double version4 = Double
+      .parseDouble(extractDataServiceVersionString(ODataServiceVersion.V40.toString()));
+    final double version401 = Double
+      .parseDouble(extractDataServiceVersionString(ODataServiceVersion.V401.toString()));
+    final double other = Double.parseDouble(extractDataServiceVersionString(value));
+
+    return Double.compare(other, version4) == 0 || Double.compare(other, version401) == 0;
+  }
+
+  /**
+   * Validates format and range of a data service version string.
+   *
+   * @param version version string
+   * @return <code>true</code> for a valid version
+   */
+  public static boolean validateDataServiceVersion(final String version) {
+    final Matcher matcher = DATASERVICEVERSIONPATTERN.matcher(version);
+    if (matcher.matches()) {
+      final String possibleDataServiceVersion = matcher.group(1);
+      return V10.toString().equals(possibleDataServiceVersion)
+        || V20.toString().equals(possibleDataServiceVersion)
+        || V30.toString().equals(possibleDataServiceVersion)
+        || V40.toString().equals(possibleDataServiceVersion)
+        || V401.toString().equals(possibleDataServiceVersion);
+    } else {
+      throw new IllegalArgumentException(version);
+    }
+  }
+
   private final String version;
 
   private ODataServiceVersion(final String version) {
@@ -125,6 +129,6 @@ public enum ODataServiceVersion {
 
   @Override
   public String toString() {
-    return version;
+    return this.version;
   }
 }

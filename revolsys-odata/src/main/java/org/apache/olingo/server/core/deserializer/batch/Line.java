@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -20,6 +20,7 @@ package org.apache.olingo.server.core.deserializer.batch;
 
 public class Line {
   private final int lineNumber;
+
   private final String content;
 
   public Line(final String content, final int lineNumber) {
@@ -27,46 +28,43 @@ public class Line {
     this.lineNumber = lineNumber;
   }
 
-  public int getLineNumber() {
-    return lineNumber;
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if ((obj == null) || (getClass() != obj.getClass())) {
+      return false;
+    }
+    final Line other = (Line)obj;
+    if (this.content == null) {
+      if (other.content != null) {
+        return false;
+      }
+    } else if (!this.content.equals(other.content)) {
+      return false;
+    }
+    if (this.lineNumber != other.lineNumber) {
+      return false;
+    }
+    return true;
   }
 
-  @Override
-  public String toString() {
-    return content;
+  public int getLineNumber() {
+    return this.lineNumber;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((content == null) ? 0 : content.hashCode());
-    result = prime * result + lineNumber;
+    result = prime * result + (this.content == null ? 0 : this.content.hashCode());
+    result = prime * result + this.lineNumber;
     return result;
   }
 
   @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    Line other = (Line) obj;
-    if (content == null) {
-      if (other.content != null) {
-        return false;
-      }
-    } else if (!content.equals(other.content)) {
-      return false;
-    }
-    if (lineNumber != other.lineNumber) {
-      return false;
-    }
-    return true;
+  public String toString() {
+    return this.content;
   }
 }

@@ -28,41 +28,42 @@ import org.apache.olingo.server.core.uri.queryoption.ExpandOptionImpl;
 
 public class ExpandTreeBuilderImpl extends ExpandTreeBuilder {
 
+  public static ExpandTreeBuilder create() {
+    return new ExpandTreeBuilderImpl(null);
+  }
+
   private final Map<String, ExpandTreeBuilder> childBuilderCache = new HashMap<>();
+
   private final ExpandItemImpl parentItem;
+
   private ExpandOptionImpl expandOption = null;
 
   private ExpandTreeBuilderImpl(final ExpandItemImpl parentItem) {
     this.parentItem = parentItem;
   }
-  
-  
-  @Override
-  public ExpandTreeBuilder expand(final EdmNavigationProperty edmNavigationProperty) {
-    if (expandOption == null) {
-      expandOption = new ExpandOptionImpl();
-      if(parentItem != null && parentItem.getExpandOption() == null){
-        parentItem.setSystemQueryOption(expandOption);
-      }
-    }
-    
-    ExpandTreeBuilder builder = childBuilderCache.get(edmNavigationProperty.getName());
-    if(builder == null){
-      ExpandItemImpl expandItem = buildExpandItem(edmNavigationProperty);
-      expandOption.addExpandItem(expandItem);
-      builder = new ExpandTreeBuilderImpl(expandItem);
-      childBuilderCache.put(edmNavigationProperty.getName(), builder);
-    }
-    
-    return builder;
-  }
 
   @Override
   public ExpandOption build() {
-    return expandOption;
+    return this.expandOption;
   }
-  
-  public static ExpandTreeBuilder create(){
-    return new ExpandTreeBuilderImpl(null);
+
+  @Override
+  public ExpandTreeBuilder expand(final EdmNavigationProperty edmNavigationProperty) {
+    if (this.expandOption == null) {
+      this.expandOption = new ExpandOptionImpl();
+      if (this.parentItem != null && this.parentItem.getExpandOption() == null) {
+        this.parentItem.setSystemQueryOption(this.expandOption);
+      }
+    }
+
+    ExpandTreeBuilder builder = this.childBuilderCache.get(edmNavigationProperty.getName());
+    if (builder == null) {
+      final ExpandItemImpl expandItem = buildExpandItem(edmNavigationProperty);
+      this.expandOption.addExpandItem(expandItem);
+      builder = new ExpandTreeBuilderImpl(expandItem);
+      this.childBuilderCache.put(edmNavigationProperty.getName(), builder);
+    }
+
+    return builder;
   }
 }

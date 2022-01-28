@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -29,7 +29,9 @@ import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
 public interface BottomTop extends ApplyItem {
 
   /** Pre-defined method for partial aggregration. */
-  public enum Method { BOTTOM_COUNT, BOTTOM_PERCENT, BOTTOM_SUM, TOP_COUNT, TOP_PERCENT, TOP_SUM }
+  public enum Method {
+    BOTTOM_COUNT, BOTTOM_PERCENT, BOTTOM_SUM, TOP_COUNT, TOP_PERCENT, TOP_SUM
+  }
 
   /**
    * Gets the partial-aggregation method.

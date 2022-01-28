@@ -38,6 +38,6 @@ public interface ActionVoidProcessor extends Processor {
    * @throws ODataApplicationException if the service implementation encounters a failure
    * @throws ODataLibraryException
    */
-  void processActionVoid(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType requestFormat)
-      throws ODataApplicationException, ODataLibraryException;
+  void processActionVoid(ODataRequest request, ODataResponse response, UriInfo uriInfo,
+    ContentType requestFormat) throws ODataApplicationException, ODataLibraryException;
 }

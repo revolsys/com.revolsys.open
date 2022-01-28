@@ -26,16 +26,17 @@ import java.util.List;
  */
 public class Delta extends EntityCollection {
 
-  private final List<DeletedEntity> deletedEntities = new ArrayList<DeletedEntity>();
-  private final List<DeltaLink> addedLinks = new ArrayList<DeltaLink>();
-  private final List<DeltaLink> deletedLinks = new ArrayList<DeltaLink>();
+  private final List<DeletedEntity> deletedEntities = new ArrayList<>();
 
-  /**
-   * Get list of deleted entities (must not be NULL).
-   * @return list of deleted entities (must not be NULL)
-   */
-  public List<DeletedEntity> getDeletedEntities() {
-    return deletedEntities;
+  private final List<DeltaLink> addedLinks = new ArrayList<>();
+
+  private final List<DeltaLink> deletedLinks = new ArrayList<>();
+
+  @Override
+  public boolean equals(final Object o) {
+    return super.equals(o) && this.deletedEntities.equals(((Delta)o).deletedEntities)
+      && this.addedLinks.equals(((Delta)o).addedLinks)
+      && this.deletedLinks.equals(((Delta)o).deletedLinks);
   }
 
   /**
@@ -43,7 +44,15 @@ public class Delta extends EntityCollection {
    * @return list of added links (must not be NULL)
    */
   public List<DeltaLink> getAddedLinks() {
-    return addedLinks;
+    return this.addedLinks;
+  }
+
+  /**
+   * Get list of deleted entities (must not be NULL).
+   * @return list of deleted entities (must not be NULL)
+   */
+  public List<DeletedEntity> getDeletedEntities() {
+    return this.deletedEntities;
   }
 
   /**
@@ -51,23 +60,15 @@ public class Delta extends EntityCollection {
    * @return list of deleted links (must not be NULL)
    */
   public List<DeltaLink> getDeletedLinks() {
-    return deletedLinks;
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    return super.equals(o)
-        && deletedEntities.equals(((Delta) o).deletedEntities)
-        && addedLinks.equals(((Delta) o).addedLinks)
-        && deletedLinks.equals(((Delta) o).deletedLinks);
+    return this.deletedLinks;
   }
 
   @Override
   public int hashCode() {
     int result = super.hashCode();
-    result = 31 * result + deletedEntities.hashCode();
-    result = 31 * result + addedLinks.hashCode();
-    result = 31 * result + deletedLinks.hashCode();
+    result = 31 * result + this.deletedEntities.hashCode();
+    result = 31 * result + this.addedLinks.hashCode();
+    result = 31 * result + this.deletedLinks.hashCode();
     return result;
   }
 }

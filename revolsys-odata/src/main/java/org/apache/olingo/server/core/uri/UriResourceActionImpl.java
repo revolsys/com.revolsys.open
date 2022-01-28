@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -32,13 +32,8 @@ import org.apache.olingo.server.api.uri.UriResourceKind;
 public class UriResourceActionImpl extends UriResourceImpl implements UriResourceAction {
 
   private final EdmActionImport actionImport;
-  private final EdmAction action;
 
-  public UriResourceActionImpl(final EdmActionImport actionImport) {
-    super(UriResourceKind.action);
-    this.actionImport = actionImport;
-    this.action = actionImport.getUnboundAction();
-  }
+  private final EdmAction action;
 
   public UriResourceActionImpl(final EdmAction action) {
     super(UriResourceKind.action);
@@ -46,34 +41,41 @@ public class UriResourceActionImpl extends UriResourceImpl implements UriResourc
     this.action = action;
   }
 
+  public UriResourceActionImpl(final EdmActionImport actionImport) {
+    super(UriResourceKind.action);
+    this.actionImport = actionImport;
+    this.action = actionImport.getUnboundAction();
+  }
+
   @Override
   public EdmAction getAction() {
-    return action;
+    return this.action;
   }
 
   @Override
   public EdmActionImport getActionImport() {
-    return actionImport;
-  }
-
-  @Override
-  public boolean isCollection() {
-    return action.getReturnType() != null && action.getReturnType().isCollection();
-  }
-
-  @Override
-  public EdmType getType() {
-    return action.getReturnType() == null ? null : action.getReturnType().getType();
-  }
-
-  @Override
-  public String getSegmentValue(final boolean includeFilters) {
-    return actionImport == null ? (action == null ? "" : action.getName()) : actionImport.getName();
+    return this.actionImport;
   }
 
   @Override
   public String getSegmentValue() {
     return getSegmentValue(false);
+  }
+
+  @Override
+  public String getSegmentValue(final boolean includeFilters) {
+    return this.actionImport == null ? this.action == null ? "" : this.action.getName()
+      : this.actionImport.getName();
+  }
+
+  @Override
+  public EdmType getType() {
+    return this.action.getReturnType() == null ? null : this.action.getReturnType().getType();
+  }
+
+  @Override
+  public boolean isCollection() {
+    return this.action.getReturnType() != null && this.action.getReturnType().isCollection();
   }
 
   @Override

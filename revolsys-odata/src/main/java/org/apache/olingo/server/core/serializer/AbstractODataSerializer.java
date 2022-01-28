@@ -29,17 +29,16 @@ public abstract class AbstractODataSerializer implements ODataSerializer {
   protected static final String IO_EXCEPTION_TEXT = "An I/O exception occurred.";
 
   protected void closeCircleStreamBufferOutput(final OutputStream outputStream,
-      final SerializerException cachedException)
-      throws SerializerException {
+    final SerializerException cachedException) throws SerializerException {
     if (outputStream != null) {
       try {
         outputStream.close();
-      } catch (IOException e) {
+      } catch (final IOException e) {
         if (cachedException != null) {
           throw cachedException;
         } else {
           throw new SerializerException(IO_EXCEPTION_TEXT, e,
-              SerializerException.MessageKeys.IO_EXCEPTION);
+            SerializerException.MessageKeys.IO_EXCEPTION);
         }
       }
     }

@@ -27,32 +27,19 @@ import java.util.List;
  *
  * @param <T> Type of the contained geospatial elements
  */
-public abstract class ComposedGeospatial<T extends Geospatial> extends Geospatial implements Iterable<T> {
+public abstract class ComposedGeospatial<T extends Geospatial> extends Geospatial
+  implements Iterable<T> {
 
   protected final List<T> geospatials;
 
   protected ComposedGeospatial(final Dimension dimension, final Type type, final SRID srid,
-      final List<T> geospatials) {
+    final List<T> geospatials) {
 
     super(dimension, type, srid);
-    this.geospatials = new ArrayList<T>();
+    this.geospatials = new ArrayList<>();
     if (geospatials != null) {
       this.geospatials.addAll(geospatials);
     }
-  }
-
-  @Override
-  public Iterator<T> iterator() {
-    return this.geospatials.iterator();
-  }
-
-  /**
-   * Checks if is empty.
-   *
-   * @return 'TRUE' if is empty; 'FALSE' otherwise.
-   */
-  public boolean isEmpty() {
-    return geospatials.isEmpty();
   }
 
   @Override
@@ -64,22 +51,36 @@ public abstract class ComposedGeospatial<T extends Geospatial> extends Geospatia
       return false;
     }
 
-    final ComposedGeospatial<?> other = (ComposedGeospatial<?>) o;
-    return dimension == other.dimension
-        && (srid == null ? other.srid == null : srid.equals(other.srid))
-        && geospatials.equals(other.geospatials);
+    final ComposedGeospatial<?> other = (ComposedGeospatial<?>)o;
+    return this.dimension == other.dimension
+      && (this.srid == null ? other.srid == null : this.srid.equals(other.srid))
+      && this.geospatials.equals(other.geospatials);
   }
 
   @Override
   public int hashCode() {
-    int result = dimension == null ? 0 : dimension.hashCode();
-    result = 31 * result + (srid == null ? 0 : srid.hashCode());
-    result = 31 * result + geospatials.hashCode();
+    int result = this.dimension == null ? 0 : this.dimension.hashCode();
+    result = 31 * result + (this.srid == null ? 0 : this.srid.hashCode());
+    result = 31 * result + this.geospatials.hashCode();
     return result;
+  }
+
+  /**
+   * Checks if is empty.
+   *
+   * @return 'TRUE' if is empty; 'FALSE' otherwise.
+   */
+  public boolean isEmpty() {
+    return this.geospatials.isEmpty();
+  }
+
+  @Override
+  public Iterator<T> iterator() {
+    return this.geospatials.iterator();
   }
 
   @Override
   public String toString() {
-    return geospatials.toString();
+    return this.geospatials.toString();
   }
 }

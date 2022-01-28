@@ -30,45 +30,19 @@ public class CsdlEntitySet extends CsdlBindingTarget {
   // Default for EntitySets is true
   private boolean includeInServiceDocument = true;
 
-  @Override
-  public CsdlEntitySet setName(final String name) {
-    this.name = name;
-    return this;
-  }
-
-  @Override
-  public CsdlEntitySet setNavigationPropertyBindings(
-      final List<CsdlNavigationPropertyBinding> navigationPropertyBindings) {
-    this.navigationPropertyBindings = navigationPropertyBindings;
-    return this;
-  }
-
-  @Override
-  public CsdlEntitySet setAnnotations(final List<CsdlAnnotation> annotations) {
-    super.setAnnotations(annotations);
-    return this;
-  }
-
-
-  @Override
-  public CsdlEntitySet setType(final String type) {
-    this.type = new FullQualifiedName(type);
-    return this;
-  }
-
-  @Override
-  public CsdlEntitySet setType(final FullQualifiedName type) {
-    this.type = type;
-    return this;
-  }
-
   /**
    * Is include in service document.
    *
    * @return the boolean
    */
   public boolean isIncludeInServiceDocument() {
-    return includeInServiceDocument;
+    return this.includeInServiceDocument;
+  }
+
+  @Override
+  public CsdlEntitySet setAnnotations(final List<CsdlAnnotation> annotations) {
+    super.setAnnotations(annotations);
+    return this;
   }
 
   /**
@@ -81,16 +55,41 @@ public class CsdlEntitySet extends CsdlBindingTarget {
     this.includeInServiceDocument = includeInServiceDocument;
     return this;
   }
-  
+
   @Override
-  public CsdlEntitySet setTitle(String title) {
+  public CsdlEntitySet setMapping(final CsdlMapping mapping) {
+    this.mapping = mapping;
+    return this;
+  }
+
+  @Override
+  public CsdlEntitySet setName(final String name) {
+    this.name = name;
+    return this;
+  }
+
+  @Override
+  public CsdlEntitySet setNavigationPropertyBindings(
+    final List<CsdlNavigationPropertyBinding> navigationPropertyBindings) {
+    this.navigationPropertyBindings = navigationPropertyBindings;
+    return this;
+  }
+
+  @Override
+  public CsdlEntitySet setTitle(final String title) {
     super.setTitle(title);
     return this;
   }
-  
+
   @Override
-  public CsdlEntitySet setMapping(CsdlMapping mapping) {
-    this.mapping = mapping;
+  public CsdlEntitySet setType(final FullQualifiedName type) {
+    this.type = type;
+    return this;
+  }
+
+  @Override
+  public CsdlEntitySet setType(final String type) {
+    this.type = new FullQualifiedName(type);
     return this;
   }
 }

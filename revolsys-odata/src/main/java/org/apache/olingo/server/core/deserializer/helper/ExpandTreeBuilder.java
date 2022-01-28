@@ -25,14 +25,13 @@ import org.apache.olingo.server.core.uri.UriResourceNavigationPropertyImpl;
 import org.apache.olingo.server.core.uri.queryoption.ExpandItemImpl;
 
 public abstract class ExpandTreeBuilder {
-  
-  public abstract ExpandTreeBuilder expand(EdmNavigationProperty edmNavigationProperty);
 
   public abstract ExpandOption build();
-  
+
   protected ExpandItemImpl buildExpandItem(final EdmNavigationProperty edmNavigationProperty) {
-    return new ExpandItemImpl()
-        .setResourcePath(new UriInfoImpl()
-            .addResourcePart(new UriResourceNavigationPropertyImpl(edmNavigationProperty)));
+    return new ExpandItemImpl().setResourcePath(new UriInfoImpl()
+      .addResourcePart(new UriResourceNavigationPropertyImpl(edmNavigationProperty)));
   }
+
+  public abstract ExpandTreeBuilder expand(EdmNavigationProperty edmNavigationProperty);
 }

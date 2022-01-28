@@ -22,5 +22,5 @@ package org.apache.olingo.commons.api.edm.annotation;
  * Represents a logical edm:Le expression
  */
 public interface EdmNot extends EdmLogicalOrComparisonExpression {
-//No additional methods needed.
+  // No additional methods needed.
 }

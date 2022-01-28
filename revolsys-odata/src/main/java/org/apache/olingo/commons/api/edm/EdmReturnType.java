@@ -26,11 +26,6 @@ import org.apache.olingo.commons.api.edm.geo.SRID;
 public interface EdmReturnType extends EdmTyped {
 
   /**
-   * @return true if nullable or not specified
-   */
-  boolean isNullable();
-
-  /**
    * @return the maximum length as an Integer or null if not specified
    */
   Integer getMaxLength();
@@ -49,4 +44,9 @@ public interface EdmReturnType extends EdmTyped {
    * @return a non-negative integer or the special value <tt>variable</tt>
    */
   SRID getSrid();
+
+  /**
+   * @return true if nullable or not specified
+   */
+  boolean isNullable();
 }

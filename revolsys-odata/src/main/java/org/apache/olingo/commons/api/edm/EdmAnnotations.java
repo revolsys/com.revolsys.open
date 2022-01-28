@@ -18,19 +18,18 @@
  */
 package org.apache.olingo.commons.api.edm;
 
-
 /**
  * This is used to apply a group of annotations to a single model element.
  */
-public interface EdmAnnotations extends EdmAnnotatable{
+public interface EdmAnnotations extends EdmAnnotatable {
 
   /**
    * @return a string allowing annotation authors a means of conditionally applying an annotation
    */
   String getQualifier();
-  
+
   /**
-   * Will return the full path to the target 
+   * Will return the full path to the target
    * e.g. MySchema.MyEntityContainer/MyEntitySet/MySchema.MyEntityType/MyProperty
    * @return the path to the target
    */

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -31,52 +31,15 @@ import org.apache.olingo.commons.api.edm.provider.CsdlAnnotation;
 public class CsdlUrlRef extends CsdlDynamicExpression implements CsdlAnnotatable {
 
   private CsdlExpression value;
-  private List<CsdlAnnotation> annotations = new ArrayList<CsdlAnnotation>();
 
-  @Override
-  public List<CsdlAnnotation> getAnnotations() {
-    return annotations;
-  }
-  
-  public CsdlUrlRef setAnnotations(List<CsdlAnnotation> annotations) {
-    this.annotations = annotations;
-    return this;
-  }
+  private List<CsdlAnnotation> annotations = new ArrayList<>();
 
-  /**
-   * Returns a expression of type Edm.String
-   * @return expression of type Edm.String
-   */
-  public CsdlExpression getValue() {
-    return value;
-  }
-
-  public CsdlUrlRef setValue(final CsdlExpression value) {
-    this.value = value;
-    return this;
-  }
-  
-  @Override
-  public boolean equals (Object obj) {
-    if (obj == null) {
-      return false;
-    }
-    if (!(obj instanceof CsdlUrlRef)) {
-      return false;
-    }
-    CsdlUrlRef csdlUrlRef = (CsdlUrlRef) obj;
-    return (this.getValue() == null ? csdlUrlRef.getValue() == null :
-      this.getValue().equals(csdlUrlRef.getValue()))
-        && (this.getAnnotations() == null ? csdlUrlRef.getAnnotations() == null :
-            checkAnnotations(csdlUrlRef.getAnnotations()));
-  }
-  
-  private boolean checkAnnotations(List<CsdlAnnotation> csdlUrlRefAnnot) {
+  private boolean checkAnnotations(final List<CsdlAnnotation> csdlUrlRefAnnot) {
     if (csdlUrlRefAnnot == null) {
       return false;
     }
     if (this.getAnnotations().size() == csdlUrlRefAnnot.size()) {
-      for (int i = 0; i < this.getAnnotations().size() ; i++) {
+      for (int i = 0; i < this.getAnnotations().size(); i++) {
         if (!this.getAnnotations().get(i).equals(csdlUrlRefAnnot.get(i))) {
           return false;
         }
@@ -88,11 +51,46 @@ public class CsdlUrlRef extends CsdlDynamicExpression implements CsdlAnnotatable
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    if ((obj == null) || !(obj instanceof CsdlUrlRef)) {
+      return false;
+    }
+    final CsdlUrlRef csdlUrlRef = (CsdlUrlRef)obj;
+    return (this.getValue() == null ? csdlUrlRef.getValue() == null
+      : this.getValue().equals(csdlUrlRef.getValue()))
+      && (this.getAnnotations() == null ? csdlUrlRef.getAnnotations() == null
+        : checkAnnotations(csdlUrlRef.getAnnotations()));
+  }
+
+  @Override
+  public List<CsdlAnnotation> getAnnotations() {
+    return this.annotations;
+  }
+
+  /**
+   * Returns a expression of type Edm.String
+   * @return expression of type Edm.String
+   */
+  public CsdlExpression getValue() {
+    return this.value;
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((value == null) ? 0 : value.hashCode());
-    result = prime * result + ((annotations == null) ? 0 : annotations.hashCode());
+    result = prime * result + (this.value == null ? 0 : this.value.hashCode());
+    result = prime * result + (this.annotations == null ? 0 : this.annotations.hashCode());
     return result;
+  }
+
+  public CsdlUrlRef setAnnotations(final List<CsdlAnnotation> annotations) {
+    this.annotations = annotations;
+    return this;
+  }
+
+  public CsdlUrlRef setValue(final CsdlExpression value) {
+    this.value = value;
+    return this;
   }
 }

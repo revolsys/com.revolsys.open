@@ -31,15 +31,15 @@ public interface EdmType extends EdmNamed {
   FullQualifiedName getFullQualifiedName();
 
   /**
+   * @return {@link EdmTypeKind} of this {@link EdmType}
+   */
+  EdmTypeKind getKind();
+
+  /**
    * Namespace of this {@link EdmType}.
    *
    * @return namespace as String
    */
   String getNamespace();
-
-  /**
-   * @return {@link EdmTypeKind} of this {@link EdmType}
-   */
-  EdmTypeKind getKind();
 
 }

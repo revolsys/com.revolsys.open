@@ -28,20 +28,20 @@ import org.apache.olingo.server.api.uri.queryoption.SystemQueryOptionKind;
 
 public class OrderByOptionImpl extends SystemQueryOptionImpl implements OrderByOption {
 
-  private List<OrderByItem> orders = new ArrayList<>();
+  private final List<OrderByItem> orders = new ArrayList<>();
 
   public OrderByOptionImpl() {
     setKind(SystemQueryOptionKind.ORDERBY);
   }
 
-  @Override
-  public List<OrderByItem> getOrders() {
-    return Collections.unmodifiableList(orders);
+  public OrderByOptionImpl addOrder(final OrderByItem order) {
+    this.orders.add(order);
+    return this;
   }
 
-  public OrderByOptionImpl addOrder(final OrderByItem order) {
-    orders.add(order);
-    return this;
+  @Override
+  public List<OrderByItem> getOrders() {
+    return Collections.unmodifiableList(this.orders);
   }
 
 }

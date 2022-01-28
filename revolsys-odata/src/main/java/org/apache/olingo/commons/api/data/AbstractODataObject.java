@@ -26,15 +26,58 @@ import java.net.URI;
 public abstract class AbstractODataObject extends Annotatable {
 
   private URI baseURI;
+
   private URI id;
+
   private String title;
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    final AbstractODataObject other = (AbstractODataObject)o;
+    return getAnnotations().equals(other.getAnnotations())
+      && (this.baseURI == null ? other.baseURI == null : this.baseURI.equals(other.baseURI))
+      && (this.id == null ? other.id == null : this.id.equals(other.id))
+      && (this.title == null ? other.title == null : this.title.equals(other.title));
+  }
 
   /**
    * Gets base URI.
    * @return base URI
    */
   public URI getBaseURI() {
-    return baseURI;
+    return this.baseURI;
+  }
+
+  /**
+   * Gets ID.
+   * @return ID.
+   */
+  public URI getId() {
+    return this.id;
+  }
+
+  /**
+   * Gets title.
+   * @return title
+   */
+  public String getTitle() {
+    return this.title;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = getAnnotations().hashCode();
+    result = 31 * result + (this.baseURI == null ? 0 : this.baseURI.hashCode());
+    result = 31 * result + (this.id == null ? 0 : this.id.hashCode());
+    result = 31 * result + (this.title == null ? 0 : this.title.hashCode());
+    return result;
   }
 
   /**
@@ -46,11 +89,16 @@ public abstract class AbstractODataObject extends Annotatable {
   }
 
   /**
-   * Gets ID.
-   * @return ID.
+   * Sets property with given key to given value.
+   * @param key key of property
+   * @param value new value for property
    */
-  public URI getId() {
-    return id;
+  public void setCommonProperty(final String key, final String value) {
+    if ("id".equals(key)) {
+      this.id = URI.create(value);
+    } else if ("title".equals(key)) {
+      this.title = value;
+    }
   }
 
   /**
@@ -59,51 +107,5 @@ public abstract class AbstractODataObject extends Annotatable {
    */
   public void setId(final URI id) {
     this.id = id;
-  }
-
-  /**
-   * Gets title.
-   * @return title
-   */
-  public String getTitle() {
-    return title;
-  }
-
-  /**
-   * Sets property with given key to given value.
-   * @param key key of property
-   * @param value new value for property
-   */
-  public void setCommonProperty(final String key, final String value) {
-    if ("id".equals(key)) {
-      id = URI.create(value);
-    } else if ("title".equals(key)) {
-      title = value;
-    }
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    final AbstractODataObject other = (AbstractODataObject) o;
-    return getAnnotations().equals(other.getAnnotations())
-        && (baseURI == null ? other.baseURI == null : baseURI.equals(other.baseURI))
-        && (id == null ? other.id == null : id.equals(other.id))
-        && (title == null ? other.title == null : title.equals(other.title));
-  }
-
-  @Override
-  public int hashCode() {
-    int result = getAnnotations().hashCode();
-    result = 31 * result + (baseURI == null ? 0 : baseURI.hashCode());
-    result = 31 * result + (id == null ? 0 : id.hashCode());
-    result = 31 * result + (title == null ? 0 : title.hashCode());
-    return result;
   }
 }

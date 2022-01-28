@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -36,14 +36,12 @@ import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 public interface UriHelper {
 
   /**
-   * Builds the select-list part of a {@link org.apache.olingo.commons.api.data.ContextURL ContextURL}.
-   * @param type the {@link EdmStructuredType}
-   * @param expand the $expand option
-   * @param select the $select option
-   * @return a String with the select list
+   * Builds the relative canonical URL for the given entity in the given entity set.
+   * @param edmEntitySet the entity set
+   * @param entity the entity data
+   * @return the relative canonical URL
    */
-  String buildContextURLSelectList(EdmStructuredType type, ExpandOption expand, SelectOption select)
-      throws SerializerException;
+  String buildCanonicalURL(EdmEntitySet edmEntitySet, Entity entity) throws SerializerException;
 
   /**
    * Builds the key-predicate part of a {@link org.apache.olingo.commons.api.data.ContextURL ContextURL}.
@@ -53,12 +51,14 @@ public interface UriHelper {
   String buildContextURLKeyPredicate(List<UriParameter> keys) throws SerializerException;
 
   /**
-   * Builds the relative canonical URL for the given entity in the given entity set.
-   * @param edmEntitySet the entity set
-   * @param entity the entity data
-   * @return the relative canonical URL
+   * Builds the select-list part of a {@link org.apache.olingo.commons.api.data.ContextURL ContextURL}.
+   * @param type the {@link EdmStructuredType}
+   * @param expand the $expand option
+   * @param select the $select option
+   * @return a String with the select list
    */
-  String buildCanonicalURL(EdmEntitySet edmEntitySet, Entity entity) throws SerializerException;
+  String buildContextURLSelectList(EdmStructuredType type, ExpandOption expand, SelectOption select)
+    throws SerializerException;
 
   /**
    * Builds the key predicate for the given entity.
@@ -83,5 +83,6 @@ public interface UriHelper {
    * @return {@link UriResourceEntitySet} - contains the entity set and the key predicates
    * @throws DeserializerException in case the entity-id is malformed
    */
-  UriResourceEntitySet parseEntityId(Edm edm, String entityId, String rawServiceRoot) throws DeserializerException;
+  UriResourceEntitySet parseEntityId(Edm edm, String entityId, String rawServiceRoot)
+    throws DeserializerException;
 }

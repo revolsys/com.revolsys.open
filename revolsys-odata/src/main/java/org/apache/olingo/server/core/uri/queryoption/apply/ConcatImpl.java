@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -29,20 +29,20 @@ import org.apache.olingo.server.api.uri.queryoption.apply.Concat;
  */
 public class ConcatImpl implements Concat {
 
-  private List<ApplyOption> options = new ArrayList<>();
+  private final List<ApplyOption> options = new ArrayList<>();
 
-  @Override
-  public Kind getKind() {
-    return Kind.CONCAT;
+  public ConcatImpl addApplyOption(final ApplyOption option) {
+    this.options.add(option);
+    return this;
   }
 
   @Override
   public List<ApplyOption> getApplyOptions() {
-    return options;
+    return this.options;
   }
 
-  public ConcatImpl addApplyOption(final ApplyOption option) {
-    options.add(option);
-    return this;
+  @Override
+  public Kind getKind() {
+    return Kind.CONCAT;
   }
 }

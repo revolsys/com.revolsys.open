@@ -27,16 +27,18 @@ import java.util.List;
 public class Property extends Valuable {
 
   private String name;
-  private final List<Operation> operations = new ArrayList<Operation>();
-  
+
+  private final List<Operation> operations = new ArrayList<>();
+
   /**
    * Creates a new property
    */
-  public Property() {}
-  
+  public Property() {
+  }
+
   /**
    * Creates a new property
-   * 
+   *
    * @param type  String representation of type (can be null)
    * @param name  Name of the property
    */
@@ -44,18 +46,25 @@ public class Property extends Valuable {
     this.name = name;
     super.setType(type);
   }
-  
+
   /**
    * Creates a new property
-   * 
+   *
    * @param type        String representation of type (can be null)
    * @param name        Name of the property
    * @param valueType   Kind of the property e.g. primitive property, complex property
    * @param value       Value of the property.
    */
-  public Property(final String type, final String name, final ValueType valueType, final Object value) {
+  public Property(final String type, final String name, final ValueType valueType,
+    final Object value) {
     this(type, name);
     setValue(valueType, value);
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    return super.equals(o)
+      && (this.name == null ? ((Property)o).name == null : this.name.equals(((Property)o).name));
   }
 
   /**
@@ -63,15 +72,23 @@ public class Property extends Valuable {
    * @return name of property
    */
   public String getName() {
-    return name;
+    return this.name;
   }
 
   /**
-   * Set name of property.
-   * @param name name of property
+   * Gets operations.
+   *
+   * @return operations.
    */
-  public void setName(final String name) {
-    this.name = name;
+  public List<Operation> getOperations() {
+    return this.operations;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (this.name == null ? 0 : this.name.hashCode());
+    return result;
   }
 
   /**
@@ -83,31 +100,18 @@ public class Property extends Valuable {
   public boolean isNull() {
     return getValue() == null || "Edm.Null".equals(getType());
   }
-  
+
   /**
-   * Gets operations.
-   *
-   * @return operations.
+   * Set name of property.
+   * @param name name of property
    */
-  public List<Operation> getOperations() {
-    return operations;
-  }  
-
-  @Override
-  public boolean equals(final Object o) {
-    return super.equals(o)
-        && (name == null ? ((Property) o).name == null : name.equals(((Property) o).name));
-  }
-
-  @Override
-  public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + (name == null ? 0 : name.hashCode());
-    return result;
+  public void setName(final String name) {
+    this.name = name;
   }
 
   @Override
   public String toString() {
-    return (name == null ? "null" : name) + '=' + (getValue() == null ? "null" : getValue());
+    return (this.name == null ? "null" : this.name) + '='
+      + (getValue() == null ? "null" : getValue());
   }
 }

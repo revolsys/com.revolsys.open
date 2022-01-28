@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -23,20 +23,20 @@ import org.apache.olingo.server.api.uri.queryoption.apply.Skip;
 
 public class SkipImpl implements Skip {
 
-	private SkipOption skipOption = null;
-	
-	@Override
-	public Kind getKind() {
-		return Kind.SKIP;
-	}
+  private SkipOption skipOption = null;
 
-	@Override
-	public SkipOption getSkipOption() {
-		return skipOption;
-	}
+  @Override
+  public Kind getKind() {
+    return Kind.SKIP;
+  }
 
-	public SkipImpl setSkipOption(final SkipOption skipOption) {
-	    this.skipOption = skipOption;
-	    return this;
-	  }
+  @Override
+  public SkipOption getSkipOption() {
+    return this.skipOption;
+  }
+
+  public SkipImpl setSkipOption(final SkipOption skipOption) {
+    this.skipOption = skipOption;
+    return this;
+  }
 }

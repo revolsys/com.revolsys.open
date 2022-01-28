@@ -39,9 +39,9 @@ public final class EdmSByte extends SingletonPrimitiveType {
   }
 
   @Override
-  protected <T> T internalValueOfString(final String value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode, final Class<T> returnType) throws EdmPrimitiveTypeException {
+  protected <T> T internalValueOfString(final String value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode,
+    final Class<T> returnType) throws EdmPrimitiveTypeException {
 
     Byte valueByte;
     try {
@@ -58,26 +58,28 @@ public final class EdmSByte extends SingletonPrimitiveType {
   }
 
   @Override
-  protected <T> String internalValueToString(final T value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode) throws EdmPrimitiveTypeException {
+  protected <T> String internalValueToString(final T value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode)
+    throws EdmPrimitiveTypeException {
 
     if (value instanceof Byte) {
       return value.toString();
     } else if (value instanceof Short || value instanceof Integer || value instanceof Long) {
-      if (((Number) value).longValue() >= Byte.MIN_VALUE && ((Number) value).longValue() <= Byte.MAX_VALUE) {
+      if (((Number)value).longValue() >= Byte.MIN_VALUE
+        && ((Number)value).longValue() <= Byte.MAX_VALUE) {
         return value.toString();
       } else {
         throw new EdmPrimitiveTypeException("The value '" + value + "' is not valid.");
       }
     } else if (value instanceof BigInteger) {
-      if (((BigInteger) value).bitLength() < Byte.SIZE) {
+      if (((BigInteger)value).bitLength() < Byte.SIZE) {
         return value.toString();
       } else {
         throw new EdmPrimitiveTypeException("The value '" + value + "' is not valid.");
       }
     } else {
-      throw new EdmPrimitiveTypeException("The value type " + value.getClass() + " is not supported.");
+      throw new EdmPrimitiveTypeException(
+        "The value type " + value.getClass() + " is not supported.");
     }
   }
 }

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -23,8 +23,6 @@ package org.apache.olingo.server.api.serializer;
  */
 public class BatchSerializerException extends SerializerException {
 
-  private static final long serialVersionUID = 2634433974342796905L;
-
   public enum MessageKeys implements MessageKey {
     MISSING_CONTENT_ID;
 
@@ -34,8 +32,10 @@ public class BatchSerializerException extends SerializerException {
     }
   }
 
+  private static final long serialVersionUID = 2634433974342796905L;
+
   public BatchSerializerException(final String developmentMessage, final MessageKey messageKey,
-      final String... parameters) {
+    final String... parameters) {
     super(developmentMessage, messageKey, parameters);
   }
 

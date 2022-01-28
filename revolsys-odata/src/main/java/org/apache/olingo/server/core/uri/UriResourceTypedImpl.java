@@ -31,20 +31,21 @@ public abstract class UriResourceTypedImpl extends UriResourceImpl implements Ur
     super(kind);
   }
 
+  @Override
+  public String getSegmentValue(final boolean includeFilters) {
+    return includeFilters && this.typeFilter != null
+      ? getSegmentValue() + "/"
+        + this.typeFilter.getFullQualifiedName().getFullQualifiedNameAsString()
+      : getSegmentValue();
+  }
+
   public EdmType getTypeFilter() {
-    return typeFilter;
+    return this.typeFilter;
   }
 
   public UriResourceTypedImpl setTypeFilter(final EdmStructuredType typeFilter) {
     this.typeFilter = typeFilter;
     return this;
-  }
-
-  @Override
-  public String getSegmentValue(final boolean includeFilters) {
-    return includeFilters && typeFilter != null ?
-        getSegmentValue() + "/" + typeFilter.getFullQualifiedName().getFullQualifiedNameAsString() :
-        getSegmentValue();
   }
 
   @Override

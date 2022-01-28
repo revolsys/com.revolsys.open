@@ -32,13 +32,13 @@ public interface EdmCast extends EdmDynamicExpression, EdmAnnotatable {
    * @return Returns the facet attribute MaxLength
    */
   Integer getMaxLength();
-  
+
   /**
    * Returns the facet attribute Precision
    * @return Returns the facet attribute Precision
    */
   Integer getPrecision();
-  
+
   /**
    * Returns the facet attribute Scale
    * @return Returns the facet attribute Scale
@@ -56,7 +56,7 @@ public interface EdmCast extends EdmDynamicExpression, EdmAnnotatable {
    * @return value cast to
    */
   EdmType getType();
-  
+
   /**
    * Cast value of the expression
    * @return Cast value

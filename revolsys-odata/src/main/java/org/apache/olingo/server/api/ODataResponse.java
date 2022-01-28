@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -18,11 +18,11 @@
  */
 package org.apache.olingo.server.api;
 
-import org.apache.olingo.commons.api.http.HttpStatusCode;
-
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.olingo.commons.api.http.HttpStatusCode;
 
 /**
  * Response object to carry OData-relevant HTTP information (status code, response headers, and content).
@@ -30,35 +30,23 @@ import java.util.Map;
 public class ODataResponse {
 
   private int statusCode = HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode();
+
   private final HttpHeaders headers = new HttpHeaders();
+
   private InputStream content;
 
-  /**
-   * Sets the status code.
-   * @see HttpStatusCode
-   */
-  public void setStatusCode(final int statusCode) {
-    this.statusCode = statusCode;
-  }
+  private ODataContent odataContent;
 
   /**
-   * Gets the status code.
-   * @see HttpStatusCode
-   */
-  public int getStatusCode() {
-    return statusCode;
-  }
-
-  /**
-   * <p>Set a header to the response.</p>
+   * <p>Adds a header to the response.</p>
    * <p>The header name will be handled as case-insensitive key.</p>
-   * <p>If a header already exists then the header will be replaced by this new value.</p>
+   * <p>If a header already exists then the list of values will just be extended.</p>
    * @param name case-insensitive header name
-   * @param value value for the given header name
+   * @param values list of values for the given header name
    * @see <a href="http://ietf.org/rfc/rfc7230.txt">RFC 7230, section 3.2.2</a>
    */
-  public void setHeader(final String name, final String value) {
-    headers.setHeader(name, value);
+  public void addHeader(final String name, final List<String> values) {
+    this.headers.addHeader(name, values);
   }
 
   /**
@@ -70,19 +58,7 @@ public class ODataResponse {
    * @see <a href="http://ietf.org/rfc/rfc7230.txt">RFC 7230, section 3.2.2</a>
    */
   public void addHeader(final String name, final String value) {
-    headers.setHeader(name, value);
-  }
-
-  /**
-   * <p>Adds a header to the response.</p>
-   * <p>The header name will be handled as case-insensitive key.</p>
-   * <p>If a header already exists then the list of values will just be extended.</p>
-   * @param name case-insensitive header name
-   * @param values list of values for the given header name
-   * @see <a href="http://ietf.org/rfc/rfc7230.txt">RFC 7230, section 3.2.2</a>
-   */
-  public void addHeader(final String name, final List<String> values) {
-    headers.addHeader(name, values);
+    this.headers.setHeader(name, value);
   }
 
   /**
@@ -91,16 +67,15 @@ public class ODataResponse {
    * @return an unmodifiable Map of header names/values
    */
   public Map<String, List<String>> getAllHeaders() {
-    return headers.getHeaderToValues();
+    return this.headers.getHeaderToValues();
   }
 
   /**
-   * Gets header value for a given name.
-   * @param name the header name as a case-insensitive key
-   * @return the header value(s) or null if not found
+   * Gets the content (body).
+   * @return the content as {@link InputStream}
    */
-  public List<String> getHeaders(final String name) {
-    return headers.getHeader(name);
+  public InputStream getContent() {
+    return this.content;
   }
 
   /**
@@ -116,6 +91,27 @@ public class ODataResponse {
   }
 
   /**
+   * Gets header value for a given name.
+   * @param name the header name as a case-insensitive key
+   * @return the header value(s) or null if not found
+   */
+  public List<String> getHeaders(final String name) {
+    return this.headers.getHeader(name);
+  }
+
+  public ODataContent getODataContent() {
+    return this.odataContent;
+  }
+
+  /**
+   * Gets the status code.
+   * @see HttpStatusCode
+   */
+  public int getStatusCode() {
+    return this.statusCode;
+  }
+
+  /**
    * Sets the content (body).
    * @param content the content as {@link InputStream}
    */
@@ -124,20 +120,26 @@ public class ODataResponse {
   }
 
   /**
-   * Gets the content (body).
-   * @return the content as {@link InputStream}
+   * <p>Set a header to the response.</p>
+   * <p>The header name will be handled as case-insensitive key.</p>
+   * <p>If a header already exists then the header will be replaced by this new value.</p>
+   * @param name case-insensitive header name
+   * @param value value for the given header name
+   * @see <a href="http://ietf.org/rfc/rfc7230.txt">RFC 7230, section 3.2.2</a>
    */
-  public InputStream getContent() {
-    return content;
+  public void setHeader(final String name, final String value) {
+    this.headers.setHeader(name, value);
   }
 
-  private ODataContent odataContent;
-
-  public void setODataContent(ODataContent result) {
-    odataContent = result;
+  public void setODataContent(final ODataContent result) {
+    this.odataContent = result;
   }
 
-  public ODataContent getODataContent() {
-    return odataContent;
+  /**
+   * Sets the status code.
+   * @see HttpStatusCode
+   */
+  public void setStatusCode(final int statusCode) {
+    this.statusCode = statusCode;
   }
 }

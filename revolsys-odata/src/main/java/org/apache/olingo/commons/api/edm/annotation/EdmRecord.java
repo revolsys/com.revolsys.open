@@ -29,21 +29,21 @@ import org.apache.olingo.commons.api.edm.FullQualifiedName;
  * A record expression contains zero or more edm:PropertyValue (See {@link EdmPropertyValue} )elements.
  */
 public interface EdmRecord extends EdmDynamicExpression, EdmAnnotatable {
-  
+
   /**
    * List of edm:PropertyValues (See {@link EdmPropertyValue}
    * @return List of edm:PropertyValues (See {@link EdmPropertyValue}
    */
   List<EdmPropertyValue> getPropertyValues();
-  
+
   /**
    * Returns the entity type or complex type to be constructed.
    * @return Entity type or complex type
    */
   EdmStructuredType getType();
-  
+
   /**
-   * 
+   *
    * @return Fully Qualified Name of the Record
    */
   FullQualifiedName getTypeFQN();

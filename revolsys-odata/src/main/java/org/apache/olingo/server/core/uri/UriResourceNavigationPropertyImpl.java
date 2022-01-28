@@ -23,32 +23,33 @@ import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.server.api.uri.UriResourceKind;
 import org.apache.olingo.server.api.uri.UriResourceNavigation;
 
-public class UriResourceNavigationPropertyImpl extends UriResourceWithKeysImpl implements UriResourceNavigation {
+public class UriResourceNavigationPropertyImpl extends UriResourceWithKeysImpl
+  implements UriResourceNavigation {
 
   private final EdmNavigationProperty navigationProperty;
 
   public UriResourceNavigationPropertyImpl(final EdmNavigationProperty property) {
     super(UriResourceKind.navigationProperty);
-    navigationProperty = property;
+    this.navigationProperty = property;
   }
 
   @Override
   public EdmNavigationProperty getProperty() {
-    return navigationProperty;
-  }
-
-  @Override
-  public EdmType getType() {
-    return navigationProperty.getType();
-  }
-
-  @Override
-  public boolean isCollection() {
-    return navigationProperty.isCollection() && keyPredicates == null;
+    return this.navigationProperty;
   }
 
   @Override
   public String getSegmentValue() {
-    return navigationProperty.getName();
+    return this.navigationProperty.getName();
+  }
+
+  @Override
+  public EdmType getType() {
+    return this.navigationProperty.getType();
+  }
+
+  @Override
+  public boolean isCollection() {
+    return this.navigationProperty.isCollection() && this.keyPredicates == null;
   }
 }

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -34,21 +34,26 @@ import org.apache.olingo.server.api.uri.queryoption.TopOption;
  * http://.../serviceroot/$all
  */
 public interface UriInfoAll {
-  
+
+  /**
+   * @return Object containing information of the $count option
+   */
+  CountOption getCountOption();
+
   /**
    * @return List of custom query options used in the URI (without alias definitions)
    */
   List<CustomQueryOption> getCustomQueryOptions();
 
   /**
+   * @return Object containing information of the $deltatoken option
+   */
+  DeltaTokenOption getDeltaTokenOption();
+
+  /**
    * @return Object containing information of the $format option
    */
   FormatOption getFormatOption();
-
-  /**
-   * @return Object containing information of the $count option
-   */
-  CountOption getCountOption();
 
   /**
    * @return Object containing information of the $search option
@@ -69,9 +74,4 @@ public interface UriInfoAll {
    * @return Object containing information of the $top option
    */
   TopOption getTopOption();
-  
-  /**
-   * @return Object containing information of the $deltatoken option
-   */
-  DeltaTokenOption getDeltaTokenOption();
 }

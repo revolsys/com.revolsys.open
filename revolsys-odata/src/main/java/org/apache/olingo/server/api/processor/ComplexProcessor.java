@@ -31,6 +31,19 @@ import org.apache.olingo.server.api.uri.UriInfo;
 public interface ComplexProcessor extends Processor {
 
   /**
+   * Deletes complex-type value from an entity and puts the status into the response.
+   * Deletion for complex-type values is equal to
+   * set the value to <code>NULL</code> (see chapter "11.4.9.2 Set a Value to Null")
+   * @param request OData request object containing raw HTTP information
+   * @param response OData response object for collecting response data
+   * @param uriInfo information of a parsed OData URI
+   * @throws ODataApplicationException if the service implementation encounters a failure
+   * @throws ODataLibraryException
+   */
+  void deleteComplex(ODataRequest request, ODataResponse response, UriInfo uriInfo)
+    throws ODataApplicationException, ODataLibraryException;
+
+  /**
    * Reads complex-type instance.
    * If it is not available, for example due to permissions, the service responds with 404 Not Found.
    * @param request OData request object containing raw HTTP information
@@ -40,8 +53,8 @@ public interface ComplexProcessor extends Processor {
    * @throws ODataApplicationException if the service implementation encounters a failure
    * @throws ODataLibraryException
    */
-  void readComplex(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat)
-      throws ODataApplicationException, ODataLibraryException;
+  void readComplex(ODataRequest request, ODataResponse response, UriInfo uriInfo,
+    ContentType responseFormat) throws ODataApplicationException, ODataLibraryException;
 
   /**
    * Update complex-type instance with send data in the persistence and
@@ -55,18 +68,6 @@ public interface ComplexProcessor extends Processor {
    * @throws ODataLibraryException
    */
   void updateComplex(ODataRequest request, ODataResponse response, UriInfo uriInfo,
-      ContentType requestFormat, ContentType responseFormat) throws ODataApplicationException, ODataLibraryException;
-
-  /**
-   * Deletes complex-type value from an entity and puts the status into the response.
-   * Deletion for complex-type values is equal to
-   * set the value to <code>NULL</code> (see chapter "11.4.9.2 Set a Value to Null")
-   * @param request OData request object containing raw HTTP information
-   * @param response OData response object for collecting response data
-   * @param uriInfo information of a parsed OData URI
-   * @throws ODataApplicationException if the service implementation encounters a failure
-   * @throws ODataLibraryException
-   */
-  void deleteComplex(ODataRequest request, ODataResponse response, UriInfo uriInfo)
-      throws ODataApplicationException, ODataLibraryException;
+    ContentType requestFormat, ContentType responseFormat)
+    throws ODataApplicationException, ODataLibraryException;
 }

@@ -21,4 +21,3 @@
  * EDM objects created during the URI parsing
  */
 package org.apache.olingo.commons.api.edm.annotation;
-

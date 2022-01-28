@@ -23,12 +23,6 @@ package org.apache.olingo.commons.api.http;
  */
 public enum HttpMethod {
 
-  GET,
-  POST,
-  PUT,
-  PATCH,
-  MERGE,
-  DELETE,
-  HEAD
+  GET, POST, PUT, PATCH, MERGE, DELETE, HEAD
 
 }

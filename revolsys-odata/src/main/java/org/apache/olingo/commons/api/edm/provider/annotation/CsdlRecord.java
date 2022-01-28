@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -31,85 +31,17 @@ import org.apache.olingo.commons.api.edm.provider.CsdlAnnotation;
 public class CsdlRecord extends CsdlDynamicExpression implements CsdlAnnotatable {
 
   private String type;
-  private List<CsdlPropertyValue> propertyValues = new ArrayList<CsdlPropertyValue>();
-  private List<CsdlAnnotation> annotations = new ArrayList<CsdlAnnotation>();
 
-  @Override
-  public List<CsdlAnnotation> getAnnotations() {
-    return annotations;
-  }
+  private List<CsdlPropertyValue> propertyValues = new ArrayList<>();
 
-  public CsdlRecord setAnnotations(List<CsdlAnnotation> annotations) {
-    this.annotations = annotations;
-    return this;
-  }
+  private List<CsdlAnnotation> annotations = new ArrayList<>();
 
-  /**
-   * Returns the entity type or complex type to be constructed.
-   * @return Entity type or complex type
-   */
-  public String getType() {
-    return type;
-  }
-
-  public CsdlRecord setType(final String type) {
-    this.type = type;
-    return this;
-  }
-
-  /**
-   * List of edm:PropertyValues (See {@link CsdlPropertyValue}
-   * @return List of edm:PropertyValues (See
-   */
-  public List<CsdlPropertyValue> getPropertyValues() {
-    return propertyValues;
-  }
-
-  public CsdlRecord setPropertyValues(List<CsdlPropertyValue> propertyValues) {
-    this.propertyValues = propertyValues;
-    return this;
-  }
-  
-  @Override
-  public boolean equals (Object obj) {
-    if (obj == null) {
-      return false;
-    }
-    if (!(obj instanceof CsdlRecord)) {
-      return false;
-    }
-    CsdlRecord csdlRecord = (CsdlRecord) obj;
-    return (this.getType() == null ? csdlRecord.getType() == null :
-      this.getType().equals(csdlRecord.getType()))
-        && (this.getAnnotations() == null ? csdlRecord.getAnnotations() == null :
-            checkAnnotations(csdlRecord.getAnnotations()))
-        && (this.getPropertyValues() == null ? csdlRecord.getPropertyValues() == null :
-            checkPropertyValues(csdlRecord.getPropertyValues()));
-  }
-  
-  private boolean checkPropertyValues(List<CsdlPropertyValue> csdlRecordpropertyValues) {
-    if (csdlRecordpropertyValues == null) {
-      return false;
-    }
-    if (this.getPropertyValues().size() == csdlRecordpropertyValues.size()) {
-      for (int i = 0; i < this.getPropertyValues().size(); i++) {
-        if (!this.getPropertyValues().get(i).equals(
-            csdlRecordpropertyValues.get(i))) {
-          return false;
-        }
-      }
-    } else {
-      return false;
-    }
-    return true;
-  }
-
-  private boolean checkAnnotations(List<CsdlAnnotation> csdlRecordAnnot) {
+  private boolean checkAnnotations(final List<CsdlAnnotation> csdlRecordAnnot) {
     if (csdlRecordAnnot == null) {
       return false;
     }
     if (this.getAnnotations().size() == csdlRecordAnnot.size()) {
-      for (int i = 0; i < this.getAnnotations().size() ; i++) {
+      for (int i = 0; i < this.getAnnotations().size(); i++) {
         if (!this.getAnnotations().get(i).equals(csdlRecordAnnot.get(i))) {
           return false;
         }
@@ -120,15 +52,79 @@ public class CsdlRecord extends CsdlDynamicExpression implements CsdlAnnotatable
     return true;
   }
 
+  private boolean checkPropertyValues(final List<CsdlPropertyValue> csdlRecordpropertyValues) {
+    if (csdlRecordpropertyValues == null) {
+      return false;
+    }
+    if (this.getPropertyValues().size() == csdlRecordpropertyValues.size()) {
+      for (int i = 0; i < this.getPropertyValues().size(); i++) {
+        if (!this.getPropertyValues().get(i).equals(csdlRecordpropertyValues.get(i))) {
+          return false;
+        }
+      }
+    } else {
+      return false;
+    }
+    return true;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if ((obj == null) || !(obj instanceof CsdlRecord)) {
+      return false;
+    }
+    final CsdlRecord csdlRecord = (CsdlRecord)obj;
+    return (this.getType() == null ? csdlRecord.getType() == null
+      : this.getType().equals(csdlRecord.getType()))
+      && (this.getAnnotations() == null ? csdlRecord.getAnnotations() == null
+        : checkAnnotations(csdlRecord.getAnnotations()))
+      && (this.getPropertyValues() == null ? csdlRecord.getPropertyValues() == null
+        : checkPropertyValues(csdlRecord.getPropertyValues()));
+  }
+
+  @Override
+  public List<CsdlAnnotation> getAnnotations() {
+    return this.annotations;
+  }
+
+  /**
+   * List of edm:PropertyValues (See {@link CsdlPropertyValue}
+   * @return List of edm:PropertyValues (See
+   */
+  public List<CsdlPropertyValue> getPropertyValues() {
+    return this.propertyValues;
+  }
+
+  /**
+   * Returns the entity type or complex type to be constructed.
+   * @return Entity type or complex type
+   */
+  public String getType() {
+    return this.type;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((type == null) ? 0 : type.hashCode());
-    result = prime * result + ((propertyValues == null) ? 0 : 
-      propertyValues.hashCode());
-    result = prime * result + ((annotations == null) ? 0 : 
-      annotations.hashCode());
+    result = prime * result + (this.type == null ? 0 : this.type.hashCode());
+    result = prime * result + (this.propertyValues == null ? 0 : this.propertyValues.hashCode());
+    result = prime * result + (this.annotations == null ? 0 : this.annotations.hashCode());
     return result;
+  }
+
+  public CsdlRecord setAnnotations(final List<CsdlAnnotation> annotations) {
+    this.annotations = annotations;
+    return this;
+  }
+
+  public CsdlRecord setPropertyValues(final List<CsdlPropertyValue> propertyValues) {
+    this.propertyValues = propertyValues;
+    return this;
+  }
+
+  public CsdlRecord setType(final String type) {
+    this.type = type;
+    return this;
   }
 }

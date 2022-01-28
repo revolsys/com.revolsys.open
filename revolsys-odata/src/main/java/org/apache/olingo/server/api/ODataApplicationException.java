@@ -30,8 +30,11 @@ import org.apache.olingo.commons.api.http.HttpStatusCode;
 public class ODataApplicationException extends ODataException {
 
   private static final long serialVersionUID = 5358683245923127425L;
+
   private int statusCode = HttpStatusCode.INTERNAL_SERVER_ERROR.getStatusCode();
-  private Locale locale;
+
+  private final Locale locale;
+
   private String oDataErrorCode;
 
   /**
@@ -58,7 +61,7 @@ public class ODataApplicationException extends ODataException {
    * @see HttpStatusCode
    */
   public ODataApplicationException(final String msg, final int statusCode, final Locale locale,
-      final String oDataErrorCode) {
+    final String oDataErrorCode) {
     this(msg, statusCode, locale);
     this.oDataErrorCode = oDataErrorCode;
   }
@@ -74,7 +77,7 @@ public class ODataApplicationException extends ODataException {
    * @see Throwable#getCause()
    */
   public ODataApplicationException(final String msg, final int statusCode, final Locale locale,
-      final Throwable cause) {
+    final Throwable cause) {
     super(msg, cause);
     this.statusCode = statusCode;
     this.locale = locale;
@@ -91,10 +94,26 @@ public class ODataApplicationException extends ODataException {
    * @see HttpStatusCode
    * @see Throwable#getCause()
    */
-  public ODataApplicationException(final String msg, final int statusCode, final Locale locale, final Throwable cause,
-      final String oDataErrorCode) {
+  public ODataApplicationException(final String msg, final int statusCode, final Locale locale,
+    final Throwable cause, final String oDataErrorCode) {
     this(msg, statusCode, locale, cause);
     this.oDataErrorCode = oDataErrorCode;
+  }
+
+  /**
+   * Returns the Locale which was used for the error message. The default is null.
+   * @return locale used for the error message
+   */
+  public Locale getLocale() {
+    return this.locale;
+  }
+
+  /**
+   * This method will return the error code specified by the application. The default is null.
+   * @return the applications error code.
+   */
+  public String getODataErrorCode() {
+    return this.oDataErrorCode;
   }
 
   /**
@@ -103,22 +122,6 @@ public class ODataApplicationException extends ODataException {
    * @return status code for this exception
    */
   public int getStatusCode() {
-    return statusCode;
-  }
-
-  /**
-   * Returns the Locale which was used for the error message. The default is null.
-   * @return locale used for the error message
-   */
-  public Locale getLocale() {
-    return locale;
-  }
-
-  /**
-   * This method will return the error code specified by the application. The default is null.
-   * @return the applications error code.
-   */
-  public String getODataErrorCode() {
-    return oDataErrorCode;
+    return this.statusCode;
   }
 }

@@ -28,39 +28,40 @@ import org.apache.olingo.commons.api.edm.FullQualifiedName;
 public class Target {
 
   private String targetName;
+
   private FullQualifiedName entityContainer;
 
   public Target(final String target, final EdmEntityContainer defaultContainer) {
     final String[] bindingTargetParts = target.split("/");
     if (bindingTargetParts.length == 1) {
-      entityContainer = defaultContainer.getFullQualifiedName();
-      targetName = bindingTargetParts[0];
+      this.entityContainer = defaultContainer.getFullQualifiedName();
+      this.targetName = bindingTargetParts[0];
     } else {
-      entityContainer = new FullQualifiedName(bindingTargetParts[0]);
-      targetName = bindingTargetParts[1];
+      this.entityContainer = new FullQualifiedName(bindingTargetParts[0]);
+      this.targetName = bindingTargetParts[1];
     }
-  }
-
-  /**
-   * @return name of the target as a String
-   */
-  public String getTargetName() {
-    return targetName;
   }
 
   /**
    * @return {@link FullQualifiedName} of the entity container this target is contained in.
    */
   public FullQualifiedName getEntityContainer() {
-    return entityContainer;
+    return this.entityContainer;
+  }
+
+  /**
+   * @return name of the target as a String
+   */
+  public String getTargetName() {
+    return this.targetName;
   }
 
   @Override
   public String toString() {
-    if (entityContainer == null) {
-      return targetName;
+    if (this.entityContainer == null) {
+      return this.targetName;
     }
-    return entityContainer.getFullQualifiedNameAsString() + "/" + targetName;
+    return this.entityContainer.getFullQualifiedNameAsString() + "/" + this.targetName;
   }
 
 }

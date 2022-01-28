@@ -34,32 +34,32 @@ public class UriResourceSingletonImpl extends UriResourceTypedImpl implements Ur
   }
 
   @Override
-  public EdmSingleton getSingleton() {
-    return singleton;
+  public EdmEntityType getEntityType() {
+    return this.singleton.getEntityType();
   }
 
   @Override
   public EdmEntityType getEntityTypeFilter() {
-    return (EdmEntityType) getTypeFilter();
+    return (EdmEntityType)getTypeFilter();
+  }
+
+  @Override
+  public String getSegmentValue() {
+    return this.singleton.getName();
+  }
+
+  @Override
+  public EdmSingleton getSingleton() {
+    return this.singleton;
   }
 
   @Override
   public EdmType getType() {
-    return singleton.getEntityType();
-  }
-
-  @Override
-  public EdmEntityType getEntityType() {
-    return singleton.getEntityType();
+    return this.singleton.getEntityType();
   }
 
   @Override
   public boolean isCollection() {
     return false;
-  }
-
-  @Override
-  public String getSegmentValue() {
-    return singleton.getName();
   }
 }

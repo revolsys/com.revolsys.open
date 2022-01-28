@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -23,38 +23,31 @@ package org.apache.olingo.server.api.uri.queryoption.expression;
  * For the semantic of these methods please see the ODATA specification for URL conventions
  */
 public enum MethodKind {
-  COMPUTE_AGGREGATE("aggregate"),
-  CONTAINS("contains"),
-  STARTSWITH("startswith"),
-  ENDSWITH("endswith"),
-  LENGTH("length"),
-  INDEXOF("indexof"),
-  SUBSTRING("substring"),
-  TOLOWER("tolower"),
-  TOUPPER("toupper"),
-  TRIM("trim"),
-  CONCAT("concat"),
-  YEAR("year"),
-  MONTH("month"),
-  DAY("day"),
-  HOUR("hour"),
-  MINUTE("minute"),
-  SECOND("second"),
-  FRACTIONALSECONDS("fractionalseconds"),
-  TOTALSECONDS("totalseconds"), DATE("date"), TIME("time"),
-  TOTALOFFSETMINUTES("totaloffsetminutes"),
-  MINDATETIME("mindatetime"),
-  MAXDATETIME("maxdatetime"),
-  NOW("now"),
-  ROUND("round"),
-  FLOOR("floor"),
-  CEILING("ceiling"),
-  GEODISTANCE("geo.distance"),
-  GEOLENGTH("geo.length"),
-  GEOINTERSECTS("geo.intersects"),
-  CAST("cast"),
-  ISOF("isof"),
-  SUBSTRINGOF("substringof");
+  COMPUTE_AGGREGATE("aggregate"), CONTAINS("contains"), STARTSWITH("startswith"), ENDSWITH(
+    "endswith"), LENGTH("length"), INDEXOF("indexof"), SUBSTRING(
+      "substring"), TOLOWER("tolower"), TOUPPER("toupper"), TRIM("trim"), CONCAT("concat"), YEAR(
+        "year"), MONTH("month"), DAY("day"), HOUR("hour"), MINUTE("minute"), SECOND(
+          "second"), FRACTIONALSECONDS("fractionalseconds"), TOTALSECONDS("totalseconds"), DATE(
+            "date"), TIME("time"), TOTALOFFSETMINUTES("totaloffsetminutes"), MINDATETIME(
+              "mindatetime"), MAXDATETIME("maxdatetime"), NOW("now"), ROUND(
+                "round"), FLOOR("floor"), CEILING("ceiling"), GEODISTANCE(
+                  "geo.distance"), GEOLENGTH("geo.length"), GEOINTERSECTS(
+                    "geo.intersects"), CAST("cast"), ISOF("isof"), SUBSTRINGOF("substringof");
+
+  /**
+   * URI syntax to enumeration value
+   * @param method Method in the syntax used in the URI
+   * @return Method kind which represents the given syntax
+   */
+  public static MethodKind get(final String method) {
+    for (final MethodKind op : MethodKind.values()) {
+
+      if (op.toString().equals(method)) {
+        return op;
+      }
+    }
+    return null;
+  }
 
   private String syntax;
 
@@ -71,22 +64,7 @@ public enum MethodKind {
    * @return URI syntax for that operator kind
    */
   public String toString() {
-    return syntax;
-  }
-
-  /**
-   * URI syntax to enumeration value
-   * @param method Method in the syntax used in the URI
-   * @return Method kind which represents the given syntax
-   */
-  public static MethodKind get(final String method) {
-    for (MethodKind op : MethodKind.values()) {
-
-      if (op.toString().equals(method)) {
-        return op;
-      }
-    }
-    return null;
+    return this.syntax;
   }
 
 }

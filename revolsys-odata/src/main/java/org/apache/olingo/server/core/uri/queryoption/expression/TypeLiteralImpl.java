@@ -33,17 +33,19 @@ public class TypeLiteralImpl implements TypeLiteral {
   }
 
   @Override
-  public EdmType getType() {
-    return type;
+  public <T> T accept(final ExpressionVisitor<T> visitor)
+    throws ExpressionVisitException, ODataApplicationException {
+    return visitor.visitTypeLiteral(this.type);
   }
 
   @Override
-  public <T> T accept(final ExpressionVisitor<T> visitor) throws ExpressionVisitException, ODataApplicationException {
-    return visitor.visitTypeLiteral(type);
+  public EdmType getType() {
+    return this.type;
   }
 
   @Override
   public String toString() {
-    return type == null ? "NULL" : type.getFullQualifiedName().getFullQualifiedNameAsString();
+    return this.type == null ? "NULL"
+      : this.type.getFullQualifiedName().getFullQualifiedNameAsString();
   }
 }

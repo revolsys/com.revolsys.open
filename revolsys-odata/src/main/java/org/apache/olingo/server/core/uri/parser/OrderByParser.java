@@ -35,6 +35,7 @@ import org.apache.olingo.server.core.uri.validator.UriValidationException;
 public class OrderByParser {
 
   private final Edm edm;
+
   private final OData odata;
 
   public OrderByParser(final Edm edm, final OData odata) {
@@ -42,14 +43,14 @@ public class OrderByParser {
     this.odata = odata;
   }
 
-  public OrderByOption parse(UriTokenizer tokenizer, final EdmStructuredType referencedType,
-      final Collection<String> crossjoinEntitySetNames, final Map<String, AliasQueryOption> aliases)
-      throws UriParserException, UriValidationException {
-    OrderByOptionImpl orderByOption = new OrderByOptionImpl();
+  public OrderByOption parse(final UriTokenizer tokenizer, final EdmStructuredType referencedType,
+    final Collection<String> crossjoinEntitySetNames, final Map<String, AliasQueryOption> aliases)
+    throws UriParserException, UriValidationException {
+    final OrderByOptionImpl orderByOption = new OrderByOptionImpl();
     do {
-      final Expression orderByExpression = new ExpressionParser(edm, odata)
-          .parse(tokenizer, referencedType, crossjoinEntitySetNames, aliases);
-      OrderByItemImpl item = new OrderByItemImpl();
+      final Expression orderByExpression = new ExpressionParser(this.edm, this.odata)
+        .parse(tokenizer, referencedType, crossjoinEntitySetNames, aliases);
+      final OrderByItemImpl item = new OrderByItemImpl();
       item.setExpression(orderByExpression);
       if (tokenizer.next(TokenKind.AscSuffix)) {
         item.setDescending(false);

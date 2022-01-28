@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -25,6 +25,7 @@ import java.util.Collection;
  */
 public class ETagInformation {
   private final boolean all;
+
   private final Collection<String> eTags;
 
   public ETagInformation(final boolean all, final Collection<String> eTags) {
@@ -33,18 +34,18 @@ public class ETagInformation {
   }
 
   /**
-   * Gets the information whether the values contain "*".
-   */
-  public boolean isAll() {
-    return all;
-  }
-
-  /**
    * Gets the collection of ETag values found.
    * It is empty if {@link #isAll()} returns <code>true</code>.
    */
   public Collection<String> getETags() {
-    return eTags;
+    return this.eTags;
+  }
+
+  /**
+   * Gets the information whether the values contain "*".
+   */
+  public boolean isAll() {
+    return this.all;
   }
 
   /**
@@ -59,12 +60,12 @@ public class ETagInformation {
   public boolean isMatchedBy(final String eTag) {
     if (eTag == null) {
       return false;
-    } else if (all) {
+    } else if (this.all) {
       return true;
     } else {
-      for (final String candidate : eTags) {
+      for (final String candidate : this.eTags) {
         if ((eTag.startsWith("W/") ? eTag.substring(2) : eTag)
-            .equals(candidate.startsWith("W/") ? candidate.substring(2) : candidate)) {
+          .equals(candidate.startsWith("W/") ? candidate.substring(2) : candidate)) {
           return true;
         }
       }

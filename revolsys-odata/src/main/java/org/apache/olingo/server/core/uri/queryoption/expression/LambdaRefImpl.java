@@ -28,21 +28,22 @@ public class LambdaRefImpl implements LambdaRef {
   private final String variableText;
 
   public LambdaRefImpl(final String text) {
-    variableText = text;
+    this.variableText = text;
+  }
+
+  @Override
+  public <T> T accept(final ExpressionVisitor<T> visitor)
+    throws ExpressionVisitException, ODataApplicationException {
+    return visitor.visitLambdaReference(this.variableText);
   }
 
   @Override
   public String getVariableName() {
-    return variableText;
-  }
-
-  @Override
-  public <T> T accept(final ExpressionVisitor<T> visitor) throws ExpressionVisitException, ODataApplicationException {
-    return visitor.visitLambdaReference(variableText);
+    return this.variableText;
   }
 
   @Override
   public String toString() {
-    return variableText;
+    return this.variableText;
   }
 }

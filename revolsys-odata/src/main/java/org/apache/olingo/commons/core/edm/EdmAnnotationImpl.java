@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -30,7 +30,9 @@ import org.apache.olingo.commons.core.edm.annotation.AbstractEdmExpression;
 public class EdmAnnotationImpl extends AbstractEdmAnnotatable implements EdmAnnotation {
 
   private final CsdlAnnotation annotation;
+
   private EdmTerm term;
+
   private EdmExpression expression;
 
   public EdmAnnotationImpl(final Edm edm, final CsdlAnnotation annotation) {
@@ -39,28 +41,27 @@ public class EdmAnnotationImpl extends AbstractEdmAnnotatable implements EdmAnno
   }
 
   @Override
-  public EdmTerm getTerm() {
-    if (term == null) {
-      if (annotation.getTerm() == null) {
-        throw new EdmException("Term must not be null for an annotation.");
-      }
-      term = edm.getTerm(new FullQualifiedName(annotation.getTerm()));
+  public EdmExpression getExpression() {
+    if (this.expression == null && this.annotation.getExpression() != null) {
+      this.expression = AbstractEdmExpression.getExpression(this.edm,
+        this.annotation.getExpression());
     }
-    return term;
+    return this.expression;
   }
 
   @Override
   public String getQualifier() {
-    return annotation.getQualifier();
+    return this.annotation.getQualifier();
   }
 
- 
-
   @Override
-  public EdmExpression getExpression() {
-    if (expression == null && annotation.getExpression() != null) {
-      expression = AbstractEdmExpression.getExpression(edm, annotation.getExpression());
+  public EdmTerm getTerm() {
+    if (this.term == null) {
+      if (this.annotation.getTerm() == null) {
+        throw new EdmException("Term must not be null for an annotation.");
+      }
+      this.term = this.edm.getTerm(new FullQualifiedName(this.annotation.getTerm()));
     }
-    return expression;
+    return this.term;
   }
 }

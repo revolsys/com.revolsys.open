@@ -28,14 +28,39 @@ public class SelectItemImpl implements SelectItem {
   private UriInfoResource path;
 
   private boolean isStar;
+
   private FullQualifiedName addOperationsInSchemaNameSpace;
 
   private EdmType startTypeFilter;
 
+  public void addAllOperationsInSchema(final FullQualifiedName addOperationsInSchemaNameSpace) {
+    this.addOperationsInSchemaNameSpace = addOperationsInSchemaNameSpace;
+  }
+
+  @Override
+  public FullQualifiedName getAllOperationsInSchemaNameSpace() {
+    return this.addOperationsInSchemaNameSpace;
+  }
+
   @Override
   public UriInfoResource getResourcePath() {
 
-    return path;
+    return this.path;
+  }
+
+  @Override
+  public EdmType getStartTypeFilter() {
+    return this.startTypeFilter;
+  }
+
+  @Override
+  public boolean isAllOperationsInSchema() {
+    return this.addOperationsInSchemaNameSpace != null;
+  }
+
+  @Override
+  public boolean isStar() {
+    return this.isStar;
   }
 
   public SelectItemImpl setResourcePath(final UriInfoResource path) {
@@ -43,33 +68,9 @@ public class SelectItemImpl implements SelectItem {
     return this;
   }
 
-  @Override
-  public boolean isStar() {
-    return isStar;
-  }
-
   public SelectItemImpl setStar(final boolean isStar) {
     this.isStar = isStar;
     return this;
-  }
-
-  @Override
-  public boolean isAllOperationsInSchema() {
-    return addOperationsInSchemaNameSpace != null;
-  }
-
-  @Override
-  public FullQualifiedName getAllOperationsInSchemaNameSpace() {
-    return addOperationsInSchemaNameSpace;
-  }
-
-  public void addAllOperationsInSchema(final FullQualifiedName addOperationsInSchemaNameSpace) {
-    this.addOperationsInSchemaNameSpace = addOperationsInSchemaNameSpace;
-  }
-
-  @Override
-  public EdmType getStartTypeFilter() {
-    return startTypeFilter;
   }
 
   public SelectItemImpl setTypeFilter(final EdmType startTypeFilter) {

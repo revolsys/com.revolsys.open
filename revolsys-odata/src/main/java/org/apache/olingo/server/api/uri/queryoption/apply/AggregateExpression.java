@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -32,26 +32,21 @@ import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
 public interface AggregateExpression extends Expression {
 
   /** Standard aggregation method. */
-  public enum StandardMethod { SUM, MIN, MAX, AVERAGE, COUNT_DISTINCT }
+  public enum StandardMethod {
+    SUM, MIN, MAX, AVERAGE, COUNT_DISTINCT
+  }
 
   /**
-   * Gets the path prefix and the path segment.
-   * @return a (potentially empty) list of path segments (and never <code>null</code>)
+   * Adds the dynamic property for aggregation expression.
+   * @param name an identifier
    */
-  List<UriResource> getPath();
+  void addDynamicProperty(String name);
 
   /**
-   * Gets the common expression to be aggregated.
-   * @return an {@link Expression} that could be <code>null</code>
+   * Gets the name of the aggregate if an alias name has been set.
+   * @return an identifier String or <code>null</code>
    */
-  Expression getExpression();
-
-  /**
-   * Gets the standard aggregation method if used.
-   * @return a {@link StandardMethod} or <code>null</code>
-   * @see #getCustomMethod()
-   */
-  StandardMethod getStandardMethod();
+  String getAlias();
 
   /**
    * Gets the name of the custom aggregation method if used.
@@ -61,10 +56,22 @@ public interface AggregateExpression extends Expression {
   FullQualifiedName getCustomMethod();
 
   /**
-   * Gets the name of the aggregate if an alias name has been set.
-   * @return an identifier String or <code>null</code>
+   * Gets the dynamic properties for aggregation expression.
+   * @return the set of properties
    */
-  String getAlias();
+  Set<String> getDynamicProperties();
+
+  /**
+   * Gets the common expression to be aggregated.
+   * @return an {@link Expression} that could be <code>null</code>
+   */
+  Expression getExpression();
+
+  /**
+   * Gets the aggregate expressions for <code>from</code>.
+   * @return a (potentially empty) list of aggregate expressions (but never <code>null</code>)
+   */
+  List<AggregateExpression> getFrom();
 
   /**
    * Gets the inline aggregation expression to be applied to the target of the path if used.
@@ -74,20 +81,15 @@ public interface AggregateExpression extends Expression {
   AggregateExpression getInlineAggregateExpression();
 
   /**
-   * Gets the aggregate expressions for <code>from</code>.
-   * @return a (potentially empty) list of aggregate expressions (but never <code>null</code>)
+   * Gets the path prefix and the path segment.
+   * @return a (potentially empty) list of path segments (and never <code>null</code>)
    */
-  List<AggregateExpression> getFrom();
-  
-  /**
-   * Gets the dynamic properties for aggregation expression.
-   * @return the set of properties
-   */
-  Set<String> getDynamicProperties();
+  List<UriResource> getPath();
 
   /**
-   * Adds the dynamic property for aggregation expression.
-   * @param name an identifier
+   * Gets the standard aggregation method if used.
+   * @return a {@link StandardMethod} or <code>null</code>
+   * @see #getCustomMethod()
    */
-  void addDynamicProperty(String name);
+  StandardMethod getStandardMethod();
 }

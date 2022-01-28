@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -19,9 +19,6 @@
 package org.apache.olingo.commons.api.edm.provider.annotation;
 
 public class CsdlConstantExpression extends CsdlExpression {
-
-  private final ConstantExpressionType type;
-  private String value;
 
   /**
    * Type of the constant expression
@@ -77,7 +74,7 @@ public class CsdlConstantExpression extends CsdlExpression {
     TimeOfDay;
 
     /**
-     * Creates a new type by a given string e.g. "TimeOfDay". 
+     * Creates a new type by a given string e.g. "TimeOfDay".
      * Will NOT throw an IlligalArgumentException for invalid types. If needed use the valueOf method.
      * @param value Type as string
      * @return Type type
@@ -86,20 +83,37 @@ public class CsdlConstantExpression extends CsdlExpression {
       ConstantExpressionType result = null;
       try {
         result = valueOf(value);
-      } catch (IllegalArgumentException e) {
+      } catch (final IllegalArgumentException e) {
         // ignore
       }
       return result;
     }
   }
 
-  public CsdlConstantExpression(ConstantExpressionType type) {
+  private final ConstantExpressionType type;
+
+  private String value;
+
+  public CsdlConstantExpression(final ConstantExpressionType type) {
     this.type = type;
   }
 
-  public CsdlConstantExpression(ConstantExpressionType type, String value) {
+  public CsdlConstantExpression(final ConstantExpressionType type, final String value) {
     this.type = type;
     this.value = value;
+  }
+
+  @Override
+  public boolean equals(final Object obj) {
+    if ((obj == null) || !(obj instanceof CsdlConstantExpression)) {
+      return false;
+    }
+    final CsdlConstantExpression csdlConstExp = (CsdlConstantExpression)obj;
+
+    return (this.getValue() == null ? csdlConstExp.getValue() == null
+      : this.getValue().equals(csdlConstExp.getValue()))
+      && (this.getType() == null ? csdlConstExp.getType() == null
+        : this.getType().equals(csdlConstExp.getType()));
   }
 
   /**
@@ -107,7 +121,7 @@ public class CsdlConstantExpression extends CsdlExpression {
    * @return type of the constant expression
    */
   public ConstantExpressionType getType() {
-    return type;
+    return this.type;
   }
 
   /**
@@ -115,7 +129,16 @@ public class CsdlConstantExpression extends CsdlExpression {
    * @return value of the constant expression as String
    */
   public String getValue() {
-    return value;
+    return this.value;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (this.type == null ? 0 : this.type.hashCode());
+    result = prime * result + (this.value == null ? 0 : this.value.hashCode());
+    return result;
   }
 
   /**
@@ -126,30 +149,5 @@ public class CsdlConstantExpression extends CsdlExpression {
   public CsdlConstantExpression setValue(final String value) {
     this.value = value;
     return this;
-  }
-
-  @Override
-  public boolean equals (Object obj) {
-    if (obj == null) {
-      return false;
-    }
-    if (!(obj instanceof CsdlConstantExpression)) {
-      return false;
-    }
-    CsdlConstantExpression csdlConstExp = (CsdlConstantExpression) obj;
-    
-    return (this.getValue() == null ? csdlConstExp.getValue() == null :
-      this.getValue().equals(csdlConstExp.getValue()))
-        && (this.getType() == null ? csdlConstExp.getType() == null :
-          this.getType().equals(csdlConstExp.getType()));
-  }
-  
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((type == null) ? 0 : type.hashCode());
-    result = prime * result + ((value == null) ? 0 : value.hashCode());
-    return result;
   }
 }

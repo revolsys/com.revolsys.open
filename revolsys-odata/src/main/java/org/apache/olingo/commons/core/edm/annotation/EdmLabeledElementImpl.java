@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -24,38 +24,39 @@ import org.apache.olingo.commons.api.edm.annotation.EdmExpression;
 import org.apache.olingo.commons.api.edm.annotation.EdmLabeledElement;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlLabeledElement;
 
-public class EdmLabeledElementImpl
-    extends AbstractEdmAnnotatableDynamicExpression implements EdmLabeledElement {
+public class EdmLabeledElementImpl extends AbstractEdmAnnotatableDynamicExpression
+  implements EdmLabeledElement {
 
   private EdmExpression value;
-  private CsdlLabeledElement csdlLableledElement;
 
-  public EdmLabeledElementImpl(Edm edm, CsdlLabeledElement csdlExp) {
+  private final CsdlLabeledElement csdlLableledElement;
+
+  public EdmLabeledElementImpl(final Edm edm, final CsdlLabeledElement csdlExp) {
     super(edm, "LabeledElement", csdlExp);
     this.csdlLableledElement = csdlExp;
   }
 
   @Override
+  public EdmExpressionType getExpressionType() {
+    return EdmExpressionType.LabeledElement;
+  }
+
+  @Override
   public String getName() {
-    if (csdlLableledElement.getName() == null) {
+    if (this.csdlLableledElement.getName() == null) {
       throw new EdmException("The LabeledElement expression must have a name attribute.");
     }
-    return csdlLableledElement.getName();
+    return this.csdlLableledElement.getName();
   }
 
   @Override
   public EdmExpression getValue() {
-    if (value == null) {
-      if (csdlLableledElement.getValue() == null) {
+    if (this.value == null) {
+      if (this.csdlLableledElement.getValue() == null) {
         throw new EdmException("The LabeledElement expression must have a child expression");
       }
-      value = getExpression(edm, csdlLableledElement.getValue());
+      this.value = getExpression(this.edm, this.csdlLableledElement.getValue());
     }
-    return value;
-  }
-
-  @Override
-  public EdmExpressionType getExpressionType() {
-    return EdmExpressionType.LabeledElement;
+    return this.value;
   }
 }

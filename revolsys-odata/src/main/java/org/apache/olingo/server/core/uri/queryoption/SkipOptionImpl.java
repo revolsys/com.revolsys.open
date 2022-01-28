@@ -30,7 +30,7 @@ public class SkipOptionImpl extends SystemQueryOptionImpl implements SkipOption 
 
   @Override
   public int getValue() {
-    return value;
+    return this.value;
   }
 
   public SkipOptionImpl setValue(final int value) {

@@ -30,7 +30,7 @@ public class TopOptionImpl extends SystemQueryOptionImpl implements TopOption {
 
   @Override
   public int getValue() {
-    return value;
+    return this.value;
   }
 
   public TopOptionImpl setValue(final int value) {

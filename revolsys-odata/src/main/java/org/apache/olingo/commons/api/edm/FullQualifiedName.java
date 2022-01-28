@@ -28,20 +28,10 @@ public final class FullQualifiedName implements Serializable {
   private static final long serialVersionUID = -4063629050858999076L;
 
   private final String namespace;
+
   private final String name;
 
   private final String fqn;
-
-  /**
-   * Create the FQN with given namespace and name
-   * @param namespace namespace of FQN
-   * @param name name of FQN
-   */
-  public FullQualifiedName(final String namespace, final String name) {
-    this.namespace = namespace;
-    this.name = name;
-    fqn = namespace + "." + name;
-  }
 
   /**
    * Create the FQN with given namespace and name (which is split of last <code>.</code> of the parameter).
@@ -51,37 +41,27 @@ public final class FullQualifiedName implements Serializable {
     final int dotIdx = namespaceAndName.lastIndexOf('.');
     if (dotIdx == -1 || dotIdx == 0 || dotIdx == namespaceAndName.length() - 1) {
       throw new IllegalArgumentException(
-          "Malformed " + FullQualifiedName.class.getSimpleName() + ": " + namespaceAndName);
+        "Malformed " + FullQualifiedName.class.getSimpleName() + ": " + namespaceAndName);
     }
 
-    fqn = namespaceAndName;
-    namespace = fqn.substring(0, dotIdx);
-    name = fqn.substring(dotIdx + 1);
+    this.fqn = namespaceAndName;
+    this.namespace = this.fqn.substring(0, dotIdx);
+    this.name = this.fqn.substring(dotIdx + 1);
   }
 
   /**
-   * @return namespace
+   * Create the FQN with given namespace and name
+   * @param namespace namespace of FQN
+   * @param name name of FQN
    */
-  public String getNamespace() {
-    return namespace;
-  }
-
-  /**
-   * @return name
-   */
-  public String getName() {
-    return name;
-  }
-
-  /**
-   * @return namespace.name
-   */
-  public String getFullQualifiedNameAsString() {
-    return fqn;
+  public FullQualifiedName(final String namespace, final String name) {
+    this.namespace = namespace;
+    this.name = name;
+    this.fqn = namespace + "." + name;
   }
 
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(final Object o) {
     if (this == o) {
       return true;
     }
@@ -89,18 +69,39 @@ public final class FullQualifiedName implements Serializable {
       return false;
     }
 
-    final FullQualifiedName that = (FullQualifiedName) o;
-    return (namespace == null ? that.namespace == null : namespace.equals(that.namespace))
-        && (name == null ? that.name == null : name.equals(that.name));
+    final FullQualifiedName that = (FullQualifiedName)o;
+    return (this.namespace == null ? that.namespace == null : this.namespace.equals(that.namespace))
+      && (this.name == null ? that.name == null : this.name.equals(that.name));
+  }
+
+  /**
+   * @return namespace.name
+   */
+  public String getFullQualifiedNameAsString() {
+    return this.fqn;
+  }
+
+  /**
+   * @return name
+   */
+  public String getName() {
+    return this.name;
+  }
+
+  /**
+   * @return namespace
+   */
+  public String getNamespace() {
+    return this.namespace;
   }
 
   @Override
   public int hashCode() {
-    return fqn == null ? 0 : fqn.hashCode();
+    return this.fqn == null ? 0 : this.fqn.hashCode();
   }
 
   @Override
   public String toString() {
-    return fqn;
+    return this.fqn;
   }
 }

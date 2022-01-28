@@ -27,6 +27,7 @@ import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitor
 public class AliasImpl implements Alias {
 
   private final String parameterName;
+
   private final AliasQueryOption alias;
 
   public AliasImpl(final String parameterName, final AliasQueryOption alias) {
@@ -35,21 +36,22 @@ public class AliasImpl implements Alias {
   }
 
   @Override
-  public String getParameterName() {
-    return parameterName;
+  public <T> T accept(final ExpressionVisitor<T> visitor)
+    throws ExpressionVisitException, ODataApplicationException {
+    return visitor.visitAlias(this.parameterName);
   }
 
   public AliasQueryOption getAlias() {
-    return alias;
+    return this.alias;
   }
 
   @Override
-  public <T> T accept(final ExpressionVisitor<T> visitor) throws ExpressionVisitException, ODataApplicationException {
-    return visitor.visitAlias(parameterName);
+  public String getParameterName() {
+    return this.parameterName;
   }
 
   @Override
   public String toString() {
-    return parameterName;
+    return this.parameterName;
   }
 }

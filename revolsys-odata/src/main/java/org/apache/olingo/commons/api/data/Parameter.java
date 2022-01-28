@@ -26,19 +26,32 @@ public class Parameter extends Valuable {
   private String name;
 
   /**
+   * Gets the value in its entity representation or null if it is not based on an entity value type.
+   * @return entity representation or null if it is not based on an entity value type
+   */
+  public Entity asEntity() {
+    return isEntity() && !isCollection() ? (Entity)getValue() : null;
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    return super.equals(o)
+      && (this.name == null ? ((Parameter)o).name == null : this.name.equals(((Parameter)o).name));
+  }
+
+  /**
    * Gets the name of the parameter.
    * @return name of the parameter
    */
   public String getName() {
-    return name;
+    return this.name;
   }
 
-  /**
-   * Sets the name of the parameter.
-   * @param name of the parameter
-   */
-  public void setName(final String name) {
-    this.name = name;
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (this.name == null ? 0 : this.name.hashCode());
+    return result;
   }
 
   /**
@@ -50,28 +63,16 @@ public class Parameter extends Valuable {
   }
 
   /**
-   * Gets the value in its entity representation or null if it is not based on an entity value type.
-   * @return entity representation or null if it is not based on an entity value type
+   * Sets the name of the parameter.
+   * @param name of the parameter
    */
-  public Entity asEntity() {
-    return isEntity() && !isCollection() ? (Entity) getValue() : null;
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    return super.equals(o)
-        && (name == null ? ((Parameter) o).name == null : name.equals(((Parameter) o).name));
-  }
-
-  @Override
-  public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + (name == null ? 0 : name.hashCode());
-    return result;
+  public void setName(final String name) {
+    this.name = name;
   }
 
   @Override
   public String toString() {
-    return (name == null ? "null" : name) + '=' + (getValue() == null ? "null" : getValue());
+    return (this.name == null ? "null" : this.name) + '='
+      + (getValue() == null ? "null" : getValue());
   }
 }

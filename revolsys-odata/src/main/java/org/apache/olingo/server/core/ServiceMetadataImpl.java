@@ -35,20 +35,18 @@ import org.apache.olingo.server.api.etag.ServiceMetadataETagSupport;
 public class ServiceMetadataImpl implements ServiceMetadata {
 
   private final Edm edm;
+
   private final List<EdmxReference> references;
+
   private final ServiceMetadataETagSupport serviceMetadataETagSupport;
 
-  public ServiceMetadataImpl(final CsdlEdmProvider edmProvider, final List<EdmxReference> references,
-      final ServiceMetadataETagSupport serviceMetadataETagSupport) {
-    edm = new EdmProviderImpl(edmProvider);
+  public ServiceMetadataImpl(final CsdlEdmProvider edmProvider,
+    final List<EdmxReference> references,
+    final ServiceMetadataETagSupport serviceMetadataETagSupport) {
+    this.edm = new EdmProviderImpl(edmProvider);
     this.references = new ArrayList<>();
     this.references.addAll(references);
     this.serviceMetadataETagSupport = serviceMetadataETagSupport;
-  }
-
-  @Override
-  public Edm getEdm() {
-    return edm;
   }
 
   @Override
@@ -57,12 +55,17 @@ public class ServiceMetadataImpl implements ServiceMetadata {
   }
 
   @Override
+  public Edm getEdm() {
+    return this.edm;
+  }
+
+  @Override
   public List<EdmxReference> getReferences() {
-    return Collections.unmodifiableList(references);
+    return Collections.unmodifiableList(this.references);
   }
 
   @Override
   public ServiceMetadataETagSupport getServiceMetadataETagSupport() {
-    return serviceMetadataETagSupport;
+    return this.serviceMetadataETagSupport;
   }
 }

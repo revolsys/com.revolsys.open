@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -33,32 +33,23 @@ import org.apache.olingo.server.api.prefer.Preferences;
  */
 public class PreferencesImpl implements Preferences {
 
-  //parameter name for odata.callback
+  // parameter name for odata.callback
   private static final String URL = "url";
 
   private final Map<String, Preference> preferences;
 
   public PreferencesImpl(final Collection<String> preferHeaders) {
-    preferences = PreferParser.parse(preferHeaders);
-  }
-
-  @Override
-  public Preference getPreference(final String name) {
-    return preferences.get(name.toLowerCase(Locale.ROOT));
-  }
-
-  @Override
-  public boolean hasAllowEntityReferences() {
-    return preferences.containsKey(PreferenceName.ALLOW_ENTITY_REFERENCES.getName());
+    this.preferences = PreferParser.parse(preferHeaders);
   }
 
   @Override
   public URI getCallback() {
-    if (preferences.containsKey(PreferenceName.CALLBACK.getName())
-        && preferences.get(PreferenceName.CALLBACK.getName()).getParameters() != null
-        && preferences.get(PreferenceName.CALLBACK.getName()).getParameters().get(URL) != null) {
+    if (this.preferences.containsKey(PreferenceName.CALLBACK.getName())
+      && this.preferences.get(PreferenceName.CALLBACK.getName()).getParameters() != null
+      && this.preferences.get(PreferenceName.CALLBACK.getName()).getParameters().get(URL) != null) {
       try {
-        return URI.create(preferences.get(PreferenceName.CALLBACK.getName()).getParameters().get(URL));
+        return URI
+          .create(this.preferences.get(PreferenceName.CALLBACK.getName()).getParameters().get(URL));
       } catch (final IllegalArgumentException e) {
         return null;
       }
@@ -67,25 +58,31 @@ public class PreferencesImpl implements Preferences {
   }
 
   @Override
-  public boolean hasContinueOnError() {
-    return preferences.containsKey(PreferenceName.CONTINUE_ON_ERROR.getName());
-  }
-
-  @Override
   public Integer getMaxPageSize() {
     return getNonNegativeIntegerPreference(PreferenceName.MAX_PAGE_SIZE.getName());
   }
 
+  private Integer getNonNegativeIntegerPreference(final String name) {
+    if (this.preferences.containsKey(name) && this.preferences.get(name).getValue() != null) {
+      try {
+        final Integer result = Integer.valueOf(this.preferences.get(name).getValue());
+        return result < 0 ? null : result;
+      } catch (final NumberFormatException e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
   @Override
-  public boolean hasTrackChanges() {
-    return (preferences.containsKey(PreferenceName.TRACK_CHANGES.getName())
-        ||preferences.containsKey(PreferenceName.TRACK_CHANGES_PREF.getName()));
+  public Preference getPreference(final String name) {
+    return this.preferences.get(name.toLowerCase(Locale.ROOT));
   }
 
   @Override
   public Return getReturn() {
-    if (preferences.containsKey(PreferenceName.RETURN.getName())) {
-      final String value = preferences.get(PreferenceName.RETURN.getName()).getValue();
+    if (this.preferences.containsKey(PreferenceName.RETURN.getName())) {
+      final String value = this.preferences.get(PreferenceName.RETURN.getName()).getValue();
       if (Return.REPRESENTATION.toString().toLowerCase(Locale.ROOT).equals(value)) {
         return Return.REPRESENTATION;
       } else if (Return.MINIMAL.toString().toLowerCase(Locale.ROOT).equals(value)) {
@@ -96,24 +93,28 @@ public class PreferencesImpl implements Preferences {
   }
 
   @Override
-  public boolean hasRespondAsync() {
-    return preferences.containsKey(PreferenceName.RESPOND_ASYNC.getName());
-  }
-
-  @Override
   public Integer getWait() {
     return getNonNegativeIntegerPreference(PreferenceName.WAIT.getName());
   }
 
-  private Integer getNonNegativeIntegerPreference(final String name) {
-    if (preferences.containsKey(name) && preferences.get(name).getValue() != null) {
-      try {
-        final Integer result = Integer.valueOf(preferences.get(name).getValue());
-        return result < 0 ? null : result;
-      } catch (final NumberFormatException e) {
-        return null;
-      }
-    }
-    return null;
+  @Override
+  public boolean hasAllowEntityReferences() {
+    return this.preferences.containsKey(PreferenceName.ALLOW_ENTITY_REFERENCES.getName());
+  }
+
+  @Override
+  public boolean hasContinueOnError() {
+    return this.preferences.containsKey(PreferenceName.CONTINUE_ON_ERROR.getName());
+  }
+
+  @Override
+  public boolean hasRespondAsync() {
+    return this.preferences.containsKey(PreferenceName.RESPOND_ASYNC.getName());
+  }
+
+  @Override
+  public boolean hasTrackChanges() {
+    return this.preferences.containsKey(PreferenceName.TRACK_CHANGES.getName())
+      || this.preferences.containsKey(PreferenceName.TRACK_CHANGES_PREF.getName());
   }
 }

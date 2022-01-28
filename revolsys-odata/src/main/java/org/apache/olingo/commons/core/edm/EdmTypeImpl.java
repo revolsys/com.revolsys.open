@@ -27,10 +27,11 @@ import org.apache.olingo.commons.api.edm.provider.CsdlAnnotatable;
 public class EdmTypeImpl extends AbstractEdmNamed implements EdmType {
 
   protected final FullQualifiedName typeName;
+
   protected final EdmTypeKind kind;
 
   public EdmTypeImpl(final Edm edm, final FullQualifiedName typeName, final EdmTypeKind kind,
-      final CsdlAnnotatable annotatable) {
+    final CsdlAnnotatable annotatable) {
     super(edm, typeName.getName(), annotatable);
     this.typeName = typeName;
     this.kind = kind;
@@ -38,16 +39,16 @@ public class EdmTypeImpl extends AbstractEdmNamed implements EdmType {
 
   @Override
   public FullQualifiedName getFullQualifiedName() {
-    return typeName;
-  }
-
-  @Override
-  public String getNamespace() {
-    return typeName.getNamespace();
+    return this.typeName;
   }
 
   @Override
   public EdmTypeKind getKind() {
-    return kind;
+    return this.kind;
+  }
+
+  @Override
+  public String getNamespace() {
+    return this.typeName.getNamespace();
   }
 }

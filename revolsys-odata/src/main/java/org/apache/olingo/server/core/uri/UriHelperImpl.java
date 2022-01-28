@@ -49,28 +49,32 @@ import org.apache.olingo.server.core.uri.parser.Parser;
 public class UriHelperImpl implements UriHelper {
 
   @Override
-  public String buildContextURLSelectList(final EdmStructuredType type,
-      final ExpandOption expand, final SelectOption select) throws SerializerException {
-    return ContextURLHelper.buildSelectList(type, expand, select);
+  public String buildCanonicalURL(final EdmEntitySet edmEntitySet, final Entity entity)
+    throws SerializerException {
+    return edmEntitySet.getName() + '(' + buildKeyPredicate(edmEntitySet.getEntityType(), entity)
+      + ')';
   }
 
   @Override
-  public String buildContextURLKeyPredicate(final List<UriParameter> keys) throws SerializerException {
+  public String buildContextURLKeyPredicate(final List<UriParameter> keys)
+    throws SerializerException {
     return ContextURLHelper.buildKeyPredicate(keys);
   }
 
   @Override
-  public String buildCanonicalURL(final EdmEntitySet edmEntitySet, final Entity entity) throws SerializerException {
-    return edmEntitySet.getName() + '(' + buildKeyPredicate(edmEntitySet.getEntityType(), entity) + ')';
+  public String buildContextURLSelectList(final EdmStructuredType type, final ExpandOption expand,
+    final SelectOption select) throws SerializerException {
+    return ContextURLHelper.buildSelectList(type, expand, select);
   }
 
   @Override
-  public String buildKeyPredicate(final EdmEntityType edmEntityType, final Entity entity) throws SerializerException {
-    StringBuilder result = new StringBuilder();
+  public String buildKeyPredicate(final EdmEntityType edmEntityType, final Entity entity)
+    throws SerializerException {
+    final StringBuilder result = new StringBuilder();
     final List<String> keyNames = edmEntityType.getKeyPredicateNames();
     boolean first = true;
     for (final String keyName : keyNames) {
-      EdmKeyPropertyRef refType = edmEntityType.getKeyPropertyRef(keyName);
+      final EdmKeyPropertyRef refType = edmEntityType.getKeyPropertyRef(keyName);
       if (first) {
         first = false;
       } else {
@@ -79,55 +83,25 @@ public class UriHelperImpl implements UriHelper {
       if (keyNames.size() > 1) {
         result.append(Encoder.encode(keyName)).append('=');
       }
-      final EdmProperty edmProperty =  refType.getProperty();
+      final EdmProperty edmProperty = refType.getProperty();
       if (edmProperty == null) {
         throw new SerializerException("Property not found (possibly an alias): " + keyName,
-            SerializerException.MessageKeys.MISSING_PROPERTY, keyName);
+          SerializerException.MessageKeys.MISSING_PROPERTY, keyName);
       }
-      final EdmPrimitiveType type = (EdmPrimitiveType) edmProperty.getType();
+      final EdmPrimitiveType type = (EdmPrimitiveType)edmProperty.getType();
       final Object propertyValue = findPropertyRefValue(entity, refType);
       try {
         final String value = type.toUriLiteral(
-            type.valueToString(propertyValue,
-                edmProperty.isNullable(), edmProperty.getMaxLength(),
-                edmProperty.getPrecision(), edmProperty.getScale(), edmProperty.isUnicode()));
+          type.valueToString(propertyValue, edmProperty.isNullable(), edmProperty.getMaxLength(),
+            edmProperty.getPrecision(), edmProperty.getScale(), edmProperty.isUnicode()));
         result.append(Encoder.encode(value));
       } catch (final EdmPrimitiveTypeException e) {
         throw new SerializerException("Wrong key value!", e,
-            SerializerException.MessageKeys.WRONG_PROPERTY_VALUE, edmProperty.getName(), 
-            propertyValue != null ? propertyValue.toString(): null);
+          SerializerException.MessageKeys.WRONG_PROPERTY_VALUE, edmProperty.getName(),
+          propertyValue != null ? propertyValue.toString() : null);
       }
     }
     return result.toString();
-  }
-  
-  private Object findPropertyRefValue(Entity entity, EdmKeyPropertyRef refType) throws SerializerException {
-    final int INDEX_ERROR_CODE = -1;
-    final String propertyPath = refType.getName();
-    String tmpPropertyName;
-    int lastIndex;
-    int index = propertyPath.indexOf('/');
-    if (index == INDEX_ERROR_CODE) {
-        index  = propertyPath.length();
-    }
-    tmpPropertyName = propertyPath.substring(0, index);
-    //get first property
-    Property prop = entity.getProperty(tmpPropertyName);
-    //get following properties
-    while (index < propertyPath.length()) {
-        lastIndex = ++index;
-        index = propertyPath.indexOf('/', index+1);
-        if (index == INDEX_ERROR_CODE) {
-            index = propertyPath.length();
-        }
-        tmpPropertyName = propertyPath.substring(lastIndex, index);
-        prop = findProperty(tmpPropertyName, prop.asComplex().getValue());
-     }
-    if (prop == null) {
-      throw new SerializerException("Key Value Cannot be null for property: " + propertyPath, 
-          SerializerException.MessageKeys.NULL_PROPERTY, propertyPath);
-    }
-    return prop.getValue();
   }
 
   private Property findProperty(final String propertyName, final List<Property> properties) {
@@ -138,10 +112,40 @@ public class UriHelperImpl implements UriHelper {
     }
     return null;
   }
-  
+
+  private Object findPropertyRefValue(final Entity entity, final EdmKeyPropertyRef refType)
+    throws SerializerException {
+    final int INDEX_ERROR_CODE = -1;
+    final String propertyPath = refType.getName();
+    String tmpPropertyName;
+    int lastIndex;
+    int index = propertyPath.indexOf('/');
+    if (index == INDEX_ERROR_CODE) {
+      index = propertyPath.length();
+    }
+    tmpPropertyName = propertyPath.substring(0, index);
+    // get first property
+    Property prop = entity.getProperty(tmpPropertyName);
+    // get following properties
+    while (index < propertyPath.length()) {
+      lastIndex = ++index;
+      index = propertyPath.indexOf('/', index + 1);
+      if (index == INDEX_ERROR_CODE) {
+        index = propertyPath.length();
+      }
+      tmpPropertyName = propertyPath.substring(lastIndex, index);
+      prop = findProperty(tmpPropertyName, prop.asComplex().getValue());
+    }
+    if (prop == null) {
+      throw new SerializerException("Key Value Cannot be null for property: " + propertyPath,
+        SerializerException.MessageKeys.NULL_PROPERTY, propertyPath);
+    }
+    return prop.getValue();
+  }
+
   @Override
-  public UriResourceEntitySet parseEntityId(final Edm edm, final String entityId, final String rawServiceRoot)
-      throws DeserializerException {
+  public UriResourceEntitySet parseEntityId(final Edm edm, final String entityId,
+    final String rawServiceRoot) throws DeserializerException {
 
     String oDataPath = entityId;
     if (rawServiceRoot != null && entityId.startsWith(rawServiceRoot)) {
@@ -150,19 +154,22 @@ public class UriHelperImpl implements UriHelper {
     oDataPath = oDataPath.startsWith("/") ? oDataPath : "/" + oDataPath;
 
     try {
-      final List<UriResource> uriResourceParts =
-          new Parser(edm, new ODataImpl()).parseUri(oDataPath, null, null, rawServiceRoot).getUriResourceParts();
-      if (uriResourceParts.size() == 1 && uriResourceParts.get(0).getKind() == UriResourceKind.entitySet) {
-        final UriResourceEntitySet entityUriResource = (UriResourceEntitySet) uriResourceParts.get(0);
+      final List<UriResource> uriResourceParts = new Parser(edm, new ODataImpl())
+        .parseUri(oDataPath, null, null, rawServiceRoot)
+        .getUriResourceParts();
+      if (uriResourceParts.size() == 1
+        && uriResourceParts.get(0).getKind() == UriResourceKind.entitySet) {
+        final UriResourceEntitySet entityUriResource = (UriResourceEntitySet)uriResourceParts
+          .get(0);
 
         return entityUriResource;
       }
 
-      throw new DeserializerException("Invalid entity binding link", MessageKeys.INVALID_ENTITY_BINDING_LINK,
-          entityId);
+      throw new DeserializerException("Invalid entity binding link",
+        MessageKeys.INVALID_ENTITY_BINDING_LINK, entityId);
     } catch (final ODataLibraryException e) {
-      throw new DeserializerException("Invalid entity binding link", e, MessageKeys.INVALID_ENTITY_BINDING_LINK,
-          entityId);
+      throw new DeserializerException("Invalid entity binding link", e,
+        MessageKeys.INVALID_ENTITY_BINDING_LINK, entityId);
     }
   }
 }

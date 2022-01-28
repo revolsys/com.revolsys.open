@@ -36,11 +36,12 @@ public final class EdmGeographyMultiPoint extends AbstractGeospatialType<MultiPo
   }
 
   @Override
-  protected <T> T internalValueOfString(final String value, final Boolean isNullable, final Integer maxLength,
-      final Integer precision, final Integer scale, final Boolean isUnicode, final Class<T> returnType)
-          throws EdmPrimitiveTypeException {
+  protected <T> T internalValueOfString(final String value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode,
+    final Class<T> returnType) throws EdmPrimitiveTypeException {
 
-    final MultiPoint point = stringToMultiPoint(value, isNullable, maxLength, precision, scale, isUnicode);
+    final MultiPoint point = stringToMultiPoint(value, isNullable, maxLength, precision, scale,
+      isUnicode);
     if (returnType.isAssignableFrom(MultiPoint.class)) {
       return returnType.cast(point);
     } else {
@@ -50,14 +51,16 @@ public final class EdmGeographyMultiPoint extends AbstractGeospatialType<MultiPo
   }
 
   @Override
-  protected <T> String internalValueToString(final T value, final Boolean isNullable, final Integer maxLength,
-      final Integer precision, final Integer scale, final Boolean isUnicode) throws EdmPrimitiveTypeException {
+  protected <T> String internalValueToString(final T value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode)
+    throws EdmPrimitiveTypeException {
 
     if (value instanceof MultiPoint) {
-      return toString((MultiPoint) value, isNullable, maxLength, precision, scale, isUnicode);
+      return toString((MultiPoint)value, isNullable, maxLength, precision, scale, isUnicode);
     }
 
-    throw new EdmPrimitiveTypeException("The value type " + value.getClass() + " is not supported.");
+    throw new EdmPrimitiveTypeException(
+      "The value type " + value.getClass() + " is not supported.");
   }
 
 }

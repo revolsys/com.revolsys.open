@@ -33,21 +33,86 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class CircleStreamBuffer {
 
+  /**
+   *
+   */
+  private static class InternalInputStream extends InputStream {
+
+    private final CircleStreamBuffer inBuffer;
+
+    public InternalInputStream(final CircleStreamBuffer csBuffer) {
+      this.inBuffer = csBuffer;
+    }
+
+    @Override
+    public int available() throws IOException {
+      return this.inBuffer.remaining();
+    }
+
+    @Override
+    public void close() throws IOException {
+      this.inBuffer.closeRead();
+    }
+
+    @Override
+    public int read() throws IOException {
+      return this.inBuffer.read();
+    }
+
+    @Override
+    public int read(final byte[] buffer, final int off, final int len) throws IOException {
+      return this.inBuffer.read(buffer, off, len);
+    }
+  }
+
+  /**
+   *
+   */
+  private static class InternalOutputStream extends OutputStream {
+    private final CircleStreamBuffer outBuffer;
+
+    public InternalOutputStream(final CircleStreamBuffer csBuffer) {
+      this.outBuffer = csBuffer;
+    }
+
+    @Override
+    public void close() throws IOException {
+      this.outBuffer.closeWrite();
+    }
+
+    @Override
+    public void write(final byte[] buffer, final int off, final int len) throws IOException {
+      this.outBuffer.write(buffer, off, len);
+    }
+
+    @Override
+    public void write(final int b) throws IOException {
+      this.outBuffer.write(b);
+    }
+  }
+
   private static final int NEW_BUFFER_RESIZE_FACTOR = 2;
+
   private static final int READ_EOF = -1;
+
   private static final int DEFAULT_CAPACITY = 8192;
+
   private static final int MAX_CAPACITY = DEFAULT_CAPACITY * 32;
 
   private int currentAllocateCapacity = DEFAULT_CAPACITY;
 
   private boolean writeMode = true;
+
   private boolean writeClosed = false;
+
   private boolean readClosed = false;
 
-  private Queue<ByteBuffer> bufferQueue = new LinkedBlockingQueue<>();
+  private final Queue<ByteBuffer> bufferQueue = new LinkedBlockingQueue<>();
+
   private ByteBuffer currentWriteBuffer;
 
   private final InternalInputStream inStream;
+
   private final InternalOutputStream outStream;
 
   /**
@@ -63,28 +128,10 @@ public class CircleStreamBuffer {
    * @param initialCapacity initial capacity of internal buffer
    */
   public CircleStreamBuffer(final int initialCapacity) {
-    currentAllocateCapacity = initialCapacity;
+    this.currentAllocateCapacity = initialCapacity;
     createNewWriteBuffer();
-    inStream = new InternalInputStream(this);
-    outStream = new InternalOutputStream(this);
-  }
-
-  /**
-   * Get {@link InputStream} for data read access.
-   *
-   * @return the stream
-   */
-  public InputStream getInputStream() {
-    return inStream;
-  }
-
-  /**
-   * Get {@link OutputStream} for write data.
-   *
-   * @return the stream
-   */
-  public OutputStream getOutputStream() {
-    return outStream;
+    this.inStream = new InternalInputStream(this);
+    this.outStream = new InternalOutputStream(this);
   }
 
   // #############################################
@@ -94,25 +141,27 @@ public class CircleStreamBuffer {
   // #############################################
 
   /**
-   * Closes the write (input) part of the {@link CircleStreamBuffer}.
-   * After this call the buffer can only be read out.
+   * Allocate a new buffer with requested capacity
+   *
+   * @param requestedCapacity minimal capacity of new buffer
+   * @return the buffer
    */
-  public void closeWrite() {
-    writeClosed = true;
-  }
-
-  /**
-   * Closes the read (output) part of the {@link CircleStreamBuffer}.
-   * After this call it is possible to write into the buffer (but can never be read out).
-   */
-  public void closeRead() {
-    readClosed = true;
-    // clear references to byte buffers
-    ByteBuffer buffer = bufferQueue.poll();
-    while (buffer != null) {
-      buffer.clear();
-      buffer = bufferQueue.poll();
+  private ByteBuffer allocateBuffer(final int requestedCapacity) {
+    if (requestedCapacity > MAX_CAPACITY) {
+      this.currentAllocateCapacity = MAX_CAPACITY;
+      return ByteBuffer.allocate(requestedCapacity);
     }
+
+    if (requestedCapacity <= this.currentAllocateCapacity) {
+      this.currentAllocateCapacity *= NEW_BUFFER_RESIZE_FACTOR;
+      if (this.currentAllocateCapacity > MAX_CAPACITY) {
+        this.currentAllocateCapacity = MAX_CAPACITY;
+      }
+    } else {
+      this.currentAllocateCapacity = requestedCapacity;
+    }
+
+    return ByteBuffer.allocate(this.currentAllocateCapacity);
   }
 
   /**
@@ -123,16 +172,26 @@ public class CircleStreamBuffer {
     closeRead();
   }
 
-  private int remaining() throws IOException {
-    if (writeMode) {
-      return currentWriteBuffer.remaining();
-    } else {
-      ByteBuffer toRead = getReadBuffer();
-      if (toRead == null) {
-        return 0;
-      }
-      return toRead.remaining();
+  /**
+   * Closes the read (output) part of the {@link CircleStreamBuffer}.
+   * After this call it is possible to write into the buffer (but can never be read out).
+   */
+  public void closeRead() {
+    this.readClosed = true;
+    // clear references to byte buffers
+    ByteBuffer buffer = this.bufferQueue.poll();
+    while (buffer != null) {
+      buffer.clear();
+      buffer = this.bufferQueue.poll();
     }
+  }
+
+  /**
+   * Closes the write (input) part of the {@link CircleStreamBuffer}.
+   * After this call the buffer can only be read out.
+   */
+  public void closeWrite() {
+    this.writeClosed = true;
   }
 
   // #############################################
@@ -141,26 +200,86 @@ public class CircleStreamBuffer {
   // #
   // #############################################
 
+  private void createNewWriteBuffer() {
+    createNewWriteBuffer(this.currentAllocateCapacity);
+  }
+
+  /**
+   * Creates a new buffer (per {@link #allocateBuffer(int)}) with the requested capacity as minimum capacity, add the
+   * new allocated
+   * buffer to the {@link #bufferQueue} and set it as {@link #currentWriteBuffer}.
+   *
+   * @param requestedCapacity minimum capacity for new allocated buffer
+   */
+  private void createNewWriteBuffer(final int requestedCapacity) {
+    final ByteBuffer b = allocateBuffer(requestedCapacity);
+    this.bufferQueue.add(b);
+    this.currentWriteBuffer = b;
+  }
+
+  public ByteBuffer getBuffer() throws IOException {
+    if (this.readClosed) {
+      throw new IOException("Tried to read from closed stream.");
+    }
+    this.writeMode = false;
+
+    // FIXME: mibo_160108: This is not efficient and only for test/poc reasons
+    int reqSize = 0;
+    for (final ByteBuffer byteBuffer : this.bufferQueue) {
+      reqSize += byteBuffer.position();
+    }
+    final ByteBuffer tmp = ByteBuffer.allocateDirect(reqSize);
+    for (final ByteBuffer byteBuffer : this.bufferQueue) {
+      byteBuffer.flip();
+      tmp.put(byteBuffer);
+    }
+    return tmp;
+  }
+
+  /**
+   * Get {@link InputStream} for data read access.
+   *
+   * @return the stream
+   */
+  public InputStream getInputStream() {
+    return this.inStream;
+  }
+
+  // #############################################
+  // #
+  // # Writing parts
+  // #
+  // #############################################
+
+  /**
+   * Get {@link OutputStream} for write data.
+   *
+   * @return the stream
+   */
+  public OutputStream getOutputStream() {
+    return this.outStream;
+  }
+
   private ByteBuffer getReadBuffer() throws IOException {
-    if (readClosed) {
+    if (this.readClosed) {
       throw new IOException("Tried to read from closed stream.");
     }
 
     boolean next = false;
     ByteBuffer tmp = null;
-    if (writeMode) {
-      writeMode = false;
+    if (this.writeMode) {
+      this.writeMode = false;
       next = true;
     } else {
-      tmp = bufferQueue.peek();
+      tmp = this.bufferQueue.peek();
       if (tmp != null && !tmp.hasRemaining()) {
-        tmp = bufferQueue.poll();
+        tmp = this.bufferQueue.poll();
         next = true;
       }
     }
 
     if (next) {
-      tmp = bufferQueue.peek();
+      tmp = this.bufferQueue.peek();
       if (tmp != null) {
         tmp.flip();
       }
@@ -170,8 +289,34 @@ public class CircleStreamBuffer {
     return tmp;
   }
 
+  private ByteBuffer getWriteBuffer(final int size) throws IOException {
+    if (this.writeClosed) {
+      throw new IOException("Tried to write into closed stream.");
+    }
+
+    if (this.writeMode) {
+      if (remaining() < size) {
+        createNewWriteBuffer(size);
+      }
+    } else {
+      this.writeMode = true;
+      createNewWriteBuffer();
+    }
+
+    return this.currentWriteBuffer;
+  }
+
+  private int read() throws IOException {
+    final ByteBuffer readBuffer = getReadBuffer();
+    if (readBuffer == null) {
+      return READ_EOF;
+    }
+
+    return readBuffer.get();
+  }
+
   private int read(final byte[] b, final int off, final int len) throws IOException {
-    ByteBuffer readBuffer = getReadBuffer();
+    final ByteBuffer readBuffer = getReadBuffer();
     if (readBuffer == null) {
       return READ_EOF;
     }
@@ -184,106 +329,16 @@ public class CircleStreamBuffer {
     return toReadLength;
   }
 
-  private int read() throws IOException {
-    ByteBuffer readBuffer = getReadBuffer();
-    if (readBuffer == null) {
-      return READ_EOF;
-    }
-
-    return readBuffer.get();
-  }
-
-  public ByteBuffer getBuffer() throws IOException {
-    if (readClosed) {
-      throw new IOException("Tried to read from closed stream.");
-    }
-    writeMode = false;
-
-    // FIXME: mibo_160108: This is not efficient and only for test/poc reasons
-    int reqSize = 0;
-    for (ByteBuffer byteBuffer : bufferQueue) {
-      reqSize += byteBuffer.position();
-    }
-    ByteBuffer tmp = ByteBuffer.allocateDirect(reqSize);
-    for (ByteBuffer byteBuffer : bufferQueue) {
-      byteBuffer.flip();
-      tmp.put(byteBuffer);
-    }
-    return tmp;
-  }
-
-  // #############################################
-  // #
-  // # Writing parts
-  // #
-  // #############################################
-
-  private void write(final byte[] data, final int off, final int len) throws IOException {
-    ByteBuffer writeBuffer = getWriteBuffer(len);
-    writeBuffer.put(data, off, len);
-  }
-
-  private ByteBuffer getWriteBuffer(final int size) throws IOException {
-    if (writeClosed) {
-      throw new IOException("Tried to write into closed stream.");
-    }
-
-    if (writeMode) {
-      if (remaining() < size) {
-        createNewWriteBuffer(size);
-      }
+  private int remaining() throws IOException {
+    if (this.writeMode) {
+      return this.currentWriteBuffer.remaining();
     } else {
-      writeMode = true;
-      createNewWriteBuffer();
-    }
-
-    return currentWriteBuffer;
-  }
-
-  private void write(final int b) throws IOException {
-    ByteBuffer writeBuffer = getWriteBuffer(1);
-    writeBuffer.put((byte) b);
-  }
-
-  private void createNewWriteBuffer() {
-    createNewWriteBuffer(currentAllocateCapacity);
-  }
-
-  /**
-   * Creates a new buffer (per {@link #allocateBuffer(int)}) with the requested capacity as minimum capacity, add the
-   * new allocated
-   * buffer to the {@link #bufferQueue} and set it as {@link #currentWriteBuffer}.
-   *
-   * @param requestedCapacity minimum capacity for new allocated buffer
-   */
-  private void createNewWriteBuffer(final int requestedCapacity) {
-    ByteBuffer b = allocateBuffer(requestedCapacity);
-    bufferQueue.add(b);
-    currentWriteBuffer = b;
-  }
-
-  /**
-   * Allocate a new buffer with requested capacity
-   *
-   * @param requestedCapacity minimal capacity of new buffer
-   * @return the buffer
-   */
-  private ByteBuffer allocateBuffer(final int requestedCapacity) {
-    if (requestedCapacity > MAX_CAPACITY) {
-      currentAllocateCapacity = MAX_CAPACITY;
-      return ByteBuffer.allocate(requestedCapacity);
-    }
-
-    if (requestedCapacity <= currentAllocateCapacity) {
-      currentAllocateCapacity *= NEW_BUFFER_RESIZE_FACTOR;
-      if (currentAllocateCapacity > MAX_CAPACITY) {
-        currentAllocateCapacity = MAX_CAPACITY;
+      final ByteBuffer toRead = getReadBuffer();
+      if (toRead == null) {
+        return 0;
       }
-    } else {
-      currentAllocateCapacity = requestedCapacity;
+      return toRead.remaining();
     }
-
-    return ByteBuffer.allocate(currentAllocateCapacity);
   }
 
   // #############################################
@@ -292,61 +347,13 @@ public class CircleStreamBuffer {
   // #
   // #############################################
 
-  /**
-   *
-   */
-  private static class InternalInputStream extends InputStream {
-
-    private final CircleStreamBuffer inBuffer;
-
-    public InternalInputStream(final CircleStreamBuffer csBuffer) {
-      inBuffer = csBuffer;
-    }
-
-    @Override
-    public int available() throws IOException {
-      return inBuffer.remaining();
-    }
-
-    @Override
-    public int read() throws IOException {
-      return inBuffer.read();
-    }
-
-    @Override
-    public int read(final byte[] buffer, final int off, final int len) throws IOException {
-      return inBuffer.read(buffer, off, len);
-    }
-
-    @Override
-    public void close() throws IOException {
-      inBuffer.closeRead();
-    }
+  private void write(final byte[] data, final int off, final int len) throws IOException {
+    final ByteBuffer writeBuffer = getWriteBuffer(len);
+    writeBuffer.put(data, off, len);
   }
 
-  /**
-   *
-   */
-  private static class InternalOutputStream extends OutputStream {
-    private final CircleStreamBuffer outBuffer;
-
-    public InternalOutputStream(final CircleStreamBuffer csBuffer) {
-      outBuffer = csBuffer;
-    }
-
-    @Override
-    public void write(final int b) throws IOException {
-      outBuffer.write(b);
-    }
-
-    @Override
-    public void write(final byte[] buffer, final int off, final int len) throws IOException {
-      outBuffer.write(buffer, off, len);
-    }
-
-    @Override
-    public void close() throws IOException {
-      outBuffer.closeWrite();
-    }
+  private void write(final int b) throws IOException {
+    final ByteBuffer writeBuffer = getWriteBuffer(1);
+    writeBuffer.put((byte)b);
   }
 }

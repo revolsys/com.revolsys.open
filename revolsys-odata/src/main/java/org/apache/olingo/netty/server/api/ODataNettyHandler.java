@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -35,13 +35,14 @@ public interface ODataNettyHandler {
    * @param request - must be a HTTP OData request
    * @param response - HTTP OData response
    */
-  void processNettyRequest(HttpRequest request, HttpResponse response, Map<String, String> requestParameters);
-  
+  void processNettyRequest(HttpRequest request, HttpResponse response,
+    Map<String, String> requestParameters);
+
   /**
    * <p>Registers additional custom processor implementations for handling OData requests.</p>
    * <p>If request processing requires a processor that is not registered then a
    * "not implemented" exception will happen.</p>
    */
   void register(Processor processor);
-  
+
 }

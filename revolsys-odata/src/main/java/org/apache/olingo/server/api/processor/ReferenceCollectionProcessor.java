@@ -41,5 +41,5 @@ public interface ReferenceCollectionProcessor extends Processor {
    * @throws ODataLibraryException
    */
   void readReferenceCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo,
-      ContentType responseFormat) throws ODataApplicationException, ODataLibraryException;
+    ContentType responseFormat) throws ODataApplicationException, ODataLibraryException;
 }

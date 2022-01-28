@@ -21,8 +21,6 @@ package org.apache.olingo.server.core.uri.parser;
 /** Exception thrown during URI parsing in cases where an URI part is invalid according to the Entity Data Model. */
 public class UriParserSemanticException extends UriParserException {
 
-  private static final long serialVersionUID = 3850285860949809622L;
-
   public static enum MessageKeys implements MessageKey {
     /** parameters: function-import name, function parameters */
     FUNCTION_NOT_FOUND,
@@ -55,8 +53,7 @@ public class UriParserSemanticException extends UriParserException {
     /** parameter: value */
     INVALID_KEY_VALUE,
     /** parameters: expected number, actual number */
-    WRONG_NUMBER_OF_KEY_PROPERTIES,
-    KEY_NOT_ALLOWED,
+    WRONG_NUMBER_OF_KEY_PROPERTIES, KEY_NOT_ALLOWED,
     /** parameter: resource_name */
     RESOURCE_NOT_FOUND,
     /** parameter: not implemented part */
@@ -74,8 +71,7 @@ public class UriParserSemanticException extends UriParserException {
     /** parameter: expression */
     ONLY_FOR_PRIMITIVE_TYPES,
     /** parameter: function name */
-    FUNCTION_MUST_USE_COLLECTIONS,
-    COLLECTION_NOT_ALLOWED,
+    FUNCTION_MUST_USE_COLLECTIONS, COLLECTION_NOT_ALLOWED,
     /** parameter: not implemented part for system query option $id */
     NOT_IMPLEMENTED_SYSTEM_QUERY_OPTION;
 
@@ -85,14 +81,15 @@ public class UriParserSemanticException extends UriParserException {
     }
   }
 
+  private static final long serialVersionUID = 3850285860949809622L;
+
   public UriParserSemanticException(final String developmentMessage, final MessageKey messageKey,
-      final String... parameters) {
+    final String... parameters) {
     super(developmentMessage, messageKey, parameters);
   }
 
   public UriParserSemanticException(final String developmentMessage, final Throwable cause,
-      final MessageKey messageKey,
-      final String... parameters) {
+    final MessageKey messageKey, final String... parameters) {
     super(developmentMessage, cause, messageKey, parameters);
   }
 }

@@ -30,21 +30,60 @@ import org.apache.olingo.commons.api.format.ContentType;
 import org.apache.olingo.commons.api.http.HttpHeader;
 
 public class BatchLineReader {
+  /**
+   * Read state indicator (whether currently the <code>body</code> or <code>header</code> part is read).
+   */
+  private static class ReadState {
+    private int state = 0;
+
+    public void foundBoundary() {
+      this.state = 0;
+    }
+
+    public void foundLinebreak() {
+      this.state++;
+    }
+
+    public boolean isReadBody() {
+      return this.state >= 2;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(this.state);
+    }
+  }
+
   private static final byte CR = '\r';
+
   private static final byte LF = '\n';
+
   private static final int EOF = -1;
+
   private static final int BUFFER_SIZE = 8192;
+
   private static final Charset DEFAULT_CHARSET = Charset.forName("ISO-8859-1");
+
   public static final String BOUNDARY = "boundary";
+
   public static final String DOUBLE_DASH = "--";
+
   public static final String CRLF = "\r\n";
+
   public static final String LFS = "\n";
+
   private Charset currentCharset = DEFAULT_CHARSET;
+
   private String currentBoundary = null;
-  private ReadState readState = new ReadState();
-  private InputStream reader;
-  private byte[] buffer;
+
+  private final ReadState readState = new ReadState();
+
+  private final InputStream reader;
+
+  private final byte[] buffer;
+
   private int offset = 0;
+
   private int limit = 0;
 
   public BatchLineReader(final InputStream reader) {
@@ -57,32 +96,93 @@ public class BatchLineReader {
     }
 
     this.reader = reader;
-    buffer = new byte[bufferSize];
+    this.buffer = new byte[bufferSize];
   }
 
   public void close() throws IOException {
-    reader.close();
+    this.reader.close();
   }
 
-  public List<String> toList() throws IOException {
-    final List<String> result = new ArrayList<>();
-    String currentLine = readLine();
-    if (currentLine != null) {
-      currentBoundary = currentLine.trim();
-      result.add(currentLine);
+  private int fillBuffer() throws IOException {
+    this.limit = this.reader.read(this.buffer, 0, this.buffer.length);
+    this.offset = 0;
 
-      while ((currentLine = readLine()) != null) {
-        result.add(currentLine);
+    return this.limit;
+  }
+
+  private ByteBuffer grantBuffer(ByteBuffer buffer) {
+    if (!buffer.hasRemaining()) {
+      buffer.flip();
+      final ByteBuffer tmp = ByteBuffer.allocate(buffer.limit() * 2);
+      tmp.put(buffer);
+      buffer = tmp;
+    }
+    return buffer;
+  }
+
+  private boolean isBoundary(final String currentLine) {
+    return (this.currentBoundary + CRLF).equals(currentLine)
+      || (this.currentBoundary + LFS).equals(currentLine)
+      || (this.currentBoundary + DOUBLE_DASH + CRLF).equals(currentLine)
+      || (this.currentBoundary + DOUBLE_DASH + LFS).equals(currentLine);
+  }
+
+  String readLine() throws IOException {
+    if (this.limit == EOF) {
+      return null;
+    }
+
+    ByteBuffer innerBuffer = ByteBuffer.allocate(BUFFER_SIZE);
+    // EOF will be considered as line ending
+    boolean foundLineEnd = false;
+
+    while (!foundLineEnd) {
+      // Is buffer refill required?
+      if (this.limit == this.offset && fillBuffer() == EOF) {
+        foundLineEnd = true;
+      }
+
+      if (!foundLineEnd) {
+        final byte currentChar = this.buffer[this.offset++];
+        innerBuffer = grantBuffer(innerBuffer);
+        innerBuffer.put(currentChar);
+
+        if (currentChar == LF) {
+          foundLineEnd = true;
+        } else if (currentChar == CR) {
+          foundLineEnd = true;
+
+          // Check next byte. Consume \n if available
+          // Is buffer refill required?
+          if (this.limit == this.offset) {
+            fillBuffer();
+          }
+
+          // Check if there is at least one character
+          if (this.limit != EOF && this.buffer[this.offset] == LF) {
+            innerBuffer = grantBuffer(innerBuffer);
+            innerBuffer.put(LF);
+            this.offset++;
+          }
+        }
       }
     }
-    return result;
+
+    if (innerBuffer.position() == 0) {
+      return null;
+    } else {
+      final String currentLine = new String(innerBuffer.array(), 0, innerBuffer.position(),
+        this.readState.isReadBody() ? this.currentCharset : DEFAULT_CHARSET);
+      updateCurrentCharset(currentLine);
+      return currentLine;
+    }
   }
 
   public List<Line> toLineList() throws IOException {
     final List<Line> result = new ArrayList<>();
     String currentLine = readLine();
     if (currentLine != null) {
-      currentBoundary = currentLine.trim();
+      this.currentBoundary = currentLine.trim();
       int counter = 1;
       result.add(new Line(currentLine, counter++));
 
@@ -94,129 +194,46 @@ public class BatchLineReader {
     return result;
   }
 
+  public List<String> toList() throws IOException {
+    final List<String> result = new ArrayList<>();
+    String currentLine = readLine();
+    if (currentLine != null) {
+      this.currentBoundary = currentLine.trim();
+      result.add(currentLine);
+
+      while ((currentLine = readLine()) != null) {
+        result.add(currentLine);
+      }
+    }
+    return result;
+  }
+
   private void updateCurrentCharset(final String currentLine) {
     if (currentLine != null) {
-      if (currentLine.toLowerCase(Locale.ENGLISH).startsWith(HttpHeader.CONTENT_TYPE.toLowerCase(Locale.ENGLISH))) {
-        int cutOff = currentLine.endsWith(CRLF) ? 2 : currentLine.endsWith(LFS) ? 1 : 0;
+      if (currentLine.toLowerCase(Locale.ENGLISH)
+        .startsWith(HttpHeader.CONTENT_TYPE.toLowerCase(Locale.ENGLISH))) {
+        final int cutOff = currentLine.endsWith(CRLF) ? 2 : currentLine.endsWith(LFS) ? 1 : 0;
         final ContentType contentType = ContentType.parse(
-            currentLine.substring(HttpHeader.CONTENT_TYPE.length() + 1, currentLine.length() - cutOff).trim());
+          currentLine.substring(HttpHeader.CONTENT_TYPE.length() + 1, currentLine.length() - cutOff)
+            .trim());
         if (contentType != null) {
           final String charsetString = contentType.getParameter(ContentType.PARAMETER_CHARSET);
-          currentCharset = charsetString == null ?
-              contentType.isCompatible(ContentType.APPLICATION_JSON) || contentType.getSubtype().contains("xml") ?
-                  Charset.forName("UTF-8") :
-                  DEFAULT_CHARSET :
-              Charset.forName(charsetString);
+          this.currentCharset = charsetString == null
+            ? contentType.isCompatible(ContentType.APPLICATION_JSON)
+              || contentType.getSubtype().contains("xml") ? Charset.forName("UTF-8")
+                : DEFAULT_CHARSET
+            : Charset.forName(charsetString);
 
           final String boundary = contentType.getParameter(BOUNDARY);
           if (boundary != null) {
-            currentBoundary = DOUBLE_DASH + boundary;
+            this.currentBoundary = DOUBLE_DASH + boundary;
           }
         }
       } else if (CRLF.equals(currentLine) || LFS.equals(currentLine)) {
-        readState.foundLinebreak();
+        this.readState.foundLinebreak();
       } else if (isBoundary(currentLine)) {
-        readState.foundBoundary();
+        this.readState.foundBoundary();
       }
-    }
-  }
-
-  private boolean isBoundary(final String currentLine) {
-    return (currentBoundary + CRLF).equals(currentLine)
-        || (currentBoundary + LFS).equals(currentLine)
-        || (currentBoundary + DOUBLE_DASH + CRLF).equals(currentLine)
-        || (currentBoundary + DOUBLE_DASH + LFS).equals(currentLine);
-  }
-
-  String readLine() throws IOException {
-    if (limit == EOF) {
-      return null;
-    }
-
-    ByteBuffer innerBuffer = ByteBuffer.allocate(BUFFER_SIZE);
-    // EOF will be considered as line ending
-    boolean foundLineEnd = false;
-
-    while (!foundLineEnd) {
-      // Is buffer refill required?
-      if (limit == offset && fillBuffer() == EOF) {
-        foundLineEnd = true;
-      }
-
-      if (!foundLineEnd) {
-        byte currentChar = buffer[offset++];
-        innerBuffer = grantBuffer(innerBuffer);
-        innerBuffer.put(currentChar);
-
-        if (currentChar == LF) {
-          foundLineEnd = true;
-        } else if (currentChar == CR) {
-          foundLineEnd = true;
-
-          // Check next byte. Consume \n if available
-          // Is buffer refill required?
-          if (limit == offset) {
-            fillBuffer();
-          }
-
-          // Check if there is at least one character
-          if (limit != EOF && buffer[offset] == LF) {
-            innerBuffer = grantBuffer(innerBuffer);
-            innerBuffer.put(LF);
-            offset++;
-          }
-        }
-      }
-    }
-
-    if (innerBuffer.position() == 0) {
-      return null;
-    } else {
-      final String currentLine = new String(innerBuffer.array(), 0, innerBuffer.position(),
-          readState.isReadBody() ? currentCharset : DEFAULT_CHARSET);
-      updateCurrentCharset(currentLine);
-      return currentLine;
-    }
-  }
-
-  private ByteBuffer grantBuffer(ByteBuffer buffer) {
-    if(!buffer.hasRemaining()) {
-      buffer.flip();
-      ByteBuffer tmp = ByteBuffer.allocate(buffer.limit() *2);
-      tmp.put(buffer);
-      buffer = tmp;
-    }
-    return buffer;
-  }
-
-  private int fillBuffer() throws IOException {
-    limit = reader.read(buffer, 0, buffer.length);
-    offset = 0;
-
-    return limit;
-  }
-
-  /**
-   * Read state indicator (whether currently the <code>body</code> or <code>header</code> part is read).
-   */
-  private static class ReadState {
-    private int state = 0;
-
-    public void foundLinebreak() {
-      state++;
-    }
-
-    public void foundBoundary() {
-      state = 0;
-    }
-
-    public boolean isReadBody() {
-      return state >= 2;
-    }
-
-    @Override
-    public String toString() {
-      return String.valueOf(state);
     }
   }
 }

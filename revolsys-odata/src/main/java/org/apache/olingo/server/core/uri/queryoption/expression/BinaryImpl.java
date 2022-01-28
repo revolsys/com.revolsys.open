@@ -32,22 +32,26 @@ import org.apache.olingo.server.api.uri.queryoption.expression.ExpressionVisitor
 public class BinaryImpl implements Binary {
 
   private final Expression left;
+
   private final BinaryOperatorKind operator;
+
   private final Expression right;
+
   private final EdmType type;
+
   private final List<Expression> expressions;
 
-  public BinaryImpl(final Expression left, final BinaryOperatorKind operator, final Expression right,
-      final EdmType type) {
+  public BinaryImpl(final Expression left, final BinaryOperatorKind operator,
+    final Expression right, final EdmType type) {
     this.left = left;
     this.operator = operator;
     this.right = right;
     this.type = type;
     this.expressions = null;
   }
-  
-  public BinaryImpl(final Expression left, final BinaryOperatorKind operator, final List<Expression> right,
-      final EdmType type) {
+
+  public BinaryImpl(final Expression left, final BinaryOperatorKind operator,
+    final List<Expression> right, final EdmType type) {
     this.left = left;
     this.operator = operator;
     this.right = null;
@@ -56,47 +60,49 @@ public class BinaryImpl implements Binary {
   }
 
   @Override
-  public BinaryOperatorKind getOperator() {
-    return operator;
-  }
-
-  @Override
-  public Expression getLeftOperand() {
-    return left;
-  }
-
-  @Override
-  public Expression getRightOperand() {
-    return right;
-  }
-
-  public EdmType getType() {
-    return type;
-  }
-
-  @Override
-  public <T> T accept(final ExpressionVisitor<T> visitor) throws ExpressionVisitException, ODataApplicationException {
-    T localLeft = this.left.accept(visitor);
+  public <T> T accept(final ExpressionVisitor<T> visitor)
+    throws ExpressionVisitException, ODataApplicationException {
+    final T localLeft = this.left.accept(visitor);
     if (this.right != null) {
-      T localRight = this.right.accept(visitor);
-      return visitor.visitBinaryOperator(operator, localLeft, localRight);
+      final T localRight = this.right.accept(visitor);
+      return visitor.visitBinaryOperator(this.operator, localLeft, localRight);
     } else if (this.expressions != null) {
-      List<T> expressions = new ArrayList<>();
+      final List<T> expressions = new ArrayList<>();
       for (final Expression expression : this.expressions) {
         expressions.add(expression.accept(visitor));
       }
-      return visitor.visitBinaryOperator(operator, localLeft, expressions);
+      return visitor.visitBinaryOperator(this.operator, localLeft, expressions);
     }
     return null;
   }
 
   @Override
-  public String toString() {
-    return "{" + left + " " + operator.name() + " " + (null != right ? right : expressions) + '}';
+  public List<Expression> getExpressions() {
+    return this.expressions;
   }
 
   @Override
-  public List<Expression> getExpressions() {
-    return expressions;
+  public Expression getLeftOperand() {
+    return this.left;
+  }
+
+  @Override
+  public BinaryOperatorKind getOperator() {
+    return this.operator;
+  }
+
+  @Override
+  public Expression getRightOperand() {
+    return this.right;
+  }
+
+  public EdmType getType() {
+    return this.type;
+  }
+
+  @Override
+  public String toString() {
+    return "{" + this.left + " " + this.operator.name() + " "
+      + (null != this.right ? this.right : this.expressions) + '}';
   }
 }

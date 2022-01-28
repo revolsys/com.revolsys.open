@@ -21,8 +21,6 @@ package org.apache.olingo.server.core.uri.parser;
 /** Exception thrown during URI parsing in cases where the URI violates the URI construction rules. */
 public class UriParserSyntaxException extends UriParserException {
 
-  private static final long serialVersionUID = 5887744747812478226L;
-
   public static enum MessageKeys implements MessageKey {
     /** parameter: segment */
     MUST_BE_LAST_SEGMENT,
@@ -33,9 +31,7 @@ public class UriParserSyntaxException extends UriParserException {
     /** parameters: query-option name, query-option value */
     WRONG_VALUE_FOR_SYSTEM_QUERY_OPTION,
     /** parameter: $format option value */
-    WRONG_VALUE_FOR_SYSTEM_QUERY_OPTION_FORMAT,
-    SYSTEM_QUERY_OPTION_LEVELS_NOT_ALLOWED_HERE,
-    SYNTAX,
+    WRONG_VALUE_FOR_SYSTEM_QUERY_OPTION_FORMAT, SYSTEM_QUERY_OPTION_LEVELS_NOT_ALLOWED_HERE, SYNTAX,
     /** parameter: alias name */
     DUPLICATED_ALIAS,
     /**Entity id must be followed by system query option id */
@@ -47,13 +43,15 @@ public class UriParserSyntaxException extends UriParserException {
     }
   }
 
+  private static final long serialVersionUID = 5887744747812478226L;
+
   public UriParserSyntaxException(final String developmentMessage, final MessageKey messageKey,
-      final String... parameters) {
+    final String... parameters) {
     super(developmentMessage, messageKey, parameters);
   }
 
-  public UriParserSyntaxException(final String developmentMessage, final Throwable cause, final MessageKey messageKey,
-      final String... parameters) {
+  public UriParserSyntaxException(final String developmentMessage, final Throwable cause,
+    final MessageKey messageKey, final String... parameters) {
     super(developmentMessage, cause, messageKey, parameters);
   }
 }

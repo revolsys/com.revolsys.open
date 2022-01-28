@@ -26,9 +26,9 @@ import java.util.List;
 public interface EdmSchema extends EdmAnnotatable {
 
   /**
-   * @return the namespace for this schema
+   * @return all actions for this schema
    */
-  String getNamespace();
+  List<EdmAction> getActions();
 
   /**
    * @return the alias for this schema. May be null.
@@ -36,14 +36,9 @@ public interface EdmSchema extends EdmAnnotatable {
   String getAlias();
 
   /**
-   * @return all enum types for this schema
+   * @return all {@link EdmAnnotations} for this schema.
    */
-  List<EdmEnumType> getEnumTypes();
-
-  /**
-   * @return all entity types for this schema
-   */
-  List<EdmEntityType> getEntityTypes();
+  List<EdmAnnotations> getAnnotationGroups();
 
   /**
    * @return all complex types for this schema
@@ -51,9 +46,19 @@ public interface EdmSchema extends EdmAnnotatable {
   List<EdmComplexType> getComplexTypes();
 
   /**
-   * @return all actions for this schema
+   * @return the entity container for this schema. May be null.
    */
-  List<EdmAction> getActions();
+  EdmEntityContainer getEntityContainer();
+
+  /**
+   * @return all entity types for this schema
+   */
+  List<EdmEntityType> getEntityTypes();
+
+  /**
+   * @return all enum types for this schema
+   */
+  List<EdmEnumType> getEnumTypes();
 
   /**
    * @return all functions for this schema
@@ -61,9 +66,9 @@ public interface EdmSchema extends EdmAnnotatable {
   List<EdmFunction> getFunctions();
 
   /**
-   * @return all {@link EdmTypeDefinition} for this schema.
+   * @return the namespace for this schema
    */
-  List<EdmTypeDefinition> getTypeDefinitions();
+  String getNamespace();
 
   /**
    * @return all {@link EdmTerm} for this schema.
@@ -71,13 +76,8 @@ public interface EdmSchema extends EdmAnnotatable {
   List<EdmTerm> getTerms();
 
   /**
-   * @return all {@link EdmAnnotations} for this schema.
+   * @return all {@link EdmTypeDefinition} for this schema.
    */
-  List<EdmAnnotations> getAnnotationGroups();
-
-  /**
-   * @return the entity container for this schema. May be null.
-   */
-  EdmEntityContainer getEntityContainer();
+  List<EdmTypeDefinition> getTypeDefinitions();
 
 }

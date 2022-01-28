@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -24,18 +24,24 @@ import java.util.List;
 /**
  * The type Csdl on delete.
  */
-public class CsdlOnDelete extends CsdlAbstractEdmItem implements CsdlAnnotatable {
+public class CsdlOnDelete implements CsdlAbstractEdmItem, CsdlAnnotatable {
 
   private CsdlOnDeleteAction action = CsdlOnDeleteAction.None;
-  
-  private List<CsdlAnnotation> annotations = new ArrayList<CsdlAnnotation>();
+
+  private List<CsdlAnnotation> annotations = new ArrayList<>();
+
   /**
    * Gets action.
    *
    * @return the action
    */
   public CsdlOnDeleteAction getAction() {
-    return action;
+    return this.action;
+  }
+
+  @Override
+  public List<CsdlAnnotation> getAnnotations() {
+    return this.annotations;
   }
 
   /**
@@ -47,11 +53,6 @@ public class CsdlOnDelete extends CsdlAbstractEdmItem implements CsdlAnnotatable
   public CsdlOnDelete setAction(final CsdlOnDeleteAction action) {
     this.action = action;
     return this;
-  }
-
-  @Override
-  public List<CsdlAnnotation> getAnnotations() {
-    return annotations;
   }
 
   /**

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -29,6 +29,7 @@ import org.apache.olingo.commons.api.edm.provider.CsdlParameter;
 public class EdmParameterImpl extends AbstractEdmNamed implements EdmParameter {
 
   private final CsdlParameter parameter;
+
   private EdmType typeImpl;
 
   public EdmParameterImpl(final Edm edm, final CsdlParameter parameter) {
@@ -37,52 +38,56 @@ public class EdmParameterImpl extends AbstractEdmNamed implements EdmParameter {
   }
 
   @Override
-  public boolean isCollection() {
-    return parameter.isCollection();
-  }
-
-  @Override
   public EdmMapping getMapping() {
-    return parameter.getMapping();
-  }
-
-  @Override
-  public boolean isNullable() {
-    return parameter.isNullable();
+    return this.parameter.getMapping();
   }
 
   @Override
   public Integer getMaxLength() {
-    return parameter.getMaxLength();
+    return this.parameter.getMaxLength();
   }
 
   @Override
   public Integer getPrecision() {
-    return parameter.getPrecision();
+    return this.parameter.getPrecision();
   }
 
   @Override
   public Integer getScale() {
-    return parameter.getScale();
+    return this.parameter.getScale();
   }
 
   @Override
   public SRID getSrid() {
-    return parameter.getSrid();
+    return this.parameter.getSrid();
   }
 
   @Override
   public EdmType getType() {
-    if (typeImpl == null) {
-      if (parameter.getType() == null) {
-        throw new EdmException("Parameter " + parameter.getName() + " must hava a full qualified type.");
+    if (this.typeImpl == null) {
+      if (this.parameter.getType() == null) {
+        throw new EdmException(
+          "Parameter " + this.parameter.getName() + " must hava a full qualified type.");
       }
-      typeImpl = new EdmTypeInfo.Builder().setEdm(edm).setTypeExpression(parameter.getType()).build().getType();
-      if (typeImpl == null) {
-        throw new EdmException("Cannot find type with name: " + parameter.getTypeFQN());
+      this.typeImpl = new EdmTypeInfo.Builder().setEdm(this.edm)
+        .setTypeExpression(this.parameter.getType())
+        .build()
+        .getType();
+      if (this.typeImpl == null) {
+        throw new EdmException("Cannot find type with name: " + this.parameter.getTypeFQN());
       }
     }
 
-    return typeImpl;
+    return this.typeImpl;
+  }
+
+  @Override
+  public boolean isCollection() {
+    return this.parameter.isCollection();
+  }
+
+  @Override
+  public boolean isNullable() {
+    return this.parameter.isNullable();
   }
 }

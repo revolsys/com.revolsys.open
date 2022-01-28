@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -29,37 +29,14 @@ import org.apache.olingo.commons.api.edm.provider.CsdlAnnotation;
  */
 public class CsdlNull extends CsdlDynamicExpression implements CsdlAnnotatable {
 
-  private List<CsdlAnnotation> annotations = new ArrayList<CsdlAnnotation>();
+  private List<CsdlAnnotation> annotations = new ArrayList<>();
 
-  @Override
-  public List<CsdlAnnotation> getAnnotations() {
-    return annotations;
-  }
-
-  public CsdlNull setAnnotations(List<CsdlAnnotation> annotations) {
-    this.annotations = annotations;
-    return this;
-  }
-  
-  @Override
-  public boolean equals (Object obj) {
-    if (obj == null) {
-      return false;
-    }
-    if (!(obj instanceof CsdlNull)) {
-      return false;
-    }
-    CsdlNull csdlNull = (CsdlNull) obj;
-    return (this.getAnnotations() == null ? csdlNull.getAnnotations() == null :
-        checkAnnotations(csdlNull.getAnnotations()));
-  }
-  
-  private boolean checkAnnotations(List<CsdlAnnotation> csdlNullAnnot) {
+  private boolean checkAnnotations(final List<CsdlAnnotation> csdlNullAnnot) {
     if (csdlNullAnnot == null) {
       return false;
     }
     if (this.getAnnotations().size() == csdlNullAnnot.size()) {
-      for (int i = 0; i < this.getAnnotations().size() ; i++) {
+      for (int i = 0; i < this.getAnnotations().size(); i++) {
         if (!this.getAnnotations().get(i).equals(csdlNullAnnot.get(i))) {
           return false;
         }
@@ -71,11 +48,30 @@ public class CsdlNull extends CsdlDynamicExpression implements CsdlAnnotatable {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    if ((obj == null) || !(obj instanceof CsdlNull)) {
+      return false;
+    }
+    final CsdlNull csdlNull = (CsdlNull)obj;
+    return this.getAnnotations() == null ? csdlNull.getAnnotations() == null
+      : checkAnnotations(csdlNull.getAnnotations());
+  }
+
+  @Override
+  public List<CsdlAnnotation> getAnnotations() {
+    return this.annotations;
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((annotations == null) ? 0 : 
-      annotations.hashCode());
+    result = prime * result + (this.annotations == null ? 0 : this.annotations.hashCode());
     return result;
+  }
+
+  public CsdlNull setAnnotations(final List<CsdlAnnotation> annotations) {
+    this.annotations = annotations;
+    return this;
   }
 }

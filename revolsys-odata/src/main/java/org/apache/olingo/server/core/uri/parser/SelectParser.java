@@ -53,9 +53,75 @@ public class SelectParser {
     this.edm = edm;
   }
 
-  public SelectOption parse(UriTokenizer tokenizer, final EdmStructuredType referencedType,
-      final boolean referencedIsCollection) throws UriParserException, UriValidationException {
-    List<SelectItem> selectItems = new ArrayList<>();
+  private void addSelectPath(final UriTokenizer tokenizer, final EdmStructuredType referencedType,
+    final UriInfoImpl resource) throws UriParserException {
+    final String name = tokenizer.getText();
+    final EdmProperty property = referencedType.getStructuralProperty(name);
+
+    if (property == null) {
+      final EdmNavigationProperty navigationProperty = referencedType.getNavigationProperty(name);
+      if (navigationProperty == null) {
+        throw new UriParserSemanticException("Selected property not found.",
+          UriParserSemanticException.MessageKeys.EXPRESSION_PROPERTY_NOT_IN_TYPE,
+          referencedType.getName(), name);
+      } else {
+        resource.addResourcePart(new UriResourceNavigationPropertyImpl(navigationProperty));
+      }
+
+    } else if (property.isPrimitive() || property.getType().getKind() == EdmTypeKind.ENUM
+      || property.getType().getKind() == EdmTypeKind.DEFINITION) {
+      resource.addResourcePart(new UriResourcePrimitivePropertyImpl(property));
+
+    } else {
+      final UriResourceComplexPropertyImpl complexPart = new UriResourceComplexPropertyImpl(
+        property);
+      resource.addResourcePart(complexPart);
+      if (tokenizer.next(TokenKind.SLASH)) {
+        if (tokenizer.next(TokenKind.QualifiedName)) {
+          final FullQualifiedName qualifiedName = new FullQualifiedName(tokenizer.getText());
+          final EdmComplexType type = this.edm.getComplexType(qualifiedName);
+          if (type == null) {
+            throw new UriParserSemanticException("Type not found.",
+              UriParserSemanticException.MessageKeys.UNKNOWN_TYPE,
+              qualifiedName.getFullQualifiedNameAsString());
+          } else if (type.compatibleTo(property.getType())) {
+            complexPart.setTypeFilter(type);
+            if (tokenizer.next(TokenKind.SLASH)) {
+              if (tokenizer.next(TokenKind.ODataIdentifier)) {
+                addSelectPath(tokenizer, type, resource);
+              } else {
+                throw new UriParserSemanticException("Unknown part after '/'.",
+                  UriParserSemanticException.MessageKeys.UNKNOWN_PART, "");
+              }
+            }
+          } else {
+            throw new UriParserSemanticException("The type cast is not compatible.",
+              UriParserSemanticException.MessageKeys.INCOMPATIBLE_TYPE_FILTER, type.getName());
+          }
+        } else if (tokenizer.next(TokenKind.ODataIdentifier)) {
+          addSelectPath(tokenizer, (EdmStructuredType)property.getType(), resource);
+        } else if (tokenizer.next(TokenKind.SLASH)) {
+          throw new UriParserSyntaxException("Illegal $select expression.",
+            UriParserSyntaxException.MessageKeys.SYNTAX);
+        } else {
+          throw new UriParserSemanticException("Unknown part after '/'.",
+            UriParserSemanticException.MessageKeys.UNKNOWN_PART, "");
+        }
+      }
+    }
+  }
+
+  private void ensureReferencedTypeNotNull(final EdmStructuredType referencedType)
+    throws UriParserException {
+    if (referencedType == null) {
+      throw new UriParserSemanticException("The referenced part is not typed.",
+        UriParserSemanticException.MessageKeys.ONLY_FOR_TYPED_PARTS, "select");
+    }
+  }
+
+  public SelectOption parse(final UriTokenizer tokenizer, final EdmStructuredType referencedType,
+    final boolean referencedIsCollection) throws UriParserException, UriValidationException {
+    final List<SelectItem> selectItems = new ArrayList<>();
     SelectItem item;
     do {
       item = parseItem(tokenizer, referencedType, referencedIsCollection);
@@ -65,14 +131,74 @@ public class SelectParser {
     return new SelectOptionImpl().setSelectItems(selectItems);
   }
 
-  private SelectItem parseItem(UriTokenizer tokenizer,
-      final EdmStructuredType referencedType, final boolean referencedIsCollection) throws UriParserException {
-    SelectItemImpl item = new SelectItemImpl();
+  private FullQualifiedName parseAllOperationsInSchema(final UriTokenizer tokenizer)
+    throws UriParserException {
+    final String namespace = tokenizer.getText();
+    if (tokenizer.next(TokenKind.DOT)) {
+      if (tokenizer.next(TokenKind.STAR)) {
+        // Validate the namespace. Currently a namespace from a non-default
+        // schema is not supported.
+        // There is no direct access to the namespace without loading the whole
+        // schema;
+        // however, the default entity container should always be there, so its
+        // access methods can be used.
+        if (this.edm.getEntityContainer(
+          new FullQualifiedName(namespace, this.edm.getEntityContainer().getName())) == null) {
+          throw new UriParserSemanticException("Wrong namespace '" + namespace + "'.",
+            UriParserSemanticException.MessageKeys.UNKNOWN_PART, namespace);
+        }
+        return new FullQualifiedName(namespace, tokenizer.getText());
+      } else {
+        throw new UriParserSemanticException("Expected star after dot.",
+          UriParserSemanticException.MessageKeys.UNKNOWN_PART, "");
+      }
+    }
+    return null;
+  }
+
+  private UriResourcePartTyped parseBoundOperation(final UriTokenizer tokenizer,
+    final FullQualifiedName qualifiedName, final EdmStructuredType referencedType,
+    final boolean referencedIsCollection) throws UriParserException {
+    final EdmAction boundAction = this.edm.getBoundAction(qualifiedName,
+      referencedType.getFullQualifiedName(), referencedIsCollection);
+    if (boundAction == null) {
+      final List<String> parameterNames = parseFunctionParameterNames(tokenizer);
+      final EdmFunction boundFunction = this.edm.getBoundFunction(qualifiedName,
+        referencedType.getFullQualifiedName(), referencedIsCollection, parameterNames);
+      if (boundFunction == null) {
+        throw new UriParserSemanticException("Function not found.",
+          UriParserSemanticException.MessageKeys.UNKNOWN_PART,
+          qualifiedName.getFullQualifiedNameAsString());
+      } else {
+        return new UriResourceFunctionImpl(null, boundFunction, null);
+      }
+    } else {
+      return new UriResourceActionImpl(boundAction);
+    }
+  }
+
+  private List<String> parseFunctionParameterNames(final UriTokenizer tokenizer)
+    throws UriParserException {
+    final List<String> names = new ArrayList<>();
+    if (tokenizer.next(TokenKind.OPEN)) {
+      do {
+        ParserHelper.requireNext(tokenizer, TokenKind.ODataIdentifier);
+        names.add(tokenizer.getText());
+      } while (tokenizer.next(TokenKind.COMMA));
+      ParserHelper.requireNext(tokenizer, TokenKind.CLOSE);
+    }
+    return names;
+  }
+
+  private SelectItem parseItem(final UriTokenizer tokenizer, final EdmStructuredType referencedType,
+    final boolean referencedIsCollection) throws UriParserException {
+    final SelectItemImpl item = new SelectItemImpl();
     if (tokenizer.next(TokenKind.STAR)) {
       item.setStar(true);
 
     } else if (tokenizer.next(TokenKind.QualifiedName)) {
-      // The namespace or its alias could consist of dot-separated OData identifiers.
+      // The namespace or its alias could consist of dot-separated OData
+      // identifiers.
       final FullQualifiedName allOperationsInSchema = parseAllOperationsInSchema(tokenizer);
       if (allOperationsInSchema != null) {
         item.addAllOperationsInSchema(allOperationsInSchema);
@@ -80,26 +206,27 @@ public class SelectParser {
       } else {
         ensureReferencedTypeNotNull(referencedType);
         final FullQualifiedName qualifiedName = new FullQualifiedName(tokenizer.getText());
-        EdmStructuredType type = edm.getEntityType(qualifiedName);
+        EdmStructuredType type = this.edm.getEntityType(qualifiedName);
         if (type == null) {
-          type = edm.getComplexType(qualifiedName);
+          type = this.edm.getComplexType(qualifiedName);
         }
         if (type == null) {
-          item.setResourcePath(new UriInfoImpl().setKind(UriInfoKind.resource).addResourcePart(
-              parseBoundOperation(tokenizer, qualifiedName, referencedType, referencedIsCollection)));
+          item.setResourcePath(new UriInfoImpl().setKind(UriInfoKind.resource)
+            .addResourcePart(parseBoundOperation(tokenizer, qualifiedName, referencedType,
+              referencedIsCollection)));
 
         } else {
           if (type.compatibleTo(referencedType)) {
             item.setTypeFilter(type);
             if (tokenizer.next(TokenKind.SLASH)) {
               ParserHelper.requireNext(tokenizer, TokenKind.ODataIdentifier);
-              UriInfoImpl resource = new UriInfoImpl().setKind(UriInfoKind.resource);
+              final UriInfoImpl resource = new UriInfoImpl().setKind(UriInfoKind.resource);
               addSelectPath(tokenizer, type, resource);
               item.setResourcePath(resource);
             }
           } else {
             throw new UriParserSemanticException("The type cast is not compatible.",
-                UriParserSemanticException.MessageKeys.INCOMPATIBLE_TYPE_FILTER, type.getName());
+              UriParserSemanticException.MessageKeys.INCOMPATIBLE_TYPE_FILTER, type.getName());
           }
         }
       }
@@ -113,128 +240,12 @@ public class SelectParser {
 
       } else {
         ensureReferencedTypeNotNull(referencedType);
-        UriInfoImpl resource = new UriInfoImpl().setKind(UriInfoKind.resource);
+        final UriInfoImpl resource = new UriInfoImpl().setKind(UriInfoKind.resource);
         addSelectPath(tokenizer, referencedType, resource);
         item.setResourcePath(resource);
       }
     }
 
     return item;
-  }
-
-  private FullQualifiedName parseAllOperationsInSchema(UriTokenizer tokenizer) throws UriParserException {
-    final String namespace = tokenizer.getText();
-    if (tokenizer.next(TokenKind.DOT)) {
-      if (tokenizer.next(TokenKind.STAR)) {
-        // Validate the namespace.  Currently a namespace from a non-default schema is not supported.
-        // There is no direct access to the namespace without loading the whole schema;
-        // however, the default entity container should always be there, so its access methods can be used.
-        if (edm.getEntityContainer(new FullQualifiedName(namespace, edm.getEntityContainer().getName())) == null) {
-          throw new UriParserSemanticException("Wrong namespace '" + namespace + "'.",
-              UriParserSemanticException.MessageKeys.UNKNOWN_PART, namespace);
-        }
-        return new FullQualifiedName(namespace, tokenizer.getText());
-      } else {
-        throw new UriParserSemanticException("Expected star after dot.",
-            UriParserSemanticException.MessageKeys.UNKNOWN_PART, "");
-      }
-    }
-    return null;
-  }
-
-  private void ensureReferencedTypeNotNull(final EdmStructuredType referencedType) throws UriParserException {
-    if (referencedType == null) {
-      throw new UriParserSemanticException("The referenced part is not typed.",
-          UriParserSemanticException.MessageKeys.ONLY_FOR_TYPED_PARTS, "select");
-    }
-  }
-
-  private UriResourcePartTyped parseBoundOperation(UriTokenizer tokenizer, final FullQualifiedName qualifiedName,
-      final EdmStructuredType referencedType, final boolean referencedIsCollection) throws UriParserException {
-    final EdmAction boundAction = edm.getBoundAction(qualifiedName,
-        referencedType.getFullQualifiedName(),
-        referencedIsCollection);
-    if (boundAction == null) {
-      final List<String> parameterNames = parseFunctionParameterNames(tokenizer);
-      final EdmFunction boundFunction = edm.getBoundFunction(qualifiedName,
-          referencedType.getFullQualifiedName(), referencedIsCollection, parameterNames);
-      if (boundFunction == null) {
-        throw new UriParserSemanticException("Function not found.",
-            UriParserSemanticException.MessageKeys.UNKNOWN_PART, qualifiedName.getFullQualifiedNameAsString());
-      } else {
-        return new UriResourceFunctionImpl(null, boundFunction, null);
-      }
-    } else {
-      return new UriResourceActionImpl(boundAction);
-    }
-  }
-
-  private List<String> parseFunctionParameterNames(UriTokenizer tokenizer) throws UriParserException {
-    List<String> names = new ArrayList<>();
-    if (tokenizer.next(TokenKind.OPEN)) {
-      do {
-        ParserHelper.requireNext(tokenizer, TokenKind.ODataIdentifier);
-        names.add(tokenizer.getText());
-      } while (tokenizer.next(TokenKind.COMMA));
-      ParserHelper.requireNext(tokenizer, TokenKind.CLOSE);
-    }
-    return names;
-  }
-
-  private void addSelectPath(UriTokenizer tokenizer, final EdmStructuredType referencedType, UriInfoImpl resource)
-      throws UriParserException {
-    final String name = tokenizer.getText();
-    final EdmProperty property = referencedType.getStructuralProperty(name);
-
-    if (property == null) {
-      final EdmNavigationProperty navigationProperty = referencedType.getNavigationProperty(name);
-      if (navigationProperty == null) {
-        throw new UriParserSemanticException("Selected property not found.",
-            UriParserSemanticException.MessageKeys.EXPRESSION_PROPERTY_NOT_IN_TYPE,
-            referencedType.getName(), name);
-      } else {
-        resource.addResourcePart(new UriResourceNavigationPropertyImpl(navigationProperty));
-      }
-
-    } else if (property.isPrimitive()
-        || property.getType().getKind() == EdmTypeKind.ENUM
-        || property.getType().getKind() == EdmTypeKind.DEFINITION) {
-      resource.addResourcePart(new UriResourcePrimitivePropertyImpl(property));
-
-    } else {
-      UriResourceComplexPropertyImpl complexPart = new UriResourceComplexPropertyImpl(property);
-      resource.addResourcePart(complexPart);
-      if (tokenizer.next(TokenKind.SLASH)) {
-        if (tokenizer.next(TokenKind.QualifiedName)) {
-          final FullQualifiedName qualifiedName = new FullQualifiedName(tokenizer.getText());
-          final EdmComplexType type = edm.getComplexType(qualifiedName);
-          if (type == null) {
-            throw new UriParserSemanticException("Type not found.",
-                UriParserSemanticException.MessageKeys.UNKNOWN_TYPE, qualifiedName.getFullQualifiedNameAsString());
-          } else if (type.compatibleTo(property.getType())) {
-            complexPart.setTypeFilter(type);
-            if (tokenizer.next(TokenKind.SLASH)) {
-              if (tokenizer.next(TokenKind.ODataIdentifier)) {
-                addSelectPath(tokenizer, type, resource);
-              } else {
-                throw new UriParserSemanticException("Unknown part after '/'.",
-                    UriParserSemanticException.MessageKeys.UNKNOWN_PART, "");
-              }
-            }
-          } else {
-            throw new UriParserSemanticException("The type cast is not compatible.",
-                UriParserSemanticException.MessageKeys.INCOMPATIBLE_TYPE_FILTER, type.getName());
-          }
-        } else if (tokenizer.next(TokenKind.ODataIdentifier)) {
-          addSelectPath(tokenizer, (EdmStructuredType) property.getType(), resource);
-        } else if (tokenizer.next(TokenKind.SLASH)) {
-          throw new UriParserSyntaxException("Illegal $select expression.",
-              UriParserSyntaxException.MessageKeys.SYNTAX);
-        } else {
-          throw new UriParserSemanticException("Unknown part after '/'.",
-              UriParserSemanticException.MessageKeys.UNKNOWN_PART, "");
-        }
-      }
-    }
   }
 }

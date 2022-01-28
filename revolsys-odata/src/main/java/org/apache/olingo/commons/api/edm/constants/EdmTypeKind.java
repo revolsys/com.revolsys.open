@@ -25,31 +25,31 @@ public enum EdmTypeKind {
   /**
    * Primitive type
    */
-  PRIMITIVE, 
+  PRIMITIVE,
   /**
    * Enum type
    */
-  ENUM, 
+  ENUM,
   /**
    * Type definition
    */
-  DEFINITION, 
+  DEFINITION,
   /**
    * Complex type
    */
-  COMPLEX, 
+  COMPLEX,
   /**
    * Entity type
    */
-  ENTITY, 
+  ENTITY,
   /**
    * Navigation property type
    */
-  NAVIGATION, 
+  NAVIGATION,
   /**
    * Action type
    */
-  ACTION, 
+  ACTION,
   /**
    * Function type
    */

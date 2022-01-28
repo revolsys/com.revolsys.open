@@ -31,16 +31,6 @@ import java.nio.channels.WritableByteChannel;
  */
 public interface ODataContent {
   /**
-   * Write the available content into the given <code>WritableByteChannel</code>.
-   *
-   * If during write of the content an exception is thrown this exception will be catched
-   * and the org.apache.olingo.server.api.ODataContentWriteErrorCallback is called (if registered).
-   *
-   * @param channel channel in which the content is written.
-   */
-  void write(WritableByteChannel channel);
-
-  /**
    * Write the available content into the given <code>OutputStream</code>.
    *
    * If during write of the content an exception is thrown this exception will be catched
@@ -49,4 +39,14 @@ public interface ODataContent {
    * @param stream stream in which the content is written.
    */
   void write(OutputStream stream);
+
+  /**
+   * Write the available content into the given <code>WritableByteChannel</code>.
+   *
+   * If during write of the content an exception is thrown this exception will be catched
+   * and the org.apache.olingo.server.api.ODataContentWriteErrorCallback is called (if registered).
+   *
+   * @param channel channel in which the content is written.
+   */
+  void write(WritableByteChannel channel);
 }

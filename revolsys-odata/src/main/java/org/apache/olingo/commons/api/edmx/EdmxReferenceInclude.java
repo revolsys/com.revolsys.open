@@ -23,7 +23,17 @@ package org.apache.olingo.commons.api.edmx;
  */
 public class EdmxReferenceInclude {
   private final String namespace;
+
   private final String alias;
+
+  /**
+   * Create include with given namespace and empty (<code>NULL</code>) alias.
+   *
+   * @param namespace of include
+   */
+  public EdmxReferenceInclude(final String namespace) {
+    this(namespace, null);
+  }
 
   /**
    * Create include with given namespace and alias.
@@ -37,25 +47,16 @@ public class EdmxReferenceInclude {
   }
 
   /**
-   * Create include with given namespace and empty (<code>NULL</code>) alias.
-   *
-   * @param namespace of include
+   * @return alias of the include if one defined; null otherwise
    */
-  public EdmxReferenceInclude(final String namespace) {
-    this(namespace, null);
+  public String getAlias() {
+    return this.alias;
   }
 
   /**
    * @return Namespace of the include
    */
   public String getNamespace() {
-    return namespace;
-  }
-
-  /**
-   * @return alias of the include if one defined; null otherwise
-   */
-  public String getAlias() {
-    return alias;
+    return this.namespace;
   }
 }

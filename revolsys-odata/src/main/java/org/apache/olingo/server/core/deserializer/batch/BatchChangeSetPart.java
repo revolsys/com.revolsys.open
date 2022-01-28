@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -25,31 +25,32 @@ import org.apache.olingo.server.api.deserializer.batch.BatchDeserializerExceptio
 public class BatchChangeSetPart extends BatchQueryOperation {
   private BatchQueryOperation request;
 
-  public BatchChangeSetPart(final List<Line> message, final boolean isStrict) throws BatchDeserializerException {
+  public BatchChangeSetPart(final List<Line> message, final boolean isStrict)
+    throws BatchDeserializerException {
     super(message, isStrict);
   }
 
   @Override
-  public BatchChangeSetPart parse() throws BatchDeserializerException {
-    headers = BatchParserCommon.consumeHeaders(message);
-    BatchParserCommon.consumeBlankLine(message, isStrict);
-
-    request = new BatchQueryOperation(message, isStrict).parse();
-
-    return this;
-  }
-
-  public BatchQueryOperation getRequest() {
-    return request;
-  }
-
-  @Override
   public List<Line> getBody() {
-    return request.getBody();
+    return this.request.getBody();
   }
 
   @Override
   public Line getHttpStatusLine() {
-    return request.getHttpStatusLine();
+    return this.request.getHttpStatusLine();
+  }
+
+  public BatchQueryOperation getRequest() {
+    return this.request;
+  }
+
+  @Override
+  public BatchChangeSetPart parse() throws BatchDeserializerException {
+    this.headers = BatchParserCommon.consumeHeaders(this.message);
+    BatchParserCommon.consumeBlankLine(this.message, this.isStrict);
+
+    this.request = new BatchQueryOperation(this.message, this.isStrict).parse();
+
+    return this;
   }
 }

@@ -24,10 +24,10 @@ import org.apache.olingo.commons.api.edm.provider.annotation.CsdlNull;
 
 public class EdmNullImpl extends AbstractEdmAnnotatableDynamicExpression implements EdmNull {
 
-  public EdmNullImpl(Edm edm, CsdlNull csdlExp) {
+  public EdmNullImpl(final Edm edm, final CsdlNull csdlExp) {
     super(edm, "Null", csdlExp);
   }
-  
+
   @Override
   public EdmExpressionType getExpressionType() {
     return EdmExpressionType.Null;

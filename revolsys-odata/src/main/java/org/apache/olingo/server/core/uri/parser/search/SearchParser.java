@@ -30,7 +30,7 @@ import org.apache.olingo.server.core.uri.queryoption.SearchOptionImpl;
 
 /*
  * Rewritten grammar
- * 
+ *
  * SearchExpr ::= ExprOR
  * ExprOR ::= ExprAnd ('OR' ExprAnd)*
  * ExprAnd ::= Term ('AND'? Term)*
@@ -41,51 +41,73 @@ import org.apache.olingo.server.core.uri.queryoption.SearchOptionImpl;
 public class SearchParser {
 
   private Iterator<SearchQueryToken> tokens;
+
   private SearchQueryToken token;
 
-  public SearchOption parse(final String searchQuery) throws SearchParserException, SearchTokenizerException {
-    SearchTokenizer tokenizer = new SearchTokenizer();
+  private String getTokenAsString() {
+    return this.token == null ? "<EOF>" : this.token.getToken().name();
+  }
+
+  private boolean isEof() {
+    return this.token == null;
+  }
+
+  private boolean isTerm() {
+    return isToken(SearchQueryToken.Token.NOT) || isToken(SearchQueryToken.Token.PHRASE)
+      || isToken(SearchQueryToken.Token.WORD) || isToken(SearchQueryToken.Token.OPEN);
+  }
+
+  private boolean isToken(final SearchQueryToken.Token toCheckToken) {
+    return this.token != null && this.token.getToken() == toCheckToken;
+  }
+
+  private void nextToken() {
+    if (this.tokens.hasNext()) {
+      this.token = this.tokens.next();
+    } else {
+      this.token = null;
+    }
+  }
+
+  protected SearchExpression parse(final List<SearchQueryToken> tokens)
+    throws SearchParserException {
+    this.tokens = tokens.iterator();
+    nextToken();
+    if (this.token == null) {
+      throw new SearchParserException("No search String",
+        SearchParserException.MessageKeys.NO_EXPRESSION_FOUND);
+    }
+    final SearchExpression searchExpression = processSearchExpression();
+    if (!isEof()) {
+      throw new SearchParserException("Token left after end of search query parsing.",
+        SearchParserException.MessageKeys.INVALID_END_OF_QUERY, getTokenAsString());
+    }
+    return searchExpression;
+  }
+
+  public SearchOption parse(final String searchQuery)
+    throws SearchParserException, SearchTokenizerException {
+    final SearchTokenizer tokenizer = new SearchTokenizer();
     SearchExpression searchExpression;
     try {
       searchExpression = parse(tokenizer.tokenize(searchQuery));
-    } catch (SearchTokenizerException e) {
-      String message = e.getMessage();
+    } catch (final SearchTokenizerException e) {
+      final String message = e.getMessage();
       throw new SearchParserException("Tokenizer exception with message: " + message, e,
-          SearchParserException.MessageKeys.TOKENIZER_EXCEPTION, message);
+        SearchParserException.MessageKeys.TOKENIZER_EXCEPTION, message);
     }
     final SearchOptionImpl searchOption = new SearchOptionImpl();
     searchOption.setSearchExpression(searchExpression);
     return searchOption;
   }
 
-  protected SearchExpression parse(final List<SearchQueryToken> tokens) throws SearchParserException {
-    this.tokens = tokens.iterator();
-    nextToken();
-    if (token == null) {
-      throw new SearchParserException("No search String", SearchParserException.MessageKeys.NO_EXPRESSION_FOUND);
+  private void processClose() throws SearchParserException {
+    if (isToken(Token.CLOSE)) {
+      nextToken();
+    } else {
+      throw new SearchParserException("Missing close bracket after open bracket.",
+        SearchParserException.MessageKeys.MISSING_CLOSE);
     }
-    SearchExpression searchExpression = processSearchExpression();
-    if (!isEof()) {
-      throw new SearchParserException("Token left after end of search query parsing.",
-          SearchParserException.MessageKeys.INVALID_END_OF_QUERY, getTokenAsString());
-    }
-    return searchExpression;
-  }
-
-  private SearchExpression processSearchExpression() throws SearchParserException {
-    return processExprOr();
-  }
-
-  private SearchExpression processExprOr() throws SearchParserException {
-    SearchExpression left = processExprAnd();
-
-    while (isToken(Token.OR)) {
-      nextToken(); // Match OR
-      final SearchExpression right = processExprAnd();
-      left = new SearchBinaryImpl(left, SearchBinaryOperatorKind.OR, right);
-    }
-
-    return left;
   }
 
   private SearchExpression processExprAnd() throws SearchParserException {
@@ -100,6 +122,39 @@ public class SearchParser {
     }
 
     return left;
+  }
+
+  private SearchExpression processExprOr() throws SearchParserException {
+    SearchExpression left = processExprAnd();
+
+    while (isToken(Token.OR)) {
+      nextToken(); // Match OR
+      final SearchExpression right = processExprAnd();
+      left = new SearchBinaryImpl(left, SearchBinaryOperatorKind.OR, right);
+    }
+
+    return left;
+  }
+
+  private SearchExpression processNot() throws SearchParserException {
+    nextToken();
+    if (isToken(Token.WORD) || isToken(Token.PHRASE)) {
+      return new SearchUnaryImpl(processWordOrPhrase());
+    }
+
+    final String tokenAsString = getTokenAsString();
+    throw new SearchParserException("NOT must be followed by a term not a " + tokenAsString,
+      SearchParserException.MessageKeys.INVALID_NOT_OPERAND, tokenAsString);
+  }
+
+  private SearchTerm processPhrase() {
+    final String literal = this.token.getLiteral();
+    nextToken();
+    return new SearchTermImpl(literal.substring(1, literal.length() - 1));
+  }
+
+  private SearchExpression processSearchExpression() throws SearchParserException {
+    return processExprOr();
   }
 
   private SearchExpression processTerm() throws SearchParserException {
@@ -118,24 +173,10 @@ public class SearchParser {
     }
   }
 
-  private void processClose() throws SearchParserException {
-    if (isToken(Token.CLOSE)) {
-      nextToken();
-    } else {
-      throw new SearchParserException("Missing close bracket after open bracket.",
-          SearchParserException.MessageKeys.MISSING_CLOSE);
-    }
-  }
-
-  private SearchExpression processNot() throws SearchParserException {
+  private SearchTerm processWord() {
+    final String literal = this.token.getLiteral();
     nextToken();
-    if (isToken(Token.WORD) || isToken(Token.PHRASE)) {
-      return new SearchUnaryImpl(processWordOrPhrase());
-    }
-
-    final String tokenAsString = getTokenAsString();
-    throw new SearchParserException("NOT must be followed by a term not a " + tokenAsString,
-        SearchParserException.MessageKeys.INVALID_NOT_OPERAND, tokenAsString);
+    return new SearchTermImpl(literal);
   }
 
   private SearchTerm processWordOrPhrase() throws SearchParserException {
@@ -147,46 +188,7 @@ public class SearchParser {
 
     final String tokenName = getTokenAsString();
     throw new SearchParserException("Expected PHRASE||WORD found: " + tokenName,
-        SearchParserException.MessageKeys.EXPECTED_DIFFERENT_TOKEN,
-        Token.PHRASE.name() + "" + Token.WORD.name(), tokenName);
-  }
-
-  private SearchTerm processWord() {
-    String literal = token.getLiteral();
-    nextToken();
-    return new SearchTermImpl(literal);
-  }
-
-  private SearchTerm processPhrase() {
-    String literal = token.getLiteral();
-    nextToken();
-    return new SearchTermImpl(literal.substring(1, literal.length() - 1));
-  }
-
-  private boolean isTerm() {
-    return isToken(SearchQueryToken.Token.NOT)
-        || isToken(SearchQueryToken.Token.PHRASE)
-        || isToken(SearchQueryToken.Token.WORD)
-        || isToken(SearchQueryToken.Token.OPEN);
-  }
-
-  private boolean isEof() {
-    return token == null;
-  }
-
-  private boolean isToken(final SearchQueryToken.Token toCheckToken) {
-    return token != null && token.getToken() == toCheckToken;
-  }
-
-  private void nextToken() {
-    if (tokens.hasNext()) {
-      token = tokens.next();
-    } else {
-      token = null;
-    }
-  }
-
-  private String getTokenAsString() {
-    return token == null ? "<EOF>" : token.getToken().name();
+      SearchParserException.MessageKeys.EXPECTED_DIFFERENT_TOKEN,
+      Token.PHRASE.name() + "" + Token.WORD.name(), tokenName);
   }
 }

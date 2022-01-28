@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -20,7 +20,23 @@ package org.apache.olingo.commons.api.edm.provider.annotation;
 
 import org.apache.olingo.commons.api.edm.provider.CsdlAbstractEdmItem;
 
-public abstract class CsdlExpression extends CsdlAbstractEdmItem {
+public abstract class CsdlExpression implements CsdlAbstractEdmItem {
+
+  /**
+   * Casts the expression to {@link CsdlConstantExpression}.
+   * @return Constant Expression
+   */
+  public CsdlConstantExpression asConstant() {
+    return isConstant() ? (CsdlConstantExpression)this : null;
+  }
+
+  /**
+   * Cast the expression to {@link CsdlDynamicExpression}.
+   * @return Dynamic Expression
+   */
+  public CsdlDynamicExpression asDynamic() {
+    return isDynamic() ? (CsdlDynamicExpression)this : null;
+  }
 
   /**
    * Return true if the expression is constant
@@ -31,26 +47,10 @@ public abstract class CsdlExpression extends CsdlAbstractEdmItem {
   }
 
   /**
-   * Casts the expression to {@link CsdlConstantExpression}.
-   * @return Constant Expression
-   */
-  public CsdlConstantExpression asConstant() {
-    return isConstant() ? (CsdlConstantExpression) this : null;
-  }
-
-  /**
    * Returns true if the expression is dynamic.
    * @return true if the expression is dynamic
    */
   public boolean isDynamic() {
     return this instanceof CsdlDynamicExpression;
-  }
-
-  /**
-   * Cast the expression to {@link CsdlDynamicExpression}.
-   * @return Dynamic Expression
-   */
-  public CsdlDynamicExpression asDynamic() {
-    return isDynamic() ? (CsdlDynamicExpression) this : null;
   }
 }

@@ -33,8 +33,16 @@ public abstract class SingletonPrimitiveType extends AbstractPrimitiveType {
   }
 
   @Override
-  public int hashCode() {
-    return getClass().hashCode();
+  public EdmTypeKind getKind() {
+    return EdmTypeKind.PRIMITIVE;
+  }
+
+  @Override
+  public String getName() {
+    if (this.name == null) {
+      this.name = getClass().getSimpleName().substring(3);
+    }
+    return this.name;
   }
 
   @Override
@@ -43,15 +51,7 @@ public abstract class SingletonPrimitiveType extends AbstractPrimitiveType {
   }
 
   @Override
-  public String getName() {
-    if(name == null) {
-      name = getClass().getSimpleName().substring(3);
-    }
-    return name;
-  }
-
-  @Override
-  public EdmTypeKind getKind() {
-    return EdmTypeKind.PRIMITIVE;
+  public int hashCode() {
+    return getClass().hashCode();
   }
 }

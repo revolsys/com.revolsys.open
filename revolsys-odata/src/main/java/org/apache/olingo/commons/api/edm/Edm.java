@@ -28,19 +28,78 @@ import java.util.List;
 public interface Edm {
 
   /**
-   * This method <b>DOES NOT</b> support lazy loading. All schemas are loaded completely!
+   * Get {@link EdmAnnotations} by target.
    *
-   * @return all schemas defined for this EDM
+   * @param targetName <tt>edm:Annotations</tt> target
+   * @param qualifier for the target. Can be <code>NULL</code>
+   * @return {@link EdmAnnotations}
    */
-  List<EdmSchema> getSchemas();
+  EdmAnnotations getAnnotationGroup(FullQualifiedName targetName, String qualifier);
 
   /**
-   * Get schema by namespace.
+   * Get Action by full qualified name and binding parameter type.
    *
-   * @param namespace must not be null
-   * @return {@link EdmSchema}
+   * @param actionName must not be null
+   * @param bindingParameterTypeName must not be null
+   * @param isBindingParameterCollection may be null
+   * @return {@link EdmAction}
    */
-  EdmSchema getSchema(String namespace);
+  EdmAction getBoundAction(FullQualifiedName actionName, FullQualifiedName bindingParameterTypeName,
+    Boolean isBindingParameterCollection);
+
+  /**
+   * Get Action by full qualified name and binding parameter type.
+   * Note: action can not be overloaded on binding type
+   *
+   * @param bindingParameterTypeName must not be null
+   * @param isBindingParameterCollection may be null
+   * @return {@link EdmAction}
+   */
+  EdmAction getBoundActionWithBindingType(FullQualifiedName bindingParameterTypeName,
+    Boolean isBindingParameterCollection);
+
+  /**
+   * Get Function by full qualified name and binding parameter type and binding parameter names.
+   *
+   * @param functionName must not be null
+   * @param bindingParameterTypeName must not be null
+   * @param isBindingParameterCollection may be null
+   * @param parameterNames may be null: in this case it is considered as empty
+   * @return {@link EdmFunction}
+   */
+  EdmFunction getBoundFunction(FullQualifiedName functionName,
+    FullQualifiedName bindingParameterTypeName, Boolean isBindingParameterCollection,
+    List<String> parameterNames);
+
+  /**
+   * Get Function by binding parameter type
+   *
+   * @param bindingParameterTypeName must not be null
+   * @param isBindingParameterCollection may be null
+   * @return {@link EdmFunction}
+   */
+  List<EdmFunction> getBoundFunctionsWithBindingType(FullQualifiedName bindingParameterTypeName,
+    Boolean isBindingParameterCollection);
+
+  /**
+   * Get complex type by full qualified name..
+   * <br/>
+   * See {@link EdmComplexType} for more information.
+   *
+   * @param name full qualified name of complex type
+   * @return {@link EdmComplexType}
+   */
+  EdmComplexType getComplexType(FullQualifiedName name);
+
+  /**
+   * Get complex type with annotations by full qualified name..
+   * <br/>
+   * See {@link EdmComplexType} for more information.
+   *
+   * @param name full qualified name of complex type
+   * @return {@link EdmComplexType}
+   */
+  EdmComplexType getComplexTypeWithAnnotations(FullQualifiedName name);
 
   /**
    * Get main entity container.
@@ -62,26 +121,6 @@ public interface Edm {
   EdmEntityContainer getEntityContainer(FullQualifiedName name);
 
   /**
-   * Get enum type by full qualified name.
-   * <br/>
-   * See {@link EdmEnumType} for more information
-   *
-   * @param name full qualified name of enum type
-   * @return {@link EdmEnumType}
-   */
-  EdmEnumType getEnumType(FullQualifiedName name);
-
-  /**
-   * Get a type definition by full qualified name.
-   * <br/>
-   * See {@link EdmTypeDefinition} for more information
-   *
-   * @param name full qualified name of type definition
-   * @return {@link EdmTypeDefinition}
-   */
-  EdmTypeDefinition getTypeDefinition(FullQualifiedName name);
-
-  /**
    * Get entity type by full qualified name.
    * <br/>
    * See {@link EdmEntityType} for more information.
@@ -100,27 +139,50 @@ public interface Edm {
    * @return {@link EdmEntityType}
    */
   EdmEntityType getEntityTypeWithAnnotations(FullQualifiedName name);
-  
-  /**
-   * Get complex type by full qualified name..
-   * <br/>
-   * See {@link EdmComplexType} for more information.
-   *
-   * @param name full qualified name of complex type
-   * @return {@link EdmComplexType}
-   */
-  EdmComplexType getComplexType(FullQualifiedName name);
 
   /**
-   * Get complex type with annotations by full qualified name..
+   * Get enum type by full qualified name.
    * <br/>
-   * See {@link EdmComplexType} for more information.
+   * See {@link EdmEnumType} for more information
    *
-   * @param name full qualified name of complex type
-   * @return {@link EdmComplexType}
+   * @param name full qualified name of enum type
+   * @return {@link EdmEnumType}
    */
-  EdmComplexType getComplexTypeWithAnnotations(FullQualifiedName name);
-  
+  EdmEnumType getEnumType(FullQualifiedName name);
+
+  /**
+   * Get schema by namespace.
+   *
+   * @param namespace must not be null
+   * @return {@link EdmSchema}
+   */
+  EdmSchema getSchema(String namespace);
+
+  /**
+   * This method <b>DOES NOT</b> support lazy loading. All schemas are loaded completely!
+   *
+   * @return all schemas defined for this EDM
+   */
+  List<EdmSchema> getSchemas();
+
+  /**
+   * Get Term full by qualified name.
+   *
+   * @param termName must not be null
+   * @return {@link EdmTerm}
+   */
+  EdmTerm getTerm(FullQualifiedName termName);
+
+  /**
+   * Get a type definition by full qualified name.
+   * <br/>
+   * See {@link EdmTypeDefinition} for more information
+   *
+   * @param name full qualified name of type definition
+   * @return {@link EdmTypeDefinition}
+   */
+  EdmTypeDefinition getTypeDefinition(FullQualifiedName name);
+
   /**
    * Get unbound Action by full qualified name.
    *
@@ -128,36 +190,6 @@ public interface Edm {
    * @return {@link EdmAction}
    */
   EdmAction getUnboundAction(FullQualifiedName actionName);
-
-  /**
-   * Get Action by full qualified name and binding parameter type.
-   *
-   * @param actionName must not be null
-   * @param bindingParameterTypeName must not be null
-   * @param isBindingParameterCollection may be null
-   * @return {@link EdmAction}
-   */
-  EdmAction getBoundAction(FullQualifiedName actionName, FullQualifiedName bindingParameterTypeName,
-      Boolean isBindingParameterCollection);
-
-  /**
-   * Get Action by full qualified name and binding parameter type.
-   * Note: action can not be overloaded on binding type
-   * 
-   * @param bindingParameterTypeName must not be null
-   * @param isBindingParameterCollection may be null
-   * @return {@link EdmAction}
-   */  
-  EdmAction getBoundActionWithBindingType(FullQualifiedName bindingParameterTypeName,
-      Boolean isBindingParameterCollection);
-
-  /**
-   * Get Function by full qualified name.
-   *
-   * @param functionName must not be null
-   * @return {@link EdmFunction}
-   */
-  List<EdmFunction> getUnboundFunctions(FullQualifiedName functionName);
 
   /**
    * Get Function by full qualified name.
@@ -169,41 +201,10 @@ public interface Edm {
   EdmFunction getUnboundFunction(FullQualifiedName functionName, List<String> parameterNames);
 
   /**
-   * Get Function by full qualified name and binding parameter type and binding parameter names.
+   * Get Function by full qualified name.
    *
    * @param functionName must not be null
-   * @param bindingParameterTypeName must not be null
-   * @param isBindingParameterCollection may be null
-   * @param parameterNames may be null: in this case it is considered as empty
    * @return {@link EdmFunction}
    */
-  EdmFunction getBoundFunction(FullQualifiedName functionName, FullQualifiedName bindingParameterTypeName,
-      Boolean isBindingParameterCollection, List<String> parameterNames);
-
-  /**
-   * Get Function by binding parameter type
-   *
-   * @param bindingParameterTypeName must not be null
-   * @param isBindingParameterCollection may be null
-   * @return {@link EdmFunction}
-   */
-  List<EdmFunction> getBoundFunctionsWithBindingType(FullQualifiedName bindingParameterTypeName,
-      Boolean isBindingParameterCollection);  
-
-  /**
-   * Get Term full by qualified name.
-   *
-   * @param termName must not be null
-   * @return {@link EdmTerm}
-   */
-  EdmTerm getTerm(FullQualifiedName termName);
-
-  /**
-   * Get {@link EdmAnnotations} by target.
-   *
-   * @param targetName <tt>edm:Annotations</tt> target
-   * @param qualifier for the target. Can be <code>NULL</code>
-   * @return {@link EdmAnnotations}
-   */
-  EdmAnnotations getAnnotationGroup(FullQualifiedName targetName, String qualifier);
+  List<EdmFunction> getUnboundFunctions(FullQualifiedName functionName);
 }

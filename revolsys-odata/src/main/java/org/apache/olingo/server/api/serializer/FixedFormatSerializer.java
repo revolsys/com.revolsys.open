@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -30,33 +30,11 @@ import org.apache.olingo.server.api.deserializer.batch.ODataResponsePart;
 public interface FixedFormatSerializer {
 
   /**
-   * Writes binary output into an InputStream.
-   * @param binary the binary data
+   * Serializes a ODataResponse into an async response.
+   * @param odataResponse the response parts
+   * @return response as an input stream
    */
-  InputStream binary(byte[] binary) throws SerializerException;
-  
-  /**
-   * Writes bytes to an Input stream
-   * @param mediaEntity bytes
-   * @return
-   * @throws SerializerException
-   */
-  SerializerStreamResult mediaEntityStreamed(EntityMediaObject mediaEntity) throws SerializerException;
-  
-  /**
-   * Writes a count into an InputStream as plain text.
-   * @param count the count
-   */
-  InputStream count(Integer count) throws SerializerException;
-
-  /**
-   * Writes the raw value of a primitive-type instance into an InputStream.
-   * @param type the primitive type
-   * @param value the value
-   * @param options options for the serializer
-   */
-  InputStream primitiveValue(EdmPrimitiveType type, Object value, PrimitiveValueSerializerOptions options)
-      throws SerializerException;
+  InputStream asyncResponse(ODataResponse odataResponse) throws SerializerException;
 
   /**
    * Serializes a batch response.
@@ -64,12 +42,36 @@ public interface FixedFormatSerializer {
    * @param boundary the boundary between the parts
    * @return response as an input stream
    */
-  InputStream batchResponse(List<ODataResponsePart> batchResponses, String boundary) throws BatchSerializerException;
+  InputStream batchResponse(List<ODataResponsePart> batchResponses, String boundary)
+    throws BatchSerializerException;
 
   /**
-   * Serializes a ODataResponse into an async response.
-   * @param odataResponse the response parts
-   * @return response as an input stream
+   * Writes binary output into an InputStream.
+   * @param binary the binary data
    */
-  InputStream asyncResponse(ODataResponse odataResponse) throws SerializerException;
+  InputStream binary(byte[] binary) throws SerializerException;
+
+  /**
+   * Writes a count into an InputStream as plain text.
+   * @param count the count
+   */
+  InputStream count(Integer count) throws SerializerException;
+
+  /**
+   * Writes bytes to an Input stream
+   * @param mediaEntity bytes
+   * @return
+   * @throws SerializerException
+   */
+  SerializerStreamResult mediaEntityStreamed(EntityMediaObject mediaEntity)
+    throws SerializerException;
+
+  /**
+   * Writes the raw value of a primitive-type instance into an InputStream.
+   * @param type the primitive type
+   * @param value the value
+   * @param options options for the serializer
+   */
+  InputStream primitiveValue(EdmPrimitiveType type, Object value,
+    PrimitiveValueSerializerOptions options) throws SerializerException;
 }

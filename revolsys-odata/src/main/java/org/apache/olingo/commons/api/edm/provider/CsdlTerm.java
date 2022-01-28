@@ -26,7 +26,7 @@ import org.apache.olingo.commons.api.edm.geo.SRID;
 /**
  * The type Csdl term.
  */
-public class CsdlTerm extends CsdlAbstractEdmItem implements CsdlNamed, CsdlAnnotatable {
+public class CsdlTerm implements CsdlAbstractEdmItem, CsdlNamed, CsdlAnnotatable {
 
   private String name;
 
@@ -34,7 +34,7 @@ public class CsdlTerm extends CsdlAbstractEdmItem implements CsdlNamed, CsdlAnno
 
   private String baseTerm;
 
-  private List<String> appliesTo = new ArrayList<String>();
+  private List<String> appliesTo = new ArrayList<>();
 
   // Facets
   private String defaultValue;
@@ -49,62 +49,11 @@ public class CsdlTerm extends CsdlAbstractEdmItem implements CsdlNamed, CsdlAnno
 
   private SRID srid;
 
-  private List<CsdlAnnotation> annotations = new ArrayList<CsdlAnnotation>();
+  private List<CsdlAnnotation> annotations = new ArrayList<>();
 
   @Override
-  public String getName() {
-    return name;
-  }
-
-  /**
-   * Sets name.
-   *
-   * @param name the name
-   * @return the name
-   */
-  public CsdlTerm setName(final String name) {
-    this.name = name;
-    return this;
-  }
-
-  /**
-   * Gets type.
-   *
-   * @return the type
-   */
-  public String getType() {
-    return type;
-  }
-
-  /**
-   * Sets type.
-   *
-   * @param type the type
-   * @return the type
-   */
-  public CsdlTerm setType(final String type) {
-    this.type = type;
-    return this;
-  }
-
-  /**
-   * Gets base term.
-   *
-   * @return the base term
-   */
-  public String getBaseTerm() {
-    return baseTerm;
-  }
-
-  /**
-   * Sets base term.
-   *
-   * @param baseTerm the base term
-   * @return the base term
-   */
-  public CsdlTerm setBaseTerm(final String baseTerm) {
-    this.baseTerm = baseTerm;
-    return this;
+  public List<CsdlAnnotation> getAnnotations() {
+    return this.annotations;
   }
 
   /**
@@ -113,18 +62,16 @@ public class CsdlTerm extends CsdlAbstractEdmItem implements CsdlNamed, CsdlAnno
    * @return the applies to
    */
   public List<String> getAppliesTo() {
-    return appliesTo;
+    return this.appliesTo;
   }
 
   /**
-   * Sets applies to.
+   * Gets base term.
    *
-   * @param appliesTo the applies to
-   * @return the applies to
+   * @return the base term
    */
-  public CsdlTerm setAppliesTo(final List<String> appliesTo) {
-    this.appliesTo = appliesTo;
-    return this;
+  public String getBaseTerm() {
+    return this.baseTerm;
   }
 
   /**
@@ -133,38 +80,7 @@ public class CsdlTerm extends CsdlAbstractEdmItem implements CsdlNamed, CsdlAnno
    * @return the default value
    */
   public String getDefaultValue() {
-    return defaultValue;
-  }
-
-  /**
-   * Sets default value.
-   *
-   * @param defaultValue the default value
-   * @return the default value
-   */
-  public CsdlTerm setDefaultValue(final String defaultValue) {
-    this.defaultValue = defaultValue;
-    return this;
-  }
-
-  /**
-   * Is nullable.
-   *
-   * @return the boolean
-   */
-  public boolean isNullable() {
-    return nullable;
-  }
-
-  /**
-   * Sets nullable.
-   *
-   * @param nullable the nullable
-   * @return the nullable
-   */
-  public CsdlTerm setNullable(final boolean nullable) {
-    this.nullable = nullable;
-    return this;
+    return this.defaultValue;
   }
 
   /**
@@ -173,18 +89,12 @@ public class CsdlTerm extends CsdlAbstractEdmItem implements CsdlNamed, CsdlAnno
    * @return the max length
    */
   public Integer getMaxLength() {
-    return maxLength;
+    return this.maxLength;
   }
 
-  /**
-   * Sets max length.
-   *
-   * @param maxLength the max length
-   * @return the max length
-   */
-  public CsdlTerm setMaxLength(final Integer maxLength) {
-    this.maxLength = maxLength;
-    return this;
+  @Override
+  public String getName() {
+    return this.name;
   }
 
   /**
@@ -193,18 +103,7 @@ public class CsdlTerm extends CsdlAbstractEdmItem implements CsdlNamed, CsdlAnno
    * @return the precision
    */
   public Integer getPrecision() {
-    return precision;
-  }
-
-  /**
-   * Sets precision.
-   *
-   * @param precision the precision
-   * @return the precision
-   */
-  public CsdlTerm setPrecision(final Integer precision) {
-    this.precision = precision;
-    return this;
+    return this.precision;
   }
 
   /**
@@ -213,23 +112,34 @@ public class CsdlTerm extends CsdlAbstractEdmItem implements CsdlNamed, CsdlAnno
    * @return the scale
    */
   public Integer getScale() {
-    return scale;
+    return this.scale;
   }
 
   /**
-   * Sets scale.
+   * Gets srid.
    *
-   * @param scale the scale
-   * @return the scale
+   * @return the srid
    */
-  public CsdlTerm setScale(final Integer scale) {
-    this.scale = scale;
-    return this;
+  public SRID getSrid() {
+    return this.srid;
   }
 
-  @Override
-  public List<CsdlAnnotation> getAnnotations() {
-    return annotations;
+  /**
+   * Gets type.
+   *
+   * @return the type
+   */
+  public String getType() {
+    return this.type;
+  }
+
+  /**
+   * Is nullable.
+   *
+   * @return the boolean
+   */
+  public boolean isNullable() {
+    return this.nullable;
   }
 
   /**
@@ -244,12 +154,91 @@ public class CsdlTerm extends CsdlAbstractEdmItem implements CsdlNamed, CsdlAnno
   }
 
   /**
-   * Gets srid.
+   * Sets applies to.
    *
-   * @return the srid
+   * @param appliesTo the applies to
+   * @return the applies to
    */
-  public SRID getSrid() {
-    return srid;
+  public CsdlTerm setAppliesTo(final List<String> appliesTo) {
+    this.appliesTo = appliesTo;
+    return this;
+  }
+
+  /**
+   * Sets base term.
+   *
+   * @param baseTerm the base term
+   * @return the base term
+   */
+  public CsdlTerm setBaseTerm(final String baseTerm) {
+    this.baseTerm = baseTerm;
+    return this;
+  }
+
+  /**
+   * Sets default value.
+   *
+   * @param defaultValue the default value
+   * @return the default value
+   */
+  public CsdlTerm setDefaultValue(final String defaultValue) {
+    this.defaultValue = defaultValue;
+    return this;
+  }
+
+  /**
+   * Sets max length.
+   *
+   * @param maxLength the max length
+   * @return the max length
+   */
+  public CsdlTerm setMaxLength(final Integer maxLength) {
+    this.maxLength = maxLength;
+    return this;
+  }
+
+  /**
+   * Sets name.
+   *
+   * @param name the name
+   * @return the name
+   */
+  public CsdlTerm setName(final String name) {
+    this.name = name;
+    return this;
+  }
+
+  /**
+   * Sets nullable.
+   *
+   * @param nullable the nullable
+   * @return the nullable
+   */
+  public CsdlTerm setNullable(final boolean nullable) {
+    this.nullable = nullable;
+    return this;
+  }
+
+  /**
+   * Sets precision.
+   *
+   * @param precision the precision
+   * @return the precision
+   */
+  public CsdlTerm setPrecision(final Integer precision) {
+    this.precision = precision;
+    return this;
+  }
+
+  /**
+   * Sets scale.
+   *
+   * @param scale the scale
+   * @return the scale
+   */
+  public CsdlTerm setScale(final Integer scale) {
+    this.scale = scale;
+    return this;
   }
 
   /**
@@ -260,6 +249,17 @@ public class CsdlTerm extends CsdlAbstractEdmItem implements CsdlNamed, CsdlAnno
    */
   public CsdlTerm setSrid(final SRID srid) {
     this.srid = srid;
+    return this;
+  }
+
+  /**
+   * Sets type.
+   *
+   * @param type the type
+   * @return the type
+   */
+  public CsdlTerm setType(final String type) {
+    this.type = type;
     return this;
   }
 }

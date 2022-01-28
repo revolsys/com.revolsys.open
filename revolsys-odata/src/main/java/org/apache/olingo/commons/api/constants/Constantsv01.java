@@ -23,11 +23,11 @@ import org.apache.olingo.commons.api.IConstants;
 /**
  * Constant values related to the OData protocol.
  */
-public final class Constantsv01 implements IConstants{
+public final class Constantsv01 implements IConstants {
 
   // JSON stuff
   public static final String JSON_METADATA = "metadata";
-  
+
   public static final String JSON_TYPE = "@type";
 
   public static final String JSON_ID = "@id";
@@ -61,65 +61,10 @@ public final class Constantsv01 implements IConstants{
   public static final String JSON_NEXT_LINK = "@nextLink";
 
   public static final String JSON_DELTA_LINK = "@deltaLink";
-  
-  @Override
-  public String getMetadata() {
-    return JSON_METADATA;
-  }
 
   @Override
-  public String getType() {
-    return JSON_TYPE;
-  }
-
-  @Override
-  public String getId() {
-    return JSON_ID;
-  }
-
-  @Override
-  public String getReadLink() {
-    return JSON_READ_LINK;
-  }
-
-  @Override
-  public String getEditLink() {
-    return JSON_EDIT_LINK;
-  }
-
-  @Override
-  public String getContext() {
-    return JSON_CONTEXT;
-  }
-
-  @Override
-  public String getEtag() {
-    return JSON_ETAG;
-  }
-
-  @Override
-  public String getMediaEtag() {
-    return JSON_MEDIA_ETAG;
-  }
-
-  @Override
-  public String getMediaContentType() {
-    return JSON_MEDIA_CONTENT_TYPE;
-  }
-
-  @Override
-  public String getMediaReadLink() {
-    return JSON_MEDIA_READ_LINK;
-  }
-
-  @Override
-  public String getMediaEditLink() {
-    return JSON_MEDIA_EDIT_LINK;
-  }
-
-  @Override
-  public String getMetadataEtag() {
-    return JSON_METADATA_ETAG;
+  public String getAssociationLink() {
+    return JSON_ASSOCIATION_LINK;
   }
 
   @Override
@@ -128,13 +73,8 @@ public final class Constantsv01 implements IConstants{
   }
 
   @Override
-  public String getAssociationLink() {
-    return JSON_ASSOCIATION_LINK;
-  }
-
-  @Override
-  public String getNavigationLink() {
-    return JSON_NAVIGATION_LINK;
+  public String getContext() {
+    return JSON_CONTEXT;
   }
 
   @Override
@@ -143,12 +83,72 @@ public final class Constantsv01 implements IConstants{
   }
 
   @Override
+  public String getDeltaLink() {
+    return JSON_DELTA_LINK;
+  }
+
+  @Override
+  public String getEditLink() {
+    return JSON_EDIT_LINK;
+  }
+
+  @Override
+  public String getEtag() {
+    return JSON_ETAG;
+  }
+
+  @Override
+  public String getId() {
+    return JSON_ID;
+  }
+
+  @Override
+  public String getMediaContentType() {
+    return JSON_MEDIA_CONTENT_TYPE;
+  }
+
+  @Override
+  public String getMediaEditLink() {
+    return JSON_MEDIA_EDIT_LINK;
+  }
+
+  @Override
+  public String getMediaEtag() {
+    return JSON_MEDIA_ETAG;
+  }
+
+  @Override
+  public String getMediaReadLink() {
+    return JSON_MEDIA_READ_LINK;
+  }
+
+  @Override
+  public String getMetadata() {
+    return JSON_METADATA;
+  }
+
+  @Override
+  public String getMetadataEtag() {
+    return JSON_METADATA_ETAG;
+  }
+
+  @Override
+  public String getNavigationLink() {
+    return JSON_NAVIGATION_LINK;
+  }
+
+  @Override
   public String getNextLink() {
     return JSON_NEXT_LINK;
   }
 
   @Override
-  public String getDeltaLink() {
-    return JSON_DELTA_LINK;
+  public String getReadLink() {
+    return JSON_READ_LINK;
+  }
+
+  @Override
+  public String getType() {
+    return JSON_TYPE;
   }
 }

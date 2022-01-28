@@ -39,9 +39,9 @@ public final class EdmByte extends SingletonPrimitiveType {
   }
 
   @Override
-  protected <T> T internalValueOfString(final String value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode, final Class<T> returnType) throws EdmPrimitiveTypeException {
+  protected <T> T internalValueOfString(final String value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode,
+    final Class<T> returnType) throws EdmPrimitiveTypeException {
 
     Short valueShort;
     try {
@@ -56,33 +56,35 @@ public final class EdmByte extends SingletonPrimitiveType {
     try {
       return EdmInt64.convertNumber(valueShort, returnType);
     } catch (final IllegalArgumentException e) {
-      throw new EdmPrimitiveTypeException("The literal '" + value
-          + "' cannot be converted to value type " + returnType + ".", e);
+      throw new EdmPrimitiveTypeException(
+        "The literal '" + value + "' cannot be converted to value type " + returnType + ".", e);
     } catch (final ClassCastException e) {
       throw new EdmPrimitiveTypeException("The value type " + returnType + " is not supported.", e);
     }
   }
 
   @Override
-  protected <T> String internalValueToString(final T value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode) throws EdmPrimitiveTypeException {
+  protected <T> String internalValueToString(final T value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode)
+    throws EdmPrimitiveTypeException {
 
-    if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long) {
-      if (((Number) value).longValue() >= 0 && ((Number) value).longValue() < 1 << Byte.SIZE) {
+    if (value instanceof Byte || value instanceof Short || value instanceof Integer
+      || value instanceof Long) {
+      if (((Number)value).longValue() >= 0 && ((Number)value).longValue() < 1 << Byte.SIZE) {
         return value.toString();
       } else {
         throw new EdmPrimitiveTypeException("The value '" + value + "' is not valid.");
       }
     } else if (value instanceof BigInteger) {
-      if (((BigInteger) value).compareTo(BigInteger.ZERO) >= 0
-          && ((BigInteger) value).compareTo(BigInteger.valueOf(1 << Byte.SIZE)) < 0) {
+      if (((BigInteger)value).compareTo(BigInteger.ZERO) >= 0
+        && ((BigInteger)value).compareTo(BigInteger.valueOf(1 << Byte.SIZE)) < 0) {
         return value.toString();
       } else {
         throw new EdmPrimitiveTypeException("The value '" + value + "' is not valid.");
       }
     } else {
-      throw new EdmPrimitiveTypeException("The value type " + value.getClass() + " is not supported.");
+      throw new EdmPrimitiveTypeException(
+        "The value type " + value.getClass() + " is not supported.");
     }
   }
 }

@@ -22,9 +22,11 @@ import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.server.api.uri.UriResourceKind;
 import org.apache.olingo.server.api.uri.UriResourceLambdaVariable;
 
-public class UriResourceLambdaVarImpl extends UriResourceTypedImpl implements UriResourceLambdaVariable {
+public class UriResourceLambdaVarImpl extends UriResourceTypedImpl
+  implements UriResourceLambdaVariable {
 
   private final String variableText;
+
   private final EdmType type;
 
   public UriResourceLambdaVarImpl(final String variableText, final EdmType type) {
@@ -34,22 +36,22 @@ public class UriResourceLambdaVarImpl extends UriResourceTypedImpl implements Ur
   }
 
   @Override
-  public String getVariableName() {
-    return variableText;
+  public String getSegmentValue() {
+    return this.variableText;
   }
 
   @Override
   public EdmType getType() {
-    return type;
+    return this.type;
+  }
+
+  @Override
+  public String getVariableName() {
+    return this.variableText;
   }
 
   @Override
   public boolean isCollection() {
     return false;
-  }
-
-  @Override
-  public String getSegmentValue() {
-    return variableText;
   }
 }

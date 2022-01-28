@@ -39,6 +39,7 @@ public interface ActionPrimitiveCollectionProcessor extends Processor {
    * @throws ODataApplicationException if the service implementation encounters a failure
    * @throws ODataLibraryException
    */
-  void processActionPrimitiveCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo,
-      ContentType requestFormat, ContentType responseFormat) throws ODataApplicationException, ODataLibraryException;
+  void processActionPrimitiveCollection(ODataRequest request, ODataResponse response,
+    UriInfo uriInfo, ContentType requestFormat, ContentType responseFormat)
+    throws ODataApplicationException, ODataLibraryException;
 }

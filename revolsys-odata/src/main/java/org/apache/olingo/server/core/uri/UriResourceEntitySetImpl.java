@@ -24,7 +24,8 @@ import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.server.api.uri.UriResourceEntitySet;
 import org.apache.olingo.server.api.uri.UriResourceKind;
 
-public class UriResourceEntitySetImpl extends UriResourceWithKeysImpl implements UriResourceEntitySet {
+public class UriResourceEntitySetImpl extends UriResourceWithKeysImpl
+  implements UriResourceEntitySet {
 
   private final EdmEntitySet edmEntitySet;
 
@@ -35,26 +36,26 @@ public class UriResourceEntitySetImpl extends UriResourceWithKeysImpl implements
 
   @Override
   public EdmEntitySet getEntitySet() {
-    return edmEntitySet;
+    return this.edmEntitySet;
   }
 
   @Override
   public EdmEntityType getEntityType() {
-    return edmEntitySet.getEntityType();
-  }
-
-  @Override
-  public EdmType getType() {
-    return edmEntitySet.getEntityType();
-  }
-
-  @Override
-  public boolean isCollection() {
-    return keyPredicates == null;
+    return this.edmEntitySet.getEntityType();
   }
 
   @Override
   public String getSegmentValue() {
-    return edmEntitySet.getName();
+    return this.edmEntitySet.getName();
+  }
+
+  @Override
+  public EdmType getType() {
+    return this.edmEntitySet.getEntityType();
+  }
+
+  @Override
+  public boolean isCollection() {
+    return this.keyPredicates == null;
   }
 }

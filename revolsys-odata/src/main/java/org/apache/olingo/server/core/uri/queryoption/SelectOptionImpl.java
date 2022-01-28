@@ -33,14 +33,15 @@ public class SelectOptionImpl extends SystemQueryOptionImpl implements SelectOpt
     setKind(SystemQueryOptionKind.SELECT);
   }
 
+  @Override
+  public List<SelectItem> getSelectItems() {
+    return this.selectItems == null ? Collections.<SelectItem> emptyList()
+      : Collections.unmodifiableList(this.selectItems);
+  }
+
   public SelectOptionImpl setSelectItems(final List<SelectItem> selectItems) {
     this.selectItems = selectItems;
     return this;
-  }
-
-  @Override
-  public List<SelectItem> getSelectItems() {
-    return selectItems == null ? Collections.<SelectItem> emptyList() : Collections.unmodifiableList(selectItems);
   }
 
 }

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -29,16 +29,6 @@ import org.apache.olingo.server.api.uri.UriInfoResource;
 public interface SelectItem {
 
   /**
-   * @return A star is used as select item
-   */
-  boolean isStar();
-
-  /**
-   * @return Namespace and star is used as select item in order to select operations
-   */
-  boolean isAllOperationsInSchema();
-
-  /**
    * @return Namespace when a star is used in combination with an namespace
    */
   FullQualifiedName getAllOperationsInSchemaNameSpace();
@@ -53,5 +43,15 @@ public interface SelectItem {
    * For example: ...Suppliers?$select=Namespace.PreferredSupplier/AccountRepresentative
    */
   EdmType getStartTypeFilter();
+
+  /**
+   * @return Namespace and star is used as select item in order to select operations
+   */
+  boolean isAllOperationsInSchema();
+
+  /**
+   * @return A star is used as select item
+   */
+  boolean isStar();
 
 }

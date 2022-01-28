@@ -23,4 +23,3 @@
  *
  */
 package org.apache.olingo.server.api.deserializer;
-

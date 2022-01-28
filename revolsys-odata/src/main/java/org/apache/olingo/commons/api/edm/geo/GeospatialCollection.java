@@ -33,14 +33,14 @@ public class GeospatialCollection extends ComposedGeospatial<Geospatial> {
    * @param srid          SRID Value
    * @param geospatials   Members of the collection
    */
-  public GeospatialCollection(final Dimension dimension, final SRID srid, final List<Geospatial> geospatials) {
+  public GeospatialCollection(final Dimension dimension, final SRID srid,
+    final List<Geospatial> geospatials) {
     super(dimension, Type.GEOSPATIALCOLLECTION, srid, geospatials);
   }
 
   @Override
   public EdmPrimitiveTypeKind getEdmPrimitiveTypeKind() {
-    return dimension == Dimension.GEOGRAPHY ?
-        EdmPrimitiveTypeKind.GeographyCollection :
-        EdmPrimitiveTypeKind.GeometryCollection;
+    return this.dimension == Dimension.GEOGRAPHY ? EdmPrimitiveTypeKind.GeographyCollection
+      : EdmPrimitiveTypeKind.GeometryCollection;
   }
 }

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -30,14 +30,14 @@ import org.apache.olingo.commons.api.edm.EdmType;
 public interface UriResourceNavigation extends UriResourcePartTyped {
 
   /**
-   * @return Navigation property
-   */
-  EdmNavigationProperty getProperty();
-
-  /**
    * @return Key predicates if used, otherwise an empty list
    */
   List<UriParameter> getKeyPredicates();
+
+  /**
+   * @return Navigation property
+   */
+  EdmNavigationProperty getProperty();
 
   /**
    * @return Type filter before key predicates if used, otherwise null

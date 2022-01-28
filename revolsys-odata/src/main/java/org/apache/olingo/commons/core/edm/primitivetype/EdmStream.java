@@ -41,25 +41,9 @@ public final class EdmStream extends SingletonPrimitiveType {
   }
 
   @Override
-  public boolean validate(final String value, final Boolean isNullable, final Integer maxLength,
-      final Integer precision, final Integer scale, final Boolean isUnicode) {
-
-    if (value == null) {
-      return isNullable == null || isNullable;
-    }
-
-    try {
-      new URI(value);
-      return true;
-    } catch (final URISyntaxException e) {
-      return false;
-    }
-  }
-
-  @Override
-  protected <T> T internalValueOfString(final String value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode, final Class<T> returnType) throws EdmPrimitiveTypeException {
+  protected <T> T internalValueOfString(final String value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode,
+    final Class<T> returnType) throws EdmPrimitiveTypeException {
 
     URI stream = null;
     try {
@@ -71,7 +55,7 @@ public final class EdmStream extends SingletonPrimitiveType {
     if (returnType.isAssignableFrom(URI.class)) {
       return returnType.cast(stream);
     } else if (returnType.isAssignableFrom(Link.class)) {
-      Link link = new Link();
+      final Link link = new Link();
       link.setHref(value);
       return returnType.cast(link);
     } else {
@@ -80,16 +64,33 @@ public final class EdmStream extends SingletonPrimitiveType {
   }
 
   @Override
-  protected <T> String internalValueToString(final T value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode) throws EdmPrimitiveTypeException {
+  protected <T> String internalValueToString(final T value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode)
+    throws EdmPrimitiveTypeException {
 
     if (value instanceof URI) {
-      return ((URI) value).toASCIIString();
+      return ((URI)value).toASCIIString();
     } else if (value instanceof Link) {
       return ((Link)value).getHref();
     } else {
-      throw new EdmPrimitiveTypeException("The value type " + value.getClass() + " is not supported.");
+      throw new EdmPrimitiveTypeException(
+        "The value type " + value.getClass() + " is not supported.");
+    }
+  }
+
+  @Override
+  public boolean validate(final String value, final Boolean isNullable, final Integer maxLength,
+    final Integer precision, final Integer scale, final Boolean isUnicode) {
+
+    if (value == null) {
+      return isNullable == null || isNullable;
+    }
+
+    try {
+      new URI(value);
+      return true;
+    } catch (final URISyntaxException e) {
+      return false;
     }
   }
 }

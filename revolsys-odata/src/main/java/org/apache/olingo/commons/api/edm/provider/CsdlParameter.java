@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -27,7 +27,7 @@ import org.apache.olingo.commons.api.edm.geo.SRID;
 /**
  * The type Csdl parameter.
  */
-public class CsdlParameter extends CsdlAbstractEdmItem implements CsdlNamed, CsdlAnnotatable {
+public class CsdlParameter implements CsdlAbstractEdmItem, CsdlNamed, CsdlAnnotatable {
 
   private String name;
 
@@ -48,11 +48,140 @@ public class CsdlParameter extends CsdlAbstractEdmItem implements CsdlNamed, Csd
 
   private SRID srid;
 
-  private List<CsdlAnnotation> annotations = new ArrayList<CsdlAnnotation>();
+  private List<CsdlAnnotation> annotations = new ArrayList<>();
+
+  @Override
+  public List<CsdlAnnotation> getAnnotations() {
+    return this.annotations;
+  }
+
+  /**
+   * Gets mapping.
+   *
+   * @return the mapping
+   */
+  public CsdlMapping getMapping() {
+    return this.mapping;
+  }
+
+  /**
+   * Gets max length.
+   *
+   * @return the max length
+   */
+  public Integer getMaxLength() {
+    return this.maxLength;
+  }
 
   @Override
   public String getName() {
-    return name;
+    return this.name;
+  }
+
+  /**
+   * Gets precision.
+   *
+   * @return the precision
+   */
+  public Integer getPrecision() {
+    return this.precision;
+  }
+
+  /**
+   * Gets scale.
+   *
+   * @return the scale
+   */
+  public Integer getScale() {
+    return this.scale;
+  }
+
+  /**
+   * Gets srid.
+   *
+   * @return the srid
+   */
+  public SRID getSrid() {
+    return this.srid;
+  }
+
+  /**
+   * Gets type.
+   *
+   * @return the type
+   */
+  public String getType() {
+    return this.type;
+  }
+
+  /**
+   * Gets type fQN.
+   *
+   * @return the type fQN
+   */
+  public FullQualifiedName getTypeFQN() {
+    return new FullQualifiedName(this.type);
+  }
+
+  /**
+   * Is collection.
+   *
+   * @return the boolean
+   */
+  public boolean isCollection() {
+    return this.isCollection;
+  }
+
+  /**
+   * Is nullable.
+   *
+   * @return the boolean
+   */
+  public boolean isNullable() {
+    return this.nullable;
+  }
+
+  /**
+   * Sets a list of annotations
+   * @param annotations list of annotations
+   * @return this instance
+   */
+  public CsdlParameter setAnnotations(final List<CsdlAnnotation> annotations) {
+    this.annotations = annotations;
+    return this;
+  }
+
+  /**
+   * Sets collection.
+   *
+   * @param isCollection the is collection
+   * @return the collection
+   */
+  public CsdlParameter setCollection(final boolean isCollection) {
+    this.isCollection = isCollection;
+    return this;
+  }
+
+  /**
+   * Sets mapping.
+   *
+   * @param mapping the mapping
+   * @return the mapping
+   */
+  public CsdlParameter setMapping(final CsdlMapping mapping) {
+    this.mapping = mapping;
+    return this;
+  }
+
+  /**
+   * Sets max length.
+   *
+   * @param maxLength the max length
+   * @return the max length
+   */
+  public CsdlParameter setMaxLength(final Integer maxLength) {
+    this.maxLength = maxLength;
+    return this;
   }
 
   /**
@@ -67,31 +196,46 @@ public class CsdlParameter extends CsdlAbstractEdmItem implements CsdlNamed, Csd
   }
 
   /**
-   * Gets type.
+   * Sets nullable.
    *
-   * @return the type
+   * @param nullable the nullable
+   * @return the nullable
    */
-  public String getType() {
-    return type;
+  public CsdlParameter setNullable(final boolean nullable) {
+    this.nullable = nullable;
+    return this;
   }
 
   /**
-   * Gets type fQN.
+   * Sets precision.
    *
-   * @return the type fQN
+   * @param precision the precision
+   * @return the precision
    */
-  public FullQualifiedName getTypeFQN() {
-    return new FullQualifiedName(type);
+  public CsdlParameter setPrecision(final Integer precision) {
+    this.precision = precision;
+    return this;
   }
 
   /**
-   * Sets type.
+   * Sets scale.
    *
-   * @param type the type
-   * @return the type
+   * @param scale the scale
+   * @return the scale
    */
-  public CsdlParameter setType(final String type) {
-    this.type = type;
+  public CsdlParameter setScale(final Integer scale) {
+    this.scale = scale;
+    return this;
+  }
+
+  /**
+   * Sets srid.
+   *
+   * @param srid the srid
+   * @return the srid
+   */
+  public CsdlParameter setSrid(final SRID srid) {
+    this.srid = srid;
     return this;
   }
 
@@ -107,157 +251,13 @@ public class CsdlParameter extends CsdlAbstractEdmItem implements CsdlNamed, Csd
   }
 
   /**
-   * Is collection.
+   * Sets type.
    *
-   * @return the boolean
+   * @param type the type
+   * @return the type
    */
-  public boolean isCollection() {
-    return isCollection;
-  }
-
-  /**
-   * Sets collection.
-   *
-   * @param isCollection the is collection
-   * @return the collection
-   */
-  public CsdlParameter setCollection(final boolean isCollection) {
-    this.isCollection = isCollection;
-    return this;
-  }
-
-  /**
-   * Is nullable.
-   *
-   * @return the boolean
-   */
-  public boolean isNullable() {
-    return nullable;
-  }
-
-  /**
-   * Sets nullable.
-   *
-   * @param nullable the nullable
-   * @return the nullable
-   */
-  public CsdlParameter setNullable(final boolean nullable) {
-    this.nullable = nullable;
-    return this;
-  }
-
-  /**
-   * Gets max length.
-   *
-   * @return the max length
-   */
-  public Integer getMaxLength() {
-    return maxLength;
-  }
-
-  /**
-   * Sets max length.
-   *
-   * @param maxLength the max length
-   * @return the max length
-   */
-  public CsdlParameter setMaxLength(final Integer maxLength) {
-    this.maxLength = maxLength;
-    return this;
-  }
-
-  /**
-   * Gets precision.
-   *
-   * @return the precision
-   */
-  public Integer getPrecision() {
-    return precision;
-  }
-
-  /**
-   * Sets precision.
-   *
-   * @param precision the precision
-   * @return the precision
-   */
-  public CsdlParameter setPrecision(final Integer precision) {
-    this.precision = precision;
-    return this;
-  }
-
-  /**
-   * Gets scale.
-   *
-   * @return the scale
-   */
-  public Integer getScale() {
-    return scale;
-  }
-
-  /**
-   * Sets scale.
-   *
-   * @param scale the scale
-   * @return the scale
-   */
-  public CsdlParameter setScale(final Integer scale) {
-    this.scale = scale;
-    return this;
-  }
-
-  /**
-   * Gets srid.
-   *
-   * @return the srid
-   */
-  public SRID getSrid() {
-    return srid;
-  }
-
-  /**
-   * Sets srid.
-   *
-   * @param srid the srid
-   * @return the srid
-   */
-  public CsdlParameter setSrid(final SRID srid) {
-    this.srid = srid;
-    return this;
-  }
-
-  @Override
-  public List<CsdlAnnotation> getAnnotations() {
-    return annotations;
-  }
-
-  /**
-   * Sets a list of annotations
-   * @param annotations list of annotations
-   * @return this instance
-   */
-  public CsdlParameter setAnnotations(final List<CsdlAnnotation> annotations) {
-    this.annotations = annotations;
-    return this;
-  }
-
-  /**
-   * Gets mapping.
-   *
-   * @return the mapping
-   */
-  public CsdlMapping getMapping() {
-    return mapping;
-  }
-
-  /**
-   * Sets mapping.
-   *
-   * @param mapping the mapping
-   * @return the mapping
-   */
-  public CsdlParameter setMapping(final CsdlMapping mapping) {
-    this.mapping = mapping;
+  public CsdlParameter setType(final String type) {
+    this.type = type;
     return this;
   }
 }

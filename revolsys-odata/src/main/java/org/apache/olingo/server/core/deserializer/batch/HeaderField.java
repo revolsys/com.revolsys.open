@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -23,7 +23,9 @@ import java.util.List;
 
 public class HeaderField implements Cloneable {
   private final String fieldName;
+
   private final int lineNumber;
+
   private List<String> values;
 
   public HeaderField(final String fieldName, final int lineNumber) {
@@ -36,18 +38,55 @@ public class HeaderField implements Cloneable {
     this.lineNumber = lineNumber;
   }
 
-  public String getFieldName() {
-    return fieldName;
+  @Override
+  public HeaderField clone() throws CloneNotSupportedException {
+    final HeaderField clone = (HeaderField)super.clone();
+    clone.values = new ArrayList<>(this.values.size());
+    clone.values.addAll(this.values);
+    return clone;
   }
 
-  public List<String> getValues() {
-    return values;
+  @Override
+  public boolean equals(final Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if ((obj == null) || (getClass() != obj.getClass())) {
+      return false;
+    }
+    final HeaderField other = (HeaderField)obj;
+    if (this.fieldName == null) {
+      if (other.fieldName != null) {
+        return false;
+      }
+    } else if (!this.fieldName.equals(other.fieldName)) {
+      return false;
+    }
+    if (this.lineNumber != other.lineNumber) {
+      return false;
+    }
+    if (this.values == null) {
+      if (other.values != null) {
+        return false;
+      }
+    } else if (!this.values.equals(other.values)) {
+      return false;
+    }
+    return true;
+  }
+
+  public String getFieldName() {
+    return this.fieldName;
+  }
+
+  public int getLineNumber() {
+    return this.lineNumber;
   }
 
   public String getValue() {
     final StringBuilder result = new StringBuilder();
 
-    for (final String value : values) {
+    for (final String value : this.values) {
       result.append(value);
       result.append(", ");
     }
@@ -59,57 +98,17 @@ public class HeaderField implements Cloneable {
     return result.toString();
   }
 
-  @Override
-  public HeaderField clone() throws CloneNotSupportedException{
-    HeaderField clone = (HeaderField) super.clone();
-    clone.values = new ArrayList<>(values.size());
-    clone.values.addAll(values);
-    return clone;
-  }
-
-  public int getLineNumber() {
-    return lineNumber;
+  public List<String> getValues() {
+    return this.values;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((fieldName == null) ? 0 : fieldName.hashCode());
-    result = prime * result + lineNumber;
-    result = prime * result + ((values == null) ? 0 : values.hashCode());
+    result = prime * result + (this.fieldName == null ? 0 : this.fieldName.hashCode());
+    result = prime * result + this.lineNumber;
+    result = prime * result + (this.values == null ? 0 : this.values.hashCode());
     return result;
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    HeaderField other = (HeaderField) obj;
-    if (fieldName == null) {
-      if (other.fieldName != null) {
-        return false;
-      }
-    } else if (!fieldName.equals(other.fieldName)) {
-      return false;
-    }
-    if (lineNumber != other.lineNumber) {
-      return false;
-    }
-    if (values == null) {
-      if (other.values != null) {
-        return false;
-      }
-    } else if (!values.equals(other.values)) {
-      return false;
-    }
-    return true;
   }
 }

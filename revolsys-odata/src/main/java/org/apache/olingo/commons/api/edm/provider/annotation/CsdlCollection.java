@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -28,39 +28,9 @@ import java.util.List;
  */
 public class CsdlCollection extends CsdlDynamicExpression {
 
-  private List<CsdlExpression> items = new ArrayList<CsdlExpression>();
+  private List<CsdlExpression> items = new ArrayList<>();
 
-  /**
-   * Returns a list of child expression
-   * @return List of child expression
-   */
-  public List<CsdlExpression> getItems() {
-    return items;
-  }
-
-  /**
-   * Returns a list of child expression
-   * @return List of child expression
-   */
-  public CsdlCollection setItems(List<CsdlExpression> items) {
-    this.items = items;
-    return this;
-  }
-  
-  @Override
-  public boolean equals (Object obj) {
-    if (obj == null) {
-      return false;
-    }
-    if (!(obj instanceof CsdlCollection)) {
-      return false;
-    }
-    CsdlCollection annotColl = (CsdlCollection) obj;
-    return (this.getItems() == null ? annotColl.getItems() == null :
-      checkItems(annotColl.getItems()));
-  }
-  
-  private boolean checkItems(List<CsdlExpression> annotCollItems) {
+  private boolean checkItems(final List<CsdlExpression> annotCollItems) {
     if (annotCollItems == null) {
       return false;
     }
@@ -77,10 +47,37 @@ public class CsdlCollection extends CsdlDynamicExpression {
   }
 
   @Override
+  public boolean equals(final Object obj) {
+    if ((obj == null) || !(obj instanceof CsdlCollection)) {
+      return false;
+    }
+    final CsdlCollection annotColl = (CsdlCollection)obj;
+    return this.getItems() == null ? annotColl.getItems() == null
+      : checkItems(annotColl.getItems());
+  }
+
+  /**
+   * Returns a list of child expression
+   * @return List of child expression
+   */
+  public List<CsdlExpression> getItems() {
+    return this.items;
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((items == null) ? 0 : items.hashCode());
+    result = prime * result + (this.items == null ? 0 : this.items.hashCode());
     return result;
+  }
+
+  /**
+   * Returns a list of child expression
+   * @return List of child expression
+   */
+  public CsdlCollection setItems(final List<CsdlExpression> items) {
+    this.items = items;
+    return this;
   }
 }

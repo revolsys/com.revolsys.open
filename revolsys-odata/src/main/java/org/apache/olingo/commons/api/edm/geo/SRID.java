@@ -37,12 +37,9 @@ import org.apache.olingo.commons.api.edm.geo.Geospatial.Dimension;
 public final class SRID implements Serializable {
 
   private static final long serialVersionUID = 8412685060902464629L;
+
   private static final String VARIABLE = "variable";
 
-  private Dimension dimension = Dimension.GEOGRAPHY;
-  private Integer value;
-  private Boolean variable;
-  
   /**
    * Creates a new SRID instance from a given value.
    * @param exp Either "variable" or a numeric non-negative SRID value
@@ -57,15 +54,39 @@ public final class SRID implements Serializable {
       instance.value = Integer.valueOf(exp);
       if (instance.value < 0) {
         throw new IllegalArgumentException(
-            "The value of the SRID attribute MUST be a non-negative integer or the special value 'variable'");
+          "The value of the SRID attribute MUST be a non-negative integer or the special value 'variable'");
       }
     }
 
     return instance;
   }
 
+  private Dimension dimension = Dimension.GEOGRAPHY;
+
+  private Integer value;
+
+  private Boolean variable;
+
   protected SRID() {
     // empty constructor for package instantiation
+  }
+
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    final SRID srid = (SRID)o;
+
+    if ((this.dimension != srid.dimension) || (this.value != null ? !this.value.equals(srid.value) : srid.value != null)) {
+      return false;
+    }
+    return !(this.variable != null ? !this.variable.equals(srid.variable) : srid.variable != null);
+
   }
 
   /**
@@ -73,7 +94,28 @@ public final class SRID implements Serializable {
    * @return dimension of the SRID instance
    */
   public Dimension getDimension() {
-    return dimension;
+    return this.dimension;
+  }
+
+  private String getValue() {
+    return this.value == null ? this.dimension == Dimension.GEOMETRY ? "0" : "4326"
+      : this.value.toString();
+  }
+
+  @Override
+  public int hashCode() {
+    int result = this.dimension != null ? this.dimension.hashCode() : 0;
+    result = 31 * result + (this.value != null ? this.value.hashCode() : 0);
+    result = 31 * result + (this.variable != null ? this.variable.hashCode() : 0);
+    return result;
+  }
+
+  /**
+   * Returns true if the value of the instance is not equals to the default (uninitialized).
+   * @return true if the value of the instance is not equals to the default (uninitialized)
+   */
+  public boolean isNotDefault() {
+    return this.value != null || this.variable != null;
   }
 
   /**
@@ -84,51 +126,8 @@ public final class SRID implements Serializable {
     this.dimension = dimension;
   }
 
-  private String getValue() {
-    return value == null ?
-        dimension == Dimension.GEOMETRY ? "0" : "4326" :
-        value.toString();
-  }
-
-  /**
-   * Returns true if the value of the instance is not equals to the default (uninitialized).
-   * @return true if the value of the instance is not equals to the default (uninitialized)
-   */
-  public boolean isNotDefault() {
-    return value != null || variable != null;
-  }
-
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    SRID srid = (SRID) o;
-
-    if (dimension != srid.dimension) {
-      return false;
-    }
-    if (value != null ? !value.equals(srid.value) : srid.value != null) {
-      return false;
-    }
-    return !(variable != null ? !variable.equals(srid.variable) : srid.variable != null);
-
-  }
-
-  @Override
-  public int hashCode() {
-    int result = dimension != null ? dimension.hashCode() : 0;
-    result = 31 * result + (value != null ? value.hashCode() : 0);
-    result = 31 * result + (variable != null ? variable.hashCode() : 0);
-    return result;
-  }
-
   @Override
   public String toString() {
-    return variable != null && variable ? VARIABLE : getValue();
+    return this.variable != null && this.variable ? VARIABLE : getValue();
   }
 }

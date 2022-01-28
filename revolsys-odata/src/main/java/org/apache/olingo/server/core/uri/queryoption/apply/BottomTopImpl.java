@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -29,7 +29,9 @@ import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
 public class BottomTopImpl implements BottomTop {
 
   private Method method;
+
   private Expression number;
+
   private Expression value;
 
   @Override
@@ -39,7 +41,17 @@ public class BottomTopImpl implements BottomTop {
 
   @Override
   public Method getMethod() {
-    return method;
+    return this.method;
+  }
+
+  @Override
+  public Expression getNumber() {
+    return this.number;
+  }
+
+  @Override
+  public Expression getValue() {
+    return this.value;
   }
 
   public BottomTopImpl setMethod(final Method method) {
@@ -47,19 +59,9 @@ public class BottomTopImpl implements BottomTop {
     return this;
   }
 
-  @Override
-  public Expression getNumber() {
-    return number;
-  }
-
   public BottomTopImpl setNumber(final Expression number) {
     this.number = number;
     return this;
-  }
-
-  @Override
-  public Expression getValue() {
-    return value;
   }
 
   public BottomTopImpl setValue(final Expression value) {

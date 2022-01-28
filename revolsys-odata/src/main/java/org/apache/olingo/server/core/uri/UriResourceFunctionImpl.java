@@ -31,14 +31,17 @@ import org.apache.olingo.server.api.uri.UriResourceKind;
 /**
  * Covers Function imports and BoundFunction in URI
  */
-public class UriResourceFunctionImpl extends UriResourceWithKeysImpl implements UriResourceFunction {
+public class UriResourceFunctionImpl extends UriResourceWithKeysImpl
+  implements UriResourceFunction {
 
   private final EdmFunctionImport functionImport;
+
   private final EdmFunction function;
+
   private final List<UriParameter> parameters;
 
-  public UriResourceFunctionImpl(final EdmFunctionImport edmFunctionImport, final EdmFunction function,
-      final List<UriParameter> parameters) {
+  public UriResourceFunctionImpl(final EdmFunctionImport edmFunctionImport,
+    final EdmFunction function, final List<UriParameter> parameters) {
     super(UriResourceKind.function);
     this.functionImport = edmFunctionImport;
     this.function = function;
@@ -46,34 +49,34 @@ public class UriResourceFunctionImpl extends UriResourceWithKeysImpl implements 
   }
 
   @Override
-  public List<UriParameter> getParameters() {
-    return parameters == null ?
-        Collections.<UriParameter> emptyList() :
-          Collections.unmodifiableList(parameters);
-  }
-
-  @Override
   public EdmFunction getFunction() {
-    return function;
+    return this.function;
   }
 
   @Override
   public EdmFunctionImport getFunctionImport() {
-    return functionImport;
+    return this.functionImport;
   }
 
   @Override
-  public EdmType getType() {
-    return function.getReturnType().getType();
-  }
-
-  @Override
-  public boolean isCollection() {
-    return keyPredicates == null && function.getReturnType().isCollection();
+  public List<UriParameter> getParameters() {
+    return this.parameters == null ? Collections.<UriParameter> emptyList()
+      : Collections.unmodifiableList(this.parameters);
   }
 
   @Override
   public String getSegmentValue() {
-    return functionImport == null ? (function == null ? "" : function.getName()) : functionImport.getName();
+    return this.functionImport == null ? this.function == null ? "" : this.function.getName()
+      : this.functionImport.getName();
+  }
+
+  @Override
+  public EdmType getType() {
+    return this.function.getReturnType().getType();
+  }
+
+  @Override
+  public boolean isCollection() {
+    return this.keyPredicates == null && this.function.getReturnType().isCollection();
   }
 }

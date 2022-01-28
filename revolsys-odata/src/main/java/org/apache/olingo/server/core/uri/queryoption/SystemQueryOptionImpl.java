@@ -27,16 +27,16 @@ public abstract class SystemQueryOptionImpl extends QueryOptionImpl implements S
 
   @Override
   public SystemQueryOptionKind getKind() {
-    return kind;
-  }
-
-  protected void setKind(final SystemQueryOptionKind kind) {
-    this.kind = kind;
+    return this.kind;
   }
 
   @Override
   public String getName() {
-    return kind.toString();
+    return this.kind.toString();
+  }
+
+  protected void setKind(final SystemQueryOptionKind kind) {
+    this.kind = kind;
   }
 
 }

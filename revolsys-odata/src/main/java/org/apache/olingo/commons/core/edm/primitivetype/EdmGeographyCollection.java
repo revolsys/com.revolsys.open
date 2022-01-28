@@ -36,12 +36,12 @@ public final class EdmGeographyCollection extends AbstractGeospatialType<Geospat
   }
 
   @Override
-  protected <T> T internalValueOfString(final String value, final Boolean isNullable, final Integer maxLength,
-      final Integer precision, final Integer scale, final Boolean isUnicode,
-      final Class<T> returnType) throws EdmPrimitiveTypeException {
+  protected <T> T internalValueOfString(final String value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode,
+    final Class<T> returnType) throws EdmPrimitiveTypeException {
 
-    final GeospatialCollection collection =
-        stringToCollection(value, isNullable, maxLength, precision, scale, isUnicode);
+    final GeospatialCollection collection = stringToCollection(value, isNullable, maxLength,
+      precision, scale, isUnicode);
     if (returnType.isAssignableFrom(GeospatialCollection.class)) {
       return returnType.cast(collection);
     } else {
@@ -50,13 +50,16 @@ public final class EdmGeographyCollection extends AbstractGeospatialType<Geospat
   }
 
   @Override
-  protected <T> String internalValueToString(final T value, final Boolean isNullable, final Integer maxLength,
-      final Integer precision, final Integer scale, final Boolean isUnicode) throws EdmPrimitiveTypeException {
+  protected <T> String internalValueToString(final T value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode)
+    throws EdmPrimitiveTypeException {
 
     if (value instanceof GeospatialCollection) {
-      return toString((GeospatialCollection) value, isNullable, maxLength, precision, scale, isUnicode);
+      return toString((GeospatialCollection)value, isNullable, maxLength, precision, scale,
+        isUnicode);
     }
 
-    throw new EdmPrimitiveTypeException("The value type " + value.getClass() + " is not supported.");
+    throw new EdmPrimitiveTypeException(
+      "The value type " + value.getClass() + " is not supported.");
   }
 }

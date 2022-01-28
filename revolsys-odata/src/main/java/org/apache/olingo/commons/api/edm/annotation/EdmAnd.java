@@ -19,7 +19,7 @@
 package org.apache.olingo.commons.api.edm.annotation;
 
 /**
- * Represents a logical and annotation 
+ * Represents a logical and annotation
  */
 public interface EdmAnd extends EdmLogicalOrComparisonExpression {
   // No additional methods needed for now.

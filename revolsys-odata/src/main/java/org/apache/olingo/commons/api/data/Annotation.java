@@ -25,12 +25,25 @@ public class Annotation extends Valuable {
 
   private String term;
 
+  @Override
+  public boolean equals(final Object o) {
+    return super.equals(o) && (this.term == null ? ((Annotation)o).term == null
+      : this.term.equals(((Annotation)o).term));
+  }
+
   /**
    * Get term for Annotation.
    * @return term for Annotation.
    */
   public String getTerm() {
-    return term;
+    return this.term;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = super.hashCode();
+    result = 31 * result + (this.term == null ? 0 : this.term.hashCode());
+    return result;
   }
 
   /**
@@ -42,20 +55,7 @@ public class Annotation extends Valuable {
   }
 
   @Override
-  public boolean equals(final Object o) {
-    return super.equals(o)
-        && (term == null ? ((Annotation) o).term == null : term.equals(((Annotation) o).term));
-  }
-
-  @Override
-  public int hashCode() {
-    int result = super.hashCode();
-    result = 31 * result + (term == null ? 0 : term.hashCode());
-    return result;
-  }
-
-  @Override
   public String toString() {
-    return term == null ? "null" : term;
+    return this.term == null ? "null" : this.term;
   }
 }

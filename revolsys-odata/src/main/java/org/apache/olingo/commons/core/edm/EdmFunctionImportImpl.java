@@ -32,33 +32,33 @@ public class EdmFunctionImportImpl extends AbstractEdmOperationImport implements
   private final CsdlFunctionImport functionImport;
 
   public EdmFunctionImportImpl(final Edm edm, final EdmEntityContainer container,
-      final CsdlFunctionImport functionImport) {
+    final CsdlFunctionImport functionImport) {
     super(edm, container, functionImport);
     this.functionImport = functionImport;
   }
 
   @Override
   public FullQualifiedName getFunctionFqn() {
-    return functionImport.getFunctionFQN();
+    return this.functionImport.getFunctionFQN();
+  }
+
+  @Override
+  public String getTitle() {
+    return this.functionImport.getTitle();
   }
 
   @Override
   public EdmFunction getUnboundFunction(final List<String> parameterNames) {
-    return edm.getUnboundFunction(getFunctionFqn(), parameterNames);
+    return this.edm.getUnboundFunction(getFunctionFqn(), parameterNames);
   }
 
   @Override
   public List<EdmFunction> getUnboundFunctions() {
-    return edm.getUnboundFunctions(getFunctionFqn());
+    return this.edm.getUnboundFunctions(getFunctionFqn());
   }
 
   @Override
   public boolean isIncludeInServiceDocument() {
-    return functionImport.isIncludeInServiceDocument();
-  }
-  
-  @Override
-  public String getTitle() {
-    return functionImport.getTitle();
+    return this.functionImport.isIncludeInServiceDocument();
   }
 }

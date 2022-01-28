@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -28,29 +28,30 @@ import org.apache.olingo.commons.core.edm.AbstractEdmAnnotatable;
 public class EdmPropertyValueImpl extends AbstractEdmAnnotatable implements EdmPropertyValue {
 
   private EdmExpression value;
-  private CsdlPropertyValue csdlExp;
 
-  public EdmPropertyValueImpl(Edm edm, CsdlPropertyValue csdlExp) {
+  private final CsdlPropertyValue csdlExp;
+
+  public EdmPropertyValueImpl(final Edm edm, final CsdlPropertyValue csdlExp) {
     super(edm, csdlExp);
     this.csdlExp = csdlExp;
   }
 
   @Override
   public String getProperty() {
-    if (csdlExp.getProperty() == null) {
+    if (this.csdlExp.getProperty() == null) {
       throw new EdmException("PropertyValue expressions require a referenced property value.");
     }
-    return csdlExp.getProperty();
+    return this.csdlExp.getProperty();
   }
 
   @Override
   public EdmExpression getValue() {
-    if (value == null) {
-      if (csdlExp.getValue() == null) {
+    if (this.value == null) {
+      if (this.csdlExp.getValue() == null) {
         throw new EdmException("PropertyValue expressions require an expression value.");
       }
-      value = AbstractEdmExpression.getExpression(edm, csdlExp.getValue());
+      this.value = AbstractEdmExpression.getExpression(this.edm, this.csdlExp.getValue());
     }
-    return value;
+    return this.value;
   }
 }

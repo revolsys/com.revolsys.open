@@ -31,18 +31,6 @@ import org.apache.olingo.server.api.uri.UriInfo;
 public interface MediaEntityProcessor extends EntityProcessor {
 
   /**
-   * Reads entity media data from persistence and puts content and status into the response.
-   * @param request OData request object containing raw HTTP information
-   * @param response OData response object for collecting response data
-   * @param uriInfo information of a parsed OData URI
-   * @param responseFormat requested content type after content negotiation
-   * @throws ODataApplicationException if the service implementation encounters a failure
-   * @throws ODataLibraryException
-   */
-  void readMediaEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo, ContentType responseFormat)
-      throws ODataApplicationException, ODataLibraryException;
-
-  /**
    * Creates an entity with sent media data in the persistence and puts content, status and Location into the response.
    * @param request OData request object containing raw HTTP information
    * @param response OData response object for collecting response data
@@ -53,7 +41,31 @@ public interface MediaEntityProcessor extends EntityProcessor {
    * @throws ODataLibraryException
    */
   void createMediaEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo,
-      ContentType requestFormat, ContentType responseFormat) throws ODataApplicationException, ODataLibraryException;
+    ContentType requestFormat, ContentType responseFormat)
+    throws ODataApplicationException, ODataLibraryException;
+
+  /**
+   * Deletes entity media data and associated entity from persistence and puts the status into the response.
+   * @param request OData request object containing raw HTTP information
+   * @param response OData response object for collecting response data
+   * @param uriInfo information of a parsed OData URI
+   * @throws ODataApplicationException if the service implementation encounters a failure
+   * @throws ODataLibraryException
+   */
+  void deleteMediaEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo)
+    throws ODataApplicationException, ODataLibraryException;
+
+  /**
+   * Reads entity media data from persistence and puts content and status into the response.
+   * @param request OData request object containing raw HTTP information
+   * @param response OData response object for collecting response data
+   * @param uriInfo information of a parsed OData URI
+   * @param responseFormat requested content type after content negotiation
+   * @throws ODataApplicationException if the service implementation encounters a failure
+   * @throws ODataLibraryException
+   */
+  void readMediaEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo,
+    ContentType responseFormat) throws ODataApplicationException, ODataLibraryException;
 
   /**
    * Updates entity media data in the persistence and puts content and status into the response.
@@ -66,16 +78,6 @@ public interface MediaEntityProcessor extends EntityProcessor {
    * @throws ODataLibraryException
    */
   void updateMediaEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo,
-      ContentType requestFormat, ContentType responseFormat) throws ODataApplicationException, ODataLibraryException;
-
-  /**
-   * Deletes entity media data and associated entity from persistence and puts the status into the response.
-   * @param request OData request object containing raw HTTP information
-   * @param response OData response object for collecting response data
-   * @param uriInfo information of a parsed OData URI
-   * @throws ODataApplicationException if the service implementation encounters a failure
-   * @throws ODataLibraryException
-   */
-  void deleteMediaEntity(ODataRequest request, ODataResponse response, UriInfo uriInfo)
-      throws ODataApplicationException, ODataLibraryException;
+    ContentType requestFormat, ContentType responseFormat)
+    throws ODataApplicationException, ODataLibraryException;
 }

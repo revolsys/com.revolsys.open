@@ -22,11 +22,17 @@ import org.apache.olingo.server.api.uri.queryoption.QueryOption;
 
 public abstract class QueryOptionImpl implements QueryOption {
   private String name;
+
   private String text;
 
   @Override
   public String getName() {
-    return name;
+    return this.name;
+  }
+
+  @Override
+  public String getText() {
+    return this.text;
   }
 
   public QueryOptionImpl setName(final String name) {
@@ -34,13 +40,8 @@ public abstract class QueryOptionImpl implements QueryOption {
     return this;
   }
 
-  @Override
-  public String getText() {
-    return text;
-  }
-
   public QueryOptionImpl setText(final String value) {
-    text = value;
+    this.text = value;
     return this;
   }
 

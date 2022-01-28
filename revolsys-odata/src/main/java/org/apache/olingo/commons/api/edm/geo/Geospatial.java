@@ -104,8 +104,14 @@ public abstract class Geospatial {
    * @see Dimension
    */
   public Dimension getDimension() {
-    return dimension;
+    return this.dimension;
   }
+
+  /**
+   * Returns the {@link EdmPrimitiveTypeKind}
+   * @return EDM primitive type kind
+   */
+  public abstract EdmPrimitiveTypeKind getEdmPrimitiveTypeKind();
 
   /**
    * Gets type.
@@ -114,7 +120,7 @@ public abstract class Geospatial {
    * @see Type
    */
   public Type getGeoType() {
-    return type;
+    return this.type;
   }
 
   /**
@@ -123,12 +129,6 @@ public abstract class Geospatial {
    * @return s-rid.
    */
   public SRID getSrid() {
-    return srid;
+    return this.srid;
   }
-
-  /**
-   * Returns the {@link EdmPrimitiveTypeKind}
-   * @return EDM primitive type kind
-   */
-  public abstract EdmPrimitiveTypeKind getEdmPrimitiveTypeKind();
 }

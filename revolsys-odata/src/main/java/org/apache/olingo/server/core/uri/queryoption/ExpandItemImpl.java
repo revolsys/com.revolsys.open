@@ -38,14 +38,23 @@ import org.apache.olingo.server.api.uri.queryoption.TopOption;
 
 public class ExpandItemImpl implements ExpandItem {
   private LevelsExpandOption levelsExpandOption;
+
   private FilterOption filterOption;
+
   private SearchOption searchOption;
+
   private OrderByOption orderByOption;
+
   private SkipOption skipOption;
+
   private TopOption topOption;
+
   private CountOption inlineCountOption;
+
   private SelectOption selectOption;
+
   private ExpandOption expandOption;
+
   private ApplyOption applyOption;
 
   private UriInfoResource resourceInfo;
@@ -53,135 +62,90 @@ public class ExpandItemImpl implements ExpandItem {
   private boolean isStar;
 
   private boolean isRef;
+
   private boolean hasCountPath;
+
   private EdmType startTypeFilter;
 
-  public ExpandItemImpl setSystemQueryOption(final SystemQueryOption sysItem) {
-
-    if (sysItem instanceof ApplyOption) {
-      validateDoubleSystemQueryOption(applyOption, sysItem);
-      applyOption = (ApplyOption) sysItem;
-    } else if (sysItem instanceof ExpandOption) {
-      validateDoubleSystemQueryOption(expandOption, sysItem);
-      expandOption = (ExpandOption) sysItem;
-    } else if (sysItem instanceof FilterOption) {
-      validateDoubleSystemQueryOption(filterOption, sysItem);
-      filterOption = (FilterOption) sysItem;
-    } else if (sysItem instanceof CountOption) {
-      validateDoubleSystemQueryOption(inlineCountOption, sysItem);
-      inlineCountOption = (CountOption) sysItem;
-    } else if (sysItem instanceof OrderByOption) {
-      validateDoubleSystemQueryOption(orderByOption, sysItem);
-      orderByOption = (OrderByOption) sysItem;
-    } else if (sysItem instanceof SearchOption) {
-      validateDoubleSystemQueryOption(searchOption, sysItem);
-      searchOption = (SearchOption) sysItem;
-    } else if (sysItem instanceof SelectOption) {
-      validateDoubleSystemQueryOption(selectOption, sysItem);
-      selectOption = (SelectOption) sysItem;
-    } else if (sysItem instanceof SkipOption) {
-      validateDoubleSystemQueryOption(skipOption, sysItem);
-      skipOption = (SkipOption) sysItem;
-    } else if (sysItem instanceof TopOption) {
-      validateDoubleSystemQueryOption(topOption, sysItem);
-      topOption = (TopOption) sysItem;
-    } else if (sysItem instanceof LevelsExpandOption) {
-      if (levelsExpandOption != null) {
-        throw new ODataRuntimeException("$levels");
-      }
-      levelsExpandOption = (LevelsExpandOption) sysItem;
-    }
-    return this;
-  }
-
-  private void validateDoubleSystemQueryOption(final SystemQueryOption oldOption, final SystemQueryOption newOption) {
-    if (oldOption != null) {
-      throw new ODataRuntimeException(newOption.getName());
-    }
-  }
-
-  public ExpandItemImpl setSystemQueryOptions(final List<SystemQueryOption> list) {
-    for (SystemQueryOption item : list) {
-      setSystemQueryOption(item);
-    }
-    return this;
-  }
-
   @Override
-  public LevelsExpandOption getLevelsOption() {
-    return levelsExpandOption;
-  }
-
-  @Override
-  public FilterOption getFilterOption() {
-    return filterOption;
-  }
-
-  @Override
-  public SearchOption getSearchOption() {
-    return searchOption;
-  }
-
-  @Override
-  public OrderByOption getOrderByOption() {
-    return orderByOption;
-  }
-
-  @Override
-  public SkipOption getSkipOption() {
-    return skipOption;
-  }
-
-  @Override
-  public TopOption getTopOption() {
-    return topOption;
+  public ApplyOption getApplyOption() {
+    return this.applyOption;
   }
 
   @Override
   public CountOption getCountOption() {
-    return inlineCountOption;
-  }
-
-  @Override
-  public SelectOption getSelectOption() {
-
-    return selectOption;
+    return this.inlineCountOption;
   }
 
   @Override
   public ExpandOption getExpandOption() {
-    return expandOption;
+    return this.expandOption;
   }
 
   @Override
-  public ApplyOption getApplyOption() {
-    return applyOption;
+  public FilterOption getFilterOption() {
+    return this.filterOption;
   }
 
-  public ExpandItemImpl setResourcePath(final UriInfoResource resourceInfo) {
-    this.resourceInfo = resourceInfo;
-    return this;
+  @Override
+  public LevelsExpandOption getLevelsOption() {
+    return this.levelsExpandOption;
+  }
+
+  @Override
+  public OrderByOption getOrderByOption() {
+    return this.orderByOption;
   }
 
   @Override
   public UriInfoResource getResourcePath() {
 
-    return resourceInfo;
+    return this.resourceInfo;
   }
 
   @Override
-  public boolean isStar() {
-    return isStar;
+  public SearchOption getSearchOption() {
+    return this.searchOption;
   }
 
-  public ExpandItemImpl setIsStar(final boolean isStar) {
-    this.isStar = isStar;
-    return this;
+  @Override
+  public SelectOption getSelectOption() {
+
+    return this.selectOption;
+  }
+
+  @Override
+  public SkipOption getSkipOption() {
+    return this.skipOption;
+  }
+
+  @Override
+  public EdmType getStartTypeFilter() {
+    return this.startTypeFilter;
+  }
+
+  @Override
+  public TopOption getTopOption() {
+    return this.topOption;
+  }
+
+  @Override
+  public boolean hasCountPath() {
+    return this.hasCountPath;
   }
 
   @Override
   public boolean isRef() {
-    return isRef;
+    return this.isRef;
+  }
+
+  @Override
+  public boolean isStar() {
+    return this.isStar;
+  }
+
+  public void setCountPath(final boolean value) {
+    this.hasCountPath = value;
   }
 
   public ExpandItemImpl setIsRef(final boolean isRef) {
@@ -189,9 +153,59 @@ public class ExpandItemImpl implements ExpandItem {
     return this;
   }
 
-  @Override
-  public EdmType getStartTypeFilter() {
-    return startTypeFilter;
+  public ExpandItemImpl setIsStar(final boolean isStar) {
+    this.isStar = isStar;
+    return this;
+  }
+
+  public ExpandItemImpl setResourcePath(final UriInfoResource resourceInfo) {
+    this.resourceInfo = resourceInfo;
+    return this;
+  }
+
+  public ExpandItemImpl setSystemQueryOption(final SystemQueryOption sysItem) {
+
+    if (sysItem instanceof ApplyOption) {
+      validateDoubleSystemQueryOption(this.applyOption, sysItem);
+      this.applyOption = (ApplyOption)sysItem;
+    } else if (sysItem instanceof ExpandOption) {
+      validateDoubleSystemQueryOption(this.expandOption, sysItem);
+      this.expandOption = (ExpandOption)sysItem;
+    } else if (sysItem instanceof FilterOption) {
+      validateDoubleSystemQueryOption(this.filterOption, sysItem);
+      this.filterOption = (FilterOption)sysItem;
+    } else if (sysItem instanceof CountOption) {
+      validateDoubleSystemQueryOption(this.inlineCountOption, sysItem);
+      this.inlineCountOption = (CountOption)sysItem;
+    } else if (sysItem instanceof OrderByOption) {
+      validateDoubleSystemQueryOption(this.orderByOption, sysItem);
+      this.orderByOption = (OrderByOption)sysItem;
+    } else if (sysItem instanceof SearchOption) {
+      validateDoubleSystemQueryOption(this.searchOption, sysItem);
+      this.searchOption = (SearchOption)sysItem;
+    } else if (sysItem instanceof SelectOption) {
+      validateDoubleSystemQueryOption(this.selectOption, sysItem);
+      this.selectOption = (SelectOption)sysItem;
+    } else if (sysItem instanceof SkipOption) {
+      validateDoubleSystemQueryOption(this.skipOption, sysItem);
+      this.skipOption = (SkipOption)sysItem;
+    } else if (sysItem instanceof TopOption) {
+      validateDoubleSystemQueryOption(this.topOption, sysItem);
+      this.topOption = (TopOption)sysItem;
+    } else if (sysItem instanceof LevelsExpandOption) {
+      if (this.levelsExpandOption != null) {
+        throw new ODataRuntimeException("$levels");
+      }
+      this.levelsExpandOption = (LevelsExpandOption)sysItem;
+    }
+    return this;
+  }
+
+  public ExpandItemImpl setSystemQueryOptions(final List<SystemQueryOption> list) {
+    for (final SystemQueryOption item : list) {
+      setSystemQueryOption(item);
+    }
+    return this;
   }
 
   public ExpandItemImpl setTypeFilter(final EdmType startTypeFilter) {
@@ -199,12 +213,10 @@ public class ExpandItemImpl implements ExpandItem {
     return this;
   }
 
-  @Override
-  public boolean hasCountPath() {
-    return this.hasCountPath;
-  }
-  
-  public void setCountPath(boolean value) {
-    this.hasCountPath = value;
+  private void validateDoubleSystemQueryOption(final SystemQueryOption oldOption,
+    final SystemQueryOption newOption) {
+    if (oldOption != null) {
+      throw new ODataRuntimeException(newOption.getName());
+    }
   }
 }

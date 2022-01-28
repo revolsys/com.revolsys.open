@@ -32,65 +32,35 @@ import org.apache.olingo.server.api.deserializer.DeserializerResult;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
 
 public class DeserializerResultImpl implements DeserializerResult {
-  private Entity entity;
-  private EntityCollection entitySet;
-  private ExpandOption expandOption;
-  private Property property;
-  private Map<String, Parameter> actionParameters;
-  private List<URI> entityReferences;
-
-  private DeserializerResultImpl() {}
-
-  @Override
-  public Entity getEntity() {
-    return entity;
-  }
-
-  @Override
-  public EntityCollection getEntityCollection() {
-    return entitySet;
-  }
-
-  @Override
-  public ExpandOption getExpandTree() {
-    return expandOption;
-  }
-
-  @Override
-  public Map<String, Parameter> getActionParameters() {
-    return actionParameters;
-  }
-
-  @Override
-  public Property getProperty() {
-    return property;
-  }
-
-  @Override
-  public List<URI> getEntityReferences() {
-    return entityReferences;
-  }
-
-  public static DeserializerResultBuilder with() {
-    return new DeserializerResultBuilder();
-  }
-
   public static class DeserializerResultBuilder {
     private Entity entity;
+
     private EntityCollection entitySet;
+
     private ExpandOption expandOption;
+
     private Property property;
+
     private Map<String, Parameter> actionParameters;
+
     private List<URI> entityReferences;
 
+    public DeserializerResultBuilder actionParameters(
+      final Map<String, Parameter> actionParameters) {
+      this.actionParameters = actionParameters;
+      return this;
+    }
+
     public DeserializerResult build() {
-      DeserializerResultImpl result = new DeserializerResultImpl();
-      result.entity = entity;
-      result.entitySet = entitySet;
-      result.expandOption = expandOption;
-      result.property = property;
-      result.entityReferences = (entityReferences == null) ? new ArrayList<>() : entityReferences;
-      result.actionParameters = (actionParameters == null) ? new LinkedHashMap<>() : actionParameters;
+      final DeserializerResultImpl result = new DeserializerResultImpl();
+      result.entity = this.entity;
+      result.entitySet = this.entitySet;
+      result.expandOption = this.expandOption;
+      result.property = this.property;
+      result.entityReferences = this.entityReferences == null ? new ArrayList<>()
+        : this.entityReferences;
+      result.actionParameters = this.actionParameters == null ? new LinkedHashMap<>()
+        : this.actionParameters;
 
       return result;
     }
@@ -105,6 +75,11 @@ public class DeserializerResultImpl implements DeserializerResult {
       return this;
     }
 
+    public DeserializerResultBuilder entityReferences(final List<URI> entityReferences) {
+      this.entityReferences = entityReferences;
+      return this;
+    }
+
     public DeserializerResultBuilder expandOption(final ExpandOption expandOption) {
       this.expandOption = expandOption;
       return this;
@@ -114,15 +89,54 @@ public class DeserializerResultImpl implements DeserializerResult {
       this.property = property;
       return this;
     }
+  }
 
-    public DeserializerResultBuilder entityReferences(final List<URI> entityReferences) {
-      this.entityReferences = entityReferences;
-      return this;
-    }
+  public static DeserializerResultBuilder with() {
+    return new DeserializerResultBuilder();
+  }
 
-    public DeserializerResultBuilder actionParameters(final Map<String, Parameter> actionParameters) {
-      this.actionParameters = actionParameters;
-      return this;
-    }
+  private Entity entity;
+
+  private EntityCollection entitySet;
+
+  private ExpandOption expandOption;
+
+  private Property property;
+
+  private Map<String, Parameter> actionParameters;
+
+  private List<URI> entityReferences;
+
+  private DeserializerResultImpl() {
+  }
+
+  @Override
+  public Map<String, Parameter> getActionParameters() {
+    return this.actionParameters;
+  }
+
+  @Override
+  public Entity getEntity() {
+    return this.entity;
+  }
+
+  @Override
+  public EntityCollection getEntityCollection() {
+    return this.entitySet;
+  }
+
+  @Override
+  public List<URI> getEntityReferences() {
+    return this.entityReferences;
+  }
+
+  @Override
+  public ExpandOption getExpandTree() {
+    return this.expandOption;
+  }
+
+  @Override
+  public Property getProperty() {
+    return this.property;
   }
 }

@@ -26,20 +26,17 @@ import java.util.List;
  */
 public abstract class Linked extends AbstractODataObject {
 
-  private final List<Link> associationLinks = new ArrayList<Link>();
-  private final List<Link> navigationLinks = new ArrayList<Link>();
-  private final List<Link> bindingLinks = new ArrayList<Link>();
+  private final List<Link> associationLinks = new ArrayList<>();
 
-  protected Link getOneByTitle(final String name, final List<Link> links) {
-    Link result = null;
+  private final List<Link> navigationLinks = new ArrayList<>();
 
-    for (Link link : links) {
-      if (name.equals(link.getTitle())) {
-        result = link;
-      }
-    }
+  private final List<Link> bindingLinks = new ArrayList<>();
 
-    return result;
+  @Override
+  public boolean equals(final Object o) {
+    return super.equals(o) && this.associationLinks.equals(((Linked)o).associationLinks)
+      && this.navigationLinks.equals(((Linked)o).navigationLinks)
+      && this.bindingLinks.equals(((Linked)o).bindingLinks);
   }
 
   /**
@@ -49,7 +46,7 @@ public abstract class Linked extends AbstractODataObject {
    * @return association link with given name, if available, otherwise <tt>null</tt>
    */
   public Link getAssociationLink(final String name) {
-    return getOneByTitle(name, associationLinks);
+    return getOneByTitle(name, this.associationLinks);
   }
 
   /**
@@ -58,7 +55,25 @@ public abstract class Linked extends AbstractODataObject {
    * @return association links.
    */
   public List<Link> getAssociationLinks() {
-    return associationLinks;
+    return this.associationLinks;
+  }
+
+  /**
+   * Gets binding link with given name, if available, otherwise <tt>null</tt>.
+   * @param name candidate link name
+   * @return binding link with given name, if available, otherwise <tt>null</tt>
+   */
+  public Link getNavigationBinding(final String name) {
+    return getOneByTitle(name, this.bindingLinks);
+  }
+
+  /**
+   * Gets binding links.
+   *
+   * @return links.
+   */
+  public List<Link> getNavigationBindings() {
+    return this.bindingLinks;
   }
 
   /**
@@ -68,7 +83,7 @@ public abstract class Linked extends AbstractODataObject {
    * @return navigation link with given name, if available, otherwise <tt>null</tt>
    */
   public Link getNavigationLink(final String name) {
-    return getOneByTitle(name, navigationLinks);
+    return getOneByTitle(name, this.navigationLinks);
   }
 
   /**
@@ -77,41 +92,27 @@ public abstract class Linked extends AbstractODataObject {
    * @return links.
    */
   public List<Link> getNavigationLinks() {
-    return navigationLinks;
+    return this.navigationLinks;
   }
 
-  /**
-   * Gets binding link with given name, if available, otherwise <tt>null</tt>.
-   * @param name candidate link name
-   * @return binding link with given name, if available, otherwise <tt>null</tt>
-   */
-  public Link getNavigationBinding(final String name) {
-    return getOneByTitle(name, bindingLinks);
-  }
+  protected Link getOneByTitle(final String name, final List<Link> links) {
+    Link result = null;
 
-  /**
-   * Gets binding links.
-   *
-   * @return links.
-   */
-  public List<Link> getNavigationBindings() {
-    return bindingLinks;
-  }
+    for (final Link link : links) {
+      if (name.equals(link.getTitle())) {
+        result = link;
+      }
+    }
 
-  @Override
-  public boolean equals(final Object o) {
-    return super.equals(o)
-        && associationLinks.equals(((Linked) o).associationLinks)
-        && navigationLinks.equals(((Linked) o).navigationLinks)
-        && bindingLinks.equals(((Linked) o).bindingLinks);
+    return result;
   }
 
   @Override
   public int hashCode() {
     int result = super.hashCode();
-    result = 31 * result + associationLinks.hashCode();
-    result = 31 * result + navigationLinks.hashCode();
-    result = 31 * result + bindingLinks.hashCode();
+    result = 31 * result + this.associationLinks.hashCode();
+    result = 31 * result + this.navigationLinks.hashCode();
+    result = 31 * result + this.bindingLinks.hashCode();
     return result;
   }
 }

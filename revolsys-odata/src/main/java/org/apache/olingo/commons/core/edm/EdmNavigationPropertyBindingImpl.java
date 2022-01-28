@@ -23,6 +23,7 @@ import org.apache.olingo.commons.api.edm.EdmNavigationPropertyBinding;
 public class EdmNavigationPropertyBindingImpl implements EdmNavigationPropertyBinding {
 
   private final String path;
+
   private final String target;
 
   public EdmNavigationPropertyBindingImpl(final String path, final String target) {
@@ -32,12 +33,12 @@ public class EdmNavigationPropertyBindingImpl implements EdmNavigationPropertyBi
 
   @Override
   public String getPath() {
-    return path;
+    return this.path;
   }
 
   @Override
   public String getTarget() {
-    return target;
+    return this.target;
   }
 
 }

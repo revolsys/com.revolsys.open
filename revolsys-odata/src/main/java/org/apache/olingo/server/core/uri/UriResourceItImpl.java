@@ -28,6 +28,7 @@ import org.apache.olingo.server.api.uri.UriResourceKind;
 public class UriResourceItImpl extends UriResourceWithKeysImpl implements UriResourceIt {
 
   private final EdmType type;
+
   private final boolean isCollection;
 
   public UriResourceItImpl(final EdmType type, final boolean isCollection) {
@@ -37,17 +38,17 @@ public class UriResourceItImpl extends UriResourceWithKeysImpl implements UriRes
   }
 
   @Override
+  public String getSegmentValue() {
+    return "$it";
+  }
+
+  @Override
   public EdmType getType() {
-    return type;
+    return this.type;
   }
 
   @Override
   public boolean isCollection() {
-    return keyPredicates == null && isCollection;
-  }
-
-  @Override
-  public String getSegmentValue() {
-    return "$it";
+    return this.keyPredicates == null && this.isCollection;
   }
 }

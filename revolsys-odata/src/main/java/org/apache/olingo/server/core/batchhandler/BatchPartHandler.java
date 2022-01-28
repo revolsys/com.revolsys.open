@@ -33,45 +33,33 @@ import org.apache.olingo.server.core.batchhandler.referenceRewriting.BatchRefere
 
 public class BatchPartHandler {
   private final ODataHandler oDataHandler;
+
   private final BatchProcessor batchProcessor;
+
   private final BatchFacade batchFacade;
+
   private final BatchReferenceRewriter rewriter;
 
   public BatchPartHandler(final ODataHandler oDataHandler, final BatchProcessor processor,
-                          final BatchFacade batchFacade) {
+    final BatchFacade batchFacade) {
     this.oDataHandler = oDataHandler;
-    batchProcessor = processor;
+    this.batchProcessor = processor;
     this.batchFacade = batchFacade;
-    rewriter = new BatchReferenceRewriter();
-  }
-
-  public ODataResponse handleODataRequest(final ODataRequest request) throws BatchDeserializerException {
-    return handle(request, true);
-  }
-
-  public ODataResponsePart handleBatchRequest(final BatchRequestPart request)
-      throws ODataApplicationException, ODataLibraryException {
-    if (request.isChangeSet()) {
-      return handleChangeSet(request);
-    } else {
-      final ODataResponse response = handle(request.getRequests().get(0), false);
-
-      return new ODataResponsePart(response, false);
-    }
+    this.rewriter = new BatchReferenceRewriter();
   }
 
   public ODataResponse handle(final ODataRequest request, final boolean isChangeSet)
-      throws BatchDeserializerException {
+    throws BatchDeserializerException {
     ODataResponse response;
 
     if (isChangeSet) {
-      rewriter.replaceReference(request);
+      this.rewriter.replaceReference(request);
 
-      response = oDataHandler.process(request);
+      response = this.oDataHandler.process(request);
 
-      rewriter.addMapping(request, response);
+      this.rewriter.addMapping(request, response);
     } else {
-      response = oDataHandler.process(request);
+      response = this.oDataHandler.process(request);
     }
 
     // Add content id to response
@@ -83,9 +71,25 @@ public class BatchPartHandler {
     return response;
   }
 
-  private ODataResponsePart handleChangeSet(final BatchRequestPart request) throws ODataApplicationException,
-  ODataLibraryException {
-    return batchProcessor.processChangeSet(batchFacade, request.getRequests());
+  public ODataResponsePart handleBatchRequest(final BatchRequestPart request)
+    throws ODataApplicationException, ODataLibraryException {
+    if (request.isChangeSet()) {
+      return handleChangeSet(request);
+    } else {
+      final ODataResponse response = handle(request.getRequests().get(0), false);
+
+      return new ODataResponsePart(response, false);
+    }
+  }
+
+  private ODataResponsePart handleChangeSet(final BatchRequestPart request)
+    throws ODataApplicationException, ODataLibraryException {
+    return this.batchProcessor.processChangeSet(this.batchFacade, request.getRequests());
+  }
+
+  public ODataResponse handleODataRequest(final ODataRequest request)
+    throws BatchDeserializerException {
+    return handle(request, true);
   }
 
 }

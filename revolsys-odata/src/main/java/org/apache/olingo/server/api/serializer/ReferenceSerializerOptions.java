@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -24,37 +24,38 @@ import org.apache.olingo.commons.api.data.ContextURL;
  * Options to pass as additional information to the reference serializer.
  */
 public final class ReferenceSerializerOptions {
-  private ContextURL contextURL;
+  /** Builder of OData serializer options. */
+  public static final class Builder {
+    private final ReferenceSerializerOptions options;
 
-  /** Gets the {@link ContextURL}. */
-  public ContextURL getContextURL() {
-    return contextURL;
+    public Builder() {
+      this.options = new ReferenceSerializerOptions();
+    }
+
+    /** Builds the OData serializer options. */
+    public ReferenceSerializerOptions build() {
+      return this.options;
+    }
+
+    /** Sets the {@link ContextURL}. */
+    public Builder contextURL(final ContextURL contextURL) {
+      this.options.contextURL = contextURL;
+      return this;
+    }
   }
-
-  private ReferenceSerializerOptions() {}
 
   /** Initializes the options builder. */
   public static Builder with() {
     return new Builder();
   }
 
-  /** Builder of OData serializer options. */
-  public static final class Builder {
-    private ReferenceSerializerOptions options;
+  private ContextURL contextURL;
 
-    public Builder() {
-      options = new ReferenceSerializerOptions();
-    }
+  private ReferenceSerializerOptions() {
+  }
 
-    /** Sets the {@link ContextURL}. */
-    public Builder contextURL(final ContextURL contextURL) {
-      options.contextURL = contextURL;
-      return this;
-    }
-
-    /** Builds the OData serializer options. */
-    public ReferenceSerializerOptions build() {
-      return options;
-    }
+  /** Gets the {@link ContextURL}. */
+  public ContextURL getContextURL() {
+    return this.contextURL;
   }
 }

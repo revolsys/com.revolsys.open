@@ -24,7 +24,7 @@ import org.apache.olingo.commons.api.edm.provider.annotation.CsdlLogicalOrCompar
 
 public class EdmNotImpl extends AbstractEdmLogicalOrComparisonExpression implements EdmNot {
 
-    public EdmNotImpl(Edm edm, CsdlLogicalOrComparisonExpression csdlExp) {
+  public EdmNotImpl(final Edm edm, final CsdlLogicalOrComparisonExpression csdlExp) {
     super(edm, csdlExp);
   }
 }

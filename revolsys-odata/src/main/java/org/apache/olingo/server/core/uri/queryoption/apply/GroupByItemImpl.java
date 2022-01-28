@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -32,36 +32,39 @@ import org.apache.olingo.server.api.uri.queryoption.apply.GroupByItem;
 public class GroupByItemImpl implements GroupByItem {
 
   private UriInfo path;
+
   private boolean isRollupAll;
-  private List<GroupByItem> rollup = new ArrayList<>();
+
+  private final List<GroupByItem> rollup = new ArrayList<>();
+
+  public GroupByItemImpl addRollupItem(final GroupByItem groupByItem) {
+    this.rollup.add(groupByItem);
+    return this;
+  }
 
   @Override
   public List<UriResource> getPath() {
-    return path == null ? Collections.<UriResource> emptyList() : path.getUriResourceParts();
-  }
-
-  public GroupByItemImpl setPath(final UriInfo uriInfo) {
-    path = uriInfo;
-    return this;
+    return this.path == null ? Collections.<UriResource> emptyList()
+      : this.path.getUriResourceParts();
   }
 
   @Override
   public List<GroupByItem> getRollup() {
-    return rollup;
-  }
-
-  public GroupByItemImpl addRollupItem(final GroupByItem groupByItem) {
-    rollup.add(groupByItem);
-    return this;
+    return this.rollup;
   }
 
   @Override
   public boolean isRollupAll() {
-    return isRollupAll;
+    return this.isRollupAll;
   }
 
   public GroupByItemImpl setIsRollupAll() {
     this.isRollupAll = true;
+    return this;
+  }
+
+  public GroupByItemImpl setPath(final UriInfo uriInfo) {
+    this.path = uriInfo;
     return this;
   }
 }

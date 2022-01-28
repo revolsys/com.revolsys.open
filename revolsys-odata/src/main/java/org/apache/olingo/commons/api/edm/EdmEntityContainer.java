@@ -29,22 +29,19 @@ import java.util.List;
 public interface EdmEntityContainer extends EdmNamed, EdmAnnotatable {
 
   /**
-   * @return namespace of this entity container
-   */
-  String getNamespace();
-
-  /**
-   * @return full qualified name of this entity container
-   */
-  FullQualifiedName getFullQualifiedName();
-
-  /**
-   * Get contained Singleton by name.
+   * Get contained ActionImport by name.
    *
-   * @param name name of contained Singleton
-   * @return {@link EdmSingleton}
+   * @param name name of contained ActionImport
+   * @return {@link EdmActionImport}
    */
-  EdmSingleton getSingleton(String name);
+  EdmActionImport getActionImport(String name);
+
+  /**
+   * This method <b>DOES NOT</b> support lazy loading
+   *
+   * @return returns all action imports for this container.
+   */
+  List<EdmActionImport> getActionImports();
 
   /**
    * Get contained EntitySet by name.
@@ -55,12 +52,24 @@ public interface EdmEntityContainer extends EdmNamed, EdmAnnotatable {
   EdmEntitySet getEntitySet(String name);
 
   /**
-   * Get contained ActionImport by name.
+   * This method <b>DOES NOT</b> support lazy loading
    *
-   * @param name name of contained ActionImport
-   * @return {@link EdmActionImport}
+   * @return returns all entity sets for this container.
    */
-  EdmActionImport getActionImport(String name);
+  List<EdmEntitySet> getEntitySets();
+
+  /**
+   * This method <b>DOES NOT</b> support lazy loading
+   *
+   * @return returns all entity sets for this container with
+   * annotations defined in external file.
+   */
+  List<EdmEntitySet> getEntitySetsWithAnnotations();
+
+  /**
+   * @return full qualified name of this entity container
+   */
+  FullQualifiedName getFullQualifiedName();
 
   /**
    * Get contained FunctionImport by name.
@@ -73,24 +82,27 @@ public interface EdmEntityContainer extends EdmNamed, EdmAnnotatable {
   /**
    * This method <b>DOES NOT</b> support lazy loading
    *
-   * @return returns all entity sets for this container.
-   */
-  List<EdmEntitySet> getEntitySets();
-  
-  /**
-   * This method <b>DOES NOT</b> support lazy loading
-   *
-   * @return returns all entity sets for this container with 
-   * annotations defined in external file.
-   */
-  List<EdmEntitySet> getEntitySetsWithAnnotations();
-
-  /**
-   * This method <b>DOES NOT</b> support lazy loading
-   *
    * @return returns all function imports for this container.
    */
   List<EdmFunctionImport> getFunctionImports();
+
+  /**
+   * @return namespace of this entity container
+   */
+  String getNamespace();
+
+  /**
+   * @return the {@link FullQualifiedName} of the parentContainer or null if no parent is specified
+   */
+  FullQualifiedName getParentContainerName();
+
+  /**
+   * Get contained Singleton by name.
+   *
+   * @param name name of contained Singleton
+   * @return {@link EdmSingleton}
+   */
+  EdmSingleton getSingleton(String name);
 
   /**
    * This method <b>DOES NOT</b> support lazy loading
@@ -98,16 +110,4 @@ public interface EdmEntityContainer extends EdmNamed, EdmAnnotatable {
    * @return returns all singletons for this container.
    */
   List<EdmSingleton> getSingletons();
-
-  /**
-   * This method <b>DOES NOT</b> support lazy loading
-   *
-   * @return returns all action imports for this container.
-   */
-  List<EdmActionImport> getActionImports();
-
-  /**
-   * @return the {@link FullQualifiedName} of the parentContainer or null if no parent is specified
-   */
-  FullQualifiedName getParentContainerName();
 }

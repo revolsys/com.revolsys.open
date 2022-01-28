@@ -25,7 +25,8 @@ import org.apache.olingo.commons.api.edm.provider.CsdlSingleton;
 
 public class EdmSingletonImpl extends AbstractEdmBindingTarget implements EdmSingleton {
 
-  public EdmSingletonImpl(final Edm edm, final EdmEntityContainer container, final CsdlSingleton singleton) {
+  public EdmSingletonImpl(final Edm edm, final EdmEntityContainer container,
+    final CsdlSingleton singleton) {
     super(edm, container, singleton);
   }
 }

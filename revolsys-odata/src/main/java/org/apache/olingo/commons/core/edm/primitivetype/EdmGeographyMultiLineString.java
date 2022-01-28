@@ -36,12 +36,12 @@ public final class EdmGeographyMultiLineString extends AbstractGeospatialType<Mu
   }
 
   @Override
-  protected <T> T internalValueOfString(final String value, final Boolean isNullable, final Integer maxLength,
-      final Integer precision, final Integer scale, final Boolean isUnicode,
-      final Class<T> returnType) throws EdmPrimitiveTypeException {
+  protected <T> T internalValueOfString(final String value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode,
+    final Class<T> returnType) throws EdmPrimitiveTypeException {
 
-    final MultiLineString multiLineString =
-        stringToMultiLineString(value, isNullable, maxLength, precision, scale, isUnicode);
+    final MultiLineString multiLineString = stringToMultiLineString(value, isNullable, maxLength,
+      precision, scale, isUnicode);
     if (returnType.isAssignableFrom(MultiLineString.class)) {
       return returnType.cast(multiLineString);
     } else {
@@ -50,13 +50,15 @@ public final class EdmGeographyMultiLineString extends AbstractGeospatialType<Mu
   }
 
   @Override
-  protected <T> String internalValueToString(final T value, final Boolean isNullable, final Integer maxLength,
-      final Integer precision, final Integer scale, final Boolean isUnicode) throws EdmPrimitiveTypeException {
+  protected <T> String internalValueToString(final T value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode)
+    throws EdmPrimitiveTypeException {
 
     if (value instanceof MultiLineString) {
-      return toString((MultiLineString) value, isNullable, maxLength, precision, scale, isUnicode);
+      return toString((MultiLineString)value, isNullable, maxLength, precision, scale, isUnicode);
     }
 
-    throw new EdmPrimitiveTypeException("The value type " + value.getClass() + " is not supported.");
+    throw new EdmPrimitiveTypeException(
+      "The value type " + value.getClass() + " is not supported.");
   }
 }

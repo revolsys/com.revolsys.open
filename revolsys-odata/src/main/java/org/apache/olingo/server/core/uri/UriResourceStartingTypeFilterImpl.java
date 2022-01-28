@@ -23,6 +23,7 @@ import org.apache.olingo.commons.api.edm.EdmType;
 public class UriResourceStartingTypeFilterImpl extends UriResourceWithKeysImpl {
 
   private final EdmType type;
+
   private final boolean isCollection;
 
   public UriResourceStartingTypeFilterImpl(final EdmType type, final boolean isCollection) {
@@ -32,17 +33,17 @@ public class UriResourceStartingTypeFilterImpl extends UriResourceWithKeysImpl {
   }
 
   @Override
+  public String getSegmentValue() {
+    return this.type.getFullQualifiedName().getFullQualifiedNameAsString();
+  }
+
+  @Override
   public EdmType getType() {
-    return type;
+    return this.type;
   }
 
   @Override
   public boolean isCollection() {
-    return keyPredicates == null && isCollection;
-  }
-
-  @Override
-  public String getSegmentValue() {
-    return type.getFullQualifiedName().getFullQualifiedNameAsString();
+    return this.keyPredicates == null && this.isCollection;
   }
 }

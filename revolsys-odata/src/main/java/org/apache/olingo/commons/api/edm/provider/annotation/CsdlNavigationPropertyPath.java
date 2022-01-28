@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -23,8 +23,18 @@ package org.apache.olingo.commons.api.edm.provider.annotation;
  * built-in abstract type Edm.NavigationPropertyPath
  */
 public class CsdlNavigationPropertyPath extends CsdlDynamicExpression {
-  
+
   private String value;
+
+  @Override
+  public boolean equals(final Object obj) {
+    if ((obj == null) || !(obj instanceof CsdlNavigationPropertyPath)) {
+      return false;
+    }
+    final CsdlNavigationPropertyPath csdlNavPropPath = (CsdlNavigationPropertyPath)obj;
+    return this.getValue() == null ? csdlNavPropPath.getValue() == null
+      : this.getValue().equals(csdlNavPropPath.getValue());
+  }
 
   /**
    * Returns the navigation property path itself.
@@ -32,32 +42,19 @@ public class CsdlNavigationPropertyPath extends CsdlDynamicExpression {
    * @return navigation property
    */
   public String getValue() {
-    return value;
+    return this.value;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (this.value == null ? 0 : this.value.hashCode());
+    return result;
   }
 
   public CsdlNavigationPropertyPath setValue(final String value) {
     this.value = value;
     return this;
-  }
-  
-  @Override
-  public boolean equals (Object obj) {
-    if (obj == null) {
-      return false;
-    }
-    if (!(obj instanceof CsdlNavigationPropertyPath)) {
-      return false;
-    }
-    CsdlNavigationPropertyPath csdlNavPropPath = (CsdlNavigationPropertyPath) obj;
-    return (this.getValue() == null ? csdlNavPropPath.getValue() == null :
-      this.getValue().equals(csdlNavPropPath.getValue()));
-  }
-  
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((value == null) ? 0 : value.hashCode());
-    return result;
   }
 }

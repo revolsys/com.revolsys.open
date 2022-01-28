@@ -32,4 +32,3 @@
  * in order to overwrite the default behavior.
  */
 package org.apache.olingo.server.api.processor;
-

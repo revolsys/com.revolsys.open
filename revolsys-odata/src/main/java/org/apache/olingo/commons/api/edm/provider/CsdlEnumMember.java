@@ -24,17 +24,41 @@ import java.util.List;
 /**
  * The type Csdl enum member.
  */
-public class CsdlEnumMember extends CsdlAbstractEdmItem implements CsdlNamed, CsdlAnnotatable {
+public class CsdlEnumMember implements CsdlAbstractEdmItem, CsdlNamed, CsdlAnnotatable {
 
   private String name;
 
   private String value;
 
-  private List<CsdlAnnotation> annotations = new ArrayList<CsdlAnnotation>();
+  private List<CsdlAnnotation> annotations = new ArrayList<>();
+
+  @Override
+  public List<CsdlAnnotation> getAnnotations() {
+    return this.annotations;
+  }
 
   @Override
   public String getName() {
-    return name;
+    return this.name;
+  }
+
+  /**
+   * Gets value.
+   *
+   * @return the value
+   */
+  public String getValue() {
+    return this.value;
+  }
+
+  /**
+   * Sets a list of annotations
+   * @param annotations list of annotations
+   * @return this instance
+   */
+  public CsdlEnumMember setAnnotations(final List<CsdlAnnotation> annotations) {
+    this.annotations = annotations;
+    return this;
   }
 
   /**
@@ -49,15 +73,6 @@ public class CsdlEnumMember extends CsdlAbstractEdmItem implements CsdlNamed, Cs
   }
 
   /**
-   * Gets value.
-   *
-   * @return the value
-   */
-  public String getValue() {
-    return value;
-  }
-
-  /**
    * Sets value.
    *
    * @param value the value
@@ -65,21 +80,6 @@ public class CsdlEnumMember extends CsdlAbstractEdmItem implements CsdlNamed, Cs
    */
   public CsdlEnumMember setValue(final String value) {
     this.value = value;
-    return this;
-  }
-
-  @Override
-  public List<CsdlAnnotation> getAnnotations() {
-    return annotations;
-  }
-  
-  /**
-   * Sets a list of annotations
-   * @param annotations list of annotations
-   * @return this instance
-   */
-  public CsdlEnumMember setAnnotations(final List<CsdlAnnotation> annotations) {
-    this.annotations = annotations;
     return this;
   }
 }

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -23,7 +23,9 @@ package org.apache.olingo.commons.api.edmx;
  */
 public class EdmxReferenceIncludeAnnotation {
   private final String termNamespace;
+
   private String qualifier;
+
   private String targetNamespace;
 
   /**
@@ -43,24 +45,31 @@ public class EdmxReferenceIncludeAnnotation {
    * @param targetNamespace of include annotation
    */
   public EdmxReferenceIncludeAnnotation(final String termNamespace, final String qualifier,
-      final String targetNamespace) {
+    final String targetNamespace) {
     this.termNamespace = termNamespace;
     this.qualifier = qualifier;
     this.targetNamespace = targetNamespace;
   }
 
   /**
-   * @return TermNamespace of the include annotation
-   */
-  public String getTermNamespace() {
-    return termNamespace;
-  }
-
-  /**
    * @return Qualifier if one defined; null otherwise
    */
   public String getQualifier() {
-    return qualifier;
+    return this.qualifier;
+  }
+
+  /**
+   * @return targetNamespace if defined; null otherwise
+   */
+  public String getTargetNamespace() {
+    return this.targetNamespace;
+  }
+
+  /**
+   * @return TermNamespace of the include annotation
+   */
+  public String getTermNamespace() {
+    return this.termNamespace;
   }
 
   /**
@@ -72,13 +81,6 @@ public class EdmxReferenceIncludeAnnotation {
   public EdmxReferenceIncludeAnnotation setQualifier(final String qualifier) {
     this.qualifier = qualifier;
     return this;
-  }
-
-  /**
-   * @return targetNamespace if defined; null otherwise
-   */
-  public String getTargetNamespace() {
-    return targetNamespace;
   }
 
   /**

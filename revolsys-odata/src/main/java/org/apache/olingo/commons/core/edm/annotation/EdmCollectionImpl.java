@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -31,29 +31,30 @@ import org.apache.olingo.commons.api.edm.provider.annotation.CsdlExpression;
 public class EdmCollectionImpl extends AbstractEdmDynamicExpression implements EdmCollection {
 
   private List<EdmExpression> items;
-  private CsdlCollection csdlCollection;
 
-  public EdmCollectionImpl(Edm edm, CsdlCollection csdlExp) {
+  private final CsdlCollection csdlCollection;
+
+  public EdmCollectionImpl(final Edm edm, final CsdlCollection csdlExp) {
     super(edm, "Collection");
     this.csdlCollection = csdlExp;
   }
 
   @Override
-  public List<EdmExpression> getItems() {
-    if (items == null) {
-      List<EdmExpression> localItems = new ArrayList<>();
-      if (csdlCollection.getItems() != null) {
-        for (CsdlExpression item : csdlCollection.getItems()) {
-          localItems.add(getExpression(edm, item));
-        }
-      }
-      items = Collections.unmodifiableList(localItems);
-    }
-    return items;
+  public EdmExpressionType getExpressionType() {
+    return EdmExpressionType.Collection;
   }
 
   @Override
-  public EdmExpressionType getExpressionType() {
-    return EdmExpressionType.Collection;
+  public List<EdmExpression> getItems() {
+    if (this.items == null) {
+      final List<EdmExpression> localItems = new ArrayList<>();
+      if (this.csdlCollection.getItems() != null) {
+        for (final CsdlExpression item : this.csdlCollection.getItems()) {
+          localItems.add(getExpression(this.edm, item));
+        }
+      }
+      this.items = Collections.unmodifiableList(localItems);
+    }
+    return this.items;
   }
 }

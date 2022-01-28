@@ -31,27 +31,19 @@ public final class EdmBoolean extends SingletonPrimitiveType {
     return INSTANCE;
   }
 
+  private static boolean validateLiteral(final String value) {
+    return "true".equals(value) || "false".equals(value);
+  }
+
   @Override
   public Class<?> getDefaultType() {
     return Boolean.class;
   }
 
   @Override
-  public boolean validate(final String value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode) {
-
-    return value == null ? isNullable == null || isNullable : validateLiteral(value);
-  }
-
-  private static boolean validateLiteral(final String value) {
-    return "true".equals(value) || "false".equals(value);
-  }
-
-  @Override
-  protected <T> T internalValueOfString(final String value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode, final Class<T> returnType) throws EdmPrimitiveTypeException {
+  protected <T> T internalValueOfString(final String value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode,
+    final Class<T> returnType) throws EdmPrimitiveTypeException {
 
     if (validateLiteral(value)) {
       if (returnType.isAssignableFrom(Boolean.class)) {
@@ -65,14 +57,22 @@ public final class EdmBoolean extends SingletonPrimitiveType {
   }
 
   @Override
-  protected <T> String internalValueToString(final T value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode) throws EdmPrimitiveTypeException {
+  protected <T> String internalValueToString(final T value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode)
+    throws EdmPrimitiveTypeException {
 
     if (value instanceof Boolean) {
-      return Boolean.toString((Boolean) value);
+      return Boolean.toString((Boolean)value);
     } else {
-      throw new EdmPrimitiveTypeException("The value type " + value.getClass() + " is not supported.");
+      throw new EdmPrimitiveTypeException(
+        "The value type " + value.getClass() + " is not supported.");
     }
+  }
+
+  @Override
+  public boolean validate(final String value, final Boolean isNullable, final Integer maxLength,
+    final Integer precision, final Integer scale, final Boolean isUnicode) {
+
+    return value == null ? isNullable == null || isNullable : validateLiteral(value);
   }
 }

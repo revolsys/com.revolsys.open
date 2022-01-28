@@ -23,11 +23,25 @@ import org.apache.olingo.commons.api.data.ContextURL;
 /** Options for the EDM-assisted serializer. */
 public class EdmAssistedSerializerOptions {
 
-  private ContextURL contextURL;
+  /** Builder of serializer options. */
+  public static final class Builder {
 
-  /** Gets the {@link ContextURL}. */
-  public ContextURL getContextURL() {
-    return contextURL;
+    private final EdmAssistedSerializerOptions options;
+
+    private Builder() {
+      this.options = new EdmAssistedSerializerOptions();
+    }
+
+    /** Builds the OData serializer options. */
+    public EdmAssistedSerializerOptions build() {
+      return this.options;
+    }
+
+    /** Sets the {@link ContextURL}. */
+    public Builder contextURL(final ContextURL contextURL) {
+      this.options.contextURL = contextURL;
+      return this;
+    }
   }
 
   /** Initializes the options builder. */
@@ -35,24 +49,10 @@ public class EdmAssistedSerializerOptions {
     return new Builder();
   }
 
-  /** Builder of serializer options. */
-  public static final class Builder {
+  private ContextURL contextURL;
 
-    private final EdmAssistedSerializerOptions options;
-
-    private Builder() {
-      options = new EdmAssistedSerializerOptions();
-    }
-
-    /** Sets the {@link ContextURL}. */
-    public Builder contextURL(final ContextURL contextURL) {
-      options.contextURL = contextURL;
-      return this;
-    }
-
-    /** Builds the OData serializer options. */
-    public EdmAssistedSerializerOptions build() {
-      return options;
-    }
+  /** Gets the {@link ContextURL}. */
+  public ContextURL getContextURL() {
+    return this.contextURL;
   }
 }

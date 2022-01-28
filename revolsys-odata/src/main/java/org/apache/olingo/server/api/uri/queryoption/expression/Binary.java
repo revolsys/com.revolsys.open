@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -29,10 +29,10 @@ import java.util.List;
 public interface Binary extends Expression {
 
   /**
-   * @return binary operator kind
-   * @see BinaryOperatorKind
+   *
+   * @return list of expressions of the right operand
    */
-  public BinaryOperatorKind getOperator();
+  public List<Expression> getExpressions();
 
   /**
    * @return Expression sub tree of the left operand
@@ -40,14 +40,14 @@ public interface Binary extends Expression {
   public Expression getLeftOperand();
 
   /**
+   * @return binary operator kind
+   * @see BinaryOperatorKind
+   */
+  public BinaryOperatorKind getOperator();
+
+  /**
    * @return Expression sub tree of the right operand
    */
   public Expression getRightOperand();
-  
-  /**
-   * 
-   * @return list of expressions of the right operand
-   */
-  public List<Expression> getExpressions();
 
 }

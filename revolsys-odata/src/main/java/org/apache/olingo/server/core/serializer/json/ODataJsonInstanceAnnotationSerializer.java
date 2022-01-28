@@ -42,189 +42,189 @@ import com.fasterxml.jackson.core.JsonGenerator;
 
 public class ODataJsonInstanceAnnotationSerializer {
 
-	private final boolean isODataMetadataNone;
-	private final boolean isODataMetadataFull;
-	private IConstants constants;
-	private final boolean isIEEE754Compatible;
+  private final boolean isODataMetadataNone;
 
-	public ODataJsonInstanceAnnotationSerializer(final ContentType contentType, final IConstants constants) {
-		isIEEE754Compatible = ContentTypeHelper.isODataIEEE754Compatible(contentType);
-		isODataMetadataNone = ContentTypeHelper.isODataMetadataNone(contentType);
-		isODataMetadataFull = ContentTypeHelper.isODataMetadataFull(contentType);
-		this.constants = constants;
-	}
+  private final boolean isODataMetadataFull;
 
-	/**
-	 * Write the instance annotation of an entity
-	 * @param annotations List of annotations
-	 * @param json JsonGenerator
-	 * @throws IOException 
-	 * @throws SerializerException
-	 * @throws DecoderException
-	 */
-	public void writeInstanceAnnotationsOnEntity(final List<Annotation> annotations, final JsonGenerator json)
-			throws IOException, SerializerException, DecoderException {
-		for (Annotation annotation : annotations) {
-			if (isODataMetadataFull) {
-				json.writeStringField(constants.getType(), "#" + annotation.getType());
-			}
-			json.writeFieldName("@" + annotation.getTerm());
-			writeInstanceAnnotation(json, annotation, "");
-		}
-	}
+  private final IConstants constants;
 
-	/**
-	 * Write instance annotation of a property
-	 * @param edmProperty EdmProperty
-	 * @param property Property
-	 * @param json JsonGenerator
-	 * @throws IOException
-	 * @throws SerializerException
-	 * @throws DecoderException
-	 */
-	public void writeInstanceAnnotationsOnProperties(final EdmProperty edmProperty, final Property property,
-			final JsonGenerator json) throws IOException, SerializerException, DecoderException {
-		if (property != null) {
-			for (Annotation annotation : property.getAnnotations()) {
-				json.writeFieldName(edmProperty.getName() + "@" + annotation.getTerm());
-				writeInstanceAnnotation(json, annotation, "");
-			}
-		}
-	}
+  private final boolean isIEEE754Compatible;
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private void writeInstanceAnnotation(final JsonGenerator json, Valuable annotation, String name)
-			throws IOException, SerializerException, DecoderException {
-		try {
-			switch (annotation.getValueType()) {
-			case PRIMITIVE:
-				if (isODataMetadataFull && name.length() > 0) {
-					json.writeStringField(name + constants.getType(), "#" + annotation.getType());
-				}
-				if (name.length() > 0) {
-					json.writeFieldName(name);
-				}
-				writeInstanceAnnotOnPrimitiveProperty(json, annotation, annotation.getValue());
-				break;
-			case COLLECTION_PRIMITIVE:
-				if (isODataMetadataFull && name.length() > 0) {
-					json.writeStringField(name + constants.getType(), 
-							"#Collection(" + annotation.getType() + ")");
-				}
-				if (name.length() > 0) {
-					json.writeFieldName(name);
-				}
-				json.writeStartArray();
-				List list = annotation.asCollection();
-				for (Object value : list) {
-					writeInstanceAnnotOnPrimitiveProperty(json, annotation, value);
-				}
-				json.writeEndArray();
-				break;
-			case COMPLEX:
-				if (isODataMetadataFull && name.length() > 0) {
-					json.writeStringField(name + constants.getType(), "#" + annotation.getType());
-				}
-				if (name.length() > 0) {
-					json.writeFieldName(name);
-				}
-				ComplexValue complexValue = annotation.asComplex();
-				writeInstanceAnnotOnComplexProperty(json, annotation, complexValue);
-				break;
-			case COLLECTION_COMPLEX:
-				if (isODataMetadataFull && name.length() > 0) {
-					json.writeStringField(name + constants.getType(), 
-							"#Collection(" + annotation.getType() + ")");
-				}
-				if (name.length() > 0) {
-					json.writeFieldName(name);
-				}
-				json.writeStartArray();
-				List<ComplexValue> complexValues = (List<ComplexValue>) annotation.asCollection();
-				for (ComplexValue complxValue : complexValues) {
-					writeInstanceAnnotOnComplexProperty(json, annotation, complxValue);
-				}
-				json.writeEndArray();
-				break;
-			default:
-			}
-		} catch (final EdmPrimitiveTypeException e) {
-			throw new SerializerException("Wrong value for instance annotation!", e,
-					SerializerException.MessageKeys.WRONG_PROPERTY_VALUE, 
-					((Annotation) annotation).getTerm(),
-					annotation.getValue().toString());
-		}
-	}
+  public ODataJsonInstanceAnnotationSerializer(final ContentType contentType,
+    final IConstants constants) {
+    this.isIEEE754Compatible = ContentTypeHelper.isODataIEEE754Compatible(contentType);
+    this.isODataMetadataNone = ContentTypeHelper.isODataMetadataNone(contentType);
+    this.isODataMetadataFull = ContentTypeHelper.isODataMetadataFull(contentType);
+    this.constants = constants;
+  }
 
-	private void writeInstanceAnnotOnComplexProperty(final JsonGenerator json, Valuable annotation,
-			ComplexValue complexValue) throws IOException, SerializerException, DecoderException {
-		json.writeStartObject();
-		if (isODataMetadataFull) {
-			json.writeStringField(constants.getType(), "#" + complexValue.getTypeName());
-		}
-		List<Property> properties = complexValue.getValue();
-		for (Property prop : properties) {
-			writeInstanceAnnotation(json, prop, prop.getName());
-		}
-		json.writeEndObject();
-	}
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  private void writeInstanceAnnotation(final JsonGenerator json, final Valuable annotation,
+    final String name) throws IOException, SerializerException, DecoderException {
+    try {
+      switch (annotation.getValueType()) {
+        case PRIMITIVE:
+          if (this.isODataMetadataFull && name.length() > 0) {
+            json.writeStringField(name + this.constants.getType(), "#" + annotation.getType());
+          }
+          if (name.length() > 0) {
+            json.writeFieldName(name);
+          }
+          writeInstanceAnnotOnPrimitiveProperty(json, annotation, annotation.getValue());
+        break;
+        case COLLECTION_PRIMITIVE:
+          if (this.isODataMetadataFull && name.length() > 0) {
+            json.writeStringField(name + this.constants.getType(),
+              "#Collection(" + annotation.getType() + ")");
+          }
+          if (name.length() > 0) {
+            json.writeFieldName(name);
+          }
+          json.writeStartArray();
+          final List list = annotation.asCollection();
+          for (final Object value : list) {
+            writeInstanceAnnotOnPrimitiveProperty(json, annotation, value);
+          }
+          json.writeEndArray();
+        break;
+        case COMPLEX:
+          if (this.isODataMetadataFull && name.length() > 0) {
+            json.writeStringField(name + this.constants.getType(), "#" + annotation.getType());
+          }
+          if (name.length() > 0) {
+            json.writeFieldName(name);
+          }
+          final ComplexValue complexValue = annotation.asComplex();
+          writeInstanceAnnotOnComplexProperty(json, annotation, complexValue);
+        break;
+        case COLLECTION_COMPLEX:
+          if (this.isODataMetadataFull && name.length() > 0) {
+            json.writeStringField(name + this.constants.getType(),
+              "#Collection(" + annotation.getType() + ")");
+          }
+          if (name.length() > 0) {
+            json.writeFieldName(name);
+          }
+          json.writeStartArray();
+          final List<ComplexValue> complexValues = (List<ComplexValue>)annotation.asCollection();
+          for (final ComplexValue complxValue : complexValues) {
+            writeInstanceAnnotOnComplexProperty(json, annotation, complxValue);
+          }
+          json.writeEndArray();
+        break;
+        default:
+      }
+    } catch (final EdmPrimitiveTypeException e) {
+      throw new SerializerException("Wrong value for instance annotation!", e,
+        SerializerException.MessageKeys.WRONG_PROPERTY_VALUE, ((Annotation)annotation).getTerm(),
+        annotation.getValue().toString());
+    }
+  }
 
-	private void writeInstanceAnnotOnPrimitiveProperty(final JsonGenerator json, Valuable annotation, Object value)
-			throws IOException, EdmPrimitiveTypeException {
-		writePrimitiveValue("",
-				EdmPrimitiveTypeFactory.getInstance(
-						EdmPrimitiveTypeKind.getByName(annotation.getType())), value, null,
-				null, null, null, true, json);
-	}
+  /**
+   * Write the instance annotation of an entity
+   * @param annotations List of annotations
+   * @param json JsonGenerator
+   * @throws IOException 
+   * @throws SerializerException
+   * @throws DecoderException
+   */
+  public void writeInstanceAnnotationsOnEntity(final List<Annotation> annotations,
+    final JsonGenerator json) throws IOException, SerializerException, DecoderException {
+    for (final Annotation annotation : annotations) {
+      if (this.isODataMetadataFull) {
+        json.writeStringField(this.constants.getType(), "#" + annotation.getType());
+      }
+      json.writeFieldName("@" + annotation.getTerm());
+      writeInstanceAnnotation(json, annotation, "");
+    }
+  }
 
-	protected void writePrimitiveValue(final String name, final EdmPrimitiveType type, final Object primitiveValue,
-			final Boolean isNullable, final Integer maxLength, final Integer precision, final Integer scale,
-			final Boolean isUnicode, final JsonGenerator json) 
-					throws EdmPrimitiveTypeException, IOException {
-		final String value = type.valueToString(
-				primitiveValue, isNullable, maxLength, precision, scale, isUnicode);
-		if (value == null) {
-			json.writeNull();
-		} else if (type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Boolean)) {
-			json.writeBoolean(Boolean.parseBoolean(value));
-		} else if (type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Byte)
-				|| type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Double)
-				|| type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Int16)
-				|| type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Int32)
-				|| type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.SByte)
-				|| type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Single)
-				|| (type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Decimal)
-				|| type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Int64))
-						&& !isIEEE754Compatible) {
-			json.writeNumber(value);
-		} else if (type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Stream)) {
-			if (primitiveValue instanceof Link) {
-				Link stream = (Link) primitiveValue;
-				if (!isODataMetadataNone) {
-					if (stream.getMediaETag() != null) {
-						json.writeStringField(name + constants.getMediaEtag(), 
-								stream.getMediaETag());
-					}
-					if (stream.getType() != null) {
-						json.writeStringField(name + constants.getMediaContentType(), 
-								stream.getType());
-					}
-				}
-				if (isODataMetadataFull) {
-					if (stream.getRel() != null && 
-							stream.getRel().equals(Constants.NS_MEDIA_READ_LINK_REL)) {
-						json.writeStringField(name + constants.getMediaReadLink(), 
-								stream.getHref());
-					}
-					if (stream.getRel() == null || 
-							stream.getRel().equals(Constants.NS_MEDIA_EDIT_LINK_REL)) {
-						json.writeStringField(name + constants.getMediaEditLink(), 
-								stream.getHref());
-					}
-				}
-			}
-		} else {
-			json.writeString(value);
-		}
-	}
+  /**
+   * Write instance annotation of a property
+   * @param edmProperty EdmProperty
+   * @param property Property
+   * @param json JsonGenerator
+   * @throws IOException
+   * @throws SerializerException
+   * @throws DecoderException
+   */
+  public void writeInstanceAnnotationsOnProperties(final EdmProperty edmProperty,
+    final Property property, final JsonGenerator json)
+    throws IOException, SerializerException, DecoderException {
+    if (property != null) {
+      for (final Annotation annotation : property.getAnnotations()) {
+        json.writeFieldName(edmProperty.getName() + "@" + annotation.getTerm());
+        writeInstanceAnnotation(json, annotation, "");
+      }
+    }
+  }
+
+  private void writeInstanceAnnotOnComplexProperty(final JsonGenerator json,
+    final Valuable annotation, final ComplexValue complexValue)
+    throws IOException, SerializerException, DecoderException {
+    json.writeStartObject();
+    if (this.isODataMetadataFull) {
+      json.writeStringField(this.constants.getType(), "#" + complexValue.getTypeName());
+    }
+    final List<Property> properties = complexValue.getValue();
+    for (final Property prop : properties) {
+      writeInstanceAnnotation(json, prop, prop.getName());
+    }
+    json.writeEndObject();
+  }
+
+  private void writeInstanceAnnotOnPrimitiveProperty(final JsonGenerator json,
+    final Valuable annotation, final Object value) throws IOException, EdmPrimitiveTypeException {
+    writePrimitiveValue("",
+      EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.getByName(annotation.getType())),
+      value, null, null, null, null, true, json);
+  }
+
+  protected void writePrimitiveValue(final String name, final EdmPrimitiveType type,
+    final Object primitiveValue, final Boolean isNullable, final Integer maxLength,
+    final Integer precision, final Integer scale, final Boolean isUnicode, final JsonGenerator json)
+    throws EdmPrimitiveTypeException, IOException {
+    final String value = type.valueToString(primitiveValue, isNullable, maxLength, precision, scale,
+      isUnicode);
+    if (value == null) {
+      json.writeNull();
+    } else if (type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Boolean)) {
+      json.writeBoolean(Boolean.parseBoolean(value));
+    } else if (type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Byte)
+      || type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Double)
+      || type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Int16)
+      || type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Int32)
+      || type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.SByte)
+      || type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Single)
+      || (type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Decimal)
+        || type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Int64))
+        && !this.isIEEE754Compatible) {
+      json.writeNumber(value);
+    } else if (type == EdmPrimitiveTypeFactory.getInstance(EdmPrimitiveTypeKind.Stream)) {
+      if (primitiveValue instanceof Link) {
+        final Link stream = (Link)primitiveValue;
+        if (!this.isODataMetadataNone) {
+          if (stream.getMediaETag() != null) {
+            json.writeStringField(name + this.constants.getMediaEtag(), stream.getMediaETag());
+          }
+          if (stream.getType() != null) {
+            json.writeStringField(name + this.constants.getMediaContentType(), stream.getType());
+          }
+        }
+        if (this.isODataMetadataFull) {
+          if (stream.getRel() != null && stream.getRel().equals(Constants.NS_MEDIA_READ_LINK_REL)) {
+            json.writeStringField(name + this.constants.getMediaReadLink(), stream.getHref());
+          }
+          if (stream.getRel() == null || stream.getRel().equals(Constants.NS_MEDIA_EDIT_LINK_REL)) {
+            json.writeStringField(name + this.constants.getMediaEditLink(), stream.getHref());
+          }
+        }
+      }
+    } else {
+      json.writeString(value);
+    }
+  }
 }

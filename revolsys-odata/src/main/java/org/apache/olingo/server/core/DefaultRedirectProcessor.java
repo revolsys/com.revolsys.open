@@ -38,8 +38,8 @@ public class DefaultRedirectProcessor implements RedirectProcessor {
 
     String location;
 
-    String rawUri = request.getRawRequestUri();
-    String rawQueryPath = request.getRawQueryPath();
+    final String rawUri = request.getRawRequestUri();
+    final String rawQueryPath = request.getRawQueryPath();
     if (rawQueryPath == null) {
       location = request.getRawRequestUri() + "/";
     } else {

@@ -40,7 +40,7 @@ public interface EdmApply extends EdmDynamicExpression, EdmAnnotatable {
    * @return function full qualified name
    */
   String getFunction();
-  
+
   /**
    * Returns the expressions applied to the parameters of the function
    * @return List of expression

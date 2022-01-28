@@ -27,7 +27,7 @@ import org.apache.olingo.commons.api.edm.geo.SRID;
 /**
  * The type Csdl type definition.
  */
-public class CsdlTypeDefinition extends CsdlAbstractEdmItem implements CsdlNamed, CsdlAnnotatable {
+public class CsdlTypeDefinition implements CsdlAbstractEdmItem, CsdlNamed, CsdlAnnotatable {
 
   private String name;
 
@@ -44,11 +44,94 @@ public class CsdlTypeDefinition extends CsdlAbstractEdmItem implements CsdlNamed
 
   private SRID srid;
 
-  private List<CsdlAnnotation> annotations = new ArrayList<CsdlAnnotation>();
+  private List<CsdlAnnotation> annotations = new ArrayList<>();
+
+  @Override
+  public List<CsdlAnnotation> getAnnotations() {
+    return this.annotations;
+  }
+
+  /**
+   * Gets max length.
+   *
+   * @return the max length
+   */
+  public Integer getMaxLength() {
+    return this.maxLength;
+  }
 
   @Override
   public String getName() {
-    return name;
+    return this.name;
+  }
+
+  /**
+   * Gets precision.
+   *
+   * @return the precision
+   */
+  public Integer getPrecision() {
+    return this.precision;
+  }
+
+  /**
+   * Gets scale.
+   *
+   * @return the scale
+   */
+  public Integer getScale() {
+    return this.scale;
+  }
+
+  /**
+   * Gets srid.
+   *
+   * @return the srid
+   */
+  public SRID getSrid() {
+    return this.srid;
+  }
+
+  /**
+   * Gets underlying type.
+   *
+   * @return the underlying type
+   */
+  public String getUnderlyingType() {
+    if (this.underlyingType != null) {
+      return this.underlyingType.getFullQualifiedNameAsString();
+    }
+    return null;
+  }
+
+  /**
+   * Is unicode.
+   *
+   * @return the boolean
+   */
+  public boolean isUnicode() {
+    return this.unicode;
+  }
+
+  /**
+   * Sets a list of annotations
+   * @param annotations list of annotations
+   * @return this instance
+   */
+  public CsdlTypeDefinition setAnnotations(final List<CsdlAnnotation> annotations) {
+    this.annotations = annotations;
+    return this;
+  }
+
+  /**
+   * Sets max length.
+   *
+   * @param maxLength the max length
+   * @return the max length
+   */
+  public CsdlTypeDefinition setMaxLength(final Integer maxLength) {
+    this.maxLength = maxLength;
+    return this;
   }
 
   /**
@@ -63,25 +146,35 @@ public class CsdlTypeDefinition extends CsdlAbstractEdmItem implements CsdlNamed
   }
 
   /**
-   * Gets underlying type.
+   * Sets precision.
    *
-   * @return the underlying type
+   * @param precision the precision
+   * @return the precision
    */
-  public String getUnderlyingType() {
-    if (underlyingType != null) {
-      return underlyingType.getFullQualifiedNameAsString();
-    }
-    return null;
+  public CsdlTypeDefinition setPrecision(final Integer precision) {
+    this.precision = precision;
+    return this;
   }
 
   /**
-   * Sets underlying type.
+   * Sets scale.
    *
-   * @param underlyingType the underlying type
-   * @return the underlying type
+   * @param scale the scale
+   * @return the scale
    */
-  public CsdlTypeDefinition setUnderlyingType(final String underlyingType) {
-    this.underlyingType = new FullQualifiedName(underlyingType);
+  public CsdlTypeDefinition setScale(final Integer scale) {
+    this.scale = scale;
+    return this;
+  }
+
+  /**
+   * Sets srid.
+   *
+   * @param srid the srid
+   * @return the srid
+   */
+  public CsdlTypeDefinition setSrid(final SRID srid) {
+    this.srid = srid;
     return this;
   }
 
@@ -97,72 +190,14 @@ public class CsdlTypeDefinition extends CsdlAbstractEdmItem implements CsdlNamed
   }
 
   /**
-   * Gets max length.
+   * Sets underlying type.
    *
-   * @return the max length
+   * @param underlyingType the underlying type
+   * @return the underlying type
    */
-  public Integer getMaxLength() {
-    return maxLength;
-  }
-
-  /**
-   * Sets max length.
-   *
-   * @param maxLength the max length
-   * @return the max length
-   */
-  public CsdlTypeDefinition setMaxLength(final Integer maxLength) {
-    this.maxLength = maxLength;
+  public CsdlTypeDefinition setUnderlyingType(final String underlyingType) {
+    this.underlyingType = new FullQualifiedName(underlyingType);
     return this;
-  }
-
-  /**
-   * Gets precision.
-   *
-   * @return the precision
-   */
-  public Integer getPrecision() {
-    return precision;
-  }
-
-  /**
-   * Sets precision.
-   *
-   * @param precision the precision
-   * @return the precision
-   */
-  public CsdlTypeDefinition setPrecision(final Integer precision) {
-    this.precision = precision;
-    return this;
-  }
-
-  /**
-   * Gets scale.
-   *
-   * @return the scale
-   */
-  public Integer getScale() {
-    return scale;
-  }
-
-  /**
-   * Sets scale.
-   *
-   * @param scale the scale
-   * @return the scale
-   */
-  public CsdlTypeDefinition setScale(final Integer scale) {
-    this.scale = scale;
-    return this;
-  }
-
-  /**
-   * Is unicode.
-   *
-   * @return the boolean
-   */
-  public boolean isUnicode() {
-    return unicode;
   }
 
   /**
@@ -173,41 +208,6 @@ public class CsdlTypeDefinition extends CsdlAbstractEdmItem implements CsdlNamed
    */
   public CsdlTypeDefinition setUnicode(final boolean unicode) {
     this.unicode = unicode;
-    return this;
-  }
-
-  /**
-   * Gets srid.
-   *
-   * @return the srid
-   */
-  public SRID getSrid() {
-    return srid;
-  }
-
-  /**
-   * Sets srid.
-   *
-   * @param srid the srid
-   * @return the srid
-   */
-  public CsdlTypeDefinition setSrid(final SRID srid) {
-    this.srid = srid;
-    return this;
-  }
-
-  @Override
-  public List<CsdlAnnotation> getAnnotations() {
-    return annotations;
-  }
-  
-  /**
-   * Sets a list of annotations
-   * @param annotations list of annotations
-   * @return this instance
-   */
-  public CsdlTypeDefinition setAnnotations(final List<CsdlAnnotation> annotations) {
-    this.annotations = annotations;
     return this;
   }
 }

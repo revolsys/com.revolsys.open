@@ -40,17 +40,17 @@ public interface ODataHandler {
   ODataResponse process(final ODataRequest request);
 
   /**
-   * <p>Registers additional custom processor implementations for handling OData requests.</p>
-   * <p>If request processing requires a processor that is not registered then a
-   * "not implemented" exception will happen.</p>
-   */
-  void register(Processor processor);
-
-  /**
    * <p>Registers additional extensions for handling OData requests.</p>
    * <p>This method is used for registration of all possible extensions
    * and provide the extensibility for further extensions and
    * different ODataHandler implementations/extensions.</p>
    */
   void register(OlingoExtension extension);
+
+  /**
+   * <p>Registers additional custom processor implementations for handling OData requests.</p>
+   * <p>If request processing requires a processor that is not registered then a
+   * "not implemented" exception will happen.</p>
+   */
+  void register(Processor processor);
 }

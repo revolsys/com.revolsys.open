@@ -24,4 +24,3 @@
  *
  */
 package org.apache.olingo.server.api.uri.queryoption.search;
-

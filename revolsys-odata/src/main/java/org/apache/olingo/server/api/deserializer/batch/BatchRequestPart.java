@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -29,7 +29,8 @@ import org.apache.olingo.server.api.ODataRequest;
  */
 public class BatchRequestPart {
   private List<ODataRequest> requests = new ArrayList<>();
-  private boolean isChangeSet;
+
+  private final boolean isChangeSet;
 
   /**
    * Creates a new instance of BachRequestPart.
@@ -48,16 +49,8 @@ public class BatchRequestPart {
    */
   public BatchRequestPart(final boolean isChangeSet, final ODataRequest request) {
     this.isChangeSet = isChangeSet;
-    requests = new ArrayList<>();
-    requests.add(request);
-  }
-
-  /**
-   * Gets the info if a BatchPart is a ChangeSet.
-   * @return true or false
-   */
-  public boolean isChangeSet() {
-    return isChangeSet;
+    this.requests = new ArrayList<>();
+    this.requests.add(request);
   }
 
   /**
@@ -65,6 +58,14 @@ public class BatchRequestPart {
    * @return a list of {@link ODataRequest}
    */
   public List<ODataRequest> getRequests() {
-    return Collections.unmodifiableList(requests);
+    return Collections.unmodifiableList(this.requests);
+  }
+
+  /**
+   * Gets the info if a BatchPart is a ChangeSet.
+   * @return true or false
+   */
+  public boolean isChangeSet() {
+    return this.isChangeSet;
   }
 }

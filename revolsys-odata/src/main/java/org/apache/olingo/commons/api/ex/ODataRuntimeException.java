@@ -26,6 +26,15 @@ public class ODataRuntimeException extends RuntimeException {
   private static final long serialVersionUID = 5492375572049190883L;
 
   /**
+   * Create with <code>cause</code> of exception.
+   *
+   * @param cause cause of exception
+   */
+  public ODataRuntimeException(final Exception cause) {
+    super(cause);
+  }
+
+  /**
    * Create with <code>message</code>.
    *
    * @param msg message text for exception
@@ -42,15 +51,6 @@ public class ODataRuntimeException extends RuntimeException {
    */
   public ODataRuntimeException(final String msg, final Exception cause) {
     super(msg, cause);
-  }
-
-  /**
-   * Create with <code>cause</code> of exception.
-   *
-   * @param cause cause of exception
-   */
-  public ODataRuntimeException(final Exception cause) {
-    super(cause);
   }
 
 }

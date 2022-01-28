@@ -27,7 +27,7 @@ import org.apache.olingo.commons.api.edm.geo.SRID;
 /**
  * The type Csdl return type.
  */
-public class CsdlReturnType extends CsdlAbstractEdmItem implements CsdlAnnotatable {
+public class CsdlReturnType implements CsdlAbstractEdmItem, CsdlAnnotatable {
 
   private String type;
 
@@ -43,8 +43,49 @@ public class CsdlReturnType extends CsdlAbstractEdmItem implements CsdlAnnotatab
   private Integer scale;
 
   private SRID srid;
-  
-  private List<CsdlAnnotation> annotations = new ArrayList<CsdlAnnotation>();
+
+  private List<CsdlAnnotation> annotations = new ArrayList<>();
+
+  @Override
+  public List<CsdlAnnotation> getAnnotations() {
+    return this.annotations;
+  }
+
+  /**
+   * Gets max length.
+   *
+   * @return the max length
+   */
+  public Integer getMaxLength() {
+    return this.maxLength;
+  }
+
+  /**
+   * Gets precision.
+   *
+   * @return the precision
+   */
+  public Integer getPrecision() {
+    return this.precision;
+  }
+
+  /**
+   * Gets scale.
+   *
+   * @return the scale
+   */
+  public Integer getScale() {
+    return this.scale;
+  }
+
+  /**
+   * Gets srid.
+   *
+   * @return the srid
+   */
+  public SRID getSrid() {
+    return this.srid;
+  }
 
   /**
    * Gets type.
@@ -52,7 +93,7 @@ public class CsdlReturnType extends CsdlAbstractEdmItem implements CsdlAnnotatab
    * @return the type
    */
   public String getType() {
-    return type;
+    return this.type;
   }
 
   /**
@@ -61,17 +102,101 @@ public class CsdlReturnType extends CsdlAbstractEdmItem implements CsdlAnnotatab
    * @return the type fQN
    */
   public FullQualifiedName getTypeFQN() {
-    return new FullQualifiedName(type);
+    return new FullQualifiedName(this.type);
   }
 
   /**
-   * Sets type.
+   * Is collection.
    *
-   * @param type the type
-   * @return the type
+   * @return the boolean
    */
-  public CsdlReturnType setType(final String type) {
-    this.type = type;
+  public boolean isCollection() {
+    return this.isCollection;
+  }
+
+  /**
+   * Is nullable.
+   *
+   * @return the boolean
+   */
+  public boolean isNullable() {
+    return this.nullable;
+  }
+
+  /**
+   * Sets annotations.
+   *
+   * @param annotations the annotations
+   * @return the annotations
+   */
+  public CsdlReturnType setAnnotations(final List<CsdlAnnotation> annotations) {
+    this.annotations = annotations;
+    return this;
+  }
+
+  /**
+   * Sets collection.
+   *
+   * @param isCollection the is collection
+   * @return the collection
+   */
+  public CsdlReturnType setCollection(final boolean isCollection) {
+    this.isCollection = isCollection;
+    return this;
+  }
+
+  /**
+   * Sets max length.
+   *
+   * @param maxLength the max length
+   * @return the max length
+   */
+  public CsdlReturnType setMaxLength(final Integer maxLength) {
+    this.maxLength = maxLength;
+    return this;
+  }
+
+  /**
+   * Sets nullable.
+   *
+   * @param nullable the nullable
+   * @return the nullable
+   */
+  public CsdlReturnType setNullable(final boolean nullable) {
+    this.nullable = nullable;
+    return this;
+  }
+
+  /**
+   * Sets precision.
+   *
+   * @param precision the precision
+   * @return the precision
+   */
+  public CsdlReturnType setPrecision(final Integer precision) {
+    this.precision = precision;
+    return this;
+  }
+
+  /**
+   * Sets scale.
+   *
+   * @param scale the scale
+   * @return the scale
+   */
+  public CsdlReturnType setScale(final Integer scale) {
+    this.scale = scale;
+    return this;
+  }
+
+  /**
+   * Sets srid.
+   *
+   * @param srid the srid
+   * @return the srid
+   */
+  public CsdlReturnType setSrid(final SRID srid) {
+    this.srid = srid;
     return this;
   }
 
@@ -87,138 +212,13 @@ public class CsdlReturnType extends CsdlAbstractEdmItem implements CsdlAnnotatab
   }
 
   /**
-   * Is collection.
+   * Sets type.
    *
-   * @return the boolean
+   * @param type the type
+   * @return the type
    */
-  public boolean isCollection() {
-    return isCollection;
-  }
-
-  /**
-   * Sets collection.
-   *
-   * @param isCollection the is collection
-   * @return the collection
-   */
-  public CsdlReturnType setCollection(final boolean isCollection) {
-    this.isCollection = isCollection;
-    return this;
-  }
-
-  /**
-   * Is nullable.
-   *
-   * @return the boolean
-   */
-  public boolean isNullable() {
-    return nullable;
-  }
-
-  /**
-   * Sets nullable.
-   *
-   * @param nullable the nullable
-   * @return the nullable
-   */
-  public CsdlReturnType setNullable(final boolean nullable) {
-    this.nullable = nullable;
-    return this;
-  }
-
-  /**
-   * Gets max length.
-   *
-   * @return the max length
-   */
-  public Integer getMaxLength() {
-    return maxLength;
-  }
-
-  /**
-   * Sets max length.
-   *
-   * @param maxLength the max length
-   * @return the max length
-   */
-  public CsdlReturnType setMaxLength(final Integer maxLength) {
-    this.maxLength = maxLength;
-    return this;
-  }
-
-  /**
-   * Gets precision.
-   *
-   * @return the precision
-   */
-  public Integer getPrecision() {
-    return precision;
-  }
-
-  /**
-   * Sets precision.
-   *
-   * @param precision the precision
-   * @return the precision
-   */
-  public CsdlReturnType setPrecision(final Integer precision) {
-    this.precision = precision;
-    return this;
-  }
-
-  /**
-   * Gets scale.
-   *
-   * @return the scale
-   */
-  public Integer getScale() {
-    return scale;
-  }
-
-  /**
-   * Sets scale.
-   *
-   * @param scale the scale
-   * @return the scale
-   */
-  public CsdlReturnType setScale(final Integer scale) {
-    this.scale = scale;
-    return this;
-  }
-
-  /**
-   * Gets srid.
-   *
-   * @return the srid
-   */
-  public SRID getSrid() {
-    return srid;
-  }
-
-  /**
-   * Sets srid.
-   *
-   * @param srid the srid
-   * @return the srid
-   */
-  public CsdlReturnType setSrid(final SRID srid) {
-    this.srid = srid;
-    return this;
-  }
-
-  @Override
-  public List<CsdlAnnotation> getAnnotations() {
-    return annotations;
-  }
-
-  /**
-   * Sets annotations.
-   *
-   * @param annotations the annotations
-   * @return the annotations
-   */
-  public CsdlReturnType setAnnotations(final List<CsdlAnnotation> annotations) {
-    this.annotations = annotations;
+  public CsdlReturnType setType(final String type) {
+    this.type = type;
     return this;
   }
 }

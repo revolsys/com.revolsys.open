@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -24,9 +24,10 @@ import org.apache.olingo.commons.api.edm.FullQualifiedName;
 public class TargetQualifierMapKey {
 
   private final FullQualifiedName targetName;
+
   private final String qualifier;
 
-  public TargetQualifierMapKey(FullQualifiedName targetName, String qualifier) {
+  public TargetQualifierMapKey(final FullQualifiedName targetName, final String qualifier) {
     if (targetName == null) {
       throw new EdmException("targetName for TargetQualifierMapKey must not be null.");
     }
@@ -35,41 +36,38 @@ public class TargetQualifierMapKey {
   }
 
   @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((qualifier == null) ? 0 : qualifier.hashCode());
-    result = prime * result + ((targetName == null) ? 0 : targetName.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
+  public boolean equals(final Object obj) {
     if (this == obj) {
       return true;
     }
-    if (obj == null) {
+    if ((obj == null) || !(obj instanceof TargetQualifierMapKey)) {
       return false;
     }
-    if (!(obj instanceof TargetQualifierMapKey)) {
-      return false;
-    }
-    TargetQualifierMapKey other = (TargetQualifierMapKey) obj;
-    if (qualifier == null) {
+    final TargetQualifierMapKey other = (TargetQualifierMapKey)obj;
+    if (this.qualifier == null) {
       if (other.qualifier != null) {
         return false;
       }
-    } else if (!qualifier.equals(other.qualifier)) {
+    } else if (!this.qualifier.equals(other.qualifier)) {
       return false;
     }
-    if (targetName == null) {
+    if (this.targetName == null) {
       if (other.targetName != null) {
         return false;
       }
-    } else if (!targetName.equals(other.targetName)) {
+    } else if (!this.targetName.equals(other.targetName)) {
       return false;
     }
     return true;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (this.qualifier == null ? 0 : this.qualifier.hashCode());
+    result = prime * result + (this.targetName == null ? 0 : this.targetName.hashCode());
+    return result;
   }
 
 }

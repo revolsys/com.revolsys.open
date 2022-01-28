@@ -22,27 +22,27 @@ import org.apache.olingo.server.api.ODataContent;
 import org.apache.olingo.server.api.serializer.SerializerStreamResult;
 
 public class SerializerStreamResultImpl implements SerializerStreamResult {
-  private ODataContent oDataContent;
+  public static class SerializerResultBuilder {
+    private final SerializerStreamResultImpl result = new SerializerStreamResultImpl();
 
-  @Override
-  public ODataContent getODataContent() {
-    return oDataContent;
+    public SerializerStreamResult build() {
+      return this.result;
+    }
+
+    public SerializerResultBuilder content(final ODataContent content) {
+      this.result.oDataContent = content;
+      return this;
+    }
   }
 
   public static SerializerResultBuilder with() {
     return new SerializerResultBuilder();
   }
 
-  public static class SerializerResultBuilder {
-    private SerializerStreamResultImpl result = new SerializerStreamResultImpl();
+  private ODataContent oDataContent;
 
-    public SerializerResultBuilder content(final ODataContent content) {
-      result.oDataContent = content;
-      return this;
-    }
-
-    public SerializerStreamResult build() {
-      return result;
-    }
+  @Override
+  public ODataContent getODataContent() {
+    return this.oDataContent;
   }
 }

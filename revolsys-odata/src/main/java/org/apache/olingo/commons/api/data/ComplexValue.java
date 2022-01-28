@@ -27,8 +27,21 @@ import java.util.List;
 public class ComplexValue extends Linked {
 
   private final List<Property> value = new ArrayList<>();
-  
+
   private String typeName;
+
+  @Override
+  public boolean equals(final Object o) {
+    return super.equals(o) && this.value.equals(((ComplexValue)o).value);
+  }
+
+  /**
+   * Get string representation of type (can be null if not set).
+   * @return string representation of type (can be null if not set)
+   */
+  public String getTypeName() {
+    return this.typeName;
+  }
 
   /**
    * Get list of all values for this ComplexValue.
@@ -36,32 +49,14 @@ public class ComplexValue extends Linked {
    * @return all values for this ComplexValue (can not be null).
    */
   public List<Property> getValue() {
-    return value;
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    return super.equals(o) && value.equals(((ComplexValue) o).value);
+    return this.value;
   }
 
   @Override
   public int hashCode() {
     int result = super.hashCode();
-    result = 31 * result + value.hashCode();
+    result = 31 * result + this.value.hashCode();
     return result;
-  }
-
-  @Override
-  public String toString() {
-    return value.toString();
-  }
-  
-  /**
-   * Get string representation of type (can be null if not set).
-   * @return string representation of type (can be null if not set)
-   */
-  public String getTypeName() {
-    return typeName;
   }
 
   /**
@@ -70,5 +65,10 @@ public class ComplexValue extends Linked {
    */
   public void setTypeName(final String typeName) {
     this.typeName = typeName;
+  }
+
+  @Override
+  public String toString() {
+    return this.value.toString();
   }
 }

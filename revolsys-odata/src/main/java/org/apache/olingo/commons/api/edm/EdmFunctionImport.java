@@ -26,11 +26,15 @@ import java.util.List;
 public interface EdmFunctionImport extends EdmOperationImport {
 
   /**
-   * Gets unbound functions.
-   *
-   * @return unbound functions
+   * @return the Full qualified name for the function as specified in the metadata
    */
-  List<EdmFunction> getUnboundFunctions();
+  FullQualifiedName getFunctionFqn();
+
+  /**
+   * Returns a human readable title or null if not set.
+   * @return a human readable title or null
+   */
+  String getTitle();
 
   /**
    * Gets unbound function with given parameter names.
@@ -41,16 +45,12 @@ public interface EdmFunctionImport extends EdmOperationImport {
   EdmFunction getUnboundFunction(List<String> parameterNames);
 
   /**
-   * @return the Full qualified name for the function as specified in the metadata
+   * Gets unbound functions.
+   *
+   * @return unbound functions
    */
-  FullQualifiedName getFunctionFqn();
+  List<EdmFunction> getUnboundFunctions();
 
-  /**
-   * Returns a human readable title or null if not set.
-   * @return a human readable title or null
-   */
-  String getTitle();
-  
   /**
    * @return true if the function import must be included in the service document
    */

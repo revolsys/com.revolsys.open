@@ -27,9 +27,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
@@ -220,25 +218,6 @@ public class ODataHttpHandlerImpl implements ODataHttpHandler {
 
   public ODataHttpHandlerImpl(final OData odata, final ServiceMetadata serviceMetadata) {
     this.handler = new ODataHandlerImpl(odata, serviceMetadata);
-  }
-
-  private Map<String, String> createEnvironmentVariablesMap(final HttpServletRequest request) {
-    final Map<String, String> environment = new LinkedHashMap<>();
-    environment.put("authType", request.getAuthType());
-    environment.put("localAddr", request.getLocalAddr());
-    environment.put("localName", request.getLocalName());
-    environment.put("localPort", getIntAsString(request.getLocalPort()));
-    environment.put("pathInfo", request.getPathInfo());
-    environment.put("pathTranslated", request.getPathTranslated());
-    environment.put("remoteAddr", request.getRemoteAddr());
-    environment.put("remoteHost", request.getRemoteHost());
-    environment.put("remotePort", getIntAsString(request.getRemotePort()));
-    environment.put("remoteUser", request.getRemoteUser());
-    environment.put("scheme", request.getScheme());
-    environment.put("serverName", request.getServerName());
-    environment.put("serverPort", getIntAsString(request.getServerPort()));
-    environment.put("servletPath", request.getServletPath());
-    return environment;
   }
 
   private ODataRequest fillODataRequest(final ODataRequest odRequest,

@@ -35,13 +35,14 @@ public final class FunctionMapKey {
 
   private final List<String> parameterNames;
 
-  public FunctionMapKey(final FullQualifiedName functionName, final FullQualifiedName bindingParameterTypeName,
-      final Boolean isBindingParameterCollection, final List<String> parameterNames) {
+  public FunctionMapKey(final FullQualifiedName functionName,
+    final FullQualifiedName bindingParameterTypeName, final Boolean isBindingParameterCollection,
+    final List<String> parameterNames) {
 
     this.functionName = functionName;
     if (bindingParameterTypeName != null && isBindingParameterCollection == null) {
       throw new EdmException(
-          "Indicator that the bindingparameter is a collection must not be null if its an bound function.");
+        "Indicator that the bindingparameter is a collection must not be null if its an bound function.");
     }
     this.bindingParameterTypeName = bindingParameterTypeName;
     this.isBindingParameterCollection = isBindingParameterCollection;
@@ -53,34 +54,25 @@ public final class FunctionMapKey {
   }
 
   @Override
-  public int hashCode() {
-    int result = functionName != null ? functionName.hashCode() : 0;
-    result = 31 * result + (bindingParameterTypeName != null ? bindingParameterTypeName.hashCode() : 0);
-    result = 31 * result + (isBindingParameterCollection != null ? isBindingParameterCollection.hashCode() : 0);
-    result = 31 * result + parameterNames.hashCode();
-    return result;
-  }
-
-  @Override
   public boolean equals(final Object obj) {
     if (this == obj) {
       return true;
     }
-    if ((obj == null) || !(obj instanceof FunctionMapKey)) {
+    if (obj == null || !(obj instanceof FunctionMapKey)) {
       return false;
     }
-    final FunctionMapKey other = (FunctionMapKey) obj;
+    final FunctionMapKey other = (FunctionMapKey)obj;
 
-    if (functionName.equals(other.functionName)
-        && (bindingParameterTypeName == null && other.bindingParameterTypeName == null)
-        || (bindingParameterTypeName != null && bindingParameterTypeName.equals(other.bindingParameterTypeName))
-        && (isBindingParameterCollection == null
-        && other.isBindingParameterCollection == null)
-        || (isBindingParameterCollection != null
-        && isBindingParameterCollection.equals(other.isBindingParameterCollection))
-            && parameterNames.size() == other.parameterNames.size()) {
+    if (this.functionName.equals(other.functionName) && this.bindingParameterTypeName == null
+      && other.bindingParameterTypeName == null
+      || this.bindingParameterTypeName != null
+        && this.bindingParameterTypeName.equals(other.bindingParameterTypeName)
+        && this.isBindingParameterCollection == null && other.isBindingParameterCollection == null
+      || this.isBindingParameterCollection != null
+        && this.isBindingParameterCollection.equals(other.isBindingParameterCollection)
+        && this.parameterNames.size() == other.parameterNames.size()) {
 
-      for (String name : parameterNames) {
+      for (final String name : this.parameterNames) {
         if (!other.parameterNames.contains(name)) {
           return false;
         }
@@ -88,5 +80,17 @@ public final class FunctionMapKey {
       return true;
     }
     return false;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = this.functionName != null ? this.functionName.hashCode() : 0;
+    result = 31 * result
+      + (this.bindingParameterTypeName != null ? this.bindingParameterTypeName.hashCode() : 0);
+    result = 31 * result
+      + (this.isBindingParameterCollection != null ? this.isBindingParameterCollection.hashCode()
+        : 0);
+    result = 31 * result + this.parameterNames.hashCode();
+    return result;
   }
 }

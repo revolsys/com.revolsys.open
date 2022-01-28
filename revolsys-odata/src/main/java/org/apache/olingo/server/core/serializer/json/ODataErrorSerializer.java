@@ -33,10 +33,10 @@ import com.fasterxml.jackson.core.JsonGenerator;
 public class ODataErrorSerializer {
 
   public void writeErrorDocument(final JsonGenerator json, final ODataError error)
-      throws IOException, SerializerException {
+    throws IOException, SerializerException {
     if (error == null) {
       throw new SerializerException("ODataError object MUST NOT be null!",
-          SerializerException.MessageKeys.NULL_INPUT);
+        SerializerException.MessageKeys.NULL_INPUT);
     }
     json.writeStartObject();
     json.writeFieldName(Constants.JSON_ERROR);
@@ -47,7 +47,7 @@ public class ODataErrorSerializer {
 
     if (error.getDetails() != null) {
       json.writeArrayFieldStart(Constants.ERROR_DETAILS);
-      for (ODataErrorDetail detail : error.getDetails()) {
+      for (final ODataErrorDetail detail : error.getDetails()) {
         json.writeStartObject();
         writeODataError(json, detail.getCode(), detail.getMessage(), detail.getTarget());
         writeODataAdditionalProperties(json, detail.getAdditionalProperties());
@@ -61,31 +61,31 @@ public class ODataErrorSerializer {
   }
 
   @SuppressWarnings("unchecked")
-  private void writeODataAdditionalProperties(JsonGenerator json, 
-		  Map<String, Object> additionalProperties) throws IOException {
-	  if (additionalProperties != null) {
-		  for (Entry<String, Object> additionalProperty : additionalProperties.entrySet()) {
-			  Object value = additionalProperty.getValue();
-			  if (value instanceof List) {
-				  List<Map<String, Object>> list = (List<Map<String, Object>>) value;
-				  json.writeArrayFieldStart(additionalProperty.getKey());
-				  for (Map<String, Object> entry : list) {
-					  json.writeStartObject();
-					  writeODataAdditionalProperties(json, entry);
-					  json.writeEndObject();
-				  }
-				  json.writeEndArray();
-			  } else if (value instanceof Map) {
-				  writeODataAdditionalProperties(json, (Map<String, Object>) value);
-			  } else {
-				  json.writeObjectField(additionalProperty.getKey(), value);
-			  }
-		  }
-	  }
-}
+  private void writeODataAdditionalProperties(final JsonGenerator json,
+    final Map<String, Object> additionalProperties) throws IOException {
+    if (additionalProperties != null) {
+      for (final Entry<String, Object> additionalProperty : additionalProperties.entrySet()) {
+        final Object value = additionalProperty.getValue();
+        if (value instanceof List) {
+          final List<Map<String, Object>> list = (List<Map<String, Object>>)value;
+          json.writeArrayFieldStart(additionalProperty.getKey());
+          for (final Map<String, Object> entry : list) {
+            json.writeStartObject();
+            writeODataAdditionalProperties(json, entry);
+            json.writeEndObject();
+          }
+          json.writeEndArray();
+        } else if (value instanceof Map) {
+          writeODataAdditionalProperties(json, (Map<String, Object>)value);
+        } else {
+          json.writeObjectField(additionalProperty.getKey(), value);
+        }
+      }
+    }
+  }
 
-private void writeODataError(final JsonGenerator json, final String code, final String message, final String target)
-      throws IOException {
+  private void writeODataError(final JsonGenerator json, final String code, final String message,
+    final String target) throws IOException {
     json.writeFieldName(Constants.ERROR_CODE);
     if (code == null) {
       json.writeNull();

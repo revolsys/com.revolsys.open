@@ -22,8 +22,6 @@ import org.apache.olingo.server.api.ODataLibraryException;
 
 /** Exception thrown during basic request handling. */
 public class ODataHandlerException extends ODataLibraryException {
-  private static final long serialVersionUID = -907752788975531134L;
-
   public static enum MessageKeys implements MessageKey {
     /** parameters: HTTP method, HTTP method */
     AMBIGUOUS_XHTTP_METHOD,
@@ -54,13 +52,15 @@ public class ODataHandlerException extends ODataLibraryException {
     }
   }
 
+  private static final long serialVersionUID = -907752788975531134L;
+
   public ODataHandlerException(final String developmentMessage, final MessageKey messageKey,
-      final String... parameters) {
+    final String... parameters) {
     super(developmentMessage, messageKey, parameters);
   }
 
-  public ODataHandlerException(final String developmentMessage, final Throwable cause, final MessageKey messageKey,
-      final String... parameters) {
+  public ODataHandlerException(final String developmentMessage, final Throwable cause,
+    final MessageKey messageKey, final String... parameters) {
     super(developmentMessage, cause, messageKey, parameters);
   }
 

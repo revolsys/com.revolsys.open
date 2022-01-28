@@ -32,60 +32,19 @@ import org.apache.olingo.commons.core.edm.primitivetype.EdmPrimitiveTypeFactory;
 
 public class EdmTypeDefinitionImpl extends EdmTypeImpl implements EdmTypeDefinition {
 
-  private CsdlTypeDefinition typeDefinition;
+  private final CsdlTypeDefinition typeDefinition;
+
   private EdmPrimitiveType edmPrimitiveTypeInstance;
 
   public EdmTypeDefinitionImpl(final Edm edm, final FullQualifiedName typeDefinitionName,
-      final CsdlTypeDefinition typeDefinition) {
+    final CsdlTypeDefinition typeDefinition) {
     super(edm, typeDefinitionName, EdmTypeKind.DEFINITION, typeDefinition);
     this.typeDefinition = typeDefinition;
   }
 
   @Override
-  public EdmPrimitiveType getUnderlyingType() {
-    if (edmPrimitiveTypeInstance == null) {
-      try {
-        if (typeDefinition.getUnderlyingType() == null) {
-          throw new EdmException("Underlying Type for type definition: "
-              + typeName.getFullQualifiedNameAsString() + " must not be null.");
-        }
-        edmPrimitiveTypeInstance = EdmPrimitiveTypeFactory.getInstance(
-            EdmPrimitiveTypeKind.valueOfFQN(typeDefinition.getUnderlyingType()));
-      } catch (IllegalArgumentException e) {
-        throw new EdmException("Invalid underlying type: " + typeDefinition.getUnderlyingType(), e);
-      }
-    }
-    return edmPrimitiveTypeInstance;
-  }
-
-  @Override
-  public Integer getMaxLength() {
-    return typeDefinition.getMaxLength();
-  }
-
-  @Override
-  public Integer getPrecision() {
-    return typeDefinition.getPrecision();
-  }
-
-  @Override
-  public Integer getScale() {
-    return typeDefinition.getScale();
-  }
-
-  @Override
-  public SRID getSrid() {
-    return typeDefinition.getSrid();
-  }
-
-  @Override
-  public Boolean isUnicode() {
-    return typeDefinition.isUnicode();
-  }
-
-  @Override
-  public boolean isCompatible(final EdmPrimitiveType primitiveType) {
-    return this == primitiveType || getUnderlyingType().isCompatible(primitiveType);
+  public String fromUriLiteral(final String literal) throws EdmPrimitiveTypeException {
+    return getUnderlyingType().fromUriLiteral(literal);
   }
 
   @Override
@@ -94,35 +53,51 @@ public class EdmTypeDefinitionImpl extends EdmTypeImpl implements EdmTypeDefinit
   }
 
   @Override
-  public boolean validate(final String value, final Boolean isNullable, final Integer maxLength,
-      final Integer precision, final Integer scale, final Boolean isUnicode) {
-    return getUnderlyingType().validate(value, isNullable,
-        maxLength == null ? getMaxLength() : maxLength,
-        precision == null ? getPrecision() : precision,
-        scale == null ? getScale() : scale,
-        isUnicode == null ? isUnicode() : isUnicode);
+  public Integer getMaxLength() {
+    return this.typeDefinition.getMaxLength();
   }
 
   @Override
-  public <T> T valueOfString(final String value, final Boolean isNullable, final Integer maxLength,
-      final Integer precision, final Integer scale, final Boolean isUnicode, final Class<T> returnType)
-      throws EdmPrimitiveTypeException {
-    return getUnderlyingType().valueOfString(value, isNullable,
-        maxLength == null ? getMaxLength() : maxLength,
-        precision == null ? getPrecision() : precision,
-        scale == null ? getScale() : scale,
-        isUnicode == null ? isUnicode() : isUnicode,
-        returnType);
+  public Integer getPrecision() {
+    return this.typeDefinition.getPrecision();
   }
 
   @Override
-  public String valueToString(final Object value, final Boolean isNullable, final Integer maxLength,
-      final Integer precision, final Integer scale, final Boolean isUnicode) throws EdmPrimitiveTypeException {
-    return getUnderlyingType().valueToString(value, isNullable,
-        maxLength == null ? getMaxLength() : maxLength,
-        precision == null ? getPrecision() : precision,
-        scale == null ? getScale() : scale,
-        isUnicode == null ? isUnicode() : isUnicode);
+  public Integer getScale() {
+    return this.typeDefinition.getScale();
+  }
+
+  @Override
+  public SRID getSrid() {
+    return this.typeDefinition.getSrid();
+  }
+
+  @Override
+  public EdmPrimitiveType getUnderlyingType() {
+    if (this.edmPrimitiveTypeInstance == null) {
+      try {
+        if (this.typeDefinition.getUnderlyingType() == null) {
+          throw new EdmException("Underlying Type for type definition: "
+            + this.typeName.getFullQualifiedNameAsString() + " must not be null.");
+        }
+        this.edmPrimitiveTypeInstance = EdmPrimitiveTypeFactory
+          .getInstance(EdmPrimitiveTypeKind.valueOfFQN(this.typeDefinition.getUnderlyingType()));
+      } catch (final IllegalArgumentException e) {
+        throw new EdmException(
+          "Invalid underlying type: " + this.typeDefinition.getUnderlyingType(), e);
+      }
+    }
+    return this.edmPrimitiveTypeInstance;
+  }
+
+  @Override
+  public boolean isCompatible(final EdmPrimitiveType primitiveType) {
+    return this == primitiveType || getUnderlyingType().isCompatible(primitiveType);
+  }
+
+  @Override
+  public Boolean isUnicode() {
+    return this.typeDefinition.isUnicode();
   }
 
   @Override
@@ -131,7 +106,31 @@ public class EdmTypeDefinitionImpl extends EdmTypeImpl implements EdmTypeDefinit
   }
 
   @Override
-  public String fromUriLiteral(final String literal) throws EdmPrimitiveTypeException {
-    return getUnderlyingType().fromUriLiteral(literal);
+  public boolean validate(final String value, final Boolean isNullable, final Integer maxLength,
+    final Integer precision, final Integer scale, final Boolean isUnicode) {
+    return getUnderlyingType().validate(value, isNullable,
+      maxLength == null ? getMaxLength() : maxLength,
+      precision == null ? getPrecision() : precision, scale == null ? getScale() : scale,
+      isUnicode == null ? isUnicode() : isUnicode);
+  }
+
+  @Override
+  public <T> T valueOfString(final String value, final Boolean isNullable, final Integer maxLength,
+    final Integer precision, final Integer scale, final Boolean isUnicode,
+    final Class<T> returnType) throws EdmPrimitiveTypeException {
+    return getUnderlyingType().valueOfString(value, isNullable,
+      maxLength == null ? getMaxLength() : maxLength,
+      precision == null ? getPrecision() : precision, scale == null ? getScale() : scale,
+      isUnicode == null ? isUnicode() : isUnicode, returnType);
+  }
+
+  @Override
+  public String valueToString(final Object value, final Boolean isNullable, final Integer maxLength,
+    final Integer precision, final Integer scale, final Boolean isUnicode)
+    throws EdmPrimitiveTypeException {
+    return getUnderlyingType().valueToString(value, isNullable,
+      maxLength == null ? getMaxLength() : maxLength,
+      precision == null ? getPrecision() : precision, scale == null ? getScale() : scale,
+      isUnicode == null ? isUnicode() : isUnicode);
   }
 }

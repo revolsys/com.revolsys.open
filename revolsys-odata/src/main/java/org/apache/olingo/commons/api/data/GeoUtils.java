@@ -37,19 +37,19 @@ public final class GeoUtils {
     Geospatial.Dimension dimension;
 
     switch (type) {
-    case Geography:
-    case GeographyCollection:
-    case GeographyLineString:
-    case GeographyMultiLineString:
-    case GeographyPoint:
-    case GeographyMultiPoint:
-    case GeographyPolygon:
-    case GeographyMultiPolygon:
-      dimension = Geospatial.Dimension.GEOGRAPHY;
+      case Geography:
+      case GeographyCollection:
+      case GeographyLineString:
+      case GeographyMultiLineString:
+      case GeographyPoint:
+      case GeographyMultiPoint:
+      case GeographyPolygon:
+      case GeographyMultiPolygon:
+        dimension = Geospatial.Dimension.GEOGRAPHY;
       break;
 
-    default:
-      dimension = Geospatial.Dimension.GEOMETRY;
+      default:
+        dimension = Geospatial.Dimension.GEOMETRY;
     }
 
     return dimension;
@@ -59,51 +59,47 @@ public final class GeoUtils {
    * Get type based on given dimension (Geography / Geometry) and element name.
    *
    * @param dimension either geography or geometry
-   * @param elementName Element of return. Can be one of the following constants 
+   * @param elementName Element of return. Can be one of the following constants
    *        <ul>
    *           <li>{@link Constants#ELEM_POINT}</li>
    *           <li>{@link Constants#ELEM_MULTIPOINT}</li>
    *           <li>{@link Constants#ELEM_LINESTRING}</li>
-   *           <li>{@link Constants#ELEM_MULTILINESTRING}</li> 
+   *           <li>{@link Constants#ELEM_MULTILINESTRING}</li>
    *           <li>{@link Constants#ELEM_POLYGON}</li>
    *           <li>{@link Constants#ELEM_MULTIPOLYGON}</li>
    *           <li>{@link Constants#ELEM_GEOCOLLECTION}</li>
    *        </ul>
    * @return elementName name of type
    */
-  public static EdmPrimitiveTypeKind getType(final Geospatial.Dimension dimension, final String elementName) {
+  public static EdmPrimitiveTypeKind getType(final Geospatial.Dimension dimension,
+    final String elementName) {
     EdmPrimitiveTypeKind type = null;
 
     if (Constants.ELEM_POINT.equals(elementName)) {
-      type = dimension == Geospatial.Dimension.GEOGRAPHY
-          ? EdmPrimitiveTypeKind.GeographyPoint
-              : EdmPrimitiveTypeKind.GeometryPoint;
+      type = dimension == Geospatial.Dimension.GEOGRAPHY ? EdmPrimitiveTypeKind.GeographyPoint
+        : EdmPrimitiveTypeKind.GeometryPoint;
     } else if (Constants.ELEM_MULTIPOINT.equals(elementName)) {
-      type = dimension == Geospatial.Dimension.GEOGRAPHY
-          ? EdmPrimitiveTypeKind.GeographyMultiPoint
-              : EdmPrimitiveTypeKind.GeometryMultiPoint;
+      type = dimension == Geospatial.Dimension.GEOGRAPHY ? EdmPrimitiveTypeKind.GeographyMultiPoint
+        : EdmPrimitiveTypeKind.GeometryMultiPoint;
     } else if (Constants.ELEM_LINESTRING.equals(elementName)) {
-      type = dimension == Geospatial.Dimension.GEOGRAPHY
-          ? EdmPrimitiveTypeKind.GeographyLineString
-              : EdmPrimitiveTypeKind.GeometryLineString;
+      type = dimension == Geospatial.Dimension.GEOGRAPHY ? EdmPrimitiveTypeKind.GeographyLineString
+        : EdmPrimitiveTypeKind.GeometryLineString;
     } else if (Constants.ELEM_MULTILINESTRING.equals(elementName)) {
       type = dimension == Geospatial.Dimension.GEOGRAPHY
-          ? EdmPrimitiveTypeKind.GeographyMultiLineString
-              : EdmPrimitiveTypeKind.GeometryMultiLineString;
+        ? EdmPrimitiveTypeKind.GeographyMultiLineString
+        : EdmPrimitiveTypeKind.GeometryMultiLineString;
     } else if (Constants.ELEM_POLYGON.equals(elementName)) {
-      type = dimension == Geospatial.Dimension.GEOGRAPHY
-          ? EdmPrimitiveTypeKind.GeographyPolygon
-              : EdmPrimitiveTypeKind.GeometryPolygon;
+      type = dimension == Geospatial.Dimension.GEOGRAPHY ? EdmPrimitiveTypeKind.GeographyPolygon
+        : EdmPrimitiveTypeKind.GeometryPolygon;
     } else if (Constants.ELEM_MULTIPOLYGON.equals(elementName)) {
       type = dimension == Geospatial.Dimension.GEOGRAPHY
-          ? EdmPrimitiveTypeKind.GeographyMultiPolygon
-              : EdmPrimitiveTypeKind.GeometryMultiPolygon;
+        ? EdmPrimitiveTypeKind.GeographyMultiPolygon
+        : EdmPrimitiveTypeKind.GeometryMultiPolygon;
     } else if (Constants.ELEM_GEOCOLLECTION.equals(elementName)
-        || Constants.ELEM_GEOMEMBERS.equals(elementName)) {
+      || Constants.ELEM_GEOMEMBERS.equals(elementName)) {
 
-      type = dimension == Geospatial.Dimension.GEOGRAPHY
-          ? EdmPrimitiveTypeKind.GeographyCollection
-              : EdmPrimitiveTypeKind.GeometryCollection;
+      type = dimension == Geospatial.Dimension.GEOGRAPHY ? EdmPrimitiveTypeKind.GeographyCollection
+        : EdmPrimitiveTypeKind.GeometryCollection;
     }
 
     return type;

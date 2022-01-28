@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -23,20 +23,20 @@ import org.apache.olingo.server.api.uri.queryoption.apply.OrderBy;
 
 public class OrderByImpl implements OrderBy {
 
-	private OrderByOption orderByOption = null;
-	
-	@Override
-	public Kind getKind() {
-		return Kind.ORDERBY;
-	}
+  private OrderByOption orderByOption = null;
 
-	@Override
-	public OrderByOption getOrderByOption() {
-		return orderByOption;
-	}
+  @Override
+  public Kind getKind() {
+    return Kind.ORDERBY;
+  }
 
-	public OrderByImpl setOrderByOption(final OrderByOption orderByOption) {
-	    this.orderByOption = orderByOption;
-	    return this;
-	  }
+  @Override
+  public OrderByOption getOrderByOption() {
+    return this.orderByOption;
+  }
+
+  public OrderByImpl setOrderByOption(final OrderByOption orderByOption) {
+    this.orderByOption = orderByOption;
+    return this;
+  }
 }

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -32,66 +32,89 @@ import org.apache.olingo.commons.api.ex.ODataException;
  */
 public abstract class ODataLibraryException extends ODataException {
 
-  private static final long serialVersionUID = -1210541002198287561L;
-  private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
-
-  protected static final String DEFAULT_SERVER_BUNDLE_NAME = "server-core-exceptions-i18n";
-
   /** Key for the exception text in the resource bundle. */
   public interface MessageKey {
     /** Gets this key. */
     String getKey();
   }
 
-  private MessageKey messageKey;
-  private Object[] parameters;
+  /** Error message text and {@link Locale} used for it. */
+  public static class ODataErrorMessage {
+    private final String message;
+
+    private final Locale locale;
+
+    public ODataErrorMessage(final String message, final Locale usedLocale) {
+      this.message = message;
+      this.locale = usedLocale;
+    }
+
+    /** Gets the {@link Locale} used for this message. */
+    public Locale getLocale() {
+      return this.locale;
+    }
+
+    /** Gets the message text. */
+    public String getMessage() {
+      return this.message;
+    }
+  }
+
+  private static final long serialVersionUID = -1210541002198287561L;
+
+  private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
+
+  protected static final String DEFAULT_SERVER_BUNDLE_NAME = "server-core-exceptions-i18n";
+
+  private final MessageKey messageKey;
+
+  private final Object[] parameters;
 
   protected ODataLibraryException(final String developmentMessage, final MessageKey messageKey,
-      final String... parameters) {
+    final String... parameters) {
     super(developmentMessage);
     this.messageKey = messageKey;
     this.parameters = parameters;
   }
 
   protected ODataLibraryException(final String developmentMessage, final Throwable cause,
-      final MessageKey messageKey,
-      final String... parameters) {
+    final MessageKey messageKey, final String... parameters) {
     super(developmentMessage, cause);
     this.messageKey = messageKey;
     this.parameters = parameters;
   }
 
-  @Override
-  public String getLocalizedMessage() {
-    return getTranslatedMessage(DEFAULT_LOCALE).getMessage();
-  }
-
-  @Override
-  public String toString() {
-    return getMessage();
-  }
-
-  /** Gets the message key. */
-  public MessageKey getMessageKey() {
-    return messageKey;
-  }
-
-  /**
-   * Gets the translated message text for a given locale (or the default locale if not available),
-   * returning the developer message text if none is found.
-   * @param locale the preferred {@link Locale}
-   * @return the error message
-   */
-  public ODataErrorMessage getTranslatedMessage(final Locale locale) {
-    if (messageKey == null) {
-      return new ODataErrorMessage(getMessage(), DEFAULT_LOCALE);
+  private ODataErrorMessage buildMessage(final ResourceBundle bundle, final Locale locale) {
+    String message = null;
+    final StringBuilder builder = new StringBuilder();
+    final Formatter f = new Formatter(builder, locale);
+    try {
+      message = bundle.getString(getClass().getSimpleName() + '.' + this.messageKey.getKey());
+      f.format(message, this.parameters);
+      Locale usedLocale = bundle.getLocale();
+      if (Locale.ROOT.equals(usedLocale)) {
+        usedLocale = DEFAULT_LOCALE;
+      }
+      return new ODataErrorMessage(builder.toString(), usedLocale);
+    } catch (final MissingResourceException e) {
+      return new ODataErrorMessage("Missing message for key '" + this.messageKey.getKey() + "'!",
+        DEFAULT_LOCALE);
+    } catch (final MissingFormatArgumentException e) {
+      return new ODataErrorMessage(
+        "Missing replacement for place holder in message '" + message
+          + "' for following arguments '" + Arrays.toString(this.parameters) + "'!",
+        DEFAULT_LOCALE);
+    } finally {
+      f.close();
     }
-    ResourceBundle bundle = createResourceBundle(locale);
-    if (bundle == null) {
-      return new ODataErrorMessage(getMessage(), DEFAULT_LOCALE);
-    }
+  }
 
-    return buildMessage(bundle, locale);
+  private ResourceBundle createResourceBundle(final Locale locale) {
+    try {
+      return ResourceBundle.getBundle(getBundleName(), locale == null ? DEFAULT_LOCALE : locale);
+    } catch (final MissingResourceException e) {
+      return null;
+    }
   }
 
   /**
@@ -102,54 +125,36 @@ public abstract class ODataLibraryException extends ODataException {
    */
   protected abstract String getBundleName();
 
-  private ResourceBundle createResourceBundle(final Locale locale) {
-    try {
-      return ResourceBundle.getBundle(getBundleName(), locale == null ? DEFAULT_LOCALE : locale);
-    } catch (final MissingResourceException e) {
-      return null;
-    }
+  @Override
+  public String getLocalizedMessage() {
+    return getTranslatedMessage(DEFAULT_LOCALE).getMessage();
   }
 
-  private ODataErrorMessage buildMessage(final ResourceBundle bundle, final Locale locale) {
-    String message = null;
-    StringBuilder builder = new StringBuilder();
-    Formatter f = new Formatter(builder, locale);
-    try {
-      message = bundle.getString(getClass().getSimpleName() + '.' + messageKey.getKey());
-      f.format(message, parameters);
-      Locale usedLocale = bundle.getLocale();
-      if (Locale.ROOT.equals(usedLocale)) {
-        usedLocale = DEFAULT_LOCALE;
-      }
-      return new ODataErrorMessage(builder.toString(), usedLocale);
-    } catch (MissingResourceException e) {
-      return new ODataErrorMessage("Missing message for key '" + messageKey.getKey() + "'!", DEFAULT_LOCALE);
-    } catch (MissingFormatArgumentException e) {
-      return new ODataErrorMessage("Missing replacement for place holder in message '" + message +
-          "' for following arguments '" + Arrays.toString(parameters) + "'!", DEFAULT_LOCALE);
-    }finally{
-      f.close();
-    }
+  /** Gets the message key. */
+  public MessageKey getMessageKey() {
+    return this.messageKey;
   }
 
-  /** Error message text and {@link Locale} used for it. */
-  public static class ODataErrorMessage {
-    private String message;
-    private Locale locale;
-
-    public ODataErrorMessage(final String message, final Locale usedLocale) {
-      this.message = message;
-      locale = usedLocale;
+  /**
+   * Gets the translated message text for a given locale (or the default locale if not available),
+   * returning the developer message text if none is found.
+   * @param locale the preferred {@link Locale}
+   * @return the error message
+   */
+  public ODataErrorMessage getTranslatedMessage(final Locale locale) {
+    if (this.messageKey == null) {
+      return new ODataErrorMessage(getMessage(), DEFAULT_LOCALE);
+    }
+    final ResourceBundle bundle = createResourceBundle(locale);
+    if (bundle == null) {
+      return new ODataErrorMessage(getMessage(), DEFAULT_LOCALE);
     }
 
-    /** Gets the message text. */
-    public String getMessage() {
-      return message;
-    }
+    return buildMessage(bundle, locale);
+  }
 
-    /** Gets the {@link Locale} used for this message. */
-    public Locale getLocale() {
-      return locale;
-    }
+  @Override
+  public String toString() {
+    return getMessage();
   }
 }

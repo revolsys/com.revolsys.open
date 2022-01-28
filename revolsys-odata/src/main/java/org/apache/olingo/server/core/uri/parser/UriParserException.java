@@ -24,12 +24,13 @@ abstract public class UriParserException extends ODataLibraryException {
 
   private static final long serialVersionUID = -6438700016830955949L;
 
-  public UriParserException(final String developmentMessage, final MessageKey messageKey, final String... parameters) {
+  public UriParserException(final String developmentMessage, final MessageKey messageKey,
+    final String... parameters) {
     super(developmentMessage, messageKey, parameters);
   }
 
-  public UriParserException(final String developmentMessage, final Throwable cause, final MessageKey messageKey,
-      final String... parameters) {
+  public UriParserException(final String developmentMessage, final Throwable cause,
+    final MessageKey messageKey, final String... parameters) {
     super(developmentMessage, cause, messageKey, parameters);
   }
 

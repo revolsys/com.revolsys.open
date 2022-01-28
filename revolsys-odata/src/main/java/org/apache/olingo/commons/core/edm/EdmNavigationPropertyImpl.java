@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -36,8 +36,11 @@ import org.apache.olingo.commons.api.edm.provider.CsdlReferentialConstraint;
 public class EdmNavigationPropertyImpl extends AbstractEdmNamed implements EdmNavigationProperty {
 
   private final CsdlNavigationProperty navigationProperty;
+
   private List<EdmReferentialConstraint> referentialConstraints;
+
   private EdmEntityType typeImpl;
+
   private EdmNavigationProperty partnerNavigationProperty;
 
   public EdmNavigationPropertyImpl(final Edm edm, final CsdlNavigationProperty navigationProperty) {
@@ -46,58 +49,44 @@ public class EdmNavigationPropertyImpl extends AbstractEdmNamed implements EdmNa
   }
 
   @Override
-  public boolean isCollection() {
-    return navigationProperty.isCollection();
-  }
-
-  @Override
-  public boolean isNullable() {
-    return navigationProperty.isNullable();
-  }
-
-  @Override
   public boolean containsTarget() {
-    return navigationProperty.isContainsTarget();
+    return this.navigationProperty.isContainsTarget();
   }
 
   @Override
-  public EdmEntityType getType() {
-    if (typeImpl == null) {
-      typeImpl = edm.getEntityType(navigationProperty.getTypeFQN());
-      if (typeImpl == null) {
-        throw new EdmException("Cannot find type with name: " + navigationProperty.getTypeFQN());
-      }
-    }
-    return typeImpl;
+  public EdmOnDelete getOnDelete() {
+    final CsdlOnDelete csdlOnDelete = this.navigationProperty.getOnDelete();
+    return csdlOnDelete != null ? new EdmOnDeleteImpl(this.edm, csdlOnDelete) : null;
   }
 
   @Override
   public EdmNavigationProperty getPartner() {
-    if (partnerNavigationProperty == null) {
-      String partner = navigationProperty.getPartner();
+    if (this.partnerNavigationProperty == null) {
+      final String partner = this.navigationProperty.getPartner();
       if (partner != null) {
         EdmStructuredType type = getType();
         EdmNavigationProperty property = null;
         final String[] split = partner.split("/");
-        for (String element : split) {
+        for (final String element : split) {
           property = type.getNavigationProperty(element);
           if (property == null) {
             throw new EdmException("Cannot find navigation property with name: " + element
-                + " at type " + type.getName());
+              + " at type " + type.getName());
           }
           type = property.getType();
         }
-        partnerNavigationProperty = property;
+        this.partnerNavigationProperty = property;
       }
     }
-    return partnerNavigationProperty;
+    return this.partnerNavigationProperty;
   }
 
   @Override
   public String getReferencingPropertyName(final String referencedPropertyName) {
-    final List<CsdlReferentialConstraint> refConstraints = navigationProperty.getReferentialConstraints();
+    final List<CsdlReferentialConstraint> refConstraints = this.navigationProperty
+      .getReferentialConstraints();
     if (refConstraints != null) {
-      for (CsdlReferentialConstraint constraint : refConstraints) {
+      for (final CsdlReferentialConstraint constraint : refConstraints) {
         if (constraint.getReferencedProperty().equals(referencedPropertyName)) {
           return constraint.getProperty();
         }
@@ -108,23 +97,40 @@ public class EdmNavigationPropertyImpl extends AbstractEdmNamed implements EdmNa
 
   @Override
   public List<EdmReferentialConstraint> getReferentialConstraints() {
-    if (referentialConstraints == null) {
-      final List<CsdlReferentialConstraint> providerConstraints = navigationProperty.getReferentialConstraints();
-      final List<EdmReferentialConstraint> referentialConstraintsLocal = new ArrayList<EdmReferentialConstraint>();
+    if (this.referentialConstraints == null) {
+      final List<CsdlReferentialConstraint> providerConstraints = this.navigationProperty
+        .getReferentialConstraints();
+      final List<EdmReferentialConstraint> referentialConstraintsLocal = new ArrayList<>();
       if (providerConstraints != null) {
-        for (CsdlReferentialConstraint constraint : providerConstraints) {
-          referentialConstraintsLocal.add(new EdmReferentialConstraintImpl(edm, constraint));
+        for (final CsdlReferentialConstraint constraint : providerConstraints) {
+          referentialConstraintsLocal.add(new EdmReferentialConstraintImpl(this.edm, constraint));
         }
       }
 
-      referentialConstraints = Collections.unmodifiableList(referentialConstraintsLocal);
+      this.referentialConstraints = Collections.unmodifiableList(referentialConstraintsLocal);
     }
-    return referentialConstraints;
+    return this.referentialConstraints;
   }
 
   @Override
-  public EdmOnDelete getOnDelete() {
-    CsdlOnDelete csdlOnDelete = navigationProperty.getOnDelete();
-    return csdlOnDelete != null ? new EdmOnDeleteImpl(edm, csdlOnDelete) : null;
+  public EdmEntityType getType() {
+    if (this.typeImpl == null) {
+      this.typeImpl = this.edm.getEntityType(this.navigationProperty.getTypeFQN());
+      if (this.typeImpl == null) {
+        throw new EdmException(
+          "Cannot find type with name: " + this.navigationProperty.getTypeFQN());
+      }
+    }
+    return this.typeImpl;
+  }
+
+  @Override
+  public boolean isCollection() {
+    return this.navigationProperty.isCollection();
+  }
+
+  @Override
+  public boolean isNullable() {
+    return this.navigationProperty.isNullable();
   }
 }

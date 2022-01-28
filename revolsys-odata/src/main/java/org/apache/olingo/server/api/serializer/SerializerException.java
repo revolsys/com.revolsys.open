@@ -23,18 +23,11 @@ import org.apache.olingo.server.api.ODataLibraryException;
 /** Exception thrown by the {@link ODataSerializer}. */
 public class SerializerException extends ODataLibraryException {
 
-  private static final long serialVersionUID = 5358683245923127425L;
-
   /** Keys for exception texts in the resource bundle. */
   public enum MessageKeys implements MessageKey {
-    NULL_METADATA_OR_EDM,
-    NOT_IMPLEMENTED,
+    NULL_METADATA_OR_EDM, NOT_IMPLEMENTED,
     /** parameter: format */
-    UNSUPPORTED_FORMAT,
-    JSON_METADATA,
-    IO_EXCEPTION,
-    NULL_INPUT,
-    NO_CONTEXT_URL,
+    UNSUPPORTED_FORMAT, JSON_METADATA, IO_EXCEPTION, NULL_INPUT, NO_CONTEXT_URL,
     /** parameter: property name */
     UNSUPPORTED_PROPERTY_TYPE,
     /** parameter: property name */
@@ -48,11 +41,7 @@ public class SerializerException extends ODataLibraryException {
     /** parameters: property name, property value */
     WRONG_PROPERTY_VALUE,
     /** parameters: primitive-type name, value */
-    WRONG_PRIMITIVE_VALUE,
-    UNKNOWN_TYPE,
-    WRONG_BASE_TYPE,
-    UNSUPPORTED_OPERATION_TYPE,
-    NULL_PROPERTY,
+    WRONG_PRIMITIVE_VALUE, UNKNOWN_TYPE, WRONG_BASE_TYPE, UNSUPPORTED_OPERATION_TYPE, NULL_PROPERTY,
     /** parameter: encoding-name */
     UNSUPPORTED_ENCODING;
 
@@ -62,14 +51,16 @@ public class SerializerException extends ODataLibraryException {
     }
   }
 
+  private static final long serialVersionUID = 5358683245923127425L;
+
   /**
    * Creates serializer exception.
    * @param developmentMessage message text as fallback and for debugging purposes
    * @param messageKey one of the {@link MessageKeys} for the exception text in the resource bundle
    * @param parameters parameters for the exception text
    */
-  public SerializerException(final String developmentMessage,
-      final MessageKey messageKey, final String... parameters) {
+  public SerializerException(final String developmentMessage, final MessageKey messageKey,
+    final String... parameters) {
     super(developmentMessage, messageKey, parameters);
   }
 
@@ -81,7 +72,7 @@ public class SerializerException extends ODataLibraryException {
    * @param parameters parameters for the exception text
    */
   public SerializerException(final String developmentMessage, final Throwable cause,
-      final MessageKey messageKey, final String... parameters) {
+    final MessageKey messageKey, final String... parameters) {
     super(developmentMessage, cause, messageKey, parameters);
   }
 

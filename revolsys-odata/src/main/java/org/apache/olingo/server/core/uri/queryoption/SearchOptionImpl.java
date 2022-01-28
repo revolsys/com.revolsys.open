@@ -32,7 +32,7 @@ public class SearchOptionImpl extends SystemQueryOptionImpl implements SearchOpt
 
   @Override
   public SearchExpression getSearchExpression() {
-    return searchExpression;
+    return this.searchExpression;
   }
 
   public SearchOptionImpl setSearchExpression(final SearchExpression searchExpression) {

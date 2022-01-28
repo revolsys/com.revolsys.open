@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -31,30 +31,31 @@ import org.apache.olingo.server.api.uri.queryoption.apply.GroupByItem;
 public class GroupByImpl implements GroupBy {
 
   private ApplyOption applyOption;
-  private List<GroupByItem> groupByItems = new ArrayList<>();
+
+  private final List<GroupByItem> groupByItems = new ArrayList<>();
+
+  public GroupByImpl addGroupByItem(final GroupByItem groupByItem) {
+    this.groupByItems.add(groupByItem);
+    return this;
+  }
+
+  @Override
+  public ApplyOption getApplyOption() {
+    return this.applyOption;
+  }
+
+  @Override
+  public List<GroupByItem> getGroupByItems() {
+    return this.groupByItems;
+  }
 
   @Override
   public Kind getKind() {
     return Kind.GROUP_BY;
   }
 
-  @Override
-  public ApplyOption getApplyOption() {
-    return applyOption;
-  }
-
   public GroupByImpl setApplyOption(final ApplyOption applyOption) {
     this.applyOption = applyOption;
-    return this;
-  }
-
-  @Override
-  public List<GroupByItem> getGroupByItems() {
-    return groupByItems;
-  }
-
-  public GroupByImpl addGroupByItem(final GroupByItem groupByItem) {
-    groupByItems.add(groupByItem);
     return this;
   }
 }

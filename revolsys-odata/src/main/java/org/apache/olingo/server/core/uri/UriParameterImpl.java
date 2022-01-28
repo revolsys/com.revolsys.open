@@ -23,24 +23,38 @@ import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
 
 public class UriParameterImpl implements UriParameter {
   private String name;
+
   private String text;
+
   private String alias;
+
   private Expression expression;
+
   private String referencedProperty;
 
   @Override
-  public String getName() {
-    return name;
-  }
-
-  public UriParameterImpl setName(final String name) {
-    this.name = name;
-    return this;
+  public String getAlias() {
+    return this.alias;
   }
 
   @Override
-  public String getAlias() {
-    return alias;
+  public Expression getExpression() {
+    return this.expression;
+  }
+
+  @Override
+  public String getName() {
+    return this.name;
+  }
+
+  @Override
+  public String getReferencedProperty() {
+    return this.referencedProperty;
+  }
+
+  @Override
+  public String getText() {
+    return this.text;
   }
 
   public UriParameterImpl setAlias(final String alias) {
@@ -48,9 +62,19 @@ public class UriParameterImpl implements UriParameter {
     return this;
   }
 
-  @Override
-  public String getText() {
-    return text;
+  public UriParameterImpl setExpression(final Expression expression) {
+    this.expression = expression;
+    return this;
+  }
+
+  public UriParameterImpl setName(final String name) {
+    this.name = name;
+    return this;
+  }
+
+  public UriParameterImpl setReferencedProperty(final String referencedProperty) {
+    this.referencedProperty = referencedProperty;
+    return this;
   }
 
   public UriParameterImpl setText(final String text) {
@@ -59,27 +83,7 @@ public class UriParameterImpl implements UriParameter {
   }
 
   @Override
-  public Expression getExpression() {
-    return expression;
-  }
-
-  public UriParameterImpl setExpression(final Expression expression) {
-    this.expression = expression;
-    return this;
-  }
-
-  @Override
-  public String getReferencedProperty() {
-    return referencedProperty;
-  }
-
-  public UriParameterImpl setReferencedProperty(final String referencedProperty) {
-    this.referencedProperty = referencedProperty;
-    return this;
-  }
-
-  @Override
   public String toString() {
-    return name;
+    return this.name;
   }
 }

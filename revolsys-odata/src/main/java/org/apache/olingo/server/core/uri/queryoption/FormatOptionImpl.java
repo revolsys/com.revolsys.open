@@ -27,14 +27,14 @@ public class FormatOptionImpl extends SystemQueryOptionImpl implements FormatOpt
     setKind(SystemQueryOptionKind.FORMAT);
   }
 
-  public FormatOptionImpl setFormat(final String value) {
-    setText(value);
-    return this;
-  }
-
   @Override
   public String getFormat() {
     return getText();
+  }
+
+  public FormatOptionImpl setFormat(final String value) {
+    setText(value);
+    return this;
   }
 
 }

@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import org.jeometry.common.compare.NumericComparator;
 import org.jeometry.common.data.identifier.Code;
 import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.type.CollectionDataType;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypeProxy;
 import org.jeometry.common.data.type.DataTypes;
@@ -611,6 +612,10 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
     } else {
       return !this.codeTable.isLoadAll() || this.codeTable.isLoaded();
     }
+  }
+
+  public boolean isDataTypeCollection() {
+    return this.type instanceof CollectionDataType;
   }
 
   public boolean isGenerated() {

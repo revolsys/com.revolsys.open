@@ -35,12 +35,12 @@ public class ExpandOptionImpl extends SystemQueryOptionImpl implements ExpandOpt
   }
 
   public ExpandOptionImpl addExpandItem(final ExpandItem expandItem) {
-    expandItems.add(expandItem);
+    this.expandItems.add(expandItem);
     return this;
   }
 
   @Override
   public List<ExpandItem> getExpandItems() {
-    return Collections.unmodifiableList(expandItems);
+    return Collections.unmodifiableList(this.expandItems);
   }
 }

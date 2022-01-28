@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -27,14 +27,14 @@ import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
 public interface ComputeExpression {
 
   /**
-   * Gets the expression to compute.
-   * @return an {@link Expression} (but never <code>null</code>)
-   */
-  Expression getExpression();
-
-  /**
    * Gets the name of the computation result if an alias name has been set.
    * @return an identifier String (but never <code>null</code>)
    */
   String getAlias();
+
+  /**
+   * Gets the expression to compute.
+   * @return an {@link Expression} (but never <code>null</code>)
+   */
+  Expression getExpression();
 }

@@ -26,13 +26,18 @@ import org.apache.olingo.server.api.uri.queryoption.search.SearchUnary;
 public abstract class SearchExpressionImpl implements SearchExpression {
 
   @Override
-  public boolean isSearchTerm() {
-    return this instanceof SearchTerm;
+  public SearchBinary asSearchBinary() {
+    return isSearchBinary() ? (SearchBinary)this : null;
   }
 
   @Override
   public SearchTerm asSearchTerm() {
-    return isSearchTerm() ? (SearchTerm) this : null;
+    return isSearchTerm() ? (SearchTerm)this : null;
+  }
+
+  @Override
+  public SearchUnary asSearchUnary() {
+    return isSearchUnary() ? (SearchUnary)this : null;
   }
 
   @Override
@@ -41,18 +46,13 @@ public abstract class SearchExpressionImpl implements SearchExpression {
   }
 
   @Override
-  public SearchBinary asSearchBinary() {
-    return isSearchBinary() ? (SearchBinary) this : null;
+  public boolean isSearchTerm() {
+    return this instanceof SearchTerm;
   }
 
   @Override
   public boolean isSearchUnary() {
     return this instanceof SearchUnary;
-  }
-
-  @Override
-  public SearchUnary asSearchUnary() {
-    return isSearchUnary() ? (SearchUnary) this : null;
   }
 
 }

@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -32,12 +32,21 @@ public class CsdlEntityType extends CsdlStructuralType {
   private boolean hasStream = false;
 
   /**
+   * Gets key.
+   *
+   * @return the key
+   */
+  public List<CsdlPropertyRef> getKey() {
+    return this.key;
+  }
+
+  /**
    * Has stream.
    *
    * @return the boolean
    */
   public boolean hasStream() {
-    return hasStream;
+    return this.hasStream;
   }
 
   /**
@@ -47,7 +56,31 @@ public class CsdlEntityType extends CsdlStructuralType {
    * @return the boolean
    */
   public boolean isHasStream() {
-    return hasStream;
+    return this.hasStream;
+  }
+
+  @Override
+  public CsdlEntityType setAbstract(final boolean isAbstract) {
+    this.isAbstract = isAbstract;
+    return this;
+  }
+
+  @Override
+  public CsdlEntityType setAnnotations(final List<CsdlAnnotation> annotations) {
+    this.annotations = annotations;
+    return this;
+  }
+
+  @Override
+  public CsdlEntityType setBaseType(final FullQualifiedName baseType) {
+    this.baseType = baseType;
+    return this;
+  }
+
+  @Override
+  public CsdlEntityType setBaseType(final String baseType) {
+    this.baseType = new FullQualifiedName(baseType);
+    return this;
   }
 
   /**
@@ -59,15 +92,6 @@ public class CsdlEntityType extends CsdlStructuralType {
   public CsdlEntityType setHasStream(final boolean hasStream) {
     this.hasStream = hasStream;
     return this;
-  }
-
-  /**
-   * Gets key.
-   *
-   * @return the key
-   */
-  public List<CsdlPropertyRef> getKey() {
-    return key;
   }
 
   /**
@@ -88,44 +112,21 @@ public class CsdlEntityType extends CsdlStructuralType {
   }
 
   @Override
+  public CsdlEntityType setNavigationProperties(
+    final List<CsdlNavigationProperty> navigationProperties) {
+    this.navigationProperties = navigationProperties;
+    return this;
+  }
+
+  @Override
   public CsdlEntityType setOpenType(final boolean isOpenType) {
     this.isOpenType = isOpenType;
     return this;
   }
 
   @Override
-  public CsdlEntityType setBaseType(final String baseType) {
-    this.baseType = new FullQualifiedName(baseType);
-    return this;
-  }
-
-  @Override
-  public CsdlEntityType setBaseType(final FullQualifiedName baseType) {
-    this.baseType = baseType;
-    return this;
-  }
-
-  @Override
-  public CsdlEntityType setAbstract(final boolean isAbstract) {
-    this.isAbstract = isAbstract;
-    return this;
-  }
-
-  @Override
   public CsdlEntityType setProperties(final List<CsdlProperty> properties) {
     this.properties = properties;
-    return this;
-  }
-
-  @Override
-  public CsdlEntityType setNavigationProperties(final List<CsdlNavigationProperty> navigationProperties) {
-    this.navigationProperties = navigationProperties;
-    return this;
-  }
-
-  @Override
-  public CsdlEntityType setAnnotations(final List<CsdlAnnotation> annotations) {
-    this.annotations = annotations;
     return this;
   }
 }

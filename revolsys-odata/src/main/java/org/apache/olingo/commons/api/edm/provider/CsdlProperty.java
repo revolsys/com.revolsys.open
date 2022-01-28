@@ -18,60 +18,39 @@
  */
 package org.apache.olingo.commons.api.edm.provider;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
-import org.apache.olingo.commons.api.edm.geo.SRID;
+
+import com.revolsys.record.schema.FieldDefinition;
 
 /**
  * The type Csdl property.
  */
-public class CsdlProperty extends CsdlAbstractEdmItem implements CsdlNamed, CsdlAnnotatable {
+public class CsdlProperty implements CsdlAbstractEdmItem, CsdlNamed, CsdlAnnotatable {
 
-  private String name;
+  private final FieldDefinition field;
 
-  private String type;
+  public CsdlProperty(final FieldDefinition field) {
+    this.field = field;
+  }
 
-  private boolean collection;
+  public boolean equalsType(final FullQualifiedName typeName) {
+    return typeName.equals(getTypeName());
+  }
 
-  private String mimeType;
+  @Override
+  public List<CsdlAnnotation> getAnnotations() {
+    return getField().getProperty("csdlAnnotations");
+  }
 
-  private CsdlMapping mapping;
-
-  // Facets
-  private String defaultValue;
-
-  private boolean nullable = true;
-
-  private Integer maxLength;
-
-  private Integer precision;
-
-  private Integer scale;
-
-  private String scaleAsString;
-
-  private boolean unicode = true;
-
-  private SRID srid;
-
-  private List<CsdlAnnotation> annotations = new ArrayList<CsdlAnnotation>();
+  public FieldDefinition getField() {
+    return this.field;
+  }
 
   @Override
   public String getName() {
-    return name;
-  }
-
-  /**
-   * Sets name.
-   *
-   * @param name the name
-   * @return the name
-   */
-  public CsdlProperty setName(final String name) {
-    this.name = name;
-    return this;
+    return getField().getName();
   }
 
   /**
@@ -80,18 +59,7 @@ public class CsdlProperty extends CsdlAbstractEdmItem implements CsdlNamed, Csdl
    * @return the type
    */
   public String getType() {
-    return type;
-  }
-
-  /**
-   * Sets type.
-   *
-   * @param type the type
-   * @return the type
-   */
-  public CsdlProperty setType(final String type) {
-    this.type = type;
-    return this;
+    return getField().getProperty("csdlType");
   }
 
   /**
@@ -99,19 +67,8 @@ public class CsdlProperty extends CsdlAbstractEdmItem implements CsdlNamed, Csdl
    *
    * @return the type as fQN object
    */
-  public FullQualifiedName getTypeAsFQNObject() {
-    return new FullQualifiedName(type);
-  }
-
-  /**
-   * Sets type.
-   *
-   * @param fqnName the fqn name
-   * @return the type
-   */
-  public CsdlProperty setType(final FullQualifiedName fqnName) {
-    type = fqnName.getFullQualifiedNameAsString();
-    return this;
+  public FullQualifiedName getTypeName() {
+    return getField().getProperty("csdlTypeName");
   }
 
   /**
@@ -119,233 +76,8 @@ public class CsdlProperty extends CsdlAbstractEdmItem implements CsdlNamed, Csdl
    *
    * @return the boolean
    */
-  public boolean isCollection() {
-    return collection;
+  public boolean isDataTypeCollection() {
+    return getField().isDataTypeCollection();
   }
 
-  /**
-   * Sets collection.
-   *
-   * @param isCollection the is collection
-   * @return the collection
-   */
-  public CsdlProperty setCollection(final boolean isCollection) {
-    collection = isCollection;
-    return this;
-  }
-
-  /**
-   * Gets default value.
-   *
-   * @return the default value
-   */
-  public String getDefaultValue() {
-    return defaultValue;
-  }
-
-  /**
-   * Sets default value.
-   *
-   * @param defaultValue the default value
-   * @return the default value
-   */
-  public CsdlProperty setDefaultValue(final String defaultValue) {
-    this.defaultValue = defaultValue;
-    return this;
-  }
-
-  /**
-   * Is nullable.
-   *
-   * @return the boolean
-   */
-  public boolean isNullable() {
-    return nullable;
-  }
-
-  /**
-   * Sets nullable.
-   *
-   * @param nullable the nullable
-   * @return the nullable
-   */
-  public CsdlProperty setNullable(final boolean nullable) {
-    this.nullable = nullable;
-    return this;
-  }
-
-  /**
-   * Gets max length.
-   *
-   * @return the max length
-   */
-  public Integer getMaxLength() {
-    return maxLength;
-  }
-
-  /**
-   * Sets max length.
-   *
-   * @param maxLength the max length
-   * @return the max length
-   */
-  public CsdlProperty setMaxLength(final Integer maxLength) {
-    this.maxLength = maxLength;
-    return this;
-  }
-
-  /**
-   * Gets precision.
-   *
-   * @return the precision
-   */
-  public Integer getPrecision() {
-    return precision;
-  }
-
-  /**
-   * Sets precision.
-   *
-   * @param precision the precision
-   * @return the precision
-   */
-  public CsdlProperty setPrecision(final Integer precision) {
-    this.precision = precision;
-    return this;
-  }
-
-  /**
-   * Gets scale.
-   *
-   * @return the scale
-   */
-  public Integer getScale() {
-    return scale;
-  }
-
-  /**
-   * Sets scale.
-   *
-   * @param scale the scale
-   * @return the scale
-   */
-  public CsdlProperty setScale(final Integer scale) {
-    this.scale = scale;
-    return this;
-  }
-
-  /**
-   * Gets scaleAsString.
-   *
-   * @return the scaleAsString
-   */
-  public String getScaleAsString() {
-    return scaleAsString;
-  }
-
-  /**
-   * Sets scaleAsString.
-   *
-   * @param scaleAsString the scaleAsString
-   * @return the scaleAsString
-   */
-  public CsdlProperty setScaleAsString(final String scaleAsString) {
-    this.scaleAsString = scaleAsString;
-    return this;
-  }
-
-  /**
-   * Is unicode.
-   *
-   * @return the boolean
-   */
-  public boolean isUnicode() {
-    return unicode;
-  }
-
-  /**
-   * Sets unicode.
-   *
-   * @param unicode the unicode
-   * @return the unicode
-   */
-  public CsdlProperty setUnicode(final boolean unicode) {
-    this.unicode = unicode;
-    return this;
-  }
-
-  /**
-   * Gets mime type.
-   *
-   * @return the mime type
-   */
-  public String getMimeType() {
-    return mimeType;
-  }
-
-  /**
-   * Sets mime type.
-   *
-   * @param mimeType the mime type
-   * @return the mime type
-   */
-  public CsdlProperty setMimeType(final String mimeType) {
-    this.mimeType = mimeType;
-    return this;
-  }
-
-  /**
-   * Gets mapping.
-   *
-   * @return the mapping
-   */
-  public CsdlMapping getMapping() {
-    return mapping;
-  }
-
-  /**
-   * Sets mapping.
-   *
-   * @param mapping the mapping
-   * @return the mapping
-   */
-  public CsdlProperty setMapping(final CsdlMapping mapping) {
-    this.mapping = mapping;
-    return this;
-  }
-
-  @Override
-  public List<CsdlAnnotation> getAnnotations() {
-    return annotations;
-  }
-
-  /**
-   * Sets a list of annotations
-   * @param annotations list of annotations
-   * @return this instance
-   */
-  public CsdlProperty setAnnotations(final List<CsdlAnnotation> annotations) {
-    this.annotations = annotations;
-    return this;
-  }
-  
-  /**
-   * Sets srid.
-   *
-   * @param srid the srid
-   * @return the srid
-   */
-  public CsdlProperty setSrid(final SRID srid) {
-    this.srid = srid;
-    return this;
-  }
-
-  /**
-   * Gets srid.
-   *
-   * @return the srid
-   */
-  public SRID getSrid() {
-    return srid;
-  }
 }

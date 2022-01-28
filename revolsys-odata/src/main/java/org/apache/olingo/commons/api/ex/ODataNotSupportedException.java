@@ -26,6 +26,15 @@ public class ODataNotSupportedException extends ODataRuntimeException {
   private static final long serialVersionUID = 42L;
 
   /**
+   * Create with <code>cause</code> of exception.
+   *
+   * @param cause cause of exception
+   */
+  public ODataNotSupportedException(final Exception cause) {
+    super(cause);
+  }
+
+  /**
    * Create with <code>message</code>.
    *
    * @param msg message text for exception
@@ -42,15 +51,6 @@ public class ODataNotSupportedException extends ODataRuntimeException {
    */
   public ODataNotSupportedException(final String msg, final Exception cause) {
     super(msg, cause);
-  }
-
-  /**
-   * Create with <code>cause</code> of exception.
-   *
-   * @param cause cause of exception
-   */
-  public ODataNotSupportedException(final Exception cause) {
-    super(cause);
   }
 
 }

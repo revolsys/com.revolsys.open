@@ -29,41 +29,33 @@ import org.apache.olingo.commons.api.http.HttpMethod;
  */
 public class ODataRequest {
   private HttpMethod method;
-  private HttpHeaders headers = new HttpHeaders();
+
+  private final HttpHeaders headers = new HttpHeaders();
+
   private InputStream body;
+
   private String rawQueryPath;
+
   private String rawRequestUri;
+
   private String rawODataPath;
+
   private String rawBaseUri;
+
   private String rawServiceResolutionUri;
+
   private String protocol;
 
   /**
-   * Gets the HTTP method.
-   * @return the HTTP method (GET, PUT, POST ...)
-   */
-  public HttpMethod getMethod() {
-    return method;
-  }
-
-  /**
-   * Sets the HTTP method.
-   * @param method the HTTP method (GET, PUT, POST ...)
-   */
-  public void setMethod(final HttpMethod method) {
-    this.method = method;
-  }
-
-  /**
-   * <p>Sets a header in the request.</p>
+   * <p>Adds a header to the request.</p>
    * <p>The header name will be handled as case-insensitive key.</p>
-   * <p>If a header already exists then the header will be replaced by this new value.</p>
+   * <p>If a header already exists then the list of values will just be extended.</p>
    * @param name case-insensitive header name
-   * @param value value for the given header name
+   * @param values list of values for the given header name
    * @see <a href="http://ietf.org/rfc/rfc7230.txt">RFC 7230, section 3.2.2</a>
    */
-  public void setHeader(final String name, final String value) {
-    headers.setHeader(name, value);
+  public void addHeader(final String name, final List<String> values) {
+    this.headers.addHeader(name, values);
   }
 
   /**
@@ -75,28 +67,23 @@ public class ODataRequest {
    * @see <a href="http://ietf.org/rfc/rfc7230.txt">RFC 7230, section 3.2.2</a>
    */
   public void addHeader(final String name, final String value) {
-    headers.addHeader(name, value);
+    this.headers.addHeader(name, value);
   }
 
   /**
-   * <p>Adds a header to the request.</p>
-   * <p>The header name will be handled as case-insensitive key.</p>
-   * <p>If a header already exists then the list of values will just be extended.</p>
-   * @param name case-insensitive header name
-   * @param values list of values for the given header name
-   * @see <a href="http://ietf.org/rfc/rfc7230.txt">RFC 7230, section 3.2.2</a>
+   * Gets all headers.
+   * @return an unmodifiable Map of header names/values
    */
-  public void addHeader(final String name, final List<String> values) {
-    headers.addHeader(name, values);
+  public Map<String, List<String>> getAllHeaders() {
+    return this.headers.getHeaderToValues();
   }
 
   /**
-   * Gets header values for a given name.
-   * @param name the header name as a case-insensitive key
-   * @return the header value(s) or null if not found
+   * Gets the body of the request.
+   * @return the request payload as {@link InputStream} or null
    */
-  public List<String> getHeaders(final String name) {
-    return headers.getHeader(name);
+  public InputStream getBody() {
+    return this.body;
   }
 
   /**
@@ -110,19 +97,68 @@ public class ODataRequest {
   }
 
   /**
-   * Gets all headers.
-   * @return an unmodifiable Map of header names/values
+   * Gets header values for a given name.
+   * @param name the header name as a case-insensitive key
+   * @return the header value(s) or null if not found
    */
-  public Map<String, List<String>> getAllHeaders() {
-    return headers.getHeaderToValues();
+  public List<String> getHeaders(final String name) {
+    return this.headers.getHeader(name);
   }
 
   /**
-   * Gets the body of the request.
-   * @return the request payload as {@link InputStream} or null
+   * Gets the HTTP method.
+   * @return the HTTP method (GET, PUT, POST ...)
    */
-  public InputStream getBody() {
-    return body;
+  public HttpMethod getMethod() {
+    return this.method;
+  }
+
+  /**
+   * @return the protocol version used e.g. HTTP/1.1
+   */
+  public String getProtocol() {
+    return this.protocol;
+  }
+
+  /**
+   * Gets the base URI.
+   * @return undecoded base URI, e.g., "<code>http://localhost/my%20service</code>"
+   */
+  public String getRawBaseUri() {
+    return this.rawBaseUri;
+  }
+
+  /**
+   * Gets the path segments of the request URI that belong to OData.
+   * @return undecoded OData path segments, e.g., "/Employees"
+   */
+  public String getRawODataPath() {
+    return this.rawODataPath;
+  }
+
+  /**
+   * Gets the query part of the request URI.
+   * @return the undecoded query options, e.g., "<code>$format=json,$top=10</code>"
+   * @see <a href="http://ietf.org/rfc/rfc3986.txt">RFC 3986, section 3.4</a>
+   */
+  public String getRawQueryPath() {
+    return this.rawQueryPath;
+  }
+
+  /**
+   * Gets the total request URI.
+   * @return undecoded request URI, e.g., "<code>http://localhost/my%20service/sys1/Employees?$format=json</code>"
+   */
+  public String getRawRequestUri() {
+    return this.rawRequestUri;
+  }
+
+  /**
+   * Gets the URI part responsible for service resolution.
+   * @return undecoded path segments that do not belong to the OData URL schema or null, e.g., "<code>sys1</code>"
+   */
+  public String getRawServiceResolutionUri() {
+    return this.rawServiceResolutionUri;
   }
 
   /**
@@ -134,28 +170,32 @@ public class ODataRequest {
   }
 
   /**
-   * Gets the query part of the request URI.
-   * @return the undecoded query options, e.g., "<code>$format=json,$top=10</code>"
-   * @see <a href="http://ietf.org/rfc/rfc3986.txt">RFC 3986, section 3.4</a>
+   * <p>Sets a header in the request.</p>
+   * <p>The header name will be handled as case-insensitive key.</p>
+   * <p>If a header already exists then the header will be replaced by this new value.</p>
+   * @param name case-insensitive header name
+   * @param value value for the given header name
+   * @see <a href="http://ietf.org/rfc/rfc7230.txt">RFC 7230, section 3.2.2</a>
    */
-  public String getRawQueryPath() {
-    return rawQueryPath;
+  public void setHeader(final String name, final String value) {
+    this.headers.setHeader(name, value);
   }
 
   /**
-   * Sets the query part of the request URI.
-   * @see #getRawQueryPath()
+   * Sets the HTTP method.
+   * @param method the HTTP method (GET, PUT, POST ...)
    */
-  public void setRawQueryPath(final String rawQueryPath) {
-    this.rawQueryPath = rawQueryPath;
+  public void setMethod(final HttpMethod method) {
+    this.method = method;
   }
 
   /**
-   * Gets the base URI.
-   * @return undecoded base URI, e.g., "<code>http://localhost/my%20service</code>"
+   * Sets the HTTP protocol used
+   * @param protocol
+   * @see #getProtocol()
    */
-  public String getRawBaseUri() {
-    return rawBaseUri;
+  public void setProtocol(final String protocol) {
+    this.protocol = protocol;
   }
 
   /**
@@ -167,11 +207,19 @@ public class ODataRequest {
   }
 
   /**
-   * Gets the total request URI.
-   * @return undecoded request URI, e.g., "<code>http://localhost/my%20service/sys1/Employees?$format=json</code>"
+   * Sets the path segments of the request URI that belong to OData.
+   * @see #getRawODataPath()
    */
-  public String getRawRequestUri() {
-    return rawRequestUri;
+  public void setRawODataPath(final String rawODataPath) {
+    this.rawODataPath = rawODataPath;
+  }
+
+  /**
+   * Sets the query part of the request URI.
+   * @see #getRawQueryPath()
+   */
+  public void setRawQueryPath(final String rawQueryPath) {
+    this.rawQueryPath = rawQueryPath;
   }
 
   /**
@@ -183,51 +231,11 @@ public class ODataRequest {
   }
 
   /**
-   * Gets the path segments of the request URI that belong to OData.
-   * @return undecoded OData path segments, e.g., "/Employees"
-   */
-  public String getRawODataPath() {
-    return rawODataPath;
-  }
-
-  /**
-   * Sets the path segments of the request URI that belong to OData.
-   * @see #getRawODataPath()
-   */
-  public void setRawODataPath(final String rawODataPath) {
-    this.rawODataPath = rawODataPath;
-  }
-
-  /**
-   * Gets the URI part responsible for service resolution.
-   * @return undecoded path segments that do not belong to the OData URL schema or null, e.g., "<code>sys1</code>"
-   */
-  public String getRawServiceResolutionUri() {
-    return rawServiceResolutionUri;
-  }
-
-  /**
    * Sets the URI part responsible for service resolution.
    * @see #getRawServiceResolutionUri()
    */
   public void setRawServiceResolutionUri(final String rawServiceResolutionUri) {
     this.rawServiceResolutionUri = rawServiceResolutionUri;
-  }
-
-  /**
-   * @return the protocol version used e.g. HTTP/1.1
-   */
-  public String getProtocol() {
-    return protocol;
-  }
-
-  /**
-   * Sets the HTTP protocol used
-   * @param protocol
-   * @see #getProtocol()
-   */
-  public void setProtocol(final String protocol) {
-    this.protocol = protocol;
   }
 
 }

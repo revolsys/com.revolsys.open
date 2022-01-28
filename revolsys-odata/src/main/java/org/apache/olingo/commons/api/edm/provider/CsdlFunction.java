@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -33,7 +33,19 @@ public class CsdlFunction extends CsdlOperation {
    * @return the boolean
    */
   public boolean isComposable() {
-    return isComposable;
+    return this.isComposable;
+  }
+
+  @Override
+  public CsdlFunction setAnnotations(final List<CsdlAnnotation> annotations) {
+    this.annotations = annotations;
+    return this;
+  }
+
+  @Override
+  public CsdlFunction setBound(final boolean isBound) {
+    this.isBound = isBound;
+    return this;
   }
 
   /**
@@ -48,20 +60,14 @@ public class CsdlFunction extends CsdlOperation {
   }
 
   @Override
-  public CsdlFunction setName(final String name) {
-    this.name = name;
-    return this;
-  }
-
-  @Override
-  public CsdlFunction setBound(final boolean isBound) {
-    this.isBound = isBound;
-    return this;
-  }
-
-  @Override
   public CsdlFunction setEntitySetPath(final String entitySetPath) {
     this.entitySetPath = entitySetPath;
+    return this;
+  }
+
+  @Override
+  public CsdlFunction setName(final String name) {
+    this.name = name;
     return this;
   }
 
@@ -74,12 +80,6 @@ public class CsdlFunction extends CsdlOperation {
   @Override
   public CsdlFunction setReturnType(final CsdlReturnType returnType) {
     this.returnType = returnType;
-    return this;
-  }
-
-  @Override
-  public CsdlFunction setAnnotations(final List<CsdlAnnotation> annotations) {
-    this.annotations = annotations;
     return this;
   }
 }

@@ -28,9 +28,20 @@ import java.util.Map;
 public class ODataErrorDetail {
 
   private String code;
+
   private String message;
+
   private String target;
+
   private Map<String, Object> additionalProperties;
+
+  /**
+   * Gets server defined additional properties.
+   * @return a pair representing server defined object.
+   */
+  public Map<String, Object> getAdditionalProperties() {
+    return this.additionalProperties;
+  }
 
   /**
    * Gets error code.
@@ -38,12 +49,7 @@ public class ODataErrorDetail {
    * @return error code.
    */
   public String getCode() {
-    return code;
-  }
-
-  public ODataErrorDetail setCode(final String code) {
-    this.code = code;
-    return this;
+    return this.code;
   }
 
   /**
@@ -52,12 +58,7 @@ public class ODataErrorDetail {
    * @return error message.
    */
   public String getMessage() {
-    return message;
-  }
-
-  public ODataErrorDetail setMessage(final String message) {
-    this.message = message;
-    return this;
+    return this.message;
   }
 
   /**
@@ -66,7 +67,27 @@ public class ODataErrorDetail {
    * @return error message.
    */
   public String getTarget() {
-    return target;
+    return this.target;
+  }
+
+  /**
+   * Sets server defined additional properties
+   * @param additionalProperties additionalProperties
+   * @return this ODataErrorDetail instance (fluent builder)
+   */
+  public ODataErrorDetail setAdditionalProperties(final Map<String, Object> additionalProperties) {
+    this.additionalProperties = additionalProperties;
+    return this;
+  }
+
+  public ODataErrorDetail setCode(final String code) {
+    this.code = code;
+    return this;
+  }
+
+  public ODataErrorDetail setMessage(final String message) {
+    this.message = message;
+    return this;
   }
 
   /**
@@ -78,23 +99,5 @@ public class ODataErrorDetail {
   public ODataErrorDetail setTarget(final String target) {
     this.target = target;
     return this;
-  }
-  
-  /**
-   * Sets server defined additional properties
-   * @param additionalProperties additionalProperties
-   * @return this ODataErrorDetail instance (fluent builder)
-   */
-  public ODataErrorDetail setAdditionalProperties(final Map<String, Object> additionalProperties) {
-	  this.additionalProperties = additionalProperties;
-	  return this;
-  }
-  
-  /**
-   * Gets server defined additional properties.
-   * @return a pair representing server defined object.
-   */
-  public Map<String, Object> getAdditionalProperties() {
-	  return this.additionalProperties;
   }
 }

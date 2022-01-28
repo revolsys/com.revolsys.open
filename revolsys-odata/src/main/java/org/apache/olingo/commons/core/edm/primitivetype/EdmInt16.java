@@ -35,21 +35,14 @@ public final class EdmInt16 extends SingletonPrimitiveType {
   }
 
   @Override
-  public boolean isCompatible(final EdmPrimitiveType primitiveType) {
-    return primitiveType instanceof EdmByte
-        || primitiveType instanceof EdmSByte
-        || primitiveType instanceof EdmInt16;
-  }
-
-  @Override
   public Class<?> getDefaultType() {
     return Short.class;
   }
 
   @Override
-  protected <T> T internalValueOfString(final String value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode, final Class<T> returnType) throws EdmPrimitiveTypeException {
+  protected <T> T internalValueOfString(final String value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode,
+    final Class<T> returnType) throws EdmPrimitiveTypeException {
     Short valueShort;
     try {
       valueShort = Short.parseShort(value);
@@ -60,34 +53,41 @@ public final class EdmInt16 extends SingletonPrimitiveType {
     try {
       return EdmInt64.convertNumber(valueShort, returnType);
     } catch (final IllegalArgumentException e) {
-      throw new EdmPrimitiveTypeException("The literal '" + value
-          + "' cannot be converted to value type " + returnType + ".", e);
+      throw new EdmPrimitiveTypeException(
+        "The literal '" + value + "' cannot be converted to value type " + returnType + ".", e);
     } catch (final ClassCastException e) {
       throw new EdmPrimitiveTypeException("The value type " + returnType + " is not supported.", e);
     }
   }
 
   @Override
-  protected <T> String internalValueToString(final T value,
-      final Boolean isNullable, final Integer maxLength, final Integer precision,
-      final Integer scale, final Boolean isUnicode) throws EdmPrimitiveTypeException {
+  protected <T> String internalValueToString(final T value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final Integer scale, final Boolean isUnicode)
+    throws EdmPrimitiveTypeException {
     if (value instanceof Byte || value instanceof Short) {
       return value.toString();
     } else if (value instanceof Integer || value instanceof Long) {
-      if (((Number) value).longValue() >= Short.MIN_VALUE
-          && ((Number) value).longValue() <= Short.MAX_VALUE) {
+      if (((Number)value).longValue() >= Short.MIN_VALUE
+        && ((Number)value).longValue() <= Short.MAX_VALUE) {
         return value.toString();
       } else {
         throw new EdmPrimitiveTypeException("The value '" + value + "' is not valid.");
       }
     } else if (value instanceof BigInteger) {
-      if (((BigInteger) value).bitLength() < Short.SIZE) {
+      if (((BigInteger)value).bitLength() < Short.SIZE) {
         return value.toString();
       } else {
         throw new EdmPrimitiveTypeException("The value '" + value + "' is not valid.");
       }
     } else {
-      throw new EdmPrimitiveTypeException("The value type " + value.getClass() + " is not supported.");
+      throw new EdmPrimitiveTypeException(
+        "The value type " + value.getClass() + " is not supported.");
     }
+  }
+
+  @Override
+  public boolean isCompatible(final EdmPrimitiveType primitiveType) {
+    return primitiveType instanceof EdmByte || primitiveType instanceof EdmSByte
+      || primitiveType instanceof EdmInt16;
   }
 }

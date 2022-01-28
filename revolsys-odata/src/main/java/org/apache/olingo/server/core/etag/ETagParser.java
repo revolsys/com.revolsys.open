@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -42,18 +42,15 @@ import java.util.regex.Pattern;
  */
 public class ETagParser {
 
-  private static final Pattern ETAG = Pattern.compile("\\s*(,\\s*)+|((?:W/)?\"[!#-~\\x80-\\xFF]*\")");
-
-  private ETagParser() {
-    // Private constructor for utility classes
-  }
+  private static final Pattern ETAG = Pattern
+    .compile("\\s*(,\\s*)+|((?:W/)?\"[!#-~\\x80-\\xFF]*\")");
 
   protected static Collection<String> parse(final Collection<String> values) {
     if (values == null) {
       return Collections.<String> emptySet();
     }
 
-    Set<String> result = new HashSet<>();
+    final Set<String> result = new HashSet<>();
     for (final String value : values) {
       final Collection<String> part = parse(value);
       if (part.size() == 1 && "*".equals(part.iterator().next())) {
@@ -69,10 +66,10 @@ public class ETagParser {
     if ("*".equals(value.trim())) {
       return Collections.singleton("*");
     } else {
-      Set<String> result = new HashSet<>();
+      final Set<String> result = new HashSet<>();
       String separator = "";
       int start = 0;
-      Matcher matcher = ETAG.matcher(value.trim());
+      final Matcher matcher = ETAG.matcher(value.trim());
       while (matcher.find() && matcher.start() == start) {
         start = matcher.end();
         if (matcher.group(1) != null) {
@@ -86,5 +83,9 @@ public class ETagParser {
       }
       return matcher.hitEnd() ? result : Collections.<String> emptySet();
     }
+  }
+
+  private ETagParser() {
+    // Private constructor for utility classes
   }
 }

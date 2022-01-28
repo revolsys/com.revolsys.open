@@ -48,8 +48,8 @@ public class FixedFormatDeserializerImpl implements FixedFormatDeserializer {
 
   @Override
   public byte[] binary(final InputStream content) throws DeserializerException {
-    ByteArrayOutputStream result = new ByteArrayOutputStream();
-    byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+    final ByteArrayOutputStream result = new ByteArrayOutputStream();
+    final byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
     int count;
     try {
       while ((count = content.read(buffer)) > -1) {
@@ -58,65 +58,39 @@ public class FixedFormatDeserializerImpl implements FixedFormatDeserializer {
       result.flush();
     } catch (final IOException e) {
       throw new DeserializerException("An I/O exception occurred.", e,
-          DeserializerException.MessageKeys.IO_EXCEPTION);
+        DeserializerException.MessageKeys.IO_EXCEPTION);
     }
     return result.toByteArray();
   }
 
   @Override
-  public Object primitiveValue(final InputStream content, final EdmProperty property) throws DeserializerException {
-    if (property == null || !property.isPrimitive()) {
-      throw new DeserializerException("Wrong property.", DeserializerException.MessageKeys.NOT_IMPLEMENTED);
-    }
-    try {
-      StringWriter writer = new StringWriter();
-      InputStreamReader reader = new InputStreamReader(content, "UTF-8");
-      int c = -1;
-      while ((c = reader.read()) != -1) {
-        writer.append((char) c);
-      }
-      final EdmPrimitiveType type = (EdmPrimitiveType) property.getType();
-      return type.valueOfString(writer.toString(),
-          property.isNullable(), property.getMaxLength(), property.getPrecision(), property.getScale(),
-          property.isUnicode(), type.getDefaultType());
-    } catch (final EdmPrimitiveTypeException e) {
-      throw new DeserializerException("The value is not valid.", e,
-          DeserializerException.MessageKeys.INVALID_VALUE_FOR_PROPERTY, property.getName());
-    } catch (final IOException e) {
-      throw new DeserializerException("An I/O exception occurred.", e,
-          DeserializerException.MessageKeys.IO_EXCEPTION);
-    }
-  }
-
-  @Override
-  public Parameter parameter(final String content, final EdmParameter parameter) throws DeserializerException {
+  public Parameter parameter(final String content, final EdmParameter parameter)
+    throws DeserializerException {
     final EdmType type = parameter.getType();
     final EdmTypeKind kind = type.getKind();
-    if ((kind == EdmTypeKind.PRIMITIVE || kind == EdmTypeKind.DEFINITION || kind == EdmTypeKind.ENUM)
-        && !parameter.isCollection()) {
+    if ((kind == EdmTypeKind.PRIMITIVE || kind == EdmTypeKind.DEFINITION
+      || kind == EdmTypeKind.ENUM) && !parameter.isCollection()) {
       // The content is a primitive URI literal.
-      Parameter result = new Parameter();
+      final Parameter result = new Parameter();
       result.setName(parameter.getName());
       result.setType(type.getFullQualifiedName().getFullQualifiedNameAsString());
-      final EdmPrimitiveType primitiveType = (EdmPrimitiveType) type;
+      final EdmPrimitiveType primitiveType = (EdmPrimitiveType)type;
       try {
         if (parameter.getMapping() == null) {
           result.setValue(type.getKind() == EdmTypeKind.ENUM ? ValueType.ENUM : ValueType.PRIMITIVE,
-              primitiveType.valueOfString(primitiveType.fromUriLiteral(content),
-                  parameter.isNullable(), parameter.getMaxLength(), 
-                  parameter.getPrecision(), parameter.getScale(), true,
-                   primitiveType.getDefaultType()));
+            primitiveType.valueOfString(primitiveType.fromUriLiteral(content),
+              parameter.isNullable(), parameter.getMaxLength(), parameter.getPrecision(),
+              parameter.getScale(), true, primitiveType.getDefaultType()));
         } else {
           result.setValue(type.getKind() == EdmTypeKind.ENUM ? ValueType.ENUM : ValueType.PRIMITIVE,
-              primitiveType.valueOfString(primitiveType.fromUriLiteral(content),
-                  parameter.isNullable(), parameter.getMaxLength(), 
-                  parameter.getPrecision(), parameter.getScale(), true,
-                        parameter.getMapping().getMappedJavaClass()));
+            primitiveType.valueOfString(primitiveType.fromUriLiteral(content),
+              parameter.isNullable(), parameter.getMaxLength(), parameter.getPrecision(),
+              parameter.getScale(), true, parameter.getMapping().getMappedJavaClass()));
         }
       } catch (final EdmPrimitiveTypeException e) {
         throw new DeserializerException(
-            "Invalid value '" + content + "' for parameter " + parameter.getName(), e,
-            DeserializerException.MessageKeys.INVALID_VALUE_FOR_PROPERTY, parameter.getName());
+          "Invalid value '" + content + "' for parameter " + parameter.getName(), e,
+          DeserializerException.MessageKeys.INVALID_VALUE_FOR_PROPERTY, parameter.getName());
       }
       return result;
     } else {
@@ -127,10 +101,35 @@ public class FixedFormatDeserializerImpl implements FixedFormatDeserializer {
 
   @Override
   public List<BatchRequestPart> parseBatchRequest(final InputStream content, final String boundary,
-      final BatchOptions options)
-          throws BatchDeserializerException {
+    final BatchOptions options) throws BatchDeserializerException {
     final BatchParser parser = new BatchParser();
 
     return parser.parseBatchRequest(content, boundary, options);
+  }
+
+  @Override
+  public Object primitiveValue(final InputStream content, final EdmProperty property)
+    throws DeserializerException {
+    if (property == null || !property.isPrimitive()) {
+      throw new DeserializerException("Wrong property.",
+        DeserializerException.MessageKeys.NOT_IMPLEMENTED);
+    }
+    try {
+      final StringWriter writer = new StringWriter();
+      final InputStreamReader reader = new InputStreamReader(content, "UTF-8");
+      int c = -1;
+      while ((c = reader.read()) != -1) {
+        writer.append((char)c);
+      }
+      final EdmPrimitiveType type = (EdmPrimitiveType)property.getType();
+      return type.valueOfString(writer.toString(), property.isNullable(), property.getMaxLength(),
+        property.getPrecision(), property.getScale(), property.isUnicode(), type.getDefaultType());
+    } catch (final EdmPrimitiveTypeException e) {
+      throw new DeserializerException("The value is not valid.", e,
+        DeserializerException.MessageKeys.INVALID_VALUE_FOR_PROPERTY, property.getName());
+    } catch (final IOException e) {
+      throw new DeserializerException("An I/O exception occurred.", e,
+        DeserializerException.MessageKeys.IO_EXCEPTION);
+    }
   }
 }

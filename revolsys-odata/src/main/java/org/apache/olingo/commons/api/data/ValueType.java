@@ -25,19 +25,19 @@ public enum ValueType {
   /**
    * Primitive value
    */
-  PRIMITIVE, 
+  PRIMITIVE,
   /**
    * Geospatial value
    */
-  GEOSPATIAL, 
+  GEOSPATIAL,
   /**
    * Enum type
    */
-  ENUM, 
+  ENUM,
   /**
    * Complex value
    */
-  COMPLEX, 
+  COMPLEX,
   /**
    * Entity value
    */
@@ -66,7 +66,7 @@ public enum ValueType {
   private final ValueType baseType;
 
   ValueType() {
-    baseType = this;
+    this.baseType = this;
   }
 
   ValueType(final ValueType baseType) {
@@ -78,6 +78,6 @@ public enum ValueType {
    * @return base type
    */
   public ValueType getBaseType() {
-    return baseType;
+    return this.baseType;
   }
 }

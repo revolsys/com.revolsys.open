@@ -22,8 +22,6 @@ import org.apache.olingo.server.api.ODataLibraryException;
 
 public class UriValidationException extends ODataLibraryException {
 
-  private static final long serialVersionUID = -3179078078053564742L;
-
   public static enum MessageKeys implements MessageKey {
     /** parameter: unsupported query option */
     UNSUPPORTED_QUERY_OPTION,
@@ -68,13 +66,15 @@ public class UriValidationException extends ODataLibraryException {
     }
   }
 
+  private static final long serialVersionUID = -3179078078053564742L;
+
   public UriValidationException(final String developmentMessage, final MessageKey messageKey,
-      final String... parameters) {
+    final String... parameters) {
     super(developmentMessage, messageKey, parameters);
   }
 
-  public UriValidationException(final String developmentMessage, final Throwable cause, final MessageKey messageKey,
-      final String... parameters) {
+  public UriValidationException(final String developmentMessage, final Throwable cause,
+    final MessageKey messageKey, final String... parameters) {
     super(developmentMessage, cause, messageKey, parameters);
   }
 

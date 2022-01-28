@@ -72,7 +72,28 @@ package org.apache.olingo.commons.api.edm;
 public interface EdmPrimitiveType extends EdmType {
 
   String EDM_NAMESPACE = "Edm";
-  
+
+  /**
+   * Converts URI literal representation to default literal representation.
+   * <p>
+   * Returns <code>null</code> if the literal is <code>null</code>. Checks the presence of a required prefix and of
+   * required surrounding quotation marks but does not perform any further validation.
+   * </p>
+   *
+   * @param literal the literal in URI representation
+   * @return default literal representation as String
+   * @throws EdmPrimitiveTypeException if a required prefix or required surrounding quotation marks are missing
+   */
+  String fromUriLiteral(String literal) throws EdmPrimitiveTypeException;
+
+  /**
+   * Returns the default Java type for this EDM primitive type as described in the documentation of
+   * {@link EdmPrimitiveType}.
+   *
+   * @return the default Java type
+   */
+  Class<?> getDefaultType();
+
   /**
    * Checks type compatibility.
    *
@@ -82,12 +103,15 @@ public interface EdmPrimitiveType extends EdmType {
   boolean isCompatible(EdmPrimitiveType primitiveType);
 
   /**
-   * Returns the default Java type for this EDM primitive type as described in the documentation of
-   * {@link EdmPrimitiveType}.
+   * Converts default literal representation to URI literal representation.
+   * <p>
+   * Returns <code>null</code> if the literal is <code>null</code>. Does not perform any validation.
+   * </p>
    *
-   * @return the default Java type
+   * @param literal the literal in default representation
+   * @return URI literal representation as String
    */
-  Class<?> getDefaultType();
+  String toUriLiteral(String literal);
 
   /**
    * Validates literal value.
@@ -100,8 +124,24 @@ public interface EdmPrimitiveType extends EdmType {
    * @param isUnicode whether non-ASCII characters are allowed (relevant only for Edm.String)
    * @return <code>true</code> if the validation is successful
    */
-  boolean validate(String value,
-      Boolean isNullable, Integer maxLength, Integer precision, Integer scale, Boolean isUnicode);
+  boolean validate(String value, Boolean isNullable, Integer maxLength, Integer precision,
+    Integer scale, Boolean isUnicode);
+
+  /**
+   * Validates literal value for Decimal values in V4.01
+   *
+   * @param value the literal value
+   * @param isNullable whether the <code>null</code> value is allowed
+   * @param maxLength the maximum length
+   * @param precision the precision
+   * @param scale the scale (could be variable or floating)
+   * @param isUnicode whether non-ASCII characters are allowed (relevant only for Edm.String)
+   * @return <code>true</code> if the validation is successful
+   */
+  default boolean validateDecimals(final String value, final Boolean isNullable,
+    final Integer maxLength, final Integer precision, final String scale, final Boolean isUnicode) {
+    return false;
+  }
 
   /**
    * Converts literal representation of value to system data type.
@@ -117,9 +157,8 @@ public interface EdmPrimitiveType extends EdmType {
    * @throws EdmPrimitiveTypeException
    * @return the value as an instance of the class the parameter <code>returnType</code> indicates
    */
-  <T> T valueOfString(String value,
-      Boolean isNullable, Integer maxLength, Integer precision, Integer scale, Boolean isUnicode,
-      Class<T> returnType) throws EdmPrimitiveTypeException;
+  <T> T valueOfString(String value, Boolean isNullable, Integer maxLength, Integer precision,
+    Integer scale, Boolean isUnicode, Class<T> returnType) throws EdmPrimitiveTypeException;
 
   /**
    * Converts system data type to literal representation of value.
@@ -137,47 +176,6 @@ public interface EdmPrimitiveType extends EdmType {
    * @throws EdmPrimitiveTypeException
    * @return literal representation as String
    */
-  String valueToString(Object value,
-      Boolean isNullable, Integer maxLength, Integer precision, Integer scale, Boolean isUnicode)
-          throws EdmPrimitiveTypeException;
-
-  /**
-   * Converts default literal representation to URI literal representation.
-   * <p>
-   * Returns <code>null</code> if the literal is <code>null</code>. Does not perform any validation.
-   * </p>
-   *
-   * @param literal the literal in default representation
-   * @return URI literal representation as String
-   */
-  String toUriLiteral(String literal);
-
-  /**
-   * Converts URI literal representation to default literal representation.
-   * <p>
-   * Returns <code>null</code> if the literal is <code>null</code>. Checks the presence of a required prefix and of
-   * required surrounding quotation marks but does not perform any further validation.
-   * </p>
-   *
-   * @param literal the literal in URI representation
-   * @return default literal representation as String
-   * @throws EdmPrimitiveTypeException if a required prefix or required surrounding quotation marks are missing
-   */
-  String fromUriLiteral(String literal) throws EdmPrimitiveTypeException;
-  
-  /**
-   * Validates literal value for Decimal values in V4.01
-   *
-   * @param value the literal value
-   * @param isNullable whether the <code>null</code> value is allowed
-   * @param maxLength the maximum length
-   * @param precision the precision
-   * @param scale the scale (could be variable or floating)
-   * @param isUnicode whether non-ASCII characters are allowed (relevant only for Edm.String)
-   * @return <code>true</code> if the validation is successful
-   */
-  default boolean validateDecimals(String value, Boolean isNullable, Integer maxLength, 
-      Integer precision, String scale, Boolean isUnicode) {
-        return false;
-  }
+  String valueToString(Object value, Boolean isNullable, Integer maxLength, Integer precision,
+    Integer scale, Boolean isUnicode) throws EdmPrimitiveTypeException;
 }

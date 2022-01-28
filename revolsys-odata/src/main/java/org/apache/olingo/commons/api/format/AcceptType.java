@@ -46,69 +46,8 @@ import java.util.regex.Pattern;
  */
 public final class AcceptType {
 
-  private static final Pattern Q_PATTERN = Pattern.compile("\\A(?:0(?:\\.\\d{0,3})?)|(?:1(?:\\.0{0,3})?)\\Z");
-
-  private final String type;
-  private final String subtype;
-  private final Map<String, String> parameters;
-  private final Float quality;
-
-  private AcceptType(final String type, final String subtype, final Map<String, String> parameters,
-      final Float quality) {
-    this.type = type;
-    this.subtype = subtype;
-    this.parameters = TypeUtil.createParameterMap();
-    this.parameters.putAll(parameters);
-    this.quality = quality;
-  }
-
-  private AcceptType(final String type) {
-    List<String> typeSubtype = new ArrayList<String>();
-    parameters = TypeUtil.createParameterMap();
-
-    parse(type, typeSubtype, parameters);
-    this.type = typeSubtype.get(0);
-    subtype = typeSubtype.get(1);
-
-    if (TypeUtil.MEDIA_TYPE_WILDCARD.equals(this.type) && !TypeUtil.MEDIA_TYPE_WILDCARD.equals(subtype)) {
-      throw new IllegalArgumentException("Illegal combination of WILDCARD type with NONE WILDCARD "
-          + "subtype in accept header:" + type);
-    }
-
-    final String q = parameters.get(TypeUtil.PARAMETER_Q);
-    if (q == null) {
-      quality = 1F;
-    } else if (Q_PATTERN.matcher(q).matches()) {
-        quality = Float.valueOf(q);
-    } else {
-      throw new IllegalArgumentException("Illegal quality parameter '" + q + "' in accept header:" + type);
-    }
-  }
-
-  private static void parse(final String format, final List<String> typeSubtype,
-      final Map<String, String> parameters) {
-
-    final String[] typesAndParameters = format.split(TypeUtil.PARAMETER_SEPARATOR, 2);
-    final String types = typesAndParameters[0];
-    final String params = (typesAndParameters.length > 1 ? typesAndParameters[1] : null);
-
-    String[] tokens = types.split(TypeUtil.TYPE_SUBTYPE_SEPARATOR);
-    if (tokens.length == 2) {
-      if (tokens[0] == null || tokens[0].isEmpty()) {
-        throw new IllegalArgumentException("No type found in format: '" + format + "'.");
-      } else if (tokens[1] == null || tokens[1].isEmpty()) {
-        throw new IllegalArgumentException("No subtype found in format: '" + format + "'.");
-      } else {
-        typeSubtype.add(tokens[0]);
-        typeSubtype.add(tokens[1]);
-      }
-    } else {
-      throw new IllegalArgumentException("Not exactly one '" + TypeUtil.TYPE_SUBTYPE_SEPARATOR +
-          " at the beginning or at the end in format: " + format);
-    }
-
-    TypeUtil.parseParameters(params, parameters);
-  }
+  private static final Pattern Q_PATTERN = Pattern
+    .compile("\\A(?:0(?:\\.\\d{0,3})?)|(?:1(?:\\.0{0,3})?)\\Z");
 
   /**
    * Creates a list of {@link AcceptType} objects based on given input string.
@@ -120,14 +59,14 @@ public final class AcceptType {
     if (acceptTypes == null) {
       throw new IllegalArgumentException("Type parameter MUST NOT be null.");
     }
-    List<AcceptType> result = new ArrayList<AcceptType>();
-    List<IllegalArgumentException> exceptionList = new ArrayList<IllegalArgumentException>();
+    final List<AcceptType> result = new ArrayList<>();
+    final List<IllegalArgumentException> exceptionList = new ArrayList<>();
 
-    String[] values = acceptTypes.split(",");
-    for (String value : values) {
+    final String[] values = acceptTypes.split(",");
+    for (final String value : values) {
       try {
         result.add(new AcceptType(value.trim()));
-      } catch (IllegalArgumentException e) {
+      } catch (final IllegalArgumentException e) {
         exceptionList.add(e);
       }
     }
@@ -135,7 +74,7 @@ public final class AcceptType {
     if (!exceptionList.isEmpty() || result.isEmpty()) {
       throw exceptionList.get(0);
     }
-    
+
     sort(result);
 
     return result;
@@ -147,39 +86,124 @@ public final class AcceptType {
    * @return an immutable one-element list of <code>AcceptType</code> objects that matches only the given content type
    */
   public static List<AcceptType> fromContentType(final ContentType contentType) {
-    return Collections.singletonList(new AcceptType(
-        contentType.getType(), contentType.getSubtype(), contentType.getParameters(), 1F));
+    return Collections.singletonList(new AcceptType(contentType.getType(), contentType.getSubtype(),
+      contentType.getParameters(), 1F));
   }
 
-  public String getType() {
-    return type;
+  private static void parse(final String format, final List<String> typeSubtype,
+    final Map<String, String> parameters) {
+
+    final String[] typesAndParameters = format.split(TypeUtil.PARAMETER_SEPARATOR, 2);
+    final String types = typesAndParameters[0];
+    final String params = typesAndParameters.length > 1 ? typesAndParameters[1] : null;
+
+    final String[] tokens = types.split(TypeUtil.TYPE_SUBTYPE_SEPARATOR);
+    if (tokens.length == 2) {
+      if (tokens[0] == null || tokens[0].isEmpty()) {
+        throw new IllegalArgumentException("No type found in format: '" + format + "'.");
+      } else if (tokens[1] == null || tokens[1].isEmpty()) {
+        throw new IllegalArgumentException("No subtype found in format: '" + format + "'.");
+      } else {
+        typeSubtype.add(tokens[0]);
+        typeSubtype.add(tokens[1]);
+      }
+    } else {
+      throw new IllegalArgumentException("Not exactly one '" + TypeUtil.TYPE_SUBTYPE_SEPARATOR
+        + " at the beginning or at the end in format: " + format);
+    }
+
+    TypeUtil.parseParameters(params, parameters);
   }
 
-  public String getSubtype() {
-    return subtype;
+  /**
+   * Sorts given list of Accept types
+   * according to their quality-parameter values and their specificity
+   * as defined in RFC 7231, chapters 3.1.1.1, 5.3.1, and 5.3.2.
+   * @param toSort list which is sorted and hence re-arranged
+   */
+  private static void sort(final List<AcceptType> toSort) {
+    Collections.sort(toSort, new Comparator<AcceptType>() {
+      @Override
+      public int compare(final AcceptType a1, final AcceptType a2) {
+        int compare = a2.getQuality().compareTo(a1.getQuality());
+        if (compare != 0) {
+          return compare;
+        }
+        compare = (a1.getType().equals(TypeUtil.MEDIA_TYPE_WILDCARD) ? 1 : 0)
+          - (a2.getType().equals(TypeUtil.MEDIA_TYPE_WILDCARD) ? 1 : 0);
+        if (compare != 0) {
+          return compare;
+        }
+        compare = (a1.getSubtype().equals(TypeUtil.MEDIA_TYPE_WILDCARD) ? 1 : 0)
+          - (a2.getSubtype().equals(TypeUtil.MEDIA_TYPE_WILDCARD) ? 1 : 0);
+        if (compare != 0) {
+          return compare;
+        }
+        return a2.getParameters().size() - a1.getParameters().size();
+      }
+    });
   }
 
-  public Map<String, String> getParameters() {
-    return Collections.unmodifiableMap(parameters);
+  private final String type;
+
+  private final String subtype;
+
+  private final Map<String, String> parameters;
+
+  private final Float quality;
+
+  private AcceptType(final String type) {
+    final List<String> typeSubtype = new ArrayList<>();
+    this.parameters = TypeUtil.createParameterMap();
+
+    parse(type, typeSubtype, this.parameters);
+    this.type = typeSubtype.get(0);
+    this.subtype = typeSubtype.get(1);
+
+    if (TypeUtil.MEDIA_TYPE_WILDCARD.equals(this.type)
+      && !TypeUtil.MEDIA_TYPE_WILDCARD.equals(this.subtype)) {
+      throw new IllegalArgumentException("Illegal combination of WILDCARD type with NONE WILDCARD "
+        + "subtype in accept header:" + type);
+    }
+
+    final String q = this.parameters.get(TypeUtil.PARAMETER_Q);
+    if (q == null) {
+      this.quality = 1F;
+    } else if (Q_PATTERN.matcher(q).matches()) {
+      this.quality = Float.valueOf(q);
+    } else {
+      throw new IllegalArgumentException(
+        "Illegal quality parameter '" + q + "' in accept header:" + type);
+    }
+  }
+
+  private AcceptType(final String type, final String subtype, final Map<String, String> parameters,
+    final Float quality) {
+    this.type = type;
+    this.subtype = subtype;
+    this.parameters = TypeUtil.createParameterMap();
+    this.parameters.putAll(parameters);
+    this.quality = quality;
   }
 
   public String getParameter(final String name) {
-    return parameters.get(name.toLowerCase(Locale.ROOT));
+    return this.parameters.get(name.toLowerCase(Locale.ROOT));
+  }
+
+  public Map<String, String> getParameters() {
+    return Collections.unmodifiableMap(this.parameters);
   }
 
   public Float getQuality() {
-    return quality;
+    return this.quality;
   }
 
-  @Override
-  public String toString() {
-    StringBuilder result = new StringBuilder();
-    result.append(type).append('/').append(subtype);
-    for (final Map.Entry<String, String> entry : parameters.entrySet()) {
-      result.append(';').append(entry.getKey()).append('=').append(entry.getValue());
-    }
+  public String getSubtype() {
+    return this.subtype;
+  }
 
-    return result.toString();
+  public String getType() {
+    return this.type;
   }
 
   /**
@@ -194,27 +218,29 @@ public final class AcceptType {
    * @return whether this accept type matches the given content type
    */
   public boolean matches(final ContentType contentType) {
-    if (type.equals(TypeUtil.MEDIA_TYPE_WILDCARD)) {
+    if (this.type.equals(TypeUtil.MEDIA_TYPE_WILDCARD)) {
       return true;
     }
-    if (!type.equalsIgnoreCase(contentType.getType())) {
+    if (!this.type.equalsIgnoreCase(contentType.getType())) {
       return false;
     }
-    if (subtype.equals(TypeUtil.MEDIA_TYPE_WILDCARD)) {
+    if (this.subtype.equals(TypeUtil.MEDIA_TYPE_WILDCARD)) {
       return true;
     }
-    if (!subtype.equalsIgnoreCase(contentType.getSubtype())) {
+    if (!this.subtype.equalsIgnoreCase(contentType.getSubtype())) {
       return false;
     }
-    Map<String, String> compareParameters = contentType.getParameters();
-    for (final Map.Entry<String, String> entry : parameters.entrySet()) {
-      if (entry.getKey().equalsIgnoreCase(ContentType.PARAMETER_CHARSET) && 
-          compareParameters.containsKey(entry.getKey())) {
+    final Map<String, String> compareParameters = contentType.getParameters();
+    for (final Map.Entry<String, String> entry : this.parameters.entrySet()) {
+      if (entry.getKey().equalsIgnoreCase(ContentType.PARAMETER_CHARSET)
+        && compareParameters.containsKey(entry.getKey())) {
         continue;
       } else {
-        if (compareParameters.containsKey(entry.getKey()) || TypeUtil.PARAMETER_Q.equalsIgnoreCase(entry.getKey())) {
-          String compare = compareParameters.get(entry.getKey());
-          if (!entry.getValue().equalsIgnoreCase(compare) && !TypeUtil.PARAMETER_Q.equalsIgnoreCase(entry.getKey())) {
+        if (compareParameters.containsKey(entry.getKey())
+          || TypeUtil.PARAMETER_Q.equalsIgnoreCase(entry.getKey())) {
+          final String compare = compareParameters.get(entry.getKey());
+          if (!entry.getValue().equalsIgnoreCase(compare)
+            && !TypeUtil.PARAMETER_Q.equalsIgnoreCase(entry.getKey())) {
             return false;
           }
         } else {
@@ -225,33 +251,14 @@ public final class AcceptType {
     return true;
   }
 
-  /**
-   * Sorts given list of Accept types
-   * according to their quality-parameter values and their specificity
-   * as defined in RFC 7231, chapters 3.1.1.1, 5.3.1, and 5.3.2.
-   * @param toSort list which is sorted and hence re-arranged
-   */
-  private static void sort(List<AcceptType> toSort) {
-    Collections.sort(toSort,
-        new Comparator<AcceptType>() {
-      @Override
-      public int compare(final AcceptType a1, final AcceptType a2) {
-        int compare = a2.getQuality().compareTo(a1.getQuality());
-        if (compare != 0) {
-          return compare;
-        }
-        compare = (a1.getType().equals(TypeUtil.MEDIA_TYPE_WILDCARD) ? 1 : 0)
-            - (a2.getType().equals(TypeUtil.MEDIA_TYPE_WILDCARD) ? 1 : 0);
-        if (compare != 0) {
-          return compare;
-        }
-        compare = (a1.getSubtype().equals(TypeUtil.MEDIA_TYPE_WILDCARD) ? 1 : 0)
-            - (a2.getSubtype().equals(TypeUtil.MEDIA_TYPE_WILDCARD) ? 1 : 0);
-        if (compare != 0) {
-          return compare;
-        }
-        return a2.getParameters().size() - a1.getParameters().size();
-      }
-    });
+  @Override
+  public String toString() {
+    final StringBuilder result = new StringBuilder();
+    result.append(this.type).append('/').append(this.subtype);
+    for (final Map.Entry<String, String> entry : this.parameters.entrySet()) {
+      result.append(';').append(entry.getKey()).append('=').append(entry.getValue());
+    }
+
+    return result.toString();
   }
 }

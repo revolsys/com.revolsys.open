@@ -26,23 +26,26 @@ import java.net.URI;
 public class DeltaLink extends Annotatable {
 
   private URI source;
+
   private String relationship;
+
   private URI target;
 
-  /**
-   * Get source of this link.
-   * @return source of this link
-   */
-  public URI getSource() {
-    return source;
-  }
+  @Override
+  public boolean equals(final Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
 
-  /**
-   * Set source of this link.
-   * @param source source of this link
-   */
-  public void setSource(final URI source) {
-    this.source = source;
+    final DeltaLink other = (DeltaLink)o;
+    return getAnnotations().equals(other.getAnnotations())
+      && (this.source == null ? other.source == null : this.source.equals(other.source))
+      && (this.relationship == null ? other.relationship == null
+        : this.relationship.equals(other.relationship))
+      && (this.target == null ? other.target == null : this.target.equals(other.target));
   }
 
   /**
@@ -50,7 +53,32 @@ public class DeltaLink extends Annotatable {
    * @return relationship of this link
    */
   public String getRelationship() {
-    return relationship;
+    return this.relationship;
+  }
+
+  /**
+   * Get source of this link.
+   * @return source of this link
+   */
+  public URI getSource() {
+    return this.source;
+  }
+
+  /**
+   * Get target of this link.
+   * @return target of this link
+   */
+  public URI getTarget() {
+    return this.target;
+  }
+
+  @Override
+  public int hashCode() {
+    int result = getAnnotations().hashCode();
+    result = 31 * result + (this.source == null ? 0 : this.source.hashCode());
+    result = 31 * result + (this.relationship == null ? 0 : this.relationship.hashCode());
+    result = 31 * result + (this.target == null ? 0 : this.target.hashCode());
+    return result;
   }
 
   /**
@@ -62,11 +90,11 @@ public class DeltaLink extends Annotatable {
   }
 
   /**
-   * Get target of this link.
-   * @return target of this link
+   * Set source of this link.
+   * @param source source of this link
    */
-  public URI getTarget() {
-    return target;
+  public void setSource(final URI source) {
+    this.source = source;
   }
 
   /**
@@ -75,30 +103,5 @@ public class DeltaLink extends Annotatable {
    */
   public void setTarget(final URI target) {
     this.target = target;
-  }
-
-  @Override
-  public boolean equals(final Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    final DeltaLink other = (DeltaLink) o;
-    return getAnnotations().equals(other.getAnnotations())
-        && (source == null ? other.source == null : source.equals(other.source))
-        && (relationship == null ? other.relationship == null : relationship.equals(other.relationship))
-        && (target == null ? other.target == null : target.equals(other.target));
-  }
-
-  @Override
-  public int hashCode() {
-    int result = getAnnotations().hashCode();
-    result = 31 * result + (source == null ? 0 : source.hashCode());
-    result = 31 * result + (relationship == null ? 0 : relationship.hashCode());
-    result = 31 * result + (target == null ? 0 : target.hashCode());
-    return result;
   }
 }

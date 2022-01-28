@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -51,16 +51,31 @@ import org.apache.olingo.server.api.prefer.Preferences.Preference;
 public class PreferParser {
 
   private static final String TOKEN = "(?:[-!#$%&'*+.^_`|~]|\\w)+";
+
   private static final String QUOTED_STRING = "(?:\"(?:[\\t !#-\\[\\]-~\\x80-\\xFF]|"
-      + "(?:\\\\[\\t !-~\\x80-\\xFF]))*\")";
-  private static final String NAMED_VALUE =
-      "(" + TOKEN + ")(?:\\s*=\\s*(" + TOKEN + "|" + QUOTED_STRING + "))?";
-  private static final Pattern PREFERENCE = Pattern.compile("\\s*(,\\s*)+|"
-      + "(?:" + NAMED_VALUE + "((?:\\s*;\\s*(?:" + NAMED_VALUE + ")?)*))");
+    + "(?:\\\\[\\t !-~\\x80-\\xFF]))*\")";
+
+  private static final String NAMED_VALUE = "(" + TOKEN + ")(?:\\s*=\\s*(" + TOKEN + "|"
+    + QUOTED_STRING + "))?";
+
+  private static final Pattern PREFERENCE = Pattern
+    .compile("\\s*(,\\s*)+|" + "(?:" + NAMED_VALUE + "((?:\\s*;\\s*(?:" + NAMED_VALUE + ")?)*))");
+
   private static final Pattern PARAMETER = Pattern.compile("\\s*(;\\s*)+|(?:" + NAMED_VALUE + ")");
 
-  private PreferParser() {
-    // Private constructor for utility classes
+  private static String getValue(final String value) {
+    if (value == null) {
+      return null;
+    }
+    String result = value;
+    if (value.startsWith("\"")) {
+      result = value.substring(1, value.length() - 1);
+    }
+    // Unquote backslash-quoted characters.
+    if (result.indexOf('\\') >= 0) {
+      result = result.replaceAll("\\\\(.)", "$1");
+    }
+    return result;
   }
 
   protected static Map<String, Preference> parse(final Collection<String> values) {
@@ -68,7 +83,7 @@ public class PreferParser {
       return Collections.emptyMap();
     }
 
-    Map<String, Preference> result = new HashMap<>();
+    final Map<String, Preference> result = new HashMap<>();
     for (final String value : values) {
       if (value != null && !value.isEmpty()) {
         parse(value, result);
@@ -78,10 +93,10 @@ public class PreferParser {
   }
 
   private static void parse(final String value, final Map<String, Preference> result) {
-    Map<String, Preference> partResult = new HashMap<>();
+    final Map<String, Preference> partResult = new HashMap<>();
     String separator = "";
     int start = 0;
-    Matcher matcher = PREFERENCE.matcher(value.trim());
+    final Matcher matcher = PREFERENCE.matcher(value.trim());
     while (matcher.find() && matcher.start() == start) {
       start = matcher.end();
       if (matcher.group(1) != null) {
@@ -89,14 +104,15 @@ public class PreferParser {
       } else if (separator != null) {
         final String name = matcher.group(2).toLowerCase(Locale.ROOT);
         // RFC 7240:
-        // If any preference is specified more than once, only the first instance is to be
-        // considered. All subsequent occurrences SHOULD be ignored without signaling
+        // If any preference is specified more than once, only the first
+        // instance is to be
+        // considered. All subsequent occurrences SHOULD be ignored without
+        // signaling
         // an error or otherwise altering the processing of the request.
         if (!partResult.containsKey(name)) {
           final String preferenceValue = getValue(matcher.group(3));
-          final Map<String, String> parameters =
-              matcher.group(4) == null || matcher.group(4).isEmpty() ? null :
-                parseParameters(matcher.group(4));
+          final Map<String, String> parameters = matcher.group(4) == null
+            || matcher.group(4).isEmpty() ? null : parseParameters(matcher.group(4));
           partResult.put(name, new Preference(preferenceValue, parameters));
         }
         separator = null;
@@ -115,10 +131,10 @@ public class PreferParser {
   }
 
   private static Map<String, String> parseParameters(final String parameters) {
-    Map<String, String> result = new HashMap<>();
+    final Map<String, String> result = new HashMap<>();
     String separator = "";
     int start = 0;
-    Matcher matcher = PARAMETER.matcher(parameters.trim());
+    final Matcher matcher = PARAMETER.matcher(parameters.trim());
     while (matcher.find() && matcher.start() == start) {
       start = matcher.end();
       if (matcher.group(1) != null) {
@@ -137,18 +153,7 @@ public class PreferParser {
     return matcher.hitEnd() ? Collections.unmodifiableMap(result) : null;
   }
 
-  private static String getValue(final String value) {
-    if (value == null) {
-      return null;
-    }
-    String result = value;
-    if (value.startsWith("\"")) {
-      result = value.substring(1, value.length() - 1);
-    }
-    // Unquote backslash-quoted characters.
-    if (result.indexOf('\\') >= 0) {
-      result = result.replaceAll("\\\\(.)", "$1");
-    }
-    return result;
+  private PreferParser() {
+    // Private constructor for utility classes
   }
 }

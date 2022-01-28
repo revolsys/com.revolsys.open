@@ -40,5 +40,6 @@ public interface ActionComplexCollectionProcessor extends Processor {
    * @throws ODataLibraryException
    */
   void processActionComplexCollection(ODataRequest request, ODataResponse response, UriInfo uriInfo,
-      ContentType requestFormat, ContentType responseFormat) throws ODataApplicationException, ODataLibraryException;
+    ContentType requestFormat, ContentType responseFormat)
+    throws ODataApplicationException, ODataLibraryException;
 }

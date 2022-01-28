@@ -23,7 +23,7 @@ import java.util.List;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 
 /**
- * Represents a line string. 
+ * Represents a line string.
  * Either of type Edm.GeographyLineString or Edm.GeometryLineString
  */
 public class LineString extends ComposedGeospatial<Point> {
@@ -40,8 +40,7 @@ public class LineString extends ComposedGeospatial<Point> {
 
   @Override
   public EdmPrimitiveTypeKind getEdmPrimitiveTypeKind() {
-    return dimension == Dimension.GEOGRAPHY ?
-        EdmPrimitiveTypeKind.GeographyLineString :
-        EdmPrimitiveTypeKind.GeometryLineString;
+    return this.dimension == Dimension.GEOGRAPHY ? EdmPrimitiveTypeKind.GeographyLineString
+      : EdmPrimitiveTypeKind.GeometryLineString;
   }
 }

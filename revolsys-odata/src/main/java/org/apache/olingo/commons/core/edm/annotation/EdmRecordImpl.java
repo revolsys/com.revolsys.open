@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -35,40 +35,14 @@ import org.apache.olingo.commons.core.edm.EdmTypeInfo;
 public class EdmRecordImpl extends AbstractEdmAnnotatableDynamicExpression implements EdmRecord {
 
   private List<EdmPropertyValue> propertyValues;
-  private EdmStructuredType type;
-  private CsdlRecord record;
 
-  public EdmRecordImpl(final Edm edm, CsdlRecord csdlExp) {
+  private EdmStructuredType type;
+
+  private final CsdlRecord record;
+
+  public EdmRecordImpl(final Edm edm, final CsdlRecord csdlExp) {
     super(edm, "Record", csdlExp);
     this.record = csdlExp;
-  }
-
-  @Override
-  public List<EdmPropertyValue> getPropertyValues() {
-    if (propertyValues == null) {
-      List<EdmPropertyValue> localValues = new ArrayList<>();
-      if (record.getPropertyValues() != null) {
-        for (CsdlPropertyValue value : record.getPropertyValues()) {
-          localValues.add(new EdmPropertyValueImpl(edm, value));
-        }
-      }
-      propertyValues = Collections.unmodifiableList(localValues);
-    }
-    return propertyValues;
-  }
-
-  @Override
-  public EdmStructuredType getType() {
-    if (type == null && record.getType() != null) {
-      // record MAY have a type information.
-      final EdmTypeInfo typeInfo = new EdmTypeInfo.Builder().setEdm(edm).setTypeExpression(record.getType()).build();
-      if (typeInfo.isEntityType() || typeInfo.isComplexType()) {
-        type = typeInfo.isEntityType() ? typeInfo.getEntityType() : typeInfo.getComplexType();
-      } else {
-        throw new EdmException("Record expressions must specify a complex or entity type.");
-      }
-    }
-    return type;
   }
 
   @Override
@@ -77,7 +51,37 @@ public class EdmRecordImpl extends AbstractEdmAnnotatableDynamicExpression imple
   }
 
   @Override
+  public List<EdmPropertyValue> getPropertyValues() {
+    if (this.propertyValues == null) {
+      final List<EdmPropertyValue> localValues = new ArrayList<>();
+      if (this.record.getPropertyValues() != null) {
+        for (final CsdlPropertyValue value : this.record.getPropertyValues()) {
+          localValues.add(new EdmPropertyValueImpl(this.edm, value));
+        }
+      }
+      this.propertyValues = Collections.unmodifiableList(localValues);
+    }
+    return this.propertyValues;
+  }
+
+  @Override
+  public EdmStructuredType getType() {
+    if (this.type == null && this.record.getType() != null) {
+      // record MAY have a type information.
+      final EdmTypeInfo typeInfo = new EdmTypeInfo.Builder().setEdm(this.edm)
+        .setTypeExpression(this.record.getType())
+        .build();
+      if (typeInfo.isEntityType() || typeInfo.isComplexType()) {
+        this.type = typeInfo.isEntityType() ? typeInfo.getEntityType() : typeInfo.getComplexType();
+      } else {
+        throw new EdmException("Record expressions must specify a complex or entity type.");
+      }
+    }
+    return this.type;
+  }
+
+  @Override
   public FullQualifiedName getTypeFQN() {
-    return record.getType() != null ? new FullQualifiedName(record.getType()) : null;
+    return this.record.getType() != null ? new FullQualifiedName(this.record.getType()) : null;
   }
 }

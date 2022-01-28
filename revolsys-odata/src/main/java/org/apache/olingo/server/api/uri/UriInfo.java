@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -29,19 +29,7 @@ import org.apache.olingo.server.api.uri.queryoption.SystemQueryOption;
  * Use method {@link #getKind()} to obtain URI info kind information and to perform an appropriate cast.</p>
  */
 public interface UriInfo extends UriInfoService, UriInfoMetadata, UriInfoResource, UriInfoBatch,
-UriInfoAll, UriInfoCrossjoin, UriInfoEntityId {
-
-  /**
-   * See {@link UriInfoKind} for more details which kinds are allowed.
-   * @return the kind of this URI info object.
-   */
-  UriInfoKind getKind();
-
-  /**
-   * Convenience casting method.
-   * @return this as a {@link UriInfoService} object
-   */
-  UriInfoService asUriInfoService();
+  UriInfoAll, UriInfoCrossjoin, UriInfoEntityId {
 
   /**
    * Convenience casting method.
@@ -80,14 +68,26 @@ UriInfoAll, UriInfoCrossjoin, UriInfoEntityId {
   UriInfoResource asUriInfoResource();
 
   /**
-   * Gets a list of all system query options which were in the URI.
-   * @return a list of all system query options used
+   * Convenience casting method.
+   * @return this as a {@link UriInfoService} object
    */
-  List<SystemQueryOption> getSystemQueryOptions();
+  UriInfoService asUriInfoService();
 
   /**
    * Gets a list of all alias definitions which were in the URI (including aliases not used anywhere).
    * @return a list of all alias definitions
    */
   List<AliasQueryOption> getAliases();
+
+  /**
+   * See {@link UriInfoKind} for more details which kinds are allowed.
+   * @return the kind of this URI info object.
+   */
+  UriInfoKind getKind();
+
+  /**
+   * Gets a list of all system query options which were in the URI.
+   * @return a list of all system query options used
+   */
+  List<SystemQueryOption> getSystemQueryOptions();
 }

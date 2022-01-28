@@ -6,9 +6,9 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -28,94 +28,50 @@ import org.apache.olingo.commons.api.edm.provider.annotation.CsdlLogicalOrCompar
 
 public abstract class AbstractEdmExpression implements EdmExpression {
 
-  private final String name;
-  protected final Edm edm;
-
-  public AbstractEdmExpression(Edm edm, String name) {
-    this.edm = edm;
-    this.name = name;
-  }
-
-  @Override
-  public String getExpressionName() {
-    return name;
-  };
-
-  @Override
-  public boolean isConstant() {
-    return this instanceof EdmConstantExpression;
-  }
-
-  @Override
-  public EdmConstantExpression asConstant() {
-    return isConstant() ? (EdmConstantExpression) this : null;
-  }
-
-  @Override
-  public boolean isDynamic() {
-    return this instanceof EdmDynamicExpression;
-  }
-
-  @Override
-  public EdmDynamicExpression asDynamic() {
-    return isDynamic() ? (EdmDynamicExpression) this : null;
-  }
-  
-  public static EdmExpression getExpression(Edm edm, final CsdlExpression exp) {
-    EdmExpression _expression = null;
-
-    if (exp.isConstant()) {
-      _expression = new EdmConstantExpressionImpl(edm, exp.asConstant());
-    } else if (exp.isDynamic()) {
-      _expression = getDynamicExpression(edm, exp.asDynamic());
-    }
-
-    return _expression;
-  }
-
-  private static EdmDynamicExpression getDynamicExpression(Edm edm, final CsdlDynamicExpression exp) {
+  private static EdmDynamicExpression getDynamicExpression(final Edm edm,
+    final CsdlDynamicExpression exp) {
 
     EdmDynamicExpression _expression = null;
 
     if (exp.isLogicalOrComparison()) {
-      CsdlLogicalOrComparisonExpression expLocal = exp.asLogicalOrComparison();
+      final CsdlLogicalOrComparisonExpression expLocal = exp.asLogicalOrComparison();
       switch (exp.asLogicalOrComparison().getType()) {
-      case Not:
-        _expression = new EdmNotImpl(edm, expLocal);
+        case Not:
+          _expression = new EdmNotImpl(edm, expLocal);
         break;
-      case And:
-        _expression = new EdmAndImpl(edm, expLocal);
-        break;
-
-      case Or:
-        _expression = new EdmOrImpl(edm, expLocal);
+        case And:
+          _expression = new EdmAndImpl(edm, expLocal);
         break;
 
-      case Eq:
-        _expression = new EdmEqImpl(edm, expLocal);
+        case Or:
+          _expression = new EdmOrImpl(edm, expLocal);
         break;
 
-      case Ne:
-        _expression = new EdmNeImpl(edm, expLocal);
+        case Eq:
+          _expression = new EdmEqImpl(edm, expLocal);
         break;
 
-      case Ge:
-        _expression = new EdmGeImpl(edm, expLocal);
+        case Ne:
+          _expression = new EdmNeImpl(edm, expLocal);
         break;
 
-      case Gt:
-        _expression = new EdmGtImpl(edm, expLocal);
+        case Ge:
+          _expression = new EdmGeImpl(edm, expLocal);
         break;
 
-      case Le:
-        _expression = new EdmLeImpl(edm, expLocal);
+        case Gt:
+          _expression = new EdmGtImpl(edm, expLocal);
         break;
 
-      case Lt:
-        _expression = new EdmLtImpl(edm, expLocal);
+        case Le:
+          _expression = new EdmLeImpl(edm, expLocal);
         break;
 
-      default:
+        case Lt:
+          _expression = new EdmLtImpl(edm, expLocal);
+        break;
+
+        default:
       }
     } else if (exp.isAnnotationPath()) {
       _expression = new EdmAnnotationPathImpl(edm, exp.asAnnotationPath());
@@ -148,5 +104,51 @@ public abstract class AbstractEdmExpression implements EdmExpression {
     }
 
     return _expression;
+  }
+
+  public static EdmExpression getExpression(final Edm edm, final CsdlExpression exp) {
+    EdmExpression _expression = null;
+
+    if (exp.isConstant()) {
+      _expression = new EdmConstantExpressionImpl(edm, exp.asConstant());
+    } else if (exp.isDynamic()) {
+      _expression = getDynamicExpression(edm, exp.asDynamic());
+    }
+
+    return _expression;
+  }
+
+  private final String name;
+
+  protected final Edm edm;
+
+  public AbstractEdmExpression(final Edm edm, final String name) {
+    this.edm = edm;
+    this.name = name;
+  }
+
+  @Override
+  public EdmConstantExpression asConstant() {
+    return isConstant() ? (EdmConstantExpression)this : null;
+  }
+
+  @Override
+  public EdmDynamicExpression asDynamic() {
+    return isDynamic() ? (EdmDynamicExpression)this : null;
+  }
+
+  @Override
+  public String getExpressionName() {
+    return this.name;
+  }
+
+  @Override
+  public boolean isConstant() {
+    return this instanceof EdmConstantExpression;
+  }
+
+  @Override
+  public boolean isDynamic() {
+    return this instanceof EdmDynamicExpression;
   }
 }

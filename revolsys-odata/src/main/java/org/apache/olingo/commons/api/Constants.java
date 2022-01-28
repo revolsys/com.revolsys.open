@@ -51,7 +51,7 @@ public interface Constants {
   String NS_ASSOCIATION_LINK_REL = "http://docs.oasis-open.org/odata/ns/relatedlinks/";
 
   String NS_MEDIA_EDIT_LINK_REL = "http://docs.oasis-open.org/odata/ns/edit-media/";
-  
+
   String NS_MEDIA_READ_LINK_REL = "http://docs.oasis-open.org/odata/ns/mediaresource/";
 
   String NS_DELTA_LINK_REL = "http://docs.oasis-open.org/odata/ns/delta";
@@ -106,7 +106,7 @@ public interface Constants {
   String ATTR_METADATA = "metadata";
 
   String ATTR_HREF = "href";
-  
+
   String ATTR_NAME = "name";
 
   String ATTR_REF = "ref";
@@ -219,7 +219,7 @@ public interface Constants {
   String VALUE = "value";
 
   String JSON_URL = "url";
-  
+
   String JSON_TITLE = "title";
 
   String JSON_COORDINATES = "coordinates";
@@ -276,7 +276,7 @@ public interface Constants {
   QName QNAME_ATOM_ELEM_CONTENT = new QName(NS_ATOM, ATOM_ELEM_CONTENT);
 
   String ATOM_ELEM_ACTION = "action";
-  
+
   String ATOM_ELEM_FUNCTION = "function";
 
   String ATOM_ELEM_INLINE = "inline";
@@ -303,7 +303,7 @@ public interface Constants {
   String ERROR_DETAILS = "details";
 
   String ERROR_DETAIL = "detail";
-  
+
   String ERROR_INNERERROR = "innererror";
 
   // canonical functions to be applied via dynamic annotation <tt>Apply</tt>
@@ -314,25 +314,43 @@ public interface Constants {
   String CANONICAL_FUNCTION_URIENCODE = "odata.uriEncode";
 
   String MEDIA_EDIT_LINK_TYPE = "*/*";
+
   String ENTITY_NAVIGATION_LINK_TYPE = ContentType.APPLICATION_ATOM_XML_ENTRY.toContentTypeString();
-  String ENTITY_SET_NAVIGATION_LINK_TYPE = ContentType.APPLICATION_ATOM_XML_FEED.toContentTypeString();
+
+  String ENTITY_SET_NAVIGATION_LINK_TYPE = ContentType.APPLICATION_ATOM_XML_FEED
+    .toContentTypeString();
+
   String ASSOCIATION_LINK_TYPE = ContentType.APPLICATION_XML.toContentTypeString();
+
   String ENTITY_COLLECTION_BINDING_LINK_TYPE = ContentType.APPLICATION_XML.toContentTypeString();
+
   String ENTITY_BINDING_LINK_TYPE = ContentType.APPLICATION_XML.toContentTypeString();
-  
- //For v4.01 Delta
-  
+
+  // For v4.01 Delta
+
   String LINK = "/$link";
+
   String DELETEDLINK = "/$deletedLink";
+
   String DELTA = "/$delta";
+
   String DELTAVALUE = "delta";
+
   String AT = "@";
+
   String DELETEDENTITY = "/$deletedEntity";
+
   String DELTALINK = "@deltaLink";
+
   String HASH = "#";
+
   String REMOVED = "removed";
+
   String ENTITY = "/$entity";
+
   String REASON = "Reason";
+
   String ID = "@id";
+
   String NEXTLINK = "@nextLink";
 }

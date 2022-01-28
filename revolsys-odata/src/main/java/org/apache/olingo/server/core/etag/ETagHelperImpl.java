@@ -27,33 +27,31 @@ import org.apache.olingo.server.api.etag.PreconditionException;
 public class ETagHelperImpl implements ETagHelper {
 
   @Override
-  public boolean checkReadPreconditions(final String eTag,
-      final Collection<String> ifMatchHeaders, final Collection<String> ifNoneMatchHeaders)
-          throws PreconditionException {
-    if (eTag != null) {
-      final ETagInformation ifMatch = createETagInformation(ifMatchHeaders);
-      if (!ifMatch.isMatchedBy(eTag) && !ifMatch.getETags().isEmpty()) {
-        throw new PreconditionException("The If-Match precondition is not fulfilled.",
-            PreconditionException.MessageKeys.FAILED);
-      }
-      return createETagInformation(ifNoneMatchHeaders).isMatchedBy(eTag);
-    }
-    return false;
-  }
-
-  @Override
-  public void checkChangePreconditions(final String eTag,
-      final Collection<String> ifMatchHeaders, final Collection<String> ifNoneMatchHeaders)
-          throws PreconditionException {
+  public void checkChangePreconditions(final String eTag, final Collection<String> ifMatchHeaders,
+    final Collection<String> ifNoneMatchHeaders) throws PreconditionException {
     if (eTag != null) {
       final ETagInformation ifMatch = createETagInformation(ifMatchHeaders);
       final ETagInformation ifNoneMatch = createETagInformation(ifNoneMatchHeaders);
       if (!ifMatch.isMatchedBy(eTag) && !ifMatch.getETags().isEmpty()
-          || ifNoneMatch.isMatchedBy(eTag)) {
+        || ifNoneMatch.isMatchedBy(eTag)) {
         throw new PreconditionException("The preconditions are not fulfilled.",
-            PreconditionException.MessageKeys.FAILED);
+          PreconditionException.MessageKeys.FAILED);
       }
     }
+  }
+
+  @Override
+  public boolean checkReadPreconditions(final String eTag, final Collection<String> ifMatchHeaders,
+    final Collection<String> ifNoneMatchHeaders) throws PreconditionException {
+    if (eTag != null) {
+      final ETagInformation ifMatch = createETagInformation(ifMatchHeaders);
+      if (!ifMatch.isMatchedBy(eTag) && !ifMatch.getETags().isEmpty()) {
+        throw new PreconditionException("The If-Match precondition is not fulfilled.",
+          PreconditionException.MessageKeys.FAILED);
+      }
+      return createETagInformation(ifNoneMatchHeaders).isMatchedBy(eTag);
+    }
+    return false;
   }
 
   /**
@@ -67,6 +65,6 @@ public class ETagHelperImpl implements ETagHelper {
     final Collection<String> eTags = ETagParser.parse(values);
     final boolean isAll = eTags.size() == 1 && "*".equals(eTags.iterator().next());
     return new ETagInformation(isAll,
-        isAll ? Collections.<String> emptySet() : Collections.unmodifiableCollection(eTags));
+      isAll ? Collections.<String> emptySet() : Collections.unmodifiableCollection(eTags));
   }
 }

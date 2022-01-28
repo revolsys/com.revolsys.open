@@ -22,40 +22,40 @@ package org.apache.olingo.commons.api;
  * Constant values related to the OData protocol.
  */
 public interface IConstants {
-  
-  public String getMetadata();
-  
-  public String getType();
-  
-  public String getId();
-  
-  public String getReadLink();
+
+  public String getAssociationLink();
+
+  public String getBind();
+
+  public String getContext();
+
+  public String getCount();
+
+  public String getDeltaLink();
 
   public String getEditLink();
-  
-  public String getContext();
-  
+
   public String getEtag();
-  
-  public String getMediaEtag();
-  
+
+  public String getId();
+
   public String getMediaContentType();
-  
-  public String getMediaReadLink();
-  
+
   public String getMediaEditLink();
-  
+
+  public String getMediaEtag();
+
+  public String getMediaReadLink();
+
+  public String getMetadata();
+
   public String getMetadataEtag();
-  
-  public String getBind();
-  
-  public String getAssociationLink();
-  
+
   public String getNavigationLink();
-  
-  public String getCount();
-  
+
   public String getNextLink();
-  
-  public String getDeltaLink();
+
+  public String getReadLink();
+
+  public String getType();
 }
