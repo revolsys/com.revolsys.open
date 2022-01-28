@@ -58,7 +58,6 @@ import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 import org.apache.olingo.server.core.serializer.SerializerResultImpl;
 import org.apache.olingo.server.core.serializer.utils.CircleStreamBuffer;
 import org.apache.olingo.server.core.serializer.utils.ContentTypeHelper;
-import org.apache.olingo.server.core.serializer.utils.ContextURLBuilder;
 import org.apache.olingo.server.core.serializer.utils.ExpandSelectHelper;
 import org.apache.olingo.server.core.uri.UriHelperImpl;
 
@@ -137,7 +136,7 @@ public class JsonDeltaSerializer implements EdmDeltaSerializer {
         options == null ? null : options.getContextURL());
       writeContextURL(contextURL, json);
 
-      if (options != null && options.getCount() != null && options.getCount().getValue()) {
+      if (options != null && options.isCount()) {
         writeInlineCount(delta.getCount(), json);
       }
       json.label(Constants.VALUE);
@@ -305,8 +304,7 @@ public class JsonDeltaSerializer implements EdmDeltaSerializer {
 
   void writeContextURL(final ContextURL contextURL, final JsonWriter json) throws IOException {
     if (!this.isODataMetadataNone && contextURL != null) {
-      json.labelValue(Constants.JSON_CONTEXT,
-        ContextURLBuilder.create(contextURL).toASCIIString() + DELTA);
+      json.labelValue(Constants.JSON_CONTEXT, contextURL.toUriString() + DELTA);
     }
   }
 

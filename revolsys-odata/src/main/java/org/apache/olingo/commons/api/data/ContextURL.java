@@ -20,9 +20,11 @@ package org.apache.olingo.commons.api.data;
 
 import java.net.URI;
 
+import org.apache.olingo.commons.api.Constants;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmType;
+import org.apache.olingo.commons.core.Encoder;
 
 /**
  * High-level representation of a context URL, built from the string value returned by a service; provides access to the
@@ -37,14 +39,14 @@ public final class ContextURL {
    */
   public static final class Builder {
 
-    private final ContextURL contextURL = new ContextURL();
+    private final ContextURL contextUrl = new ContextURL();
 
     /**
      * Define the result as a collection.
      * @return Builder
      */
     public Builder asCollection() {
-      this.contextURL.isCollection = true;
+      this.contextUrl.isCollection = true;
       return this;
     }
 
@@ -53,7 +55,7 @@ public final class ContextURL {
      * @return the according ContextURL
      */
     public ContextURL build() {
-      return this.contextURL;
+      return this.contextUrl;
     }
 
     /**
@@ -62,7 +64,7 @@ public final class ContextURL {
      * @return Builder
      */
     public Builder derived(final EdmEntityType derivedType) {
-      this.contextURL.derivedEntity = derivedType.getFullQualifiedName()
+      this.contextUrl.derivedEntity = derivedType.getFullQualifiedName()
         .getFullQualifiedNameAsString();
       return this;
     }
@@ -73,7 +75,7 @@ public final class ContextURL {
      * @return Builder
      */
     public Builder derivedEntity(final String derivedEntity) {
-      this.contextURL.derivedEntity = derivedEntity;
+      this.contextUrl.derivedEntity = derivedEntity;
       return this;
     }
 
@@ -83,7 +85,7 @@ public final class ContextURL {
      * @return Builder
      */
     public Builder entitySet(final EdmEntitySet entitySet) {
-      this.contextURL.entitySetOrSingletonOrType = entitySet.getName();
+      this.contextUrl.entitySetOrSingletonOrType = entitySet.getName();
       return this;
     }
 
@@ -93,7 +95,7 @@ public final class ContextURL {
      * @return Builder
      */
     public Builder entitySetOrSingletonOrType(final String entitySetOrSingletonOrType) {
-      this.contextURL.entitySetOrSingletonOrType = entitySetOrSingletonOrType;
+      this.contextUrl.entitySetOrSingletonOrType = entitySetOrSingletonOrType;
       return this;
     }
 
@@ -103,7 +105,7 @@ public final class ContextURL {
      * @return Builder
      */
     public Builder keyPath(final String keyPath) {
-      this.contextURL.keyPath = keyPath;
+      this.contextUrl.keyPath = keyPath;
       return this;
     }
 
@@ -113,7 +115,7 @@ public final class ContextURL {
      * @return Builder
      */
     public Builder navOrPropertyPath(final String navOrPropertyPath) {
-      this.contextURL.navOrPropertyPath = navOrPropertyPath;
+      this.contextUrl.navOrPropertyPath = navOrPropertyPath;
       return this;
     }
 
@@ -123,7 +125,7 @@ public final class ContextURL {
      * @return Builder
      */
     public Builder oDataPath(final String oDataPath) {
-      this.contextURL.odataPath = oDataPath;
+      this.contextUrl.odataPath = oDataPath;
       return this;
     }
 
@@ -133,7 +135,7 @@ public final class ContextURL {
      * @return Builder
      */
     public Builder selectList(final String selectList) {
-      this.contextURL.selectList = selectList;
+      this.contextUrl.selectList = selectList;
       return this;
     }
 
@@ -143,7 +145,7 @@ public final class ContextURL {
      * @return Builder
      */
     public Builder serviceRoot(final URI serviceRoot) {
-      this.contextURL.serviceRoot = serviceRoot;
+      this.contextUrl.serviceRoot = serviceRoot;
       return this;
     }
 
@@ -153,7 +155,7 @@ public final class ContextURL {
      * @return Builder
      */
     public Builder suffix(final Suffix suffix) {
-      this.contextURL.suffix = suffix;
+      this.contextUrl.suffix = suffix;
       return this;
     }
 
@@ -163,7 +165,7 @@ public final class ContextURL {
      * @return Builder
      */
     public Builder type(final EdmType type) {
-      this.contextURL.entitySetOrSingletonOrType = type.getFullQualifiedName().toString();
+      this.contextUrl.entitySetOrSingletonOrType = type.getFullQualifiedName().toString();
       return this;
     }
   }
@@ -360,5 +362,91 @@ public final class ContextURL {
    */
   public boolean isReference() {
     return this.suffix == Suffix.REFERENCE;
+  }
+
+  @Override
+  public String toString() {
+    return toUriString();
+  }
+
+  public URI toURI() {
+    final StringBuilder result = new StringBuilder();
+    if (this.serviceRoot != null) {
+      result.append(this.serviceRoot);
+    } else if (getODataPath() != null) {
+      final String oDataPath = getODataPath();
+      final char[] chars = oDataPath.toCharArray();
+      for (int i = 1; i < chars.length - 1; i++) {
+        if (chars[i] == '/' && chars[i - 1] != '/') {
+          result.append("../");
+        }
+      }
+    }
+
+    result.append(Constants.METADATA);
+    final String entitySetOrSingletonOrType = getEntitySetOrSingletonOrType();
+    if (entitySetOrSingletonOrType != null) {
+      result.append('#');
+      if (isCollection()) {
+        result.append("Collection(").append(Encoder.encode(entitySetOrSingletonOrType)).append(")");
+      } else {
+        result.append(Encoder.encode(entitySetOrSingletonOrType));
+      }
+    }
+    final String derivedEntity = getDerivedEntity();
+    if (derivedEntity != null) {
+      if (entitySetOrSingletonOrType == null) {
+        throw new IllegalArgumentException(
+          "ContextURL: Derived Type without anything to derive from!");
+      }
+      result.append('/').append(Encoder.encode(derivedEntity));
+    }
+    final String keyPath = getKeyPath();
+    if (keyPath != null) {
+      result.append('(').append(keyPath).append(')');
+    }
+    final String navOrPropertyPath = getNavOrPropertyPath();
+    if (navOrPropertyPath != null) {
+      if (this.serviceRoot == null || !this.serviceRoot.isAbsolute()) {
+        final String[] paths = navOrPropertyPath.split("/");
+        for (final String path : paths) {
+          result.insert(0, "../");
+        }
+      }
+      result.append('/').append(navOrPropertyPath);
+    }
+    final String selectList = getSelectList();
+    if (selectList != null) {
+      result.append('(').append(selectList).append(')');
+    }
+    if (isReference()) {
+      if (this.serviceRoot == null || !this.serviceRoot.isAbsolute()) {
+        result.insert(0, "../");
+      }
+      if (entitySetOrSingletonOrType != null) {
+        throw new IllegalArgumentException("ContextURL: $ref with Entity Set");
+      }
+      if (isCollection()) {
+        result.append('#')
+          .append("Collection(")
+          .append(ContextURL.Suffix.REFERENCE.getRepresentation())
+          .append(")");
+      } else {
+        result.append('#').append(ContextURL.Suffix.REFERENCE.getRepresentation());
+      }
+    } else {
+      final Suffix suffix = getSuffix();
+      if (suffix != null) {
+        if (entitySetOrSingletonOrType == null) {
+          throw new IllegalArgumentException("ContextURL: Suffix without preceding Entity Set!");
+        }
+        result.append('/').append(suffix.getRepresentation());
+      }
+    }
+    return URI.create(result.toString());
+  }
+
+  public String toUriString() {
+    return toURI().toASCIIString();
   }
 }

@@ -78,7 +78,6 @@ import org.apache.olingo.server.core.ODataWritableContent;
 import org.apache.olingo.server.core.serializer.AbstractODataSerializer;
 import org.apache.olingo.server.core.serializer.SerializerResultImpl;
 import org.apache.olingo.server.core.serializer.utils.CircleStreamBuffer;
-import org.apache.olingo.server.core.serializer.utils.ContextURLBuilder;
 import org.apache.olingo.server.core.serializer.utils.ExpandSelectHelper;
 import org.apache.olingo.server.core.uri.UriHelperImpl;
 import org.apache.olingo.server.core.uri.queryoption.ExpandOptionImpl;
@@ -181,8 +180,7 @@ public class ODataXmlSerializer extends AbstractODataSerializer {
       writer.writeNamespace(ATOM, NS_ATOM);
       writer.writeAttribute(METADATA, NS_METADATA, Constants.ATTR_TYPE,
         "#" + resolvedType.getFullQualifiedName().getFullQualifiedNameAsString());
-      writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT,
-        ContextURLBuilder.create(contextURL).toASCIIString());
+      writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT, contextURL.toUriString());
       writeMetadataETag(metadata, writer);
       if (property.isNull()) {
         writer.writeAttribute(METADATA, NS_METADATA, Constants.ATTR_NULL, "true");
@@ -231,8 +229,7 @@ public class ODataXmlSerializer extends AbstractODataSerializer {
       writer.writeNamespace(DATA, NS_DATA);
       writer.writeNamespace(ATOM, NS_ATOM);
       writer.writeAttribute(METADATA, NS_METADATA, Constants.ATTR_TYPE, collectionType(type));
-      writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT,
-        ContextURLBuilder.create(contextURL).toASCIIString());
+      writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT, contextURL.toUriString());
       writeMetadataETag(metadata, writer);
       Set<List<String>> selectedPaths = null;
       if (null != options && null != options.getSelect()) {
@@ -352,8 +349,7 @@ public class ODataXmlSerializer extends AbstractODataSerializer {
       writer.writeNamespace(METADATA, NS_METADATA);
       writer.writeNamespace(DATA, NS_DATA);
 
-      writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT,
-        ContextURLBuilder.create(contextURL).toASCIIString());
+      writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT, contextURL.toUriString());
       writeMetadataETag(metadata, writer);
       writeOperations(entitySet.getOperations(), writer);
       if (options != null && options.getId() != null) {
@@ -362,8 +358,7 @@ public class ODataXmlSerializer extends AbstractODataSerializer {
         writer.writeEndElement();
       }
 
-      if (options != null && options.getCount() != null && options.getCount().getValue()
-        && entitySet.getCount() != null) {
+      if (options != null && options.isCount() && entitySet.getCount() != null) {
         writeCount(entitySet, writer);
       }
       if (entitySet.getNext() != null) {
@@ -418,8 +413,7 @@ public class ODataXmlSerializer extends AbstractODataSerializer {
       writer.writeNamespace(METADATA, NS_METADATA);
       writer.writeNamespace(DATA, NS_DATA);
 
-      writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT,
-        ContextURLBuilder.create(contextURL).toASCIIString());
+      writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT, contextURL.toUriString());
       writeMetadataETag(metadata, writer);
 
       if (options != null && options.getId() != null) {
@@ -428,8 +422,7 @@ public class ODataXmlSerializer extends AbstractODataSerializer {
         writer.writeEndElement();
       }
 
-      if (options != null && options.getCount() != null && options.getCount().getValue()
-        && entitySet.getCount() != null) {
+      if (options != null && options.isCount() && entitySet.getCount() != null) {
         writeCount(entitySet, writer);
       }
       if (entitySet != null && entitySet.getNext() != null) {
@@ -506,20 +499,22 @@ public class ODataXmlSerializer extends AbstractODataSerializer {
       writer.writeStartElement(ATOM, Constants.ATOM_ELEM_FEED, NS_ATOM);
       writer.writeNamespace(ATOM, NS_ATOM);
       writer.writeNamespace(METADATA, NS_METADATA);
-      if (options != null && options.getContextURL() != null) { // top-level
-                                                                // entity
-        writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT,
-          ContextURLBuilder.create(options.getContextURL()).toASCIIString());
-      }
-      if (options != null && options.getCount() != null && options.getCount().getValue()
-        && entitySet.getCount() != null) {
-        writeCount(entitySet, writer);
+      ContextURL contextUrl = null;
+      if (options != null) {
+        contextUrl = options.getContextURL();
+        if (contextUrl != null) {
+          writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT, contextUrl.toUriString());
+        }
+        final CountOption count = options.getCount();
+        if (count != null && count.getValue() && entitySet.getCount() != null) {
+          writeCount(entitySet, writer);
+        }
       }
       if (entitySet.getNext() != null) {
         writeNextLink(entitySet, writer);
       }
       for (final Entity entity : entitySet) {
-        writeReference(entity, options == null ? null : options.getContextURL(), writer, false);
+        writeReference(entity, contextUrl, writer, false);
       }
       writer.writeEndElement();
       writer.writeEndDocument();
@@ -689,8 +684,7 @@ public class ODataXmlSerializer extends AbstractODataSerializer {
       writer.writeStartElement(METADATA, Constants.VALUE, NS_METADATA);
       writer.writeNamespace(METADATA, NS_METADATA);
       if (contextURL != null) {
-        writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT,
-          ContextURLBuilder.create(contextURL).toASCIIString());
+        writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT, contextURL.toUriString());
       }
       writeMetadataETag(metadata, writer);
       if (property.isNull()) {
@@ -745,8 +739,7 @@ public class ODataXmlSerializer extends AbstractODataSerializer {
       writer.writeStartElement(METADATA, Constants.VALUE, NS_METADATA);
       writer.writeNamespace(METADATA, NS_METADATA);
       if (contextURL != null) {
-        writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT,
-          ContextURLBuilder.create(contextURL).toASCIIString());
+        writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT, contextURL.toUriString());
       }
       writeMetadataETag(metadata, writer);
       writer.writeAttribute(METADATA, NS_METADATA, Constants.ATTR_TYPE,
@@ -1005,8 +998,7 @@ public class ODataXmlSerializer extends AbstractODataSerializer {
         writer.writeNamespace(DATA, NS_DATA);
 
         if (contextURL != null) { // top-level entity
-          writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT,
-            ContextURLBuilder.create(contextURL).toASCIIString());
+          writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT, contextURL.toUriString());
           writeMetadataETag(metadata, writer);
         }
       }
@@ -1427,8 +1419,7 @@ public class ODataXmlSerializer extends AbstractODataSerializer {
     if (top) {
       writer.writeNamespace(METADATA, NS_METADATA);
       if (contextURL != null) { // top-level entity
-        writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT,
-          ContextURLBuilder.create(contextURL).toASCIIString());
+        writer.writeAttribute(METADATA, NS_METADATA, Constants.CONTEXT, contextURL.toUriString());
       }
     }
     writer.writeAttribute(Constants.ATOM_ATTR_ID, entity.getId().toASCIIString());

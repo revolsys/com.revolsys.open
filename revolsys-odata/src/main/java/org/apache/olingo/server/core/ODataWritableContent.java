@@ -129,7 +129,7 @@ public class ODataWritableContent implements ODataContent {
     public void write(final OutputStream out) {
       try {
         if (this.mediaEntity == null) {
-          writeEntity(this.iterator, out);
+          writeEntities(this.iterator, out);
         } else {
           writeBinary(this.mediaEntity, out);
         }
@@ -146,7 +146,7 @@ public class ODataWritableContent implements ODataContent {
     protected abstract void writeBinary(EntityMediaObject mediaEntity, OutputStream outputStream)
       throws SerializerException;
 
-    protected abstract void writeEntity(EntityIterator entity, OutputStream outputStream)
+    protected abstract void writeEntities(EntityIterator entity, OutputStream outputStream)
       throws SerializerException;
   }
 
@@ -168,10 +168,10 @@ public class ODataWritableContent implements ODataContent {
     }
 
     @Override
-    protected void writeEntity(final EntityIterator entity, final OutputStream outputStream)
+    protected void writeEntities(final EntityIterator entity, final OutputStream outputStream)
       throws SerializerException {
       try {
-        this.jsonSerializer.entityCollectionIntoStream(this.metadata, this.entityType, entity,
+        this.jsonSerializer.writeRecords(this.metadata, this.entityType, entity,
           this.options, outputStream);
         outputStream.flush();
       } catch (final IOException e) {
@@ -197,7 +197,7 @@ public class ODataWritableContent implements ODataContent {
     }
 
     @Override
-    protected void writeEntity(final EntityIterator entity, final OutputStream outputStream)
+    protected void writeEntities(final EntityIterator entity, final OutputStream outputStream)
       throws SerializerException {
       throw new ODataRuntimeException("Not Implemented in Entity Handling");
     }
@@ -221,7 +221,7 @@ public class ODataWritableContent implements ODataContent {
     }
 
     @Override
-    protected void writeEntity(final EntityIterator entity, final OutputStream outputStream)
+    protected void writeEntities(final EntityIterator entity, final OutputStream outputStream)
       throws SerializerException {
       try {
         this.xmlSerializer.entityCollectionIntoStream(this.metadata, this.entityType, entity,

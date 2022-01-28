@@ -168,6 +168,10 @@ public class EntityCollectionSerializerOptions {
     return this.writeOnlyReferences;
   }
 
+  public boolean isCount() {
+    return this.count != null && this.count.getValue();
+  }
+
   /** Inline entries will not have @delta if representation is full **/
   public boolean isFullRepresentation() {
     return this.isFullRepresentation;

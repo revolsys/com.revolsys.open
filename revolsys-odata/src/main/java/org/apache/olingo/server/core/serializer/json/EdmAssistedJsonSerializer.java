@@ -58,7 +58,6 @@ import org.apache.olingo.server.api.serializer.SerializerResult;
 import org.apache.olingo.server.core.serializer.SerializerResultImpl;
 import org.apache.olingo.server.core.serializer.utils.CircleStreamBuffer;
 import org.apache.olingo.server.core.serializer.utils.ContentTypeHelper;
-import org.apache.olingo.server.core.serializer.utils.ContextURLBuilder;
 
 import com.revolsys.record.io.format.json.JsonWriter;
 
@@ -365,7 +364,7 @@ public class EdmAssistedJsonSerializer implements EdmAssistedSerializer {
       || metadata.getServiceMetadataETagSupport() == null ? null
         : metadata.getServiceMetadataETagSupport().getMetadataETag();
     final String contextURLString = this.isODataMetadataNone || contextURL == null ? null
-      : ContextURLBuilder.create(contextURL).toASCIIString();
+      : contextURL.toUriString();
     OutputStream outputStream = null;
     SerializerException cachedException = null;
 
