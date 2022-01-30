@@ -9,11 +9,15 @@ public class XmlSimpleTypeFunction<T> extends XmlSimpleType {
     return new XmlSimpleTypeFunction<T2>(namespace, name, converter);
   }
 
-  private final Function<String, T> converter;
+  private Function<String, T> converter;
 
   public XmlSimpleTypeFunction(final XmlName xmlName, final Function<String, T> converter) {
     super(xmlName);
     this.converter = converter;
+  }
+
+  public XmlSimpleTypeFunction(final XmlNamespace namespace, final String localPart) {
+    super(namespace.getName(localPart));
   }
 
   public XmlSimpleTypeFunction(final XmlNamespace namespace, final String localPart,
@@ -23,6 +27,13 @@ public class XmlSimpleTypeFunction<T> extends XmlSimpleType {
 
   public Function<String, T> getConverter() {
     return this.converter;
+  }
+
+  public void setConverter(final Function<String, T> converter) {
+    if (this.converter != null) {
+      throw new IllegalStateException("Cannot modify the converter");
+    }
+    this.converter = converter;
   }
 
   @SuppressWarnings("unchecked")

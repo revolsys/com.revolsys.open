@@ -42,6 +42,12 @@ public class XmlSchema {
     return type;
   }
 
+  public <V> XmlSimpleTypeFunction<?> createSimpleType(final String localPart) {
+    final XmlSimpleTypeFunction<?> type = new XmlSimpleTypeFunction<>(this.namespace, localPart);
+    addType(type);
+    return type;
+  }
+
   public XmlSimpleTypeDataType createSimpleType(final String localPart, final DataType dataType) {
     final XmlSimpleTypeDataType type = new XmlSimpleTypeDataType(this.namespace, localPart,
       dataType);

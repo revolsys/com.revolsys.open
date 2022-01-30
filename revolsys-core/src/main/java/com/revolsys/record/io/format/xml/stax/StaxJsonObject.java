@@ -1,5 +1,6 @@
 package com.revolsys.record.io.format.xml.stax;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
@@ -16,6 +17,7 @@ import com.revolsys.record.io.format.xml.XmlSimpleType;
 import com.revolsys.record.io.format.xml.XmlType;
 import com.revolsys.util.Debug;
 import com.revolsys.util.Uuid;
+import com.revolsys.util.UuidBuilder;
 import com.revolsys.util.UuidNamespace;
 
 public class StaxJsonObject implements Jsonable {
@@ -91,6 +93,26 @@ public class StaxJsonObject implements Jsonable {
       this.id = UUID_NAMESPACE.uuid(toJsonString(false));
     }
     return this.id;
+  }
+
+  public UUID getId(final Collection<String> ignoreFieldNames) {
+    boolean hadValue = false;
+    final UuidBuilder builder = UUID_NAMESPACE.builder();
+    builder.append(getClass().getName());
+    JsonObject properties = this.properties;
+    for (final String name : properties.keySet()) {
+      if (!ignoreFieldNames.contains(name)) {
+        hadValue = true;
+        final Object value = properties.getValue(name);
+        builder.append(name);
+        builder.append(value);
+      }
+    }
+    if (hadValue) {
+      return builder.build();
+    } else {
+      return null;
+    }
   }
 
   public <V> V getValue(final String name) {
