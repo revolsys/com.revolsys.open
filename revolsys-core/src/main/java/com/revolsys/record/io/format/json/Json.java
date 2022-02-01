@@ -282,7 +282,7 @@ public class Json extends AbstractIoFactory
       } else {
         return value;
       }
-    }, (value) -> {
+    }, value -> {
       if (value instanceof Map) {
         return Json.toString((Map)value);
       } else if (value == null) {
@@ -296,6 +296,8 @@ public class Json extends AbstractIoFactory
   public static final String FILE_EXTENSION = "json";
 
   public static final String MIME_TYPE = "application/json";
+
+  public static final String MIME_TYPE_UTF8 = "application/json;charset=utf-8";
 
   public static final DataType JSON_OBJECT = new JsonObjectDataType("JsonObject", JsonObject.class);
 

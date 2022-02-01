@@ -4,18 +4,12 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.xml.namespace.QName;
-
 import com.revolsys.record.io.format.json.JsonList;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.Jsonable;
-import com.revolsys.record.io.format.xml.XmlAttribute;
 import com.revolsys.record.io.format.xml.XmlComplexType;
 import com.revolsys.record.io.format.xml.XmlElement;
 import com.revolsys.record.io.format.xml.XmlSchema;
-import com.revolsys.record.io.format.xml.XmlSimpleType;
-import com.revolsys.record.io.format.xml.XmlType;
-import com.revolsys.util.Debug;
 import com.revolsys.util.Uuid;
 import com.revolsys.util.UuidBuilder;
 import com.revolsys.util.UuidNamespace;
@@ -25,34 +19,9 @@ public class StaxJsonObject implements Jsonable {
   private static final UuidNamespace UUID_NAMESPACE = Uuid
     .sha1("65bd15b3-647d-474e-8eb3-e1441dd73bba");
 
-  @SuppressWarnings("unchecked")
-  public static <V> V readValue(final StaxReader in, final StaxJsonObjectSchema jsonSchema,
-    final XmlElement element) {
-    final XmlType type = element.getType();
-    if (type instanceof XmlComplexType) {
-      final XmlComplexType complexType = (XmlComplexType)type;
-      return (V)jsonSchema.newJsonObject(complexType).initFromSchema(in, jsonSchema, complexType);
-    } else if (type instanceof XmlSimpleType) {
-      final XmlSimpleType simpleType = (XmlSimpleType)type;
-      final String text = in.getElementText();
-      if (text == null) {
-        return null;
-      } else {
-        return simpleType.toValue(text);
-      }
-    } else if (type instanceof StaxToObjectType) {
-      final StaxToObjectType<?> simpleType = (StaxToObjectType<?>)type;
-      return (V)simpleType.read(in);
-    } else {
-      in.skipSubTree();
-      Debug.noOp();
-      return null;
-    }
-  }
-
   public static <V> V readValue(final StaxReader in, final XmlSchema schema,
     final XmlElement element) {
-    return readValue(in, new StaxJsonObjectSchema(schema), element);
+    return new StaxJsonObjectSchema(schema).readElement(in, element);
   }
 
   protected final JsonObject properties = JsonObject.tree();
@@ -71,7 +40,7 @@ public class StaxJsonObject implements Jsonable {
     super();
   }
 
-  private void addProperty(final String name, final Object value) {
+  public void addValue(final String name, final Object value) {
     if (value == null) {
       this.properties.remove(name);
     } else {
@@ -99,7 +68,7 @@ public class StaxJsonObject implements Jsonable {
     boolean hadValue = false;
     final UuidBuilder builder = UUID_NAMESPACE.builder();
     builder.append(getClass().getName());
-    JsonObject properties = this.properties;
+    final JsonObject properties = this.properties;
     for (final String name : properties.keySet()) {
       if (!ignoreFieldNames.contains(name)) {
         hadValue = true;
@@ -133,6 +102,10 @@ public class StaxJsonObject implements Jsonable {
     return getId().hashCode();
   }
 
+  public boolean hasValue(final String childName) {
+    return this.properties.hasValue(childName);
+  }
+
   public void initFromElementHandler(final StaxReader in,
     final StaxElementHandler<?> elementHandler) {
     elementHandler.handleElement(in, new StaxElementCallback() {
@@ -140,7 +113,7 @@ public class StaxJsonObject implements Jsonable {
       public void handleAttributeValue(final StaxReader in, final int i,
         final StaxAttributeReader handler, final Object value) {
         final String name = handler.getName();
-        addProperty(name, value);
+        addValue(name, value);
       }
 
       @Override
@@ -153,61 +126,15 @@ public class StaxJsonObject implements Jsonable {
             JsonList list = StaxJsonObject.this.properties.getValue(name);
             if (list == null) {
               list = JsonList.array();
-              addProperty(name, list);
+              addValue(name, list);
             }
             list.add(value);
           } else {
-            addProperty(name, value);
+            addValue(name, value);
           }
         }
       }
     });
-  }
-
-  public StaxJsonObject initFromSchema(final StaxReader in, final StaxJsonObjectSchema jsonSchema,
-    final XmlComplexType type) {
-    for (int i = 0; i < in.getAttributeCount(); i++) {
-      final String text = in.getAttributeValue(i);
-      if (text != null) {
-        final QName xmlName = in.getAttributeName(i);
-        final XmlAttribute attribute = type.getAttribute(xmlName);
-        if (attribute != null) {
-          final Object value = attribute.getType().toValue(text);
-          if (value != null) {
-            addProperty(xmlName.getLocalPart(), value);
-          }
-        } else {
-          final String key = type + "." + xmlName.getLocalPart();
-          // if (this.unhandled.add(key)) {
-          Debug.println(key);
-          // }
-        }
-      }
-    }
-    final int depth = in.getDepth();
-    while (in.skipToStartElement(depth)) {
-      final QName xmlName = in.getName();
-      final String childName = xmlName.getLocalPart();
-      final XmlElement childElement = type.getElement(xmlName);
-      if (childElement != null) {
-        final Object childValue = readValue(in, jsonSchema, childElement);
-        if (childElement.isList()) {
-          JsonList list = getValue(childName);
-          if (list == null) {
-            list = JsonList.array();
-            addProperty(childName, list);
-          }
-          list.add(childValue);
-        } else {
-          addProperty(childName, childValue);
-        }
-      } else {
-        final String key = type.getLocalPart() + "." + xmlName.getLocalPart();
-        Debug.println(key);
-        in.skipSubTree();
-      }
-    }
-    return this;
   }
 
   public boolean isTrue(final String name) {

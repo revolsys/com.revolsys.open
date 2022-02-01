@@ -69,7 +69,7 @@ public class AbstractTableRecordRestController {
   }
 
   public static void setContentTypeJson(final HttpServletResponse response) {
-    setContentTypeText(response, Json.MIME_TYPE);
+    setContentTypeText(response, Json.MIME_TYPE_UTF8);
   }
 
   public static void setContentTypeText(final HttpServletResponse response,

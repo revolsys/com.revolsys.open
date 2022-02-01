@@ -20,7 +20,12 @@ public class XmlSchema {
   }
 
   public XmlElement addElement(final String localPart, final XmlType type) {
-    final XmlName xmlName = this.namespace.getName(localPart);
+    return addElement(this.namespace, localPart, type);
+  }
+
+  public XmlElement addElement(final XmlNamespace namespace, final String localPart,
+    final XmlType type) {
+    final XmlName xmlName = namespace.getName(localPart);
     return addElement(type, xmlName);
   }
 
@@ -63,9 +68,16 @@ public class XmlSchema {
     return type;
   }
 
+  public XmlElement getElement(final QName qName) {
+    return this.elementByName.get(qName);
+  }
+
+  public XmlType getType(final QName qName) {
+    return this.typeByName.get(qName);
+  }
+
   @Override
   public String toString() {
     return this.namespace.toString();
   }
-
 }
