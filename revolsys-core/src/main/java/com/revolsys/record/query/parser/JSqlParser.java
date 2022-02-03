@@ -19,7 +19,6 @@ import com.revolsys.record.query.ColumnReference;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Divide;
 import com.revolsys.record.query.GreaterThanEqual;
-import com.revolsys.record.query.ILike;
 import com.revolsys.record.query.In;
 import com.revolsys.record.query.IsNotNull;
 import com.revolsys.record.query.IsNull;
@@ -104,7 +103,7 @@ public class JSqlParser extends AbstractSqlParser {
     this.converters.put(MinorThan.class, convertBinaryExpression(LessThan::new));
     this.converters.put(MinorThanEquals.class, convertBinaryExpression(LessThanEqual::new));
     this.converters.put(NotEqualsTo.class, convertBinaryExpression(Q.NOT_EQUAL));
-    this.converters.put(LikeExpression.class, convertBinaryExpression(ILike::new));
+    this.converters.put(LikeExpression.class, convertBinaryExpression(Q.ILIKE));
 
     this.converters.put(StringValue.class,
       convertValue((final StringValue value) -> value.getNotExcapedValue()));

@@ -1,7 +1,6 @@
 package com.revolsys.odata.service.processor;
 
 import java.io.OutputStream;
-import java.nio.channels.WritableByteChannel;
 
 import org.apache.olingo.server.api.ODataContent;
 import org.apache.olingo.server.api.serializer.SerializerStreamResult;
@@ -29,11 +28,4 @@ public class ODataEntityInteratorDataContent implements ODataContent {
     }
   }
 
-  @Override
-  public void write(final WritableByteChannel channel) {
-    try (
-      BaseCloseable c = this.iterator) {
-      this.dataContent.write(channel);
-    }
-  }
 }

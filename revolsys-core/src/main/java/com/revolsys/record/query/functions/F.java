@@ -70,7 +70,7 @@ public class F {
     final RecordDefinition recordDefinition = query.getRecordDefinition();
     final FieldDefinition field = recordDefinition.getGeometryField();
     final BoundingBox bbox = boundingBox.getBoundingBox();
-    final Value value = Value.newValue(field, bbox);
+    final Value value = Value.newValue(field, bbox, true);
     final EnvelopeIntersects condition = new EnvelopeIntersects(field, value);
     query.and(condition);
     return condition;

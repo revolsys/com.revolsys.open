@@ -45,7 +45,7 @@ public class ConfigurableRequestBuilderFactory extends ApacheHttpRequestBuilderF
   }
 
   @Override
-  protected ApacheHttpRequestBuilder newRequestBuilder() {
+  public ApacheHttpRequestBuilder newRequestBuilder() {
     return new ConfigurableRequestBuilder(this);
   }
 

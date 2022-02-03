@@ -64,7 +64,7 @@ public class BatchResponseSerializer {
         if (response.getContent() == null) {
           if (response.getODataContent() != null) {
             final ODataContent res = response.getODataContent();
-            res.write(Channels.newChannel(output));
+            res.write(output);
           }
         } else {
           try (

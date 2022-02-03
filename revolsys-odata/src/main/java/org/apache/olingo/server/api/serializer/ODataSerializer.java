@@ -21,7 +21,6 @@ package org.apache.olingo.server.api.serializer;
 import org.apache.olingo.commons.api.Constants;
 import org.apache.olingo.commons.api.data.AbstractEntityCollection;
 import org.apache.olingo.commons.api.data.Entity;
-import org.apache.olingo.commons.api.data.EntityIterator;
 import org.apache.olingo.commons.api.data.Property;
 import org.apache.olingo.commons.api.edm.EdmComplexType;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
@@ -29,6 +28,8 @@ import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveType;
 import org.apache.olingo.server.api.ODataServerError;
 import org.apache.olingo.server.api.ServiceMetadata;
+
+import com.revolsys.odata.model.ODataEntityIterator;
 
 /** OData serializer */
 public interface ODataSerializer {
@@ -85,8 +86,8 @@ public interface ODataSerializer {
    * @param options options for the serializer
    */
   SerializerStreamResult entityCollectionStreamed(ServiceMetadata metadata,
-    EdmEntityType entityType, EntityIterator entities, EntityCollectionSerializerOptions options)
-    throws SerializerException;
+    EdmEntityType entityType, ODataEntityIterator entities,
+    EntityCollectionSerializerOptions options) throws SerializerException;
 
   /**
    * Writes an ODataError into an InputStream.

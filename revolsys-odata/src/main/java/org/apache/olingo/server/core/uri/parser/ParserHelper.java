@@ -125,7 +125,7 @@ public class ParserHelper {
           UriValidationException.MessageKeys.DOUBLE_KEY_PROPERTY, keyPredicateName);
       }
       if (remainingKeyNames.isEmpty()) {
-        throw new UriParserSemanticException("Too many key properties.",
+        throw new UriParserSemanticException("Too many key properties:" + tokenizer,
           UriParserSemanticException.MessageKeys.WRONG_NUMBER_OF_KEY_PROPERTIES,
           Integer.toString(parameters.size()), Integer.toString(parameters.size() + 1));
       }
@@ -230,7 +230,7 @@ public class ParserHelper {
     ParserHelper.requireNext(tokenizer, TokenKind.EQ);
     if (tokenizer.next(TokenKind.COMMA) || tokenizer.next(TokenKind.CLOSE)
       || tokenizer.next(TokenKind.EOF)) {
-      throw new UriParserSyntaxException("Key value expected.",
+      throw new UriParserSyntaxException("Key value expected: " + tokenizer,
         UriParserSyntaxException.MessageKeys.SYNTAX);
     }
     if (nextPrimitiveTypeValue(tokenizer, (EdmPrimitiveType)edmProperty.getType(),
@@ -238,7 +238,8 @@ public class ParserHelper {
       return createUriParameter(edmProperty, keyPredicateName, tokenizer.getText(), edm,
         referringType, aliases);
     } else {
-      throw new UriParserSemanticException(keyPredicateName + " has not a valid  key value.",
+      throw new UriParserSemanticException(
+        keyPredicateName + " has not a valid  key value:" + tokenizer,
         UriParserSemanticException.MessageKeys.INVALID_KEY_VALUE, keyPredicateName);
     }
   }
@@ -377,7 +378,8 @@ public class ParserHelper {
       ParserHelper.requireNext(tokenizer, TokenKind.ODataIdentifier);
       final String name = tokenizer.getText();
       if (parameterNames.contains(name)) {
-        throw new UriParserSemanticException("Duplicated function parameter " + name,
+        throw new UriParserSemanticException(
+          "Duplicated function parameter " + name + ":" + tokenizer,
           UriParserSemanticException.MessageKeys.INVALID_KEY_VALUE, name);
       }
       parameterNames.add(name);
@@ -397,7 +399,7 @@ public class ParserHelper {
           parameter.setText(tokenizer.getText());
         } else {
           throw new UriParserSemanticException(
-            "A JSON array or object is not allowed as parameter value.",
+            "A JSON array or object is not allowed as parameter value:" + tokenizer,
             UriParserSemanticException.MessageKeys.COMPLEX_PARAMETER_IN_RESOURCE_PATH,
             tokenizer.getText());
         }
@@ -410,7 +412,7 @@ public class ParserHelper {
               : ((Literal)expression).getText() : null)
           .setExpression(expression instanceof Literal ? null : expression);
       } else if (nextPrimitiveValue(tokenizer) == null) {
-        throw new UriParserSemanticException("Wrong parameter value.",
+        throw new UriParserSemanticException("Wrong parameter value:" + tokenizer,
           UriParserSemanticException.MessageKeys.INVALID_KEY_VALUE, "");
       } else {
         final String literalValue = tokenizer.getText();
@@ -429,7 +431,7 @@ public class ParserHelper {
     final List<EdmKeyPropertyRef> keyPropertyRefs = edmEntityType.getKeyPropertyRefs();
     if (tokenizer.next(TokenKind.CLOSE)) {
       throw new UriParserSemanticException(
-        "Expected " + keyPropertyRefs.size() + " key predicates but got none.",
+        "Expected " + keyPropertyRefs.size() + " key predicates but got none:" + tokenizer,
         UriParserSemanticException.MessageKeys.WRONG_NUMBER_OF_KEY_PROPERTIES,
         Integer.toString(keyPropertyRefs.size()), "0");
     }
@@ -469,7 +471,7 @@ public class ParserHelper {
       if (tokenizer.next(TokenKind.ODataIdentifier)) {
         keys.addAll(compoundKey(tokenizer, edmEntityType, edm, referringType, aliases));
       } else {
-        throw new UriParserSemanticException("The key value is not valid.",
+        throw new UriParserSemanticException("The key value is not valid:" + tokenizer,
           UriParserSemanticException.MessageKeys.INVALID_KEY_VALUE, "");
       }
     }
@@ -494,7 +496,8 @@ public class ParserHelper {
     // Check that all key predicates are filled from the URI.
     if (keys.size() < keyPropertyRefs.size()) {
       throw new UriParserSemanticException(
-        "Expected " + keyPropertyRefs.size() + " key predicates but found " + keys.size() + ".",
+        "Expected " + keyPropertyRefs.size() + " key predicates but found " + keys.size() + ":"
+          + tokenizer,
         UriParserSemanticException.MessageKeys.WRONG_NUMBER_OF_KEY_PROPERTIES,
         Integer.toString(keyPropertyRefs.size()), Integer.toString(keys.size()));
     } else {
@@ -511,7 +514,7 @@ public class ParserHelper {
           navigationProperty.getPartner(), edm, referringType, aliases);
       } else {
         throw new UriParserSemanticException(
-          "A key is not allowed on non-collection navigation properties.",
+          "A key is not allowed on non-collection navigation properties:" + tokenizer,
           UriParserSemanticException.MessageKeys.KEY_NOT_ALLOWED);
       }
     }
@@ -545,13 +548,13 @@ public class ParserHelper {
         ? edm.getEntityType(qualifiedName)
         : edm.getComplexType(qualifiedName);
       if (type == null) {
-        throw new UriParserSemanticException("Type '" + qualifiedName + "' not found.",
+        throw new UriParserSemanticException("Type '" + qualifiedName + "' not found:" + tokenizer,
           UriParserSemanticException.MessageKeys.UNKNOWN_PART,
           qualifiedName.getFullQualifiedNameAsString());
       } else {
         if (!type.compatibleTo(referencedType)) {
           throw new UriParserSemanticException(
-            "The type cast '" + qualifiedName + "' is not compatible.",
+            "The type cast '" + qualifiedName + "' is not compatible:" + tokenizer,
             UriParserSemanticException.MessageKeys.INCOMPATIBLE_TYPE_FILTER, type.getName());
         }
       }
@@ -563,7 +566,8 @@ public class ParserHelper {
   protected static void requireNext(final UriTokenizer tokenizer, final TokenKind required)
     throws UriParserException {
     if (!tokenizer.next(required)) {
-      throw new UriParserSyntaxException("Expected token '" + required.toString() + "' not found.",
+      throw new UriParserSyntaxException(
+        "Expected token '" + required.toString() + "' not found: " + tokenizer,
         UriParserSyntaxException.MessageKeys.SYNTAX);
     }
   }

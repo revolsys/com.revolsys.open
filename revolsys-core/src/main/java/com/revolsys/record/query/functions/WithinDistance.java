@@ -133,6 +133,10 @@ public class WithinDistance implements Condition, Function {
     return Arrays.asList(this.geometry1Value, this.geometry2Value, this.distanceValue);
   }
 
+  public void setDistance(final QueryValue distanceValue) {
+    this.distanceValue = distanceValue;
+  }
+
   @Override
   public boolean test(final MapEx record) {
     if (this.geometry1Value == null || this.geometry2Value == null || this.distanceValue == null) {

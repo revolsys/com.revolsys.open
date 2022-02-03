@@ -31,7 +31,7 @@ public class BearerTokenRequestBuilderFactory extends ApacheHttpRequestBuilderFa
   }
 
   @Override
-  protected ApacheHttpRequestBuilder newRequestBuilder() {
+  public ApacheHttpRequestBuilder newRequestBuilder() {
     return new BearerTokenRequestBuilder(this);
   }
 }

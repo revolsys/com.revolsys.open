@@ -10,6 +10,7 @@ com.revolsys.record.io.format.json.Json
 com.revolsys.record.io.format.kml.Kmz
 com.revolsys.record.io.format.kml.Kml
 com.revolsys.record.io.format.moep.MoepBinary
+com.revolsys.record.io.format.odata.OData
 com.revolsys.record.io.format.saif.Saif
 com.revolsys.record.io.format.shp.Shapefile
 com.revolsys.record.io.format.shp.ShapefileZip

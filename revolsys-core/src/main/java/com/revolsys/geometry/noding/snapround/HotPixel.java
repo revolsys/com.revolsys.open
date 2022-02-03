@@ -33,6 +33,8 @@
 
 package com.revolsys.geometry.noding.snapround;
 
+import org.jeometry.common.number.Doubles;
+
 import com.revolsys.geometry.algorithm.LineIntersector;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Point;
@@ -233,10 +235,10 @@ public class HotPixel extends PointDoubleXY {
       return true;
     }
 
-    if (equals(x1, y1)) {
+    if (Doubles.equal(x1, y1)) {
       return true;
     }
-    if (equals(x2, y2)) {
+    if (Doubles.equal(x2, y2)) {
       return true;
     }
 

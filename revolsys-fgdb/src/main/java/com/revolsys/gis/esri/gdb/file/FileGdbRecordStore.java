@@ -39,7 +39,6 @@ import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.parallel.SingleThreadExecutor;
 import com.revolsys.record.Record;
 import com.revolsys.record.code.CodeTable;
-import com.revolsys.record.io.RecordIterator;
 import com.revolsys.record.io.format.esri.gdb.xml.model.DEFeatureClass;
 import com.revolsys.record.io.format.esri.gdb.xml.model.DEFeatureDataset;
 import com.revolsys.record.io.format.esri.gdb.xml.model.DETable;
@@ -482,6 +481,11 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   @Override
+  public FileGdbQueryIterator getRecords(final Query query) {
+    return newIterator(query, null);
+  }
+
+  @Override
   public String getRecordStoreType() {
     return FileGdbRecordStoreFactory.DESCRIPTION;
   }
@@ -682,7 +686,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public RecordIterator newIterator(final Query query, final Map<String, Object> properties) {
+  public FileGdbQueryIterator newIterator(final Query query, final Map<String, Object> properties) {
     PathName pathName = query.getTablePath();
     final RecordDefinition recordDefinition = query.getRecordDefinition();
     if (recordDefinition != null) {

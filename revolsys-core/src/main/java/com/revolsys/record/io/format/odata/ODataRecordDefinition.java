@@ -1,8 +1,7 @@
-package com.revolsys.odata.model;
+package com.revolsys.record.io.format.odata;
 
 import java.util.List;
 
-import org.apache.olingo.commons.core.edm.EdmPropertyImpl;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.io.PathName;
 
@@ -28,7 +27,7 @@ public class ODataRecordDefinition extends RecordDefinitionImpl {
         if (!fieldName.startsWith("$")) {
           final JsonObject entityField = entityType.getJsonObject(fieldName);
           final String type = entityField.getString("$Type");
-          final DataType dataType = EdmPropertyImpl.getDataTypeFromEdm(type);
+          final DataType dataType = OData.getDataTypeFromEdm(type);
           final boolean required = !entityField.getBoolean("$Nullable", true);
           final FieldDefinition fieldDefinition = new FieldDefinition(fieldName, dataType,
             required);

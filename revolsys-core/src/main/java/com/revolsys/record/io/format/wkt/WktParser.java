@@ -332,7 +332,7 @@ public class WktParser {
   }
 
   @SuppressWarnings("unchecked")
-  private <T extends Geometry> T parseGeometry(GeometryFactory geometryFactory,
+  private <G extends Geometry> G parseGeometry(GeometryFactory geometryFactory,
     final boolean useAxisCountFromGeometryFactory, final PushbackReader reader) {
     try {
       final int axisCount = geometryFactory.getAxisCount();
@@ -394,7 +394,7 @@ public class WktParser {
           }
         break;
         case 'L':
-          if (hasText(reader, "INESTRING") || hasText(reader, "LineString")) {
+          if (hasText(reader, "INESTRING") || hasText(reader, "ineString")) {
             geometry = parseLineString(geometryFactory, useAxisCountFromGeometryFactory, reader);
           } else if (hasText(reader, "INEARRING")) {
             geometry = parseLinearRing(geometryFactory, useAxisCountFromGeometryFactory, reader);
@@ -423,7 +423,7 @@ public class WktParser {
           }
         break;
         case 'P':
-          if (hasText(reader, "OINT") || hasText(reader, "point")) {
+          if (hasText(reader, "OINT") || hasText(reader, "oint")) {
             geometry = parsePoint(geometryFactory, useAxisCountFromGeometryFactory, reader);
           } else if (hasText(reader, "OLYGON") || hasText(reader, "olygon")) {
             geometry = parsePolygon(geometryFactory, useAxisCountFromGeometryFactory, reader);
@@ -444,17 +444,17 @@ public class WktParser {
         if (useAxisCountFromGeometryFactory) {
           geometryFactory = GeometryFactory.fixed(srid, axisCount, scales);
           if (geometry.getGeometryFactory() == geometryFactory) {
-            return (T)geometry;
+            return (G)geometry;
           } else {
-            return (T)geometryFactory.geometry(geometry);
+            return (G)geometryFactory.geometry(geometry);
           }
         } else {
-          return (T)geometry;
+          return (G)geometry;
         }
       } else if (geometryFactory == this.geometryFactory) {
-        return (T)geometry;
+        return (G)geometry;
       } else {
-        return (T)this.geometryFactory.geometry(geometry);
+        return (G)this.geometryFactory.geometry(geometry);
       }
     } catch (final IOException e) {
       throw Exceptions.wrap("Error reading WKT:" + FileUtil.getString(reader, 50), e);

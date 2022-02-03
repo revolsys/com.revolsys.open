@@ -39,4 +39,8 @@ public abstract class SystemQueryOptionImpl extends QueryOptionImpl implements S
     this.kind = kind;
   }
 
+  @Override
+  public String toString() {
+    return this.kind + "=" + super.toString();
+  }
 }

@@ -46,7 +46,7 @@ public class AzureQueueSharedKeyRequestBuilderFactory extends ApacheHttpRequestB
   }
 
   @Override
-  protected AzureQueueSharedKeyRequestBuilder newRequestBuilder() {
+  public AzureQueueSharedKeyRequestBuilder newRequestBuilder() {
     return new AzureQueueSharedKeyRequestBuilder(this);
   }
 

@@ -19,8 +19,10 @@
 package org.apache.olingo.server.core.uri.parser;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
@@ -72,6 +74,7 @@ import org.apache.olingo.server.core.uri.queryoption.SystemQueryOptionImpl;
 import org.apache.olingo.server.core.uri.queryoption.TopOptionImpl;
 import org.apache.olingo.server.core.uri.queryoption.apply.DynamicStructuredType;
 import org.apache.olingo.server.core.uri.validator.UriValidationException;
+import org.jeometry.common.logging.Logs;
 
 public class Parser {
   private static final String ATOM = "atom";
@@ -89,6 +92,8 @@ public class Parser {
   private static final String ENTITY = "$entity";
 
   private static final String HTTP = "http";
+
+  private static final Set<String> UNSUPPORTED_QUERY_OPTIONS = new HashSet<>();
 
   private final Edm edm;
 
@@ -186,8 +191,9 @@ public class Parser {
     if (optionName.startsWith(DOLLAR)) {
       final SystemQueryOptionKind kind = SystemQueryOptionKind.get(optionName);
       if (kind == null) {
-        throw new UriParserSyntaxException("Unknown system query option!",
-          UriParserSyntaxException.MessageKeys.UNKNOWN_SYSTEM_QUERY_OPTION, optionName);
+        if (UNSUPPORTED_QUERY_OPTIONS.add(optionName)) {
+          Logs.warn(this, "Unsupported query option:" + optionName);
+        }
       }
       SystemQueryOptionImpl systemOption;
       switch (kind) {

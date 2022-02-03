@@ -51,6 +51,11 @@ public class Value implements QueryValue {
     return new Value(field, value);
   }
 
+  public static Value newValue(final FieldDefinition field, final Object value,
+    final boolean dontConvert) {
+    return new Value(field, value, dontConvert);
+  }
+
   public static Value newValue(final Object value) {
     return newValue(JdbcFieldDefinitions.newFieldDefinition(value), value);
   }
@@ -62,6 +67,8 @@ public class Value implements QueryValue {
   private JdbcFieldDefinition jdbcField;
 
   private Object queryValue;
+
+  private boolean dontConvert;
 
   public Value(final ColumnReference column, Object value) {
     this.column = column;
@@ -75,6 +82,27 @@ public class Value implements QueryValue {
     setQueryValue(value);
     this.displayValue = this.queryValue;
     setFieldDefinition(field);
+  }
+
+  public Value(final FieldDefinition field, final Object value, final boolean dontConvert) {
+    this.column = field;
+    this.dontConvert = dontConvert;
+    if (dontConvert) {
+      this.queryValue = getValue(value);
+      this.displayValue = this.queryValue;
+      if (field != null) {
+        this.column = field;
+        if (field instanceof JdbcFieldDefinition) {
+          this.jdbcField = (JdbcFieldDefinition)field;
+        } else {
+          this.jdbcField = JdbcFieldDefinitions.newFieldDefinition(this.queryValue);
+        }
+      }
+    } else {
+      setQueryValue(value);
+      this.displayValue = this.queryValue;
+      setFieldDefinition(field);
+    }
   }
 
   @Override
@@ -245,8 +273,9 @@ public class Value implements QueryValue {
       } else {
         this.jdbcField = JdbcFieldDefinitions.newFieldDefinition(this.queryValue);
       }
-      this.queryValue = field.toFieldValue(this.queryValue);
-
+      if (!this.dontConvert) {
+        this.queryValue = field.toFieldValue(this.queryValue);
+      }
       CodeTable codeTable = null;
       if (field != null) {
         final RecordDefinition recordDefinition = field.getRecordDefinition();

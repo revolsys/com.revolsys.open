@@ -45,4 +45,8 @@ public abstract class QueryOptionImpl implements QueryOption {
     return this;
   }
 
+  @Override
+  public String toString() {
+    return this.text;
+  }
 }

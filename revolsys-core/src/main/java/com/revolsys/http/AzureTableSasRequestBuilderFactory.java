@@ -37,7 +37,7 @@ public class AzureTableSasRequestBuilderFactory extends ApacheHttpRequestBuilder
   }
 
   @Override
-  protected AzureTableSasRequestBuilder newRequestBuilder() {
+  public AzureTableSasRequestBuilder newRequestBuilder() {
     return new AzureTableSasRequestBuilder(this);
   }
 }

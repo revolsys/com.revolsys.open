@@ -234,7 +234,7 @@ public class ODataNettyHandlerImpl implements ODataNettyHandler {
    */
   static void writeContent(final ODataResponse odataResponse, final HttpResponse response) {
     final ODataContent res = odataResponse.getODataContent();
-    res.write(Channels.newChannel(new ByteBufOutputStream(((HttpContent)response).content())));
+    res.write(new ByteBufOutputStream(((HttpContent)response).content()));
   }
 
   private final ODataHandlerImpl handler;

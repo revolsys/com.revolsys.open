@@ -30,6 +30,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -204,9 +205,10 @@ public class ODataHttpHandlerImpl implements ODataHttpHandler {
 
   static void writeContent(final ODataResponse odataResponse,
     final HttpServletResponse servletResponse) {
-    try {
+    try (
+      ServletOutputStream out = servletResponse.getOutputStream()) {
       final ODataContent res = odataResponse.getODataContent();
-      res.write(Channels.newChannel(servletResponse.getOutputStream()));
+      res.write(out);
     } catch (final IOException e) {
       throw new ODataRuntimeException("Error on reading request content", e);
     }

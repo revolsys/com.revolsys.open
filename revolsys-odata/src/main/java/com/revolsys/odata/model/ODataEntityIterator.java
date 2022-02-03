@@ -2,10 +2,13 @@ package com.revolsys.odata.model;
 
 import java.net.URI;
 import java.util.Iterator;
+import java.util.List;
 
+import org.apache.olingo.commons.api.data.AbstractEntityCollection;
 import org.apache.olingo.commons.api.data.Entity;
-import org.apache.olingo.commons.api.data.EntityIterator;
+import org.apache.olingo.commons.api.data.Operation;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
+import org.apache.olingo.commons.api.ex.ODataNotSupportedException;
 import org.apache.olingo.server.api.ODataApplicationException;
 import org.apache.olingo.server.api.ODataRequest;
 import org.apache.olingo.server.api.uri.UriInfo;
@@ -20,7 +23,8 @@ import com.revolsys.record.schema.TableRecordStoreConnection;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.util.UriBuilder;
 
-public class ODataEntityIterator extends EntityIterator implements BaseCloseable {
+public class ODataEntityIterator extends AbstractEntityCollection
+  implements BaseCloseable, Iterator<Entity> {
 
   private Transaction transaction;
 
@@ -48,6 +52,8 @@ public class ODataEntityIterator extends EntityIterator implements BaseCloseable
 
   private boolean countLoaded;
 
+  private Integer count;
+
   public ODataEntityIterator(final ODataRequest request, final UriInfo uriInfo,
     final EdmEntitySet edmEntitySet, final ODataEntityType entityType,
     final TableRecordStoreConnection connection) throws ODataApplicationException {
@@ -68,7 +74,6 @@ public class ODataEntityIterator extends EntityIterator implements BaseCloseable
     this.entityType.addLimits(this.query, this.uriInfo);
     this.skip = query.getOffset();
     this.limit = query.getLimit();
-
   }
 
   @Override
@@ -90,10 +95,20 @@ public class ODataEntityIterator extends EntityIterator implements BaseCloseable
         Transaction transaction = this.connection.newTransaction()) {
         final RecordStore recordStore = this.entityType.getRecordStore();
         final Integer count = recordStore.getRecordCount(this.countQuery);
-        setCount(count);
+        this.count = count;
       }
     }
-    return super.getCount();
+    return this.count;
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p/>
+   * <b>ATTENTION:</b> <code>getDeltaLink</code> is not supported by default.
+   */
+  @Override
+  public URI getDeltaLink() {
+    throw new ODataNotSupportedException("Entity Iterator does not support getDeltaLink()");
   }
 
   private Iterator<Record> getIterator() {
@@ -124,6 +139,18 @@ public class ODataEntityIterator extends EntityIterator implements BaseCloseable
     return new UriBuilder(uri).setParameter("$skip", totalRead).build();
   }
 
+  /**
+   * {@inheritDoc}
+   * <p/>
+   * <b>ATTENTION:</b> <code>getOperations</code> is not supported by default.
+   */
+  @Override
+  public List<Operation> getOperations() {
+    // "Remove is not supported for iteration over Entities."
+    throw new ODataNotSupportedException(
+      "Entity Iterator does not support getOperations() by default");
+  }
+
   @Override
   public boolean hasNext() {
     final Iterator<Record> iterator = getIterator();
@@ -132,6 +159,14 @@ public class ODataEntityIterator extends EntityIterator implements BaseCloseable
       close();
     }
     return hasNext;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Iterator<Entity> iterator() {
+    return this;
   }
 
   @Override
@@ -144,6 +179,17 @@ public class ODataEntityIterator extends EntityIterator implements BaseCloseable
     } catch (final RuntimeException e) {
       throw e;
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   * <p/>
+   * <b>ATTENTION:</b> <code>remove</code> is not supported by default.
+   */
+  @Override
+  public void remove() {
+    // "Remove is not supported for iteration over Entities."
+    throw new ODataNotSupportedException("Entity Iterator does not support remove()");
   }
 
   @Override

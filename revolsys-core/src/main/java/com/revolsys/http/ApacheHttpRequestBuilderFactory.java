@@ -53,7 +53,7 @@ public class ApacheHttpRequestBuilderFactory {
     return create(HttpMethod.HEAD, uri);
   }
 
-  protected ApacheHttpRequestBuilder newRequestBuilder() {
+  public ApacheHttpRequestBuilder newRequestBuilder() {
     return new ApacheHttpRequestBuilder(this);
   }
 

@@ -46,14 +46,13 @@ import org.apache.olingo.server.api.serializer.RepresentationType;
 import org.apache.olingo.server.api.serializer.SerializerException;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.queryoption.FormatOption;
-import org.apache.olingo.server.api.uri.queryoption.SystemQueryOptionKind;
 import org.apache.olingo.server.core.uri.parser.Parser;
 import org.apache.olingo.server.core.uri.parser.UriParserException;
 import org.apache.olingo.server.core.uri.parser.UriParserSemanticException;
 import org.apache.olingo.server.core.uri.parser.UriParserSyntaxException;
-import org.apache.olingo.server.core.uri.queryoption.FormatOptionImpl;
 import org.apache.olingo.server.core.uri.validator.UriValidationException;
 import org.apache.olingo.server.core.uri.validator.UriValidator;
+import org.jeometry.common.logging.Logs;
 
 public class ODataHandlerImpl implements ODataHandler {
 
@@ -66,8 +65,6 @@ public class ODataHandlerImpl implements ODataHandler {
   private CustomContentTypeSupport customContentTypeSupport;
 
   private CustomETagSupport customETagSupport;
-
-  private UriInfo uriInfo;
 
   private Exception lastThrownException;
 
@@ -87,47 +84,13 @@ public class ODataHandlerImpl implements ODataHandler {
     return this.customETagSupport;
   }
 
-  /**
-   * Extract format option from either <code>uriInfo</code> (if not <code>NULL</code>)
-   * or query from <code>request</code> (if not <code>NULL</code>).
-   * If both options are <code>NULL</code>, <code>NULL</code> is returned.
-   *
-   * @param request request which is checked
-   * @param uriInfo uriInfo which is checked
-   * @return the evaluated format option or <code>NULL</code>.
-   */
-  private FormatOption getFormatOption(final ODataRequest request, final UriInfo uriInfo) {
-    if (uriInfo == null) {
-      final String query = request.getRawQueryPath();
-      if (query == null) {
-        return null;
-      }
-
-      final String formatOption = SystemQueryOptionKind.FORMAT.toString();
-      final int index = query.indexOf(formatOption);
-      int endIndex = query.indexOf('&', index);
-      if (endIndex == -1) {
-        endIndex = query.length();
-      }
-      String format = "";
-      if (index + formatOption.length() < endIndex) {
-        format = query.substring(index + formatOption.length(), endIndex);
-      }
-      return new FormatOptionImpl().setFormat(format);
-    }
-    return uriInfo.getFormatOption();
-  }
-
   public Exception getLastThrownException() {
     return this.lastThrownException;
   }
 
-  public UriInfo getUriInfo() {
-    return this.uriInfo;
-  }
-
   public void handleException(final ODataRequest request, final ODataResponse response,
     final ODataServerError serverError, final Exception exception) {
+    Logs.error(this, exception);
     this.lastThrownException = exception;
     ErrorProcessor exceptionProcessor;
     try {
@@ -139,7 +102,7 @@ public class ODataHandlerImpl implements ODataHandler {
     }
     ContentType requestedContentType;
     try {
-      final FormatOption formatOption = getFormatOption(request, this.uriInfo);
+      final FormatOption formatOption = request.getFormatOption();
       requestedContentType = ContentNegotiator.doContentNegotiation(formatOption, request,
         getCustomContentTypeSupport(), RepresentationType.ERROR);
     } catch (final AcceptHeaderContentNegotiatorException e) {
@@ -206,19 +169,21 @@ public class ODataHandlerImpl implements ODataHandler {
       throw e;
     }
 
+    UriInfo uriInfo;
     try {
-      this.uriInfo = new Parser(this.serviceMetadata.getEdm(), this.odata).parseUri(
+      uriInfo = new Parser(this.serviceMetadata.getEdm(), this.odata).parseUri(
         request.getRawODataPath(), request.getRawQueryPath(), null, request.getRawBaseUri());
+      request.setUriInfo(uriInfo);
     } catch (final ODataLibraryException e) {
       throw e;
     }
     final HttpMethod method = request.getMethod();
     try {
-      new UriValidator().validate(this.uriInfo, method);
+      new UriValidator().validate(uriInfo, method);
     } catch (final UriValidationException e) {
       throw e;
     }
-    new ODataDispatcher(this.uriInfo, this).dispatch(request, response);
+    new ODataDispatcher(uriInfo, this).dispatch(request, response);
   }
 
   @Override

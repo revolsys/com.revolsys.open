@@ -1457,4 +1457,10 @@ public class UriTokenizer {
     this.savedStartIndex = this.startIndex;
     this.savedIndex = this.index;
   }
+
+  @Override
+  public String toString() {
+    return this.parseString.substring(0, this.index) + "<->"
+      + this.parseString.substring(this.index);
+  }
 }

@@ -19,7 +19,6 @@
 package org.apache.olingo.server.api;
 
 import java.io.OutputStream;
-import java.nio.channels.WritableByteChannel;
 
 /**
  * Contains the response content for the OData request.
@@ -40,13 +39,4 @@ public interface ODataContent {
    */
   void write(OutputStream stream);
 
-  /**
-   * Write the available content into the given <code>WritableByteChannel</code>.
-   *
-   * If during write of the content an exception is thrown this exception will be catched
-   * and the org.apache.olingo.server.api.ODataContentWriteErrorCallback is called (if registered).
-   *
-   * @param channel channel in which the content is written.
-   */
-  void write(WritableByteChannel channel);
 }

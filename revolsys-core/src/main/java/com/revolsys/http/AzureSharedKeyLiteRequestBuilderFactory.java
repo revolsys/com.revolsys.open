@@ -74,7 +74,7 @@ public class AzureSharedKeyLiteRequestBuilderFactory extends ApacheHttpRequestBu
   }
 
   @Override
-  protected ApacheHttpRequestBuilder newRequestBuilder() {
+  public ApacheHttpRequestBuilder newRequestBuilder() {
     return new AzureSharedKeyLiteRequestBuilder(this);
   }
 

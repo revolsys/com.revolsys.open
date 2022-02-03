@@ -38,7 +38,6 @@ import org.apache.olingo.commons.api.data.AbstractEntityCollection;
 import org.apache.olingo.commons.api.data.ComplexValue;
 import org.apache.olingo.commons.api.data.ContextURL;
 import org.apache.olingo.commons.api.data.Entity;
-import org.apache.olingo.commons.api.data.EntityIterator;
 import org.apache.olingo.commons.api.data.Link;
 import org.apache.olingo.commons.api.data.Linked;
 import org.apache.olingo.commons.api.data.Operation;
@@ -94,6 +93,7 @@ import org.apache.olingo.server.core.serializer.utils.ExpandSelectHelper;
 import org.apache.olingo.server.core.uri.UriHelperImpl;
 import org.apache.olingo.server.core.uri.queryoption.ExpandOptionImpl;
 
+import com.revolsys.odata.model.ODataEntityIterator;
 import com.revolsys.record.io.format.json.JsonWriter;
 
 public class ODataJsonSerializer extends AbstractODataSerializer {
@@ -355,7 +355,7 @@ public class ODataJsonSerializer extends AbstractODataSerializer {
 
   @Override
   public SerializerStreamResult entityCollectionStreamed(final ServiceMetadata metadata,
-    final EdmEntityType entityType, final EntityIterator entities,
+    final EdmEntityType entityType, final ODataEntityIterator entities,
     final EntityCollectionSerializerOptions options) throws SerializerException {
 
     return ODataWritableContent.with(entities, entityType, this, metadata, options).build();
@@ -1423,7 +1423,7 @@ public class ODataJsonSerializer extends AbstractODataSerializer {
   }
 
   public void writeRecords(final ServiceMetadata metadata, final EdmEntityType entityType,
-    final EntityIterator records, final EntityCollectionSerializerOptions options,
+    final ODataEntityIterator records, final EntityCollectionSerializerOptions options,
     final OutputStream outputStream) throws SerializerException {
 
     SerializerException cachedException;

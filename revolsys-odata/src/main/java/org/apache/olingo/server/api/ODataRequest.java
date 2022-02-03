@@ -23,6 +23,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.olingo.commons.api.http.HttpMethod;
+import org.apache.olingo.server.api.uri.UriInfo;
+import org.apache.olingo.server.api.uri.queryoption.FormatOption;
+import org.apache.olingo.server.api.uri.queryoption.SystemQueryOptionKind;
+import org.apache.olingo.server.core.uri.queryoption.FormatOptionImpl;
 
 /**
  * Request object to carry HTTP information optimized for and required to handle OData requests only.
@@ -45,6 +49,8 @@ public class ODataRequest {
   private String rawServiceResolutionUri;
 
   private String protocol;
+
+  private UriInfo uriInfo;
 
   /**
    * <p>Adds a header to the request.</p>
@@ -84,6 +90,37 @@ public class ODataRequest {
    */
   public InputStream getBody() {
     return this.body;
+  }
+
+  /**
+   * Extract format option from either <code>uriInfo</code> (if not <code>NULL</code>)
+   * or query from <code>request</code> (if not <code>NULL</code>).
+   * If both options are <code>NULL</code>, <code>NULL</code> is returned.
+   *
+   * @param request request which is checked
+   * @param uriInfo uriInfo which is checked
+   * @return the evaluated format option or <code>NULL</code>.
+   */
+  public FormatOption getFormatOption() {
+    if (this.uriInfo == null) {
+      final String query = getRawQueryPath();
+      if (query == null) {
+        return null;
+      }
+
+      final String formatOption = SystemQueryOptionKind.FORMAT.toString();
+      final int index = query.indexOf(formatOption);
+      int endIndex = query.indexOf('&', index);
+      if (endIndex == -1) {
+        endIndex = query.length();
+      }
+      String format = "";
+      if (index + formatOption.length() < endIndex) {
+        format = query.substring(index + formatOption.length(), endIndex);
+      }
+      return new FormatOptionImpl().setFormat(format);
+    }
+    return this.uriInfo.getFormatOption();
   }
 
   /**
@@ -161,6 +198,10 @@ public class ODataRequest {
     return this.rawServiceResolutionUri;
   }
 
+  public UriInfo getUriInfo() {
+    return this.uriInfo;
+  }
+
   /**
    * Sets the body of the request.
    * @param body the request payload as {@link InputStream}
@@ -236,6 +277,10 @@ public class ODataRequest {
    */
   public void setRawServiceResolutionUri(final String rawServiceResolutionUri) {
     this.rawServiceResolutionUri = rawServiceResolutionUri;
+  }
+
+  public void setUriInfo(final UriInfo uriInfo) {
+    this.uriInfo = uriInfo;
   }
 
 }

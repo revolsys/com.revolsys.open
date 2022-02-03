@@ -1,4 +1,4 @@
-package com.revolsys.odata.model;
+package com.revolsys.record.io.format.odata;
 
 import org.jeometry.common.io.PathName;
 

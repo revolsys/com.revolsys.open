@@ -1287,8 +1287,8 @@ public class ExpressionParser {
         ParserHelper.bws(this.tokenizer);
         final Expression geoPolygonParameter = parseExpression();
         ParserHelper.bws(this.tokenizer);
-        checkType(geoPolygonParameter, EdmPrimitiveTypeKind.GeographyPolygon,
-          EdmPrimitiveTypeKind.GeometryPolygon);
+        // checkType(geoPolygonParameter, EdmPrimitiveTypeKind.GeographyPolygon,
+        // EdmPrimitiveTypeKind.GeometryPolygon);
         checkNoCollection(geoPolygonParameter);
         parameters.add(geoPolygonParameter);
       break;
@@ -1368,7 +1368,7 @@ public class ExpressionParser {
     final EdmElement property = structuredType.getProperty(oDataIdentifier);
 
     if (property == null) {
-      throw new UriParserSemanticException("Unknown property.",
+      throw new UriParserSemanticException("Unknown property: " + oDataIdentifier,
         UriParserSemanticException.MessageKeys.EXPRESSION_PROPERTY_NOT_IN_TYPE,
         lastType.getFullQualifiedName().getFullQualifiedNameAsString(), oDataIdentifier);
     }
@@ -1439,5 +1439,10 @@ public class ExpressionParser {
     } else if (lastResource instanceof UriResourceWithKeysImpl) {
       ((UriResourceWithKeysImpl)lastResource).setEntryTypeFilter(entityTypeFilter);
     }
+  }
+
+  @Override
+  public String toString() {
+    return this.tokenizer.toString();
   }
 }

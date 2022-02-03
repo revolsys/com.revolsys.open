@@ -273,7 +273,9 @@ public class Q {
   }
 
   public static Condition iLike(final String left, final String right) {
-    return Q.like(F.upper(new Cast(left, "varchar(4000)")), ("%" + right + "%").toUpperCase());
+    final Column leftCondition = new Column(left);
+    final Value valueCondition = Value.newValue("%" + right + "%");
+    return new ILike(leftCondition, valueCondition);
   }
 
   public static In in(final FieldDefinition fieldDefinition,
@@ -374,7 +376,7 @@ public class Q {
 
   public static Like like(final String left, final QueryValue right) {
     final Column leftCondition = new Column(left);
-    return new Like(leftCondition, right);
+    return like(leftCondition, right);
   }
 
   public static Condition likeRegEx(final RecordStore recordStore, final String fieldName,

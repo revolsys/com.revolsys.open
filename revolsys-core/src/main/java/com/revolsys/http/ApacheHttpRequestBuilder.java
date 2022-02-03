@@ -545,23 +545,22 @@ public class ApacheHttpRequestBuilder {
   @Override
   public String toString() {
     final StringBuilder builder = new StringBuilder();
-    builder.append("ApacheHttpRequestBuilder [method=");
     builder.append(this.method);
+    builder.append(' ');
+    builder.append(this.uri);
+    builder.append(' ');
+    builder.append(this.parameters);
+
     builder.append(", charset=");
     builder.append(this.charset);
     builder.append(", version=");
     builder.append(this.version);
-    builder.append(", uri=");
-    builder.append(this.uri);
     builder.append(", headerGroup=");
     builder.append(this.headerGroup);
     builder.append(", entity=");
     builder.append(this.entity);
-    builder.append(", parameters=");
-    builder.append(this.parameters);
     builder.append(", config=");
     builder.append(this.config);
-    builder.append("]");
     return builder.toString();
   }
 

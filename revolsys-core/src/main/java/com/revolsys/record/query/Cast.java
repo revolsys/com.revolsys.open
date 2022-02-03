@@ -12,10 +12,6 @@ public class Cast extends AbstractUnaryQueryValue {
     this.dataType = dataType;
   }
 
-  public Cast(final String name, final String dataType) {
-    this(new Column(name), dataType);
-  }
-
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
     final StringBuilder buffer) {
