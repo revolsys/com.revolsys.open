@@ -19,7 +19,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -41,9 +40,9 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.net.UrlProxy;
 
-import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.io.FileUtil;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.spring.resource.Resource;
 
 /**
@@ -127,40 +126,37 @@ public final class UrlUtil {
           } else {
             firstParameter = false;
           }
-          try {
-            if (value instanceof String[]) {
-              final String[] values = (String[])value;
-              for (int i = 0; i < values.length; i++) {
-                query.append(name).append('=').append(URLEncoder.encode(values[i], "US-ASCII"));
-                if (i < values.length - 1) {
-                  query.append('&');
-                }
-              }
-            } else if (value instanceof Collection) {
-              boolean first = true;
-              final Collection<?> values = (Collection<?>)value;
-              for (final Object childValue : values) {
-                if (childValue != null) {
-                  if (first == true) {
-                    first = false;
-                  } else {
-                    query.append('&');
-                  }
-                  query.append(name)
-                    .append('=')
-                    .append(URLEncoder.encode(childValue.toString(), "US-ASCII"));
-                }
-              }
-
-            } else {
+          if (value instanceof String[]) {
+            final String[] values = (String[])value;
+            for (int i = 0; i < values.length; i++) {
               query.append(name)
                 .append('=')
-                .append(URLEncoder.encode(value.toString(), "US-ASCII"));
+                .append(URLEncoder.encode(values[i], StandardCharsets.US_ASCII));
+              if (i < values.length - 1) {
+                query.append('&');
+              }
             }
-          } catch (final UnsupportedEncodingException e) {
-            throw new Error(e);
-          }
+          } else if (value instanceof Collection) {
+            boolean first = true;
+            final Collection<?> values = (Collection<?>)value;
+            for (final Object childValue : values) {
+              if (childValue != null) {
+                if (first == true) {
+                  first = false;
+                } else {
+                  query.append('&');
+                }
+                query.append(name)
+                  .append('=')
+                  .append(URLEncoder.encode(childValue.toString(), StandardCharsets.US_ASCII));
+              }
+            }
 
+          } else {
+            query.append(name)
+              .append('=')
+              .append(URLEncoder.encode(value.toString(), StandardCharsets.US_ASCII));
+          }
         }
       }
     }
@@ -172,36 +168,36 @@ public final class UrlUtil {
       if (!firstParameter) {
         query.append('&');
       }
-      try {
-        if (value instanceof String[]) {
-          final String[] values = (String[])value;
-          for (int i = 0; i < values.length; i++) {
-            query.append(name).append('=').append(URLEncoder.encode(values[i], "US-ASCII"));
-            if (i < values.length - 1) {
+      if (value instanceof String[]) {
+        final String[] values = (String[])value;
+        for (int i = 0; i < values.length; i++) {
+          query.append(name)
+            .append('=')
+            .append(URLEncoder.encode(values[i], StandardCharsets.US_ASCII));
+          if (i < values.length - 1) {
+            query.append('&');
+          }
+        }
+      } else if (value instanceof Collection) {
+        boolean first = true;
+        final Collection<?> values = (Collection<?>)value;
+        for (final Object childValue : values) {
+          if (childValue != null) {
+            if (first == true) {
+              first = false;
+            } else {
               query.append('&');
             }
+            query.append(name)
+              .append('=')
+              .append(URLEncoder.encode(childValue.toString(), StandardCharsets.US_ASCII));
           }
-        } else if (value instanceof Collection) {
-          boolean first = true;
-          final Collection<?> values = (Collection<?>)value;
-          for (final Object childValue : values) {
-            if (childValue != null) {
-              if (first == true) {
-                first = false;
-              } else {
-                query.append('&');
-              }
-              query.append(name)
-                .append('=')
-                .append(URLEncoder.encode(childValue.toString(), "US-ASCII"));
-            }
-          }
-
-        } else {
-          query.append(name).append('=').append(URLEncoder.encode(value.toString(), "US-ASCII"));
         }
-      } catch (final UnsupportedEncodingException e) {
-        throw new Error(e);
+
+      } else {
+        query.append(name)
+          .append('=')
+          .append(URLEncoder.encode(value.toString(), StandardCharsets.US_ASCII));
       }
 
     }

@@ -147,7 +147,7 @@ public interface JsonList extends List<Object>, JsonType {
 
   };
 
-  static Supplier<JsonList> ARRAY_SUPPLIER = () -> new JsonListArray();
+  static Supplier<JsonList> ARRAY_SUPPLIER = JsonListArray::new;
 
   static JsonList array() {
     return new JsonListArray();
@@ -251,6 +251,10 @@ public interface JsonList extends List<Object>, JsonType {
     List.super.forEach(value -> {
       action.accept((V)value);
     });
+  }
+
+  default Double getDouble(final int index) {
+    return getValue(index, DataTypes.DOUBLE);
   }
 
   default Integer getInteger(final int index) {

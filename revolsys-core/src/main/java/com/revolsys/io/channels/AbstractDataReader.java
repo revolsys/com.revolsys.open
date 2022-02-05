@@ -17,6 +17,27 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
 
   public static final int DEFAULT_BUFFER_SIZE = 8192;
 
+  public static String toString(final ByteBuffer buffer) {
+    try {
+      final int i = buffer.position();
+      final int min = Math.max(0, i - 50);
+      final int max = Math.min(buffer.limit(), i + 50);
+      buffer.position(min);
+      final byte[] before = new byte[i - min];
+      buffer.get(before);
+      final char c = (char)buffer.get();
+      final byte[] after = new byte[max - i - 1];
+      buffer.get(after);
+      buffer.position(i);
+      return new String(before, StandardCharsets.US_ASCII) + " |"
+        + ((Character)c).toString().replaceAll("[\\n\\r]", "\\\\n") + "| "
+        + new String(after, StandardCharsets.US_ASCII);
+    } catch (final Exception e) {
+      e.printStackTrace();
+    }
+    return "sb";
+  }
+
   private int available = 0;
 
   protected ByteBuffer buffer;
@@ -525,6 +546,11 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
   }
 
   @Override
+  public String toString() {
+    return toString(this.buffer);
+  }
+
+  @Override
   public void unreadByte(final byte b) {
     ByteBuffer buffer = this.buffer;
     final ByteBuffer unreadBuffer = this.unreadBuffer;
@@ -549,5 +575,4 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
       this.buffer.position(newPosition);
     }
   }
-
 }
