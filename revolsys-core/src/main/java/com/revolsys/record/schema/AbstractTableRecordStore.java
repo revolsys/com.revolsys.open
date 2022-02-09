@@ -393,7 +393,6 @@ public class AbstractTableRecordStore {
   public Condition newODataFilter(String filter) {
     if (Property.hasValue(filter)) {
       filter = filter.replace("%2B", "+");
-
       final TableReference table = getTable();
       return (Condition)ODataParser.parseFilter(table, filter);
     } else {
