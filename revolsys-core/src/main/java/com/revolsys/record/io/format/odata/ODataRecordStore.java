@@ -72,14 +72,14 @@ public class ODataRecordStore extends AbstractRecordStore {
   private static final Map<Class<? extends QueryValue>, BiConsumer<StringBuilder, QueryValue>> HANDLERS = new HashMap<>();
 
   static {
+    addMultipleCondition(And.class, " and ");
+    addMultipleCondition(Or.class, " or ");
     addBinaryCondition(Equal.class, " eq ");
     addBinaryCondition(NotEqual.class, " ne ");
     addBinaryCondition(GreaterThan.class, " gt ");
     addBinaryCondition(GreaterThanEqual.class, " ge ");
     addBinaryCondition(LessThan.class, " lt ");
     addBinaryCondition(LessThanEqual.class, " le ");
-    addBinaryCondition(And.class, " and ");
-    addBinaryCondition(Or.class, " or ");
     addBinaryCondition(Add.class, " add ");
     addBinaryCondition(Subtract.class, " sub ");
     addBinaryCondition(Multiply.class, " mul ");
@@ -180,8 +180,9 @@ public class ODataRecordStore extends AbstractRecordStore {
       }
       filter.append(text);
       filter.append("'))");
+    } else {
+      throw new IllegalArgumentException("iLike only supports column and value: " + queryValue);
     }
-    throw new IllegalArgumentException("iLike only supports column and value: " + queryValue);
   }
 
   private static void addLike(final StringBuilder filter, final QueryValue queryValue) {
@@ -206,6 +207,27 @@ public class ODataRecordStore extends AbstractRecordStore {
       filter.append(')');
     }
     throw new IllegalArgumentException("Like only supports column and value: " + queryValue);
+  }
+
+  public static void addMultipleCondition(final Class<? extends QueryValue> clazz,
+    final String operator) {
+    HANDLERS.put(clazz, (filter, condition) -> addMultipleCondition(filter, condition, operator));
+  }
+
+  private static void addMultipleCondition(final StringBuilder filter, final QueryValue value,
+    final String operator) {
+    final List<QueryValue> values = value.getQueryValues();
+    filter.append('(');
+    boolean first = true;
+    for (final QueryValue arg : values) {
+      if (first) {
+        first = false;
+      } else {
+        filter.append(operator);
+      }
+      appendQueryValue(filter, arg);
+    }
+    filter.append(')');
   }
 
   private static void addUnaryCondition(final Class<? extends QueryValue> clazz,

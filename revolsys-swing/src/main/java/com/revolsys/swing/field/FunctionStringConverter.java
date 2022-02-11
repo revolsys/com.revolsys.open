@@ -19,6 +19,8 @@ public class FunctionStringConverter<T> extends ObjectToStringConverter
 
   private final Function<Object, String> function;
 
+  private Object prototypeValue;
+
   public FunctionStringConverter(final Function<Object, String> function) {
     this.function = function;
   }
@@ -30,7 +32,12 @@ public class FunctionStringConverter<T> extends ObjectToStringConverter
   @Override
   public Component getListCellRendererComponent(final JList<? extends T> list, final T value,
     final int index, final boolean isSelected, final boolean cellHasFocus) {
-    final String text = getPreferredStringForItem(value);
+    final String text;
+    if (value == this.prototypeValue) {
+      text = this.prototypeValue.toString();
+    } else {
+      text = getPreferredStringForItem(value);
+    }
     this.renderer.getListCellRendererComponent(list, text, index, isSelected, cellHasFocus);
     this.renderer.setText(text);
     this.renderer.setHorizontalAlignment(this.horizontalAlignment);
@@ -48,5 +55,9 @@ public class FunctionStringConverter<T> extends ObjectToStringConverter
 
   public void setHorizontalAlignment(final int horizontalAlignment) {
     this.horizontalAlignment = horizontalAlignment;
+  }
+
+  public void setPrototypeValue(final Object prototypeValue) {
+    this.prototypeValue = prototypeValue;
   }
 }
