@@ -227,11 +227,8 @@ public class ApacheHttpRequestBuilder {
   }
 
   public ApacheHttpRequestBuilder addHeader(final String name, final String value) {
-    if (this.headerGroup == null) {
-      this.headerGroup = new HeaderGroup();
-    }
-    this.headerGroup.addHeader(new BasicHeader(name, value));
-    return this.addHeader(new BasicHeader(name, value));
+    final BasicHeader header = new BasicHeader(name, value);
+    return addHeader(header);
   }
 
   public ApacheHttpRequestBuilder addParameter(final NameValuePair parameter) {
@@ -445,11 +442,8 @@ public class ApacheHttpRequestBuilder {
   }
 
   public ApacheHttpRequestBuilder setHeader(final String name, final String value) {
-    if (this.headerGroup == null) {
-      this.headerGroup = new HeaderGroup();
-    }
-    this.headerGroup.updateHeader(new BasicHeader(name, value));
-    return this;
+    final BasicHeader header = new BasicHeader(name, value);
+    return setHeader(header);
   }
 
   public ApacheHttpRequestBuilder setJsonEntity(final JsonObject value) {

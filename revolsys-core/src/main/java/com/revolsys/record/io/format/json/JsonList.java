@@ -338,4 +338,5 @@ public interface JsonList extends List<Object>, JsonType {
   default String toJsonString(final boolean indent) {
     return Json.toString(this, indent);
   }
+
 }
