@@ -6,7 +6,10 @@ The source code is stored on [https://github.com](GitHub.com) which uses the
 The purpose of this guide is to provide and overview of the common commands used for git
 repositories.
 
-Developers must understand fully how to use git. This document will be expanded over time
+Developers must understand fully how to use git. This document will be expanded over time to include
+the important commands to use. The following websites contain documentation that will help you learn
+git.
+
 * [Git Cheat Sheet](https://training.github.com/downloads/github-git-cheat-sheet.pdf)
 * [Git Docs](https://git-scm.com/docs)
 * [Eclipse GIT Docs](https://www.eclipse.org/egit/documentation/)
@@ -39,6 +42,23 @@ git config --local user.email "mark.smith@example.com"
 
 For GitHub.com commits you can hide your real email address by configuring and using a 
 [GitHub noreply email address](https://docs.github.com/en/account-and-profile/setting-up-and-managing-your-github-user-account/managing-email-preferences/setting-your-commit-email-address).
+
+# Authentication
+
+[GithHub Authentication](https://docs.github.com/en/authentication)
+
+## ssh
+
+Git URL's starting with git: use the SSH protocol. To authenticate you will need to create and register
+a ssh key with github.
+
+[Connecting to GitHub with ssh]https://docs.github.com/en/authentication/connecting-to-github-with-ssh)
+
+## https
+Git URL's starting with https: use the HTTPD protocol. To authenticate you will need to create
+a devloper token.
+
+[GitHub Personal Access Token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 
 # Concepts
 
@@ -77,8 +97,7 @@ worktree. If you made changes to a file then you may need to resolve conflicts.i
 
 git merge ...
 
-## Commit
-
+## Committ
 The following commands are used to update the local "index" of changes from the worktee and then
 commit that to the local copy of the branch.
 
