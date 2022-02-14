@@ -74,6 +74,8 @@ public class ComboBox<T> extends JComboBox<T> implements Field, KeyListener {
 
   private final FieldSupport fieldSupport;
 
+  private final FunctionStringConverter<T> stringConverter;
+
   public ComboBox(final String fieldName, final ComboBoxModel<T> model,
     Function<Object, String> converter, final ListCellRenderer<T> renderer) {
     super(model);
@@ -85,6 +87,7 @@ public class ComboBox<T> extends JComboBox<T> implements Field, KeyListener {
       converter = newDefaultConverter();
     }
     final FunctionStringConverter<T> stringConverter = new FunctionStringConverter<>(converter);
+    this.stringConverter = stringConverter;
     if (renderer == null) {
       setRenderer(stringConverter);
     }
@@ -238,6 +241,14 @@ public class ComboBox<T> extends JComboBox<T> implements Field, KeyListener {
       setSelectedItem(value);
     }
     return this.fieldSupport.setValue(value);
+  }
+
+  @Override
+  public void setPrototypeDisplayValue(final T prototypeDisplayValue) {
+    super.setPrototypeDisplayValue(prototypeDisplayValue);
+    if (this.stringConverter != null) {
+      this.stringConverter.setPrototypeValue(prototypeDisplayValue);
+    }
   }
 
   @Override

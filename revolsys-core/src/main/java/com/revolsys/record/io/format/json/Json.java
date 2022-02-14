@@ -100,7 +100,7 @@ public class Json extends AbstractIoFactory
     }
   }
 
-  private static class JsonListDataType extends AbstractDataType {
+  public static class JsonListDataType extends AbstractDataType {
 
     public JsonListDataType() {
       super("JsonList", JsonList.class, true);

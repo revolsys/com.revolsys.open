@@ -3,6 +3,7 @@ package com.revolsys.record.io.format.odata;
 import java.util.List;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.ListDataType;
 import org.jeometry.common.io.PathName;
 
 import com.revolsys.collection.map.MapEx;
@@ -11,6 +12,7 @@ import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
+import com.revolsys.util.Debug;
 
 public class ODataRecordDefinition extends RecordDefinitionImpl {
 
@@ -24,10 +26,17 @@ public class ODataRecordDefinition extends RecordDefinitionImpl {
     final JsonObject entityType = entityTypeMap.getJsonObject(entityTypeName, JsonObject.EMPTY);
     if (entityType.equalValue("$Kind", "EntityType")) {
       for (final String fieldName : entityType.keySet()) {
+
         if (!fieldName.startsWith("$")) {
+          if ("tableNames".equals(fieldName)) {
+            Debug.noOp();
+          }
           final JsonObject entityField = entityType.getJsonObject(fieldName);
           final String type = entityField.getString("$Type");
-          final DataType dataType = OData.getDataTypeFromEdm(type);
+          DataType dataType = OData.getDataTypeFromEdm(type);
+          if (entityField.getBoolean("$Collection", false)) {
+            dataType = new ListDataType(List.class, dataType);
+          }
           final boolean required = !entityField.getBoolean("$Nullable", true);
           final FieldDefinition fieldDefinition = new FieldDefinition(fieldName, dataType,
             required);

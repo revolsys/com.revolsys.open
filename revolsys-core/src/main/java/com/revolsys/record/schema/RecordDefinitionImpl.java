@@ -326,6 +326,12 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     }
   }
 
+  public void addFields(final RecordDefinitionProxy recordDefinition) {
+    for (final FieldDefinition field : recordDefinition.getFieldDefinitions()) {
+      addField(field);
+    }
+  }
+
   protected void addIdField(final FieldDefinition fieldDefinition) {
     fieldDefinition.setIdField(true);
     final int index = fieldDefinition.getIndex();

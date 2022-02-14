@@ -2,8 +2,11 @@ package com.revolsys.record.io;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.TreeMap;
+import java.util.function.Function;
 
 import org.jeometry.common.data.identifier.Identifier;
 
@@ -91,6 +94,23 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
         properties);
       return reader;
     }
+  }
+
+  static <V> RecordReader newRecordReader(final RecordDefinition recordDefinition,
+    final Iterable<V> iterable, final Function<V, Record> converter) {
+    final Iterator<V> iterator = iterable.iterator();
+    return newRecordReader(recordDefinition, iterator, converter);
+  }
+
+  static <V> RecordReader newRecordReader(final RecordDefinition recordDefinition,
+    final Iterator<V> iterator, final Function<V, Record> converter) {
+    return new AbstractRecordReader(recordDefinition) {
+      @Override
+      protected Record getNext() throws NoSuchElementException {
+        final V value = iterator.next();
+        return converter.apply(value);
+      }
+    };
   }
 
   static RecordReader newZipRecordReader(final Object source, final String fileExtension) {
