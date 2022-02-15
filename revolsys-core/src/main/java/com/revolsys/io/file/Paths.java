@@ -320,7 +320,7 @@ public interface Paths {
   }
 
   static Path getPath(final Path path) {
-    return path.toAbsolutePath();
+    return path.toAbsolutePath().normalize();
   }
 
   static Path getPath(final Path parent, final String path) {
