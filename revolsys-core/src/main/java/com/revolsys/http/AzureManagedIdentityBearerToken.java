@@ -1,7 +1,5 @@
 package com.revolsys.http;
 
-import org.jeometry.common.logging.Logs;
-
 import com.revolsys.net.oauth.BearerToken;
 import com.revolsys.record.io.format.json.JsonObject;
 
@@ -14,7 +12,7 @@ public class AzureManagedIdentityBearerToken extends BearerToken {
     setExpireTime(expireTime);
     final String returnedResource = config.getString("resource");
     setScope(resource, returnedResource);
-    Logs.error(this, resource);
+    System.out.println("DEBUG" + config);
   }
 
 }
