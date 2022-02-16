@@ -245,9 +245,9 @@ public class StaxElementHandler<V> implements XmlNameProxy {
         }
       } else {
         final String key = getLocalPart() + "." + attributeName.getLocalPart();
-        if (this.unhandled.add(key)) {
-          Debug.println(key);
-        }
+        // if (this.unhandled.add(key)) {
+        // Debug.println(key);
+        // }
       }
     }
   }
@@ -277,9 +277,9 @@ public class StaxElementHandler<V> implements XmlNameProxy {
         handler.handleElement(in, callback);
       } else {
         final String key = getLocalPart() + "." + elementName.getLocalPart();
-        if (this.unhandled.add(key)) {
-          Debug.println(key);
-        }
+        // if (this.unhandled.add(key)) {
+        // Debug.println(key);
+        // }
       }
     }
   }

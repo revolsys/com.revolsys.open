@@ -16,7 +16,6 @@ import com.revolsys.record.io.format.xml.XmlNameProxy;
 import com.revolsys.record.io.format.xml.XmlSchema;
 import com.revolsys.record.io.format.xml.XmlSimpleType;
 import com.revolsys.record.io.format.xml.XmlType;
-import com.revolsys.util.Debug;
 
 public class StaxJsonObjectSchema {
 
@@ -81,7 +80,7 @@ public class StaxJsonObjectSchema {
         } else {
           final String key = type + "." + xmlName.getLocalPart();
           // if (this.unhandled.add(key)) {
-          Debug.println(key);
+          // Debug.println(key);
           // }
         }
       }
@@ -105,7 +104,7 @@ public class StaxJsonObjectSchema {
         }
       } else {
         final String key = type.getLocalPart() + "." + xmlName.getLocalPart();
-        Debug.println(key);
+        // Debug.println(key);
         in.skipSubTree();
       }
     }
