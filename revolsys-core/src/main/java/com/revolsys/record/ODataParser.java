@@ -772,17 +772,16 @@ public class ODataParser {
           instring = false;
         } else {
           singleQuoteCount = 0;
-          rt++;
         }
       } else if (c == '\'') {
         instring = true;
         singleQuoteCount = 0;
       } else if (instring || Character.isLetterOrDigit(c) || c == '/' || c == '_' || c == '.'
         || c == '*') {
-        rt++;
       } else {
         return rt;
       }
+      rt++;
     }
     return rt - 1;
   }

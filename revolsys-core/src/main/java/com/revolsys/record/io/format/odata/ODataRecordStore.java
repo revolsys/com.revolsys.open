@@ -327,6 +327,25 @@ public class ODataRecordStore extends AbstractRecordStore {
     }
   }
 
+  @Override
+  public boolean deleteRecord(final PathName typePath, final Identifier identifier) {
+    final String name = typePath.getName();
+    final URI baseUri = getUri();
+    final Object idValue = identifier.getValue(0);
+    String idString;
+    if (idValue instanceof Number) {
+      idString = idValue.toString();
+    } else {
+      idString = "'" + idValue.toString().replace("'", "''") + "'";
+    }
+    final URI uri = new UriBuilder(baseUri).appendPathSegments(name + "(" + idString + ")").build();
+
+    final ApacheHttpRequestBuilder request = this.requestFactory.delete(uri)
+      .setParameter(ODataRecordStore.FORMAT_JSON);
+    final JsonObject result = request.getJson();
+    return result.getBoolean("deleted", false);
+  }
+
   JsonObject getJson(final URI uri) {
     return this.requestFactory.get(uri).setParameter(FORMAT_JSON).getJson();
   }
@@ -403,9 +422,8 @@ public class ODataRecordStore extends AbstractRecordStore {
     final ApacheHttpRequestBuilder request = this.requestFactory.post(uri)
       .setParameter(ODataRecordStore.FORMAT_JSON)
       .setJsonEntity(json);
-    request.execute((result) -> {
-      Debug.noOp();
-    });
+    final JsonObject result = request.getJson();
+    record.setValues(result);
   }
 
   @Override
