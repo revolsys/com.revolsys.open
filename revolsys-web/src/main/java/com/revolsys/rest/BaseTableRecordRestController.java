@@ -35,7 +35,7 @@ public class BaseTableRecordRestController extends AbstractTableRecordRestContro
   protected void handleGetRecord(final TableRecordStoreConnection connection,
     final HttpServletRequest request, final HttpServletResponse response, final String fieldName,
     final Object value) throws IOException {
-    final Query query = newQuery(connection, request)//
+    final Query query = getTableRecordStore(connection, this.typeName).newQuery(connection)//
       .and(fieldName, value);
     handleGetRecord(connection, request, response, query);
   }

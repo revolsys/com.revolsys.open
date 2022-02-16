@@ -33,7 +33,7 @@ public class BaseTableRest extends AbstractTableRecordRestController {
     @RequestAttribute("tableConnection") final TableRecordStoreConnection connection,
     final HttpServletRequest request, final HttpServletResponse response,
     @PathVariable final String tableName, @PathVariable() final String id) throws IOException {
-    final Query query = newQuery(connection, request, tableName)//
+    final Query query = getTableRecordStore(connection, tableName).newQuery(connection)//
       .andEqualId(id);
     handleGetRecord(connection, request, response, query);
   }

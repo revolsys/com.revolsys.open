@@ -240,8 +240,9 @@ public class AbstractTableRecordStore {
   }
 
   protected JdbcConnection getJdbcConnection() {
-    if (this.recordStore instanceof JdbcRecordStore) {
-      return this.recordStore.<JdbcRecordStore> getRecordStore().getJdbcConnection();
+    final RecordStore recordStore = this.recordStore.getRecordStore();
+    if (recordStore instanceof JdbcRecordStore) {
+      return ((JdbcRecordStore)recordStore).getJdbcConnection();
     }
     throw new UnsupportedOperationException("Must be a JDBC connection");
   }
