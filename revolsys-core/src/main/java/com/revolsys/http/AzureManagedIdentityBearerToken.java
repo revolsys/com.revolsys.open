@@ -12,9 +12,6 @@ public class AzureManagedIdentityBearerToken extends BearerToken {
     setExpireTime(expireTime);
     final String returnedResource = config.getString("resource");
     setScope(resource, returnedResource);
-    System.out.println("------------------------");
-    System.out.println(config);
-    System.out.println("------------------------");
   }
 
 }
