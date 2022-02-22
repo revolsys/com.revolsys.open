@@ -1,15 +1,58 @@
 package com.revolsys.io;
 
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.spi.AbstractInterruptibleChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+
+import org.jeometry.common.exception.Exceptions;
 
 public class FileBackedOutputStreamBuffer extends OutputStream {
 
-  private final ByteArrayOutputStream buffer;
+  private final class ReadChannel extends AbstractInterruptibleChannel
+    implements ReadableByteChannel {
+
+    private int offset;
+
+    private FileChannel fileChannel;
+
+    @Override
+    protected void implCloseChannel() throws IOException {
+    }
+
+    @Override
+    public int read(ByteBuffer dst) throws IOException {
+      if (!isOpen()) {
+        throw new ClosedChannelException();
+      }
+      if (offset < bufferSize) {
+        int count = Math.min(bufferSize - offset, dst.remaining());
+        buffer.limit(buffer.position() + count);
+        dst.put(buffer);
+        buffer.limit(buffer.capacity());
+        offset += count;
+        return count;
+      } else {
+        if (fileChannel == null) {
+          if (file == null) {
+            return -1;
+          } else {
+            fileChannel = FileChannel.open(file, StandardOpenOption.READ);
+          }
+        }
+        return fileChannel.read(dst);
+      }
+    }
+  }
+
+  private final ByteBuffer buffer;
 
   private OutputStream out;
 
@@ -17,14 +60,13 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
 
   private final int bufferSize;
 
-  private int size = 0;
+  private long size = 0;
 
   private Path file;
 
   public FileBackedOutputStreamBuffer(final int bufferSize) {
     this.bufferSize = bufferSize;
-    this.buffer = new ByteArrayOutputStream(bufferSize);
-    this.out = this.buffer;
+    this.buffer = ByteBuffer.allocate(bufferSize);
   }
 
   @Override
@@ -44,11 +86,17 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
     }
   }
 
-  private void ensureCapacity(final int count) throws IOException {
-    this.size += count;
-    if (this.file == null && this.size > this.bufferSize) {
-      this.file = Files.createTempFile("file", ".bin");
-      this.out = new BufferedOutputStream(Files.newOutputStream(this.file));
+  public void flip() {
+
+    try {
+      buffer.flip();
+      if (out != null) {
+        this.out.flush();
+        this.out.close();
+        this.out = null;
+      }
+    } catch (IOException e) {
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -59,18 +107,42 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
     }
   }
 
-  public int getSize() {
+  public long getSize() {
     return this.size;
   }
 
+  public ReadableByteChannel newReadChannel() {
+    return new ReadChannel();
+  }
+
+  private void requireFile() throws IOException {
+    if (this.file == null) {
+      this.file = Files.createTempFile("file", ".bin");
+      this.out = new BufferedOutputStream(Files.newOutputStream(this.file));
+    }
+  }
+
   @Override
-  public synchronized void write(final byte[] b, final int off, final int len) throws IOException {
+  public synchronized void write(final byte[] source, int offset, int length) throws IOException {
 
     if (this.closed) {
       throw new IOException("Closed");
     } else {
-      ensureCapacity(len);
-      this.out.write(b, off, len);
+      if (length > 0) {
+        int remaining = buffer.remaining();
+        if (remaining > 0) {
+          int count = Math.min(remaining, length);
+          buffer.put(source, offset, count);
+          size += count;
+          length -= count;
+          offset += count;
+        }
+        if (length > 0) {
+          requireFile();
+          this.out.write(source, offset, length);
+          size += length;
+        }
+      }
     }
   }
 
@@ -79,15 +151,15 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
     if (this.closed) {
       throw new IOException("Closed");
     } else {
-      ensureCapacity(1);
-      this.out.write(b);
-    }
-  }
+      int remaining = buffer.remaining();
+      if (remaining > 0) {
+        buffer.put((byte)b);
+      } else {
+        requireFile();
+        this.out.write(b);
 
-  public synchronized void writeTo(final OutputStream out) throws IOException {
-    this.buffer.writeTo(out);
-    if (this.file != null) {
-      Files.copy(this.file, out);
+      }
+      size += 1;
     }
   }
 
