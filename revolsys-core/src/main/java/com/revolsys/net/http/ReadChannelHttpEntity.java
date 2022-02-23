@@ -16,7 +16,7 @@ public class ReadChannelHttpEntity extends AbstractHttpEntity {
     void writeTo(OutputStream out) throws IOException;
   }
 
-  private long length = -1;
+  private final long length;
 
   private final ReadableByteChannel channel;
 

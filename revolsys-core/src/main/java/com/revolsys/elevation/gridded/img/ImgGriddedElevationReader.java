@@ -394,7 +394,6 @@ public class ImgGriddedElevationReader extends BaseObjectWithProperties
       while (readDictionary()) {
       }
       this.root = new ImgEntry(this, rootPosition);
-      // System.out.println(Json.toString(this.root.toMap(), true));
       parseBandInfo();
       getGeoTransform();
     } else {

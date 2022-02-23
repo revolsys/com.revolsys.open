@@ -139,10 +139,6 @@ public class LasZipItemCodecPoint10V1 implements LasZipItemCodec {
     final int kBitsY = (kBitsX + this.ic_dy.getK()) / 2;
     this.lastZ = this.ic_z.decompress(this.lastZ, kBitsY < 19 ? kBitsY : 19);
 
-    // System.out.println(this.i++ + "\t" + this.lastX + "\t" + this.lastY +
-    // "\t" + x_diff + "\t"
-    // + y_diff + "\t" + median_x + "\t" + median_y);
-
     // decompress which other values have changed
     final int changed_values = this.decoder.decodeSymbol(this.m_changed_values);
 
