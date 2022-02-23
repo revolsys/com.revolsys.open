@@ -17,7 +17,6 @@ import com.revolsys.record.io.format.xml.XmlNameProxy;
 import com.revolsys.record.io.format.xml.XmlNamespace;
 import com.revolsys.record.io.format.xml.XmlSimpleType;
 import com.revolsys.record.io.format.xml.XmlSimpleTypeDataType;
-import com.revolsys.util.Debug;
 
 public class StaxElementHandler<V> implements XmlNameProxy {
 
@@ -244,7 +243,8 @@ public class StaxElementHandler<V> implements XmlNameProxy {
           callback.handleAttributeValue(in, i, handler, value);
         }
       } else {
-        final String key = getLocalPart() + "." + attributeName.getLocalPart();
+        // final String key = getLocalPart() + "." +
+        // attributeName.getLocalPart();
         // if (this.unhandled.add(key)) {
         // Debug.println(key);
         // }
@@ -276,7 +276,7 @@ public class StaxElementHandler<V> implements XmlNameProxy {
       if (handler != null) {
         handler.handleElement(in, callback);
       } else {
-        final String key = getLocalPart() + "." + elementName.getLocalPart();
+        // final String key = getLocalPart() + "." + elementName.getLocalPart();
         // if (this.unhandled.add(key)) {
         // Debug.println(key);
         // }
