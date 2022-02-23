@@ -52,10 +52,17 @@ public class JsonWebToken {
     final int secondDot = token.indexOf('.', firstDot + 1);
     final String headerBase64 = token.substring(0, firstDot);
     final Decoder decoder = Base64.getUrlDecoder();
-    this.headerBytes = decoder.decode(headerBase64);
-    this.headerText = new String(this.headerBytes, StandardCharsets.UTF_8);
-    this.header = JsonParser.read(this.headerText);
-
+    if ("0".equals(headerBase64)) {
+      this.headerBytes = new byte[] {
+        0
+      };
+      this.headerText = "0";
+      this.header = JsonObject.EMPTY;
+    } else {
+      this.headerBytes = decoder.decode(headerBase64);
+      this.headerText = new String(this.headerBytes, StandardCharsets.UTF_8);
+      this.header = JsonParser.read(this.headerText);
+    }
     final String payloadBase64 = token.substring(firstDot + 1, secondDot);
     this.payloadBytes = decoder.decode(payloadBase64);
     this.payloadText = new String(this.payloadBytes, StandardCharsets.UTF_8);
@@ -70,7 +77,7 @@ public class JsonWebToken {
   }
 
   public String getAudience() {
-    return this.payload.getString("aud");
+    return getString("aud");
   }
 
   public Instant getExpiry() {
@@ -82,7 +89,7 @@ public class JsonWebToken {
   }
 
   public String getId() {
-    return this.payload.getString("jti");
+    return getString("jti");
   }
 
   public Instant getIssuedAt() {
@@ -90,7 +97,7 @@ public class JsonWebToken {
   }
 
   private String getIssuer() {
-    return this.payload.getString("iss");
+    return getString("iss");
   }
 
   public Instant getNotBefore() {
@@ -105,8 +112,12 @@ public class JsonWebToken {
     return this.signatureBytes;
   }
 
+  public String getString(final String name) {
+    return getString(name);
+  }
+
   public String getSubject() {
-    return this.payload.getString("sub");
+    return getString("sub");
   }
 
   public Instant getTime(final String name) {
