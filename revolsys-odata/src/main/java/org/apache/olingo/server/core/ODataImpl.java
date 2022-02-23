@@ -24,12 +24,9 @@ import java.util.List;
 import org.apache.olingo.commons.api.IConstants;
 import org.apache.olingo.commons.api.constants.Constantsv00;
 import org.apache.olingo.commons.api.constants.Constantsv01;
-import org.apache.olingo.commons.api.edm.EdmPrimitiveType;
-import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.provider.CsdlEdmProvider;
 import org.apache.olingo.commons.api.edmx.EdmxReference;
 import org.apache.olingo.commons.api.format.ContentType;
-import org.apache.olingo.commons.core.edm.primitivetype.EdmPrimitiveTypeFactory;
 import org.apache.olingo.server.api.OData;
 import org.apache.olingo.server.api.ODataHandler;
 import org.apache.olingo.server.api.ODataHttpHandler;
@@ -201,11 +198,6 @@ public class ODataImpl extends OData {
   @Override
   public Preferences createPreferences(final Collection<String> preferHeaders) {
     return new PreferencesImpl(preferHeaders);
-  }
-
-  @Override
-  public EdmPrimitiveType createPrimitiveTypeInstance(final EdmPrimitiveTypeKind kind) {
-    return EdmPrimitiveTypeFactory.getInstance(kind);
   }
 
   @Override

@@ -18,9 +18,9 @@
  */
 package org.apache.olingo.commons.core.edm.annotation;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.annotation.EdmNe;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlLogicalOrComparisonExpression;
+import org.apache.olingo.commons.core.edm.Edm;
 
 public class EdmNeImpl extends AbstractEdmLogicalOrComparisonExpression implements EdmNe {
 

@@ -22,11 +22,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.annotation.EdmCollection;
 import org.apache.olingo.commons.api.edm.annotation.EdmExpression;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlCollection;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlExpression;
+import org.apache.olingo.commons.core.edm.Edm;
 
 public class EdmCollectionImpl extends AbstractEdmDynamicExpression implements EdmCollection {
 

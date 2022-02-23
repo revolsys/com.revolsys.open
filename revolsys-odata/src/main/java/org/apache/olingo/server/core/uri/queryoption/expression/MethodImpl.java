@@ -134,8 +134,10 @@ public class MethodImpl implements Method {
       case COMPUTE_AGGREGATE:
         kind = null;
     }
+    final EdmPrimitiveTypeKind kind1 = kind;
+    ODataImpl r = new ODataImpl();
 
-    return kind == null ? null : new ODataImpl().createPrimitiveTypeInstance(kind);
+    return kind == null ? null : kind1.getInstance();
   }
 
   @Override

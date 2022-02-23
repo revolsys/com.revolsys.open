@@ -53,8 +53,7 @@ public class RecordStoreConnectionManager
   }
 
   public static <V extends RecordStore> V getRecordStore(final File file) {
-    final Map<String, String> connectionProperties = Collections.singletonMap("url",
-      FileUtil.toUrlString(file));
+    final JsonObject connectionProperties = JsonObject.hash("url", FileUtil.toUrlString(file));
     final JsonObject config = JsonObject.hash("connection", connectionProperties);
     return getRecordStore(config);
   }
@@ -104,8 +103,7 @@ public class RecordStoreConnectionManager
   }
 
   public static <V extends RecordStore> V getRecordStore(final Path path) {
-    final Map<String, String> connectionProperties = Collections.singletonMap("url",
-      Paths.toUrlString(path));
+    final JsonObject connectionProperties = JsonObject.hash("url", Paths.toUrlString(path));
     final JsonObject config = JsonObject.hash("connection", connectionProperties);
     return getRecordStore(config);
   }

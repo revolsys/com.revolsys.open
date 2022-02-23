@@ -18,11 +18,11 @@
  */
 package org.apache.olingo.commons.core.edm.annotation;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.annotation.EdmExpression;
 import org.apache.olingo.commons.api.edm.annotation.EdmLabeledElement;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlLabeledElement;
+import org.apache.olingo.commons.core.edm.Edm;
 
 public class EdmLabeledElementImpl extends AbstractEdmAnnotatableDynamicExpression
   implements EdmLabeledElement {

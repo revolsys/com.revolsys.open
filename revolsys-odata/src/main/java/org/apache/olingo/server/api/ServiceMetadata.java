@@ -20,9 +20,9 @@ package org.apache.olingo.server.api;
 
 import java.util.List;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.constants.ODataServiceVersion;
 import org.apache.olingo.commons.api.edmx.EdmxReference;
+import org.apache.olingo.commons.core.edm.Edm;
 import org.apache.olingo.server.api.etag.ServiceMetadataETagSupport;
 
 /**

@@ -24,7 +24,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmComplexType;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmEnumType;
@@ -163,8 +162,7 @@ public class EdmTypeInfo {
         this.enumType = edm.getEnumType(this.fullQualifiedName);
         if (this.enumType == null) {
           if (includeAnnotations) {
-            this.complexType = ((AbstractEdm)edm)
-              .getComplexTypeWithAnnotations(this.fullQualifiedName, true);
+            this.complexType = edm.getComplexTypeWithAnnotations(this.fullQualifiedName, true);
           } else {
             this.complexType = edm.getComplexType(this.fullQualifiedName);
           }

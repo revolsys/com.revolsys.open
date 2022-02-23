@@ -72,6 +72,8 @@ public class ODataParser {
 
     public static final String CAST = "cast";
 
+    public static final String CONTAINS = "contains";
+
     public static final String ISOF = "isof";
 
     public static final String ENDSWITH = "endswith";
@@ -142,7 +144,29 @@ public class ODataParser {
 
     @Override
     public String toString() {
-      return "[" + this.value + "] " + this.type;
+      switch (this.type) {
+        case UNKNOWN:
+          return "UNKNOWN";
+        case WHITESPACE:
+          return "<" + this.value + ">";
+        case QUOTED_STRING:
+          return this.value;
+        case WORD:
+          return "{" + this.value + "}";
+        case NUMBER:
+          return this.value;
+        case OPENPAREN:
+          return "(";
+        case CLOSEPAREN:
+          return ")";
+        case EXPRESSION:
+          return this.value;
+        case SYMBOL:
+          return this.value;
+
+        default:
+          return "????";
+      }
     }
   }
 
@@ -154,7 +178,7 @@ public class ODataParser {
     Methods.STARTSWITH, Methods.SUBSTRINGOF, Methods.INDEXOF, Methods.REPLACE, Methods.TOLOWER,
     Methods.TOUPPER, Methods.TRIM, Methods.SUBSTRING, Methods.CONCAT, Methods.LENGTH, Methods.YEAR,
     Methods.MONTH, Methods.DAY, Methods.HOUR, Methods.MINUTE, Methods.SECOND, Methods.ROUND,
-    Methods.FLOOR, Methods.CEILING, Methods.GEO_INTERSECTS);
+    Methods.FLOOR, Methods.CEILING, Methods.GEO_INTERSECTS, Methods.CONTAINS);
 
   private static final Map<String, Function<List<QueryValue>, QueryValue>> METHOD_FACTORIES = Maps
     .<String, Function<List<QueryValue>, QueryValue>> buildHash()//
@@ -167,6 +191,28 @@ public class ODataParser {
         values.set(1, newValue);
       }
       return F.envelopeIntersects(values);
+    })
+    .add(Methods.CONTAINS, (args) -> {
+
+      QueryValue left = args.get(0);
+      QueryValue right = args.get(1);
+      if (left instanceof Upper && right instanceof Upper) {
+        left = left.getQueryValues().get(0);
+        right = right.getQueryValues().get(0);
+        if (right instanceof Value) {
+          final Value value = (Value)right;
+          return Q.iLike(left, "%" + value.getValue() + "%");
+        } else {
+          return Q.iLike(left, right);
+        }
+      } else {
+        if (right instanceof Value) {
+          final Value value = (Value)right;
+          return Q.like(left, value.getValue().toString());
+        } else {
+          return Q.like(left, right);
+        }
+      }
     })
     .getMap();
 

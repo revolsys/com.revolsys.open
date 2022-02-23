@@ -18,13 +18,13 @@
  */
 package org.apache.olingo.commons.core.edm.annotation;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.commons.api.edm.annotation.EdmCast;
 import org.apache.olingo.commons.api.edm.annotation.EdmExpression;
 import org.apache.olingo.commons.api.edm.geo.SRID;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlCast;
+import org.apache.olingo.commons.core.edm.Edm;
 import org.apache.olingo.commons.core.edm.EdmTypeInfo;
 
 public class EdmCastImpl extends AbstractEdmAnnotatableDynamicExpression implements EdmCast {

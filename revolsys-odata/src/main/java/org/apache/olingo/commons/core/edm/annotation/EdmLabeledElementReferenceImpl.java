@@ -18,9 +18,9 @@
  */
 package org.apache.olingo.commons.core.edm.annotation;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.annotation.EdmLabeledElementReference;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlLabeledElementReference;
+import org.apache.olingo.commons.core.edm.Edm;
 
 public class EdmLabeledElementReferenceImpl extends AbstractEdmDynamicExpression
   implements EdmLabeledElementReference {

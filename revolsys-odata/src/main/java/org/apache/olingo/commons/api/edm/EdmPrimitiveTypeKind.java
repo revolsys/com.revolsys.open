@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.olingo.commons.core.edm.primitivetype.EdmPrimitiveTypeFactory;
+
 /**
  * Enumeration of all primitive type kinds.
  */
@@ -30,7 +32,6 @@ public enum EdmPrimitiveTypeKind {
   Binary, Boolean, Byte, SByte, Date, DateTimeOffset, TimeOfDay, Duration, Decimal, Single, Double, Guid, Int16, Int32, Int64, String, Stream, Geography, GeographyPoint, GeographyLineString, GeographyPolygon, GeographyMultiPoint, GeographyMultiLineString, GeographyMultiPolygon, GeographyCollection, Geometry, GeometryPoint, GeometryLineString, GeometryPolygon, GeometryMultiPoint, GeometryMultiLineString, GeometryMultiPolygon, GeometryCollection;
 
   private static Map<String, EdmPrimitiveTypeKind> VALUES_BY_NAME;
-
   static {
     final Map<String, EdmPrimitiveTypeKind> valuesByName = new HashMap<>();
     for (final EdmPrimitiveTypeKind value : values()) {
@@ -82,6 +83,10 @@ public enum EdmPrimitiveTypeKind {
    */
   public FullQualifiedName getFullQualifiedName() {
     return new FullQualifiedName(EdmPrimitiveType.EDM_NAMESPACE, toString());
+  }
+
+  public EdmPrimitiveType getInstance() {
+    return EdmPrimitiveTypeFactory.getInstance(this);
   }
 
   /**

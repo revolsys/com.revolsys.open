@@ -1,7 +1,7 @@
 package com.revolsys.record.io;
 
-import java.util.Map;
+import com.revolsys.record.io.format.json.JsonObject;
 
 public interface RecordStoreConnectionMapProxy {
-  Map<String, Object> getRecordStoreConnectionMap();
+  JsonObject getRecordStoreConnectionMap();
 }

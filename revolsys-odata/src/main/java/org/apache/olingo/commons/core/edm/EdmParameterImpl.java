@@ -18,7 +18,6 @@
  */
 package org.apache.olingo.commons.core.edm;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.EdmMapping;
 import org.apache.olingo.commons.api.edm.EdmParameter;

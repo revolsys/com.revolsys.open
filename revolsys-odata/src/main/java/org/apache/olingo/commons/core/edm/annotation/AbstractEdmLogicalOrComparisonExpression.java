@@ -18,13 +18,13 @@
  */
 package org.apache.olingo.commons.core.edm.annotation;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.annotation.EdmExpression;
 import org.apache.olingo.commons.api.edm.annotation.EdmLogicalOrComparisonExpression;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlLogicalOrComparisonExpression;
 //CHECKSTYLE:OFF
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlLogicalOrComparisonExpression.LogicalOrComparisonExpressionType;
+import org.apache.olingo.commons.core.edm.Edm;
 
 //CHECKSTYLE:ON
 

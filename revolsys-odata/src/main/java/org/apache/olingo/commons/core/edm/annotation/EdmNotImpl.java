@@ -18,9 +18,9 @@
  */
 package org.apache.olingo.commons.core.edm.annotation;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.annotation.EdmNot;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlLogicalOrComparisonExpression;
+import org.apache.olingo.commons.core.edm.Edm;
 
 public class EdmNotImpl extends AbstractEdmLogicalOrComparisonExpression implements EdmNot {
 

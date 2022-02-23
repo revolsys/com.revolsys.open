@@ -18,11 +18,11 @@
  */
 package org.apache.olingo.commons.core.edm.annotation;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.annotation.EdmExpression;
 import org.apache.olingo.commons.api.edm.annotation.EdmUrlRef;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlUrlRef;
+import org.apache.olingo.commons.core.edm.Edm;
 
 public class EdmUrlRefImpl extends AbstractEdmAnnotatableDynamicExpression implements EdmUrlRef {
 
