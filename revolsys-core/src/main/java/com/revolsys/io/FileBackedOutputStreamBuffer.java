@@ -52,17 +52,17 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
     }
   }
 
-  private final ByteBuffer buffer;
+  final ByteBuffer buffer;
 
   private OutputStream out;
 
   private boolean closed;
 
-  private final int bufferSize;
+  final int bufferSize;
 
   private long size = 0;
 
-  private Path file;
+  Path file;
 
   public FileBackedOutputStreamBuffer(final int bufferSize) {
     this.bufferSize = bufferSize;
