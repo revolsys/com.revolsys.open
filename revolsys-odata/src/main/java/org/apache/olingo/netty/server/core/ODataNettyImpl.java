@@ -21,8 +21,6 @@ package org.apache.olingo.netty.server.core;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.olingo.commons.api.edm.EdmPrimitiveType;
-import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.provider.CsdlEdmProvider;
 import org.apache.olingo.commons.api.edmx.EdmxReference;
 import org.apache.olingo.commons.api.ex.ODataRuntimeException;
@@ -137,11 +135,6 @@ public class ODataNettyImpl extends ODataNetty {
   @Override
   public Preferences createPreferences(final Collection<String> preferHeaders) {
     return odata.createPreferences(preferHeaders);
-  }
-
-  @Override
-  public EdmPrimitiveType createPrimitiveTypeInstance(final EdmPrimitiveTypeKind kind) {
-    return odata.createPrimitiveTypeInstance(kind);
   }
 
   @Override

@@ -18,7 +18,6 @@
  */
 package org.apache.olingo.commons.core.edm.annotation;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.annotation.EdmAnd;
 import org.apache.olingo.commons.api.edm.annotation.EdmAnnotationPath;
 import org.apache.olingo.commons.api.edm.annotation.EdmApply;
@@ -44,6 +43,7 @@ import org.apache.olingo.commons.api.edm.annotation.EdmPropertyPath;
 import org.apache.olingo.commons.api.edm.annotation.EdmPropertyValue;
 import org.apache.olingo.commons.api.edm.annotation.EdmRecord;
 import org.apache.olingo.commons.api.edm.annotation.EdmUrlRef;
+import org.apache.olingo.commons.core.edm.Edm;
 
 public abstract class AbstractEdmDynamicExpression extends AbstractEdmExpression
   implements EdmDynamicExpression {

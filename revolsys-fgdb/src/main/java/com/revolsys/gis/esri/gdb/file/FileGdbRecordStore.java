@@ -1,7 +1,6 @@
 package com.revolsys.gis.esri.gdb.file;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +47,7 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.EsriGdbXmlSerializer;
 import com.revolsys.record.io.format.esri.gdb.xml.model.EsriXmlRecordDefinitionUtil;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Field;
 import com.revolsys.record.io.format.esri.gdb.xml.model.SpatialReference;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.BinaryCondition;
 import com.revolsys.record.query.CollectionValue;
 import com.revolsys.record.query.ColumnReference;
@@ -125,7 +125,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
 
   FileGdbRecordStore(final File file) {
     this.fileName = FileUtil.getCanonicalPath(file);
-    setConnectionProperties(Collections.singletonMap("url", FileUtil.toUrl(file).toString()));
+    setConnectionProperties(JsonObject.hash("url", FileUtil.toUrl(file).toString()));
     setCreateMissingRecordStore(true);
     setCreateMissingTables(true);
     addSqlQueryAppender(EnvelopeIntersects.class, this::appendFakeTrue);

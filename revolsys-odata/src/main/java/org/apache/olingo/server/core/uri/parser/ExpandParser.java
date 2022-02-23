@@ -21,13 +21,13 @@ package org.apache.olingo.server.core.uri.parser;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.EdmProperty;
 import org.apache.olingo.commons.api.edm.EdmStructuredType;
 import org.apache.olingo.commons.api.edm.constants.EdmTypeKind;
 import org.apache.olingo.commons.api.ex.ODataRuntimeException;
+import org.apache.olingo.commons.core.edm.Edm;
 import org.apache.olingo.commons.core.edm.primitivetype.EdmPrimitiveTypeFactory;
 import org.apache.olingo.server.api.OData;
 import org.apache.olingo.server.api.uri.UriInfoKind;
@@ -277,7 +277,7 @@ public class ExpandParser {
 
         } else if (tokenizer.next(TokenKind.FILTER)) {
           ParserHelper.requireNext(tokenizer, TokenKind.EQ);
-          systemQueryOption = new FilterParser(this.edm, this.odata).parse(tokenizer,
+          systemQueryOption = new FilterParser(this.edm).parse(tokenizer,
             referencedType, null, this.aliases);
 
         } else if (!forRef && !forCount && tokenizer.next(TokenKind.LEVELS)) {
@@ -286,7 +286,7 @@ public class ExpandParser {
 
         } else if (!forCount && tokenizer.next(TokenKind.ORDERBY)) {
           ParserHelper.requireNext(tokenizer, TokenKind.EQ);
-          systemQueryOption = new OrderByParser(this.edm, this.odata).parse(tokenizer,
+          systemQueryOption = new OrderByParser(this.edm).parse(tokenizer,
             referencedType, null, this.aliases);
 
         } else if (tokenizer.next(TokenKind.SEARCH)) {
@@ -321,7 +321,7 @@ public class ExpandParser {
 
         } else if (!forRef && !forCount && tokenizer.next(TokenKind.APPLY)) {
           ParserHelper.requireNext(tokenizer, TokenKind.EQ);
-          systemQueryOption = new ApplyParser(this.edm, this.odata).parse(tokenizer,
+          systemQueryOption = new ApplyParser(this.edm).parse(tokenizer,
             // Data aggregation may change the structure of the result, so we
             // create a new dynamic type.
             new DynamicStructuredType(referencedType), null, this.aliases);

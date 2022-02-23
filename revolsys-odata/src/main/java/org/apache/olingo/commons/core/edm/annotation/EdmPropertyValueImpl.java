@@ -18,12 +18,12 @@
  */
 package org.apache.olingo.commons.core.edm.annotation;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.annotation.EdmExpression;
 import org.apache.olingo.commons.api.edm.annotation.EdmPropertyValue;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlPropertyValue;
 import org.apache.olingo.commons.core.edm.AbstractEdmAnnotatable;
+import org.apache.olingo.commons.core.edm.Edm;
 
 public class EdmPropertyValueImpl extends AbstractEdmAnnotatable implements EdmPropertyValue {
 

@@ -28,7 +28,6 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmComplexType;
 import org.apache.olingo.commons.api.edm.EdmElement;
 import org.apache.olingo.commons.api.edm.EdmEntitySet;
@@ -47,7 +46,7 @@ import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.commons.api.edm.EdmTypeDefinition;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.edm.constants.EdmTypeKind;
-import org.apache.olingo.server.api.OData;
+import org.apache.olingo.commons.core.edm.Edm;
 import org.apache.olingo.server.api.uri.UriParameter;
 import org.apache.olingo.server.api.uri.UriResourceFunction;
 import org.apache.olingo.server.api.uri.UriResourceLambdaVariable;
@@ -194,8 +193,6 @@ public class ExpressionParser {
 
   private final Edm edm;
 
-  private final OData odata;
-
   private UriTokenizer tokenizer;
 
   private final Deque<UriResourceLambdaVariable> lambdaVariables = new ArrayDeque<>();
@@ -206,9 +203,8 @@ public class ExpressionParser {
 
   private Map<String, AliasQueryOption> aliases;
 
-  public ExpressionParser(final Edm edm, final OData odata) {
+  public ExpressionParser(final Edm edm) {
     this.edm = edm;
-    this.odata = odata;
   }
 
   private void checkEqualityTypes(final Expression left, final Expression right)
@@ -390,18 +386,18 @@ public class ExpressionParser {
         EdmPrimitiveTypeKind.Double)
         || isType(rightType, EdmPrimitiveTypeKind.Decimal, EdmPrimitiveTypeKind.Single,
           EdmPrimitiveTypeKind.Double)) {
-        return this.odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Double);
+        return EdmPrimitiveTypeKind.Double.getInstance();
       } else if (isType(leftType, EdmPrimitiveTypeKind.Int64)
         || isType(rightType, EdmPrimitiveTypeKind.Int64)) {
-        return this.odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Decimal);
+        return EdmPrimitiveTypeKind.Decimal.getInstance();
       } else if (isType(leftType, EdmPrimitiveTypeKind.Int32)
         || isType(rightType, EdmPrimitiveTypeKind.Int32)) {
-        return this.odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Int64);
+        return EdmPrimitiveTypeKind.Int64.getInstance();
       } else if (isType(leftType, EdmPrimitiveTypeKind.Int16)
         || isType(rightType, EdmPrimitiveTypeKind.Int16)) {
-        return this.odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Int32);
+        return EdmPrimitiveTypeKind.Int32.getInstance();
       } else {
-        return this.odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Int16);
+        return EdmPrimitiveTypeKind.Int16.getInstance();
       }
     }
     if ((isType(leftType, EdmPrimitiveTypeKind.DateTimeOffset)
@@ -414,7 +410,7 @@ public class ExpressionParser {
       && isType(rightType, EdmPrimitiveTypeKind.DateTimeOffset)
       || isType(leftType, EdmPrimitiveTypeKind.Date)
         && isType(rightType, EdmPrimitiveTypeKind.Date))) {
-      return this.odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Duration);
+      return EdmPrimitiveTypeKind.Duration.getInstance();
     }
     throw new UriParserSemanticException("Incompatible types.",
       UriParserSemanticException.MessageKeys.TYPES_NOT_COMPATIBLE,
@@ -437,8 +433,7 @@ public class ExpressionParser {
     if (EdmPrimitiveType.EDM_NAMESPACE.equals(fullQualifiedName.getNamespace())) {
       final EdmPrimitiveTypeKind primitiveTypeKind = EdmPrimitiveTypeKind
         .valueOf(fullQualifiedName.getName());
-      return primitiveTypeKind == null ? null
-        : this.odata.createPrimitiveTypeInstance(primitiveTypeKind);
+      return primitiveTypeKind == null ? null : primitiveTypeKind.getInstance();
     } else {
       return null;
     }
@@ -457,7 +452,7 @@ public class ExpressionParser {
       return true;
     }
     for (final EdmPrimitiveTypeKind kind : kinds) {
-      if (type.equals(this.odata.createPrimitiveTypeInstance(kind))) {
+      if (type.equals(kind.getInstance())) {
         return true;
       }
     }
@@ -487,7 +482,7 @@ public class ExpressionParser {
       checkType(right, EdmPrimitiveTypeKind.Boolean);
       checkNoCollection(right);
       left = new BinaryImpl(left, BinaryOperatorKind.AND, right,
-        this.odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Boolean));
+        EdmPrimitiveTypeKind.Boolean.getInstance());
     }
     return left;
   }
@@ -669,7 +664,7 @@ public class ExpressionParser {
       final Expression right = parseExprEquality();
       checkEqualityTypes(left, right);
       left = new BinaryImpl(left, tokenToBinaryOperator.get(operatorTokenKind), right,
-        this.odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Boolean));
+        EdmPrimitiveTypeKind.Boolean.getInstance());
       operatorTokenKind = ParserHelper.next(this.tokenizer, TokenKind.EqualsOperator,
         TokenKind.NotEqualsOperator);
     }
@@ -685,7 +680,7 @@ public class ExpressionParser {
       checkType(right, EdmPrimitiveTypeKind.Boolean);
       checkNoCollection(right);
       left = new BinaryImpl(left, BinaryOperatorKind.OR, right,
-        this.odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Boolean));
+        EdmPrimitiveTypeKind.Boolean.getInstance());
     }
     return left;
   }
@@ -700,7 +695,7 @@ public class ExpressionParser {
       final Expression right = parseExprUnary();
       checkNumericType(right);
       left = new BinaryImpl(left, tokenToBinaryOperator.get(operatorTokenKind), right,
-        this.odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Double));
+        EdmPrimitiveTypeKind.Double.getInstance());
       operatorTokenKind = ParserHelper.next(this.tokenizer, TokenKind.MulOperator,
         TokenKind.DivOperator, TokenKind.ModOperator);
     }
@@ -713,7 +708,7 @@ public class ExpressionParser {
       ParserHelper.requireNext(this.tokenizer, TokenKind.EnumValue);
       final Expression right = createEnumExpression(this.tokenizer.getText());
       return new BinaryImpl(left, BinaryOperatorKind.HAS, right,
-        this.odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Boolean));
+        EdmPrimitiveTypeKind.Boolean.getInstance());
     } else if (this.tokenizer.next(TokenKind.InOperator)) {
       final EdmType leftExprType = getType(left);
       final EdmPrimitiveTypeKind kinds = EdmPrimitiveTypeKind
@@ -723,13 +718,13 @@ public class ExpressionParser {
         final List<Expression> expressionList = parseInExpr();
         checkInExpressionTypes(expressionList, leftExprType);
         return new BinaryImpl(left, BinaryOperatorKind.IN, expressionList,
-          this.odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Boolean));
+          EdmPrimitiveTypeKind.Boolean.getInstance());
       } else {
         ParserHelper.bws(this.tokenizer);
         final Expression right = parseExpression();
         checkType(right, kinds);
         return new BinaryImpl(left, BinaryOperatorKind.IN, right,
-          this.odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Boolean));
+          EdmPrimitiveTypeKind.Boolean.getInstance());
       }
     }
     return left;
@@ -749,7 +744,7 @@ public class ExpressionParser {
         final Expression right = parseExprAdd();
         checkRelationTypes(left, right);
         left = new BinaryImpl(left, tokenToBinaryOperator.get(operatorTokenKind), right,
-          this.odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Boolean));
+          EdmPrimitiveTypeKind.Boolean.getInstance());
         operatorTokenKind = ParserHelper.next(this.tokenizer, TokenKind.GreaterThanOperator,
           TokenKind.GreaterThanOrEqualsOperator, TokenKind.LessThanOperator,
           TokenKind.LessThanOrEqualsOperator);
@@ -1323,7 +1318,7 @@ public class ExpressionParser {
       break;
 
       case COMPUTE_AGGREGATE:
-        final ApplyParser ap = new ApplyParser(this.edm, this.odata);
+        final ApplyParser ap = new ApplyParser(this.edm);
         final AggregateExpression aggrExpr = ap.parseAggregateMethodCallExpr(this.tokenizer,
           (EdmStructuredType)this.referringType);
         parameters.add(aggrExpr);
@@ -1344,10 +1339,11 @@ public class ExpressionParser {
       if (primitiveTypeKind == EdmPrimitiveTypeKind.Int64) {
         primitiveTypeKind = determineIntegerType(primitiveValueLiteral);
       }
+      final EdmPrimitiveTypeKind kind = primitiveTypeKind;
 
       final EdmPrimitiveType type = primitiveTypeKind == null ?
       // Null handling
-        null : this.odata.createPrimitiveTypeInstance(primitiveTypeKind);
+        null : kind.getInstance();
       return new LiteralImpl(primitiveValueLiteral, type);
     }
   }

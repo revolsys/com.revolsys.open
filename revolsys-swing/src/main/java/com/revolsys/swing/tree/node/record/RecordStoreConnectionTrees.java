@@ -1,6 +1,5 @@
 package com.revolsys.swing.tree.node.record;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -11,6 +10,7 @@ import com.revolsys.io.map.MapObjectFactory;
 import com.revolsys.record.io.RecordStoreConnection;
 import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.RecordDefinitionImpl;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
@@ -70,12 +70,12 @@ public class RecordStoreConnectionTrees extends ConnectionManagerTrees {
     final PathName typePath = recordDefinition.getPathName();
     final RecordStore recordStore = recordDefinition.getRecordStore();
     final Map<String, Object> connection = recordStore.getConnectionProperties();
-    final Map<String, Object> layerConfig = new LinkedHashMap<>();
+    final JsonObject layerConfig = JsonObject.hash();
     MapObjectFactory.setType(layerConfig, "recordStoreLayer");
-    layerConfig.put("name", recordDefinition.getName());
-    layerConfig.put("connection", connection);
-    layerConfig.put("typePath", typePath);
-    layerConfig.put("showTableView", Layer.isShowNewLayerTableView());
+    layerConfig.addValue("name", recordDefinition.getName())
+      .addValue("connection", connection)
+      .addValue("typePath", typePath)
+      .addValue("showTableView", Layer.isShowNewLayerTableView());
 
     final LinkedList<String> path = new LinkedList<>();
     {

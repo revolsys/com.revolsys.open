@@ -169,13 +169,6 @@ public abstract class OData {
   public abstract Preferences createPreferences(Collection<String> preferHeaders);
 
   /**
-   * Creates a primitive-type instance.
-   * @param kind the kind of the primitive type
-   * @return an {@link EdmPrimitiveType} instance for the type kind
-   */
-  public abstract EdmPrimitiveType createPrimitiveTypeInstance(EdmPrimitiveTypeKind kind);
-
-  /**
    * Creates a new ODataHandler for handling OData requests.
    *
    * @param serviceMetadata - metadata object required to handle an OData request

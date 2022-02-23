@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmBindingTarget;
 import org.apache.olingo.commons.api.edm.EdmEntityContainer;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
@@ -66,8 +65,8 @@ public abstract class AbstractEdmBindingTarget extends AbstractEdmNamed
 
   @Override
   public EdmEntityType getEntityTypeWithAnnotations() {
-    final EdmEntityType entityType = ((AbstractEdm)this.edm)
-      .getEntityTypeWithAnnotations(this.target.getTypeFQN(), true);
+    final EdmEntityType entityType = this.edm.getEntityTypeWithAnnotations(this.target.getTypeFQN(),
+      true);
     if (entityType == null) {
       throw new EdmException("Can´t find entity type: " + this.target.getTypeFQN()
         + " for entity set or singleton: " + getName());

@@ -50,7 +50,7 @@ public class EdmSchemaImpl extends AbstractEdmAnnotatable implements EdmSchema {
 
   private final CsdlSchema schema;
 
-  private final EdmProviderImpl edm;
+  private final Edm edm;
 
   private final CsdlEdmProvider provider;
 
@@ -78,8 +78,7 @@ public class EdmSchemaImpl extends AbstractEdmAnnotatable implements EdmSchema {
 
   private final EdmEntityContainer entityContainer;
 
-  public EdmSchemaImpl(final EdmProviderImpl edm, final CsdlEdmProvider provider,
-    final CsdlSchema schema) {
+  public EdmSchemaImpl(final Edm edm, final CsdlEdmProvider provider, final CsdlSchema schema) {
     super(edm, schema);
     this.edm = edm;
     this.provider = provider;

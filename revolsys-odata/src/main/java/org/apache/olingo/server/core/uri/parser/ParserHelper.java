@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmFunction;
 import org.apache.olingo.commons.api.edm.EdmKeyPropertyRef;
@@ -43,6 +42,7 @@ import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.commons.api.edm.EdmTypeDefinition;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.edm.constants.EdmTypeKind;
+import org.apache.olingo.commons.core.edm.Edm;
 import org.apache.olingo.server.api.OData;
 import org.apache.olingo.server.api.uri.UriParameter;
 import org.apache.olingo.server.api.uri.UriResourcePartTyped;
@@ -265,25 +265,25 @@ public class ParserHelper {
 
       // Special handling for frequently-used types and types with more than one
       // token kind.
-    } else if (odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Boolean).equals(type)) {
+    } else if (EdmPrimitiveTypeKind.Boolean.getInstance().equals(type)) {
       return tokenizer.next(TokenKind.BooleanValue);
-    } else if (odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.String).equals(type)) {
+    } else if (EdmPrimitiveTypeKind.String.getInstance().equals(type)) {
       return tokenizer.next(TokenKind.StringValue);
-    } else if (odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.SByte).equals(type)
-      || odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Byte).equals(type)
-      || odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Int16).equals(type)
-      || odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Int32).equals(type)
-      || odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Int64).equals(type)) {
+    } else if (EdmPrimitiveTypeKind.SByte.getInstance().equals(type)
+      || EdmPrimitiveTypeKind.Byte.getInstance().equals(type)
+      || EdmPrimitiveTypeKind.Int16.getInstance().equals(type)
+      || EdmPrimitiveTypeKind.Int32.getInstance().equals(type)
+      || EdmPrimitiveTypeKind.Int64.getInstance().equals(type)) {
       return tokenizer.next(TokenKind.IntegerValue);
-    } else if (odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Guid).equals(type)) {
+    } else if (EdmPrimitiveTypeKind.Guid.getInstance().equals(type)) {
       return tokenizer.next(TokenKind.GuidValue);
-    } else if (odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Decimal).equals(type)) {
+    } else if (EdmPrimitiveTypeKind.Decimal.getInstance().equals(type)) {
       // The order is important.
       // A decimal value should not be parsed as integer and let the tokenizer
       // stop at the decimal point.
       return tokenizer.next(TokenKind.DecimalValue) || tokenizer.next(TokenKind.IntegerValue);
-    } else if (odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Double).equals(type)
-      || odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Single).equals(type)) {
+    } else if (EdmPrimitiveTypeKind.Double.getInstance().equals(type)
+      || EdmPrimitiveTypeKind.Single.getInstance().equals(type)) {
       // The order is important.
       // A floating-point value should not be parsed as decimal and let the
       // tokenizer stop at 'E'.
@@ -300,7 +300,7 @@ public class ParserHelper {
         if ((kind == EdmPrimitiveTypeKind.Date || kind == EdmPrimitiveTypeKind.DateTimeOffset
           || kind == EdmPrimitiveTypeKind.TimeOfDay || kind == EdmPrimitiveTypeKind.Duration
           || kind == EdmPrimitiveTypeKind.Binary || kind.isGeospatial())
-          && odata.createPrimitiveTypeInstance(kind).equals(type)) {
+          && kind.getInstance().equals(type)) {
           return tokenizer.next(entry.getKey());
         }
       }
@@ -350,7 +350,7 @@ public class ParserHelper {
         // Don't pass on the current alias to avoid circular references.
         final Map<String, AliasQueryOption> aliasesInner = new HashMap<>(aliases);
         aliasesInner.remove(name);
-        final Expression expression = new ExpressionParser(edm, odata).parse(aliasTokenizer,
+        final Expression expression = new ExpressionParser(edm).parse(aliasTokenizer,
           referringType, null, aliasesInner);
         final EdmType expressionType = ExpressionParser.getType(expression);
         if (aliasTokenizer.next(TokenKind.EOF)
@@ -404,7 +404,7 @@ public class ParserHelper {
             tokenizer.getText());
         }
       } else if (withComplex) {
-        final Expression expression = new ExpressionParser(edm, odata).parse(tokenizer,
+        final Expression expression = new ExpressionParser(edm).parse(tokenizer,
           referringType, null, aliases);
         parameter
           .setText(

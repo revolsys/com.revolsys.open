@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmAction;
 import org.apache.olingo.commons.api.edm.EdmAnnotations;
 import org.apache.olingo.commons.api.edm.EdmComplexType;
@@ -39,7 +38,7 @@ import org.apache.olingo.commons.api.edm.EdmTypeDefinition;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.edm.provider.CsdlAnnotation;
 
-public abstract class AbstractEdm implements Edm {
+public abstract class AbstractEdm {
 
   protected Map<String, EdmSchema> schemas;
 
@@ -202,7 +201,6 @@ public abstract class AbstractEdm implements Edm {
 
   protected abstract List<EdmFunction> createUnboundFunctions(FullQualifiedName functionName);
 
-  @Override
   public EdmAnnotations getAnnotationGroup(final FullQualifiedName targetName,
     final String qualifier) {
     final FullQualifiedName fqn = resolvePossibleAlias(targetName);
@@ -221,7 +219,6 @@ public abstract class AbstractEdm implements Edm {
     return this.annotationMap;
   }
 
-  @Override
   public EdmAction getBoundAction(final FullQualifiedName actionName,
     final FullQualifiedName bindingParameterTypeName, final Boolean isBindingParameterCollection) {
 
@@ -241,7 +238,6 @@ public abstract class AbstractEdm implements Edm {
     return action;
   }
 
-  @Override
   public EdmAction getBoundActionWithBindingType(final FullQualifiedName bindingParameterTypeName,
     final Boolean isBindingParameterCollection) {
     for (final EdmSchema schema : getSchemas()) {
@@ -259,7 +255,6 @@ public abstract class AbstractEdm implements Edm {
     return null;
   }
 
-  @Override
   public EdmFunction getBoundFunction(final FullQualifiedName functionName,
     final FullQualifiedName bindingParameterTypeName, final Boolean isBindingParameterCollection,
     final List<String> parameterNames) {
@@ -281,7 +276,6 @@ public abstract class AbstractEdm implements Edm {
     return function;
   }
 
-  @Override
   public List<EdmFunction> getBoundFunctionsWithBindingType(
     final FullQualifiedName bindingParameterTypeName, final Boolean isBindingParameterCollection) {
     final List<EdmFunction> functions = new ArrayList<>();
@@ -300,7 +294,6 @@ public abstract class AbstractEdm implements Edm {
     return functions;
   }
 
-  @Override
   public EdmComplexType getComplexType(final FullQualifiedName namespaceOrAliasFQN) {
     final FullQualifiedName fqn = resolvePossibleAlias(namespaceOrAliasFQN);
     EdmComplexType complexType = this.complexTypes.get(fqn);
@@ -313,7 +306,6 @@ public abstract class AbstractEdm implements Edm {
     return complexType;
   }
 
-  @Override
   public EdmComplexType getComplexTypeWithAnnotations(final FullQualifiedName namespaceOrAliasFQN) {
     final FullQualifiedName fqn = resolvePossibleAlias(namespaceOrAliasFQN);
     EdmComplexType complexType = this.complexTypesWithAnnotations.get(fqn);
@@ -345,12 +337,10 @@ public abstract class AbstractEdm implements Edm {
     return complexType;
   }
 
-  @Override
   public EdmEntityContainer getEntityContainer() {
     return getEntityContainer(null);
   }
 
-  @Override
   public EdmEntityContainer getEntityContainer(final FullQualifiedName namespaceOrAliasFQN) {
     final FullQualifiedName fqn = resolvePossibleAlias(namespaceOrAliasFQN);
     EdmEntityContainer container = this.entityContainers.get(fqn);
@@ -367,7 +357,6 @@ public abstract class AbstractEdm implements Edm {
     return container;
   }
 
-  @Override
   public EdmEntityType getEntityType(final FullQualifiedName namespaceOrAliasFQN) {
     final FullQualifiedName fqn = resolvePossibleAlias(namespaceOrAliasFQN);
     EdmEntityType entityType = this.entityTypes.get(fqn);
@@ -380,7 +369,6 @@ public abstract class AbstractEdm implements Edm {
     return entityType;
   }
 
-  @Override
   public EdmEntityType getEntityTypeWithAnnotations(final FullQualifiedName namespaceOrAliasFQN) {
     final FullQualifiedName fqn = resolvePossibleAlias(namespaceOrAliasFQN);
     EdmEntityType entityType = this.entityTypesWithAnnotations.get(fqn);
@@ -412,7 +400,6 @@ public abstract class AbstractEdm implements Edm {
     return entityType;
   }
 
-  @Override
   public EdmEnumType getEnumType(final FullQualifiedName namespaceOrAliasFQN) {
     final FullQualifiedName fqn = resolvePossibleAlias(namespaceOrAliasFQN);
     EdmEnumType enumType = this.enumTypes.get(fqn);
@@ -425,7 +412,6 @@ public abstract class AbstractEdm implements Edm {
     return enumType;
   }
 
-  @Override
   public EdmSchema getSchema(final String namespace) {
     if (this.schemas == null) {
       initSchemas();
@@ -438,7 +424,6 @@ public abstract class AbstractEdm implements Edm {
     return schema;
   }
 
-  @Override
   public List<EdmSchema> getSchemas() {
     if (this.schemaList == null) {
       initSchemas();
@@ -446,7 +431,6 @@ public abstract class AbstractEdm implements Edm {
     return this.schemaList;
   }
 
-  @Override
   public EdmTerm getTerm(final FullQualifiedName termName) {
     final FullQualifiedName fqn = resolvePossibleAlias(termName);
     EdmTerm term = this.terms.get(fqn);
@@ -459,7 +443,6 @@ public abstract class AbstractEdm implements Edm {
     return term;
   }
 
-  @Override
   public EdmTypeDefinition getTypeDefinition(final FullQualifiedName namespaceOrAliasFQN) {
     final FullQualifiedName fqn = resolvePossibleAlias(namespaceOrAliasFQN);
     EdmTypeDefinition typeDefinition = this.typeDefinitions.get(fqn);
@@ -472,7 +455,6 @@ public abstract class AbstractEdm implements Edm {
     return typeDefinition;
   }
 
-  @Override
   public EdmAction getUnboundAction(final FullQualifiedName actionName) {
     final FullQualifiedName fqn = resolvePossibleAlias(actionName);
     EdmAction action = this.unboundActions.get(fqn);
@@ -486,7 +468,6 @@ public abstract class AbstractEdm implements Edm {
     return action;
   }
 
-  @Override
   public EdmFunction getUnboundFunction(final FullQualifiedName functionName,
     final List<String> parameterNames) {
     final FullQualifiedName functionFqn = resolvePossibleAlias(functionName);
@@ -503,7 +484,6 @@ public abstract class AbstractEdm implements Edm {
     return function;
   }
 
-  @Override
   public List<EdmFunction> getUnboundFunctions(final FullQualifiedName functionName) {
     final FullQualifiedName functionFqn = resolvePossibleAlias(functionName);
 

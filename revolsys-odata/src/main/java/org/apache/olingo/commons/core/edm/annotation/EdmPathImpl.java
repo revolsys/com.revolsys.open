@@ -18,9 +18,9 @@
  */
 package org.apache.olingo.commons.core.edm.annotation;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.annotation.EdmPath;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlPath;
+import org.apache.olingo.commons.core.edm.Edm;
 
 public class EdmPathImpl extends AbstractEdmDynamicExpression implements EdmPath {
 

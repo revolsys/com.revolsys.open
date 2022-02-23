@@ -18,13 +18,13 @@
  */
 package org.apache.olingo.commons.core.edm.annotation;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.annotation.EdmConstantExpression;
 import org.apache.olingo.commons.api.edm.annotation.EdmDynamicExpression;
 import org.apache.olingo.commons.api.edm.annotation.EdmExpression;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlDynamicExpression;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlExpression;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlLogicalOrComparisonExpression;
+import org.apache.olingo.commons.core.edm.Edm;
 
 public abstract class AbstractEdmExpression implements EdmExpression {
 
