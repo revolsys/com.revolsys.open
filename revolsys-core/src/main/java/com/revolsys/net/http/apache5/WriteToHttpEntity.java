@@ -46,8 +46,9 @@ public class WriteToHttpEntity extends AbstractHttpEntity {
     return false;
   }
 
-  public void setContentLength(final long contentLength) {
+  public WriteToHttpEntity setContentLength(final long contentLength) {
     this.contentLength = contentLength;
+    return this;
   }
 
   @Override

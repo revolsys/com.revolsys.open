@@ -296,6 +296,13 @@ public interface JsonList extends List<Object>, JsonType {
   @SuppressWarnings({
     "unchecked", "rawtypes"
   })
+  default <V> Iterable<V> iterable() {
+    return (Iterable)this;
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
   default Iterable<JsonObject> jsonObjects() {
     return (Iterable)this;
   }
