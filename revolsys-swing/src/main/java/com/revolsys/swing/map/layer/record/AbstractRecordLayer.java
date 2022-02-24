@@ -5,6 +5,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
@@ -385,8 +386,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
           layer.deleteRecordsWithConfirm(selectedRecords);
         }, true);
 
-      menu.addMenuItem("edit", -1, "Merge Selected Records", "table_row_merge",
-        AbstractRecordLayer::isCanMergeRecords, AbstractRecordLayer::mergeSelectedRecords, false);
+      menu
+        .addMenuItem("edit", -1, "Merge Selected Records", "table_row_merge",
+          AbstractRecordLayer::isCanMergeRecords, AbstractRecordLayer::mergeSelectedRecords, false)
+        .setAcceleratorKey(KeyEvent.VK_M);
 
       menu.addComponentFactory("tools", new RecordShortestPathMenu());
 
@@ -1809,8 +1812,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       final DataType geometryDataType = recordDefinition.getGeometryField().getDataType();
       if (!(geometryDataType == GeometryDataTypes.POINT
         || geometryDataType == GeometryDataTypes.MULTI_POINT)) {
-        editMenu.addMenuItemRecords("geometry", "Generalize Vertices", "generalize_line",
-          editableEnableCheck, RecordLayerActions::generalize);
+        editMenu
+          .addMenuItemRecords("geometry", "Generalize Vertices", "generalize_line",
+            editableEnableCheck, RecordLayerActions::generalize)
+          .setAcceleratorKey(KeyEvent.VK_G);
       }
     }
   }

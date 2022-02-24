@@ -335,10 +335,12 @@ public class ProjectFrame extends BaseFrame {
    */
   public void addActionAltAndMap(final String actionKey, final Runnable action, final int keyCode) {
     final JRootPane component = getRootPane();
+    KeyStroke altKeyStroke = KeyStroke.getKeyStroke(keyCode, KeyEvent.ALT_DOWN_MASK);
     RunnableAction.addAction(component, actionKey, action,
-      KeyStroke.getKeyStroke(keyCode, KeyEvent.ALT_DOWN_MASK));
+      altKeyStroke);
     MapPanel mapPanel = getMapPanel();
-    RunnableAction.addAction(mapPanel, actionKey, action, KeyStroke.getKeyStroke(keyCode, 0));
+    KeyStroke keyStroke = KeyStroke.getKeyStroke(keyCode, 0);
+    RunnableAction.addAction(mapPanel, actionKey, action, keyStroke);
   }
 
   public void addBottomTab(final ProjectFramePanel panel, final MapEx config) {
