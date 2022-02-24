@@ -24,6 +24,7 @@ import java.util.concurrent.Executor;
 import javax.sql.DataSource;
 
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.jdbc.support.SQLStateSQLExceptionTranslator;
@@ -191,7 +192,11 @@ public class JdbcConnection implements Connection {
     } else {
       exceptionTransaltor = new SQLErrorCodeSQLExceptionTranslator(this.dataSource);
     }
-    return exceptionTransaltor.translate(task, sql, e);
+    DataAccessException translatedException = exceptionTransaltor.translate(task, sql, e);
+    if (translatedException == null) {
+      return new UncategorizedSQLException(task, sql, e);
+    }
+    return translatedException;
   }
 
   @Override
