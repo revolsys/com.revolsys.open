@@ -281,7 +281,6 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
     final Resource auxFile = resource.newResourceChangeExtension(extension + ".aux.xml");
     if (auxFile != null && auxFile.exists() && auxFile.getLastModified() > modifiedTime) {
       loadWorldFileX();
-      final double[] dpi = getDpi();
 
       try {
         int srid = 0;
@@ -316,11 +315,12 @@ public abstract class AbstractGeoreferencedImage extends AbstractPropertyChangeS
           final List<Double> sourceControlPoints = DomUtil.getDoubleList(doc, "SourceGCPs");
           final List<Double> targetControlPoints = DomUtil.getDoubleList(doc, "TargetGCPs");
           if (sourceControlPoints.size() > 0 && targetControlPoints.size() > 0) {
+            int imageHeight = getImageHeight();
             final List<MappedLocation> tiePoints = new ArrayList<>();
             for (int i = 0; i < sourceControlPoints.size()
               && i < targetControlPoints.size(); i += 2) {
-              final double imageX = sourceControlPoints.get(i) * dpi[0];
-              final double imageY = sourceControlPoints.get(i + 1) * dpi[1];
+              final double imageX = sourceControlPoints.get(i);
+              final double imageY = imageHeight + sourceControlPoints.get(i + 1);
               final Point sourcePixel = new PointDoubleXY(imageX, imageY);
 
               final double x = targetControlPoints.get(i);
