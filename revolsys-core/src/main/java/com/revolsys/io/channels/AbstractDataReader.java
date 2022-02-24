@@ -260,39 +260,6 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
   }
 
   @Override
-  public short getUnsignedByte() {
-    final byte signedByte = getByte();
-    return (short)Byte.toUnsignedInt(signedByte);
-  }
-
-  @Override
-  public long getUnsignedInt() {
-    final int signedInt = getInt();
-    return Integer.toUnsignedLong(signedInt);
-  }
-
-  /**
-   * Unsigned longs don't actually work channel Java
-   * @return
-   */
-  @Override
-  public long getUnsignedLong() {
-    final long signedLong = getLong();
-    return signedLong;
-  }
-
-  @Override
-  public int getUnsignedShort() {
-    final short signedShort = getShort();
-    return Short.toUnsignedInt(signedShort);
-  }
-
-  @Override
-  public String getUsAsciiString(final int byteCount) {
-    return getString(byteCount, StandardCharsets.US_ASCII);
-  }
-
-  @Override
   public InputStream getWrapStream() {
     if (this.wrapStream == null) {
       this.wrapStream = new DelegatingInputStream(this) {

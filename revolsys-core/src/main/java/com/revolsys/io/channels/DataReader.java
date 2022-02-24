@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.jeometry.common.exception.Exceptions;
 
@@ -72,23 +73,56 @@ public interface DataReader extends BaseCloseable {
 
   short getShort();
 
-  String getString(int byteCount, Charset charset);
+  default String getString(final int byteCount, final Charset charset) {
+    final byte[] bytes = getBytes(byteCount);
+    int i = 0;
+    for (; i < bytes.length; i++) {
+      final byte character = bytes[i];
+      if (character == 0) {
+        return new String(bytes, 0, i, charset);
+      }
+    }
+    return new String(bytes, 0, i, charset);
+  }
 
-  String getStringUtf8ByteCount();
+  default String getStringUtf8ByteCount() {
+    final int byteCount = getInt();
+    if (byteCount < 0) {
+      return null;
+    } else if (byteCount == 0) {
+      return "";
+    } else {
+      return getString(byteCount, StandardCharsets.UTF_8);
+    }
+  }
 
-  short getUnsignedByte();
+  default short getUnsignedByte() {
+    final byte signedByte = getByte();
+    return (short)Byte.toUnsignedInt(signedByte);
+  }
 
-  long getUnsignedInt();
+  default long getUnsignedInt() {
+    final int signedInt = getInt();
+    return Integer.toUnsignedLong(signedInt);
+  }
 
   /**
    * Unsigned longs don't actually work channel Java
    * @return
    */
-  long getUnsignedLong();
+  default long getUnsignedLong() {
+    final long signedLong = getLong();
+    return signedLong;
+  }
 
-  int getUnsignedShort();
+  default int getUnsignedShort() {
+    final short signedShort = getShort();
+    return Short.toUnsignedInt(signedShort);
+  }
 
-  String getUsAsciiString(int byteCount);
+  default String getUsAsciiString(final int byteCount) {
+    return getString(byteCount, StandardCharsets.US_ASCII);
+  }
 
   InputStream getWrapStream();
 

@@ -95,7 +95,7 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
   }
 
   @Override
-  public double readLEDouble() throws IOException {
+  public double readLEDouble() {
     this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
       return this.buffer.getDouble();
@@ -105,13 +105,13 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
   }
 
   @Override
-  public float readLEFloat() throws IOException {
+  public float readLEFloat() {
     final int value = readLEInt();
     return Float.intBitsToFloat(value);
   }
 
   @Override
-  public int readLEInt() throws IOException {
+  public int readLEInt() {
     this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
       return this.buffer.getInt();
@@ -121,7 +121,7 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
   }
 
   @Override
-  public long readLELong() throws IOException {
+  public long readLELong() {
     this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
       return this.buffer.getLong();
@@ -131,7 +131,7 @@ public class EndianMappedByteBuffer implements EndianInputOutput {
   }
 
   @Override
-  public short readLEShort() throws IOException {
+  public short readLEShort() {
     this.buffer.order(ByteOrder.LITTLE_ENDIAN);
     try {
       return this.buffer.getShort();
