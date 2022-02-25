@@ -36,7 +36,7 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
         int count = Math.min(bufferSize - offset, dst.remaining());
         buffer.limit(buffer.position() + count);
         dst.put(buffer);
-        buffer.limit(buffer.capacity());
+        buffer.limit(bufferSize);
         offset += count;
         return count;
       } else {
@@ -103,7 +103,9 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
   @Override
   public synchronized void flush() throws IOException {
     if (!this.closed) {
-      this.out.flush();
+      if (this.out != null) {
+        this.out.flush();
+      }
     }
   }
 
@@ -112,6 +114,7 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
   }
 
   public ReadableByteChannel newReadChannel() {
+    buffer.flip();
     return new ReadChannel();
   }
 
