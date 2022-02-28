@@ -113,7 +113,7 @@ public class JsonWebToken {
   }
 
   public String getString(final String name) {
-    return getString(name);
+    return this.payload.getString(name);
   }
 
   public String getSubject() {
