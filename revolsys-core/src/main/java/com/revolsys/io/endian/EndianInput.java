@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import org.jeometry.common.exception.Exceptions;
+
 import com.revolsys.io.EndOfFileException;
 
 public interface EndianInput extends Closeable {
@@ -222,12 +224,12 @@ public interface EndianInput extends Closeable {
    * @return The double.
    * @throws IOException If an I/O error occurs.
    */
-  default double readLEDouble() throws IOException {
+  default double readLEDouble() {
     final long value = readLELong();
     return Double.longBitsToDouble(value);
   }
 
-  default float readLEFloat() throws IOException {
+  default float readLEFloat() {
     final int value = readLEInt();
     return Float.intBitsToFloat(value);
   }
@@ -238,17 +240,21 @@ public interface EndianInput extends Closeable {
    * @return The int.
    * @throws IOException If an I/O error occurs.
    */
-  default int readLEInt() throws IOException {
-    final int b1 = read();
-    final int b2 = read();
-    final int b3 = read();
-    final int b4 = read();
-    if ((b1 | b2 | b3 | b4) < 0) {
-      throw new EndOfFileException();
-    }
-    final int value = (b4 << 24) + (b3 << 16) + (b2 << 8) + b1;
+  default int readLEInt() {
+    try {
+      final int b1 = read();
+      final int b2 = read();
+      final int b3 = read();
+      final int b4 = read();
+      if ((b1 | b2 | b3 | b4) < 0) {
+        throw new EndOfFileException();
+      }
+      final int value = (b4 << 24) + (b3 << 16) + (b2 << 8) + b1;
 
-    return value;
+      return value;
+    } catch (IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   /**
@@ -257,12 +263,16 @@ public interface EndianInput extends Closeable {
    * @return The long.
    * @throws IOException If an I/O error occurs.
    */
-  default long readLELong() throws IOException {
-    long value = 0;
-    for (int shiftBy = 0; shiftBy < 64; shiftBy += 8) {
-      value |= (long)(read() & 0xff) << shiftBy;
+  default long readLELong() {
+    try {
+      long value = 0;
+      for (int shiftBy = 0; shiftBy < 64; shiftBy += 8) {
+        value |= (long)(read() & 0xff) << shiftBy;
+      }
+      return value;
+    } catch (IOException e) {
+      throw Exceptions.wrap(e);
     }
-    return value;
   }
 
   /**
@@ -271,14 +281,18 @@ public interface EndianInput extends Closeable {
   * @return The short.
   * @throws IOException If an I/O error occurs.
   */
-  default short readLEShort() throws IOException {
-    final int b1 = read();
-    final int b2 = read();
-    if ((b1 | b2) < 0) {
-      throw new EndOfFileException();
+  default short readLEShort() {
+    try {
+      final int b1 = read();
+      final int b2 = read();
+      if ((b1 | b2) < 0) {
+        throw new EndOfFileException();
+      }
+      final int value = (b2 << 8) + b1;
+      return (short)value;
+    } catch (IOException e) {
+      throw Exceptions.wrap(e);
     }
-    final int value = (b2 << 8) + b1;
-    return (short)value;
   }
 
   /**
@@ -287,16 +301,20 @@ public interface EndianInput extends Closeable {
    * @return The int.
    * @throws IOException If an I/O error occurs.
    */
-  default long readLEUnsignedInt() throws IOException {
-    final long b1 = read();
-    final long b2 = read();
-    final long b3 = read();
-    final long b4 = read();
-    if ((b1 | b2 | b3 | b4) < 0) {
-      throw new EndOfFileException();
+  default long readLEUnsignedInt() {
+    try {
+      final long b1 = read();
+      final long b2 = read();
+      final long b3 = read();
+      final long b4 = read();
+      if ((b1 | b2 | b3 | b4) < 0) {
+        throw new EndOfFileException();
+      }
+      final long value = (b4 << 24) + (b3 << 16) + (b2 << 8) + b1;
+      return value;
+    } catch (IOException e) {
+      throw Exceptions.wrap(e);
     }
-    final long value = (b4 << 24) + (b3 << 16) + (b2 << 8) + b1;
-    return value;
   }
 
   /**
@@ -306,21 +324,29 @@ public interface EndianInput extends Closeable {
    * @return The long.
    * @throws IOException If an I/O error occurs.
    */
-  default long readLEUnsignedLong() throws IOException {
-    long value = 0;
-    for (int shiftBy = 0; shiftBy < 64; shiftBy += 8) {
-      value |= (long)(read() & 0xff) << shiftBy;
+  default long readLEUnsignedLong() {
+    try {
+      long value = 0;
+      for (int shiftBy = 0; shiftBy < 64; shiftBy += 8) {
+        value |= (long)(read() & 0xff) << shiftBy;
+      }
+      return value;
+    } catch (IOException e) {
+      throw Exceptions.wrap(e);
     }
-    return value;
   }
 
-  default int readLEUnsignedShort() throws IOException {
-    final int ch1 = read();
-    final int ch2 = read();
-    if ((ch1 | ch2) < 0) {
-      throw new EndOfFileException();
+  default int readLEUnsignedShort() {
+    try {
+      final int ch1 = read();
+      final int ch2 = read();
+      if ((ch1 | ch2) < 0) {
+        throw new EndOfFileException();
+      }
+      return (ch1 << 0) + (ch2 << 8);
+    } catch (IOException e) {
+      throw Exceptions.wrap(e);
     }
-    return (ch1 << 0) + (ch2 << 8);
   }
 
   /**
