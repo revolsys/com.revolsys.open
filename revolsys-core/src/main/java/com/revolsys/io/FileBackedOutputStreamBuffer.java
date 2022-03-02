@@ -3,11 +3,13 @@ package com.revolsys.io;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.spi.AbstractInterruptibleChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -28,26 +30,30 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
     }
 
     @Override
-    public int read(ByteBuffer dst) throws IOException {
+    public int read(final ByteBuffer dst) throws IOException {
       if (!isOpen()) {
         throw new ClosedChannelException();
       }
-      if (offset < bufferSize) {
-        int count = Math.min(bufferSize - offset, dst.remaining());
-        buffer.limit(buffer.position() + count);
-        dst.put(buffer);
-        buffer.limit(bufferSize);
-        offset += count;
+      if (this.offset < FileBackedOutputStreamBuffer.this.bufferSize) {
+        final int count = Math.min(FileBackedOutputStreamBuffer.this.bufferSize - this.offset,
+          dst.remaining());
+        FileBackedOutputStreamBuffer.this.buffer
+          .limit(FileBackedOutputStreamBuffer.this.buffer.position() + count);
+        dst.put(FileBackedOutputStreamBuffer.this.buffer);
+        FileBackedOutputStreamBuffer.this.buffer
+          .limit(FileBackedOutputStreamBuffer.this.bufferSize);
+        this.offset += count;
         return count;
       } else {
-        if (fileChannel == null) {
-          if (file == null) {
+        if (this.fileChannel == null) {
+          if (FileBackedOutputStreamBuffer.this.file == null) {
             return -1;
           } else {
-            fileChannel = FileChannel.open(file, StandardOpenOption.READ);
+            this.fileChannel = FileChannel.open(FileBackedOutputStreamBuffer.this.file,
+              StandardOpenOption.READ);
           }
         }
-        return fileChannel.read(dst);
+        return this.fileChannel.read(dst);
       }
     }
   }
@@ -89,13 +95,13 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
   public void flip() {
 
     try {
-      buffer.flip();
-      if (out != null) {
+      this.buffer.flip();
+      if (this.out != null) {
         this.out.flush();
         this.out.close();
         this.out = null;
       }
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }
   }
@@ -114,8 +120,13 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
   }
 
   public ReadableByteChannel newReadChannel() {
-    buffer.flip();
+    this.buffer.flip();
     return new ReadChannel();
+  }
+
+  public java.io.Writer newWriter() {
+    return new OutputStreamWriter(new IgnoreCloseDelegatingOutputStream(this.out),
+      StandardCharsets.UTF_8);
   }
 
   private void requireFile() throws IOException {
@@ -132,18 +143,18 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
       throw new IOException("Closed");
     } else {
       if (length > 0) {
-        int remaining = buffer.remaining();
+        final int remaining = this.buffer.remaining();
         if (remaining > 0) {
-          int count = Math.min(remaining, length);
-          buffer.put(source, offset, count);
-          size += count;
+          final int count = Math.min(remaining, length);
+          this.buffer.put(source, offset, count);
+          this.size += count;
           length -= count;
           offset += count;
         }
         if (length > 0) {
           requireFile();
           this.out.write(source, offset, length);
-          size += length;
+          this.size += length;
         }
       }
     }
@@ -154,15 +165,15 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
     if (this.closed) {
       throw new IOException("Closed");
     } else {
-      int remaining = buffer.remaining();
+      final int remaining = this.buffer.remaining();
       if (remaining > 0) {
-        buffer.put((byte)b);
+        this.buffer.put((byte)b);
       } else {
         requireFile();
         this.out.write(b);
 
       }
-      size += 1;
+      this.size += 1;
     }
   }
 
