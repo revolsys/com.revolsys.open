@@ -39,11 +39,13 @@ public interface MapSerializer extends Jsonable {
    * @param value
    */
   default void addToMap(final JsonObject map, final CharSequence name, final Object value) {
-    final Object mapValue = toMapValue(value);
-    if (Property.hasValue(mapValue)) {
-      map.put(name.toString(), mapValue);
-    } else {
-      map.remove(name);
+    if (name != null) {
+      final Object mapValue = toMapValue(value);
+      if (Property.hasValue(mapValue)) {
+        map.put(name.toString(), mapValue);
+      } else {
+        map.remove(name);
+      }
     }
   }
 

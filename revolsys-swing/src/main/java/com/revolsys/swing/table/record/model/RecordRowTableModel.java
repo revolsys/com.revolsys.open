@@ -348,6 +348,9 @@ public abstract class RecordRowTableModel extends AbstractRecordTableModel
 
   @Override
   public boolean isColumnSortable(final int columnIndex) {
+    if (columnIndex < this.fieldsOffset) {
+      return false;
+    }
     final FieldDefinition field = getColumnFieldDefinition(columnIndex);
     if (field != null) {
       if (!field.isSortable()) {

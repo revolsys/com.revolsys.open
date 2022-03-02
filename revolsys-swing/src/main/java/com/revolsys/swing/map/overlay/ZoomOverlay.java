@@ -298,7 +298,7 @@ public class ZoomOverlay extends AbstractOverlay {
         pan = true;
         this.panButton = MouseEvent.BUTTON2;
       } else if (!drag && button == MouseEvent.BUTTON1 && !hasOverlayAction()) {
-        if (event.getModifiersEx() == InputEvent.BUTTON1_DOWN_MASK) {
+        if (event.getModifiersEx() == InputEvent.ALT_DOWN_MASK) {
           pan = true;
           this.panButton = MouseEvent.BUTTON1;
         }
