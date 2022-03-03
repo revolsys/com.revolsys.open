@@ -16,6 +16,7 @@ import com.revolsys.record.code.AbstractCodeTable;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.MergePolicyType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.SplitPolicyType;
+import com.revolsys.record.io.format.json.JsonObject;
 
 public class Domain extends AbstractCodeTable implements Cloneable {
   private List<CodedValue> codedValues = new ArrayList<>();
@@ -183,9 +184,9 @@ public class Domain extends AbstractCodeTable implements Cloneable {
   }
 
   @Override
-  public Map<String, ? extends Object> getMap(final Identifier id) {
+  public JsonObject getMap(final Identifier id) {
     final Object value = getValue(id);
-    return Collections.singletonMap("NAME", value);
+    return JsonObject.hash("NAME", value);
   }
 
   public String getMaxValue() {

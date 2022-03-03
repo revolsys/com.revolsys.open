@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -19,6 +18,7 @@ import com.revolsys.collection.list.Lists;
 import com.revolsys.record.Record;
 import com.revolsys.record.comparator.RecordFieldComparator;
 import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.property.RecordDefinitionProperty;
 import com.revolsys.record.query.And;
 import com.revolsys.record.query.Q;
@@ -160,16 +160,17 @@ public class MultiValueCodeTableProperty extends AbstractMultiValueCodeTable
   }
 
   @Override
-  public Map<String, ? extends Object> getMap(final Identifier id) {
+  public JsonObject getMap(final Identifier id) {
     final List<Object> values = getValues(id);
     if (values == null) {
-      return Collections.emptyMap();
+      return JsonObject.hash();
     } else {
-      final Map<String, Object> map = new HashMap<>();
-      for (int i = 0; i < values.size(); i++) {
-        final String name = this.valueFieldNames.get(i);
+      final JsonObject map = JsonObject.hash();
+      int i = 0;
+      for (final String name : this.valueFieldNames) {
         final Object value = values.get(i);
-        map.put(name, value);
+        map.addValue(name, value);
+        i++;
       }
       return map;
     }

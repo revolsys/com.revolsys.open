@@ -16,6 +16,7 @@ import org.jeometry.common.io.PathName;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.record.Record;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.And;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
@@ -153,12 +154,12 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
   }
 
   @Override
-  public Map<String, ? extends Object> getMap(final Identifier id) {
+  public JsonObject getMap(final Identifier id) {
     final Object value = getValue(id);
     if (value == null) {
-      return Collections.emptyMap();
+      return JsonObject.hash();
     } else {
-      return Collections.singletonMap(this.valueFieldName, value);
+      return JsonObject.hash(this.valueFieldName, value);
     }
   }
 

@@ -28,7 +28,7 @@ public class RecordLayerQueryTextField extends AbstractRecordQueryField {
 
   public RecordLayerQueryTextField(final String fieldName, final AbstractRecordLayer layer,
     final String displayFieldName) {
-    super(fieldName, layer.getPathName(), layer.getFieldDefinition(displayFieldName));
+    super(fieldName, layer.getRecordDefinition(), layer.getFieldDefinition(displayFieldName));
     this.layer = layer;
   }
 
@@ -42,11 +42,8 @@ public class RecordLayerQueryTextField extends AbstractRecordQueryField {
     return this.layer.getRecordDefinition();
   }
 
-  @SuppressWarnings({
-    "unchecked", "rawtypes"
-  })
   @Override
   protected List<Record> getRecords(final Query query) {
-    return (List)this.layer.getRecords(query);
+    return this.layer.getRecords(query);
   }
 }
