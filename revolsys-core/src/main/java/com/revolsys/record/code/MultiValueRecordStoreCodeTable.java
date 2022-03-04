@@ -2,11 +2,10 @@ package com.revolsys.record.code;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.identifier.ListIdentifier;
@@ -16,6 +15,8 @@ import org.jeometry.common.io.PathName;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.record.Record;
+import com.revolsys.record.comparator.RecordFieldComparator;
+import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.And;
 import com.revolsys.record.query.Q;
@@ -25,11 +26,12 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
+import com.revolsys.util.count.CategoryLabelCountMap;
 
-public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTable
+public class MultiValueRecordStoreCodeTable extends AbstractMultiValueCodeTable
   implements RecordDefinitionProxy {
 
-  private static final String DEFAULT_FIELD_NAME = "VALUE";
+  private static final List<String> DEFAULT_FIELD_NAMES = Lists.newArray("VALUE");
 
   private boolean createMissingCodes = true;
 
@@ -49,7 +51,7 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
 
   private String modificationTimestampFieldName;
 
-  private String orderBy = DEFAULT_FIELD_NAME;
+  private List<String> orderBy = DEFAULT_FIELD_NAMES;
 
   private RecordDefinition recordDefinition;
 
@@ -59,15 +61,16 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
 
   private PathName typePath;
 
-  private String valueFieldName = DEFAULT_FIELD_NAME;
+  private List<String> valueFieldNames = DEFAULT_FIELD_NAMES;
 
   private boolean allowNullValues = false;
 
-  public SingleValueRecordStoreCodeTable() {
+  public MultiValueRecordStoreCodeTable() {
+    super();
   }
 
-  public SingleValueRecordStoreCodeTable(final Map<String, ? extends Object> config) {
-    setProperties(config);
+  public MultiValueRecordStoreCodeTable(final boolean capitalizeWords) {
+    super(capitalizeWords);
   }
 
   public void addFieldAlias(final String columnName) {
@@ -75,52 +78,55 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
   }
 
   @Override
-  public final void addValue(final Record code) {
-    addValueDo(code);
-    clearCaches();
-  }
-
-  protected void addValueDo(final Record code) {
+  public void addValue(final Record code) {
     final String idFieldName = getIdFieldName();
     final Identifier id = code.getIdentifier(idFieldName);
     if (id == null) {
       throw new NullPointerException(idFieldName + "=null for " + code);
     } else {
-      Object value = code.getValue(this.valueFieldName);
-      if (value instanceof SingleIdentifier) {
-        final SingleIdentifier identifier = (SingleIdentifier)value;
-        value = identifier.getValue(0);
-      }
-      if (value == null) {
-        if (!this.allowNullValues) {
-          throw new NullPointerException(this.valueFieldName + "=null for " + code);
+      final List<Object> values = new ArrayList<>();
+      for (final String fieldName : this.valueFieldNames) {
+        Object value = code.getValue(fieldName);
+        if (value instanceof SingleIdentifier) {
+          final SingleIdentifier identifier = (SingleIdentifier)value;
+          value = identifier.getValue(0);
         }
+        if (value == null) {
+          if (!this.allowNullValues) {
+            throw new NullPointerException(this.valueFieldNames + "=null for " + code);
+          }
+        }
+        values.add(value);
       }
-      addValue(id, value);
+      addValue(id, values);
+    }
+  }
+
+  protected void addValues(final Iterable<Record> allCodes) {
+    for (final Record code : allCodes) {
+      addValue(code);
     }
   }
 
   @Override
   protected int calculateValueFieldLength() {
-    return this.recordDefinition.getFieldLength(this.valueFieldName);
+    int length = this.valueFieldNames.size();
+    for (final String fieldName : this.valueFieldNames) {
+      length += this.recordDefinition.getFieldLength(fieldName);
+    }
+    return length;
   }
 
-  protected void clearCaches() {
+  protected void clearRecordDefinition() {
   }
 
   @Override
-  public SingleValueRecordStoreCodeTable clone() {
-    final SingleValueRecordStoreCodeTable clone = (SingleValueRecordStoreCodeTable)super.clone();
+  public MultiValueRecordStoreCodeTable clone() {
+    final MultiValueRecordStoreCodeTable clone = (MultiValueRecordStoreCodeTable)super.clone();
     clone.recordDefinition = null;
     clone.fieldNameAliases = new ArrayList<>(this.fieldNameAliases);
+    clone.valueFieldNames = new ArrayList<>(this.valueFieldNames);
     return clone;
-  }
-
-  public void forEachRecord(final Consumer<Record> action) {
-    final RecordStore recordStore = this.recordStore;
-    if (recordStore != null) {
-      newQuery().forEachRecord(action);
-    }
   }
 
   @SuppressWarnings("unchecked")
@@ -139,27 +145,34 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
 
   @Override
   public String getIdFieldName() {
-    if (this.idFieldName != null) {
+    if (Property.hasValue(this.idFieldName)) {
       return this.idFieldName;
     } else if (this.recordDefinition == null) {
       return "";
     } else {
       final String idFieldName = this.recordDefinition.getIdFieldName();
-      if (idFieldName == null) {
-        return this.recordDefinition.getFieldName(0);
-      } else {
+      if (Property.hasValue(idFieldName)) {
         return idFieldName;
+      } else {
+        return this.recordDefinition.getFieldName(0);
       }
     }
   }
 
   @Override
   public JsonObject getMap(final Identifier id) {
-    final Object value = getValue(id);
-    if (value == null) {
+    final List<Object> values = getValues(id);
+    if (values == null) {
       return JsonObject.hash();
     } else {
-      return JsonObject.hash(this.valueFieldName, value);
+      final JsonObject map = JsonObject.hash();
+      int i = 0;
+      for (final String name : this.valueFieldNames) {
+        final Object value = values.get(i);
+        map.addValue(name, value);
+        i++;
+      }
+      return map;
     }
   }
 
@@ -177,10 +190,9 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
     return this.recordDefinition;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <R extends RecordStore> R getRecordStore() {
-    return (R)this.recordStore;
+  public RecordStore getRecordStore() {
+    return this.recordStore;
   }
 
   public String getTypeName() {
@@ -191,9 +203,6 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
     return this.typePath;
   }
 
-  @SuppressWarnings({
-    "rawtypes", "unchecked"
-  })
   @Override
   public <V> V getValue(final Object id) {
     if (id instanceof Identifier) {
@@ -206,13 +215,9 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
     }
   }
 
-  public String getValueFieldName() {
-    return this.valueFieldName;
-  }
-
   @Override
   public List<String> getValueFieldNames() {
-    return Collections.singletonList(this.valueFieldName);
+    return this.valueFieldNames;
   }
 
   public boolean isAllowNullValues() {
@@ -260,8 +265,20 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
         this.loading = true;
         try {
           if (this.recordStore != null) {
-            newQuery()//
-              .forEachRecord(this::addValueDo);
+            final Query query = this.recordStore.newQuery(this.typePath);
+            for (final String order : this.orderBy) {
+              query.addOrderBy(order);
+            }
+            try (
+              RecordReader reader = this.recordStore.getRecords(query)) {
+              final List<Record> codes = reader.toList();
+              final CategoryLabelCountMap statistics = this.recordStore.getStatistics();
+              if (statistics != null) {
+                statistics.getLabelCountMap("query").addCount(this.typePath, -codes.size());
+              }
+              Collections.sort(codes, new RecordFieldComparator(this.orderBy));
+              addValues(codes);
+            }
           }
         } finally {
           this.loading = false;
@@ -276,39 +293,57 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
   }
 
   @Override
-  protected synchronized Identifier loadId(final Object value, final boolean createId) {
+  protected synchronized Identifier loadId(final List<Object> values, final boolean createId) {
     if (this.loadAll && !this.loadMissingCodes && !isEmpty()) {
       return null;
     }
     Identifier id = null;
     if (createId && this.loadAll && !isLoaded()) {
       loadAll();
-      id = getIdentifier(value, false);
+      id = getIdentifier(values, false);
     } else {
-      final Query query = this.recordStore.newQuery(this.typePath);
+      final Query query = new Query(this.typePath);
       final And and = new And();
-      if (value == null) {
-        and.and(Q.isNull(this.valueFieldName));
-      } else {
-        final FieldDefinition idField = this.recordDefinition.getField(this.idFieldName);
-        final FieldDefinition valueField = this.recordDefinition.getField(this.valueFieldName);
-        and.and(Q.or(Q.equal(idField, value), Q.equal(valueField, value)));
+      if (!values.isEmpty()) {
+        int i = 0;
+        for (final String fieldName : this.valueFieldNames) {
+          final Object value = values.get(i);
+          if (value == null) {
+            and.and(Q.isNull(fieldName));
+          } else {
+            final FieldDefinition fieldDefinition = this.recordDefinition.getField(fieldName);
+            and.and(Q.equal(fieldDefinition, value));
+          }
+          i++;
+        }
       }
       query.setWhereCondition(and);
-      query.forEachRecord(this::addValueDo);
+      final RecordReader reader = this.recordStore.getRecords(query);
+      try {
+        final List<Record> codes = reader.toList();
+        if (codes.size() > 0) {
+          final CategoryLabelCountMap statistics = this.recordStore.getStatistics();
+          if (statistics != null) {
+            statistics.getLabelCountMap("query").addCount(this.typePath, -codes.size());
+          }
 
-      id = getIdByValue(value);
-      Property.firePropertyChange(this, "valuesChanged", false, true);
+          addValues(codes);
+        }
+        id = getIdByValue(values);
+        Property.firePropertyChange(this, "valuesChanged", false, true);
+      } finally {
+        reader.close();
+      }
     }
     if (createId && id == null) {
-      return newIdentifier(value);
+      return newIdentifier(values);
     } else {
       return id;
     }
   }
 
   @Override
-  protected Object loadValues(final Object id) {
+  protected List<Object> loadValues(final Object id) {
     if (this.loadAll && !isLoaded()) {
       loadAll();
     } else if (!this.loadAll || this.loadMissingCodes) {
@@ -324,14 +359,13 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
           addValue(code);
         }
       } catch (final Throwable e) {
-        e.printStackTrace();
         return null;
       }
     }
     return getValueById(id);
   }
 
-  protected synchronized Identifier newIdentifier(final Object value) {
+  protected synchronized Identifier newIdentifier(final List<Object> values) {
     if (this.createMissingCodes) {
       // TODO prevent duplicates from other threads/processes
       final Record code = this.recordStore.newRecord(this.typePath);
@@ -348,7 +382,11 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
         }
       }
       code.setIdentifier(id);
-      code.setValue(this.valueFieldName, value);
+      for (int i = 0; i < this.valueFieldNames.size(); i++) {
+        final String name = this.valueFieldNames.get(i);
+        final Object value = values.get(i);
+        code.setValue(name, value);
+      }
 
       final Instant now = Instant.now();
       if (this.creationTimestampFieldName != null) {
@@ -366,16 +404,7 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
   }
 
   @Override
-  public Query newQuery() {
-    return this.recordStore//
-      .newQuery(this.typePath)
-      .select(this.idFieldName, this.valueFieldName)
-      .addOrderBy(this.orderBy);
-  }
-
-  @Override
   public synchronized void refresh() {
-    this.clearCaches();
     super.refresh();
     if (isLoadAll()) {
       this.loaded = false;
@@ -390,64 +419,67 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
     }
   }
 
-  public SingleValueRecordStoreCodeTable setAllowNullValues(final boolean allowNullValues) {
+  public MultiValueRecordStoreCodeTable setAllowNullValues(final boolean allowNullValues) {
     this.allowNullValues = allowNullValues;
     return this;
   }
 
-  public SingleValueRecordStoreCodeTable setCreateMissingCodes(final boolean createMissingCodes) {
+  public MultiValueRecordStoreCodeTable setCreateMissingCodes(final boolean createMissingCodes) {
     this.createMissingCodes = createMissingCodes;
     return this;
   }
 
-  public SingleValueRecordStoreCodeTable setCreationTimestampFieldName(
+  public MultiValueRecordStoreCodeTable setCreationTimestampFieldName(
     final String creationTimestampFieldName) {
     this.creationTimestampFieldName = creationTimestampFieldName;
     return this;
   }
 
-  public SingleValueRecordStoreCodeTable setFieldAliases(final String... fieldNameAliases) {
+  public MultiValueRecordStoreCodeTable setFieldAliases(final String... fieldNameAliases) {
     setFieldNameAliases(Lists.newArray(fieldNameAliases));
     return this;
   }
 
-  public SingleValueRecordStoreCodeTable setFieldNameAliases(final List<String> fieldNameAliases) {
+  public MultiValueRecordStoreCodeTable setFieldNameAliases(final List<String> fieldNameAliases) {
     this.fieldNameAliases = new ArrayList<>(fieldNameAliases);
     return this;
   }
 
-  public SingleValueRecordStoreCodeTable setIdFieldName(final String idFieldName) {
+  public MultiValueRecordStoreCodeTable setIdFieldName(final String idFieldName) {
     this.idFieldName = idFieldName;
     return this;
   }
 
-  public SingleValueRecordStoreCodeTable setLoadAll(final boolean loadAll) {
+  public MultiValueRecordStoreCodeTable setLoadAll(final boolean loadAll) {
     this.loadAll = loadAll;
     return this;
   }
 
   @Override
-  public SingleValueRecordStoreCodeTable setLoadMissingCodes(final boolean loadMissingCodes) {
+  public MultiValueRecordStoreCodeTable setLoadMissingCodes(final boolean loadMissingCodes) {
     this.loadMissingCodes = loadMissingCodes;
     return this;
   }
 
-  public SingleValueRecordStoreCodeTable setModificationTimestampFieldName(
+  public MultiValueRecordStoreCodeTable setModificationTimestampFieldName(
     final String modificationTimestampFieldName) {
     this.modificationTimestampFieldName = modificationTimestampFieldName;
     return this;
   }
 
-  public SingleValueRecordStoreCodeTable setOrderByFieldName(final String orderByFieldName) {
-    this.orderBy = orderByFieldName;
+  public MultiValueRecordStoreCodeTable setOrderBy(final List<String> orderBy) {
+    this.orderBy = new ArrayList<>(orderBy);
+    return this;
+  }
+
+  public MultiValueRecordStoreCodeTable setOrderByFieldName(final String orderBy) {
+    this.orderBy = Lists.newArray(orderBy);
     return this;
   }
 
   public void setRecordDefinition(final RecordDefinition recordDefinition) {
     if (this.recordDefinition != recordDefinition) {
-      if (this.recordDefinition != null) {
-        setRecordDefinitionBefore(this.recordDefinition);
-      }
+      clearRecordDefinition();
       this.recordDefinition = recordDefinition;
       if (recordDefinition == null) {
         this.recordStore = null;
@@ -456,33 +488,41 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
         this.typePath = recordDefinition.getPathName();
         final String name = this.typePath.getName();
         setName(name);
-        if (this.idFieldName == null) {
-          this.idFieldName = recordDefinition.getIdFieldName();
-        }
         this.recordStore = this.recordDefinition.getRecordStore();
-        setValueFieldDefinition(recordDefinition.getField(this.valueFieldName));
-        setRecordDefinitionAfter(recordDefinition);
+        if (!this.valueFieldNames.isEmpty()) {
+          final String fieldName = this.valueFieldNames.get(0);
+          setValueFieldDefinition(recordDefinition.getField(fieldName));
+        }
+        setRecordDefinitionDo(recordDefinition);
       }
     }
   }
 
-  protected void setRecordDefinitionAfter(final RecordDefinition recordDefinition) {
+  protected void setRecordDefinitionDo(final RecordDefinition recordDefinition) {
+
   }
 
-  protected void setRecordDefinitionBefore(final RecordDefinition oldRecordDefinition) {
+  public MultiValueRecordStoreCodeTable setValueFieldName(final String valueColumns) {
+    setValueFieldNames(valueColumns);
+    return this;
   }
 
-  public SingleValueRecordStoreCodeTable setValueFieldName(final String valueFieldName) {
-    this.valueFieldName = valueFieldName;
-    if (this.orderBy == DEFAULT_FIELD_NAME) {
-      setOrderByFieldName(valueFieldName);
+  public MultiValueRecordStoreCodeTable setValueFieldNames(final List<String> valueColumns) {
+    this.valueFieldNames = new ArrayList<>(valueColumns);
+    if (this.orderBy == DEFAULT_FIELD_NAMES) {
+      setOrderBy(valueColumns);
     }
+    return this;
+  }
+
+  public MultiValueRecordStoreCodeTable setValueFieldNames(final String... valueColumns) {
+    setValueFieldNames(Arrays.asList(valueColumns));
     return this;
   }
 
   @Override
   public String toString() {
-    return this.typePath + " " + getIdFieldName() + " " + this.valueFieldName;
+    return this.typePath + " " + getIdFieldName() + " " + this.valueFieldNames;
 
   }
 
@@ -495,4 +535,5 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
     }
     return string.toString();
   }
+
 }
