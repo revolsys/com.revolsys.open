@@ -57,7 +57,15 @@ public class BearerToken {
 
   @Override
   public String toString() {
-    return this.accessToken;
+    if (this.accessToken == null) {
+      return "No Token";
+    } else {
+      try {
+        return new JsonWebToken(this.accessToken).toString();
+      } catch (final Exception e) {
+        return this.accessToken;
+      }
+    }
   }
 
 }

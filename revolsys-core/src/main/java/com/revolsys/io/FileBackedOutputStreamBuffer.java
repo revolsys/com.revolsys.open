@@ -125,7 +125,7 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
   }
 
   public java.io.Writer newWriter() {
-    return new OutputStreamWriter(new IgnoreCloseDelegatingOutputStream(this.out),
+    return new OutputStreamWriter(new IgnoreCloseDelegatingOutputStream(this),
       StandardCharsets.UTF_8);
   }
 
