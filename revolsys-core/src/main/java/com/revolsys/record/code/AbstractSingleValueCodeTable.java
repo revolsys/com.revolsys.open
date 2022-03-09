@@ -12,7 +12,6 @@ import org.jeometry.common.data.identifier.SingleIdentifier;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.util.CaseConverter;
-import com.revolsys.util.Debug;
 
 public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
 
@@ -279,9 +278,6 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
     super.refresh();
     this.identifiers.clear();
     this.idValueCache.clear();
-    if (!this.valueIdCache.isEmpty()) {
-      Debug.noOp();
-    }
     this.valueIdCache.clear();
   }
 

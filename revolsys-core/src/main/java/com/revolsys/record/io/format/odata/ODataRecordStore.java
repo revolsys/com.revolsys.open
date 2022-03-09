@@ -62,7 +62,6 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
-import com.revolsys.util.Debug;
 import com.revolsys.util.UriBuilder;
 import com.revolsys.util.UrlUtil;
 
@@ -482,8 +481,6 @@ public class ODataRecordStore extends AbstractRecordStore {
         if (orderField instanceof ColumnReference) {
           final ColumnReference column = (ColumnReference)orderField;
           order.append(column.getName());
-        } else {
-          Debug.noOp();
         }
         if (!orderBy.isAscending()) {
           order.append(" desc");
@@ -567,13 +564,9 @@ public class ODataRecordStore extends AbstractRecordStore {
             final ODataRecordDefinition recordDefinition = new ODataRecordDefinition(schema,
               childName, metadata, entityType);
             elements.put(childName, recordDefinition);
-          } else {
-            Debug.noOp();
           }
         }
       }
-    } else {
-      Debug.noOp();
     }
   }
 

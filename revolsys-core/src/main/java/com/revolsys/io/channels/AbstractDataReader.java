@@ -11,7 +11,6 @@ import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.io.DelegatingInputStream;
 import com.revolsys.io.EndOfFileException;
-import com.revolsys.util.Debug;
 
 public abstract class AbstractDataReader extends InputStream implements DataReader {
 
@@ -384,7 +383,6 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
         if (readCount == -1) {
           return false;
         } else if (readCount == 0) {
-          Debug.noOp();
         } else {
           this.readPosition += readCount;
           available += readCount;
