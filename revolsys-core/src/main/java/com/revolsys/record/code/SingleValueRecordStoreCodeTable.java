@@ -13,6 +13,7 @@ import org.jeometry.common.data.identifier.ListIdentifier;
 import org.jeometry.common.data.identifier.SingleIdentifier;
 import org.jeometry.common.date.Dates;
 import org.jeometry.common.io.PathName;
+import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.record.Record;
@@ -324,7 +325,7 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
           addValue(code);
         }
       } catch (final Throwable e) {
-        e.printStackTrace();
+        Logs.error(this, e);
         return null;
       }
     }
