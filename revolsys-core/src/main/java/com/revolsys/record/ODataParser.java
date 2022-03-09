@@ -285,6 +285,25 @@ public class ODataParser {
     .add("-", new Pair<>(false, Negate::new))
     .getMap();
 
+  private static boolean isHex(final char c) {
+    return c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f';
+  }
+
+  private static boolean isUuid(final String value, final int current) {
+    try {
+      if (current + 36 < value.length()) {
+        final char c = value.charAt(current);
+        if (isHex(c) && value.charAt(current + 8) == '-') {
+          final String text = value.substring(current, current + 36);
+          UUID.fromString(text);
+          return true;
+        }
+      }
+    } catch (final Exception e) {
+    }
+    return false;
+  }
+
   private static QueryValue methodCall(final String methodName,
     final List<QueryValue> methodArguments) {
     final Function<List<QueryValue>, QueryValue> function = METHOD_FACTORIES.get(methodName);
@@ -889,40 +908,50 @@ public class ODataParser {
   private static List<Token> tokenize(final String value) {
     final List<Token> rt = new ArrayList<>();
     int current = 0;
-    int end = 0;
-
     while (true) {
       if (current == value.length()) {
         return rt;
       }
       final char c = value.charAt(current);
       if (Character.isWhitespace(c)) {
-        end = readWhitespace(value, current);
-        rt.add(new Token(TokenType.WHITESPACE, value.substring(current, end)));
+        final int end = readWhitespace(value, current);
+        final String string = value.substring(current, end);
+        final Token token = new Token(TokenType.WHITESPACE, string);
+        rt.add(token);
         current = end;
       } else if (c == '\'') {
-        end = readQuotedString(value, current + 1);
-        rt.add(new Token(TokenType.QUOTED_STRING, value.substring(current, end)));
+        final int end = readQuotedString(value, current + 1);
+        final String string = value.substring(current, end);
+        final Token token = new Token(TokenType.QUOTED_STRING, string);
+        rt.add(token);
+        current = end;
+      } else if (c == '(') {
+        final Token token = new Token(TokenType.OPENPAREN, Character.toString(c));
+        rt.add(token);
+        current++;
+      } else if (c == ')') {
+        final Token token = new Token(TokenType.CLOSEPAREN, Character.toString(c));
+        rt.add(token);
+        current++;
+      } else if (",.+=:".indexOf(c) > -1) {
+        final Token token = new Token(TokenType.SYMBOL, Character.toString(c));
+        rt.add(token);
+        current++;
+      } else if (isUuid(value, current)) {
+        final int end = current + 36;
+        final String string = "'" + value.substring(current, end) + "'";
+        final Token token = new Token(TokenType.QUOTED_STRING, string);
+        rt.add(token);
         current = end;
       } else if (Character.isLetter(c) || c == '*') {
-        end = readWord(value, current + 1);
+        final int end = readWord(value, current + 1);
         final String tokenString = value.substring(current, end);
-
         rt.add(new Token(TokenType.WORD, tokenString));
         current = end;
       } else if (Character.isDigit(c) || 'c' == '-') {
         final Token token = readDigits(value, current);
         rt.add(token);
         current = token.getEnd();
-      } else if (c == '(') {
-        rt.add(new Token(TokenType.OPENPAREN, Character.toString(c)));
-        current++;
-      } else if (c == ')') {
-        rt.add(new Token(TokenType.CLOSEPAREN, Character.toString(c)));
-        current++;
-      } else if (",.+=:".indexOf(c) > -1) {
-        rt.add(new Token(TokenType.SYMBOL, Character.toString(c)));
-        current++;
       } else {
         throw new RuntimeException("Unable to tokenize: " + value + " current: " + current
           + " rem: " + value.substring(current));

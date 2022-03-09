@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +16,7 @@ import org.jeometry.common.data.refresh.Refreshable;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.util.Emptyable;
 import com.revolsys.util.Property;
@@ -110,16 +110,17 @@ public interface CodeTable
 
   String getIdFieldName();
 
-  default Map<String, ? extends Object> getMap(final Identifier id) {
+  default JsonObject getMap(final Identifier id) {
     final List<Object> values = getValues(id);
     if (values == null) {
-      return Collections.emptyMap();
+      return JsonObject.EMPTY;
     } else {
-      final Map<String, Object> map = new HashMap<>();
-      for (int i = 0; i < values.size(); i++) {
-        final String name = getValueFieldNames().get(i);
+      final JsonObject map = JsonObject.hash();
+      int i = 0;
+      for (final String name : getValueFieldNames()) {
         final Object value = values.get(i);
-        map.put(name, value);
+        map.addValue(name, value);
+        i++;
       }
       return map;
     }

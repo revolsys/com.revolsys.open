@@ -249,6 +249,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     return this.label;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <RD extends RecordDefinition> RD getRecordDefinition(
     final RecordDefinition recordDefinition) {
@@ -434,6 +435,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void setRecordFactory(final RecordFactory<? extends Record> recordFactory) {
     this.recordFactory = (RecordFactory<Record>)recordFactory;

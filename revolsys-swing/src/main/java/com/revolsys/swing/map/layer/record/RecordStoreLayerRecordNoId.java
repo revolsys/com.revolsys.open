@@ -1,5 +1,7 @@
 package com.revolsys.swing.map.layer.record;
 
+import com.revolsys.record.Record;
+
 public class RecordStoreLayerRecordNoId extends RecordStoreLayerRecord {
 
   public RecordStoreLayerRecordNoId(final RecordStoreLayer layer) {
@@ -8,7 +10,7 @@ public class RecordStoreLayerRecordNoId extends RecordStoreLayerRecord {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <R extends LayerRecord> R getRecordProxy() {
+  public <R extends Record> R getRecordProxy() {
     return (R)this;
   }
 }

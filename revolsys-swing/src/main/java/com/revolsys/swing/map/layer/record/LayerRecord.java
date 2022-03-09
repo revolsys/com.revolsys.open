@@ -102,7 +102,7 @@ public interface LayerRecord extends Record {
   }
 
   @SuppressWarnings("unchecked")
-  default <R extends LayerRecord> R getRecordProxy() {
+  default <R extends Record> R getRecordProxy() {
     return (R)this;
   }
 
