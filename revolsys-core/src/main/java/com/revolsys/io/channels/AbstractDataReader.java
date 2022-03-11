@@ -11,7 +11,6 @@ import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.io.DelegatingInputStream;
 import com.revolsys.io.EndOfFileException;
-import com.revolsys.util.Debug;
 
 public abstract class AbstractDataReader extends InputStream implements DataReader {
 
@@ -384,7 +383,6 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
         if (readCount == -1) {
           return false;
         } else if (readCount == 0) {
-          Debug.noOp();
         } else {
           this.readPosition += readCount;
           available += readCount;
@@ -466,6 +464,30 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
   }
 
   @Override
+  public void skipEol() {
+    final ByteBuffer buffer = this.buffer;
+    do {
+      if (this.available == 0) {
+        if (!readDo(1)) {
+          return;
+        }
+      }
+      buffer.mark();
+      final byte b = buffer.get();
+      switch (b) {
+        case '\n':
+        case '\r':
+          this.available--;
+        break;
+
+        default:
+          buffer.reset();
+          return;
+      }
+    } while (true);
+  }
+
+  @Override
   public boolean skipIfChar(final char c) {
     if (this.available == 0) {
       if (!readDo(1)) {
@@ -486,13 +508,13 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
 
   @Override
   public void skipWhitespace() {
+    final ByteBuffer buffer = this.buffer;
     do {
       if (this.available == 0) {
         if (!readDo(1)) {
           return;
         }
       }
-      final ByteBuffer buffer = this.buffer;
       buffer.mark();
       final byte b = buffer.get();
       switch (b) {
