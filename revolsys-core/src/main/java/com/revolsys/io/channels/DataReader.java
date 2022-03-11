@@ -172,6 +172,16 @@ public interface DataReader extends BaseCloseable {
 
   void skipBytes(int count);
 
+  default void skipEol() {
+    byte b;
+    do {
+      b = getByte();
+    } while (b == '\n' || b == '\r');
+    if (b != -1) {
+      unreadByte(b);
+    }
+  }
+
   default boolean skipIfChar(final char c) {
     if (isByte(c)) {
       getByte();

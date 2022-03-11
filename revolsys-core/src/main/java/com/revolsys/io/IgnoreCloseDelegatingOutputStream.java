@@ -5,7 +5,7 @@ import java.io.OutputStream;
 
 public class IgnoreCloseDelegatingOutputStream extends OutputStream {
 
-  private OutputStream out;
+  private final OutputStream out;
 
   public IgnoreCloseDelegatingOutputStream(final OutputStream out) {
     this.out = out;
@@ -21,7 +21,6 @@ public class IgnoreCloseDelegatingOutputStream extends OutputStream {
   public void close() throws IOException {
     final OutputStream out = this.out;
     if (out != null) {
-      this.out = null;
       out.flush();
     }
   }
