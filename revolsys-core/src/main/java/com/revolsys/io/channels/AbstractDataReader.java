@@ -37,11 +37,7 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
     return "sb";
   }
 
-  private int available = 0;
-
   protected ByteBuffer buffer;
-
-  private int inAvailable = 0;
 
   protected ByteBuffer inBuffer;
 
@@ -74,6 +70,7 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
       this.inBuffer = buffer;
       this.inBuffer.clear();
     }
+    this.inBuffer.flip();
     this.inSize = this.inBuffer.capacity();
     this.buffer = this.inBuffer;
     this.tempBuffer.order(this.inBuffer.order());
@@ -82,8 +79,8 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
 
   protected void afterSeek() {
     clearUnreadBuffer();
-    this.available = 0;
     this.buffer.clear();
+    this.buffer.flip();
   }
 
   @Override
@@ -91,11 +88,14 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
     return this;
   }
 
-  private void clearUnreadBuffer() {
-    if (this.unreadBuffer != null) {
-      this.unreadBuffer.position(this.unreadBuffer.capacity());
+  private ByteBuffer clearUnreadBuffer() {
+    if (this.buffer == this.unreadBuffer) {
+      if (this.unreadBuffer != null) {
+        this.unreadBuffer.position(this.unreadBuffer.capacity());
+      }
+      this.buffer = this.inBuffer;
     }
-    this.buffer = this.inBuffer;
+    return this.buffer;
   }
 
   @Override
@@ -107,19 +107,48 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
     this.tempBuffer = null;
   }
 
+  private int ensureRemaining() {
+    ByteBuffer buffer = this.buffer;
+    int remaining = buffer.remaining();
+    if (remaining <= 0) {
+      if (buffer == this.unreadBuffer) {
+        buffer = clearUnreadBuffer();
+        buffer = this.buffer;
+        remaining = buffer.remaining();
+        if (remaining > 0) {
+          return remaining;
+        }
+      }
+      try {
+        buffer.clear();
+        while (remaining <= 0) {
+          final int readCount = readInternal(buffer);
+          buffer.flip();
+          if (readCount == -1) {
+            return -1;
+          } else if (readCount == 0) {
+          } else {
+            this.readPosition += readCount;
+            remaining = buffer.remaining();
+          }
+        }
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    }
+    return remaining;
+  }
+
   @Override
   public int getAvailable() {
-    return this.available;
+    return this.buffer.remaining();
   }
 
   @Override
   public byte getByte() {
-    if (this.available == 0) {
-      if (!readDo(1)) {
-        throw new EndOfFileException();
-      }
+    if (ensureRemaining() == -1) {
+      throw new EndOfFileException();
     }
-    this.available--;
     return this.buffer.get();
   }
 
@@ -130,32 +159,31 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
 
   @Override
   public int getBytes(final byte[] bytes, final int offset, final int byteCount) {
-    if (this.available < byteCount) {
-      int readOffset = this.available;
+    int remaining = ensureRemaining();
+    if (remaining < byteCount) {
+      int readOffset = remaining;
       this.buffer.get(bytes, offset, readOffset);
-      this.available = 0;
       do {
         int bytesToRead = byteCount - readOffset;
         final int limit = this.buffer.limit();
         if (bytesToRead > limit) {
           bytesToRead = limit;
         }
-        if (!readDo(bytesToRead)) {
+        remaining = ensureRemaining();
+        if (remaining == -1) {
           if (readOffset == 0) {
             return -1;
           } else {
             return readOffset;
           }
         }
-        if (bytesToRead > this.available) {
-          bytesToRead = this.available;
+        if (bytesToRead > remaining) {
+          bytesToRead = remaining;
         }
-        this.available -= bytesToRead;
         this.buffer.get(bytes, offset + readOffset, bytesToRead);
         readOffset += bytesToRead;
       } while (readOffset < byteCount);
     } else {
-      this.available -= byteCount;
       this.buffer.get(bytes);
     }
     return byteCount;
@@ -175,22 +203,20 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
 
   @Override
   public double getDouble() {
-    if (this.available < 8) {
+    if (this.buffer.remaining() < 8) {
       final ByteBuffer tempBuffer = readTempBytes(8);
       return tempBuffer.getDouble();
     } else {
-      this.available -= 8;
       return this.buffer.getDouble();
     }
   }
 
   @Override
   public float getFloat() {
-    if (this.available < 4) {
+    if (this.buffer.remaining() < 4) {
       final ByteBuffer tempBuffer = readTempBytes(4);
       return tempBuffer.getFloat();
     } else {
-      this.available -= 4;
       return this.buffer.getFloat();
     }
   }
@@ -202,33 +228,30 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
 
   @Override
   public int getInt() {
-    if (this.available < 4) {
+    if (this.buffer.remaining() < 4) {
       final ByteBuffer tempBuffer = readTempBytes(4);
       return tempBuffer.getInt();
     } else {
-      this.available -= 4;
       return this.buffer.getInt();
     }
   }
 
   @Override
   public long getLong() {
-    if (this.available < 8) {
+    if (this.buffer.remaining() < 8) {
       final ByteBuffer tempBuffer = readTempBytes(8);
       return tempBuffer.getLong();
     } else {
-      this.available -= 8;
       return this.buffer.getLong();
     }
   }
 
   @Override
   public short getShort() {
-    if (this.available < 2) {
+    if (this.buffer.remaining() < 2) {
       final ByteBuffer tempBuffer = readTempBytes(2);
       return tempBuffer.getShort();
     } else {
-      this.available -= 2;
       return this.buffer.getShort();
     }
   }
@@ -272,30 +295,22 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
 
   @Override
   public boolean isByte(final byte expected) {
-    if (this.available == 0) {
-      if (!readDo(1)) {
-        return false;
-      }
+    if (ensureRemaining() == -1) {
+      return false;
     }
-    final ByteBuffer buffer = this.buffer;
-    buffer.mark();
-    final byte b = buffer.get();
-    buffer.reset();
+    final byte b = this.buffer.get();
+    unreadByte(b);
     return expected == b;
   }
 
   @Override
   public boolean isByte(final char expected) {
-    if (this.available == 0) {
-      if (!readDo(1)) {
-        return false;
-      }
+    if (ensureRemaining() == -1) {
+      return false;
     }
-    final ByteBuffer buffer = this.buffer;
-    buffer.mark();
-    final char b = (char)buffer.get();
-    buffer.reset();
-    return expected == b;
+    final byte b = this.buffer.get();
+    unreadByte(b);
+    return expected == ((char)b & 0xFF);
   }
 
   @Override
@@ -310,90 +325,52 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
 
   @Override
   public long position() {
-    return this.readPosition - this.available - this.inAvailable;
+    long position = this.readPosition - this.buffer.remaining();
+    if (this.buffer != this.inBuffer) {
+      position -= this.inBuffer.remaining();
+    }
+    return position;
   }
 
   @Override
   public int read() {
-    if (this.available == 0) {
-      if (!readDo(1)) {
-        return -1;
-      }
+    if (ensureRemaining() == -1) {
+      return -1;
     }
-    this.available--;
     final byte b = this.buffer.get();
     return b & 0xff;
   }
 
   @Override
   public int read(final byte[] bytes, final int offset, int length) throws IOException {
-    if (this.available == 0) {
-      if (!readDo(1)) {
-        return -1;
-      }
+    final int remaining = ensureRemaining();
+    if (remaining == -1) {
+      return -1;
     }
-    if (length > this.available) {
-      length = this.available;
+    if (length > remaining) {
+      length = remaining;
     }
     this.buffer.get(bytes, offset, length);
-    this.available -= length;
     return length;
   }
 
   @Override
   public int read(final ByteBuffer buffer) {
-    if (this.available == 0) {
-      if (!readDo(1)) {
-        return -1;
-      }
+    final int readRemaining = ensureRemaining();
+    if (readRemaining == -1) {
+      return -1;
     }
     final ByteBuffer readBuffer = this.buffer;
-    final int readRemaining = readBuffer.remaining();
     final int writerRemaining = buffer.remaining();
     if (readRemaining <= writerRemaining) {
       buffer.put(readBuffer);
-      this.available -= readRemaining;
       return readRemaining;
     } else {
       final int readLimit = readBuffer.limit();
       readBuffer.limit(readBuffer.position() + writerRemaining);
       buffer.put(readBuffer);
       readBuffer.limit(readLimit);
-      this.available -= writerRemaining;
       return writerRemaining;
-    }
-  }
-
-  protected boolean readDo(final int minCount) {
-    ByteBuffer buffer = this.buffer;
-    if (buffer == this.unreadBuffer) {
-      clearUnreadBuffer();
-      buffer = this.buffer;
-      this.available = this.inAvailable;
-      this.inAvailable = 0;
-      if (this.available > 0) {
-        return true;
-      }
-    }
-    int available = this.available;
-    try {
-      buffer.clear();
-      while (available < minCount) {
-        final int readCount = readInternal(buffer);
-        if (readCount == -1) {
-          return false;
-        } else if (readCount == 0) {
-        } else {
-          this.readPosition += readCount;
-          available += readCount;
-        }
-      }
-      buffer.flip();
-      return true;
-    } catch (final IOException e) {
-      throw Exceptions.wrap(e);
-    } finally {
-      this.available = available;
     }
   }
 
@@ -444,94 +421,23 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
 
   @Override
   public void skipBytes(int count) {
-    if (count < this.available) {
-      this.available -= count;
-      final int newPosition = this.buffer.position() + count;
-      this.buffer.position(newPosition);
+    int remaining = this.buffer.remaining();
+    if (count < remaining) {
     } else if (isSeekable()) {
       final long newPosition = position() + count;
       seek(newPosition);
+      return;
     } else {
-      while (count > this.available) {
-        count -= this.available;
-        this.available = 0;
-        readDo(count);
-      }
-      this.available -= count;
-      final int position = this.buffer.position();
-      this.buffer.position(position + count);
-    }
-  }
-
-  @Override
-  public void skipEol() {
-    final ByteBuffer buffer = this.buffer;
-    do {
-      if (this.available == 0) {
-        if (!readDo(1)) {
+      while (count > remaining) {
+        count -= remaining;
+        remaining = ensureRemaining();
+        if (remaining == -1) {
           return;
         }
       }
-      buffer.mark();
-      final byte b = buffer.get();
-      switch (b) {
-        case '\n':
-        case '\r':
-          this.available--;
-        break;
-
-        default:
-          buffer.reset();
-          return;
-      }
-    } while (true);
-  }
-
-  @Override
-  public boolean skipIfChar(final char c) {
-    if (this.available == 0) {
-      if (!readDo(1)) {
-        return false;
-      }
     }
-    final ByteBuffer buffer = this.buffer;
-    buffer.mark();
-    final byte b = buffer.get();
-    if (b == c) {
-      this.available--;
-      return true;
-    } else {
-      buffer.reset();
-      return false;
-    }
-  }
-
-  @Override
-  public void skipWhitespace() {
-    final ByteBuffer buffer = this.buffer;
-    do {
-      if (this.available == 0) {
-        if (!readDo(1)) {
-          return;
-        }
-      }
-      buffer.mark();
-      final byte b = buffer.get();
-      switch (b) {
-        case ' ':
-        case '\n':
-        case '\r':
-        case '\t':
-        case '\f':
-        case 0:
-          this.available--;
-        break;
-
-        default:
-          buffer.reset();
-          return;
-      }
-    } while (true);
+    final int position = this.buffer.position() + count;
+    this.buffer.position(position);
   }
 
   @Override
@@ -543,18 +449,15 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
   public void unreadByte(final byte b) {
     ByteBuffer buffer = this.buffer;
     final ByteBuffer unreadBuffer = this.unreadBuffer;
-    if (this.available == buffer.limit()) {
+    if (buffer.remaining() == buffer.limit()) {
       if (buffer == unreadBuffer) {
         throw new IllegalArgumentException("Exceeded unread capacity");
       } else {
-        this.inAvailable = this.available;
         buffer = this.buffer = this.unreadBuffer;
-        this.available = 0;
       }
     }
 
     final int newPosition = this.buffer.position() - 1;
-    this.available++;
     if (buffer == unreadBuffer) {
       this.unreadBytes[newPosition] = b;
       unreadBuffer.position(newPosition);

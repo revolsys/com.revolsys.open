@@ -10,8 +10,17 @@ import java.nio.charset.StandardCharsets;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.io.EndOfFileException;
+import com.revolsys.util.Debug;
+
+interface ByteFilter {
+  boolean accept(byte b);
+}
 
 public interface DataReader extends BaseCloseable {
+  public static ByteFilter WHITESPACE = Character::isWhitespace;
+
+  public static ByteFilter EOL = c -> c == '\n' || c == '\r';
 
   InputStream asInputStream();
 
@@ -173,32 +182,36 @@ public interface DataReader extends BaseCloseable {
   void skipBytes(int count);
 
   default void skipEol() {
-    byte b;
-    do {
-      b = getByte();
-    } while (b == '\n' || b == '\r');
-    if (b != -1) {
-      unreadByte(b);
-    }
+    skipWhile(EOL);
   }
 
   default boolean skipIfChar(final char c) {
-    if (isByte(c)) {
-      getByte();
+    final byte b = getByte();
+    if (c == (b & 0xFF)) {
       return true;
     } else {
+      unreadByte(b);
       return false;
     }
   }
 
-  default void skipWhitespace() {
+  default void skipWhile(final ByteFilter c) {
     byte b;
-    do {
-      b = getByte();
-    } while (Character.isWhitespace(b));
-    if (b != -1) {
-      unreadByte(b);
+    try {
+      do {
+        b = getByte();
+      } while (c.accept(b));
+      if (b != -1) {
+        unreadByte(b);
+      }
+    } catch (final EndOfFileException e) {
+      Debug.noOp();
     }
+
+  }
+
+  default void skipWhitespace() {
+    skipWhile(WHITESPACE);
   }
 
   void unreadByte(byte b);
