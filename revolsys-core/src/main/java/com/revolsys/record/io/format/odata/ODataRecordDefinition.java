@@ -12,7 +12,6 @@ import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinitionImpl;
-import com.revolsys.util.Debug;
 
 public class ODataRecordDefinition extends RecordDefinitionImpl {
 
@@ -28,9 +27,6 @@ public class ODataRecordDefinition extends RecordDefinitionImpl {
       for (final String fieldName : entityType.keySet()) {
 
         if (!fieldName.startsWith("$")) {
-          if ("tableNames".equals(fieldName)) {
-            Debug.noOp();
-          }
           final JsonObject entityField = entityType.getJsonObject(fieldName);
           final String type = entityField.getString("$Type");
           DataType dataType = OData.getDataTypeFromEdm(type);

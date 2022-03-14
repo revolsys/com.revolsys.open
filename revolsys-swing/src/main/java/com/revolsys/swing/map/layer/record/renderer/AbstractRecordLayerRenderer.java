@@ -9,7 +9,6 @@ import javax.swing.Icon;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
-import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.Geometry;
@@ -64,10 +63,12 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
 
   private static Predicate<MapEx> DEFAULT_FILTER = Predicates.all();
 
+  @SuppressWarnings("unchecked")
   public static Predicate<MapEx> getFilter(final RecordDefinitionProxy recordDefinitionProxy,
     final MapEx properties) {
-    MapEx filterDefinition = properties.getValue("filter");
-    if (filterDefinition != null) {
+    final Object filter = properties.getValue("filter", Predicates.all());
+    if (filter instanceof JsonObject) {
+      JsonObject filterDefinition = (JsonObject)filter;
       filterDefinition = JsonObject.hash(filterDefinition);
       final String type = MapObjectFactory.getType(filterDefinition);
       if ("valueFilter".equals(type)) {
@@ -93,6 +94,8 @@ public abstract class AbstractRecordLayerRenderer extends AbstractLayerRenderer<
       } else {
         Logs.error(AbstractRecordLayerRenderer.class, "Unknown filter type " + type);
       }
+    } else if (filter instanceof Predicate) {
+      return (Predicate<MapEx>)filter;
     }
     return Predicates.all();
   }

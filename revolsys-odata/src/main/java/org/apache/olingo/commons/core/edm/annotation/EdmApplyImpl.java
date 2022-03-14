@@ -22,12 +22,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmException;
 import org.apache.olingo.commons.api.edm.annotation.EdmApply;
 import org.apache.olingo.commons.api.edm.annotation.EdmExpression;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlApply;
 import org.apache.olingo.commons.api.edm.provider.annotation.CsdlExpression;
+import org.apache.olingo.commons.core.edm.Edm;
 
 public class EdmApplyImpl extends AbstractEdmAnnotatableDynamicExpression implements EdmApply {
 

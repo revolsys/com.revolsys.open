@@ -58,9 +58,21 @@ public class F {
       final GeometryFactory geometryFactory = fieldDefinition.getGeometryFactory();
       final Geometry geometry = geometryFactory.geometry(text);
       right = Value.newValue(fieldDefinition, geometry);
+    } else if (right instanceof Column) {
+      final Column value = (Column)right;
+      final String text = value.getName();
+      if (text.startsWith("geometry'")) {
+        final FieldDefinition fieldDefinition = field.getFieldDefinition();
+        final GeometryFactory geometryFactory = fieldDefinition.getGeometryFactory();
+        final Geometry geometry = geometryFactory.geometry(text);
+        right = Value.newValue(fieldDefinition, geometry);
+      } else {
+        throw new IllegalArgumentException(
+          "geo.intersections second argument must be a geometry: " + right);
+      }
     } else {
       throw new IllegalArgumentException(
-        "geo.intersections first argument must be a geometry: " + right);
+        "geo.intersections second argument must be a geometry: " + right);
     }
     return new EnvelopeIntersects(left, right);
   }

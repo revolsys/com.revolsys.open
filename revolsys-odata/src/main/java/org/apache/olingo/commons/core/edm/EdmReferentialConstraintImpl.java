@@ -18,7 +18,6 @@
  */
 package org.apache.olingo.commons.core.edm;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmReferentialConstraint;
 import org.apache.olingo.commons.api.edm.provider.CsdlReferentialConstraint;
 

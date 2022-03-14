@@ -151,13 +151,8 @@ public class JdbcQueryIterator extends AbstractIterator<Record>
       if (cancelled) {
         e2 = null;
       } else {
-        final JdbcConnection connection = this.connection;
         final String sql = getErrorMessage();
-        if (connection == null) {
-          e2 = new UncategorizedSQLException("Get Next", sql, e);
-        } else {
-          e2 = connection.getException("Get Next", sql, e);
-        }
+        e2 = toSqlException("Get Next", sql, e);
       }
       close();
       if (cancelled) {
@@ -244,7 +239,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record>
 
     } catch (final SQLException e) {
       JdbcUtils.close(this.statement, this.resultSet);
-      throw this.connection.getException("Execute Query", sql, e);
+      throw toSqlException("Execute Query", sql, e);
     }
     return this.resultSet;
   }
@@ -282,6 +277,15 @@ public class JdbcQueryIterator extends AbstractIterator<Record>
 
   protected void setQuery(final Query query) {
     this.query = query;
+  }
+
+  private DataAccessException toSqlException(String task, final String sql, final SQLException e) {
+    final JdbcConnection connection = this.connection;
+    if (connection == null) {
+      return new UncategorizedSQLException(task, sql, e);
+    } else {
+      return connection.getException(task, sql, e);
+    }
   }
 
 }

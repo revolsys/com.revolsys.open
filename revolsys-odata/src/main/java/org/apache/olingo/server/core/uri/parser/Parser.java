@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmEntityType;
 import org.apache.olingo.commons.api.edm.EdmStructuredType;
 import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.commons.api.ex.ODataRuntimeException;
+import org.apache.olingo.commons.core.edm.Edm;
 import org.apache.olingo.server.api.OData;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriInfoKind;
@@ -45,7 +45,6 @@ import org.apache.olingo.server.api.uri.queryoption.ApplyItem;
 import org.apache.olingo.server.api.uri.queryoption.ApplyOption;
 import org.apache.olingo.server.api.uri.queryoption.ExpandItem;
 import org.apache.olingo.server.api.uri.queryoption.ExpandOption;
-import org.apache.olingo.server.api.uri.queryoption.FilterOption;
 import org.apache.olingo.server.api.uri.queryoption.OrderByItem;
 import org.apache.olingo.server.api.uri.queryoption.OrderByOption;
 import org.apache.olingo.server.api.uri.queryoption.QueryOption;
@@ -53,6 +52,7 @@ import org.apache.olingo.server.api.uri.queryoption.SearchOption;
 import org.apache.olingo.server.api.uri.queryoption.SelectOption;
 import org.apache.olingo.server.api.uri.queryoption.SystemQueryOption;
 import org.apache.olingo.server.api.uri.queryoption.SystemQueryOptionKind;
+import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
 import org.apache.olingo.server.core.uri.UriInfoImpl;
 import org.apache.olingo.server.core.uri.UriResourceStartingTypeFilterImpl;
 import org.apache.olingo.server.core.uri.parser.UriTokenizer.TokenKind;
@@ -139,7 +139,7 @@ public class Parser {
     if (applyOption != null) {
       final String optionValue = applyOption.getText();
       final UriTokenizer applyTokenizer = new UriTokenizer(optionValue);
-      final ApplyOption option = new ApplyParser(this.edm, this.odata).parse(applyTokenizer,
+      final ApplyOption option = new ApplyParser(this.edm).parse(applyTokenizer,
         contextType instanceof EdmStructuredType ? (EdmStructuredType)contextType : null,
         entitySetNames, aliases);
       checkOptionEOF(applyTokenizer, applyOption.getName(), optionValue);
@@ -172,17 +172,25 @@ public class Parser {
     }
   }
 
-  private void parseFilterOption(final FilterOption filterOption, final EdmType contextType,
+  public Expression parseFilter(final EdmType contextType, final List<String> entitySetNames,
+    final Map<String, AliasQueryOption> aliases, final String filter)
+    throws UriParserException, UriValidationException {
+    final UriTokenizer filterTokenizer = new UriTokenizer(filter);
+    // The referring type could be a primitive type or a structured type.
+    final Expression expression = FilterParser.parseExpression(this.edm, filterTokenizer,
+      contextType, entitySetNames, aliases);
+    checkOptionEOF(filterTokenizer, "FILTER", filter);
+    return expression;
+  }
+
+  private void parseFilterOption(final UriInfoImpl contextUriInfo, final EdmType contextType,
     final List<String> entitySetNames, final Map<String, AliasQueryOption> aliases)
     throws UriParserException, UriValidationException {
+    final FilterOptionImpl filterOption = (FilterOptionImpl)contextUriInfo.getFilterOption();
     if (filterOption != null) {
       final String optionValue = filterOption.getText();
-      final UriTokenizer filterTokenizer = new UriTokenizer(optionValue);
-      // The referring type could be a primitive type or a structured type.
-      ((FilterOptionImpl)filterOption).setExpression(new FilterParser(this.edm, this.odata)
-        .parse(filterTokenizer, contextType, entitySetNames, aliases)
-        .getExpression());
-      checkOptionEOF(filterTokenizer, filterOption.getName(), optionValue);
+      final Expression expression = parseFilter(contextType, entitySetNames, aliases, optionValue);
+      filterOption.setExpression(expression);
     }
   }
 
@@ -299,7 +307,7 @@ public class Parser {
     if (orderByOption != null) {
       final String optionValue = orderByOption.getText();
       final UriTokenizer orderByTokenizer = new UriTokenizer(optionValue);
-      final OrderByOption option = new OrderByParser(this.edm, this.odata).parse(orderByTokenizer,
+      final OrderByOption option = new OrderByParser(this.edm).parse(orderByTokenizer,
         contextType instanceof EdmStructuredType ? (EdmStructuredType)contextType : null,
         entitySetNames, aliases);
       checkOptionEOF(orderByTokenizer, orderByOption.getName(), optionValue);
@@ -372,6 +380,7 @@ public class Parser {
 
     final String firstSegment = pathSegmentsDecoded.get(0);
 
+    final Map<String, AliasQueryOption> aliasMap = contextUriInfo.getAliasMap();
     if (firstSegment.isEmpty()) {
       ensureLastSegment(firstSegment, 1, numberOfSegments);
       contextUriInfo.setKind(UriInfoKind.service);
@@ -408,8 +417,7 @@ public class Parser {
            * http://localhost:8080/odata-server-tecsvc/odata.svc/$entity/
            * olingo.odata.test1.ETAllPrim?$id=ESAllPrim(32767)
            */
-          final ResourcePathParser resourcePathParser = new ResourcePathParser(this.edm,
-            contextUriInfo.getAliasMap());
+          final ResourcePathParser resourcePathParser = new ResourcePathParser(this.edm, aliasMap);
           final String typeCastSegment = pathSegmentsDecoded.get(1);
           ensureLastSegment(typeCastSegment, 2, numberOfSegments);
           contextType = resourcePathParser.parseDollarEntityTypeCast(typeCastSegment);
@@ -444,8 +452,8 @@ public class Parser {
     } else if (firstSegment.startsWith("$crossjoin")) {
       ensureLastSegment(firstSegment, 1, numberOfSegments);
       contextUriInfo.setKind(UriInfoKind.crossjoin);
-      final List<String> entitySetNames = new ResourcePathParser(this.edm,
-        contextUriInfo.getAliasMap()).parseCrossjoinSegment(firstSegment);
+      final List<String> entitySetNames = new ResourcePathParser(this.edm, aliasMap)
+        .parseCrossjoinSegment(firstSegment);
       for (final String name : entitySetNames) {
         contextUriInfo.addEntitySetName(name);
       }
@@ -453,8 +461,7 @@ public class Parser {
 
     } else {
       contextUriInfo.setKind(UriInfoKind.resource);
-      final ResourcePathParser resourcePathParser = new ResourcePathParser(this.edm,
-        contextUriInfo.getAliasMap());
+      final ResourcePathParser resourcePathParser = new ResourcePathParser(this.edm, aliasMap);
       int count = 0;
       UriResource lastSegment = null;
       for (final String pathSegment : pathSegmentsDecoded) {
@@ -514,15 +521,12 @@ public class Parser {
       // Data aggregation may change the structure of the result.
       contextType = new DynamicStructuredType((EdmStructuredType)contextType);
     }
-    parseApplyOption(contextUriInfo.getApplyOption(), contextType,
-      contextUriInfo.getEntitySetNames(), contextUriInfo.getAliasMap());
-    parseFilterOption(contextUriInfo.getFilterOption(), contextType,
-      contextUriInfo.getEntitySetNames(), contextUriInfo.getAliasMap());
-    parseOrderByOption(contextUriInfo.getOrderByOption(), contextType,
-      contextUriInfo.getEntitySetNames(), contextUriInfo.getAliasMap());
+    final List<String> entitySetNames = contextUriInfo.getEntitySetNames();
+    parseApplyOption(contextUriInfo.getApplyOption(), contextType, entitySetNames, aliasMap);
+    parseFilterOption(contextUriInfo, contextType, entitySetNames, aliasMap);
+    parseOrderByOption(contextUriInfo.getOrderByOption(), contextType, entitySetNames, aliasMap);
     parseExpandOption(contextUriInfo.getExpandOption(), contextType,
-      contextUriInfo.getKind() == UriInfoKind.all, contextUriInfo.getEntitySetNames(),
-      contextUriInfo.getAliasMap());
+      contextUriInfo.getKind() == UriInfoKind.all, entitySetNames, aliasMap);
     parseSelectOption(contextUriInfo.getSelectOption(), contextType, contextIsCollection);
 
     return contextUriInfo;

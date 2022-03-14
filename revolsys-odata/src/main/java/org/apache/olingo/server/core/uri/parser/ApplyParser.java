@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmElement;
 import org.apache.olingo.commons.api.edm.EdmFunction;
 import org.apache.olingo.commons.api.edm.EdmNavigationProperty;
@@ -38,7 +37,7 @@ import org.apache.olingo.commons.api.edm.EdmStructuredType;
 import org.apache.olingo.commons.api.edm.EdmType;
 import org.apache.olingo.commons.api.edm.FullQualifiedName;
 import org.apache.olingo.commons.api.edm.constants.EdmTypeKind;
-import org.apache.olingo.server.api.OData;
+import org.apache.olingo.commons.core.edm.Edm;
 import org.apache.olingo.server.api.uri.UriInfo;
 import org.apache.olingo.server.api.uri.UriParameter;
 import org.apache.olingo.server.api.uri.UriResource;
@@ -127,24 +126,21 @@ public class ApplyParser {
 
   private final Edm edm;
 
-  private final OData odata;
-
   private UriTokenizer tokenizer;
 
   private Collection<String> crossjoinEntitySetNames;
 
   private Map<String, AliasQueryOption> aliases;
 
-  public ApplyParser(final Edm edm, final OData odata) {
+  public ApplyParser(final Edm edm) {
     this.edm = edm;
-    this.odata = odata;
   }
 
   private void addPropertyToRefType(final EdmStructuredType referencedType, final String alias) {
     ((DynamicStructuredType)referencedType).addProperty(createDynamicProperty(alias,
       // The OData standard mandates Edm.Decimal (with no decimals), although
       // counts are always integer.
-      this.odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Decimal)));
+      EdmPrimitiveTypeKind.Decimal.getInstance()));
   }
 
   private DynamicProperty createDynamicProperty(final String name, final EdmType type) {
@@ -240,7 +236,7 @@ public class ApplyParser {
 
       // Second try is checking for a common expression.
       this.tokenizer.returnToSavedState();
-      final Expression expression = new ExpressionParser(this.edm, this.odata).parse(this.tokenizer,
+      final Expression expression = new ExpressionParser(this.edm).parse(this.tokenizer,
         referencedType, this.crossjoinEntitySetNames, this.aliases);
       aggregateExpression.setExpression(expression);
       parseAggregateWith(aggregateExpression);
@@ -355,7 +351,7 @@ public class ApplyParser {
     throws UriParserException, UriValidationException {
     final BottomTopImpl bottomTop = new BottomTopImpl();
     bottomTop.setMethod(TOKEN_KIND_TO_BOTTOM_TOP_METHOD.get(kind));
-    final ExpressionParser expressionParser = new ExpressionParser(this.edm, this.odata);
+    final ExpressionParser expressionParser = new ExpressionParser(this.edm);
     final Expression number = expressionParser.parse(this.tokenizer, referencedType,
       this.crossjoinEntitySetNames, this.aliases);
     expressionParser.checkIntegerType(number);
@@ -373,7 +369,7 @@ public class ApplyParser {
     throws UriParserException, UriValidationException {
     final ComputeImpl compute = new ComputeImpl();
     do {
-      final Expression expression = new ExpressionParser(this.edm, this.odata).parse(this.tokenizer,
+      final Expression expression = new ExpressionParser(this.edm).parse(this.tokenizer,
         referencedType, this.crossjoinEntitySetNames, this.aliases);
       final EdmType expressionType = ExpressionParser.getType(expression);
       if (expressionType.getKind() != EdmTypeKind.PRIMITIVE) {
@@ -449,7 +445,7 @@ public class ApplyParser {
       (UriResourcePartTyped)((UriInfoImpl)item.getResourcePath()).getLastResourcePart());
     if (this.tokenizer.next(TokenKind.COMMA)) {
       if (this.tokenizer.next(TokenKind.FilterTrafo)) {
-        item.setSystemQueryOption(new FilterParser(this.edm, this.odata).parse(this.tokenizer, type,
+        item.setSystemQueryOption(new FilterParser(this.edm).parse(this.tokenizer, type,
           this.crossjoinEntitySetNames, this.aliases));
         ParserHelper.requireNext(this.tokenizer, TokenKind.CLOSE);
       } else {
@@ -611,7 +607,7 @@ public class ApplyParser {
       return new ExpandImpl().setExpandOption(parseExpandTrafo(referencedType));
 
     } else if (this.tokenizer.next(TokenKind.FilterTrafo)) {
-      final FilterOption filterOption = new FilterParser(this.edm, this.odata).parse(this.tokenizer,
+      final FilterOption filterOption = new FilterParser(this.edm).parse(this.tokenizer,
         referencedType, this.crossjoinEntitySetNames, this.aliases);
       ParserHelper.requireNext(this.tokenizer, TokenKind.CLOSE);
       return new FilterImpl().setFilterOption(filterOption);
@@ -625,8 +621,8 @@ public class ApplyParser {
       return new SearchImpl().setSearchOption(searchOption);
 
     } else if (this.tokenizer.next(TokenKind.OrderByTrafo)) {
-      final OrderByOption orderByOption = new OrderByParser(this.edm, this.odata)
-        .parse(this.tokenizer, referencedType, this.crossjoinEntitySetNames, this.aliases);
+      final OrderByOption orderByOption = new OrderByParser(this.edm).parse(this.tokenizer,
+        referencedType, this.crossjoinEntitySetNames, this.aliases);
       ParserHelper.requireNext(this.tokenizer, TokenKind.CLOSE);
       return new OrderByImpl().setOrderByOption(orderByOption);
     } else if (this.tokenizer.next(TokenKind.TopTrafo)) {

@@ -113,7 +113,7 @@ public class JsonWebToken {
   }
 
   public String getString(final String name) {
-    return payload.getString(name);
+    return this.payload.getString(name);
   }
 
   public String getSubject() {
@@ -133,8 +133,21 @@ public class JsonWebToken {
     return this.token;
   }
 
+  public boolean isValid(final Iterable<String> issuers) {
+    for (final String issuer : issuers) {
+      if (isValid(issuer)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public boolean isValid(final String issuer) {
     try {
+      final String iss = getIssuer();
+      if (!issuer.equals(iss)) {
+        return false;
+      }
       if (!this.header.equalValue("typ", "JWT") && this.header.hasValue("typ")) {
         return false;
       }
@@ -158,11 +171,6 @@ public class JsonWebToken {
         if (now.isAfter(expiry)) {
           return false;
         }
-      }
-
-      final String iss = getIssuer();
-      if (!issuer.equals(iss)) {
-        return false;
       }
 
       final URI openidConfigUri = URI.create(issuer + "/.well-known/openid-configuration");

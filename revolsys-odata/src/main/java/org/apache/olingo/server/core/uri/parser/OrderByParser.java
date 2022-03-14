@@ -21,9 +21,8 @@ package org.apache.olingo.server.core.uri.parser;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmStructuredType;
-import org.apache.olingo.server.api.OData;
+import org.apache.olingo.commons.core.edm.Edm;
 import org.apache.olingo.server.api.uri.queryoption.AliasQueryOption;
 import org.apache.olingo.server.api.uri.queryoption.OrderByOption;
 import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
@@ -36,11 +35,8 @@ public class OrderByParser {
 
   private final Edm edm;
 
-  private final OData odata;
-
-  public OrderByParser(final Edm edm, final OData odata) {
+  public OrderByParser(final Edm edm) {
     this.edm = edm;
-    this.odata = odata;
   }
 
   public OrderByOption parse(final UriTokenizer tokenizer, final EdmStructuredType referencedType,
@@ -48,8 +44,8 @@ public class OrderByParser {
     throws UriParserException, UriValidationException {
     final OrderByOptionImpl orderByOption = new OrderByOptionImpl();
     do {
-      final Expression orderByExpression = new ExpressionParser(this.edm, this.odata)
-        .parse(tokenizer, referencedType, crossjoinEntitySetNames, aliases);
+      final Expression orderByExpression = new ExpressionParser(this.edm).parse(tokenizer,
+        referencedType, crossjoinEntitySetNames, aliases);
       final OrderByItemImpl item = new OrderByItemImpl();
       item.setExpression(orderByExpression);
       if (tokenizer.next(TokenKind.AscSuffix)) {

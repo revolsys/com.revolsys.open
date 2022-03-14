@@ -530,7 +530,6 @@ public class ODataEntityType extends CsdlEntityType {
         final String name = field.getName();
 
         if (addProperty(recordDefinition, field) == null) {
-          // Debug.noOp();
         }
 
         if (recordDefinition.isIdField(name)) {

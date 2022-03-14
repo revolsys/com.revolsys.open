@@ -603,7 +603,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     }
   }
 
-  private RecordStoreLayerRecord newLayerRecord() {
+  protected LayerRecord newLayerRecord() {
     if (this.hasIdField) {
       return new RecordStoreLayerRecordWithId(this);
     } else {
@@ -616,7 +616,7 @@ public class RecordStoreLayer extends AbstractRecordLayer {
     if (!isReadOnly() && isEditable() && isCanAddRecords()) {
 
       final RecordDefinition recordDefinition = getRecordDefinition();
-      final ArrayLayerRecord newRecord = newLayerRecord();
+      final LayerRecord newRecord = newLayerRecord();
       if (values != null) {
         newRecord.setState(RecordState.INITIALIZING);
         for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {

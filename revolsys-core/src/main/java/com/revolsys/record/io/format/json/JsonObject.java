@@ -57,7 +57,11 @@ public interface JsonObject extends MapEx, JsonType {
   }
 
   static JsonObject hash(final Map<? extends String, ? extends Object> m) {
-    return new JsonObjectHash(m);
+    if (m == null) {
+      return new JsonObjectHash();
+    } else {
+      return new JsonObjectHash(m);
+    }
   }
 
   static JsonObject hash(final String key, final Object value) {

@@ -152,6 +152,10 @@ public abstract class AbstractAction extends javax.swing.AbstractAction {
     return setAcceleratorKey(keyCode, modifiers);
   }
 
+  public AbstractAction setAcceleratorKey(final int keyCode) {
+    return setAcceleratorKey(keyCode, 0);
+  }
+
   public AbstractAction setAcceleratorKey(final int keyCode, final int modifiers) {
     final KeyStroke keyStroke = KeyStroke.getKeyStroke(keyCode, modifiers);
     setAcceleratorKey(keyStroke);

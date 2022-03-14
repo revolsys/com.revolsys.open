@@ -14,6 +14,7 @@ import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.record.code.AbstractCodeTable;
 import com.revolsys.record.io.format.esri.gdb.xml.model.CodedValue;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Domain;
+import com.revolsys.record.io.format.json.JsonObject;
 
 public class FileGdbDomainCodeTable extends AbstractCodeTable {
   private final Domain domain;
@@ -103,7 +104,7 @@ public class FileGdbDomainCodeTable extends AbstractCodeTable {
   }
 
   @Override
-  public Map<String, ? extends Object> getMap(final Identifier id) {
+  public JsonObject getMap(final Identifier id) {
     return this.domain.getMap(id);
   }
 

@@ -16,6 +16,7 @@ import com.revolsys.record.io.RecordStoreConnectionManager;
 import com.revolsys.record.io.RecordStoreConnectionMapProxy;
 import com.revolsys.record.io.RecordStoreConnectionRegistry;
 import com.revolsys.record.io.RecordStoreProxy;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
@@ -114,12 +115,12 @@ public class PathRecordStoreTreeNode extends PathTreeNode
   }
 
   @Override
-  public Map<String, Object> getRecordStoreConnectionMap() {
+  public JsonObject getRecordStoreConnectionMap() {
     final BaseTreeNode parent = getParent();
     final Path path = getPath();
     final URL url = getUrl(parent, path);
 
-    return Collections.<String, Object> singletonMap("url", url.toString());
+    return JsonObject.hash("url", url.toString());
   }
 
   @Override

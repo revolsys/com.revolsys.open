@@ -6,6 +6,7 @@ import java.net.URI;
 import org.apache.http.HttpRequest;
 
 public class ApacheHttpRequestBuilderFactory {
+  public static final ApacheHttpRequestBuilderFactory FACTORY = new ApacheHttpRequestBuilderFactory();
 
   public ApacheHttpRequestBuilder copy(final HttpRequest request) {
     return newRequestBuilder().setRequest(request);

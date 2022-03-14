@@ -16,10 +16,13 @@ import org.jeometry.coordinatesystem.util.Hex;
 
 import com.revolsys.collection.map.Maps;
 import com.revolsys.collection.set.Sets;
+import com.revolsys.geometry.model.Geometry;
+import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.record.query.Add;
 import com.revolsys.record.query.And;
 import com.revolsys.record.query.CollectionValue;
 import com.revolsys.record.query.Column;
+import com.revolsys.record.query.ColumnReference;
 import com.revolsys.record.query.Condition;
 import com.revolsys.record.query.Divide;
 import com.revolsys.record.query.GreaterThan;
@@ -37,6 +40,7 @@ import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.Subtract;
 import com.revolsys.record.query.TableReference;
 import com.revolsys.record.query.Value;
+import com.revolsys.record.query.functions.Distance;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.query.functions.Lower;
 import com.revolsys.record.query.functions.Upper;
@@ -71,6 +75,8 @@ public class ODataParser {
   private static class Methods {
 
     public static final String CAST = "cast";
+
+    public static final String CONTAINS = "contains";
 
     public static final String ISOF = "isof";
 
@@ -115,6 +121,8 @@ public class ODataParser {
     public static final String CEILING = "ceiling";
 
     public static final String GEO_INTERSECTS = "geo.intersects";
+
+    public static final String GEO_DISTANCE = "geo.distance";
   };
 
   public static class Token {
@@ -142,7 +150,29 @@ public class ODataParser {
 
     @Override
     public String toString() {
-      return "[" + this.value + "] " + this.type;
+      switch (this.type) {
+        case UNKNOWN:
+          return "UNKNOWN";
+        case WHITESPACE:
+          return "<" + this.value + ">";
+        case QUOTED_STRING:
+          return this.value;
+        case WORD:
+          return "{" + this.value + "}";
+        case NUMBER:
+          return this.value;
+        case OPENPAREN:
+          return "(";
+        case CLOSEPAREN:
+          return ")";
+        case EXPRESSION:
+          return this.value;
+        case SYMBOL:
+          return this.value;
+
+        default:
+          return "????";
+      }
     }
   }
 
@@ -154,7 +184,7 @@ public class ODataParser {
     Methods.STARTSWITH, Methods.SUBSTRINGOF, Methods.INDEXOF, Methods.REPLACE, Methods.TOLOWER,
     Methods.TOUPPER, Methods.TRIM, Methods.SUBSTRING, Methods.CONCAT, Methods.LENGTH, Methods.YEAR,
     Methods.MONTH, Methods.DAY, Methods.HOUR, Methods.MINUTE, Methods.SECOND, Methods.ROUND,
-    Methods.FLOOR, Methods.CEILING, Methods.GEO_INTERSECTS);
+    Methods.FLOOR, Methods.CEILING, Methods.GEO_INTERSECTS, Methods.GEO_DISTANCE, Methods.CONTAINS);
 
   private static final Map<String, Function<List<QueryValue>, QueryValue>> METHOD_FACTORIES = Maps
     .<String, Function<List<QueryValue>, QueryValue>> buildHash()//
@@ -167,6 +197,65 @@ public class ODataParser {
         values.set(1, newValue);
       }
       return F.envelopeIntersects(values);
+    })
+    .add(Methods.GEO_DISTANCE, (values) -> {
+      final QueryValue left = values.get(0);
+      QueryValue right = values.get(1);
+      if (right instanceof CollectionValue) {
+        right = ((CollectionValue)right).getQueryValues().get(0);
+      }
+
+      if (!(left instanceof ColumnReference)) {
+        throw new IllegalArgumentException(
+          "geo.intersections first argument must be a column reference");
+      }
+      final ColumnReference field = (ColumnReference)left;
+      if (right instanceof Value) {
+        final Value value = (Value)right;
+        final String text = value.getValue().toString();
+        final FieldDefinition fieldDefinition = field.getFieldDefinition();
+        final GeometryFactory geometryFactory = fieldDefinition.getGeometryFactory();
+        final Geometry geometry = geometryFactory.geometry(text);
+        right = Value.newValue(fieldDefinition, geometry);
+      } else if (right instanceof Column) {
+        final Column value = (Column)right;
+        final String text = value.getName();
+        if (text.startsWith("geometry'")) {
+          final FieldDefinition fieldDefinition = field.getFieldDefinition();
+          final GeometryFactory geometryFactory = fieldDefinition.getGeometryFactory();
+          final Geometry geometry = geometryFactory.geometry(text);
+          right = Value.newValue(fieldDefinition, geometry);
+        } else {
+          throw new IllegalArgumentException(
+            "geo.intersections second argument must be a geometry: " + right);
+        }
+      } else {
+        throw new IllegalArgumentException(
+          "geo.intersections second argument must be a geometry: " + right);
+      }
+      return new Distance(left, right);
+    })
+    .add(Methods.CONTAINS, (args) -> {
+
+      QueryValue left = args.get(0);
+      QueryValue right = args.get(1);
+      if (left instanceof Upper && right instanceof Upper) {
+        left = left.getQueryValues().get(0);
+        right = right.getQueryValues().get(0);
+        if (right instanceof Value) {
+          final Value value = (Value)right;
+          return Q.iLike(left, "%" + value.getValue() + "%");
+        } else {
+          return Q.iLike(left, right);
+        }
+      } else {
+        if (right instanceof Value) {
+          final Value value = (Value)right;
+          return Q.like(left, value.getValue().toString());
+        } else {
+          return Q.like(left, right);
+        }
+      }
     })
     .getMap();
 
@@ -195,6 +284,25 @@ public class ODataParser {
     .add("not", new Pair<>(true, Not::new))
     .add("-", new Pair<>(false, Negate::new))
     .getMap();
+
+  private static boolean isHex(final char c) {
+    return c >= '0' && c <= '9' || c >= 'A' && c <= 'F' || c >= 'a' && c <= 'f';
+  }
+
+  private static boolean isUuid(final String value, final int current) {
+    try {
+      if (current + 36 < value.length()) {
+        final char c = value.charAt(current);
+        if (isHex(c) && value.charAt(current + 8) == '-') {
+          final String text = value.substring(current, current + 36);
+          UUID.fromString(text);
+          return true;
+        }
+      }
+    } catch (final Exception e) {
+    }
+    return false;
+  }
 
   private static QueryValue methodCall(final String methodName,
     final List<QueryValue> methodArguments) {
@@ -538,14 +646,19 @@ public class ODataParser {
         break;
       }
     }
-    final int end = rt;
-    final String token = text.substring(start, end);
+    String token = text.substring(start, rt);
     if ("-".equals(token)) {
-      return new Token(TokenType.SYMBOL, token, end);
+      return new Token(TokenType.SYMBOL, token, rt);
     } else if (wasDigits) {
-      return new Token(TokenType.NUMBER, token, end);
+      if (text.charAt(rt) == '.') {
+        do {
+          rt++;
+        } while (rt < text.length() && Character.isDigit(text.charAt(rt)));
+        token = text.substring(start, rt);
+      }
+      return new Token(TokenType.NUMBER, token, rt);
     } else {
-      return new Token(TokenType.QUOTED_STRING, "'" + token + "'", end);
+      return new Token(TokenType.QUOTED_STRING, "'" + token + "'", rt);
     }
   }
 
@@ -668,29 +781,35 @@ public class ODataParser {
     // single token expression
     if (tokens.size() == 1) {
       final Token token = tokens.get(0);
+      final String text = token.value;
       if (token.type == TokenType.QUOTED_STRING) {
-        return Value.newValue(unquote(token.value));
+        return Value.newValue(unquote(text));
       } else if (token.type == TokenType.WORD) {
-        if (token.value.equals("null")) {
+        if (text.equals("null")) {
           return Value.newValue(null);
         }
-        if (token.value.equals("true")) {
+        if (text.equals("true")) {
           return Value.newValue(true);
         }
-        if (token.value.equals("false")) {
+        if (text.equals("false")) {
           return Value.newValue(false);
         }
         try {
-          return table.getColumn(token.value);
+          return table.getColumn(text);
         } catch (final Exception e) {
-          return new Column(token.value);
+          return new Column(text);
         }
       } else if (token.type == TokenType.NUMBER) {
-        try {
-          final int value = Integer.parseInt(token.value);
-          return Value.newValue(value);
-        } catch (final NumberFormatException e) {
-          final long value = Long.parseLong(token.value);
+        if (text.indexOf('.') == -1) {
+          try {
+            final int value = Integer.parseInt(text);
+            return Value.newValue(value);
+          } catch (final NumberFormatException e) {
+            final long value = Long.parseLong(text);
+            return Value.newValue(value);
+          }
+        } else {
+          final double value = Double.parseDouble(text);
           return Value.newValue(value);
         }
       } else if (token.type == TokenType.EXPRESSION) {
@@ -758,31 +877,29 @@ public class ODataParser {
   private static int readWord(final String text, final int start) {
     int rt = start;
     boolean instring = false;
-    int singleQuoteCount = 0;
-    while (rt < text.length()) {
+    final int length = text.length();
+    while (rt < length) {
       final char c = text.charAt(rt);
       if (instring) {
         if (c == '\'') {
-          if (singleQuoteCount == 0) {
-            singleQuoteCount++;
-          } else if (singleQuoteCount == 1) {
-            singleQuoteCount = 0;
+          if (rt + 1 < length) {
+            final char c2 = text.charAt(rt + 1);
+            if (c2 == '\'') {
+              rt++;
+            } else {
+              return rt + 1;
+            }
+          } else {
+            return rt;
           }
-        } else if (singleQuoteCount == 1) {
-          instring = false;
-        } else {
-          singleQuoteCount = 0;
-          rt++;
         }
       } else if (c == '\'') {
         instring = true;
-        singleQuoteCount = 0;
-      } else if (instring || Character.isLetterOrDigit(c) || c == '/' || c == '_' || c == '.'
-        || c == '*') {
-        rt++;
+      } else if (Character.isLetterOrDigit(c) || c == '/' || c == '_' || c == '.' || c == '*') {
       } else {
         return rt;
       }
+      rt++;
     }
     return rt - 1;
   }
@@ -791,40 +908,50 @@ public class ODataParser {
   private static List<Token> tokenize(final String value) {
     final List<Token> rt = new ArrayList<>();
     int current = 0;
-    int end = 0;
-
     while (true) {
       if (current == value.length()) {
         return rt;
       }
       final char c = value.charAt(current);
       if (Character.isWhitespace(c)) {
-        end = readWhitespace(value, current);
-        rt.add(new Token(TokenType.WHITESPACE, value.substring(current, end)));
+        final int end = readWhitespace(value, current);
+        final String string = value.substring(current, end);
+        final Token token = new Token(TokenType.WHITESPACE, string);
+        rt.add(token);
         current = end;
       } else if (c == '\'') {
-        end = readQuotedString(value, current + 1);
-        rt.add(new Token(TokenType.QUOTED_STRING, value.substring(current, end)));
+        final int end = readQuotedString(value, current + 1);
+        final String string = value.substring(current, end);
+        final Token token = new Token(TokenType.QUOTED_STRING, string);
+        rt.add(token);
+        current = end;
+      } else if (c == '(') {
+        final Token token = new Token(TokenType.OPENPAREN, Character.toString(c));
+        rt.add(token);
+        current++;
+      } else if (c == ')') {
+        final Token token = new Token(TokenType.CLOSEPAREN, Character.toString(c));
+        rt.add(token);
+        current++;
+      } else if (",.+=:".indexOf(c) > -1) {
+        final Token token = new Token(TokenType.SYMBOL, Character.toString(c));
+        rt.add(token);
+        current++;
+      } else if (isUuid(value, current)) {
+        final int end = current + 36;
+        final String string = "'" + value.substring(current, end) + "'";
+        final Token token = new Token(TokenType.QUOTED_STRING, string);
+        rt.add(token);
         current = end;
       } else if (Character.isLetter(c) || c == '*') {
-        end = readWord(value, current + 1);
+        final int end = readWord(value, current + 1);
         final String tokenString = value.substring(current, end);
-
         rt.add(new Token(TokenType.WORD, tokenString));
         current = end;
       } else if (Character.isDigit(c) || 'c' == '-') {
         final Token token = readDigits(value, current);
         rt.add(token);
         current = token.getEnd();
-      } else if (c == '(') {
-        rt.add(new Token(TokenType.OPENPAREN, Character.toString(c)));
-        current++;
-      } else if (c == ')') {
-        rt.add(new Token(TokenType.CLOSEPAREN, Character.toString(c)));
-        current++;
-      } else if (",.+=:".indexOf(c) > -1) {
-        rt.add(new Token(TokenType.SYMBOL, Character.toString(c)));
-        current++;
       } else {
         throw new RuntimeException("Unable to tokenize: " + value + " current: " + current
           + " rem: " + value.substring(current));

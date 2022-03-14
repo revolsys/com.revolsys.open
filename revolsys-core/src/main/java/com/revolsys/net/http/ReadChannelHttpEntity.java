@@ -20,7 +20,7 @@ public class ReadChannelHttpEntity extends AbstractHttpEntity {
 
   private final ReadableByteChannel channel;
 
-  public ReadChannelHttpEntity(final ReadableByteChannel channel, long length) {
+  public ReadChannelHttpEntity(final ReadableByteChannel channel, final long length) {
     this.channel = channel;
     this.length = length;
   }
@@ -42,7 +42,7 @@ public class ReadChannelHttpEntity extends AbstractHttpEntity {
 
   @Override
   public boolean isStreaming() {
-    return false;
+    return true;
   }
 
   @Override
@@ -50,7 +50,7 @@ public class ReadChannelHttpEntity extends AbstractHttpEntity {
     try (
       WritableByteChannel outChannel = java.nio.channels.Channels
         .newChannel(new IgnoreCloseDelegatingOutputStream(out))) {
-      Channels.copy(channel, outChannel, length);
+      Channels.copy(this.channel, outChannel, this.length);
     }
   }
 

@@ -21,10 +21,9 @@ package org.apache.olingo.server.core.uri.parser;
 import java.util.Collection;
 import java.util.Map;
 
-import org.apache.olingo.commons.api.edm.Edm;
 import org.apache.olingo.commons.api.edm.EdmPrimitiveTypeKind;
 import org.apache.olingo.commons.api.edm.EdmType;
-import org.apache.olingo.server.api.OData;
+import org.apache.olingo.commons.core.edm.Edm;
 import org.apache.olingo.server.api.uri.queryoption.AliasQueryOption;
 import org.apache.olingo.server.api.uri.queryoption.FilterOption;
 import org.apache.olingo.server.api.uri.queryoption.expression.Expression;
@@ -33,28 +32,32 @@ import org.apache.olingo.server.core.uri.validator.UriValidationException;
 
 public class FilterParser {
 
-  private final Edm edm;
-
-  private final OData odata;
-
-  public FilterParser(final Edm edm, final OData odata) {
-    this.edm = edm;
-    this.odata = odata;
-  }
-
-  public FilterOption parse(final UriTokenizer tokenizer, final EdmType referencedType,
-    final Collection<String> crossjoinEntitySetNames, final Map<String, AliasQueryOption> aliases)
-    throws UriParserException, UriValidationException {
-    final Expression filterExpression = new ExpressionParser(this.edm, this.odata).parse(tokenizer,
-      referencedType, crossjoinEntitySetNames, aliases);
+  public static Expression parseExpression(final Edm edm, final UriTokenizer tokenizer,
+    final EdmType referencedType, final Collection<String> crossjoinEntitySetNames,
+    final Map<String, AliasQueryOption> aliases) throws UriParserException, UriValidationException {
+    final Expression filterExpression = new ExpressionParser(edm).parse(tokenizer, referencedType,
+      crossjoinEntitySetNames, aliases);
     final EdmType type = ExpressionParser.getType(filterExpression);
-    if (type == null
-      || type.equals(this.odata.createPrimitiveTypeInstance(EdmPrimitiveTypeKind.Boolean))) {
-      return new FilterOptionImpl().setExpression(filterExpression);
+    if (type == null || type.equals(EdmPrimitiveTypeKind.Boolean.getInstance())) {
+      return filterExpression;
     } else {
       throw new UriParserSemanticException("Filter expressions must be boolean.",
         UriParserSemanticException.MessageKeys.TYPES_NOT_COMPATIBLE, "Edm.Boolean",
         type.getFullQualifiedName().getFullQualifiedNameAsString());
     }
+  }
+
+  private final Edm edm;
+
+  public FilterParser(final Edm edm) {
+    this.edm = edm;
+  }
+
+  public FilterOption parse(final UriTokenizer tokenizer, final EdmType referencedType,
+    final Collection<String> crossjoinEntitySetNames, final Map<String, AliasQueryOption> aliases)
+    throws UriParserException, UriValidationException {
+    final Expression filterExpression = parseExpression(this.edm, tokenizer, referencedType,
+      crossjoinEntitySetNames, aliases);
+    return new FilterOptionImpl().setExpression(filterExpression);
   }
 }

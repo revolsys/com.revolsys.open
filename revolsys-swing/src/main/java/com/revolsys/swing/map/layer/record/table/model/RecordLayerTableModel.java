@@ -708,6 +708,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
 
         final boolean sortable = tableRecordsMode.isSortable();
         table.setSortable(sortable);
+        table.setSortOrder(getColumnFieldsOffset(), SortOrder.ASCENDING);
 
         final RowFilter<RecordRowTableModel, Integer> rowFilter = getRowFilter();
         table.setRowFilter(rowFilter);

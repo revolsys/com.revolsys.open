@@ -367,7 +367,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     addField(fieldName, field);
   }
 
-  protected void addPanel(final JPanel container, final String title,
+  protected JPanel addPanel(final JPanel container, final String title,
     final List<String> fieldNames) {
     final JPanel panel = newPanel(container, title);
 
@@ -376,6 +376,7 @@ public class LayerRecordForm extends JPanel implements PropertyChangeListener, C
     }
 
     GroupLayouts.makeColumns(panel, 2, true);
+    return panel;
   }
 
   public void addReadOnlyFieldNames(final Collection<String> readOnlyFieldNames) {

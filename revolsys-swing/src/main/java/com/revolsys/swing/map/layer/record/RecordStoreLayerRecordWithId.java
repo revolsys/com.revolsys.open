@@ -1,5 +1,7 @@
 package com.revolsys.swing.map.layer.record;
 
+import com.revolsys.record.Record;
+
 public class RecordStoreLayerRecordWithId extends RecordStoreLayerRecord {
 
   private RecordStoreLayerRecordWithIdProxy proxyRecord;
@@ -10,7 +12,7 @@ public class RecordStoreLayerRecordWithId extends RecordStoreLayerRecord {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <R extends LayerRecord> R getRecordProxy() {
+  public <R extends Record> R getRecordProxy() {
     if (this.proxyRecord == null) {
       final RecordStoreLayer layer = getLayer();
       synchronized (layer.getRecordCacheSync()) {

@@ -204,6 +204,11 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
     return Identifier.newIdentifier(value);
   }
 
+  default Identifier getIdentifier(final CharSequence fieldName, final DataType dataType) {
+    final Object value = getValue(fieldName, dataType);
+    return Identifier.newIdentifier(value);
+  }
+
   default Instant getInstant(final CharSequence name) {
     return getValue(name, DataTypes.INSTANT);
   }
