@@ -310,14 +310,18 @@ public final class JsonWriter implements BaseCloseable {
     blockStart(JsonState.START_OBJECT);
   }
 
-  public void string(final String string) throws IOException {
-    final Writer out = this.out;
-    if (string == null) {
-      out.write("null");
-    } else {
-      out.write('"');
-      this.encodingOut.write(string);
-      out.write('"');
+  public void string(final String string) {
+    try {
+      final Writer out = this.out;
+      if (string == null) {
+        out.write("null");
+      } else {
+        out.write('"');
+        this.encodingOut.write(string);
+        out.write('"');
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
     }
   }
 
