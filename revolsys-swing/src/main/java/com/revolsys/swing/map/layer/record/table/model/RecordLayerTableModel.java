@@ -617,7 +617,7 @@ public class RecordLayerTableModel extends RecordRowTableModel
   private void setOrderByInternal(final Map<? extends CharSequence, Boolean> orderBy) {
     if (Property.hasValue(orderBy)) {
       this.orderBy = orderBy;
-      this.orderByComparatorIdentifier = Records.newComparatorOrderByIdentifier(orderBy);
+      this.orderByComparatorIdentifier = Records.newComparatorOrderBy(orderBy);
     } else {
       this.orderBy = Collections.emptyMap();
       this.orderByComparatorIdentifier = null;

@@ -209,6 +209,13 @@ public class AbstractTableRecordStore {
     return true;
   }
 
+  public boolean deleteRecord(final TableRecordStoreConnection connection, final Object id) {
+    try (
+      Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED)) {
+      return newQuery(connection).andEqualId(id).deleteRecords() == 1;
+    }
+  }
+
   public boolean deleteRecord(final TableRecordStoreConnection connection, final Record record) {
     try (
       Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED)) {

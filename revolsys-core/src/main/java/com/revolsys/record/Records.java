@@ -574,6 +574,22 @@ public interface Records {
     };
   }
 
+  static <R extends MapEx> Comparator<R> newComparatorField(final CharSequence fieldName) {
+    return (record1, record2) -> {
+      if (record1 == record2) {
+        return 0;
+      } else {
+        final Object value1 = record1.getValue(fieldName);
+        final Object value2 = record2.getValue(fieldName);
+        final int compare = CompareUtil.compare(value1, value2);
+        if (compare != 0) {
+          return compare;
+        }
+      }
+      return 0;
+    };
+  }
+
   static <R extends MapEx> Comparator<R> newComparatorOrderBy(final List<OrderBy> orderBy) {
     return (record1, record2) -> {
       if (record1 == record2) {
@@ -607,13 +623,42 @@ public interface Records {
     };
   }
 
+  static <R extends Record> Comparator<R> newComparatorOrderBy(
+    final Map<? extends CharSequence, Boolean> orderBy) {
+    if (Property.hasValue(orderBy)) {
+      return (record1, record2) -> {
+        if (record1 == record2) {
+          return 0;
+        } else {
+          for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
+            final CharSequence fieldName = entry.getKey();
+            final Boolean ascending = entry.getValue();
+            final Object value1 = record1.getValue(fieldName);
+            final Object value2 = record2.getValue(fieldName);
+            final int compare = CompareUtil.compare(value1, value2);
+            if (compare != 0) {
+              if (ascending) {
+                return compare;
+              } else {
+                return -compare;
+              }
+            }
+          }
+          return 0;
+        }
+      };
+    } else {
+      return (record1, record2) -> 0;
+    }
+  }
+
   static <R extends Record> Comparator<R> newComparatorOrderByIdentifier(
     final Map<? extends CharSequence, Boolean> orderBy) {
-    return (record1, record2) -> {
-      if (record1 == record2) {
-        return 0;
-      } else {
-        if (Property.hasValue(orderBy)) {
+    if (Property.hasValue(orderBy)) {
+      return (record1, record2) -> {
+        if (record1 == record2) {
+          return 0;
+        } else {
           for (final Entry<? extends CharSequence, Boolean> entry : orderBy.entrySet()) {
             final CharSequence fieldName = entry.getKey();
             final Boolean ascending = entry.getValue();
@@ -631,11 +676,17 @@ public interface Records {
           final Identifier identifier1 = record1.getIdentifier();
           final Identifier identifier2 = record2.getIdentifier();
           return CompareUtil.compare(identifier1, identifier2);
+        }
+      };
+    } else {
+      return (record1, record2) -> {
+        if (record1 == record2) {
+          return 0;
         } else {
           return -1;
         }
-      }
-    };
+      };
+    }
   }
 
   static <V extends Record> Predicate<V> newFilter(final BoundingBox boundingBox) {
