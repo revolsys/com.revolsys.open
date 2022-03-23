@@ -52,6 +52,8 @@ import com.revolsys.util.UriBuilder;
 
 public class ApacheHttpRequestBuilder {
 
+  public static final StringEntity EMPTY_ENTITY = new StringEntity("", ContentType.TEXT_PLAIN);
+
   static class InternalEntityEclosingRequest extends HttpEntityEnclosingRequestBase {
 
     private final String method;
@@ -425,6 +427,11 @@ public class ApacheHttpRequestBuilder {
 
   public ApacheHttpRequestBuilder setConfig(final RequestConfig config) {
     this.config = config;
+    return this;
+  }
+
+  public ApacheHttpRequestBuilder setEmptyEntity() {
+    setEntity(EMPTY_ENTITY);
     return this;
   }
 

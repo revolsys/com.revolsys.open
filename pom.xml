@@ -397,6 +397,17 @@
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+        <version>${org.slf4j.version}</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>commons-logging</artifactId>
+            <groupId>commons-logging</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>${org.slf4j.version}</version>
       </dependency>
@@ -661,7 +672,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <ch.qos.logback.version>1.2.10</ch.qos.logback.version>
+    <ch.qos.logback.version>1.2.11</ch.qos.logback.version>
     <com.fasterxml.jackson.version>2.13.0</com.fasterxml.jackson.version>
     <org.apache.olingo.version>4.8.0</org.apache.olingo.version>
     <org.apache.pdfbox.version>2.0.24</org.apache.pdfbox.version>
@@ -671,7 +682,7 @@
     <org.gdal.version>2.4.0</org.gdal.version>
     <org.graalvm.version>22.0.0.2</org.graalvm.version>
     <org.jeometry.version>MAIN-SNAPSHOT</org.jeometry.version>
-    <org.slf4j.version>1.7.32</org.slf4j.version>
+    <org.slf4j.version>1.7.36</org.slf4j.version>
     <org.springframework.version>5.3.15</org.springframework.version>
     <org.springframework.security.version>5.6.1</org.springframework.security.version>
     <io.netty.version>4.1.72.Final</io.netty.version>
