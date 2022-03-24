@@ -135,8 +135,7 @@ public class ArrayRecord extends BaseRecord {
     } else {
       final int fieldCount = recordDefinition.getFieldCount();
       this.values = new Object[fieldCount];
-      final Map<String, Object> defaultValues = recordDefinition.getDefaultValues();
-      setValuesByPath(defaultValues);
+      initDefaultValues();
     }
   }
 

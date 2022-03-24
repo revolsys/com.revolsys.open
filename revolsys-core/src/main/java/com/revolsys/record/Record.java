@@ -713,6 +713,7 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
     return Identifier.newIdentifier(value);
   }
 
+  @Override
   default Identifier getIdentifier(final CharSequence fieldName, final DataType dataType) {
     final Object value = getValue(fieldName, dataType);
     return Identifier.newIdentifier(value);
@@ -895,6 +896,7 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   default <T> T getValueByPath(final CharSequence path) {
     final int fieldIndex = getFieldIndex(path);
@@ -1042,6 +1044,19 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
       }
     }
     return -1;
+  }
+
+  default void initDefaultValues() {
+    final RecordDefinition recordDefinition = getRecordDefinition();
+    if (recordDefinition != null) {
+      final Map<String, Object> defaultValues = recordDefinition.getDefaultValues();
+      for (final String key : defaultValues.keySet()) {
+        if (getState().isInitializing() || !hasValue(key)) {
+          final Object value = defaultValues.get(key);
+          setValueByPath(key, value);
+        }
+      }
+    }
   }
 
   default boolean isChanged() {

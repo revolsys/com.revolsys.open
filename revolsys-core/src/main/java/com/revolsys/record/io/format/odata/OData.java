@@ -71,7 +71,7 @@ public class OData extends AbstractIoFactory implements RecordStoreFactory {
   }
 
   public static DataType getDataTypeFromEdm(final String type) {
-    return DATA_TYPE_BY_EDM_STRING.getOrDefault(type, DataTypes.STRING);
+    return DATA_TYPE_BY_EDM_STRING.getOrDefault(type, DataTypes.OBJECT);
   }
 
   public OData() {

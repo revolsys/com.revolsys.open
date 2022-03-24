@@ -137,7 +137,7 @@ public class EdmPropertyImpl extends AbstractEdmNamed implements EdmProperty {
     final GeometryFactory geometryFactory) {
     final boolean isGeometry = Geometry.class.isAssignableFrom(dataType.getJavaClass());
     if (dataType == Json.JSON_TYPE) {
-      return EdmPrimitiveTypeKind.String;
+      return EdmPrimitiveTypeKind.Untyped;
     } else if (dataType instanceof CollectionDataType) {
       final CollectionDataType collectionDataType = (CollectionDataType)dataType;
       final DataType contentType = collectionDataType.getContentType();
@@ -149,7 +149,7 @@ public class EdmPropertyImpl extends AbstractEdmNamed implements EdmProperty {
         return GEOMETRY_DATA_TYPE_MAP.get(dataType);
       }
     } else {
-      return EDM_BY_DATA_TYPE.get(dataType);
+      return EDM_BY_DATA_TYPE.getOrDefault(dataType, EdmPrimitiveTypeKind.Untyped);
     }
   }
 

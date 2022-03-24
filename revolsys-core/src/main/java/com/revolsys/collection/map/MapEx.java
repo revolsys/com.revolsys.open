@@ -94,12 +94,18 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
   }
 
   default <V> V ensureValue(final String key, final DataType dataType, final Supplier<V> supplier) {
-    V value = getValue(key, dataType);
+    final Object value = getValue(key);
     if (value == null) {
-      value = supplier.get();
-      addValue(key, value);
+      final V newValue = supplier.get();
+      addValue(key, newValue);
+      return newValue;
+    } else {
+      final V convertedValue = dataType.toObject(value);
+      if (convertedValue != value) {
+        addValue(key, convertedValue);
+      }
+      return convertedValue;
     }
-    return value;
   }
 
   default <V> V ensureValue(final String key, final Supplier<V> supplier) {

@@ -29,7 +29,7 @@ import org.apache.olingo.commons.core.edm.primitivetype.EdmPrimitiveTypeFactory;
  */
 public enum EdmPrimitiveTypeKind {
 
-  Binary, Boolean, Byte, SByte, Date, DateTimeOffset, TimeOfDay, Duration, Decimal, Single, Double, Guid, Int16, Int32, Int64, String, Stream, Geography, GeographyPoint, GeographyLineString, GeographyPolygon, GeographyMultiPoint, GeographyMultiLineString, GeographyMultiPolygon, GeographyCollection, Geometry, GeometryPoint, GeometryLineString, GeometryPolygon, GeometryMultiPoint, GeometryMultiLineString, GeometryMultiPolygon, GeometryCollection;
+  Binary, Boolean, Byte, SByte, Date, DateTimeOffset, TimeOfDay, Duration, Decimal, Single, Double, Guid, Int16, Int32, Int64, String, Stream, Geography, GeographyPoint, GeographyLineString, GeographyPolygon, GeographyMultiPoint, GeographyMultiLineString, GeographyMultiPolygon, GeographyCollection, Geometry, GeometryPoint, GeometryLineString, GeometryPolygon, GeometryMultiPoint, GeometryMultiLineString, GeometryMultiPolygon, GeometryCollection, Untyped;
 
   private static Map<String, EdmPrimitiveTypeKind> VALUES_BY_NAME;
   static {
