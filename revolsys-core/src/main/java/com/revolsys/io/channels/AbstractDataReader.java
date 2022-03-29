@@ -20,7 +20,7 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
     try {
       final int i = buffer.position();
       final int min = Math.max(0, i - 50);
-      final int max = Math.min(buffer.limit(), i + 50);
+      final int max = buffer.limit();
       buffer.position(min);
       final byte[] before = new byte[i - min];
       buffer.get(before);
@@ -160,6 +160,9 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
   @Override
   public int getBytes(final byte[] bytes, final int offset, final int byteCount) {
     int remaining = ensureRemaining();
+    if (remaining == -1) {
+      return -1;
+    }
     if (remaining < byteCount) {
       int readOffset = remaining;
       this.buffer.get(bytes, offset, readOffset);
@@ -377,7 +380,9 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
   protected abstract int readInternal(ByteBuffer buffer) throws IOException;
 
   protected ByteBuffer readTempBytes(final int count) {
-    getBytes(this.tempBytes, 0, count);
+    if (getBytes(this.tempBytes, 0, count) == -1) {
+      throw new EndOfFileException();
+    }
     this.tempBuffer.clear();
     this.tempBuffer.limit(count);
     return this.tempBuffer;

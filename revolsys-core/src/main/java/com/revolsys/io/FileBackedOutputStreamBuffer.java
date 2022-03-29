@@ -2,9 +2,11 @@ package com.revolsys.io;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -119,9 +121,17 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
     return this.size;
   }
 
+  public InputStream newInputStream() {
+    return Channels.newInputStream(newReadChannel());
+  }
+
   public ReadableByteChannel newReadChannel() {
     this.buffer.flip();
     return new ReadChannel();
+  }
+
+  public java.io.Reader newReader() {
+    return Channels.newReader(newReadChannel(), StandardCharsets.UTF_8);
   }
 
   public java.io.Writer newWriter() {

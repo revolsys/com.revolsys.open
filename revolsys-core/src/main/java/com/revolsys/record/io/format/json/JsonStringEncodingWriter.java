@@ -28,33 +28,33 @@ public class JsonStringEncodingWriter extends Writer {
     for (int i = 0; i < endIndex; i++) {
       final char c = string.charAt(i);
       if (c < JsonWriterUtil.CHARACTER_ESCAPE_END) {
-        out.append(string, startIndex, count);
+        out.append(string, startIndex, startIndex + count);
         final String escape = JsonWriterUtil.CHARACTER_ESCAPE[c];
         out.write(escape);
         startIndex = i + 1;
         count = 0;
       } else if (c == '"') {
-        out.append(string, startIndex, count);
+        out.append(string, startIndex, startIndex + count);
         out.write('\\');
         out.write('"');
         startIndex = i + 1;
         count = 0;
       } else if (c == '\\') {
-        out.append(string, startIndex, count);
+        out.append(string, startIndex, startIndex + count);
         out.write('\\');
         out.write('\\');
         startIndex = i + 1;
         count = 0;
       } else {
         if (count == 1024) {
-          out.append(string, startIndex, count);
+          out.append(string, startIndex, startIndex + count);
           startIndex = i;
           count = 0;
         }
         count++;
       }
     }
-    out.append(string, startIndex, count);
+    out.append(string, startIndex, startIndex + count);
     return this;
   }
 

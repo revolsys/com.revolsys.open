@@ -17,9 +17,12 @@ public interface JsonType extends DataTypedValue, Jsonable, BaseCloneable {
   static <V> V toJsonClone(final V value) {
     if (value == null) {
       return null;
-    } else if (value instanceof Map) {
+    } else if (value instanceof MapEx) {
       final MapEx map = (MapEx)value;
       return (V)JsonObject.hash().addValuesClone(map);
+    } else if (value instanceof Map) {
+      final Map<String, Object> map = (Map)value;
+      return (V)map;
     } else if (value instanceof List) {
       final List<?> list = (List<?>)value;
       return (V)JsonList.array().addValuesClone(list);

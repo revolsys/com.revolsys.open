@@ -25,6 +25,13 @@ public class UuidBuilder {
     return this;
   }
 
+  public UuidBuilder append(final CharSequence string) {
+    if (string != null) {
+      append(string.toString());
+    }
+    return this;
+  }
+
   public UuidBuilder append(final Object value) {
     if (value == null) {
       append("null");
@@ -38,8 +45,11 @@ public class UuidBuilder {
   }
 
   public UuidBuilder append(final String string) {
-    final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
-    return append(bytes);
+    if (string != null) {
+      final byte[] bytes = string.getBytes(StandardCharsets.UTF_8);
+      append(bytes);
+    }
+    return this;
   }
 
   public UUID build() {

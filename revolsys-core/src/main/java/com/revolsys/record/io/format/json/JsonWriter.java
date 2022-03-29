@@ -55,7 +55,12 @@ enum JsonState {
 
 }
 
-public final class JsonWriter implements BaseCloseable {
+public class JsonWriter implements BaseCloseable {
+
+  public static JsonWriter nullWriter() {
+    final Writer nullWriter = Writer.nullWriter();
+    return new JsonWriter(nullWriter);
+  }
 
   private int depth = 0;
 
