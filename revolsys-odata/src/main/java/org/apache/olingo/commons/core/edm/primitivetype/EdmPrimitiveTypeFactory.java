@@ -98,7 +98,8 @@ public final class EdmPrimitiveTypeFactory {
         return EdmGeometryMultiPolygon.getInstance();
       case GeometryCollection:
         return EdmGeometryCollection.getInstance();
-
+      case Untyped:
+        return EdmUntyped.getInstance();
       default:
         throw new IllegalArgumentException("Wrong type: " + kind);
     }

@@ -52,6 +52,8 @@ public interface JsonObject extends MapEx, JsonType {
 
   static Supplier<JsonObject> HASH_SUPPLIER = JsonObject::hash;
 
+  static Supplier<JsonObject> TREE_SUPPLIER = JsonObject::tree;
+
   static JsonObject hash() {
     return new JsonObjectHash();
   }
