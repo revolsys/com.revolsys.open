@@ -13,6 +13,8 @@ import java.util.function.Supplier;
 import org.jeometry.common.compare.CompareUtil;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypeProxy;
+import org.jeometry.common.data.type.DataTypeValueFactory;
 import org.jeometry.common.data.type.DataTypedValue;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.logging.Logs;
@@ -93,7 +95,8 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
     return CompareUtil.compare(value1, value2, nullsFirst);
   }
 
-  default <V> V ensureValue(final String key, final DataType dataType, final Supplier<V> supplier) {
+  default <V> V ensureValue(final String key, final DataTypeProxy dataType,
+    final Supplier<V> supplier) {
     final Object value = getValue(key);
     if (value == null) {
       final V newValue = supplier.get();
@@ -106,6 +109,10 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
       }
       return convertedValue;
     }
+  }
+
+  default <V> V ensureValue(final String key, final DataTypeValueFactory<V> factory) {
+    return ensureValue(key, factory, factory);
   }
 
   default <V> V ensureValue(final String key, final Supplier<V> supplier) {
@@ -349,6 +356,17 @@ public interface MapEx extends MapDefault<String, Object>, Cloneable, DataTypedV
     final T value = getValue(name, dataType);
     if (value == null) {
       return defaultValue;
+    } else {
+      return value;
+    }
+  }
+
+  default <T extends Object> T getValue(final CharSequence name,
+    final DataTypeValueFactory<T> defaultValueFactory) {
+    final DataType dataType = defaultValueFactory.getDataType();
+    final T value = getValue(name, dataType);
+    if (value == null) {
+      return defaultValueFactory.get();
     } else {
       return value;
     }

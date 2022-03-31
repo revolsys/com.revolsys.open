@@ -92,6 +92,8 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
   /** The data type of the field value. */
   private DataType type = DataTypes.STRING;
 
+  private boolean generated;
+
   public FieldDefinition() {
   }
 
@@ -592,6 +594,12 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
     return typeDescription.toString();
   }
 
+  @Override
+  public <V> V getValue(final MapEx record) {
+    final Object value = record.get(this.name);
+    return this.type.toObject(value);
+  }
+
   public boolean hasCodeTable() {
     return this.codeTable != null;
   }
@@ -619,7 +627,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
   }
 
   public boolean isGenerated() {
-    return false;
+    return this.generated;
   }
 
   public boolean isIdField() {
@@ -654,6 +662,10 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
     return this.name.length();
   }
 
+  protected void postClone(final FieldDefinition clone) {
+    clone.generated = this.generated;
+  }
+
   public FieldDefinition setAllowedValues(final Collection<?> allowedValues) {
     for (final Object allowedValue : allowedValues) {
       final Object fieldValue = toFieldValue(allowedValue);
@@ -684,6 +696,11 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
 
   public FieldDefinition setDescription(final String description) {
     this.description = description;
+    return this;
+  }
+
+  public FieldDefinition setGenerated(final boolean generated) {
+    this.generated = generated;
     return this;
   }
 

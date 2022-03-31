@@ -58,7 +58,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   private String tableAlias;
 
-  private Map<String, Object> defaultValues = new HashMap<>();
+  private JsonObject defaultValues = JsonObject.hash();
 
   private BoundingBox boundingBox = BoundingBox.empty();
 
@@ -896,7 +896,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   @Override
   public void setDefaultValues(final Map<String, ? extends Object> defaultValues) {
-    this.defaultValues = Maps.newHash(defaultValues);
+    this.defaultValues = JsonObject.hash(defaultValues);
   }
 
   public void setDescription(final String description) {

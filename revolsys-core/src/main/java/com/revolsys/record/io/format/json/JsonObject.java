@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypeValueFactory;
 import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.map.MapEx;
@@ -50,9 +50,11 @@ public interface JsonObject extends MapEx, JsonType {
     }
   };
 
-  static Supplier<JsonObject> HASH_SUPPLIER = JsonObject::hash;
+  static DataTypeValueFactory<JsonObject> HASH_FACTORY = Json.JSON_OBJECT
+    .newFactory(JsonObjectHash::new);
 
-  static Supplier<JsonObject> TREE_SUPPLIER = JsonObject::tree;
+  static DataTypeValueFactory<JsonObject> TREE_FACTORY = Json.JSON_OBJECT
+    .newFactory(JsonObjectTree::new);
 
   static JsonObject hash() {
     return new JsonObjectHash();

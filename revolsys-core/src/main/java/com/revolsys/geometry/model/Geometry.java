@@ -202,6 +202,7 @@ import com.revolsys.util.Property;
  */
 public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object>, Emptyable,
   GeometryFactoryProxy, Serializable, DataTypeProxy {
+
   int M = 3;
 
   List<String> SORTED_GEOMETRY_TYPES = Arrays.asList("Point", "MultiPoint", "LineString",
@@ -264,6 +265,14 @@ public interface Geometry extends BoundingBoxProxy, Cloneable, Comparable<Object
       return -1;
     }
     return 0;
+  }
+
+  static boolean equalsExact(final Geometry geometry1, final Geometry geometry2) {
+    if (geometry1 == null) {
+      return geometry2 == null;
+    } else {
+      return geometry1.equalsExact(geometry2);
+    }
   }
 
   static boolean equalsExact(final Object geometry1, final Object geometry2) {

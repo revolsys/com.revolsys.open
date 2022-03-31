@@ -25,8 +25,6 @@ public class JdbcFieldDefinition extends FieldDefinition {
 
   private int sqlType;
 
-  private boolean generated = false;
-
   JdbcFieldDefinition() {
     setName(JdbcFieldDefinitions.UNKNOWN);
   }
@@ -108,11 +106,6 @@ public class JdbcFieldDefinition extends FieldDefinition {
     return resultSet.getObject(indexes.incrementAndGet());
   }
 
-  @Override
-  public boolean isGenerated() {
-    return this.generated;
-  }
-
   public boolean isQuoteName() {
     return this.quoteName;
   }
@@ -134,14 +127,15 @@ public class JdbcFieldDefinition extends FieldDefinition {
   }
 
   protected void postClone(final JdbcFieldDefinition clone) {
+    super.postClone(clone);
     clone.dbName = this.dbName;
     clone.quoteName = this.quoteName;
     clone.sqlType = this.sqlType;
-    clone.generated = this.generated;
   }
 
+  @Override
   public JdbcFieldDefinition setGenerated(final boolean generated) {
-    this.generated = generated;
+    super.setGenerated(generated);
     if (generated) {
       ((JdbcRecordDefinition)getRecordDefinition()).setHasGeneratedFields(true);
     }
