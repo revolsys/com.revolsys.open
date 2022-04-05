@@ -23,7 +23,7 @@ public abstract class AbstractUnaryQueryValue implements QueryValue {
 
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
-    final StringBuilder buffer) {
+    final Appendable buffer) {
     this.value.appendSql(query, recordStore, buffer);
   }
 

@@ -46,7 +46,7 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
 
   private RecordStoreConnection recordStoreConnection;
 
-  private final Map<Class<?>, Consumer3<Query, StringBuilder, QueryValue>> sqlQueryAppenderByClass = new HashMap<>();
+  private final Map<Class<?>, Consumer3<Query, Appendable, QueryValue>> sqlQueryAppenderByClass = new HashMap<>();
 
   private GeometryFactory geometryFactory;
 
@@ -154,15 +154,15 @@ public abstract class AbstractRecordStore extends BaseObjectWithProperties imple
   }
 
   protected void addSqlQueryAppender(final Class<?> clazz,
-    final Consumer3<Query, StringBuilder, QueryValue> appender) {
+    final Consumer3<Query, Appendable, QueryValue> appender) {
     this.sqlQueryAppenderByClass.put(clazz, appender);
   }
 
   @Override
-  public void appendQueryValue(final Query query, final StringBuilder sql,
+  public void appendQueryValue(final Query query, final Appendable sql,
     final QueryValue queryValue) {
     final Class<?> valueClass = queryValue.getClass();
-    final Consumer3<Query, StringBuilder, QueryValue> appender = this.sqlQueryAppenderByClass
+    final Consumer3<Query, Appendable, QueryValue> appender = this.sqlQueryAppenderByClass
       .get(valueClass);
     if (appender == null) {
       queryValue.appendDefaultSql(query, this, sql);

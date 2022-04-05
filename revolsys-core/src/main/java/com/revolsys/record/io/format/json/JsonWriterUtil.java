@@ -15,7 +15,6 @@ import org.jeometry.common.number.Numbers;
 
 import com.revolsys.collection.list.Lists;
 import com.revolsys.io.StringPrinter;
-import com.revolsys.io.map.MapSerializer;
 
 public final class JsonWriterUtil {
   public static final String[] CHARACTER_ESCAPE;
@@ -105,7 +104,7 @@ public final class JsonWriterUtil {
         final JsonType jsonType = (JsonType)value;
         jsonType.appendJson(appendable);
       } else if (value instanceof Jsonable) {
-        final JsonType json = ((MapSerializer)value).asJson();
+        final JsonType json = ((Jsonable)value).asJson();
         if (json != null) {
           json.appendJson(appendable);
         }

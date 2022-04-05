@@ -349,7 +349,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
 
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
-    final StringBuilder sql) {
+    final Appendable sql) {
     appendName(sql);
   }
 

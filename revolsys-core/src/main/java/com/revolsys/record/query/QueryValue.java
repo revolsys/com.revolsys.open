@@ -119,10 +119,10 @@ public interface QueryValue extends Cloneable {
 
   default void appendDefaultSelect(final Query query, final RecordStore recordStore,
     final Appendable sql) {
-    appendDefaultSql(query, recordStore, (StringBuilder)sql);
+    recordStore.appendQueryValue(query, sql, this);
   }
 
-  void appendDefaultSql(Query query, RecordStore recordStore, StringBuilder sql);
+  void appendDefaultSql(Query query, RecordStore recordStore, Appendable sql);
 
   // TODO wrap in a more generic structure
   int appendParameters(int index, PreparedStatement statement);
@@ -136,8 +136,7 @@ public interface QueryValue extends Cloneable {
     }
   }
 
-  default void appendSql(final Query query, final RecordStore recordStore,
-    final StringBuilder sql) {
+  default void appendSql(final Query query, final RecordStore recordStore, final Appendable sql) {
     if (recordStore == null) {
       appendDefaultSql(query, null, sql);
     } else {

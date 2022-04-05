@@ -1,9 +1,11 @@
 package com.revolsys.record.query;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.FieldDefinition;
@@ -51,13 +53,17 @@ public class In extends AbstractBinaryQueryValue implements Condition {
 
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
-    final StringBuilder buffer) {
-    if (isEmpty()) {
-      buffer.append("1==0");
-    } else {
-      super.appendLeft(buffer, query, recordStore);
-      buffer.append(" IN ");
-      super.appendRight(buffer, query, recordStore);
+    final Appendable buffer) {
+    try {
+      if (isEmpty()) {
+        buffer.append("1==0");
+      } else {
+        super.appendLeft(buffer, query, recordStore);
+        buffer.append(" IN ");
+        super.appendRight(buffer, query, recordStore);
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
     }
   }
 

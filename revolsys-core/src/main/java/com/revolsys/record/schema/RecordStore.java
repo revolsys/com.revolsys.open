@@ -210,7 +210,7 @@ public interface RecordStore extends GeometryFactoryProxy, RecordDefinitionFacto
     }
   }
 
-  default void appendQueryValue(final Query query, final StringBuilder sql,
+  default void appendQueryValue(final Query query, final Appendable sql,
     final QueryValue queryValue) {
     queryValue.appendDefaultSql(query, this, sql);
   }

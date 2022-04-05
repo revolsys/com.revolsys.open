@@ -1,5 +1,6 @@
 package com.revolsys.record.query;
 
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.util.Arrays;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.function.Function;
 
 import org.jeometry.common.compare.CompareUtil;
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.RecordStore;
@@ -25,12 +27,16 @@ public class Between extends AbstractUnaryQueryValue implements Condition {
 
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
-    final StringBuilder buffer) {
-    super.appendDefaultSql(query, recordStore, buffer);
-    buffer.append(" BETWEEN ");
-    this.min.appendSql(query, recordStore, buffer);
-    buffer.append(" AND ");
-    this.max.appendSql(query, recordStore, buffer);
+    final Appendable buffer) {
+    try {
+      super.appendDefaultSql(query, recordStore, buffer);
+      buffer.append(" BETWEEN ");
+      this.min.appendSql(query, recordStore, buffer);
+      buffer.append(" AND ");
+      this.max.appendSql(query, recordStore, buffer);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   @Override
@@ -58,8 +64,8 @@ public class Between extends AbstractUnaryQueryValue implements Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof Between) {
       final Between condition = (Between)obj;
-      if (DataType.equal(condition.getMin(), this.getMin())) {
-        if (DataType.equal(condition.getMax(), this.getMax())) {
+      if (DataType.equal(condition.getMin(), getMin())) {
+        if (DataType.equal(condition.getMax(), getMax())) {
           return super.equals(condition);
         }
       }

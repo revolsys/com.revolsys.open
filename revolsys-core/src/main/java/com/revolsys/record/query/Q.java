@@ -11,6 +11,8 @@ import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.record.query.functions.F;
+import com.revolsys.record.query.functions.JsonRawValue;
+import com.revolsys.record.query.functions.JsonValue;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
@@ -315,6 +317,22 @@ public class Q {
   public static IsNull isNull(final String name) {
     final Column condition = new Column(name);
     return new IsNull(condition);
+  }
+
+  public static JsonRawValue jsonRawValue(final QueryValue left, final QueryValue right) {
+    return new JsonRawValue(Arrays.asList(left, right));
+  }
+
+  public static JsonRawValue jsonRawValue(final QueryValue left, final String right) {
+    return jsonRawValue(left, Value.newValue(right));
+  }
+
+  public static JsonValue jsonValue(final QueryValue left, final QueryValue right) {
+    return new JsonValue(Arrays.asList(left, right));
+  }
+
+  public static JsonValue jsonValue(final QueryValue left, final String right) {
+    return jsonValue(left, Value.newValue(right));
   }
 
   public static LessThan lessThan(final FieldDefinition fieldDefinition, final Object value) {

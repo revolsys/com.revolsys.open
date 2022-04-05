@@ -1,6 +1,9 @@
 package com.revolsys.record.query;
 
+import java.io.IOException;
+
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.record.schema.RecordStore;
 
@@ -14,12 +17,16 @@ public class Cast extends AbstractUnaryQueryValue {
 
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
-    final StringBuilder buffer) {
-    buffer.append("CAST(");
-    super.appendDefaultSql(query, recordStore, buffer);
-    buffer.append(" AS ");
-    buffer.append(this.dataType);
-    buffer.append(")");
+    final Appendable buffer) {
+    try {
+      buffer.append("CAST(");
+      super.appendDefaultSql(query, recordStore, buffer);
+      buffer.append(" AS ");
+      buffer.append(this.dataType);
+      buffer.append(")");
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   @Override
@@ -31,7 +38,7 @@ public class Cast extends AbstractUnaryQueryValue {
   public boolean equals(final Object obj) {
     if (obj instanceof Cast) {
       final Cast condition = (Cast)obj;
-      if (DataType.equal(condition.getDataType(), this.getDataType())) {
+      if (DataType.equal(condition.getDataType(), getDataType())) {
         return super.equals(condition);
       }
     }

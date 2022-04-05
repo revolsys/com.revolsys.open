@@ -1,9 +1,11 @@
 package com.revolsys.record.query.functions;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
@@ -26,12 +28,16 @@ public class EnvelopeIntersects extends AbstractBinaryQueryValue implements Cond
 
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
-    final StringBuilder buffer) {
-    buffer.append("ST_INTERSECTS(");
-    appendLeft(buffer, query, recordStore);
-    buffer.append(", ");
-    appendRight(buffer, query, recordStore);
-    buffer.append(")");
+    final Appendable buffer) {
+    try {
+      buffer.append("ST_INTERSECTS(");
+      appendLeft(buffer, query, recordStore);
+      buffer.append(", ");
+      appendRight(buffer, query, recordStore);
+      buffer.append(")");
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   @Override

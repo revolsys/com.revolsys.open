@@ -55,12 +55,16 @@ public class JdbcFieldDefinition extends FieldDefinition {
     addStatementPlaceHolder(sql);
   }
 
-  public void addSelectStatementPlaceHolder(final StringBuilder sql) {
+  public void addSelectStatementPlaceHolder(final Appendable sql) throws IOException {
     addStatementPlaceHolder(sql);
   }
 
-  public void addStatementPlaceHolder(final StringBuilder sql) {
-    sql.append('?');
+  public void addStatementPlaceHolder(final Appendable sql) {
+    try {
+      sql.append('?');
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   @Override

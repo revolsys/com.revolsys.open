@@ -2,6 +2,8 @@ package com.revolsys.record.query.functions;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 import org.jeometry.common.exception.Exceptions;
@@ -9,23 +11,38 @@ import org.jeometry.common.exception.Exceptions;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.io.format.json.JsonObject;
+import com.revolsys.record.query.ColumnIndexes;
 import com.revolsys.record.query.Query;
 import com.revolsys.record.query.QueryValue;
 import com.revolsys.record.query.Value;
+import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 
-public class JsonByKey extends SimpleFunction {
+public class JsonRawValue extends SimpleFunction {
 
-  public static final String NAME = "JSON_BY_KEY";
+  public static final String NAME = "JSON_VALUE";
 
   private String path;
 
-  public JsonByKey(final QueryValue json, final QueryValue path) {
-    super(NAME, 2, json, path);
-    if (Value.isString(path)) {
-      this.path = (String)((Value)path).getValue();
+  private String displayPath;
+
+  public JsonRawValue(final List<QueryValue> parameters) {
+    super(NAME, 2, parameters);
+    final QueryValue pathParameter = parameters.get(1);
+    if (Value.isString(pathParameter)) {
+      this.displayPath = (String)((Value)pathParameter).getValue();
+      if (this.displayPath.matches("\\w+(\\.\\w+)*")) {
+        this.path = "$." + this.displayPath;
+      } else if (this.displayPath.matches("\\$(\\.\\w+)*")) {
+        this.path = this.displayPath;
+      } else {
+        throw new IllegalArgumentException(
+          "JSON_VALUE path parameter must match $(.propertyName)* (e.g. $.address.city): "
+            + pathParameter);
+      }
     } else {
-      throw new IllegalArgumentException("JSON_BY_KEY path parameter is not a string: " + path);
+      throw new IllegalArgumentException(
+        "JSON_VALUE path parameter is not a string: " + pathParameter);
     }
   }
 
@@ -34,11 +51,13 @@ public class JsonByKey extends SimpleFunction {
     final Appendable buffer) {
     try {
       final QueryValue jsonParameter = getParameter(0);
-      jsonParameter.appendSql(query, recordStore, buffer);
 
-      buffer.append(" -> '");
+      buffer.append(getName());
+      buffer.append("(");
+      jsonParameter.appendSql(query, recordStore, buffer);
+      buffer.append(", '");
       buffer.append(this.path);
-      buffer.append("'");
+      buffer.append("')");
     } catch (final IOException e) {
       throw Exceptions.wrap(e);
     }
@@ -49,6 +68,10 @@ public class JsonByKey extends SimpleFunction {
     final QueryValue jsonParameter = getParameter(0);
     index = jsonParameter.appendParameters(index, statement);
     return index;
+  }
+
+  public String getPath() {
+    return this.path;
   }
 
   @SuppressWarnings("unchecked")
@@ -69,8 +92,15 @@ public class JsonByKey extends SimpleFunction {
   }
 
   @Override
+  public Object getValueFromResultSet(final RecordDefinition recordDefinition,
+    final ResultSet resultSet, final ColumnIndexes indexes, final boolean internStrings)
+    throws SQLException {
+    return resultSet.getObject(indexes.incrementAndGet());
+  }
+
+  @Override
   public String toString() {
     final List<QueryValue> parameters = getParameters();
-    return parameters.get(0) + " -> '" + this.path + "'";
+    return NAME + "(" + parameters.get(0) + ", '" + this.displayPath + "')";
   }
 }

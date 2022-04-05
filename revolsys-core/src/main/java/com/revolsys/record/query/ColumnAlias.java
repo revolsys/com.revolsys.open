@@ -49,8 +49,12 @@ public class ColumnAlias implements QueryValue, ColumnReference {
 
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
-    final StringBuilder sql) {
-    sql.append(this.alias);
+    final Appendable sql) {
+    try {
+      sql.append(this.alias);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   @Override

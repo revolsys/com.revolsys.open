@@ -1,10 +1,12 @@
 package com.revolsys.record.query;
 
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
@@ -22,8 +24,12 @@ public class SqlExpression implements Condition {
 
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
-    final StringBuilder buffer) {
-    buffer.append(this.sql);
+    final Appendable buffer) {
+    try {
+      buffer.append(this.sql);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   @Override
@@ -45,7 +51,7 @@ public class SqlExpression implements Condition {
   public boolean equals(final Object obj) {
     if (obj instanceof SqlExpression) {
       final SqlExpression sqlCondition = (SqlExpression)obj;
-      if (DataType.equal(sqlCondition.getSql(), this.getSql())) {
+      if (DataType.equal(sqlCondition.getSql(), getSql())) {
         if (sqlCondition.dataType == this.dataType) {
           return true;
         }

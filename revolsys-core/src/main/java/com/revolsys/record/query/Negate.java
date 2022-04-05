@@ -1,8 +1,10 @@
 package com.revolsys.record.query;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 
 import org.jeometry.common.data.type.DataTypes;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.RecordStore;
@@ -15,9 +17,13 @@ public class Negate extends AbstractUnaryQueryValue {
 
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
-    final StringBuilder buffer) {
-    buffer.append("- ");
-    super.appendDefaultSql(query, recordStore, buffer);
+    final Appendable buffer) {
+    try {
+      buffer.append("- ");
+      super.appendDefaultSql(query, recordStore, buffer);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   @Override

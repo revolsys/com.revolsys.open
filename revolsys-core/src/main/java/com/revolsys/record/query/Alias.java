@@ -12,14 +12,14 @@ import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 
-public class SelectAlias implements QueryValue {
+public class Alias implements QueryValue {
 
   private final String alias;
 
   private final QueryValue value;
 
-  public SelectAlias(final QueryValue value, final CharSequence alias) {
-    this.value = value;
+  public Alias(final QueryValue values, final CharSequence alias) {
+    this.value = values;
     this.alias = alias.toString();
   }
 
@@ -57,33 +57,33 @@ public class SelectAlias implements QueryValue {
 
   @Override
   public int appendParameters(final int index, final PreparedStatement statement) {
-    return this.value.appendParameters(index, statement);
+    return index;
   }
 
   @Override
-  public ColumnReference clone() {
+  public Alias clone() {
     try {
-      return (ColumnReference)super.clone();
+      return (Alias)super.clone();
     } catch (final CloneNotSupportedException e) {
       return null;
     }
   }
 
   @Override
-  public SelectAlias clone(final TableReference oldTable, final TableReference newTable) {
+  public Alias clone(final TableReference oldTable, final TableReference newTable) {
     if (oldTable != newTable) {
-      final QueryValue clonedColumn = this.value.clone(oldTable, newTable);
-      return new SelectAlias(clonedColumn, this.alias);
+      final QueryValue clonedValue = this.value.clone(oldTable, newTable);
+      return new Alias(clonedValue, this.alias);
     }
-    return (SelectAlias)clone();
+    return clone();
   }
 
   @Override
   public boolean equals(final Object obj) {
-    if (obj instanceof SelectAlias) {
-      final SelectAlias alias = (SelectAlias)obj;
+    if (obj instanceof Alias) {
+      final Alias alias = (Alias)obj;
       if (this.value.equals(alias.value)) {
-        return DataType.equal(alias.alias, this.alias);
+        return DataType.equal(alias.alias, alias);
       }
     }
     return false;
@@ -102,7 +102,11 @@ public class SelectAlias implements QueryValue {
   @Override
   @SuppressWarnings("unchecked")
   public <V> V getValue(final MapEx record) {
-    return this.value.getValue(record);
+    if (record == null) {
+      return null;
+    } else {
+      return (V)this.value.getValue(record);
+    }
   }
 
   @Override
@@ -115,7 +119,7 @@ public class SelectAlias implements QueryValue {
   @Override
   public String toString() {
     final StringBuilder sql = new StringBuilder();
-    this.value.appendSelect(null, null, sql);
+    this.value.appendDefaultSelect(null, null, sql);
     sql.append(" as ");
     appendAlias(sql);
     return sql.toString();

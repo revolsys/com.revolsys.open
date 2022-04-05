@@ -1,5 +1,6 @@
 package com.revolsys.record.query;
 
+import java.io.IOException;
 import java.sql.PreparedStatement;
 
 import org.jeometry.common.exception.Exceptions;
@@ -34,27 +35,31 @@ public class Join implements QueryValue {
 
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
-    final StringBuilder sql) {
-    sql.append(' ');
-    sql.append(this.joinType);
-    sql.append(' ');
-    if (this.table != null) {
-      if (this.alias == null) {
-        this.table.appendFromWithAlias(sql);
-      } else {
-        this.table.appendFromWithAlias(sql, this.alias);
+    final Appendable sql) {
+    try {
+      sql.append(' ');
+      sql.append(this.joinType.toString());
+      sql.append(' ');
+      if (this.table != null) {
+        if (this.alias == null) {
+          this.table.appendFromWithAlias(sql);
+        } else {
+          this.table.appendFromWithAlias(sql, this.alias);
+        }
       }
-    }
-    if (this.statement != null) {
-      this.statement.appendDefaultSelect(query, recordStore, sql);
-      if (this.alias != null) {
-        sql.append(" ");
-        sql.append(this.alias);
+      if (this.statement != null) {
+        this.statement.appendDefaultSelect(query, recordStore, sql);
+        if (this.alias != null) {
+          sql.append(" ");
+          sql.append(this.alias);
+        }
       }
-    }
-    if (!this.condition.isEmpty()) {
-      sql.append(" ON ");
-      this.condition.appendSql(query, recordStore, sql);
+      if (!this.condition.isEmpty()) {
+        sql.append(" ON ");
+        this.condition.appendSql(query, recordStore, sql);
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
     }
   }
 

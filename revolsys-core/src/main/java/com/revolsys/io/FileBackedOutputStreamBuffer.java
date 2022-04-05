@@ -36,14 +36,21 @@ public class FileBackedOutputStreamBuffer extends OutputStream {
       if (!isOpen()) {
         throw new ClosedChannelException();
       }
-      if (this.offset < FileBackedOutputStreamBuffer.this.bufferSize) {
-        final int count = Math.min(FileBackedOutputStreamBuffer.this.bufferSize - this.offset,
-          dst.remaining());
-        FileBackedOutputStreamBuffer.this.buffer
-          .limit(FileBackedOutputStreamBuffer.this.buffer.position() + count);
-        dst.put(FileBackedOutputStreamBuffer.this.buffer);
-        FileBackedOutputStreamBuffer.this.buffer
-          .limit(FileBackedOutputStreamBuffer.this.bufferSize);
+      int bufferSize = FileBackedOutputStreamBuffer.this.bufferSize;
+      if (this.offset < bufferSize) {
+        final int dstRemaining = dst.remaining();
+        if (FileBackedOutputStreamBuffer.this.size < bufferSize) {
+          if (this.offset < FileBackedOutputStreamBuffer.this.size) {
+            bufferSize = (int)FileBackedOutputStreamBuffer.this.size;
+          } else {
+            return -1;
+          }
+        }
+        final int count = Math.min(bufferSize - this.offset, dstRemaining);
+        final ByteBuffer buffer = FileBackedOutputStreamBuffer.this.buffer;
+        buffer.limit(buffer.position() + count);
+        dst.put(buffer);
+        buffer.limit(bufferSize);
         this.offset += count;
         return count;
       } else {

@@ -1,6 +1,9 @@
 package com.revolsys.record.query;
 
+import java.io.IOException;
+
 import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.exception.Exceptions;
 
 import com.revolsys.record.schema.RecordStore;
 
@@ -15,10 +18,14 @@ public class LeftUnaryCondition extends AbstractUnaryQueryValue implements Condi
 
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
-    final StringBuilder buffer) {
-    buffer.append(this.operator);
-    buffer.append(" ");
-    super.appendDefaultSql(query, recordStore, buffer);
+    final Appendable buffer) {
+    try {
+      buffer.append(this.operator);
+      buffer.append(" ");
+      super.appendDefaultSql(query, recordStore, buffer);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   @Override
@@ -35,7 +42,7 @@ public class LeftUnaryCondition extends AbstractUnaryQueryValue implements Condi
   public boolean equals(final Object obj) {
     if (obj instanceof LeftUnaryCondition) {
       final LeftUnaryCondition condition = (LeftUnaryCondition)obj;
-      if (DataType.equal(condition.getOperator(), this.getOperator())) {
+      if (DataType.equal(condition.getOperator(), getOperator())) {
         return super.equals(condition);
       }
     }

@@ -1,6 +1,7 @@
 package com.revolsys.gis.esri.gdb.file;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -156,91 +157,97 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     this.geodatabase.alterDomain(domain);
   }
 
-  private void appendCollectionValue(final Query query, final StringBuilder sql,
+  private void appendCollectionValue(final Query query, final Appendable sql,
     final QueryValue condition) {
-    final CollectionValue collectionValue = (CollectionValue)condition;
-    final List<Object> values = collectionValue.getValues();
-    boolean first = true;
-    for (final Object value : values) {
-      if (first) {
-        first = false;
-      } else {
-        sql.append(", ");
-      }
-      appendValue(sql, value);
-    }
-  }
-
-  private void appendFakeTrue(final Query query, final StringBuilder sql,
-    final QueryValue queryValue) {
-    sql.append("1 = 1");
-  }
-
-  private void appendLike(final Query query, final StringBuilder sql, final QueryValue condition) {
-    final BinaryCondition like = (BinaryCondition)condition;
-    final QueryValue left = like.getLeft();
-    final QueryValue right = like.getRight();
-    sql.append("UPPER(CAST(");
-    appendQueryValue(query, sql, left);
-    sql.append(" AS VARCHAR(4000))) LIKE ");
-    if (right instanceof Value) {
-      final Value valueCondition = (Value)right;
-      final Object value = valueCondition.getValue();
-      sql.append("'");
-      if (value != null) {
-        final String string = DataTypes.toString(value);
-        sql.append(string.toUpperCase().replaceAll("'", "''"));
-      }
-      sql.append("'");
-    } else {
-      appendQueryValue(query, sql, right);
-    }
-  }
-
-  private void appendSqlCondition(final Query query, final StringBuilder sql,
-    final QueryValue condition) {
-    final SqlCondition sqlCondition = (SqlCondition)condition;
-    final String where = sqlCondition.getSql();
-    final List<Object> parameters = sqlCondition.getParameterValues();
-    if (parameters.isEmpty()) {
-      if (where.indexOf('?') > -1) {
-        throw new IllegalArgumentException(
-          "No arguments specified for a where clause with placeholders: " + where);
-      } else {
-        sql.append(where);
-      }
-    } else {
-      final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
-      int i = 0;
-      while (matcher.find()) {
-        if (i >= parameters.size()) {
-          throw new IllegalArgumentException(
-            "Not enough arguments for where clause with placeholders: " + where);
+    try {
+      final CollectionValue collectionValue = (CollectionValue)condition;
+      final List<Object> values = collectionValue.getValues();
+      boolean first = true;
+      for (final Object value : values) {
+        if (first) {
+          first = false;
+        } else {
+          sql.append(", ");
         }
-        final Object argument = parameters.get(i);
-        final StringBuilder replacement = new StringBuilder();
-        matcher.appendReplacement(replacement, DataTypes.toString(argument));
-        sql.append(replacement);
-        appendValue(sql, argument);
-        i++;
+        appendValue(sql, value);
       }
-      final StringBuilder tail = new StringBuilder();
-      matcher.appendTail(tail);
-      sql.append(tail);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
     }
   }
 
-  private void appendValue(final Query query, final StringBuilder sql, final QueryValue condition) {
-    final Value valueCondition = (Value)condition;
-    Object value = valueCondition.getValue();
-    if (value instanceof Identifier) {
-      final Identifier identifier = (Identifier)value;
-      value = identifier.getValue(0);
+  private void appendFakeTrue(final Query query, final Appendable sql,
+    final QueryValue queryValue) {
+    try {
+      sql.append("1 = 1");
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
     }
-    appendValue(sql, value);
   }
 
-  public void appendValue(final StringBuilder buffer, Object value) {
+  private void appendLike(final Query query, final Appendable sql, final QueryValue condition) {
+    try {
+      final BinaryCondition like = (BinaryCondition)condition;
+      final QueryValue left = like.getLeft();
+      final QueryValue right = like.getRight();
+      sql.append("UPPER(CAST(");
+      appendQueryValue(query, sql, left);
+      sql.append(" AS VARCHAR(4000))) LIKE ");
+      if (right instanceof Value) {
+        final Value valueCondition = (Value)right;
+        final Object value = valueCondition.getValue();
+        sql.append("'");
+        if (value != null) {
+          final String string = DataTypes.toString(value);
+          sql.append(string.toUpperCase().replaceAll("'", "''"));
+        }
+        sql.append("'");
+      } else {
+        appendQueryValue(query, sql, right);
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  private void appendSqlCondition(final Query query, final Appendable sql,
+    final QueryValue condition) {
+    try {
+      final SqlCondition sqlCondition = (SqlCondition)condition;
+      final String where = sqlCondition.getSql();
+      final List<Object> parameters = sqlCondition.getParameterValues();
+      if (parameters.isEmpty()) {
+        if (where.indexOf('?') > -1) {
+          throw new IllegalArgumentException(
+            "No arguments specified for a where clause with placeholders: " + where);
+        } else {
+          sql.append(where);
+        }
+      } else {
+        final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
+        int i = 0;
+        while (matcher.find()) {
+          if (i >= parameters.size()) {
+            throw new IllegalArgumentException(
+              "Not enough arguments for where clause with placeholders: " + where);
+          }
+          final Object argument = parameters.get(i);
+          final StringBuilder replacement = new StringBuilder();
+          matcher.appendReplacement(replacement, DataTypes.toString(argument));
+          sql.append(replacement);
+          appendValue(sql, argument);
+          i++;
+        }
+        final StringBuilder tail = new StringBuilder();
+        matcher.appendTail(tail);
+        sql.append(tail);
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
+  }
+
+  private void appendValue(final Appendable buffer, Object value) throws IOException {
     if (value instanceof SingleIdentifier) {
       final SingleIdentifier identifier = (SingleIdentifier)value;
       value = identifier.getValue(0);
@@ -248,7 +255,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     if (value == null) {
       buffer.append("''");
     } else if (value instanceof Number) {
-      buffer.append(value);
+      buffer.append(value.toString());
     } else if (value instanceof java.util.Date) {
       final String stringValue = Dates.format("yyyy-MM-dd", (java.util.Date)value);
       buffer.append("DATE '" + stringValue + "'");
@@ -258,6 +265,20 @@ public class FileGdbRecordStore extends AbstractRecordStore {
       buffer.append("'");
       buffer.append(stringValue.replaceAll("'", "''"));
       buffer.append("'");
+    }
+  }
+
+  private void appendValue(final Query query, final Appendable sql, final QueryValue condition) {
+    try {
+      final Value valueCondition = (Value)condition;
+      Object value = valueCondition.getValue();
+      if (value instanceof Identifier) {
+        final Identifier identifier = (Identifier)value;
+        value = identifier.getValue(0);
+      }
+      appendValue(sql, value);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
     }
   }
 

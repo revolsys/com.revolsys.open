@@ -1,6 +1,7 @@
 package com.revolsys.gdal.record;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,8 +23,10 @@ import org.gdal.osr.SpatialReference;
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.date.Dates;
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
+import org.jeometry.common.number.Doubles;
 
 import com.revolsys.gdal.Gdal;
 import com.revolsys.geometry.model.BoundingBox;
@@ -87,156 +90,160 @@ public class OgrRecordStore extends AbstractRecordStore {
   }
 
   @Override
-  public void appendQueryValue(final Query query, final StringBuilder sql,
+  public void appendQueryValue(final Query query, final Appendable sql,
     final QueryValue condition) {
-    if (condition instanceof Like || condition instanceof ILike) {
-      final BinaryCondition like = (BinaryCondition)condition;
-      final QueryValue left = like.getLeft();
-      final QueryValue right = like.getRight();
-      sql.append("UPPER(");
-      appendQueryValue(query, sql, left);
-      sql.append(") LIKE ");
-      if (right instanceof Value) {
-        final Value valueCondition = (Value)right;
-        final Object value = valueCondition.getValue();
-        sql.append("'");
-        if (value != null) {
-          final String string = DataTypes.toString(value);
-          sql.append(string.toUpperCase());
-        }
-        sql.append("'");
-      } else {
-        appendQueryValue(query, sql, right);
-      }
-    } else if (condition instanceof LeftUnaryCondition) {
-      final LeftUnaryCondition unaryCondition = (LeftUnaryCondition)condition;
-      final String operator = unaryCondition.getOperator();
-      final QueryValue right = unaryCondition.getValue();
-      sql.append(operator);
-      sql.append(" ");
-      appendQueryValue(query, sql, right);
-    } else if (condition instanceof RightUnaryCondition) {
-      final RightUnaryCondition unaryCondition = (RightUnaryCondition)condition;
-      final QueryValue left = unaryCondition.getValue();
-      final String operator = unaryCondition.getOperator();
-      appendQueryValue(query, sql, left);
-      sql.append(" ");
-      sql.append(operator);
-    } else if (condition instanceof BinaryCondition) {
-      final BinaryCondition binaryCondition = (BinaryCondition)condition;
-      final QueryValue left = binaryCondition.getLeft();
-      final String operator = binaryCondition.getOperator();
-      final QueryValue right = binaryCondition.getRight();
-      appendQueryValue(query, sql, left);
-      sql.append(" ");
-      sql.append(operator);
-      sql.append(" ");
-      appendQueryValue(query, sql, right);
-    } else if (condition instanceof AbstractMultiCondition) {
-      final AbstractMultiCondition multipleCondition = (AbstractMultiCondition)condition;
-      sql.append("(");
-      boolean first = true;
-      final String operator = multipleCondition.getOperator();
-      for (final QueryValue subCondition : multipleCondition.getQueryValues()) {
-        if (first) {
-          first = false;
-        } else {
-          sql.append(" ");
-          sql.append(operator);
-          sql.append(" ");
-        }
-        appendQueryValue(query, sql, subCondition);
-      }
-      sql.append(")");
-    } else if (condition instanceof Value) {
-      final Value valueCondition = (Value)condition;
-      final Object value = valueCondition.getValue();
-      appendValue(sql, value);
-    } else if (condition instanceof CollectionValue) {
-      final CollectionValue collectionValue = (CollectionValue)condition;
-      final List<Object> values = collectionValue.getValues();
-      boolean first = true;
-      for (final Object value : values) {
-        if (first) {
-          first = false;
-        } else {
-          sql.append(", ");
-        }
-        appendValue(sql, value);
-      }
-    } else if (condition instanceof ColumnReference) {
-      final ColumnReference column = (ColumnReference)condition;
-      final Object name = column.getName();
-      sql.append(name);
-    } else if (condition instanceof SqlCondition) {
-      final SqlCondition sqlCondition = (SqlCondition)condition;
-      final String where = sqlCondition.getSql();
-      final List<Object> parameters = sqlCondition.getParameterValues();
-      if (parameters.isEmpty()) {
-        if (where.indexOf('?') > -1) {
-          throw new IllegalArgumentException(
-            "No arguments specified for a where clause with placeholders: " + where);
-        } else {
-          sql.append(where);
-        }
-      } else {
-        final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
-        int i = 0;
-        while (matcher.find()) {
-          if (i >= parameters.size()) {
-            throw new IllegalArgumentException(
-              "Not enough arguments for where clause with placeholders: " + where);
+    try {
+      if (condition instanceof Like || condition instanceof ILike) {
+        final BinaryCondition like = (BinaryCondition)condition;
+        final QueryValue left = like.getLeft();
+        final QueryValue right = like.getRight();
+        sql.append("UPPER(");
+        appendQueryValue(query, sql, left);
+        sql.append(") LIKE ");
+        if (right instanceof Value) {
+          final Value valueCondition = (Value)right;
+          final Object value = valueCondition.getValue();
+          sql.append("'");
+          if (value != null) {
+            final String string = DataTypes.toString(value);
+            sql.append(string.toUpperCase());
           }
-          final Object argument = parameters.get(i);
-          final StringBuilder replacement = new StringBuilder();
-          matcher.appendReplacement(replacement, DataTypes.toString(argument));
-          sql.append(replacement);
-          appendValue(sql, argument);
-          i++;
+          sql.append("'");
+        } else {
+          appendQueryValue(query, sql, right);
         }
-        final StringBuilder tail = new StringBuilder();
-        matcher.appendTail(tail);
-        sql.append(tail);
-      }
-    } else if (condition instanceof EnvelopeIntersects) {
-      final EnvelopeIntersects envelopeIntersects = (EnvelopeIntersects)condition;
-      final QueryValue boundingBox1Value = envelopeIntersects.getBoundingBox1Value();
-      final QueryValue boundingBox2Value = envelopeIntersects.getBoundingBox2Value();
-      if (boundingBox1Value == null || boundingBox2Value == null) {
-        sql.append("1 = 0");
-      } else {
-        sql.append("Intersects(");
-        appendQueryValue(query, sql, boundingBox1Value);
-        sql.append(",");
-        appendQueryValue(query, sql, boundingBox2Value);
+      } else if (condition instanceof LeftUnaryCondition) {
+        final LeftUnaryCondition unaryCondition = (LeftUnaryCondition)condition;
+        final String operator = unaryCondition.getOperator();
+        final QueryValue right = unaryCondition.getValue();
+        sql.append(operator);
+        sql.append(" ");
+        appendQueryValue(query, sql, right);
+      } else if (condition instanceof RightUnaryCondition) {
+        final RightUnaryCondition unaryCondition = (RightUnaryCondition)condition;
+        final QueryValue left = unaryCondition.getValue();
+        final String operator = unaryCondition.getOperator();
+        appendQueryValue(query, sql, left);
+        sql.append(" ");
+        sql.append(operator);
+      } else if (condition instanceof BinaryCondition) {
+        final BinaryCondition binaryCondition = (BinaryCondition)condition;
+        final QueryValue left = binaryCondition.getLeft();
+        final String operator = binaryCondition.getOperator();
+        final QueryValue right = binaryCondition.getRight();
+        appendQueryValue(query, sql, left);
+        sql.append(" ");
+        sql.append(operator);
+        sql.append(" ");
+        appendQueryValue(query, sql, right);
+      } else if (condition instanceof AbstractMultiCondition) {
+        final AbstractMultiCondition multipleCondition = (AbstractMultiCondition)condition;
+        sql.append("(");
+        boolean first = true;
+        final String operator = multipleCondition.getOperator();
+        for (final QueryValue subCondition : multipleCondition.getQueryValues()) {
+          if (first) {
+            first = false;
+          } else {
+            sql.append(" ");
+            sql.append(operator);
+            sql.append(" ");
+          }
+          appendQueryValue(query, sql, subCondition);
+        }
         sql.append(")");
-      }
-    } else if (condition instanceof WithinDistance) {
-      final WithinDistance withinDistance = (WithinDistance)condition;
-      final QueryValue geometry1Value = withinDistance.getGeometry1Value();
-      final QueryValue geometry2Value = withinDistance.getGeometry2Value();
-      final QueryValue distanceValue = withinDistance.getDistanceValue();
-      if (geometry1Value == null || geometry2Value == null || distanceValue == null) {
-        sql.append("1 = 0");
+      } else if (condition instanceof Value) {
+        final Value valueCondition = (Value)condition;
+        final Object value = valueCondition.getValue();
+        appendValue(sql, value);
+      } else if (condition instanceof CollectionValue) {
+        final CollectionValue collectionValue = (CollectionValue)condition;
+        final List<Object> values = collectionValue.getValues();
+        boolean first = true;
+        for (final Object value : values) {
+          if (first) {
+            first = false;
+          } else {
+            sql.append(", ");
+          }
+          appendValue(sql, value);
+        }
+      } else if (condition instanceof ColumnReference) {
+        final ColumnReference column = (ColumnReference)condition;
+        final String name = column.getName();
+        sql.append(name);
+      } else if (condition instanceof SqlCondition) {
+        final SqlCondition sqlCondition = (SqlCondition)condition;
+        final String where = sqlCondition.getSql();
+        final List<Object> parameters = sqlCondition.getParameterValues();
+        if (parameters.isEmpty()) {
+          if (where.indexOf('?') > -1) {
+            throw new IllegalArgumentException(
+              "No arguments specified for a where clause with placeholders: " + where);
+          } else {
+            sql.append(where);
+          }
+        } else {
+          final Matcher matcher = PLACEHOLDER_PATTERN.matcher(where);
+          int i = 0;
+          while (matcher.find()) {
+            if (i >= parameters.size()) {
+              throw new IllegalArgumentException(
+                "Not enough arguments for where clause with placeholders: " + where);
+            }
+            final Object argument = parameters.get(i);
+            final StringBuilder replacement = new StringBuilder();
+            matcher.appendReplacement(replacement, DataTypes.toString(argument));
+            sql.append(replacement);
+            appendValue(sql, argument);
+            i++;
+          }
+          final StringBuilder tail = new StringBuilder();
+          matcher.appendTail(tail);
+          sql.append(tail);
+        }
+      } else if (condition instanceof EnvelopeIntersects) {
+        final EnvelopeIntersects envelopeIntersects = (EnvelopeIntersects)condition;
+        final QueryValue boundingBox1Value = envelopeIntersects.getBoundingBox1Value();
+        final QueryValue boundingBox2Value = envelopeIntersects.getBoundingBox2Value();
+        if (boundingBox1Value == null || boundingBox2Value == null) {
+          sql.append("1 = 0");
+        } else {
+          sql.append("Intersects(");
+          appendQueryValue(query, sql, boundingBox1Value);
+          sql.append(",");
+          appendQueryValue(query, sql, boundingBox2Value);
+          sql.append(")");
+        }
+      } else if (condition instanceof WithinDistance) {
+        final WithinDistance withinDistance = (WithinDistance)condition;
+        final QueryValue geometry1Value = withinDistance.getGeometry1Value();
+        final QueryValue geometry2Value = withinDistance.getGeometry2Value();
+        final QueryValue distanceValue = withinDistance.getDistanceValue();
+        if (geometry1Value == null || geometry2Value == null || distanceValue == null) {
+          sql.append("1 = 0");
+        } else {
+          sql.append("Distance(");
+          appendQueryValue(query, sql, geometry1Value);
+          sql.append(", ");
+          appendQueryValue(query, sql, geometry2Value);
+          sql.append(") <= ");
+          appendQueryValue(query, sql, distanceValue);
+          sql.append(")");
+        }
       } else {
-        sql.append("Distance(");
-        appendQueryValue(query, sql, geometry1Value);
-        sql.append(", ");
-        appendQueryValue(query, sql, geometry2Value);
-        sql.append(") <= ");
-        appendQueryValue(query, sql, distanceValue);
-        sql.append(")");
+        condition.appendDefaultSql(query, this, sql);
       }
-    } else {
-      condition.appendDefaultSql(query, this, sql);
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
     }
   }
 
-  public void appendValue(final StringBuilder sql, final Object value) {
+  private void appendValue(final Appendable sql, final Object value) throws IOException {
     if (value == null) {
       sql.append("''");
     } else if (value instanceof Number) {
-      sql.append(value);
+      sql.append(value.toString());
     } else if (value instanceof java.sql.Date) {
       final String stringValue = Dates.format("yyyy-MM-dd", (java.util.Date)value);
       sql.append("CAST('" + stringValue + "' AS DATE)");
@@ -246,13 +253,13 @@ public class OgrRecordStore extends AbstractRecordStore {
     } else if (value instanceof BoundingBox) {
       final BoundingBox boundingBox = (BoundingBox)value;
       sql.append("BuildMbr(");
-      sql.append(boundingBox.getMinX());
+      sql.append(Doubles.toString(boundingBox.getMinX()));
       sql.append(",");
-      sql.append(boundingBox.getMinY());
+      sql.append(Doubles.toString(boundingBox.getMinY()));
       sql.append(",");
-      sql.append(boundingBox.getMaxX());
+      sql.append(Doubles.toString(boundingBox.getMaxX()));
       sql.append(",");
-      sql.append(boundingBox.getMaxY());
+      sql.append(Doubles.toString(boundingBox.getMaxY()));
       sql.append(")");
     } else {
       final String stringValue = DataTypes.toString(value);

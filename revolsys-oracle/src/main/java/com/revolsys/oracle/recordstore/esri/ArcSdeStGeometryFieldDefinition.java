@@ -92,8 +92,12 @@ public class ArcSdeStGeometryFieldDefinition extends JdbcFieldDefinition {
   }
 
   @Override
-  public void addStatementPlaceHolder(final StringBuilder sql) {
-    sql.append("SDE.ST_GEOMETRY(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+  public void addStatementPlaceHolder(final Appendable sql) {
+    try {
+      sql.append("SDE.ST_GEOMETRY(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
+    }
   }
 
   @Override

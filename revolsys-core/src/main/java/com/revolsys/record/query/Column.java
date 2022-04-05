@@ -48,11 +48,15 @@ public class Column implements QueryValue, ColumnReference {
 
   @Override
   public void appendDefaultSql(final Query query, final RecordStore recordStore,
-    final StringBuilder sql) {
-    if (this.fieldDefinition == null) {
-      sql.append(toString());
-    } else {
-      this.fieldDefinition.appendColumnName(sql, null);
+    final Appendable sql) {
+    try {
+      if (this.fieldDefinition == null) {
+        sql.append(toString());
+      } else {
+        this.fieldDefinition.appendColumnName(sql, null);
+      }
+    } catch (final IOException e) {
+      throw Exceptions.wrap(e);
     }
   }
 

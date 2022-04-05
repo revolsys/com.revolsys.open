@@ -30,6 +30,7 @@ import com.revolsys.record.RecordFactory;
 import com.revolsys.record.Records;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.io.format.json.Json;
 import com.revolsys.record.query.functions.F;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.LockMode;
@@ -280,7 +281,7 @@ public class Query extends BaseObjectWithProperties
     } else {
       throw new IllegalArgumentException("Not a field name: " + field);
     }
-    OrderBy order = new OrderBy(queryValue, ascending);
+    final OrderBy order = new OrderBy(queryValue, ascending);
     return addOrderBy(order);
   }
 
@@ -983,8 +984,20 @@ public class Query extends BaseObjectWithProperties
     if (select instanceof QueryValue) {
       selectExpression = (QueryValue)select;
     } else if (select instanceof CharSequence) {
-      final CharSequence name = (CharSequence)select;
-      selectExpression = this.table.getColumn(name);
+      final String name = ((CharSequence)select).toString();
+      final int dotIndex = name.indexOf('.');
+      if (dotIndex == -1) {
+        selectExpression = this.table.getColumn(name);
+      } else {
+        final ColumnReference column = this.table.getColumn(name.substring(0, dotIndex));
+        if (column.getDataType() == Json.JSON_TYPE) {
+          final String remainder = name.substring(dotIndex + 1);
+          selectExpression = new Alias(Q.jsonRawValue(column, remainder), remainder);
+        } else {
+          selectExpression = Q.sql(name);
+        }
+      }
+
     } else {
       throw new IllegalArgumentException("Not a valid select expression :" + select);
     }
