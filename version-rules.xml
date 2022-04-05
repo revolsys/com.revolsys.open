@@ -7,6 +7,7 @@
   ">
 	<ignoreVersions>
 		<ignoreVersion type="regex">.*-alpha.*</ignoreVersion>
+    <ignoreVersion type="regex">.*Alpha.*</ignoreVersion>
 		<ignoreVersion type="regex">.*-beta.*</ignoreVersion>
     <ignoreVersion type="regex">.*-MTEC.*</ignoreVersion>
     <ignoreVersion type="regex">.*-rc.*</ignoreVersion>

@@ -622,15 +622,22 @@ public class RecordStoreLayer extends AbstractRecordLayer {
         for (final FieldDefinition fieldDefinition : recordDefinition.getFields()) {
           if (!isIdField(fieldDefinition)) {
             final String fieldName = fieldDefinition.getName();
-            final Object value = values.get(fieldName);
-            fieldDefinition.setValue(newRecord, value);
+            if (values.containsKey(fieldName)) {
+              final Object value = values.get(fieldName);
+              fieldDefinition.setValue(newRecord, value);
+            }
           }
         }
         newRecord.setState(RecordState.NEW);
       }
 
       this.recordCacheNew.addRecord(newRecord);
-      final LayerRecord proxyRecord = new NewProxyLayerRecord(this, newRecord);
+      final LayerRecord proxyRecord;
+      if (newRecord instanceof AbstractProxyLayerRecord) {
+        proxyRecord = newRecord;
+      } else {
+        proxyRecord = new NewProxyLayerRecord(this, newRecord);
+      }
       fireRecordInserted(proxyRecord);
       return proxyRecord;
     } else {
