@@ -190,7 +190,7 @@ public class ODataParser {
     .<String, Function<List<QueryValue>, QueryValue>> buildHash()//
     .add(Methods.TOUPPER, Upper::new)
     .add(Methods.TOLOWER, Lower::new)
-    .add(Methods.GEO_INTERSECTS, (values) -> {
+    .add(Methods.GEO_INTERSECTS, values -> {
       final QueryValue value2 = values.get(1);
       if (value2 instanceof CollectionValue) {
         final QueryValue newValue = ((CollectionValue)value2).getQueryValues().get(0);
@@ -198,7 +198,7 @@ public class ODataParser {
       }
       return F.envelopeIntersects(values);
     })
-    .add(Methods.GEO_DISTANCE, (values) -> {
+    .add(Methods.GEO_DISTANCE, values -> {
       final QueryValue left = values.get(0);
       QueryValue right = values.get(1);
       if (right instanceof CollectionValue) {
@@ -235,7 +235,7 @@ public class ODataParser {
       }
       return new Distance(left, right);
     })
-    .add(Methods.CONTAINS, (args) -> {
+    .add(Methods.CONTAINS, args -> {
 
       QueryValue left = args.get(0);
       QueryValue right = args.get(1);
@@ -874,10 +874,9 @@ public class ODataParser {
     return rt;
   }
 
-  private static int readWord(final String text, final int start) {
+  private static int readWord(final String text, final int start, final int length) {
     int rt = start;
     boolean instring = false;
-    final int length = text.length();
     while (rt < length) {
       final char c = text.charAt(rt);
       if (instring) {
@@ -901,7 +900,11 @@ public class ODataParser {
       }
       rt++;
     }
-    return rt - 1;
+    if (rt == length) {
+      return rt;
+    } else {
+      return rt - 1;
+    }
   }
 
   // tokenizer
@@ -909,7 +912,8 @@ public class ODataParser {
     final List<Token> rt = new ArrayList<>();
     int current = 0;
     while (true) {
-      if (current == value.length()) {
+      final int length = value.length();
+      if (current == length) {
         return rt;
       }
       final char c = value.charAt(current);
@@ -944,7 +948,7 @@ public class ODataParser {
         rt.add(token);
         current = end;
       } else if (Character.isLetter(c) || c == '*') {
-        final int end = readWord(value, current + 1);
+        final int end = readWord(value, current + 1, length);
         final String tokenString = value.substring(current, end);
         rt.add(new Token(TokenType.WORD, tokenString));
         current = end;
