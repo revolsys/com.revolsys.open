@@ -20,6 +20,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.exception.WrappedException;
 
 import com.revolsys.io.FileUtil;
 import com.revolsys.record.io.format.json.JsonObject;
@@ -36,6 +37,8 @@ public class ApacheHttp {
       final HttpResponse response = getResponse(httpClient, request);
       action.accept(response);
     } catch (final ApacheHttpException e) {
+      throw e;
+    } catch (final WrappedException e) {
       throw e;
     } catch (final Exception e) {
       throw Exceptions.wrap(request.getURI().toString(), e);
