@@ -630,17 +630,43 @@
         <enabled>false</enabled>
       </snapshots>
     </repository>
+    
     <repository>
-      <id>revolsys external</id>
+      <id>github-filegdb</id>
+      <name>Github FileGDB</name>
+      <url>https://maven.pkg.github.com/revolsys/com.revolsys.esri.filegdb-jni</url>
       <releases>
         <enabled>true</enabled>
       </releases>
       <snapshots>
-        <enabled>true</enabled>
+        <enabled>false</enabled>
       </snapshots>
-      <name>ext</name>
-      <url>https://open.revolsys.com/artifactory/ext</url>
     </repository>
+   
+  <!--  <repository>
+      <id>github-gdal</id>
+      <name>Github gdal</name>
+      <url>https://maven.pkg.github.com/revolsys/com.revolsys.gdal.gdal-jni</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>-->
+ 
+    <repository>
+      <id>github-jocl</id>
+      <name>Github Jocl</name>
+      <url>https://maven.pkg.github.com/revolsys/jocl</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+
     <repository>
       <id>github-jeometry</id>
       <name>Github Jeometry</name>
@@ -663,7 +689,18 @@
         <enabled>false</enabled>
       </snapshots>
     </repository>
-  </repositories>
+    <repository>
+      <id>revolsys external</id>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <name>ext</name>
+      <url>https://open.revolsys.com/artifactory/ext</url>
+    </repository>
+   </repositories>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
