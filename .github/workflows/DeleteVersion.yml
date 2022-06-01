@@ -16,11 +16,15 @@ jobs:
       contents: write
       packages: write 
 
+    env:
+      APP_REPO: '${{github.repository}}'
+
     steps:
 
     - name: Init Variables
       shell: bash
       run: |
+        echo "JEOMETRY_REPO=${APP_REPO}_jeometry" >> $GITHUB_ENV
         VERSION="${{github.event.inputs.version}}"
         if [ "$VERSION" == "" ]; then
           VERSION=${GITHUB_REF#refs/tags/}
@@ -43,9 +47,8 @@ jobs:
         mkdir t
         cd t
         git init
-        git push -f "https://${USERNAME}:${REPO_KEY}@github.com/jeometry-org/jeometry.git"       ":refs/tags/${OTHER_VERSION}" || true
-        git push -f "https://${USERNAME}:${REPO_KEY}@github.com/revolsys/com.revolsys.open.git"  ":refs/tags/${OTHER_VERSION}" || true
+        git push -f "https://${USERNAME}:${REPO_KEY}@github.com/${JEOMETRY_REPO}.git"  ":refs/tags/${OTHER_VERSION}" || true
+        git push -f "https://${USERNAME}:${REPO_KEY}@github.com/${APP_REPO}.git"       ":refs/tags/${VERSION}" || true
       env:
         USERNAME: ${{github.actor}}
         REPO_KEY: ${{secrets.PUSH_TOKEN}}
-
