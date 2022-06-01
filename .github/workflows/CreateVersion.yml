@@ -4,12 +4,12 @@ on:
 
   workflow_dispatch:
     inputs:
-      tag:
-        description: 'Tag to Create'
+      version:
+        description: 'Version to Create'
         required: false
 
 jobs:
-  create_tag:
+  create_version:
     runs-on: ubuntu-latest
 
     permissions: 
@@ -73,7 +73,7 @@ jobs:
    
     - name: Set Version
       run: |
-       VERSION="${{github.event.inputs.tag}}"
+       VERSION="${{github.event.inputs.version}}"
        if [ "${VERSION}" == "" ]; then
           VERSION=${BRANCH#patches/}
         fi
@@ -86,9 +86,8 @@ jobs:
         echo "OTHER_VERSION=$OTHER_VERSION" >> $GITHUB_ENV
         echo "VERSION=$VERSION" >> $GITHUB_ENV
      
-    - name: Create Tag
+    - name: Create Git Tag
       run: |
-        echo "Creating Tag ${VERSION}"
         git -C ./jeometry commit -a -m "Version ${OTHER_VERSION}"
         git -C ./revolsys commit -a -m "Version ${VERSION}"
         git -C ./jeometry tag -f "${OTHER_VERSION}"
