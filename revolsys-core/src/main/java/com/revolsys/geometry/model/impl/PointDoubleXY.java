@@ -31,7 +31,7 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
     this.y = y;
   }
 
-  public PointDoubleXY(final GeometryFactory geometryFactory, final double x, final double y) {
+  protected PointDoubleXY(final GeometryFactory geometryFactory, final double x, final double y) {
     this.x = geometryFactory.makeXPrecise(x);
     this.y = geometryFactory.makeYPrecise(y);
   }
@@ -138,14 +138,12 @@ public class PointDoubleXY extends AbstractPoint implements Serializable {
   public double getCoordinate(final int axisIndex) {
     if (isEmpty()) {
       return java.lang.Double.NaN;
+    } else if (axisIndex == X) {
+      return this.x;
+    } else if (axisIndex == Y) {
+      return this.y;
     } else {
-      if (axisIndex == X) {
-        return this.x;
-      } else if (axisIndex == Y) {
-        return this.y;
-      } else {
-        return java.lang.Double.NaN;
-      }
+      return java.lang.Double.NaN;
     }
   }
 

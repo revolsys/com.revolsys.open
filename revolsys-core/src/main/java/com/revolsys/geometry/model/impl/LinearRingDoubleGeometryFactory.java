@@ -54,10 +54,10 @@ import com.revolsys.record.io.format.wkt.EWktWriter;
  *
  * @version 1.7
  */
-public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing {
+public class LinearRingDoubleGeometryFactory extends LineStringDoubleGeometryFactory implements LinearRing {
   private static final long serialVersionUID = -4261142084085851829L;
 
-  public LinearRingDoubleGf(final GeometryFactory factory) {
+  public LinearRingDoubleGeometryFactory(final GeometryFactory factory) {
     super(factory);
   }
 
@@ -71,19 +71,19 @@ public class LinearRingDoubleGf extends LineStringDoubleGf implements LinearRing
    * @throws IllegalArgumentException if the ring is not closed, or has too few points
    *
    */
-  public LinearRingDoubleGf(final GeometryFactory factory, final int axisCount,
+  public LinearRingDoubleGeometryFactory(final GeometryFactory factory, final int axisCount,
     final int vertexCount, final double... coordinates) {
     super(factory, axisCount, vertexCount, coordinates);
     validate();
   }
 
-  public LinearRingDoubleGf(final int axisCount, final double... coordinates) {
+  public LinearRingDoubleGeometryFactory(final int axisCount, final double... coordinates) {
     this(GeometryFactory.DEFAULT_2D, axisCount, coordinates.length / axisCount, coordinates);
   }
 
   @Override
-  public LinearRingDoubleGf clone() {
-    return (LinearRingDoubleGf)super.clone();
+  public LinearRingDoubleGeometryFactory clone() {
+    return (LinearRingDoubleGeometryFactory)super.clone();
   }
 
   /**

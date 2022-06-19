@@ -2,7 +2,7 @@ package com.revolsys.geometry.model.impl;
 
 import com.revolsys.geometry.model.GeometryFactory;
 
-public class TriangleDoubleGf extends TriangleDouble {
+public class TriangleDoubleGeometryFactory extends TriangleDouble {
   /**
    *
    */
@@ -10,7 +10,7 @@ public class TriangleDoubleGf extends TriangleDouble {
 
   private final GeometryFactory geometryFactory;
 
-  public TriangleDoubleGf(final GeometryFactory geometryFactory, final double... coordinates) {
+  public TriangleDoubleGeometryFactory(final GeometryFactory geometryFactory, final double... coordinates) {
     super(coordinates);
     this.geometryFactory = geometryFactory;
   }

@@ -85,7 +85,7 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
       } else {
         final double x = (x2 - x1) * this.segmentFraction + x1;
         final double y = (y2 - y1) * this.segmentFraction + y1;
-        return new PointDoubleXY(this.line.getGeometryFactory(), x, y);
+        return this.line.getGeometryFactory().point(x, y);
       }
     }
   }
@@ -103,7 +103,7 @@ public class LineStringLocation implements Comparable<LineStringLocation> {
       } else {
         final double x = (x2 - x1) * this.segmentFraction + x1;
         final double y = (y2 - y1) * this.segmentFraction + y1;
-        return new PointDoubleXY(this.line.getGeometryFactory(), x, y);
+        return this.line.getGeometryFactory().point(x, y);
       }
     }
   }

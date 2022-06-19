@@ -46,7 +46,7 @@ import com.revolsys.geometry.model.Point;
  *
  *@version 1.7
  */
-public class PointDoubleGf extends PointDouble {
+public class PointDoubleGeometryFactory extends PointDouble {
   private static final long serialVersionUID = 4902022702746614570L;
 
   /**
@@ -58,7 +58,7 @@ public class PointDoubleGf extends PointDouble {
    *@param  coordinates      contains the single coordinate on which to base this <code>Point</code>
    *      , or <code>null</code> to create the empty geometry.
    */
-  public PointDoubleGf(final GeometryFactory geometryFactory, final double... coordinates) {
+  public PointDoubleGeometryFactory(final GeometryFactory geometryFactory, final double... coordinates) {
     super(geometryFactory, coordinates);
     this.geometryFactory = geometryFactory;
   }

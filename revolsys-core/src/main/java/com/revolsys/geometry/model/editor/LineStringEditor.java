@@ -20,7 +20,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Point;
 import com.revolsys.geometry.model.Polygon;
-import com.revolsys.geometry.model.impl.LinearRingDoubleGf;
+import com.revolsys.geometry.model.impl.LinearRingDoubleGeometryFactory;
 
 public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
   implements LineString, LinealEditor {
@@ -854,7 +854,7 @@ public class LineStringEditor extends AbstractGeometryEditor<LineStringEditor>
     final double[] coordinates = new double[coordinateCount];
     System.arraycopy(this.coordinates, 0, coordinates, 0, coordinateCount);
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return new LinearRingDoubleGf(geometryFactory, this.axisCount, this.vertexCount, coordinates);
+    return new LinearRingDoubleGeometryFactory(geometryFactory, this.axisCount, this.vertexCount, coordinates);
   }
 
   @Override

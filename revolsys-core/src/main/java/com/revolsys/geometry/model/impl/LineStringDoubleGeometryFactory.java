@@ -53,7 +53,7 @@ import com.revolsys.geometry.model.LineString;
  *
  *@version 1.7
  */
-public class LineStringDoubleGf extends LineStringDouble {
+public class LineStringDoubleGeometryFactory extends LineStringDouble {
 
   private static final long serialVersionUID = 3110669828065365560L;
 
@@ -150,7 +150,7 @@ public class LineStringDoubleGf extends LineStringDouble {
 
   public static LineString newLineStringDoubleGf(final GeometryFactory geometryFactory,
     final int axisCount, final double... coordinates) {
-    return new LineStringDoubleGf(geometryFactory, axisCount, coordinates.length / axisCount,
+    return new LineStringDoubleGeometryFactory(geometryFactory, axisCount, coordinates.length / axisCount,
       coordinates);
   }
 
@@ -164,12 +164,12 @@ public class LineStringDoubleGf extends LineStringDouble {
    */
   private final GeometryFactory geometryFactory;
 
-  public LineStringDoubleGf(final GeometryFactory geometryFactory) {
+  public LineStringDoubleGeometryFactory(final GeometryFactory geometryFactory) {
     super(geometryFactory.getAxisCount());
     this.geometryFactory = geometryFactory;
   }
 
-  public LineStringDoubleGf(final GeometryFactory geometryFactory, final int axisCount,
+  public LineStringDoubleGeometryFactory(final GeometryFactory geometryFactory, final int axisCount,
     final int vertexCount, final double... coordinates) {
     super(axisCount, vertexCount, coordinates);
     this.geometryFactory = geometryFactory;
@@ -182,8 +182,8 @@ public class LineStringDoubleGf extends LineStringDouble {
    * @return a clone of this instance
    */
   @Override
-  public LineStringDoubleGf clone() {
-    return (LineStringDoubleGf)super.clone();
+  public LineStringDoubleGeometryFactory clone() {
+    return (LineStringDoubleGeometryFactory)super.clone();
   }
 
   @Override
