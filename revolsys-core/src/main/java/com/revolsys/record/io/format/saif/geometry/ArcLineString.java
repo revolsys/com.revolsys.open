@@ -1,10 +1,10 @@
 package com.revolsys.record.io.format.saif.geometry;
 
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.LineStringDoubleGf;
+import com.revolsys.geometry.model.impl.LineStringDoubleGeometryFactory;
 import com.revolsys.record.io.format.saif.SaifConstants;
 
-public class ArcLineString extends LineStringDoubleGf {
+public class ArcLineString extends LineStringDoubleGeometryFactory {
   /**
    *
    */

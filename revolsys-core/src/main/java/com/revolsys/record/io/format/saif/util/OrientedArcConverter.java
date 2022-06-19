@@ -8,7 +8,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.editor.LineStringEditor;
-import com.revolsys.geometry.model.impl.LineStringDoubleGf;
+import com.revolsys.geometry.model.impl.LineStringDoubleGeometryFactory;
 import com.revolsys.record.io.format.saif.SaifConstants;
 import com.revolsys.record.io.format.saif.geometry.ArcLineString;
 import com.revolsys.record.io.format.saif.geometry.OrientedArcLineString;
@@ -30,7 +30,7 @@ public class OrientedArcConverter extends ArcConverter {
     final LineStringEditor line) {
     final int axisCount = geometryFactory.getAxisCount();
     final int vertexCount = line.getVertexCount();
-    final double[] coordinates = LineStringDoubleGf.getNewCoordinates(geometryFactory, line);
+    final double[] coordinates = LineStringDoubleGeometryFactory.getNewCoordinates(geometryFactory, line);
     return new OrientedArcLineString(geometryFactory, axisCount, vertexCount, coordinates);
   }
 

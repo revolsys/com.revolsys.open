@@ -140,7 +140,7 @@ public class GeometricShapeFactory {
 
   protected Dimensions dim = new Dimensions();
 
-  protected GeometryFactory geomFact;
+  protected GeometryFactory geometryFactory;
 
   protected int vertexCount = 100;
 
@@ -164,7 +164,7 @@ public class GeometricShapeFactory {
    * @param geomFact the factory to use
    */
   public GeometricShapeFactory(final GeometryFactory geomFact) {
-    this.geomFact = geomFact;
+    this.geometryFactory = geomFact;
   }
 
   protected Point coordTrans(final double x, final double y, final Point trans) {
@@ -203,7 +203,7 @@ public class GeometricShapeFactory {
       final double y = yRadius * Math.sin(ang) + centreY;
       pts[iPt++] = newPoint(x, y);
     }
-    final LineString line = this.geomFact.lineString(pts);
+    final LineString line = this.geometryFactory.lineString(pts);
     return (LineString)rotate(line);
   }
 
@@ -244,8 +244,8 @@ public class GeometricShapeFactory {
       pts[iPt++] = newPoint(x, y);
     }
     pts[iPt++] = newPoint(centreX, centreY);
-    final LinearRing ring = this.geomFact.linearRing(pts);
-    final Polygon poly = this.geomFact.polygon(ring);
+    final LinearRing ring = this.geometryFactory.linearRing(pts);
+    final Polygon poly = this.geometryFactory.polygon(ring);
     return (Polygon)rotate(poly);
   }
 
@@ -287,12 +287,12 @@ public class GeometricShapeFactory {
     coordinates[coordinateIndex++] = 0;
     coordinates[coordinateIndex++] = 1;
 
-    final Polygon poly = this.geomFact.polygon(2, coordinates);
+    final Polygon poly = this.geometryFactory.polygon(2, coordinates);
     return (Polygon)rotate(poly);
   }
 
   protected Point newPoint(final double x, final double y) {
-    return new PointDoubleXY(this.geomFact, x, y);
+    return this.geometryFactory.point(x, y);
   }
 
   /**
@@ -339,8 +339,8 @@ public class GeometricShapeFactory {
     }
     pts[ipt++] = pts[0];
 
-    final LinearRing ring = this.geomFact.linearRing(pts);
-    final Polygon poly = this.geomFact.polygon(ring);
+    final LinearRing ring = this.geometryFactory.linearRing(pts);
+    final Polygon poly = this.geometryFactory.polygon(ring);
     return (Polygon)rotate(poly);
   }
 
@@ -403,8 +403,8 @@ public class GeometricShapeFactory {
     }
     pts[pts.length - 1] = pts[0];
 
-    final LinearRing ring = this.geomFact.linearRing(pts);
-    final Polygon poly = this.geomFact.polygon(ring);
+    final LinearRing ring = this.geometryFactory.linearRing(pts);
+    final Polygon poly = this.geometryFactory.polygon(ring);
     return (Polygon)rotate(poly);
   }
 

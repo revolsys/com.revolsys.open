@@ -26,7 +26,6 @@ import org.jeometry.coordinatesystem.model.CoordinateSystem;
 import com.revolsys.geometry.model.editor.BoundingBoxEditor;
 import com.revolsys.geometry.model.impl.BoundingBoxDoubleXY;
 import com.revolsys.geometry.model.impl.LineStringDouble;
-import com.revolsys.geometry.model.impl.PointDoubleGf;
 import com.revolsys.geometry.model.impl.RectangleXY;
 import com.revolsys.geometry.util.OutCode;
 import com.revolsys.geometry.util.Points;
@@ -429,12 +428,10 @@ public interface BoundingBox
       double dx;
       if (maxXThis < minX) {
         dx = minX - maxXThis;
+      } else if (minXThis > maxX) {
+        dx = minXThis - maxX;
       } else {
-        if (minXThis > maxX) {
-          dx = minXThis - maxX;
-        } else {
-          dx = 0;
-        }
+        dx = 0;
       }
 
       double dy;
@@ -855,13 +852,13 @@ public interface BoundingBox
       index = index % 4;
       switch (index) {
         case 0:
-          return new PointDoubleGf(getGeometryFactory(), maxX, minY);
+          return getGeometryFactory().point(maxX, minY);
         case 1:
-          return new PointDoubleGf(getGeometryFactory(), minX, minY);
+          return getGeometryFactory().point(minX, minY);
         case 2:
-          return new PointDoubleGf(getGeometryFactory(), minX, maxY);
+          return getGeometryFactory().point(minX, maxY);
         default:
-          return new PointDoubleGf(getGeometryFactory(), maxX, maxY);
+          return getGeometryFactory().point(maxX, maxY);
       }
     }
   }
@@ -1121,15 +1118,12 @@ public interface BoundingBox
         return OutCode.RIGHT;
       }
 
+    } else if (y < minY) {
+      return OutCode.BOTTOM;
+    } else if (y > maxY) {
+      return OutCode.TOP;
     } else {
-      if (y < minY) {
-        return OutCode.BOTTOM;
-      } else if (y > maxY) {
-        return OutCode.TOP;
-      } else {
-        return OutCode.INSIDE;
-      }
-
+      return OutCode.INSIDE;
     }
   }
 

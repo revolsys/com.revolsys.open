@@ -21,6 +21,6 @@ public class PointDoubleXYGeometryFactory extends PointDoubleXY {
 
   @Override
   public Point newPoint(final double x, final double y) {
-    return new PointDoubleXYGeometryFactory(this.geometryFactory, x, y);
+    return this.geometryFactory.point(x, y);
   }
 }

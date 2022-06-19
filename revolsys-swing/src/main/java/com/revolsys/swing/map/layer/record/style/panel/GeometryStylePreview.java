@@ -15,7 +15,7 @@ import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.LinearRing;
 import com.revolsys.geometry.model.Polygon;
 import com.revolsys.geometry.model.impl.LineStringDouble;
-import com.revolsys.geometry.model.impl.LinearRingDoubleGf;
+import com.revolsys.geometry.model.impl.LinearRingDoubleGeometryFactory;
 import com.revolsys.swing.map.layer.record.style.GeometryStyle;
 import com.revolsys.swing.map.view.graphics.Graphics2DViewRenderer;
 
@@ -32,7 +32,7 @@ public class GeometryStylePreview extends JPanel {
   }
 
   public static Polygon getPolygon(final int size) {
-    final LinearRing ring = new LinearRingDoubleGf(2, //
+    final LinearRing ring = new LinearRingDoubleGeometryFactory(2, //
       0.19 * size, 0.19 * size, //
       0.79 * size, 0.19 * size, //
       0.35 * size, 0.39 * size, //
