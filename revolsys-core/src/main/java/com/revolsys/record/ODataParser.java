@@ -635,7 +635,8 @@ public class ODataParser {
   private static Token readDigits(final String text, final int start) {
     int rt = start;
     boolean wasDigits = true;
-    while (rt < text.length()) {
+    final int length = text.length();
+    while (rt < length) {
       final char c = text.charAt(rt);
       if (Character.isDigit(c)) {
         rt++;
@@ -650,11 +651,13 @@ public class ODataParser {
     if ("-".equals(token)) {
       return new Token(TokenType.SYMBOL, token, rt);
     } else if (wasDigits) {
-      if (text.charAt(rt) == '.') {
-        do {
-          rt++;
-        } while (rt < text.length() && Character.isDigit(text.charAt(rt)));
-        token = text.substring(start, rt);
+      if (rt < length) {
+        if (text.charAt(rt) == '.') {
+          do {
+            rt++;
+          } while (rt < length && Character.isDigit(text.charAt(rt)));
+          token = text.substring(start, rt);
+        }
       }
       return new Token(TokenType.NUMBER, token, rt);
     } else {

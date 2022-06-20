@@ -1,0 +1,132 @@
+name: Create Version
+
+on:
+
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to Create'
+        required: false
+
+jobs:
+  create_version:
+    runs-on: ubuntu-latest
+
+    permissions: 
+      contents: write
+      packages: write 
+
+    env:
+      JEOMETRY_REPO: 'jeometry-org/jeometry'
+      REVOLSYS_REPO: 'revolsys/com.revolsys.open'
+
+    steps:
+
+    - name: Init Branch
+      shell: bash
+      run: |
+        BRANCH=${GITHUB_REF#refs/heads/}
+        echo "BRANCH=${BRANCH}" >> $GITHUB_ENV
+
+#### JAVA VERSION ####
+    - name: Set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+
+#### Initialize Environment ####
+    - name: Initialize Environment
+      if: ${{env.BRANCH == 'main'}}
+      run: |
+        echo "JEOMETRY_REPO=jeometry-org/jeometry" >> $GITHUB_ENV
+        echo "REVOLSYS_REPO=revolsys/com.revolsys.open" >> $GITHUB_ENV
+
+#### Checkout jeometry ####
+    - name: Checkout jeometry
+      uses: actions/checkout@v2
+      with:
+        ref: ${{env.BRANCH}}
+        repository: ${{env.JEOMETRY_REPO}}
+        path: jeometry
+        fetch-depth: 0
+        token: ${{secrets.PUSH_TOKEN}}
+
+#### Checkout revolsys ####
+    - name: Checkout revolsys
+      uses: actions/checkout@v2
+      with:
+        ref: ${{env.BRANCH}}
+        repository: ${{github.repository}}
+        path: revolsys
+
+#### Create Version ####
+    - name: Git Init
+      run: |
+        git config --global user.name github-actions
+        git config --global user.email github-actions@github.com
+        
+    - name: Git Push Branches
+      run: |
+        git -C ./jeometry push -f "https://${USERNAME}:${REPO_KEY}@github.com/jeometry-org/jeometry.git"      "$BRANCH"
+        git -C ./revolsys push -f "https://${USERNAME}:${REPO_KEY}@github.com/revolsys/com.revolsys.open.git" "$BRANCH"
+   
+    - name: Set Version
+      run: |
+       VERSION="${{github.event.inputs.version}}"
+       if [ "${VERSION}" == "" ]; then
+          VERSION=${BRANCH#patches/}
+        fi
+
+        echo "Setting version to ${VERSION}"
+        OTHER_VERSION="0.REVOLSYS-${VERSION}"
+        sed -i "s/<org.jeometry.version>.*<\\/org.jeometry.version>/<org.jeometry.version>${OTHER_VERSION}<\\/org.jeometry.version>/g" ./revolsys/pom.xml
+        mvn -f ./jeometry/pom.xml -B -q versions:set "-DnewVersion=${OTHER_VERSION}" -DgenerateBackupPoms=false -DprocessDependencies=false
+        mvn -f ./revolsys/pom.xml -B -q versions:set "-DnewVersion=${VERSION}" -DgenerateBackupPoms=false -DprocessDependencies=false
+        echo "OTHER_VERSION=$OTHER_VERSION" >> $GITHUB_ENV
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+     
+    - name: Create Git Tag
+      run: |
+        git -C ./jeometry commit -a -m "Version ${OTHER_VERSION}"
+        git -C ./revolsys commit -a -m "Version ${VERSION}"
+        git -C ./jeometry tag -f "${OTHER_VERSION}"
+        git -C ./revolsys tag -f "${VERSION}"
+        git -C ./jeometry push "https://${USERNAME}:${REPO_KEY}@github.com/jeometry-org/jeometry.git"      "$OTHER_VERSION"
+        git -C ./revolsys push "https://${USERNAME}:${REPO_KEY}@github.com/revolsys/com.revolsys.open.git" "$VERSION"
+      env:
+        USERNAME: ${{github.actor}}
+        REPO_KEY: ${{secrets.PUSH_TOKEN}}
+
+#### MAVEN REPOSITORY CACHE ####
+    - uses: actions/cache@v2
+      with:
+        path: |
+          '~/.m2/repository'
+          '!~/.m2/repository/org/jeometry'
+          '!~/.m2/repository/com/revolsys/open'
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+
+#### Get Project Version ####
+    - name: Get Project Version
+      working-directory: ./revolsys
+      run: echo "PROJECT_VERSION=$(grep version pom.xml|head -1 | sed 's/<\/*version>//g' | sed 's/ //g')" >> $GITHUB_ENV
+
+#### Set Snapshot Version ####
+    - name: Set Snapshot Version
+      if: contains(env.PROJECT_VERSION, 'SNAPSHOT')
+      run: |
+        BASE_REF=$(echo "$REF" | tr '[:lower:]' '[:upper:]')
+        OTHER_VERSION="0.REVOLSYS-${BASE_REF}-SNAPSHOT"
+        VERSION="${BASE_REF}-SNAPSHOT"
+        sed -i "s/<org.jeometry.version>.*<\\/org.jeometry.version>/<org.jeometry.version>${OTHER_VERSION}<\\/org.jeometry.version>/g" ./revolsys/pom.xml
+        mvn -f ./jeometry/pom.xml -B -q versions:set "-DnewVersion=${OTHER_VERSION}" -DgenerateBackupPoms=false -DprocessDependencies=false
+        mvn -f ./revolsys/pom.xml -B -q versions:set "-DnewVersion=${VERSION}" -DgenerateBackupPoms=false -DprocessDependencies=false
+
+#### Build ####
+    - name: Build
+      working-directory: ./revolsys
+      run: mvn -B -ntp install -DskipTests
+

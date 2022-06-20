@@ -1,0 +1,19 @@
+{
+  "protectedBranches":[
+    "main"
+  ],
+  "repositories":[
+    {
+      "path": "jeometry",
+      "remotes": {
+        "upstream": "jeometry-org/jeometry"
+      }
+    },
+    {
+      "path": "revolsys",
+      "remotes": {
+        "upstream": "revolsys/com.revolsys.open"
+      }
+    }
+  ]
+}
