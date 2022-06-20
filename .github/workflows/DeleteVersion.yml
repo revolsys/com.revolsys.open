@@ -1,0 +1,54 @@
+name: Delete Version
+
+on:
+
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to delete'
+        required: false
+
+jobs:
+  delete_version:
+    runs-on: ubuntu-latest
+
+    permissions: 
+      contents: write
+      packages: write 
+
+    env:
+      APP_REPO: '${{github.repository}}'
+
+    steps:
+
+    - name: Init Variables
+      shell: bash
+      run: |
+        echo "JEOMETRY_REPO=${APP_REPO}_jeometry" >> $GITHUB_ENV
+        VERSION="${{github.event.inputs.version}}"
+        if [ "$VERSION" == "" ]; then
+          VERSION=${GITHUB_REF#refs/tags/}
+        fi
+        echo "Delete version ${VERSION}"
+        OTHER_VERSION="0.REVOLSYS-${VERSION}"
+        DOCKER_VERSION=$(echo "$VERSION" | tr '[:upper:]' '[:lower:]')
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
+        echo "OTHER_VERSION=$OTHER_VERSION" >> $GITHUB_ENV
+        echo "DOCKER_VERSION=${DOCKER_VERSION}" >> $GITHUB_ENV
+
+    - name: Git Init
+      run: |
+        git config --global user.name github-actions
+        git config --global user.email github-actions@github.com
+        git config --global init.defaultBranch main
+
+    - name: Git Tag Delete
+      run: |
+        mkdir t
+        cd t
+        git init
+        git push -f "https://${USERNAME}:${REPO_KEY}@github.com/${JEOMETRY_REPO}.git"  ":refs/tags/${OTHER_VERSION}" || true
+        git push -f "https://${USERNAME}:${REPO_KEY}@github.com/${APP_REPO}.git"       ":refs/tags/${VERSION}" || true
+      env:
+        USERNAME: ${{github.actor}}
+        REPO_KEY: ${{secrets.PUSH_TOKEN}}
