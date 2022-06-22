@@ -9,6 +9,7 @@ import java.util.TreeMap;
 import java.util.function.Function;
 
 import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.io.FileNameProxy;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.ClockDirection;
@@ -26,6 +27,76 @@ import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
 
 public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
+  public static class Builder {
+    private JsonObject properties = JsonObject.hash();
+
+    private final RecordReaderFactory readerFactory;
+
+    private RecordFactory<? extends Record> recordFactory = ArrayRecord.FACTORY;
+
+    private Object source;
+
+    private Builder(final RecordReaderFactory readerFactory) {
+      this.readerFactory = readerFactory;
+    }
+
+    public RecordReader build() {
+      if (this.readerFactory == null) {
+        return null;
+      } else {
+        final Resource resource = this.readerFactory.getZipResource(this.source);
+        return this.readerFactory.newRecordReader(resource, this.recordFactory, this.properties);
+      }
+    }
+
+    public Builder setGeometryFactory(final GeometryFactory geometryFactory) {
+      this.properties.addValue("geometryFactory", geometryFactory);
+      return this;
+    }
+
+    public Builder setProperties(final JsonObject properties) {
+      if (properties == null) {
+        this.properties = JsonObject.hash();
+      } else {
+        this.properties = properties;
+      }
+      return this;
+    }
+
+    public Builder setRecordFactory(final RecordFactory<? extends Record> recordFactory) {
+      this.recordFactory = recordFactory;
+      return this;
+    }
+
+    public Builder setSource(final Object source) {
+      this.source = source;
+      return this;
+    }
+  }
+
+  static Builder builder(final Object source) {
+    final RecordReaderFactory readerFactory = IoFactory.factory(RecordReaderFactory.class, source);
+    return new Builder(readerFactory).setSource(source);
+
+  }
+
+  static Builder builderFileName(final FileNameProxy fileNameProxy) {
+    final RecordReaderFactory readerFactory;
+    if (fileNameProxy == null) {
+      readerFactory = null;
+    } else {
+      final String fileName = fileNameProxy.getFileName();
+      readerFactory = IoFactory.factoryByFileName(RecordReaderFactory.class, fileName);
+    }
+    return new Builder(readerFactory);
+  }
+
+  static Builder builderFileName(final String fileName) {
+    final RecordReaderFactory readerFactory = IoFactory.factoryByFileName(RecordReaderFactory.class,
+      fileName);
+    return new Builder(readerFactory);
+  }
+
   static RecordReader empty() {
     return new ListRecordReader(null);
   }

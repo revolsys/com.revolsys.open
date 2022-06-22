@@ -62,6 +62,10 @@ public class UuidBuilder {
     return Identifier.newIdentifier(string);
   }
 
+  public UuidBuilder separator() {
+    return append(":");
+  }
+
   @Override
   public String toString() {
     final UUID uuid = build();
