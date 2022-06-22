@@ -22,6 +22,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.io.FileNameProxy;
 import org.jeometry.coordinatesystem.model.CoordinateSystem;
 
 import com.revolsys.collection.list.Lists;
@@ -144,7 +145,9 @@ public interface IoFactory extends Available {
   public static String fileName(final Object source) {
     String fileName = null;
     if (Property.hasValue(source)) {
-      if (source instanceof Resource) {
+      if (source instanceof FileNameProxy) {
+        fileName = ((FileNameProxy)source).getFileName();
+      } else if (source instanceof Resource) {
         fileName = ((Resource)source).getFilename();
       } else if (source instanceof Path) {
         fileName = Paths.getFileName((Path)source);

@@ -304,6 +304,11 @@ public interface Resource extends org.springframework.core.io.Resource, FileProx
   @Override
   File getFile();
 
+  @Override
+  default String getFileName() {
+    return getFilename();
+  }
+
   default String getFileNameExtension() {
     final String filename = getFilename();
     return FileNames.getFileNameExtension(filename);
