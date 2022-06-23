@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.util.UUID;
 
 import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.data.identifier.UuidIdentifier;
 import org.jeometry.common.data.type.DataTypes;
 
 public class UuidBuilder {
@@ -55,6 +56,11 @@ public class UuidBuilder {
   public UUID build() {
     final byte[] digest = this.digester.digest();
     return UuidNamespace.toUuid(this.type, digest);
+  }
+
+  public UuidIdentifier buildIdentifier() {
+    final UUID uuid = build();
+    return Identifier.newIdentifier(uuid);
   }
 
   public Identifier newStringIdentifier() {
