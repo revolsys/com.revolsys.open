@@ -310,8 +310,8 @@ public interface Resource extends org.springframework.core.io.Resource, FileProx
   }
 
   default String getFileNameExtension() {
-    final String filename = getFilename();
-    return FileNames.getFileNameExtension(filename);
+    final String fileName = getFilename();
+    return FileNames.getFileNameExtension(fileName);
   }
 
   @Override

@@ -336,20 +336,22 @@ public interface IoFactory extends Available {
   default Resource getZipResource(final Object source) {
     Resource resource = Resource.getResource(source);
     if (isReadFromZipFileSupported()) {
-      final String filename = resource.getFilename();
-      if (filename.endsWith(".zip")) {
-        final String baseName = filename.substring(0, filename.length() - 4);
-        final String url = "jar:" + resource.getUri() + "!/" + baseName;
-        final UrlResource urlResource = new UrlResource(url);
-        if (urlResource.exists()) {
-          resource = urlResource;
-        } else {
-          return null;
+      final String fileName = resource.getFilename();
+      if (fileName != null) {
+        if (fileName.endsWith(".zip")) {
+          final String baseName = fileName.substring(0, fileName.length() - 4);
+          final String url = "jar:" + resource.getUri() + "!/" + baseName;
+          final UrlResource urlResource = new UrlResource(url);
+          if (urlResource.exists()) {
+            resource = urlResource;
+          } else {
+            return null;
+          }
+        } else if (fileName.endsWith(".gz")) {
+          return new GzipResource(resource);
+        } else if (fileName.endsWith(getFileExtensions().get(0) + "z")) {
+          return new GzipResource(resource);
         }
-      } else if (filename.endsWith(".gz")) {
-        return new GzipResource(resource);
-      } else if (filename.endsWith(getFileExtensions().get(0) + "z")) {
-        return new GzipResource(resource);
       }
     }
     return resource;
