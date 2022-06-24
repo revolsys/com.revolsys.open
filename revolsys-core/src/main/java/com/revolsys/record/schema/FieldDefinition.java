@@ -956,13 +956,14 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
   public JsonObject toMap() {
     final JsonObject map = new JsonObjectHash();
     addTypeToMap(map, "field");
-    map.put("name", getName());
-    map.put("title", getTitle());
+    final String name = getName();
+    map.put("name", name);
+    addToMap(map, "title", getTitle());
     addToMap(map, "description", getDescription(), "");
     map.put("dataType", getDataType().getName());
-    map.put("length", getLength());
-    map.put("scale", getScale());
-    map.put("required", isRequired());
+    addToMap(map, "length", getLength(), 0);
+    addToMap(map, "scale", getScale(), 0);
+    addToMap(map, "required", isRequired(), false);
     addToMap(map, "minValue", getMinValue(), null);
     addToMap(map, "maxValue", getMaxValue(), null);
     addToMap(map, "defaultValue", getDefaultValue(), null);

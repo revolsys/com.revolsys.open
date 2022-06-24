@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.jeometry.common.compare.CompareUtil;
 import org.jeometry.common.data.identifier.Identifiable;
@@ -293,6 +294,11 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
       value2 = record.getValue(fieldName);
     }
     return CompareUtil.compare(value1, value2, nullsFirst);
+  }
+
+  default Record consume(final Consumer<Record> action) {
+    action.accept(this);
+    return this;
   }
 
   default boolean contains(final Iterable<? extends Record> records) {

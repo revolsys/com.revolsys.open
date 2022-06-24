@@ -63,7 +63,8 @@ public class UuidBuilder {
   }
 
   public UuidBuilder separator() {
-    return append(":");
+    return append(""); // UNICODE Group Separator
+                        // https://unicode-table.com/en/001D/
   }
 
   @Override
