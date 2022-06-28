@@ -40,6 +40,11 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
       this.readerFactory = readerFactory;
     }
 
+    public Builder addProperty(final String name, final Object value) {
+      this.properties.addValue(name, value);
+      return this;
+    }
+
     public RecordReader build() {
       if (this.readerFactory == null) {
         return null;
