@@ -6,6 +6,7 @@ import java.util.function.Supplier;
 import com.revolsys.record.ChangeTrackRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
+import com.revolsys.record.query.InsertUpdateAction;
 import com.revolsys.record.query.Query;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.transaction.TransactionOption;
@@ -53,6 +54,12 @@ public class RecordStoreQuery extends Query {
     }
     final RecordReader reader = this.recordStore.getRecords(this);
     return new TransactionRecordReader(reader, transaction);
+  }
+
+  @Override
+  public Record insertOrUpdateRecord(final InsertUpdateAction action) {
+    return this.recordStore.insertOrUpdateRecord(this, action);
+
   }
 
   @Override

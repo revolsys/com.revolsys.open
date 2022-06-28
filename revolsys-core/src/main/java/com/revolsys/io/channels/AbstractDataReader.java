@@ -24,10 +24,17 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
       buffer.position(min);
       final byte[] before = new byte[i - min];
       buffer.get(before);
-      final char c = (char)buffer.get();
-      final byte[] after = new byte[max - i - 1];
-      buffer.get(after);
-      buffer.position(i);
+      char c;
+      byte[] after;
+      try {
+        c = (char)buffer.get();
+        after = new byte[max - i - 1];
+        buffer.get(after);
+        buffer.position(i);
+      } catch (final Exception e) {
+        c = ' ';
+        after = new byte[0];
+      }
       return new String(before, StandardCharsets.US_ASCII) + " |"
         + ((Character)c).toString().replaceAll("[\\n\\r]", "\\\\n") + "| "
         + new String(after, StandardCharsets.US_ASCII);
@@ -435,6 +442,7 @@ public abstract class AbstractDataReader extends InputStream implements DataRead
     } else {
       while (count > remaining) {
         count -= remaining;
+        this.buffer.position(this.buffer.limit());
         remaining = ensureRemaining();
         if (remaining == -1) {
           return;
