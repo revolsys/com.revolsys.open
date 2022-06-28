@@ -34,6 +34,7 @@ import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.Cast;
 import com.revolsys.record.query.ColumnReference;
 import com.revolsys.record.query.Condition;
+import com.revolsys.record.query.InsertUpdateAction;
 import com.revolsys.record.query.Or;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
@@ -347,6 +348,28 @@ public class AbstractTableRecordStore {
         }
       } else {
         updateAction.accept(changeTrackRecord);
+        updateRecordDo(connection, changeTrackRecord);
+        return changeTrackRecord.newRecord();
+      }
+    }
+  }
+
+  protected Record insertOrUpdateRecord(final TableRecordStoreConnection connection,
+    final TableRecordStoreQuery query, final InsertUpdateAction action) {
+    query.setRecordFactory(ArrayChangeTrackRecord.FACTORY);
+
+    try (
+      Transaction transaction = connection.newTransaction(TransactionOptions.REQUIRED)) {
+      final ChangeTrackRecord changeTrackRecord = query.getRecord();
+      if (changeTrackRecord == null) {
+        final Record newRecord = action.insertRecord();
+        if (newRecord == null) {
+          return null;
+        } else {
+          return insertRecord(connection, newRecord);
+        }
+      } else {
+        action.updateRecord(changeTrackRecord);
         updateRecordDo(connection, changeTrackRecord);
         return changeTrackRecord.newRecord();
       }

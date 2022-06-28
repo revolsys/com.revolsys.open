@@ -172,6 +172,8 @@ public class Json extends AbstractIoFactory
               return false;
             }
           }
+        } else {
+          return false;
         }
         return true;
       } else {
