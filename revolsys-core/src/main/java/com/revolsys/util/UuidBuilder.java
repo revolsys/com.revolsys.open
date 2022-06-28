@@ -62,6 +62,11 @@ public class UuidBuilder {
     return Identifier.newIdentifier(string);
   }
 
+  public UuidBuilder separator() {
+    return append(""); // UNICODE Group Separator
+                        // https://unicode-table.com/en/001D/
+  }
+
   @Override
   public String toString() {
     final UUID uuid = build();

@@ -93,6 +93,21 @@ public class UuidNamespace {
 
   }
 
+  public UUID uuid(final Object... values) {
+    final UuidBuilder builder = builder();
+    boolean first = true;
+    for (final Object value : values) {
+      if (first) {
+        first = false;
+      } else {
+        builder.separator();
+      }
+      builder.append(value);
+
+    }
+    return builder.build();
+  }
+
   public UUID uuid(final String name) {
     final byte[] bytes = name.getBytes(StandardCharsets.UTF_8);
     return uuid(bytes);

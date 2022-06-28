@@ -96,8 +96,13 @@ public class JsonWriter implements BaseCloseable {
   }
 
   private void blockEnd(final JsonState startState, final JsonState endState) {
-    this.depth--;
-    this.depthStack.remove(this.depth);
+    if (this.depth > 0) {
+      this.depth--;
+    }
+
+    if (this.depth < this.depthStack.size()) {
+      this.depthStack.remove(this.depth);
+    }
     if (this.state != startState) {
       indent();
     }

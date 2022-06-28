@@ -718,6 +718,24 @@ public class Query extends BaseObjectWithProperties
     return !this.selectExpressions.isEmpty();
   }
 
+  public Record insertOrUpdateRecord(final InsertUpdateAction action) {
+
+    final Record record = getRecord();
+    if (record == null) {
+      final Record newRecord = action.newRecord();
+      if (newRecord == null) {
+        return null;
+      } else {
+        getRecordDefinition().getRecordStore().insertRecord(newRecord);
+        return newRecord;
+      }
+    } else {
+      action.updateRecord(record);
+      getRecordDefinition().getRecordStore().updateRecord(record);
+      return record;
+    }
+  }
+
   public Record insertOrUpdateRecord(final Supplier<Record> newRecordSupplier,
     final Consumer<Record> updateAction) {
 

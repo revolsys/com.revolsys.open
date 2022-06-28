@@ -41,13 +41,15 @@ public class FileNames {
   }
 
   public static String getFileNameExtension(final String fileName) {
-    final int dotIndex = fileName.lastIndexOf('.');
-    if (dotIndex != -1) {
-      final int startIndex = fileName.lastIndexOf("/");
-      if (startIndex == -1) {
-        return fileName.substring(dotIndex + 1);
-      } else if (dotIndex > startIndex) {
-        return fileName.substring(dotIndex + 1);
+    if (fileName != null) {
+      final int dotIndex = fileName.lastIndexOf('.');
+      if (dotIndex != -1) {
+        final int startIndex = fileName.lastIndexOf("/");
+        if (startIndex == -1) {
+          return fileName.substring(dotIndex + 1);
+        } else if (dotIndex > startIndex) {
+          return fileName.substring(dotIndex + 1);
+        }
       }
     }
     return "";
