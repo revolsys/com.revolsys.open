@@ -912,6 +912,8 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
         return fieldValue;
       } catch (final IllegalArgumentException e) {
         throw e;
+      } catch (final Error e) {
+        throw e;
       } catch (final Throwable e) {
         throw new IllegalArgumentException(
           getName() + "='" + value + "' is not a valid " + getDataType().getValidationName(), e);
