@@ -19,8 +19,11 @@ import com.revolsys.collection.list.Lists;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.And;
+import com.revolsys.record.query.Equal;
+import com.revolsys.record.query.Or;
 import com.revolsys.record.query.Q;
 import com.revolsys.record.query.Query;
+import com.revolsys.record.query.Value;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
@@ -293,7 +296,23 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
       } else {
         final FieldDefinition idField = this.recordDefinition.getField(this.idFieldName);
         final FieldDefinition valueField = this.recordDefinition.getField(this.valueFieldName);
-        and.and(Q.or(Q.equal(idField, value), Q.equal(valueField, value)));
+        final Or or = Q.or();
+        try {
+          final Value valueCondition = new Value(idField, idField.toObject(value), true);
+          final Equal equal = new Equal(idField, valueCondition);
+          or.addCondition(equal);
+        } catch (final Exception e) {
+        }
+        try {
+          final Value valueCondition = new Value(valueField, valueField.toObject(value), true);
+          final Equal equal = new Equal(valueField, valueCondition);
+          or.addCondition(equal);
+        } catch (final Exception e) {
+        }
+        if (or.isEmpty()) {
+          return null;
+        }
+        and.and(or);
       }
       query.setWhereCondition(and);
       query.forEachRecord(this::addValueDo);
