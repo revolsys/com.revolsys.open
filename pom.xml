@@ -73,7 +73,7 @@
                   <version>3.8.1</version>
                 </requireMavenVersion>
                 <requireJavaVersion>
-                  <version>11</version>
+                  <version>17</version>
                 </requireJavaVersion>
               </rules>
             </configuration>
@@ -89,7 +89,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <release>11</release>
+          <release>17</release>
           <debug>true</debug>
           <debuglevel>lines,source,vars</debuglevel>
           <parameters>true</parameters>
@@ -637,33 +637,9 @@
     </repository>
     
     <repository>
-      <id>github-filegdb</id>
-      <name>Github FileGDB</name>
-      <url>https://maven.pkg.github.com/revolsys/com.revolsys.esri.filegdb-jni</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-   
-  <!--  <repository>
-      <id>github-gdal</id>
-      <name>Github gdal</name>
-      <url>https://maven.pkg.github.com/revolsys/com.revolsys.gdal.gdal-jni</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>-->
- 
-    <repository>
-      <id>github-jocl</id>
-      <name>Github Jocl</name>
-      <url>https://maven.pkg.github.com/revolsys/jocl</url>
+      <id>revolsys-libs</id>
+      <name>Revolsys Libs</name>
+      <url>https://raw.githubusercontent.com/revolsys/mvnrepository/main/</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -676,17 +652,6 @@
       <id>github-jeometry</id>
       <name>Github Jeometry</name>
       <url>https://maven.pkg.github.com/jeometry-org/jeometry</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>github-revolsys</id>
-      <name>Github Revolsys</name>
-      <url>https://maven.pkg.github.com/${gitHubRepo}</url>
       <releases>
         <enabled>true</enabled>
       </releases>
