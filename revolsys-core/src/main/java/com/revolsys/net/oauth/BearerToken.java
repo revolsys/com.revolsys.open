@@ -20,14 +20,33 @@ public class BearerToken {
 
   public BearerToken(final JsonObject config, final String scope) {
     this.accessToken = config.getString("access_token");
+
+    final Long expiresOn = config.getLong("expires_on");
+    if (expiresOn != null) {
+      this.expireTime = expiresOn * 1000;
+    } else {
+      final Long expiresIn = config.getLong("expires_in");
+      if (expiresIn != null) {
+        this.expireTime = (System.currentTimeMillis() + expiresIn) * 1000;
+      }
+    }
+
   }
 
   public String getAccessToken() {
     return this.accessToken;
   }
 
+  public String getAuthorizationHeader() {
+    return "Bearer " + this.accessToken;
+  }
+
   public Instant getExpireTime() {
     return Instant.ofEpochMilli(this.expireTime);
+  }
+
+  public long getExpireTimeMillis() {
+    return this.expireTime;
   }
 
   public String getReturnedScope() {
@@ -40,10 +59,6 @@ public class BearerToken {
 
   public boolean isExpired() {
     return System.currentTimeMillis() >= this.expireTime;
-  }
-
-  protected void setExpireTime(final long expireTime) {
-    this.expireTime = expireTime;
   }
 
   public void setScope(final String scope, final String returnedScope) {

@@ -18,9 +18,6 @@ public class OpenIdBearerToken extends BearerToken {
     this.client = client;
     this.refreshToken = config.getString("refresh_token");
     this.idToken = config.getString("id_token");
-    final Integer expiresIn = config.getInteger("expires_in");
-    final long expireTime = System.currentTimeMillis() + expiresIn * 1000;
-    setExpireTime(expireTime);
     final String returnedScope = config.getString("scope");
     setScope(resource.getResource(), returnedScope);
   }
@@ -31,9 +28,6 @@ public class OpenIdBearerToken extends BearerToken {
     this.client = client;
     this.refreshToken = config.getString("refresh_token");
     this.idToken = config.getString("id_token");
-    final Integer expiresIn = config.getInteger("expires_in");
-    final long expireTime = System.currentTimeMillis() + expiresIn * 1000;
-    setExpireTime(expireTime);
     final String returnedScope = config.getString("scope");
     setScope(scope, returnedScope);
   }
@@ -47,7 +41,7 @@ public class OpenIdBearerToken extends BearerToken {
   }
 
   protected JsonWebToken getJwt() {
-    if (this.jwt == null) {
+    if (this.jwt == null && this.idToken != null) {
       this.jwt = new JsonWebToken(this.idToken);
     }
     return this.jwt;
@@ -58,7 +52,11 @@ public class OpenIdBearerToken extends BearerToken {
   }
 
   public String getStringClaim(final String name) {
-    return getJwt().getString(name);
+    final JsonWebToken jwt = getJwt();
+    if (jwt == null) {
+      return null;
+    }
+    return jwt.getString(name);
   }
 
   public OpenIdBearerToken getValid() {

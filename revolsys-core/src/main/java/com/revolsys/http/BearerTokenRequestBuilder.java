@@ -4,7 +4,7 @@ import org.apache.http.client.methods.HttpUriRequest;
 
 public class BearerTokenRequestBuilder extends ApacheHttpRequestBuilder {
 
-  public BearerTokenRequestBuilder(final BearerTokenRequestBuilderFactory factory) {
+  public BearerTokenRequestBuilder(final BearerTokenRequestBuilderFactory<?> factory) {
     super(factory);
   }
 
@@ -16,8 +16,8 @@ public class BearerTokenRequestBuilder extends ApacheHttpRequestBuilder {
   }
 
   @Override
-  public BearerTokenRequestBuilderFactory getFactory() {
-    return (BearerTokenRequestBuilderFactory)super.getFactory();
+  public BearerTokenRequestBuilderFactory<?> getFactory() {
+    return (BearerTokenRequestBuilderFactory<?>)super.getFactory();
   }
 
 }

@@ -34,35 +34,35 @@ public class MicrosoftOAuthHandler {
     this.principalFactory = principalFactory;
   }
 
-  protected RequestBuilder authorizationUrlBuilder(final HttpServletRequest request,
-    final OAuthLoginState loginState) {
-    final String redirectUri = getOAuthRedirectUri(request);
-    final String state = loginState.getStateParam();
-    final RequestBuilder urlBuilder = this.oauthClient.authorizationUrlBuilder(this.scope,
-      redirectUri, state, loginState.getNonce(), this.prompt);
-    return urlBuilder;
-  }
-
   public String authorize(final HttpServletRequest request, final OAuthLoginState loginState)
     throws IOException {
-    final RequestBuilder urlBuilder = authorizationUrlBuilder(request, loginState);
-    return urlBuilder.build().getURI().toASCIIString();
+    final String redirectUri = getOAuthRedirectUri(request);
+    final String state = loginState.getStateParam();
+    final String nonce = loginState.getNonce();
+    return getRedirectUri(redirectUri, state, nonce, this.scope);
+  }
+
+  public OpenIdBearerToken callback(final HttpServletRequest request, final String redirectUri,
+    final String nonce, String scope) {
+    final String code = request.getParameter("code");
+    final OpenIdBearerToken token = this.oauthClient.tokenAuthorizationCode(code, redirectUri,
+      scope);
+
+    final String tokenNonce = token.getStringClaim("nonce");
+    if (!nonce.equals(tokenNonce)) {
+      throw new IllegalStateException(
+        "Failed to validate data received from Authorization service - could not validate nonce");
+    }
+    return token;
   }
 
   public String callback(final OAuthLoginState loginState, final HttpServletRequest request,
     final HttpServletResponse response) throws IOException {
     final HttpSession session = request.getSession();
     try {
-      final String code = request.getParameter("code");
       final String redirectUri = getOAuthRedirectUri(request);
-      final OpenIdBearerToken token = this.oauthClient.tokenAuthorizationCode(code, redirectUri,
-        this.scope);
-
-      final String tokenNonce = token.getStringClaim("nonce");
-      if (!loginState.equalsNonce(tokenNonce)) {
-        throw new IllegalStateException(
-          "Failed to validate data received from Authorization service - could not validate nonce");
-      }
+      final String nonce = loginState.getNonce();
+      final OpenIdBearerToken token = callback(request, redirectUri, nonce, this.scope);
       session.setAttribute("bearerToken", token);
       final Principal principal = this.principalFactory.apply(token);
       session.setAttribute("principal", principal);
@@ -76,6 +76,12 @@ public class MicrosoftOAuthHandler {
   public String getOAuthRedirectUri(final HttpServletRequest request) {
     final String serverUrl = HttpServletUtils.getServerUrl(request);
     return serverUrl + "/auth/openid/return";
+  }
+
+  public String getRedirectUri(final String redirectUri, final String state, final String nonce, String scope) {
+    final RequestBuilder urlBuilder = this.oauthClient.authorizationUrlBuilder(scope,
+      redirectUri, state, nonce, this.prompt);
+    return urlBuilder.build().getURI().toASCIIString();
   }
 
   public String getState(final HttpServletRequest request) {
@@ -131,5 +137,9 @@ public class MicrosoftOAuthHandler {
     final String serverUrl = HttpServletUtils.getServerUrl(request);
     final String redirectUrl = this.oauthClient.endSessionUrl(serverUrl).toASCIIString();
     response.sendRedirect(redirectUrl);
+  }
+
+  public OpenIdBearerToken tokenRefresh(final String refreshToken, final String scope) {
+    return this.oauthClient.tokenRefresh(refreshToken, scope);
   }
 }
