@@ -660,15 +660,15 @@
       </snapshots>
     </repository>
     <repository>
-      <id>revolsys external</id>
+      <id>github-revolsys</id>
+      <name>Github Revolsys</name>
+      <url>https://maven.pkg.github.com/${gitHubRepo}</url>
       <releases>
         <enabled>true</enabled>
       </releases>
       <snapshots>
-        <enabled>true</enabled>
+        <enabled>false</enabled>
       </snapshots>
-      <name>ext</name>
-      <url>https://open.revolsys.com/artifactory/ext</url>
     </repository>
    </repositories>
 
