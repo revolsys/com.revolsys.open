@@ -179,5 +179,9 @@
 			<artifactId>httpclient5</artifactId>
 			<version>5.1.2</version>
 		</dependency>
+		<dependency>
+      <groupId>io.projectreactor</groupId>
+      <artifactId>reactor-core</artifactId>
+    </dependency>
 	</dependencies>
 </project>

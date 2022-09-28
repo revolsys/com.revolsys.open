@@ -20,6 +20,7 @@ import org.springframework.transaction.PlatformTransactionManager;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.geometry.model.BoundingBox;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.jdbc.JdbcUtils;
 import com.revolsys.predicate.Predicates;
 import com.revolsys.properties.BaseObjectWithProperties;
@@ -44,6 +45,9 @@ import com.revolsys.util.Cancellable;
 import com.revolsys.util.CancellableProxy;
 import com.revolsys.util.Property;
 import com.revolsys.util.count.LabelCounters;
+
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.SynchronousSink;
 
 public class Query extends BaseObjectWithProperties
   implements Cloneable, CancellableProxy, Transactionable {
@@ -509,6 +513,20 @@ public class Query extends BaseObjectWithProperties
     return getRecordDefinition().getRecordStore().deleteRecords(this);
   }
 
+  public <R extends Record> Flux<R> fluxForEach() {
+    return Flux.generate(() -> getRecordReader().iterator(), (iterator,
+      sink) -> {
+      if (iterator.hasNext()) {
+        R record = (R)iterator.next();
+        sink.next(record);
+      } else {
+        sink.complete();
+      }
+      return iterator;
+    }, (Consumer<? super Iterator<Record>>)(
+      Iterator<Record> iterator) -> ((BaseCloseable)iterator).close());
+  }
+
   public void forEachRecord(final Consumer<? super Record> action) {
     try (
       RecordReader reader = getRecordReader()) {
@@ -839,12 +857,10 @@ public class Query extends BaseObjectWithProperties
       QueryValue right;
       if (value instanceof QueryValue) {
         right = (QueryValue)value;
+      } else if (left instanceof ColumnReference) {
+        right = new Value((ColumnReference)left, value);
       } else {
-        if (left instanceof ColumnReference) {
-          right = new Value((ColumnReference)left, value);
-        } else {
-          right = Value.newValue(value);
-        }
+        right = Value.newValue(value);
       }
       condition = operator.apply(left, right);
     }

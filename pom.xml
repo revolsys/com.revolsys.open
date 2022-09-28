@@ -362,6 +362,11 @@
         <version>4.0.1</version>
       </dependency>
       <dependency>
+        <groupId>io.projectreactor</groupId>
+        <artifactId>reactor-core</artifactId>
+        <version>3.4.21</version>
+      </dependency>
+      <dependency>
         <groupId>org.docx4j</groupId>
         <artifactId>docx4j-ImportXHTML</artifactId>
         <version>${org.docx4j.version}</version>

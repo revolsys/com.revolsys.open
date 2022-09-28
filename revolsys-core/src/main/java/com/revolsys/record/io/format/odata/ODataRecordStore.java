@@ -350,6 +350,17 @@ public class ODataRecordStore extends AbstractRecordStore {
     return result.getBoolean("deleted", false);
   }
 
+  @Override
+  public boolean deleteRecord(Record record) {
+    if (record == null) {
+      return false;
+    } else {
+      final PathName typeName = record.getPathName();
+      final Identifier identifier = record.getIdentifier();
+      return deleteRecord(typeName, identifier);
+    }
+  }
+
   JsonObject getJson(final URI uri) {
     return this.requestBuilderFactory.get(uri).setParameter(FORMAT_JSON).getJson();
   }

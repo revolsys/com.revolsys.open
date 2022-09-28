@@ -18,6 +18,7 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathNameProxy;
 
 import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.tsv.Tsv;
 import com.revolsys.record.io.format.tsv.TsvWriter;
 import com.revolsys.record.schema.RecordDefinition;
@@ -191,6 +192,20 @@ public class CategoryLabelCountMap implements Emptyable {
 
   public void setPrefix(final String prefix) {
     this.prefix = prefix;
+  }
+
+  public JsonObject toJson() {
+    if (isEmpty()) {
+      return JsonObject.EMPTY;
+    } else {
+      final JsonObject json = JsonObject.tree();
+      for (final Entry<String, LabelCounters> entry : this.labelCountMapByCategory.entrySet()) {
+        final String label = entry.getKey();
+        final LabelCounters counter = entry.getValue();
+        json.add(label, counter.toJson());
+      }
+      return json;
+    }
   }
 
   public String toTsv() {

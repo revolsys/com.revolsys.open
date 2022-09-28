@@ -2,6 +2,7 @@ package com.revolsys.util.count;
 
 import org.jeometry.common.logging.Logs;
 
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.util.Counter;
 
 public abstract class AbstractLabelCounters implements LabelCounters {
@@ -80,6 +81,11 @@ public abstract class AbstractLabelCounters implements LabelCounters {
   @Override
   public void setMessage(final String message) {
     this.message = message;
+  }
+
+  @Override
+  public JsonObject toJson() {
+    throw new UnsupportedOperationException();
   }
 
   @Override
