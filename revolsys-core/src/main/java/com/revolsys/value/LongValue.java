@@ -4,6 +4,13 @@ public class LongValue implements ValueHolder<Long> {
 
   public long value;
 
+  public LongValue() {
+  }
+
+  public LongValue(final long value) {
+    this.value = value;
+  }
+
   public long addValue(final long value) {
     this.value += value;
     return value;
