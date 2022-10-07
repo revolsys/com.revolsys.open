@@ -19,6 +19,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.http.ssl.TrustStrategy;
 import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.exception.WrappedException;
 
@@ -27,6 +28,8 @@ import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.json.JsonParser;
 
 public class ApacheHttp {
+
+  private static TrustStrategy defaultTrustStrategy = TrustSelfSignedStrategy.INSTANCE;
 
   public static final ContentType XML = ContentType.create("application/xml",
     StandardCharsets.UTF_8);
@@ -151,7 +154,7 @@ public class ApacheHttp {
   public static CloseableHttpClient newClient() {
     try {
       final SSLContext sslContext = SSLContextBuilder.create()
-        .loadTrustMaterial(new TrustSelfSignedStrategy())
+        .loadTrustMaterial(defaultTrustStrategy)
         .build();
       final SSLConnectionSocketFactory connectionFactory = new SSLConnectionSocketFactory(
         sslContext, (hostname, session) -> true);
@@ -163,6 +166,14 @@ public class ApacheHttp {
       throw Exceptions.wrap(e);
     }
 
+  }
+
+  public static void setDefaultTrustStrategy(final TrustStrategy defaultTrustStrategy) {
+    if (defaultTrustStrategy == null) {
+      ApacheHttp.defaultTrustStrategy = TrustSelfSignedStrategy.INSTANCE;
+    } else {
+      ApacheHttp.defaultTrustStrategy = defaultTrustStrategy;
+    }
   }
 
   public static RequestBuilder setJsonBody(final RequestBuilder requestBuilder,

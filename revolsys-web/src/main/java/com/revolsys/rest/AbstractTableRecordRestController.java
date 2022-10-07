@@ -22,7 +22,7 @@ import com.revolsys.record.schema.AbstractTableRecordStore;
 import com.revolsys.record.schema.TableRecordStoreConnection;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.transaction.TransactionOptions;
-import com.revolsys.ui.web.utils.HttpServletUtils;
+import com.revolsys.web.HttpServletUtils;
 
 public class AbstractTableRecordRestController extends AbstractWebController {
 

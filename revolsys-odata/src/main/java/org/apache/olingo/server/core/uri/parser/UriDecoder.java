@@ -18,11 +18,11 @@
  */
 package org.apache.olingo.server.core.uri.parser;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.olingo.commons.core.Decoder;
 import org.apache.olingo.server.api.uri.queryoption.QueryOption;
 import org.apache.olingo.server.core.uri.queryoption.CustomQueryOptionImpl;
 
@@ -34,7 +34,60 @@ public class UriDecoder {
 
   public static String decode(final String encoded) throws UriParserSyntaxException {
     try {
-      return Decoder.decode(encoded);
+      if (encoded == null) {
+        return encoded;
+      }
+
+      // Use a tiny finite-state machine to handle decoding on byte level.
+      // There are only three states:
+      // -2: normal bytes
+      // -1: a byte representing the percent character has been read
+      // >= 0: a byte representing the first half-byte of a percent-encoded byte
+      // has been read
+      // The variable holding the state is also used to store the value of the
+      // first half-byte.
+      final byte[] result = new byte[encoded.length()];
+      int position = 0;
+      byte encodedPart = -2;
+      for (final char c : encoded.toCharArray()) {
+        if (c <= Byte.MAX_VALUE) {
+          if (c == '+') {
+            result[position++] = (byte)' ';
+          } else if (c == '%') {
+            if (encodedPart == -2) {
+              encodedPart = -1;
+            } else {
+              throw new IllegalArgumentException();
+            }
+          } else if (encodedPart == -1) {
+            encodedPart = (byte)c;
+          } else if (encodedPart >= 0) {
+            final int i = Integer.parseInt(String.valueOf(new char[] {
+              (char)encodedPart, c
+            }), 16);
+            if (i >= 0) {
+              result[position++] = (byte)i;
+            } else {
+              throw new NumberFormatException();
+            }
+            encodedPart = -2;
+          } else {
+            result[position++] = (byte)c;
+          }
+        } else {
+          throw new IllegalArgumentException();
+        }
+      }
+
+      if (encodedPart >= 0) {
+        throw new IllegalArgumentException();
+      }
+
+      try {
+        return new String(result, 0, position, "UTF-8");
+      } catch (final UnsupportedEncodingException e) {
+        throw new IllegalArgumentException(e);
+      }
     } catch (final IllegalArgumentException e) {
       throw new UriParserSyntaxException("Wrong percent encoding!", e,
         UriParserSyntaxException.MessageKeys.SYNTAX);

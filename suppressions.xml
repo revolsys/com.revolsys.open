@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions
+  xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+
+  <suppress>
+    <notes><![CDATA[
+    file name: spring-web-5.3.23.jar
+    Deserialization is not used in the app
+   ]]></notes>
+    <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-web@.*$</packageUrl>
+    <cve>CVE-2016-1000027</cve>
+  </suppress>
+
+</suppressions>

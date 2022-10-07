@@ -6,6 +6,7 @@ import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.geometry.model.BoundingBoxProxy;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.jdbc.field.JdbcFieldDefinitions;
 import com.revolsys.record.query.Column;
 import com.revolsys.record.query.ColumnReference;
 import com.revolsys.record.query.Query;
@@ -57,7 +58,7 @@ public class F {
       final FieldDefinition fieldDefinition = field.getFieldDefinition();
       final GeometryFactory geometryFactory = fieldDefinition.getGeometryFactory();
       final Geometry geometry = geometryFactory.geometry(text);
-      right = Value.newValue(fieldDefinition, geometry);
+      right = new Value(JdbcFieldDefinitions.FIELD_UNKNOWN, geometry, true);
     } else if (right instanceof Column) {
       final Column value = (Column)right;
       final String text = value.getName();
@@ -65,7 +66,7 @@ public class F {
         final FieldDefinition fieldDefinition = field.getFieldDefinition();
         final GeometryFactory geometryFactory = fieldDefinition.getGeometryFactory();
         final Geometry geometry = geometryFactory.geometry(text);
-        right = Value.newValue(fieldDefinition, geometry);
+        right = new Value(JdbcFieldDefinitions.FIELD_UNKNOWN, geometry, true);
       } else {
         throw new IllegalArgumentException(
           "geo.intersections second argument must be a geometry: " + right);

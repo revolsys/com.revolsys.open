@@ -46,14 +46,12 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
 
   public static Map<String, Object> getMap(final Reader reader) {
     final JsonParser parser = new JsonParser(reader);
-    try {
+    try (parser) {
       if (parser.next() == EventType.startDocument) {
         return parser.getMap();
       } else {
         return Collections.emptyMap();
       }
-    } finally {
-      parser.close();
     }
   }
 
@@ -542,6 +540,7 @@ public class JsonParser implements Iterator<JsonParser.EventType>, Closeable {
           break;
           case 'f':
             text.append('\f');
+          break;
           case 'n':
             text.append('\n');
           break;

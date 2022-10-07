@@ -1,22 +1,22 @@
 package com.revolsys.http;
 
-import java.util.function.Function;
-
 import com.revolsys.net.oauth.BearerToken;
 
-public class BearerTokenRequestBuilderFactory extends ApacheHttpRequestBuilderFactory {
+public abstract class BearerTokenRequestBuilderFactory<T extends BearerToken>
+  extends ApacheHttpRequestBuilderFactory {
 
-  private final Function<BearerToken, BearerToken> tokenRefesh;
+  protected T token;
 
-  private BearerToken token;
-
-  public BearerTokenRequestBuilderFactory(final Function<BearerToken, BearerToken> tokenRefesh) {
-    this.tokenRefesh = tokenRefesh;
+  public BearerTokenRequestBuilderFactory() {
   }
 
-  protected String getAccessToken() {
+  public BearerTokenRequestBuilderFactory(final T token) {
+    this.token = token;
+  }
+
+  protected synchronized String getAccessToken() {
     if (this.token == null || this.token.isExpired()) {
-      this.token = this.tokenRefesh.apply(this.token);
+      this.token = tokenRefresh(this.token);
     }
     if (this.token == null) {
       return null;
@@ -25,7 +25,7 @@ public class BearerTokenRequestBuilderFactory extends ApacheHttpRequestBuilderFa
     }
   }
 
-  protected String getAuthorizationHeader() {
+  public String getAuthorizationHeader() {
     final String accessToken = getAccessToken();
     return "Bearer " + accessToken;
   }
@@ -34,4 +34,6 @@ public class BearerTokenRequestBuilderFactory extends ApacheHttpRequestBuilderFa
   public ApacheHttpRequestBuilder newRequestBuilder() {
     return new BearerTokenRequestBuilder(this);
   }
+
+  protected abstract T tokenRefresh(T token);
 }

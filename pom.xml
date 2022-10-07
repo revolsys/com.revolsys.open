@@ -7,7 +7,7 @@
   <name>Revolution Systems Open Library</name>
   <version>MAIN-SNAPSHOT</version>
   <description>The parent module of the Revolution Systems Open Library.</description>
-  <url>http://revolsys.github.com/com.revolsys.open/</url>
+  <url>http://revolsys.github.io/com.revolsys.open/</url>
 
   <licenses>
     <license>
@@ -303,7 +303,11 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.9.1</version>
+          <version>3.12.1</version>
+          <configuration>
+            <port>7483</port> <!-- SITE=7483 -->
+            <tempWebappDirectory>${basedir}/target/site/tempdir</tempWebappDirectory>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -330,10 +334,11 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>3.3.0</version>
         <configuration>
-          <detectLinks>true</detectLinks>
-          <detectJavaApiLink>true</detectJavaApiLink>
+          <failOnError>false</failOnError>
           <doclint>none</doclint>
           <quiet>true</quiet>
+          <detectLinks>true</detectLinks>
+          <detectJavaApiLink>true</detectJavaApiLink>
         </configuration>
         <reportSets>
           <reportSet>
@@ -351,6 +356,25 @@
           </reportSet>
         </reportSets>
       </plugin>
+      
+      <plugin>
+        <groupId>org.owasp</groupId>
+        <artifactId>dependency-check-maven</artifactId>
+        <version>7.2.1</version>
+        <reportSets>
+          <reportSet>
+            <inherited>false</inherited>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+            <configuration>
+              <suppressionFiles>
+                <suppressionFile>${project.basedir}/suppressions.xml</suppressionFile>
+              </suppressionFiles>
+            </configuration>
+          </reportSet>
+        </reportSets>
+      </plugin>
     </plugins>
   </reporting>
 
@@ -360,6 +384,11 @@
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
         <version>4.0.1</version>
+      </dependency>
+      <dependency>
+        <groupId>io.projectreactor</groupId>
+        <artifactId>reactor-core</artifactId>
+        <version>3.4.21</version>
       </dependency>
       <dependency>
         <groupId>org.docx4j</groupId>
@@ -538,11 +567,6 @@
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-web</artifactId>
-        <version>${org.springframework.security.version}</version>
-      </dependency>
-      <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>4.13.2</version>
@@ -550,12 +574,12 @@
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
-        <version>2.13.2</version>
+        <version>2.13.4</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
-        <version>2.13.2.2</version>
+        <version>2.13.4</version>
       </dependency>
       <dependency>
         <groupId>io.netty</groupId>
@@ -660,15 +684,15 @@
       </snapshots>
     </repository>
     <repository>
-      <id>revolsys external</id>
+      <id>github-revolsys</id>
+      <name>Github Revolsys</name>
+      <url>https://maven.pkg.github.com/${gitHubRepo}</url>
       <releases>
         <enabled>true</enabled>
       </releases>
       <snapshots>
-        <enabled>true</enabled>
+        <enabled>false</enabled>
       </snapshots>
-      <name>ext</name>
-      <url>https://open.revolsys.com/artifactory/ext</url>
     </repository>
    </repositories>
 
@@ -676,19 +700,19 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <ch.qos.logback.version>1.2.11</ch.qos.logback.version>
     <org.apache.pdfbox.version>2.0.26</org.apache.pdfbox.version>
-    <org.apache.xmlgraphics.batik.version>1.14</org.apache.xmlgraphics.batik.version>
+    <org.apache.xmlgraphics.batik.version>1.15</org.apache.xmlgraphics.batik.version>
     <org.apache.xmlgraphics.commons.version>2.7</org.apache.xmlgraphics.commons.version>
     <org.docx4j.version>11.4.6</org.docx4j.version>
     <org.gdal.version>2.4.0</org.gdal.version>
     <org.graalvm.version>22.0.0.2</org.graalvm.version>
     <org.jeometry.version>MAIN-SNAPSHOT</org.jeometry.version>
     <org.slf4j.version>1.7.36</org.slf4j.version>
-    <org.springframework.version>5.3.21</org.springframework.version>
-    <org.springframework.security.version>5.7.2</org.springframework.security.version>
+    <org.springframework.version>5.3.23</org.springframework.version>
     <io.netty.version>4.1.77.Final</io.netty.version>
     <gpg.skip>true</gpg.skip>
     <github.global.server>github</github.global.server>
     <skipTests>true</skipTests>
     <gitHubRepo>revolsys/com.revolsys.open</gitHubRepo>
+    <siteUrl>${project.url}</siteUrl>
   </properties>
 </project>
