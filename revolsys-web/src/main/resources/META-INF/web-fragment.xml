@@ -26,11 +26,11 @@
   </filter-mapping>
 
   <listener>
-    <listener-class>com.revolsys.ui.web.servlet.listener.ContextCleanupListener</listener-class>
+    <listener-class>com.revolsys.web.listener.ContextCleanupListener</listener-class>
   </listener>
 
   <listener>
-    <listener-class>com.revolsys.ui.web.servlet.listener.DriverManagerCleanupListener</listener-class>
+    <listener-class>com.revolsys.web.listener.DriverManagerCleanupListener</listener-class>
   </listener>  
 
   <welcome-file-list>
