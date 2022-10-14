@@ -19,10 +19,11 @@ public class PrincipalHttpServletRequest extends HttpServletRequestWrapper {
     chain.doFilter(pricipalRequest, response);
   }
 
-  private Principal principal;
+  private final Principal principal;
 
   public PrincipalHttpServletRequest(final HttpServletRequest request, final Principal principal) {
     super(request);
+    this.principal = principal;
   }
 
   @Override
