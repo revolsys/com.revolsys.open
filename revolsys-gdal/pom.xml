@@ -11,16 +11,27 @@
     <artifactId>revolsys-parent</artifactId>
     <version>MAIN-SNAPSHOT</version>
   </parent>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.revolsys.open</groupId>
+        <artifactId>revolsys-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
   <dependencies>
     <dependency>
       <groupId>com.revolsys.open</groupId>
       <artifactId>revolsys-core</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.revolsys.gdal</groupId>
       <artifactId>gdal-jni</artifactId>
-      <version>${org.gdal.version}</version>
     </dependency>
   </dependencies>
 </project>

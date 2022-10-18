@@ -12,11 +12,22 @@
 	<artifactId>revolsys-core</artifactId>
 	<name>RS Core</name>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.revolsys.open</groupId>
+        <artifactId>revolsys-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.jeometry</groupId>
 			<artifactId>jeometry-coordinatesystem</artifactId>
-			<version>${org.jeometry.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.annotation</groupId>
@@ -42,7 +53,6 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>${ch.qos.logback.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -118,7 +128,6 @@
 		<dependency>
 			<groupId>org.apache.pdfbox</groupId>
 			<artifactId>pdfbox</artifactId>
-			<version>${org.apache.pdfbox.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>commons-logging</artifactId>
@@ -129,7 +138,6 @@
 		<dependency>
 			<groupId>org.apache.pdfbox</groupId>
 			<artifactId>xmpbox</artifactId>
-			<version>${org.apache.pdfbox.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>commons-logging</groupId>
@@ -168,7 +176,6 @@
 		<dependency>
 			<groupId>com.nimbusds</groupId>
 			<artifactId>nimbus-jose-jwt</artifactId>
-			<version>9.21</version>
 		</dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
@@ -177,7 +184,6 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents.client5</groupId>
 			<artifactId>httpclient5</artifactId>
-			<version>5.1.2</version>
 		</dependency>
 		<dependency>
       <groupId>io.projectreactor</groupId>
