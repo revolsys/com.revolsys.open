@@ -132,6 +132,16 @@ public class CategoryLabelCountMap implements Emptyable {
     }
   }
 
+  public long getCount(final CharSequence category, final CharSequence label,
+    final long defaultValue) {
+    final Long count = getCount(category, label);
+    if (count == null) {
+      return defaultValue;
+    } else {
+      return count;
+    }
+  }
+
   public synchronized String getCountsText() {
     final StringBuilder sb = new StringBuilder();
     addCountsText(sb);

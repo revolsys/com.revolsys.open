@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
@@ -16,7 +17,7 @@ import com.revolsys.swing.map.layer.record.LayerRecord;
 import com.revolsys.swing.table.lambda.column.ColumnBasedTableModel;
 import com.revolsys.util.Equals;
 
-class MergeableRecord extends ArrayRecord {
+public class MergeableRecord extends ArrayRecord {
   final List<MergeOriginalRecord> originalRecords = new ArrayList<>();
 
   ColumnBasedTableModel tableModel;
@@ -59,6 +60,13 @@ class MergeableRecord extends ArrayRecord {
   void fireRowUpdated(final int fieldIndex) {
     if (this.tableModel != null) {
       this.tableModel.fireTableRowsUpdated(fieldIndex, fieldIndex);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  public <R extends LayerRecord> void forEachOriginalRecord(final Consumer<R> action) {
+    for (final MergeOriginalRecord mergeOriginalRecord : this.originalRecords) {
+      action.accept((R)mergeOriginalRecord.originalRecord);
     }
   }
 
