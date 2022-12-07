@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -47,7 +48,6 @@ import com.revolsys.util.Property;
 import com.revolsys.util.count.LabelCounters;
 
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.SynchronousSink;
 
 public class Query extends BaseObjectWithProperties
   implements Cloneable, CancellableProxy, Transactionable {
@@ -514,17 +514,16 @@ public class Query extends BaseObjectWithProperties
   }
 
   public <R extends Record> Flux<R> fluxForEach() {
-    return Flux.generate(() -> getRecordReader().iterator(), (iterator,
-      sink) -> {
+    return Flux.generate(() -> getRecordReader().iterator(), (iterator, sink) -> {
       if (iterator.hasNext()) {
-        R record = (R)iterator.next();
+        final R record = (R)iterator.next();
         sink.next(record);
       } else {
         sink.complete();
       }
       return iterator;
     }, (Consumer<? super Iterator<Record>>)(
-      Iterator<Record> iterator) -> ((BaseCloseable)iterator).close());
+      final Iterator<Record> iterator) -> ((BaseCloseable)iterator).close());
   }
 
   public void forEachRecord(final Consumer<? super Record> action) {
@@ -811,10 +810,21 @@ public class Query extends BaseObjectWithProperties
     return this.selectExpressions.isEmpty();
   }
 
+  public Query join(final BiConsumer<Query, Join> action) {
+    return join(JoinType.INNER_JOIN, action);
+  }
+
   public Join join(final JoinType joinType) {
     final Join join = joinType.build();
     this.joins.add(join);
     return join;
+  }
+
+  public Query join(final JoinType joinType, final BiConsumer<Query, Join> action) {
+    final Join join = joinType.build();
+    action.accept(this, join);
+    this.joins.add(join);
+    return this;
   }
 
   public Join join(final TableReference table) {
