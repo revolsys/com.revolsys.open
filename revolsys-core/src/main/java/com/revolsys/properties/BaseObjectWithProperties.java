@@ -1,6 +1,6 @@
 package com.revolsys.properties;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 
 import org.jeometry.common.exception.Exceptions;
 

@@ -1,8 +1,8 @@
 package com.revolsys.websocket.json;
 
-import javax.websocket.EncodeException;
-import javax.websocket.Encoder;
-import javax.websocket.EndpointConfig;
+import jakarta.websocket.EncodeException;
+import jakarta.websocket.Encoder;
+import jakarta.websocket.EndpointConfig;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.json.Json;

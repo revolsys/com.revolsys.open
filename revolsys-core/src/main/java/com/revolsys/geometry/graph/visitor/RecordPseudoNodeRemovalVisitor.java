@@ -3,8 +3,8 @@ package com.revolsys.geometry.graph.visitor;
 import java.util.List;
 import java.util.function.Predicate;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.graph.EdgePair;

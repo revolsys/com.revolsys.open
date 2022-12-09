@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 import com.revolsys.geometry.model.BoundingBox;
 import com.revolsys.io.IteratorReader;
