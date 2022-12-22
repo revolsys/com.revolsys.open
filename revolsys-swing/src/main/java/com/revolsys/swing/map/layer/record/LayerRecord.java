@@ -178,10 +178,10 @@ public interface LayerRecord extends Record {
         synchronized (this) {
           if (isLayerRecord(record)) {
             final Identifier id = getIdentifier();
-            final Identifier otherId = record.getIdentifier();
-            if (id == null || otherId == null) {
+            final Identifier id2 = record.getIdentifier();
+            if (id == null || id2 == null) {
               return false;
-            } else if (DataType.equal(id, otherId)) {
+            } else if (DataType.equal(id, id2)) {
               return true;
             } else {
               return false;

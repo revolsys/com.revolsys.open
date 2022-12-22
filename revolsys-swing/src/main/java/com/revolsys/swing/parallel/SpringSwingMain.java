@@ -7,8 +7,8 @@ import java.time.Instant;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
-import javax.annotation.PostConstruct;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.ToolTipManager;
@@ -16,8 +16,10 @@ import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
 import org.jeometry.common.logging.Logs;
+import org.springframework.beans.factory.InitializingBean;
 
 import com.revolsys.log.LogbackUtil;
+import com.revolsys.reactor.scheduler.SwingScheduler;
 import com.revolsys.swing.desktop.DesktopInitializer;
 import com.revolsys.swing.logging.ListLoggingAppender;
 import com.revolsys.swing.logging.LoggingEventPanel;
@@ -30,8 +32,10 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.core.Appender;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
-public class SpringSwingMain implements UncaughtExceptionHandler {
+public class SpringSwingMain implements UncaughtExceptionHandler, InitializingBean {
 
   protected Set<File> initialFiles = new LinkedHashSet<>();
 
@@ -44,20 +48,36 @@ public class SpringSwingMain implements UncaughtExceptionHandler {
     Thread.setDefaultUncaughtExceptionHandler(this);
   }
 
-  @PostConstruct()
-  public void initRun() {
-    try {
-      preRunDo();
-      Invoke.later(() -> {
-        try {
-          runDo();
-        } catch (final Throwable e) {
-          logError(e);
-        }
-      });
-    } catch (final Throwable e) {
-      logError(e);
-    }
+  @Override
+  public void afterPropertiesSet() {
+    new Thread(() -> {
+      final CountDownLatch latch = new CountDownLatch(1);
+      Mono.just(true)//
+        .subscribeOn(Schedulers.boundedElastic())//
+        .flatMap(this::swingBefore)
+        .publishOn(SwingScheduler.INSTANCE)
+        .flatMap(this::swingInit)
+        .flatMap(this::swingAfter)
+        .publishOn(Schedulers.boundedElastic())//
+        .flatMap(this::appBefore)
+        .publishOn(SwingScheduler.INSTANCE)
+        .flatMap(this::appSwingInit)
+        .doOnError(this::logError)
+        .doAfterTerminate(() -> latch.countDown())
+        .subscribe();
+      try {
+        latch.await();
+      } catch (final InterruptedException e) {
+      }
+    }).start();
+  }
+
+  protected Mono<Boolean> appBefore(final boolean success) {
+    return Mono.just(true);
+  }
+
+  protected Mono<Boolean> appSwingInit(final boolean success) {
+    return Mono.just(true);
   }
 
   public void logError(final Throwable e) {
@@ -72,34 +92,6 @@ public class SpringSwingMain implements UncaughtExceptionHandler {
     }
   }
 
-  protected void preRunDo() throws Throwable {
-
-  }
-
-  protected void runDo() throws Throwable {
-    boolean lookSet = false;
-    if (Property.hasValue(this.lookAndFeelName)) {
-      final LookAndFeelInfo[] installedLookAndFeels = UIManager.getInstalledLookAndFeels();
-      for (final LookAndFeelInfo lookAndFeelInfo : installedLookAndFeels) {
-        final String name = lookAndFeelInfo.getName();
-        if (this.lookAndFeelName.equals(name)) {
-          try {
-            final String className = lookAndFeelInfo.getClassName();
-            UIManager.setLookAndFeel(className);
-            lookSet = true;
-          } catch (final Throwable e) {
-          }
-        }
-      }
-    }
-    if (!lookSet) {
-      UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    }
-    JFrame.setDefaultLookAndFeelDecorated(true);
-    JDialog.setDefaultLookAndFeelDecorated(true);
-    ToolTipManager.sharedInstance().setInitialDelay(100);
-  }
-
   public void setLookAndFeelName(final String lookAndFeelName) {
     this.lookAndFeelName = lookAndFeelName;
   }
@@ -109,6 +101,43 @@ public class SpringSwingMain implements UncaughtExceptionHandler {
       DesktopInitializer.initialize(image, this.initialFiles);
     } catch (final Throwable t) {
       t.printStackTrace();
+    }
+  }
+
+  protected Mono<Boolean> swingAfter(final boolean success) {
+    return Mono.just(true);
+  }
+
+  protected Mono<Boolean> swingBefore(final boolean success) {
+    return Mono.just(true);
+  }
+
+  private Mono<Boolean> swingInit(final boolean success) {
+    try {
+      boolean lookSet = false;
+      if (Property.hasValue(this.lookAndFeelName)) {
+        final LookAndFeelInfo[] installedLookAndFeels = UIManager.getInstalledLookAndFeels();
+        for (final LookAndFeelInfo lookAndFeelInfo : installedLookAndFeels) {
+          final String name = lookAndFeelInfo.getName();
+          if (this.lookAndFeelName.equals(name)) {
+            try {
+              final String className = lookAndFeelInfo.getClassName();
+              UIManager.setLookAndFeel(className);
+              lookSet = true;
+            } catch (final Throwable e) {
+            }
+          }
+        }
+      }
+      if (!lookSet) {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      }
+      JFrame.setDefaultLookAndFeelDecorated(true);
+      JDialog.setDefaultLookAndFeelDecorated(true);
+      ToolTipManager.sharedInstance().setInitialDelay(100);
+      return Mono.just(true);
+    } catch (final Throwable e) {
+      return Mono.error(e);
     }
   }
 

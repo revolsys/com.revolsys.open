@@ -126,6 +126,7 @@ import com.revolsys.swing.map.layer.LayerRenderer;
 import com.revolsys.swing.map.layer.Project;
 import com.revolsys.swing.map.layer.record.component.RecordLayerFieldUiFactory;
 import com.revolsys.swing.map.layer.record.component.recordmerge.MergeRecordsDialog;
+import com.revolsys.swing.map.layer.record.component.recordmerge.MergeableRecord;
 import com.revolsys.swing.map.layer.record.renderer.AbstractMultipleRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.AbstractRecordLayerRenderer;
 import com.revolsys.swing.map.layer.record.renderer.GeometryStyleRecordLayerRenderer;
@@ -157,6 +158,8 @@ import com.revolsys.util.PreferenceKey;
 import com.revolsys.util.Preferences;
 import com.revolsys.util.Property;
 
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import tech.units.indriya.ComparableQuantity;
 import tech.units.indriya.quantity.Quantities;
 
@@ -1316,7 +1319,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
         return getMergedRecord(point, record2, record1);
       } else {
         final DirectionalFields property = DirectionalFields.getProperty(getRecordDefinition());
-        final Map<String, Object> newValues = property.getMergedMap(point, record1, record2);
+        final Map<String, Object> newValues = property.getMergedValues(point, record1, record2);
         for (final String idFieldName : getIdFieldNames()) {
           newValues.remove(idFieldName);
         }
@@ -2311,6 +2314,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     }
   }
 
+  public LayerRecord newMergedRecord(final MergeableRecord record) {
+    return newLayerRecord(record);
+  }
+
   public MultipleUndo newMultipleUndo() {
     return new MultipleUndo();
   }
@@ -2447,11 +2454,15 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     return new RecordSpatialIndex<>(spatialIndex);
   }
 
-  protected Map<String, Object> newSplitValues(final LayerRecord oldRecord,
-    final LineString oldLine, final Point splitPoint, final LineString newLine) {
+  protected LayerRecord newSplitRecord(final Record record, final JsonObject newValues) {
+    return newLayerRecord(newValues);
+  }
+
+  protected JsonObject newSplitValues(final LayerRecord oldRecord, final LineString oldLine,
+    final Point splitPoint, final LineString newLine) {
     final DirectionalFields directionalFields = DirectionalFields.getProperty(oldRecord);
-    final Map<String, Object> values1 = directionalFields.newSplitValues(oldRecord, oldLine,
-      splitPoint, newLine);
+    final JsonObject values1 = directionalFields.newSplitValues(oldRecord, oldLine, splitPoint,
+      newLine);
     return values1;
   }
 
@@ -3227,8 +3238,10 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   public void setSelectedRecords(final Query query) {
-    final List<LayerRecord> records = getRecords(query);
-    setSelectedRecords(records);
+    Mono.just(query)
+      .subscribeOn(Schedulers.boundedElastic())
+      .map(this::<LayerRecord> getRecords)
+      .subscribe(this::setSelectedRecords);
   }
 
   public void setSelectedRecordsById(final Identifier id) {
@@ -3464,11 +3477,11 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       saveChanges(record);
       return Collections.singletonList(record);
     } else {
-      final Map<String, Object> values1 = newSplitValues(record, line, point, line1);
-      final LayerRecord record1 = newLayerRecord(values1);
+      final JsonObject values1 = newSplitValues(record, line, point, line1);
+      final LayerRecord record1 = newSplitRecord(record, values1);
 
-      final Map<String, Object> values2 = newSplitValues(record, line, point, line2);
-      final LayerRecord record2 = newLayerRecord(values2);
+      final JsonObject values2 = newSplitValues(record, line, point, line2);
+      final LayerRecord record2 = newSplitRecord(record, values2);
 
       addSelectedRecords(record1, record2);
 

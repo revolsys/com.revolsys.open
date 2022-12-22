@@ -11,8 +11,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathNameProxy;
@@ -129,6 +129,16 @@ public class CategoryLabelCountMap implements Emptyable {
       return null;
     } else {
       return labelCountMap.getCount(label);
+    }
+  }
+
+  public long getCount(final CharSequence category, final CharSequence label,
+    final long defaultValue) {
+    final Long count = getCount(category, label);
+    if (count == null) {
+      return defaultValue;
+    } else {
+      return count;
     }
   }
 
