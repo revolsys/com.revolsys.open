@@ -1,5 +1,10 @@
 package com.revolsys.reactive;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -10,7 +15,9 @@ import java.util.function.Function;
 import org.jeometry.common.exception.Exceptions;
 import org.reactivestreams.Publisher;
 
+import com.revolsys.collection.list.Lists;
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.io.file.Paths;
 
 import reactor.core.Disposable;
 import reactor.core.publisher.BaseSubscriber;
@@ -46,6 +53,22 @@ public class Reactive {
 
   private static final Consumer<Disposable> NOOPCALLBACK = d -> {
   };
+
+  @SuppressWarnings("unchecked")
+  @SafeVarargs
+  public static <V> Mono<V> combineLatestFirst(final Publisher<V> resultSource,
+    final Publisher<? extends Object>... sources) {
+    final List<Publisher<? extends Object>> publishers = Lists.newArray(resultSource);
+    Lists.addAll(publishers, sources);
+    return Flux.combineLatest(publishers, results -> (V)results[0]).single();
+  }
+
+  @SuppressWarnings("unchecked")
+  @SafeVarargs
+  public static <V> Mono<V> combineLatestIndex(final int index,
+    final Publisher<? extends Object>... sources) {
+    return Flux.combineLatest(results -> (V)results[index], sources).single();
+  }
 
   public static <T> Flux<T> debugTime(final String message, final Flux<T> flux) {
     final AtomicReference<Long> startTime = new AtomicReference<>();
@@ -158,11 +181,11 @@ public class Reactive {
     waitOn(supplier, subscriptionCallback);
   }
 
-  public static <V> void waitOnAction(final Flux<V> publisher, Consumer<V> action) {
+  public static <V> void waitOnAction(final Flux<V> publisher, final Consumer<V> action) {
     waitOnAction(publisher, action, NOOPCALLBACK);
   }
 
-  public static <V> void waitOnAction(final Flux<V> publisher, Consumer<V> action,
+  public static <V> void waitOnAction(final Flux<V> publisher, final Consumer<V> action,
     final Consumer<Disposable> subscriptionCallback) {
     final Function<CountDownLatch, Disposable> supplier = latch -> publisher
       .doAfterTerminate(latch::countDown)
@@ -170,16 +193,64 @@ public class Reactive {
     waitOn(supplier, subscriptionCallback);
   }
 
-  public static <V> void waitOnAction(final ParallelFlux<V> publisher, Consumer<V> action) {
+  public static <V> void waitOnAction(final ParallelFlux<V> publisher, final Consumer<V> action) {
     waitOnAction(publisher, action, NOOPCALLBACK);
   }
 
-  public static <V> void waitOnAction(final ParallelFlux<V> publisher, Consumer<V> action,
+  public static <V> void waitOnAction(final ParallelFlux<V> publisher, final Consumer<V> action,
     final Consumer<Disposable> subscriptionCallback) {
     final Function<CountDownLatch, Disposable> supplier = latch -> publisher
       .doAfterTerminate(latch::countDown)
       .subscribe(action);
     waitOn(supplier, subscriptionCallback);
+  }
+
+  public static <R> Flux<R> withTempFileFlux(final Path file,
+    final Function<Path, Flux<R>> action) {
+
+    final Callable<Path> resource = () -> {
+      return file.getParent().resolve("_" + file.getFileName());
+    };
+
+    final Function<Path, Flux<R>> publisher = (tempFile) -> action.apply(tempFile)
+      .doOnError((e) -> Paths.deleteDirectories(tempFile));
+
+    final Consumer<Path> closer = (tempPath) -> {
+      try {
+        if (Paths.exists(tempPath)) {
+          Files.move(tempPath, file, StandardCopyOption.ATOMIC_MOVE,
+            StandardCopyOption.REPLACE_EXISTING);
+        }
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    };
+
+    return Flux.using(resource, publisher, closer);
+  }
+
+  public static <R> Mono<R> withTempFileMono(final Path file,
+    final Function<Path, Mono<R>> action) {
+
+    final Callable<Path> resource = () -> {
+      return file.getParent().resolve("_" + file.getFileName());
+    };
+
+    final Function<Path, Mono<R>> publisher = (tempFile) -> action.apply(tempFile)
+      .doOnError((e) -> Paths.deleteDirectories(tempFile));
+
+    final Consumer<Path> closer = (tempPath) -> {
+      try {
+        if (Paths.exists(tempPath)) {
+          Files.move(tempPath, file, StandardCopyOption.ATOMIC_MOVE,
+            StandardCopyOption.REPLACE_EXISTING);
+        }
+      } catch (final IOException e) {
+        throw Exceptions.wrap(e);
+      }
+    };
+
+    return Mono.using(resource, publisher, closer);
   }
 
 }

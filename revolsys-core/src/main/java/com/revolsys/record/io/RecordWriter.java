@@ -2,10 +2,13 @@ package com.revolsys.record.io;
 
 import java.io.File;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import com.revolsys.geometry.model.ClockDirection;
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryFactory;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactory;
 import com.revolsys.io.Writer;
@@ -16,6 +19,8 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
 import com.revolsys.util.Property;
+
+import reactor.core.publisher.Flux;
 
 public interface RecordWriter extends Writer<Record>, RecordDefinitionProxy {
 
@@ -77,6 +82,36 @@ public interface RecordWriter extends Writer<Record>, RecordDefinitionProxy {
     final RecordWriterFactory factory = IoFactory.factory(RecordWriterFactory.class, target);
     return new Builder(factory).setTarget(target);
 
+  }
+
+  static <R extends Record> Flux<R> fluxWrite(final RecordDefinitionProxy recordDefinition,
+    final Object target, final Flux<R> records) {
+    // TODO have writers use Mono to write asynchronously
+    return Flux.using(//
+      () -> newRecordWriter(recordDefinition, target), //
+      (writer) -> records.doOnNext(writer::write), //
+      BaseCloseable.CLOSER);
+  }
+
+  static <R extends Record> Flux<R> fluxWrite(final RecordDefinitionProxy recordDefinition,
+    final Supplier<Object> targetSupplier, final Consumer<RecordWriter> writerInitalizer,
+    final Flux<R> records) {
+    // TODO have writers use Mono to write asynchronously
+    return Flux.using(() -> new LazyRecordWriter(recordDefinition, () -> {
+      final RecordWriter writer = newRecordWriter(recordDefinition, targetSupplier.get());
+      if (writerInitalizer != null) {
+        writerInitalizer.accept(writer);
+      }
+      return writer;
+    }), //
+      (writer) -> records.doOnNext(writer::write), //
+      BaseCloseable.CLOSER);
+  }
+
+  static <R extends Record> Flux<R> fluxWrite(final RecordDefinitionProxy recordDefinition,
+    final Supplier<Object> targetSupplier, final Flux<R> records) {
+    // TODO have writers use Mono to write asynchronously
+    return fluxWrite(recordDefinition, targetSupplier, null, records);
   }
 
   static boolean isWritable(final File file) {
