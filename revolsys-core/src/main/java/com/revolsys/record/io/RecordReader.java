@@ -124,7 +124,7 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
 
   static Flux<Record> flux(final Supplier<Object> targetSupplier,
     final Consumer<RecordReader> readerInitalizer) {
-    return Flux.using(//
+    return BaseCloseable.fluxUsing(//
       () -> {
         final RecordReader reader = newRecordReader(targetSupplier.get());
         if (readerInitalizer != null) {
@@ -132,8 +132,8 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
         }
         return reader;
       }, //
-      (reader) -> reader.flux(), //
-      BaseCloseable.CLOSER//
+      (reader) -> reader.flux() //
+    //
     );
   }
 

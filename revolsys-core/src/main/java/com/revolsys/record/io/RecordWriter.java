@@ -87,25 +87,25 @@ public interface RecordWriter extends Writer<Record>, RecordDefinitionProxy {
   static <R extends Record> Flux<R> fluxWrite(final RecordDefinitionProxy recordDefinition,
     final Object target, final Flux<R> records) {
     // TODO have writers use Mono to write asynchronously
-    return Flux.using(//
+    return BaseCloseable.fluxUsing(//
       () -> newRecordWriter(recordDefinition, target), //
-      (writer) -> records.doOnNext(writer::write), //
-      BaseCloseable.CLOSER);
+      (writer) -> records.doOnNext(writer::write) //
+    );
   }
 
   static <R extends Record> Flux<R> fluxWrite(final RecordDefinitionProxy recordDefinition,
     final Supplier<Object> targetSupplier, final Consumer<RecordWriter> writerInitalizer,
     final Flux<R> records) {
     // TODO have writers use Mono to write asynchronously
-    return Flux.using(() -> new LazyRecordWriter(recordDefinition, () -> {
+    return BaseCloseable.fluxUsing(() -> new LazyRecordWriter(recordDefinition, () -> {
       final RecordWriter writer = newRecordWriter(recordDefinition, targetSupplier.get());
       if (writerInitalizer != null) {
         writerInitalizer.accept(writer);
       }
       return writer;
     }), //
-      (writer) -> records.doOnNext(writer::write), //
-      BaseCloseable.CLOSER);
+      (writer) -> records.doOnNext(writer::write) //
+    );
   }
 
   static <R extends Record> Flux<R> fluxWrite(final RecordDefinitionProxy recordDefinition,

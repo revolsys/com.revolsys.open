@@ -88,10 +88,9 @@ public class Reactive {
     });
   }
 
-  public static <R extends AutoCloseable, V> Flux<V> fluxCloseable(
-    final Callable<? extends R> supplier,
-    final Function<? super R, ? extends Flux<? extends V>> mapper) {
-    return Flux.using(supplier, mapper, BaseCloseable.closer());
+  public static <R extends AutoCloseable, V> Flux<V> fluxCloseable(final Callable<R> supplier,
+    final Function<R, Flux<V>> mapper) {
+    return BaseCloseable.fluxUsing(supplier, mapper);
   }
 
   public static <IN, OUT> Flux<OUT> fluxCreate(final Publisher<IN> source,
@@ -104,10 +103,9 @@ public class Reactive {
     });
   }
 
-  public static <R extends AutoCloseable, V> Mono<V> monoCloseable(
-    final Callable<? extends R> supplier,
-    final Function<? super R, ? extends Mono<? extends V>> mapper) {
-    return Mono.using(supplier, mapper, BaseCloseable.closer());
+  public static <R extends AutoCloseable, V> Mono<V> monoCloseable(final Callable<R> supplier,
+    final Function<R, Mono<V>> mapper) {
+    return BaseCloseable.monoUsing(supplier, mapper);
   }
 
   public static <T> Mono<T> monoJust(final T value, final Consumer<T> discarder) {

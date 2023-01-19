@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
+import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.FileUtil;
 import com.revolsys.io.IoFactoryRegistry;
 import com.revolsys.io.file.Paths;
@@ -44,16 +45,16 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
     IoFactoryRegistry.addFactory(writerFactory);
   }
 
-  public static <T> Flux<T> fluxFrom(Path file,
-    Function<? super FileGdbRecordStore, Flux<T>> action) {
-    return Flux.using(() -> FileGdbRecordStoreFactory.newRecordStoreInitialized(file), action,
-      FileGdbRecordStore::close);
+  public static <T> Flux<T> fluxFrom(final Path file,
+    final Function<FileGdbRecordStore, Flux<T>> action) {
+    return BaseCloseable.fluxUsing(() -> FileGdbRecordStoreFactory.newRecordStoreInitialized(file),
+      action);
   }
 
-  public static <T> Mono<T> monoFrom(Path file,
-    Function<? super FileGdbRecordStore, Mono<T>> action) {
-    return Mono.using(() -> FileGdbRecordStoreFactory.newRecordStoreInitialized(file), action,
-      FileGdbRecordStore::close);
+  public static <T> Mono<T> monoFrom(final Path file,
+    final Function<FileGdbRecordStore, Mono<T>> action) {
+    return BaseCloseable.monoUsing(() -> FileGdbRecordStoreFactory.newRecordStoreInitialized(file),
+      action);
   }
 
   public static FileGdbRecordStore newRecordStore(final File file) {
