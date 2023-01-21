@@ -118,6 +118,10 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
     return flux(() -> target, null);
   }
 
+  static Flux<Record> flux(final Object target, final Consumer<RecordReader> readerInitalizer) {
+    return flux(() -> target, readerInitalizer);
+  }
+
   static Flux<Record> flux(final Supplier<Object> targetSupplier) {
     return flux(targetSupplier, null);
   }

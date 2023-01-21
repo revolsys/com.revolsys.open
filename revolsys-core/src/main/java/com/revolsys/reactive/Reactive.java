@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -18,6 +19,7 @@ import org.reactivestreams.Publisher;
 import com.revolsys.collection.list.Lists;
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.io.file.Paths;
+import com.revolsys.util.Pair;
 
 import reactor.core.Disposable;
 import reactor.core.publisher.BaseSubscriber;
@@ -89,7 +91,7 @@ public class Reactive {
   }
 
   public static <R extends AutoCloseable, V> Flux<V> fluxCloseable(final Callable<R> supplier,
-    final Function<R, Flux<V>> mapper) {
+    final Function<R, Publisher<V>> mapper) {
     return BaseCloseable.fluxUsing(supplier, mapper);
   }
 
@@ -128,6 +130,11 @@ public class Reactive {
         }
       }
     };
+  }
+
+  public static <V> Flux<Pair<V, V>> pair(final Publisher<V> source1, final Publisher<V> source2,
+    final Comparator<V> comparator) {
+    return Flux.create(new PairSinkConsumer<>(source1, source2, comparator));
   }
 
   public static void waitOn(final Flux<?> publisher) {

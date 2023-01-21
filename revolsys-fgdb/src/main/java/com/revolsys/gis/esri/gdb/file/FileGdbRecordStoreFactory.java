@@ -12,6 +12,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
+import org.reactivestreams.Publisher;
+
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.collection.map.Maps;
 import com.revolsys.io.BaseCloseable;
@@ -46,7 +48,7 @@ public class FileGdbRecordStoreFactory implements FileRecordStoreFactory {
   }
 
   public static <T> Flux<T> fluxFrom(final Path file,
-    final Function<FileGdbRecordStore, Flux<T>> action) {
+    final Function<FileGdbRecordStore, Publisher<T>> action) {
     return BaseCloseable.fluxUsing(() -> FileGdbRecordStoreFactory.newRecordStoreInitialized(file),
       action);
   }
