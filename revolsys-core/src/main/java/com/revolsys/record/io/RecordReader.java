@@ -6,7 +6,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.io.FileNameProxy;
@@ -25,6 +27,8 @@ import com.revolsys.record.io.format.zip.ZipRecordReader;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.spring.resource.Resource;
+
+import reactor.core.publisher.Flux;
 
 public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
   public static class Builder {
@@ -108,6 +112,33 @@ public interface RecordReader extends Reader<Record>, RecordDefinitionProxy {
 
   static RecordReader empty(final RecordDefinition recordDefinition) {
     return new ListRecordReader(recordDefinition);
+  }
+
+  static Flux<Record> flux(final Object target) {
+    return flux(() -> target, null);
+  }
+
+  static Flux<Record> flux(final Object target, final Consumer<RecordReader> readerInitalizer) {
+    return flux(() -> target, readerInitalizer);
+  }
+
+  static Flux<Record> flux(final Supplier<Object> targetSupplier) {
+    return flux(targetSupplier, null);
+  }
+
+  static Flux<Record> flux(final Supplier<Object> targetSupplier,
+    final Consumer<RecordReader> readerInitalizer) {
+    return BaseCloseable.fluxUsing(//
+      () -> {
+        final RecordReader reader = newRecordReader(targetSupplier.get());
+        if (readerInitalizer != null) {
+          readerInitalizer.accept(reader);
+        }
+        return reader;
+      }, //
+      (reader) -> reader.flux() //
+    //
+    );
   }
 
   static boolean isReadable(final Object source) {
