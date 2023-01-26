@@ -6,10 +6,10 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.websocket.RemoteEndpoint.Async;
-import javax.websocket.SendHandler;
-import javax.websocket.SendResult;
-import javax.websocket.Session;
+import jakarta.websocket.RemoteEndpoint.Async;
+import jakarta.websocket.SendHandler;
+import jakarta.websocket.SendResult;
+import jakarta.websocket.Session;
 
 import org.jeometry.common.logging.Logs;
 

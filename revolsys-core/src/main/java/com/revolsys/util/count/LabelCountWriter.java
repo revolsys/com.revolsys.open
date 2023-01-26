@@ -1,6 +1,6 @@
 package com.revolsys.util.count;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import com.revolsys.io.AbstractRecordWriter;
 import com.revolsys.io.Writer;

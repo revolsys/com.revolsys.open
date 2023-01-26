@@ -6,7 +6,6 @@ import java.util.Map;
 import javax.sql.DataSource;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -83,17 +82,14 @@ public class JdbcDataSourceFactoryBean extends AbstractFactoryBean<DataSource>
     this.config = config;
   }
 
-  @Required
   public void setPassword(final String password) {
     this.password = password;
   }
 
-  @Required
   public void setUrl(final String url) {
     this.url = url;
   }
 
-  @Required
   public void setUsername(final String username) {
     this.username = username;
   }
