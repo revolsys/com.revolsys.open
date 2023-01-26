@@ -134,7 +134,7 @@ public class Reactive {
 
   public static <V> Flux<Pair<V, V>> pair(final Publisher<V> source1, final Publisher<V> source2,
     final Comparator<V> comparator) {
-    return Flux.create(new PairSinkConsumer<>(source1, source2, comparator));
+    return Flux.create(sink -> new PairSinkHandler<>(sink, source1, source2, comparator));
   }
 
   public static void waitOn(final Flux<?> publisher) {
@@ -191,6 +191,18 @@ public class Reactive {
   }
 
   public static <V> void waitOnAction(final Flux<V> publisher, final Consumer<V> action,
+    final Consumer<Disposable> subscriptionCallback) {
+    final Function<CountDownLatch, Disposable> supplier = latch -> publisher
+      .doAfterTerminate(latch::countDown)
+      .subscribe(action);
+    waitOn(supplier, subscriptionCallback);
+  }
+
+  public static <V> void waitOnAction(final Mono<V> publisher, final Consumer<V> action) {
+    waitOnAction(publisher, action, NOOPCALLBACK);
+  }
+
+  public static <V> void waitOnAction(final Mono<V> publisher, final Consumer<V> action,
     final Consumer<Disposable> subscriptionCallback) {
     final Function<CountDownLatch, Disposable> supplier = latch -> publisher
       .doAfterTerminate(latch::countDown)
