@@ -7,9 +7,9 @@ import java.util.Set;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.jeometry.common.logging.Logs;

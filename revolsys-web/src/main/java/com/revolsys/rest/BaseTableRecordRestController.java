@@ -3,8 +3,8 @@ package com.revolsys.rest;
 import java.io.IOException;
 import java.util.function.Consumer;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.io.PathName;

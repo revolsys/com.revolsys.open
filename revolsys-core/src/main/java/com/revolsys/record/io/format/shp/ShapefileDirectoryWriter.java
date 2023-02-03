@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.io.AbstractRecordWriter;

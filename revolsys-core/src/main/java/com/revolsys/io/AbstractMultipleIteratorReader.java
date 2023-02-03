@@ -3,7 +3,7 @@ package com.revolsys.io;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 
 import com.revolsys.collection.iterator.AbstractIterator;
 
