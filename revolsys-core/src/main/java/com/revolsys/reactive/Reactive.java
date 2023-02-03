@@ -224,12 +224,17 @@ public class Reactive {
 
   public static <R> Flux<R> withTempFileFlux(final Path file,
     final Function<Path, Flux<R>> action) {
+    return withTempFileFlux(file, action, false);
+  }
+
+  public static <R> Flux<R> withTempFileFlux(final Path file, final Function<Path, Flux<R>> action,
+    final boolean deleteIfEmpty) {
 
     final Callable<Path> resource = () -> {
       return file.getParent().resolve("_" + file.getFileName());
     };
 
-    final Function<Path, Flux<R>> publisher = (tempFile) -> action.apply(tempFile)
+    Function<Path, Flux<R>> publisher = (tempFile) -> action.apply(tempFile)
       .doOnError((e) -> Paths.deleteDirectories(tempFile));
 
     final Consumer<Path> closer = (tempPath) -> {
@@ -242,7 +247,11 @@ public class Reactive {
         throw Exceptions.wrap(e);
       }
     };
-
+    if (deleteIfEmpty) {
+      final Function<Path, Flux<R>> p = publisher;
+      publisher = (tempFile) -> p.apply(tempFile)
+        .switchIfEmpty(Mono.<R> empty().doOnTerminate(() -> Paths.deleteDirectories(tempFile)));
+    }
     return Flux.using(resource, publisher, closer);
   }
 
