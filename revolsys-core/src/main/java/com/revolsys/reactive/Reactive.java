@@ -105,6 +105,11 @@ public class Reactive {
     });
   }
 
+  public static <V> MergeSinkHandler<V> merge(final Publisher<V> source1,
+    final Publisher<V> source2, final Comparator<V> comparator) {
+    return new MergeSinkHandler<V>(source1, source2, comparator);
+  }
+
   public static <R extends AutoCloseable, V> Mono<V> monoCloseable(final Callable<R> supplier,
     final Function<R, Mono<V>> mapper) {
     return BaseCloseable.monoUsing(supplier, mapper);

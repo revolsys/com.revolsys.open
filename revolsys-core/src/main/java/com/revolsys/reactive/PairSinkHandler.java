@@ -145,13 +145,6 @@ public class PairSinkHandler<V> {
     sink.onRequest(this::onRequest);
   }
 
-  public PairSinkHandler(final Publisher<V> publisher1, final Publisher<V> publisher2,
-    final Comparator<V> comparator) {
-    this.subscription1 = new SourceSubscriber(publisher1);
-    this.subscription2 = new SourceSubscriber(publisher2);
-    this.comparator = comparator;
-  }
-
   private void cancel() {
     Throwable savedE = null;
     for (final SourceSubscriber subscription : Arrays.asList(this.subscription1,
