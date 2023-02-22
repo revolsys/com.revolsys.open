@@ -170,47 +170,43 @@ public class MergeSinkHandler<V> {
       final SourceSubscriber targetSubscription = this.targetSubscription;
       Mono<V> publisher = null;
 
-      final V soruceValue = sourceSubscription.peek();
+      final V sourceValue = sourceSubscription.peek();
       final V targetValue = targetSubscription.peek();
-      if (soruceValue == null) {
+      if (sourceValue == null) {
         if (targetValue == null) {
           if (sourceSubscription.isComplete() && targetSubscription.isComplete()) {
             this.sink.complete();
             return;
           }
+        } else if (sourceSubscription.isComplete()) {
+          publisher = MergeSinkHandler.this.removed$.apply(targetValue);
+          targetSubscription.pop();
         } else {
-          if (sourceSubscription.isComplete()) {
-            publisher = MergeSinkHandler.this.removed$.apply(targetValue);
-            targetSubscription.pop();
-          } else {
-            targetSubscription.unpeek();
-          }
+          targetSubscription.unpeek();
+        }
+      } else if (targetValue == null) {
+        if (targetSubscription.isComplete()) {
+          publisher = MergeSinkHandler.this.added$.apply(sourceValue);
+          sourceSubscription.pop();
+        } else {
+          sourceSubscription.unpeek();
         }
       } else {
-        if (targetValue == null) {
-          if (targetSubscription.isComplete()) {
-            publisher = MergeSinkHandler.this.newAction.apply(soruceValue);
-            sourceSubscription.pop();
-          } else {
-            sourceSubscription.unpeek();
-          }
+        final int compare = MergeSinkHandler.this.comparator.compare(sourceValue, targetValue);
+        if (compare < 0) {
+          publisher = MergeSinkHandler.this.added$.apply(sourceValue);
+          sourceSubscription.pop();
+          targetSubscription.unpeek();
+        } else if (compare == 0) {
+          publisher = MergeSinkHandler.this.matched$.apply(sourceValue, targetValue);
+          sourceSubscription.pop();
+          targetSubscription.pop();
         } else {
-          final int compare = MergeSinkHandler.this.comparator.compare(soruceValue, targetValue);
-          if (compare < 0) {
-            publisher = MergeSinkHandler.this.newAction.apply(soruceValue);
-            sourceSubscription.pop();
-            targetSubscription.unpeek();
-          } else if (compare == 0) {
-            publisher = MergeSinkHandler.this.updateAction.apply(soruceValue, targetValue);
-            sourceSubscription.pop();
-            targetSubscription.pop();
-          } else {
-            publisher = MergeSinkHandler.this.removed$.apply(targetValue);
-            sourceSubscription.unpeek();
-            targetSubscription.pop();
-          }
-
+          publisher = MergeSinkHandler.this.removed$.apply(targetValue);
+          sourceSubscription.unpeek();
+          targetSubscription.pop();
         }
+
       }
       if (publisher != null) {
         publisher.doOnError(this.sink::error).subscribe(this.sink::next);
@@ -259,9 +255,9 @@ public class MergeSinkHandler<V> {
 
   private final Comparator<V> comparator;
 
-  private Function<V, Mono<V>> newAction = Mono::just;
+  private Function<V, Mono<V>> added$ = Mono::just;
 
-  private BiFunction<V, V, Mono<V>> updateAction = (v1, v2) -> Mono.just(v2);
+  private BiFunction<V, V, Mono<V>> matched$ = (v1, v2) -> Mono.just(v2);
 
   private Function<V, Mono<V>> removed$ = Mono::just;
 
@@ -282,8 +278,61 @@ public class MergeSinkHandler<V> {
    * @param updateAction The action;
    * @return this
    */
-  public MergeSinkHandler<V> newAction(final Function<V, Mono<V>> newAction) {
-    this.newAction = newAction;
+  public MergeSinkHandler<V> added(final Function<V, V> added) {
+    this.added$ = v -> {
+      final var result = added.apply(v);
+      return Mono.just(result);
+    };
+    return this;
+  }
+
+  /**
+   * Action to perform when the value is in the source but not the target.
+   *
+   * @param updateAction The action;
+   * @return this
+   */
+  public MergeSinkHandler<V> added$(final Function<V, Mono<V>> added$) {
+    this.added$ = added$;
+    return this;
+  }
+
+  /**
+   * Action to perform when the value is in both the source and target.
+   *
+   * @param matched
+  * @return this
+    */
+  public MergeSinkHandler<V> matched(final BiFunction<V, V, V> matched) {
+    this.matched$ = (s, t) -> {
+      final var result = matched.apply(s, t);
+      return Mono.just(result);
+    };
+    return this;
+  }
+
+  /**
+   * Action to perform when the value is in both the source and target.
+   *
+   * @param matched$
+  * @return this
+    */
+  public MergeSinkHandler<V> matched$(final BiFunction<V, V, Mono<V>> matched$) {
+    this.matched$ = matched$;
+    return this;
+  }
+
+  /**
+   * Action to perform when the value is in the target but not the source.
+   *
+   * @param updateAction The action;
+   * @return this
+   */
+  public MergeSinkHandler<V> removed(final Function<V, V> removed) {
+    this.removed$ = v -> {
+      final var result = removed.apply(v);
+      return Mono.just(result);
+    };
     return this;
   }
 
@@ -305,16 +354,5 @@ public class MergeSinkHandler<V> {
   @Override
   public String toString() {
     return this.source + "\n" + this.target;
-  }
-
-  /**
-   * Action to perform when the value is in both the source and target.
-   *
-   * @param updateAction
-  * @return this
-    */
-  public MergeSinkHandler<V> updateAction(final BiFunction<V, V, Mono<V>> updateAction) {
-    this.updateAction = updateAction;
-    return this;
   }
 }
