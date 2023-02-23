@@ -889,6 +889,7 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <V> V toFieldValueException(Object value) {
     if (value == null) {
@@ -908,7 +909,11 @@ public class FieldDefinition extends BaseObjectWithProperties implements CharSeq
           }
         }
 
-        final V fieldValue = this.type.toObject(value);
+        V fieldValue = this.type.toObject(value);
+        if (fieldValue instanceof Geometry && this.geometryFactory != null) {
+          final Geometry geometry = (Geometry)fieldValue;
+          fieldValue = (V)this.geometryFactory.geometry(geometry);
+        }
         return fieldValue;
       } catch (final IllegalArgumentException e) {
         throw e;

@@ -46,6 +46,8 @@ import com.revolsys.io.FileNames;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 
+import reactor.core.publisher.Flux;
+
 public interface Paths {
   LinkOption[] LINK_OPTIONS_NONE = new LinkOption[0];
 
@@ -551,6 +553,14 @@ public interface Paths {
 
   static String toUrlString(final Path path) {
     return toUrl(path).toString();
+  }
+
+  static Flux<Path> walk$(Path dir) {
+    try {
+      return Flux.fromStream(Files.walk(dir));
+    } catch (final IOException e) {
+      return Flux.error(e);
+    }
   }
 
   static Path withExtension(final Path path, final String extension) {
