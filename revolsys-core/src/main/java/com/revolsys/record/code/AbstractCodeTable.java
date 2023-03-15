@@ -1,18 +1,17 @@
 package com.revolsys.record.code;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JComponent;
 
-import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.number.Numbers;
 
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
 import com.revolsys.record.schema.FieldDefinition;
+
+import reactor.core.publisher.Sinks;
 
 public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChange
   implements BaseCloseable, CodeTable, Cloneable {
@@ -21,13 +20,11 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
 
   protected boolean caseSensitive = false;
 
-  private Map<Identifier, Identifier> idIdCache = new LinkedHashMap<>();
-
-  private long maxId;
-
   private String name;
 
-  protected Map<String, Identifier> stringIdMap = new HashMap<>();
+  protected AtomicReference<CodeTableData> data = new AtomicReference<>();
+
+  private final Sinks.Many<CodeTableData> dataSubject = Sinks.many().replay().latest();
 
   protected int valueFieldLength = -1;
 
@@ -39,62 +36,43 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
   public AbstractCodeTable() {
   }
 
-  protected void addIdentifier(final Identifier id) {
-    this.idIdCache.put(id, id);
-    String lowerId = id.toString();
-    this.stringIdMap.put(lowerId, id);
-    if (!this.caseSensitive) {
-      lowerId = lowerId.toLowerCase();
+  protected int calculateValueFieldLength() {
+    final CodeTableData data = getData();
+    if (data == null) {
+      return 20;
+    } else {
+      return data.calculateValueFieldLength();
     }
-    this.stringIdMap.put(lowerId, id);
   }
 
-  protected abstract int calculateValueFieldLength();
+  public void clear() {
+    setData(null);
+  }
 
   @Override
   public AbstractCodeTable clone() {
     final AbstractCodeTable clone = (AbstractCodeTable)super.clone();
-    clone.idIdCache = new LinkedHashMap<>(this.idIdCache);
-    clone.stringIdMap = new LinkedHashMap<>(this.stringIdMap);
+    final CodeTableData oldData = getData();
+    clone.data = new AtomicReference<>();
+    if (oldData != null) {
+      clone.setData(oldData.clone());
+    }
     return clone;
   }
 
   @Override
   public void close() {
-    this.idIdCache.clear();
-    this.stringIdMap.clear();
+    clear();
     this.swingEditor = null;
   }
 
-  protected Identifier getIdentifierInternal(final Object id) {
-    if (id != null) {
-      final Identifier cachedId = this.idIdCache.get(id);
-      if (cachedId != null) {
-        return cachedId;
-      } else {
-        String lowerId = id.toString();
-        if (this.stringIdMap.containsKey(lowerId)) {
-          return this.stringIdMap.get(lowerId);
-        } else {
-          if (!this.caseSensitive) {
-            lowerId = lowerId.toLowerCase();
-          }
-          if (this.stringIdMap.containsKey(lowerId)) {
-            return this.stringIdMap.get(lowerId);
-          }
-        }
-      }
-    }
-    return null;
+  protected CodeTableData getData() {
+    return this.data.get();
   }
 
   @Override
   public String getName() {
     return this.name;
-  }
-
-  protected synchronized long getNextId() {
-    return ++this.maxId;
   }
 
   protected Object getNormalizedValue(final Object value) {
@@ -139,13 +117,17 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
 
   @Override
   public boolean isEmpty() {
-    return this.idIdCache.isEmpty();
+    final CodeTableData data = getData();
+    return data.isEmpty();
+  }
+
+  protected CodeTableData newData() {
+    return new CodeTableData(this);
   }
 
   @Override
   public synchronized void refresh() {
-    this.idIdCache.clear();
-    this.stringIdMap.clear();
+    clear();
   }
 
   public void setCapitalizeWords(final boolean capitalizedWords) {
@@ -154,6 +136,13 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
 
   public void setCaseSensitive(final boolean caseSensitive) {
     this.caseSensitive = caseSensitive;
+  }
+
+  public void setData(CodeTableData data) {
+    if (data != null) {
+      this.data.set(data);
+      this.dataSubject.tryEmitNext(data);
+    }
   }
 
   public void setName(final String name) {
@@ -166,13 +155,6 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
 
   public void setValueFieldDefinition(final FieldDefinition valueFieldDefinition) {
     this.valueFieldDefinition = valueFieldDefinition;
-  }
-
-  protected void updateMaxId(final Number id) {
-    final long longValue = id.longValue();
-    if (longValue > this.maxId) {
-      this.maxId = longValue;
-    }
   }
 
 }

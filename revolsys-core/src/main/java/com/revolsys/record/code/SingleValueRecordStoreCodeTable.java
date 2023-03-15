@@ -11,11 +11,11 @@ import java.util.function.Consumer;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.identifier.ListIdentifier;
 import org.jeometry.common.data.identifier.SingleIdentifier;
-import org.jeometry.common.date.Dates;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.collection.list.Lists;
+import com.revolsys.reactive.Reactive;
 import com.revolsys.record.Record;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.query.And;
@@ -30,10 +30,16 @@ import com.revolsys.record.schema.RecordDefinitionProxy;
 import com.revolsys.record.schema.RecordStore;
 import com.revolsys.util.Property;
 
+import reactor.core.Disposable;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
+
 public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTable
   implements RecordDefinitionProxy {
 
   private static final String DEFAULT_FIELD_NAME = "VALUE";
+
+  private boolean allowNullValues = false;
 
   private boolean createMissingCodes = true;
 
@@ -45,9 +51,9 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
 
   private boolean loadAll = true;
 
-  private boolean loaded = false;
+  private Disposable loadAllDisposable;
 
-  private boolean loading = false;
+  private boolean loaded = false;
 
   private boolean loadMissingCodes = true;
 
@@ -59,13 +65,9 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
 
   private RecordStore recordStore;
 
-  private final ThreadLocal<Boolean> threadLoading = new ThreadLocal<>();
-
   private PathName typePath;
 
   private String valueFieldName = DEFAULT_FIELD_NAME;
-
-  private boolean allowNullValues = false;
 
   public SingleValueRecordStoreCodeTable() {
   }
@@ -239,7 +241,7 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
 
   @Override
   public boolean isLoading() {
-    return this.loading;
+    return this.loadAllDisposable != null;
   }
 
   @Override
@@ -247,47 +249,43 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
     return this.loadMissingCodes;
   }
 
-  @Override
-  public synchronized void loadAll() {
-    final long time = System.currentTimeMillis();
-    if (this.threadLoading.get() != Boolean.TRUE) {
-      if (this.loading) {
-        while (this.loading) {
-          try {
-            wait(1000);
-          } catch (final InterruptedException e) {
-          }
+  public void loadAll() {
+    synchronized (this) {
+      if (this.loadAllDisposable != null) {
+        if (!this.loadAllDisposable.isDisposed()) {
+          this.loadAllDisposable.dispose();
         }
-        return;
-      } else {
-        this.threadLoading.set(Boolean.TRUE);
-        this.loading = true;
-        try {
-          if (this.recordStore != null) {
-            newQuery()//
-              .forEachRecord(this::addValueDo);
-          }
-        } finally {
-          this.loading = false;
-          this.loaded = true;
-          this.threadLoading.set(null);
-          this.notifyAll();
-        }
-        Property.firePropertyChange(this, "valuesChanged", false, true);
       }
+      this.loadAllDisposable = null;
+
     }
-    Dates.debugEllapsedTime(this, "Load All: " + getTypePath(), time);
+    if (this.recordStore != null) {
+      final Flux<Record> publisher = newQuery()//
+        .fluxForEach()
+        .subscribeOn(Schedulers.boundedElastic())
+        .doOnComplete(() -> {
+          this.loaded = true;
+          Property.firePropertyChange(this, "valuesChanged", false, true);
+        });
+      Reactive.waitOnAction(publisher, this::addValueDo, disposable -> {
+        synchronized (this) {
+          this.loadAllDisposable = disposable;
+        }
+      });
+    }
+
   }
 
   @Override
-  protected synchronized Identifier loadId(final Object value, final boolean createId) {
+  protected synchronized Identifier loadId(CodeTableData data, final Object value,
+    final boolean createId) {
     if (this.loadAll && !this.loadMissingCodes && !isEmpty()) {
       return null;
     }
     Identifier id = null;
     if (createId && this.loadAll && !isLoaded()) {
       loadAll();
-      id = getIdentifier(value, false);
+      id = getIdentifier(data, value, false);
     } else {
       final Query query = this.recordStore.newQuery(this.typePath);
       final And and = new And();
@@ -328,7 +326,7 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
   }
 
   @Override
-  protected Object loadValues(final Object id) {
+  protected Object loadValue(final Object id) {
     if (this.loadAll && !isLoaded()) {
       loadAll();
     } else if (!this.loadAll || this.loadMissingCodes) {
@@ -361,7 +359,7 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
         final FieldDefinition idField = recordDefinition.getIdField();
         if (idField != null) {
           if (Number.class.isAssignableFrom(idField.getDataType().getJavaClass())) {
-            id = Identifier.newIdentifier(getNextId());
+            id = Identifier.newIdentifier(this.getData().getNextId());
           } else {
             id = Identifier.newIdentifier(UUID.randomUUID().toString());
           }
@@ -405,7 +403,7 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
 
   @Override
   public void refreshIfNeeded() {
-    if (this.loadAll && !this.loading) {
+    if (this.loadAll) {
       super.refreshIfNeeded();
     }
   }
@@ -442,6 +440,9 @@ public class SingleValueRecordStoreCodeTable extends AbstractSingleValueCodeTabl
   }
 
   public SingleValueRecordStoreCodeTable setLoadAll(final boolean loadAll) {
+    if (loadAll && !this.loadAll) {
+      this.data = null;
+    }
     this.loadAll = loadAll;
     return this;
   }

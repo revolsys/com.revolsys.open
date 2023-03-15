@@ -248,7 +248,6 @@ public class MultiValueRecordStoreCodeTable extends AbstractMultiValueCodeTable
     return this.loadMissingCodes;
   }
 
-  @Override
   public synchronized void loadAll() {
     final long time = System.currentTimeMillis();
     if (this.threadLoading.get() != Boolean.TRUE) {
@@ -319,7 +318,8 @@ public class MultiValueRecordStoreCodeTable extends AbstractMultiValueCodeTable
       }
       query.setWhereCondition(and);
       final RecordReader reader = this.recordStore.getRecords(query);
-      try {
+      try (
+        reader) {
         final List<Record> codes = reader.toList();
         if (codes.size() > 0) {
           final CategoryLabelCountMap statistics = this.recordStore.getStatistics();
@@ -331,8 +331,6 @@ public class MultiValueRecordStoreCodeTable extends AbstractMultiValueCodeTable
         }
         id = getIdByValue(values);
         Property.firePropertyChange(this, "valuesChanged", false, true);
-      } finally {
-        reader.close();
       }
     }
     if (createId && id == null) {
@@ -375,7 +373,7 @@ public class MultiValueRecordStoreCodeTable extends AbstractMultiValueCodeTable
         final FieldDefinition idField = recordDefinition.getIdField();
         if (idField != null) {
           if (Number.class.isAssignableFrom(idField.getDataType().getJavaClass())) {
-            id = Identifier.newIdentifier(getNextId());
+            id = Identifier.newIdentifier(this.getData().getNextId());
           } else {
             id = Identifier.newIdentifier(UUID.randomUUID().toString());
           }

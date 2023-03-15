@@ -1,11 +1,12 @@
 package com.revolsys.record.code;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.function.Consumer;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.identifier.SingleIdentifier;
@@ -13,13 +14,25 @@ import org.jeometry.common.data.identifier.SingleIdentifier;
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.util.CaseConverter;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+
 public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
 
-  private List<Identifier> identifiers = new ArrayList<>();
+  public static interface IncompleteValue {
+  }
 
-  private Map<Identifier, Object> idValueCache = new LinkedHashMap<>();
+  private static class LoadingValue implements IncompleteValue {
 
-  private Map<Object, Identifier> valueIdCache = new LinkedHashMap<>();
+    private final Set<Consumer<Object>> singleCallbacks = new LinkedHashSet<>();
+
+    private final Set<Consumer<List<Object>>> multipleCallbacks = new LinkedHashSet<>();
+  }
+
+  private static class MissingValue implements IncompleteValue {
+    private final long time = System.currentTimeMillis();
+  }
 
   public AbstractSingleValueCodeTable() {
   }
@@ -28,76 +41,101 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
     this.capitalizeWords = capitalizeWords;
   }
 
-  protected synchronized AbstractSingleValueCodeTable addValue(final Identifier id,
-    final Object value) {
-    if (id instanceof Number) {
-      final Number number = (Number)id;
-      updateMaxId(number);
+  protected AbstractSingleValueCodeTable addValue(final Identifier id, final Object value) {
+    final CodeTableData data = this.getData();
+    synchronized (data) {
+      final Object previousValue = data.addIdentifierAndValue(id, value);
+      addValueId(data, id, value);
+      if (previousValue instanceof LoadingValue) {
+        final LoadingValue loadingValue = (LoadingValue)previousValue;
+        Mono<Void> publisher = null;
+        if (!loadingValue.singleCallbacks.isEmpty()) {
+          publisher = Flux.fromIterable(loadingValue.singleCallbacks)
+            .doOnNext(callback -> callback.accept(value))
+            .then();
+        }
+        if (!loadingValue.multipleCallbacks.isEmpty()) {
+          final List<Object> listValue = Collections.singletonList(value);
+          final Mono<Void> publisher2 = Flux.fromIterable(loadingValue.multipleCallbacks)
+            .doOnNext(callback -> callback.accept(listValue))
+            .then();
+          if (publisher == null) {
+            publisher = publisher2;
+          } else {
+            publisher = publisher.concatWith(publisher2).then();
+          }
+          publisher.subscribeOn(Schedulers.boundedElastic()).subscribe();
+
+        }
+      }
     }
 
-    this.identifiers.add(id);
-    this.idValueCache.put(id, value);
-    addValueId(id, value);
-
-    addIdentifier(id);
     return this;
   }
 
-  protected void addValueId(final Identifier id, final Object value) {
-    this.valueIdCache.put(value, id);
-    this.valueIdCache.put(getNormalizedValue(value), id);
+  protected void addValueId(CodeTableData data, final Identifier id, final Object value) {
+    data.setValueToId(id, value);
+    data.setValueToId(id, getNormalizedValue(value));
   }
 
-  protected synchronized void addValues(final Map<Identifier, List<Object>> valueMap) {
-    for (final Entry<Identifier, List<Object>> entry : valueMap.entrySet()) {
-      final Identifier id = entry.getKey();
-      final List<Object> values = entry.getValue();
-      addValue(id, values);
-    }
-  }
-
-  @Override
-  protected int calculateValueFieldLength() {
-    int length = 0;
-    for (final Object value : this.idValueCache.values()) {
-      final int valueLength = value.toString().length();
-      if (valueLength > length) {
-        length = valueLength;
+  protected void addValues(final Map<Identifier, List<Object>> valueMap) {
+    final CodeTableData data = this.getData();
+    synchronized (data) {
+      for (final Entry<Identifier, List<Object>> entry : valueMap.entrySet()) {
+        final Identifier id = entry.getKey();
+        final List<Object> values = entry.getValue();
+        addValue(id, values);
       }
     }
-    return length;
   }
 
   @Override
   public AbstractSingleValueCodeTable clone() {
-    final AbstractSingleValueCodeTable clone = (AbstractSingleValueCodeTable)super.clone();
-    clone.identifiers = new ArrayList<>(this.identifiers);
-    clone.idValueCache = new LinkedHashMap<>(this.idValueCache);
-    clone.valueIdCache = new LinkedHashMap<>(this.valueIdCache);
-    return clone;
+    return (AbstractSingleValueCodeTable)super.clone();
   }
 
   @Override
   public void close() {
     super.close();
-    this.identifiers.clear();
-    this.idValueCache.clear();
-    this.valueIdCache.clear();
+    clear();
   }
 
   protected Identifier getIdByValue(Object value) {
     value = processValue(value);
-    Identifier id = this.valueIdCache.get(value);
-    if (id != null) {
-      return id;
+    final CodeTableData data = getData();
+    Identifier identifier = data.getValueById(value);
+    if (identifier != null) {
+      return identifier;
     }
-    id = this.stringIdMap.get(value.toString());
-    if (id != null) {
-      return id;
+    identifier = data.getIdentifier(value);
+    if (identifier != null) {
+      return identifier;
+    }
+    final Object normalizedValue = getNormalizedValue(value);
+    identifier = data.getValueById(normalizedValue);
+    return identifier;
+  }
+
+  protected Identifier getIdentifier(CodeTableData data, Object value, final boolean loadMissing) {
+    if (value == null) {
+      return null;
+    }
+    refreshIfNeeded();
+    final Identifier identifier = data.getIdentifier(value);
+    if (identifier != null) {
+      return identifier;
     }
 
-    final Object normalizedValue = getNormalizedValue(value);
-    id = this.valueIdCache.get(normalizedValue);
+    value = processValue(value);
+    Identifier id = getIdByValue(value);
+    if (id == null && loadMissing && isLoadMissingCodes() && !isLoading()) {
+      synchronized (data) {
+        id = loadId(data, value, true);
+        if (id != null && !data.hasIdentifier(id)) {
+          addValue(id, value);
+        }
+      }
+    }
     return id;
   }
 
@@ -113,7 +151,8 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
 
   @Override
   public Identifier getIdentifier(final Object value) {
-    return getIdentifier(value, true);
+    final CodeTableData data = getData();
+    return getIdentifier(data, value, true);
   }
 
   @Override
@@ -126,33 +165,10 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
     }
   }
 
-  public Identifier getIdentifier(Object value, final boolean loadMissing) {
-    if (value == null) {
-      return null;
-    }
-    refreshIfNeeded();
-    final Identifier identifier = super.getIdentifierInternal(value);
-    if (identifier != null) {
-      return identifier;
-    }
-
-    value = processValue(value);
-    Identifier id = getIdByValue(value);
-    if (id == null && loadMissing && isLoadMissingCodes() && !isLoading()) {
-      synchronized (this) {
-        id = loadId(value, true);
-        if (id != null && !this.idValueCache.containsKey(id)) {
-          addValue(id, value);
-        }
-      }
-    }
-    return id;
-  }
-
   @Override
   public List<Identifier> getIdentifiers() {
     refreshIfNeeded();
-    return Collections.unmodifiableList(this.identifiers);
+    return Collections.unmodifiableList(this.getData().getIdentifiers());
   }
 
   @Override
@@ -176,11 +192,12 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
 
   @Override
   public Identifier getIdExact(final Object value) {
-    Identifier id = this.valueIdCache.get(value);
+    final CodeTableData data = getData();
+    Identifier id = data.getValueById(value);
     if (id == null) {
-      synchronized (this) {
-        id = loadId(value, false);
-        return this.valueIdCache.get(value);
+      synchronized (data) {
+        id = loadId(data, value, false);
+        return data.getValueById(value);
       }
     }
     return id;
@@ -188,78 +205,91 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <V> V getValue(final Object id) {
-    return (V)getValueById(id);
-  }
-
-  protected Object getValueById(Object id) {
-    if (id == null) {
-      return null;
-    } else if (id instanceof Identifier) {
-      final Object value = this.idValueCache.get(id);
-      if (value != null) {
-        return value;
-      }
-    }
-
-    if (this.valueIdCache.containsKey(id)) {
-      if (id instanceof SingleIdentifier) {
-        final SingleIdentifier identifier = (SingleIdentifier)id;
-        return identifier.getValue(0);
-      } else {
-        return id;
-      }
-    } else {
-      Object value = this.idValueCache.get(id);
-      if (value == null) {
-        String lowerId = id.toString();
-        if (this.stringIdMap.containsKey(lowerId)) {
-          id = this.stringIdMap.get(lowerId);
-          value = this.idValueCache.get(id);
-        } else {
-          if (!this.caseSensitive) {
-            lowerId = lowerId.toLowerCase();
-          }
-          if (this.stringIdMap.containsKey(lowerId)) {
-            id = this.stringIdMap.get(lowerId);
-            value = this.idValueCache.get(id);
-          }
+  public <V> V getValue(final Identifier id) {
+    Object value = getValueById(id);
+    if (value == null) {
+      synchronized (this.getData()) {
+        value = loadValue(id);
+        if (value != null && !isLoadAll()) {
+          addValue(id, value);
         }
       }
+    }
+    return (V)value;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V> V getValue(final Identifier id, Consumer<V> action) {
+    Object value = getValueById(id);
+    if (value == null) {
+      synchronized (this.getData()) {
+        value = loadValue(id);
+        if (value != null && !isLoadAll()) {
+          addValue(id, value);
+        }
+      }
+    }
+    return (V)value;
+  }
+
+  protected final Object getValueById(Object id) {
+    if (id == null) {
+      return null;
+    }
+    Object value = this.getData().getValueById(id);
+
+    if (value == null) {
+      if (this.getData().hasValue(id)) {
+        if (id instanceof SingleIdentifier) {
+          final SingleIdentifier identifier = (SingleIdentifier)id;
+          return identifier.getValue(0);
+        } else {
+          return id;
+        }
+      } else {
+        final Identifier identifier = this.getData().getIdentifier(id);
+        if (identifier != null) {
+          value = this.getData().getValueById(id);
+        }
+      }
+    }
+    if (value instanceof IncompleteValue) {
+      return null;
+    } else {
       return value;
     }
   }
 
   @Override
-  public List<Object> getValues(final Identifier id) {
-    if (id != null) {
-      Object value = getValueById(id);
-      if (value == null) {
-        synchronized (this) {
-          value = loadValues(id);
-          if (value != null && !isLoadAll()) {
-            addValue(id, value);
-          }
-        }
-      }
-      if (value != null) {
-        return Collections.singletonList(value);
-      }
-
+  public final List<Object> getValues(final Identifier id) {
+    final Object value = getValue(id);
+    if (value == null) {
+      return null;
+    } else {
+      return Collections.singletonList(value);
     }
-    return null;
+  }
 
+  @Override
+  public final List<Object> getValues(final Identifier id, Consumer<List<Object>> action) {
+    final Object value = getValue(id, v -> action.accept(Collections.singletonList(v)));
+    if (value == null) {
+      return null;
+    } else {
+      return Collections.singletonList(value);
+    }
   }
 
   protected boolean isLoadMissingCodes() {
     return false;
   }
 
-  protected Identifier loadId(final Object value, final boolean createId) {
+  protected Identifier loadId(CodeTableData data, final Object value, final boolean createId) {
     return null;
   }
 
-  protected Object loadValues(final Object id) {
+  protected Object loadValue(final Object id) {
     return null;
   }
 
@@ -273,12 +303,10 @@ public abstract class AbstractSingleValueCodeTable extends AbstractCodeTable {
   }
 
   @Override
-  public synchronized void refresh() {
+  public void refresh() {
     this.valueFieldLength = -1;
     super.refresh();
-    this.identifiers.clear();
-    this.idValueCache.clear();
-    this.valueIdCache.clear();
+    clear();
   }
 
   public void setValues(final MapEx values) {

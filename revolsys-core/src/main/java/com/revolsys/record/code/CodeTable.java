@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.swing.JComponent;
 
@@ -149,9 +150,24 @@ public interface CodeTable
     }
   }
 
+  @SuppressWarnings("unchecked")
+  default <V> V getValue(final Identifier id, Consumer<V> action) {
+    final List<Object> values = getValues(id, v -> action.accept((V)v.get(0)));
+    if (Property.hasValue(values)) {
+      return (V)values.get(0);
+    } else {
+      return null;
+    }
+  }
+
   default <V> V getValue(final Object id) {
     final Identifier identifier = Identifier.newIdentifier(id);
     return getValue(identifier);
+  }
+
+  default <V> V getValue(final Object id, Consumer<V> action) {
+    final Identifier identifier = Identifier.newIdentifier(id);
+    return getValue(identifier, action);
   }
 
   default FieldDefinition getValueFieldDefinition() {
@@ -175,9 +191,18 @@ public interface CodeTable
 
   List<Object> getValues(final Identifier id);
 
+  default List<Object> getValues(final Identifier id, Consumer<List<Object>> action) {
+    return getValues(id);
+  }
+
   default List<Object> getValues(final Object id) {
     final Identifier identifier = Identifier.newIdentifier(id);
     return getValues(identifier);
+  }
+
+  default List<Object> getValues(final Object id, Consumer<List<Object>> action) {
+    final Identifier identifier = Identifier.newIdentifier(id);
+    return getValues(identifier, action);
   }
 
   @Override
@@ -195,10 +220,6 @@ public interface CodeTable
 
   default boolean isLoading() {
     return false;
-  }
-
-  default void loadAll() {
-
   }
 
   @Override

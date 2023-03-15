@@ -11,12 +11,12 @@ import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.logging.Logs;
 
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
-import com.revolsys.record.code.AbstractCodeTable;
+import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.format.esri.gdb.xml.model.CodedValue;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Domain;
 import com.revolsys.record.io.format.json.JsonObject;
 
-public class FileGdbDomainCodeTable extends AbstractCodeTable {
+public class FileGdbDomainCodeTable implements CodeTable {
   private final Domain domain;
 
   private final String name;
@@ -25,6 +25,8 @@ public class FileGdbDomainCodeTable extends AbstractCodeTable {
 
   private JComponent swingEditor;
 
+  private int valueFieldLength = -1;
+
   public FileGdbDomainCodeTable(final FileGdbRecordStore recordStore, final Domain domain) {
     this.recordStore = recordStore;
     this.domain = domain;
@@ -32,21 +34,12 @@ public class FileGdbDomainCodeTable extends AbstractCodeTable {
   }
 
   @Override
-  protected int calculateValueFieldLength() {
-    int length = 0;
-    for (final CodedValue codedValue : this.domain.getCodedValues()) {
-      final String name = codedValue.getName();
-      final int valueLength = name.length();
-      if (valueLength > length) {
-        length = valueLength;
-      }
-    }
-    return length;
+  public FileGdbDomainCodeTable clone() {
+    return this;
   }
 
   @Override
-  public FileGdbDomainCodeTable clone() {
-    return (FileGdbDomainCodeTable)super.clone();
+  public void close() {
   }
 
   @Override
@@ -130,6 +123,22 @@ public class FileGdbDomainCodeTable extends AbstractCodeTable {
   }
 
   @Override
+  public int getValueFieldLength() {
+    if (this.valueFieldLength == -1) {
+      int length = 0;
+      for (final CodedValue codedValue : this.domain.getCodedValues()) {
+        final String name = codedValue.getName();
+        final int valueLength = name.length();
+        if (valueLength > length) {
+          length = valueLength;
+        }
+      }
+      this.valueFieldLength = length;
+    }
+    return this.valueFieldLength;
+  }
+
+  @Override
   public List<String> getValueFieldNames() {
     return this.domain.getValueFieldNames();
   }
@@ -167,7 +176,6 @@ public class FileGdbDomainCodeTable extends AbstractCodeTable {
   public void refresh() {
   }
 
-  @Override
   public void setSwingEditor(final JComponent swingEditor) {
     this.swingEditor = swingEditor;
   }

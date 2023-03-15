@@ -3,7 +3,6 @@ package com.revolsys.record.code;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,12 +14,6 @@ import com.revolsys.util.CaseConverter;
 
 public abstract class AbstractMultiValueCodeTable extends AbstractCodeTable {
 
-  private List<Identifier> identifiers = new ArrayList<>();
-
-  private Map<Identifier, List<Object>> idValueCache = new LinkedHashMap<>();
-
-  private Map<List<Object>, Identifier> valueIdCache = new LinkedHashMap<>();
-
   public AbstractMultiValueCodeTable() {
   }
 
@@ -28,17 +21,37 @@ public abstract class AbstractMultiValueCodeTable extends AbstractCodeTable {
     this.capitalizeWords = capitalizeWords;
   }
 
-  protected synchronized void addValue(final Identifier id, final List<Object> values) {
-    if (id instanceof Number) {
-      final Number number = (Number)id;
-      updateMaxId(number);
+  protected void addValue(final Identifier id, final List<Object> values) {
+    final CodeTableData data = this.getData();
+    synchronized (data) {
+      final Object previousValue = data.addIdentifierAndValue(id, values);
+      // if (previousValue instanceof LoadingValue) {
+      // final LoadingValue loadingValue = (LoadingValue)previousValue;
+      // Mono<Void> publisher = null;
+      // if (!loadingValue.singleCallbacks.isEmpty()) {
+      // publisher = Flux.fromIterable(loadingValue.singleCallbacks)
+      // .doOnNext(callback -> callback.accept(value))
+      // .then();
+      // }
+      // if (!loadingValue.multipleCallbacks.isEmpty()) {
+      // final List<Object> listValue = Collections.singletonList(value);
+      // final Mono<Void> publisher2 =
+      // Flux.fromIterable(loadingValue.multipleCallbacks)
+      // .doOnNext(callback -> callback.accept(listValue))
+      // .then();
+      // if (publisher == null) {
+      // publisher = publisher2;
+      // } else {
+      // publisher = publisher.concatWith(publisher2).then();
+      // }
+      // publisher.subscribeOn(Schedulers.boundedElastic()).subscribe();
+      //
+      // }
+      // }
+
+      data.setValueToId(id, values);
+      data.setValueToId(id, getNormalizedValues(values));
     }
-
-    this.identifiers.add(id);
-    this.idValueCache.put(id, values);
-    addValueId(id, values);
-
-    addIdentifier(id);
   }
 
   protected void addValue(final Identifier id, final Object... values) {
@@ -46,12 +59,7 @@ public abstract class AbstractMultiValueCodeTable extends AbstractCodeTable {
     addValue(id, valueList);
   }
 
-  protected void addValueId(final Identifier id, final List<Object> values) {
-    this.valueIdCache.put(values, id);
-    this.valueIdCache.put(getNormalizedValues(values), id);
-  }
-
-  protected synchronized void addValues(final Map<Identifier, List<Object>> valueMap) {
+  protected void addValues(final Map<Identifier, List<Object>> valueMap) {
     for (final Entry<Identifier, List<Object>> entry : valueMap.entrySet()) {
       final Identifier id = entry.getKey();
       final List<Object> values = entry.getValue();
@@ -60,40 +68,16 @@ public abstract class AbstractMultiValueCodeTable extends AbstractCodeTable {
   }
 
   @Override
-  protected int calculateValueFieldLength() {
-    int length = 0;
-    for (final Object value : this.idValueCache.values()) {
-      final int valueLength = value.toString().length();
-      if (valueLength > length) {
-        length = valueLength;
-      }
-    }
-    return length;
-  }
-
-  @Override
   public AbstractMultiValueCodeTable clone() {
-    final AbstractMultiValueCodeTable clone = (AbstractMultiValueCodeTable)super.clone();
-    clone.identifiers = new ArrayList<>(this.identifiers);
-    clone.idValueCache = new LinkedHashMap<>(this.idValueCache);
-    clone.valueIdCache = new LinkedHashMap<>(this.valueIdCache);
-    return clone;
-  }
-
-  @Override
-  public void close() {
-    super.close();
-    this.identifiers.clear();
-    this.idValueCache.clear();
-    this.valueIdCache.clear();
+    return (AbstractMultiValueCodeTable)super.clone();
   }
 
   protected Identifier getIdByValue(final List<Object> valueList) {
     processValues(valueList);
-    Identifier id = this.valueIdCache.get(valueList);
+    Identifier id = this.getData().getValueById(valueList);
     if (id == null) {
       final List<Object> normalizedValues = getNormalizedValues(valueList);
-      id = this.valueIdCache.get(normalizedValues);
+      id = this.getData().getValueById(normalizedValues);
     }
     return id;
   }
@@ -107,7 +91,7 @@ public abstract class AbstractMultiValueCodeTable extends AbstractCodeTable {
     refreshIfNeeded();
     if (values.size() == 1) {
       final Object id = values.get(0);
-      final Identifier identifier = getIdentifierInternal(id);
+      final Identifier identifier = this.getData().getIdentifier(id);
       if (identifier != null) {
         return identifier;
       }
@@ -116,9 +100,10 @@ public abstract class AbstractMultiValueCodeTable extends AbstractCodeTable {
     processValues(values);
     Identifier id = getIdByValue(values);
     if (id == null && loadMissing && isLoadMissingCodes() && !isLoading()) {
-      synchronized (this) {
+      final CodeTableData data = this.getData();
+      synchronized (data) {
         id = loadId(values, true);
-        if (id != null && !this.idValueCache.containsKey(id)) {
+        if (id != null && !data.hasIdentifier(id)) {
           addValue(id, values);
         }
       }
@@ -129,16 +114,17 @@ public abstract class AbstractMultiValueCodeTable extends AbstractCodeTable {
   @Override
   public List<Identifier> getIdentifiers() {
     refreshIfNeeded();
-    return Collections.unmodifiableList(this.identifiers);
+    return Collections.unmodifiableList(this.getData().getIdentifiers());
   }
 
   @Override
   public Identifier getIdExact(final List<Object> values) {
-    Identifier id = this.valueIdCache.get(values);
+    final CodeTableData data = this.getData();
+    Identifier id = data.getValueById(values);
     if (id == null) {
-      synchronized (this) {
+      synchronized (data) {
         id = loadId(values, false);
-        return this.valueIdCache.get(values);
+        return data.getValueById(values);
       }
     }
     return id;
@@ -154,7 +140,7 @@ public abstract class AbstractMultiValueCodeTable extends AbstractCodeTable {
   }
 
   protected List<Object> getValueById(Object id) {
-    if (this.valueIdCache.containsKey(Collections.singletonList(id))) {
+    if (this.getData().hasValue(Collections.singletonList(id))) {
       if (id instanceof SingleIdentifier) {
         final SingleIdentifier identifier = (SingleIdentifier)id;
         return Collections.singletonList(identifier.getValue(0));
@@ -162,20 +148,11 @@ public abstract class AbstractMultiValueCodeTable extends AbstractCodeTable {
         return Collections.singletonList(id);
       }
     } else {
-      List<Object> values = this.idValueCache.get(id);
+      List<Object> values = this.getData().getValueById(id);
       if (values == null) {
-        String lowerId = id.toString();
-        if (this.stringIdMap.containsKey(lowerId)) {
-          id = this.stringIdMap.get(lowerId);
-          values = this.idValueCache.get(id);
-        } else {
-          if (!this.caseSensitive) {
-            lowerId = lowerId.toLowerCase();
-          }
-          if (this.stringIdMap.containsKey(lowerId)) {
-            id = this.stringIdMap.get(lowerId);
-            values = this.idValueCache.get(id);
-          }
+        final Identifier identifier = this.getData().getIdentifier(id);
+        if (identifier != null) {
+          values = this.getData().getValueById(identifier);
         }
       }
       return values;
@@ -187,7 +164,7 @@ public abstract class AbstractMultiValueCodeTable extends AbstractCodeTable {
     if (id != null) {
       List<Object> values = getValueById(id);
       if (values == null) {
-        synchronized (this) {
+        synchronized (this.getData()) {
           values = loadValues(id);
           if (values != null && !isLoadAll()) {
             addValue(id, values);
@@ -200,7 +177,6 @@ public abstract class AbstractMultiValueCodeTable extends AbstractCodeTable {
 
     }
     return null;
-
   }
 
   protected boolean isLoadMissingCodes() {
@@ -227,11 +203,4 @@ public abstract class AbstractMultiValueCodeTable extends AbstractCodeTable {
     }
   }
 
-  @Override
-  public synchronized void refresh() {
-    super.refresh();
-    this.identifiers.clear();
-    this.idValueCache.clear();
-    this.valueIdCache.clear();
-  }
 }

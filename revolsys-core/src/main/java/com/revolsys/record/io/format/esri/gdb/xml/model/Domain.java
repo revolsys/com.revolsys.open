@@ -25,8 +25,6 @@ public class Domain extends AbstractCodeTable implements Cloneable {
 
   private int maxId = 0;
 
-  private Map<String, Identifier> stringIdMap = new HashMap<>();
-
   private JComponent swingEditor;
 
   private Map<String, Identifier> valueIdMap = new HashMap<>();
@@ -62,7 +60,7 @@ public class Domain extends AbstractCodeTable implements Cloneable {
     this.codedValues.add(value);
     final List<Object> values = Collections.<Object> singletonList(name);
     this.idValueMap.put(identifier, values);
-    this.stringIdMap.put(code.toString(), identifier);
+    getData().addIdentifier(identifier);
     this.valueIdMap.put(name.toLowerCase(), identifier);
     if (code instanceof Number) {
       final int id = ((Number)code).intValue();
@@ -94,7 +92,6 @@ public class Domain extends AbstractCodeTable implements Cloneable {
   public Domain clone() {
     final Domain clone = (Domain)super.clone();
     clone.idValueMap = new HashMap<>();
-    clone.stringIdMap = new HashMap<>();
     clone.valueIdMap = new HashMap<>();
     clone.codedValues = new ArrayList<>();
     for (final CodedValue codedValue : this.codedValues) {
@@ -151,12 +148,15 @@ public class Domain extends AbstractCodeTable implements Cloneable {
         return null;
       } else if (this.idValueMap.containsKey(value)) {
         return Identifier.newIdentifier(value);
-      } else if (this.stringIdMap.containsKey(value.toString())) {
-        return this.stringIdMap.get(value.toString());
       } else {
-        final String lowerValue = ((String)value).toLowerCase();
-        final Identifier id = this.valueIdMap.get(lowerValue);
-        return id;
+        final Identifier identifier = this.getData().getIdentifier(value);
+        if (identifier != null) {
+          return identifier;
+        } else {
+          final String lowerValue = ((String)value).toLowerCase();
+          final Identifier id = this.valueIdMap.get(lowerValue);
+          return id;
+        }
       }
     } else {
       throw new IllegalArgumentException("Expecting only a single value " + values);
@@ -252,7 +252,7 @@ public class Domain extends AbstractCodeTable implements Cloneable {
     } else {
       List<Object> values = this.idValueMap.get(id);
       if (values == null) {
-        final Identifier objectId = this.stringIdMap.get(id.toString());
+        final Identifier objectId = this.getData().getIdentifier(id);
         if (objectId == null) {
           return null;
         } else {

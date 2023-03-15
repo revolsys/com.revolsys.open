@@ -15,7 +15,7 @@ import org.jeometry.coordinatesystem.model.HorizontalCoordinateSystem;
 import org.jeometry.coordinatesystem.model.VerticalCoordinateSystem;
 import org.jeometry.coordinatesystem.model.systems.EpsgCoordinateSystems;
 
-public class EpsgCoordinateSystemsCodeTable extends AbstractCodeTable {
+public class EpsgCoordinateSystemsCodeTable implements CodeTable {
 
   private static Reference<EpsgCoordinateSystemsCodeTable> verticalReference = new WeakReference<>(
     null);
@@ -69,8 +69,7 @@ public class EpsgCoordinateSystemsCodeTable extends AbstractCodeTable {
   }
 
   @Override
-  protected int calculateValueFieldLength() {
-    return 80;
+  public void close() {
   }
 
   @Override
@@ -141,6 +140,11 @@ public class EpsgCoordinateSystemsCodeTable extends AbstractCodeTable {
     } else {
       return (V)code.get(0);
     }
+  }
+
+  @Override
+  public int getValueFieldLength() {
+    return 80;
   }
 
   @Override
