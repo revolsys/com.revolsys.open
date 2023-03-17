@@ -33,7 +33,7 @@ public class MultiValueCodeTable extends AbstractCodeTable {
   }
 
   protected void addValue(final Identifier id, final List<Object> values) {
-    super.addIdentifierAndValue(id, values);
+    addIdentifierAndValue(id, values);
     setValueToId(id, values);
     setValueToId(id, getNormalizedValues(values));
   }
@@ -79,6 +79,12 @@ public class MultiValueCodeTable extends AbstractCodeTable {
       normalizedValues.add(normalizedValue);
     }
     return normalizedValues;
+  }
+
+  @Override
+  public <V> V getValue(final Identifier id) {
+    // TODO Auto-generated method stub
+    return null;
   }
 
   @Override

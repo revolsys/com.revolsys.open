@@ -47,22 +47,18 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
   public AbstractCodeTable() {
   }
 
-  public void addIdentifier(final Identifier id) {
+  protected void addIdentifierAndValue(final Identifier id, final Object value) {
     updateMaxId(id);
     this.identifiers.add(id);
-    this.idIdCache.put(id, id);
+    this.idValueCache.put(id, value);
+    this.valueIdCache.put(id, id);
     final String idString = id.toString();
-    this.stringIdMap.put(idString, id);
+    this.valueIdCache.put(idString, id);
     if (!isCaseSensitive()) {
       final String lowerId = idString.toLowerCase();
-      this.stringIdMap.put(lowerId, id);
+      this.valueIdCache.put(lowerId, id);
     }
-  }
-
-  public Object addIdentifierAndValue(final Identifier id, final Object value) {
-    addIdentifier(id);
-    final Object oldValue = this.idValueCache.put(id, value);
-    return oldValue;
+    this.valueIdCache.put(value, id);
   }
 
   public int calculateValueFieldLength() {
@@ -131,7 +127,7 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
     return getName();
   }
 
-  public Identifier getIdFromString(Object id) {
+  public Identifier getIdFromString(final Object id) {
     final String idString = id.toString();
     Identifier identifier = this.stringIdMap.get(idString);
     if (identifier == null) {

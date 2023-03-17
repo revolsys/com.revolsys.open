@@ -20,7 +20,6 @@ import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.util.Emptyable;
-import com.revolsys.util.Property;
 
 public interface CodeTable
   extends Emptyable, Cloneable, Comparator<Object>, BaseCloseable, Refreshable {
@@ -81,13 +80,7 @@ public interface CodeTable
     return getIdentifier(values);
   }
 
-  default Identifier getIdentifier(final Object value) {
-    if (value == null) {
-      return null;
-    } else {
-      return getIdentifier(Collections.singletonList(value));
-    }
-  }
+  Identifier getIdentifier(final Object value);
 
   default Identifier getIdentifier(final Object... values) {
     final List<Object> valueList = Arrays.asList(values);
@@ -140,24 +133,10 @@ public interface CodeTable
     return null;
   }
 
-  @SuppressWarnings("unchecked")
-  default <V> V getValue(final Identifier id) {
-    final List<Object> values = getValues(id);
-    if (Property.hasValue(values)) {
-      return (V)values.get(0);
-    } else {
-      return null;
-    }
-  }
+  <V> V getValue(final Identifier id);
 
-  @SuppressWarnings("unchecked")
-  default <V> V getValue(final Identifier id, Consumer<V> action) {
-    final List<Object> values = getValues(id, v -> action.accept((V)v.get(0)));
-    if (Property.hasValue(values)) {
-      return (V)values.get(0);
-    } else {
-      return null;
-    }
+  default <V> V getValue(final Identifier id, final Consumer<V> action) {
+    return getValue(id);
   }
 
   default <V> V getValue(final Object id) {
@@ -165,7 +144,7 @@ public interface CodeTable
     return getValue(identifier);
   }
 
-  default <V> V getValue(final Object id, Consumer<V> action) {
+  default <V> V getValue(final Object id, final Consumer<V> action) {
     final Identifier identifier = Identifier.newIdentifier(id);
     return getValue(identifier, action);
   }
@@ -191,7 +170,7 @@ public interface CodeTable
 
   List<Object> getValues(final Identifier id);
 
-  default List<Object> getValues(final Identifier id, Consumer<List<Object>> action) {
+  default List<Object> getValues(final Identifier id, final Consumer<List<Object>> action) {
     return getValues(id);
   }
 
@@ -200,7 +179,7 @@ public interface CodeTable
     return getValues(identifier);
   }
 
-  default List<Object> getValues(final Object id, Consumer<List<Object>> action) {
+  default List<Object> getValues(final Object id, final Consumer<List<Object>> action) {
     final Identifier identifier = Identifier.newIdentifier(id);
     return getValues(identifier, action);
   }
