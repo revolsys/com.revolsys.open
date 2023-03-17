@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,23 +12,16 @@ import javax.swing.JComponent;
 
 import org.jeometry.common.compare.CompareUtil;
 import org.jeometry.common.data.identifier.Identifier;
+import org.jeometry.common.exception.Exceptions;
 
-import com.revolsys.record.code.AbstractCodeTable;
+import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.MergePolicyType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.SplitPolicyType;
 import com.revolsys.record.io.format.json.JsonObject;
 
-public class Domain extends AbstractCodeTable implements Cloneable {
+public class Domain implements CodeTable, Cloneable {
   private List<CodedValue> codedValues = new ArrayList<>();
-
-  private Map<Identifier, List<Object>> idValueMap = new HashMap<>();
-
-  private int maxId = 0;
-
-  private JComponent swingEditor;
-
-  private Map<String, Identifier> valueIdMap = new HashMap<>();
 
   private String description;
 
@@ -35,15 +29,35 @@ public class Domain extends AbstractCodeTable implements Cloneable {
 
   private FieldType fieldType = FieldType.esriFieldTypeSmallInteger;
 
+  private List<Identifier> identifiers = new ArrayList<>();
+
+  private Map<Identifier, Identifier> idIdCache = new LinkedHashMap<>();
+
+  private Map<Identifier, Object> idValueCache = new LinkedHashMap<>();
+
+  private Map<Identifier, List<Object>> idValueMap = new HashMap<>();
+
+  private int maxId = 0;
+
+  private String maxValue;
+
   private MergePolicyType mergePolicy = MergePolicyType.esriMPTAreaWeighted;
+
+  private String minValue;
 
   private String owner;
 
   private SplitPolicyType splitPolicy = SplitPolicyType.esriSPTDuplicate;
 
-  private String minValue;
+  private Map<String, Identifier> stringIdMap = new HashMap<>();
 
-  private String maxValue;
+  private JComponent swingEditor;
+
+  private Map<Object, Identifier> valueIdCache = new LinkedHashMap<>();
+
+  private Map<String, Identifier> valueIdMap = new HashMap<>();
+
+  private int valueFieldLength = 0;
 
   public Domain() {
   }
@@ -60,8 +74,16 @@ public class Domain extends AbstractCodeTable implements Cloneable {
     this.codedValues.add(value);
     final List<Object> values = Collections.<Object> singletonList(name);
     this.idValueMap.put(identifier, values);
-    getData().addIdentifier(identifier);
+    this.identifiers.add(identifier);
+    this.idIdCache.put(identifier, identifier);
+    final String idString = identifier.toString();
+    this.stringIdMap.put(idString, identifier);
+    final String lowerId = idString.toLowerCase();
+    this.stringIdMap.put(lowerId, identifier);
     this.valueIdMap.put(name.toLowerCase(), identifier);
+    if (name.length() > this.valueFieldLength) {
+      this.valueFieldLength = name.length();
+    }
     if (code instanceof Number) {
       final int id = ((Number)code).intValue();
       if (this.maxId < id) {
@@ -77,27 +99,28 @@ public class Domain extends AbstractCodeTable implements Cloneable {
   }
 
   @Override
-  protected int calculateValueFieldLength() {
-    int length = 0;
-    for (final String value : this.valueIdMap.keySet()) {
-      final int valueLength = value.length();
-      if (valueLength > length) {
-        length = valueLength;
+  public Domain clone() {
+    try {
+      final Domain clone = (Domain)super.clone();
+      clone.idValueMap = new HashMap<>();
+      clone.valueIdMap = new HashMap<>();
+      clone.codedValues = new ArrayList<>();
+      clone.idIdCache = new LinkedHashMap<>(this.idIdCache);
+      clone.stringIdMap = new LinkedHashMap<>(this.stringIdMap);
+      clone.identifiers = new ArrayList<>(this.identifiers);
+      clone.idValueCache = new LinkedHashMap<>(this.idValueCache);
+      clone.valueIdCache = new LinkedHashMap<>(this.valueIdCache);
+      for (final CodedValue codedValue : this.codedValues) {
+        clone.addCodedValue(codedValue.getCode(), codedValue.getName());
       }
+      return clone;
+    } catch (final CloneNotSupportedException e) {
+      throw Exceptions.wrap(e);
     }
-    return length;
   }
 
   @Override
-  public Domain clone() {
-    final Domain clone = (Domain)super.clone();
-    clone.idValueMap = new HashMap<>();
-    clone.valueIdMap = new HashMap<>();
-    clone.codedValues = new ArrayList<>();
-    for (final CodedValue codedValue : this.codedValues) {
-      clone.addCodedValue(codedValue.getCode(), codedValue.getName());
-    }
-    return clone;
+  public void close() {
   }
 
   @Override
@@ -149,7 +172,7 @@ public class Domain extends AbstractCodeTable implements Cloneable {
       } else if (this.idValueMap.containsKey(value)) {
         return Identifier.newIdentifier(value);
       } else {
-        final Identifier identifier = this.getData().getIdentifier(value);
+        final Identifier identifier = getIdentifierInternal(value);
         if (identifier != null) {
           return identifier;
         } else {
@@ -173,6 +196,18 @@ public class Domain extends AbstractCodeTable implements Cloneable {
     }
   }
 
+  private Identifier getIdentifierInternal(final Object id) {
+    if (id != null) {
+      final Identifier identifier = this.idIdCache.get(id);
+      if (identifier != null) {
+        return identifier;
+      } else {
+        return getIdFromString(id);
+      }
+    }
+    return null;
+  }
+
   @Override
   public List<Identifier> getIdentifiers() {
     return new ArrayList<>(this.idValueMap.keySet());
@@ -181,6 +216,16 @@ public class Domain extends AbstractCodeTable implements Cloneable {
   @Override
   public String getIdFieldName() {
     return getDomainName() + "_ID";
+  }
+
+  private Identifier getIdFromString(Object id) {
+    final String idString = id.toString();
+    Identifier identifier = this.stringIdMap.get(idString);
+    if (identifier == null) {
+      final String lowerId = idString.toLowerCase();
+      identifier = this.stringIdMap.get(lowerId);
+    }
+    return identifier;
   }
 
   @Override
@@ -241,6 +286,11 @@ public class Domain extends AbstractCodeTable implements Cloneable {
   }
 
   @Override
+  public int getValueFieldLength() {
+    return this.valueFieldLength;
+  }
+
+  @Override
   public List<String> getValueFieldNames() {
     return Arrays.asList("NAME");
   }
@@ -252,7 +302,7 @@ public class Domain extends AbstractCodeTable implements Cloneable {
     } else {
       List<Object> values = this.idValueMap.get(id);
       if (values == null) {
-        final Identifier objectId = this.getData().getIdentifier(id);
+        final Identifier objectId = getIdentifierInternal(id);
         if (objectId == null) {
           return null;
         } else {
@@ -345,7 +395,6 @@ public class Domain extends AbstractCodeTable implements Cloneable {
     this.splitPolicy = splitPolicy;
   }
 
-  @Override
   public void setSwingEditor(final JComponent swingEditor) {
     this.swingEditor = swingEditor;
   }

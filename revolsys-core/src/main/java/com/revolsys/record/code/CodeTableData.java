@@ -11,25 +11,25 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.exception.Exceptions;
 
-import com.revolsys.record.code.AbstractSingleValueCodeTable.IncompleteValue;
+import com.revolsys.record.code.SingleValueRecordStoreCodeTable.IncompleteValue;
 
 public class CodeTableData implements Cloneable {
 
-  private Map<Identifier, Identifier> idIdCache = new LinkedHashMap<>();
-
-  private Map<String, Identifier> stringIdMap = new HashMap<>();
-
-  private final AbstractCodeTable codeTable;
-
-  private final AtomicLong maxId = new AtomicLong();
+  private final AbstractLoadingCodeTable codeTable;
 
   private List<Identifier> identifiers = new ArrayList<>();
 
+  private Map<Identifier, Identifier> idIdCache = new LinkedHashMap<>();
+
   private Map<Identifier, Object> idValueCache = new LinkedHashMap<>();
+
+  private final AtomicLong maxId = new AtomicLong();
+
+  private Map<String, Identifier> stringIdMap = new HashMap<>();
 
   private Map<Object, Identifier> valueIdCache = new LinkedHashMap<>();
 
-  public CodeTableData(AbstractCodeTable codeTable) {
+  public CodeTableData(AbstractLoadingCodeTable codeTable) {
     super();
     this.codeTable = codeTable;
   }
