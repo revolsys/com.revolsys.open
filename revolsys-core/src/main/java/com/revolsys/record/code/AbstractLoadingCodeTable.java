@@ -1,150 +1,160 @@
 package com.revolsys.record.code;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
-
-import javax.swing.JComponent;
-
-import org.jeometry.common.data.type.DataTypes;
-import org.jeometry.common.number.Numbers;
+import java.util.function.Consumer;
 
 import com.revolsys.io.BaseCloseable;
-import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
-import com.revolsys.record.schema.FieldDefinition;
 
+import reactor.core.Disposable;
+import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 
-public abstract class AbstractLoadingCodeTable extends BaseObjectWithPropertiesAndChange
-  implements BaseCloseable, CodeTable, Cloneable {
+public abstract class AbstractLoadingCodeTable extends AbstractCodeTable
+  implements BaseCloseable, Cloneable {
 
-  protected boolean caseSensitive = false;
-
-  private String name;
-
-  protected AtomicReference<CodeTableData> data = new AtomicReference<>();
+  private final Map<Object, CodeTableLoadingEntry> loadingByValue = new HashMap<>();
 
   private final Sinks.Many<CodeTableData> dataSubject = Sinks.many().replay().latest();
 
-  protected int valueFieldLength = -1;
+  private final AtomicReference<Disposable> refreshDisposable = new AtomicReference<>();
 
-  private JComponent swingEditor;
+  private boolean loadMissingCodes = true;
 
-  private FieldDefinition valueFieldDefinition = new FieldDefinition("value", DataTypes.STRING,
-    true);
+  private boolean loadAll = true;
 
   public AbstractLoadingCodeTable() {
   }
 
-  protected int calculateValueFieldLength() {
-    final CodeTableData data = getData();
-    if (data == null) {
-      return 20;
-    } else {
-      return data.calculateValueFieldLength();
-    }
-  }
-
-  public void clear() {
-    setData(null);
-  }
-
   @Override
   public AbstractLoadingCodeTable clone() {
-    final AbstractLoadingCodeTable clone = (AbstractLoadingCodeTable)super.clone();
-    final CodeTableData oldData = getData();
-    clone.data = new AtomicReference<>();
-    if (oldData != null) {
-      clone.setData(oldData.clone());
+    return (AbstractLoadingCodeTable)super.clone();
+  }
+
+  @Override
+  public CodeTableEntry getEntry(Consumer<CodeTableEntry> callback, Object idOrValue) {
+    final CodeTableEntry entry = super.getEntry(callback, idOrValue);
+    if (entry == null) {
+      final Mono<CodeTableEntry> loader = loadValue(idOrValue);
+      if (callback == null) {
+        return loader.block();
+      } else {
+        loader.subscribe(callback);
+      }
     }
-    return clone;
+    return entry;
   }
 
   @Override
-  public void close() {
-    clear();
-    this.swingEditor = null;
-  }
-
-  protected CodeTableData getData() {
-    return this.data.get();
+  public boolean isLoadAll() {
+    return this.loadAll;
   }
 
   @Override
-  public String getName() {
-    return this.name;
+  public boolean isLoaded() {
+    return getData().isAllLoaded();
   }
 
-  protected Object getNormalizedValue(final Object value) {
-    if (value == null) {
-      return null;
-    } else if (value instanceof Number) {
-      final Number number = (Number)value;
-      return Numbers.toString(number);
-    } else if (this.caseSensitive) {
-      return value;
+  @Override
+  public boolean isLoading() {
+    final Disposable disposable = this.refreshDisposable.get();
+    return disposable != null && !disposable.isDisposed();
+  }
+
+  public boolean isLoadMissingCodes() {
+    return this.loadMissingCodes;
+  }
+
+  protected abstract Mono<CodeTableData> loadAll();
+
+  private Mono<CodeTableEntry> loadValue(Object value) {
+    Mono<CodeTableData> loaded;
+    if (!getData().isAllLoaded() && isLoadAll()) {
+      loaded = loadAll();
+    } else if (isLoadMissingCodes()) {
+      CodeTableLoadingEntry loading;
+      synchronized (this.loadingByValue) {
+        loading = this.loadingByValue.get(value);
+        if (loading == null || loading.isExpired()) {
+          loading = new CodeTableLoadingEntry(this, value);
+          this.loadingByValue.put(value, loading);
+        }
+      }
+      loaded = loading.subject().filter(b -> b).map(b -> getData());
     } else {
-      return value.toString().toLowerCase();
+      return Mono.empty();
     }
+    return loaded.flatMap(data -> {
+      final CodeTableEntry entry = data.getEntry(value);
+      if (entry == null) {
+        return Mono.empty();
+      } else {
+        return Mono.just(entry);
+      }
+    });
   }
 
-  @Override
-  public JComponent getSwingEditor() {
-    return this.swingEditor;
-  }
-
-  @Override
-  public FieldDefinition getValueFieldDefinition() {
-    return this.valueFieldDefinition;
-  }
-
-  @Override
-  public int getValueFieldLength() {
-    if (this.valueFieldLength == -1) {
-      final int length = calculateValueFieldLength();
-      this.valueFieldLength = length;
-    }
-    return this.valueFieldLength;
-  }
-
-  public boolean isCaseSensitive() {
-    return this.caseSensitive;
-  }
-
-  @Override
-  public boolean isEmpty() {
-    final CodeTableData data = getData();
-    return data.isEmpty();
-  }
+  protected abstract Mono<Boolean> loadValueDo(Object idOrValue);
 
   protected CodeTableData newData() {
     return new CodeTableData(this);
   }
 
   @Override
-  public synchronized void refresh() {
-    clear();
+  public void refresh() {
+    this.refresh$().block();
   }
 
-  public void setCaseSensitive(final boolean caseSensitive) {
-    this.caseSensitive = caseSensitive;
+  public Mono<CodeTableData> refresh$() {
+    final Disposable disposable = loadAll().subscribe(data -> {
+      this.updataData(oldData -> {
+        if (data.isAfter(oldData)) {
+          return data;
+        } else {
+          return oldData;
+        }
+      });
+    });
+    final Disposable oldValue = this.refreshDisposable.getAndSet(disposable);
+    if (oldValue != null) {
+      oldValue.dispose();
+    }
+    return this.dataSubject.asFlux().next();
   }
 
+  @Override
+  public void refreshIfNeeded() {
+    if (isLoadAll() && !isLoaded() && !isLoading()) {
+      refresh();
+    }
+  }
+
+  @Override
+  public Mono<Boolean> refreshIfNeeded$() {
+    if (isLoadAll() && !isLoaded() && !isLoading()) {
+      return refresh$().map(x -> true);
+    } else {
+      return Mono.just(false);
+    }
+  }
+
+  @Override
   public void setData(CodeTableData data) {
     if (data != null) {
-      this.data.set(data);
+      super.setData(null);
       this.dataSubject.tryEmitNext(data);
     }
   }
 
-  public void setName(final String name) {
-    this.name = name;
+  public AbstractLoadingCodeTable setLoadAll(final boolean loadAll) {
+    this.loadAll = loadAll;
+    return this;
   }
 
-  public void setSwingEditor(final JComponent swingEditor) {
-    this.swingEditor = swingEditor;
+  @Override
+  public AbstractLoadingCodeTable setLoadMissingCodes(final boolean loadMissingCodes) {
+    this.loadMissingCodes = loadMissingCodes;
+    return this;
   }
-
-  public void setValueFieldDefinition(final FieldDefinition valueFieldDefinition) {
-    this.valueFieldDefinition = valueFieldDefinition;
-  }
-
 }

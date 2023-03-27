@@ -1,154 +1,187 @@
 package com.revolsys.record.code;
 
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.jeometry.common.data.identifier.Identifier;
-import org.jeometry.common.exception.Exceptions;
+import org.jeometry.common.number.Numbers;
 
-import com.revolsys.record.code.SingleValueRecordStoreCodeTable.IncompleteValue;
+import com.revolsys.io.BaseCloseable;
 
-public class CodeTableData implements Cloneable {
+import reactor.core.Disposable;
 
-  private final AbstractLoadingCodeTable codeTable;
+public class CodeTableData implements BaseCloseable, Cloneable {
 
-  private List<Identifier> identifiers = new ArrayList<>();
+  private final Instant startTime = Instant.now();
 
-  private Map<Identifier, Identifier> idIdCache = new LinkedHashMap<>();
+  private final List<Identifier> identifiers = new ArrayList<>();
 
-  private Map<Identifier, Object> idValueCache = new LinkedHashMap<>();
+  private final Map<Object, CodeTableEntry> entryCache = new LinkedHashMap<>();
 
   private final AtomicLong maxId = new AtomicLong();
 
-  private Map<String, Identifier> stringIdMap = new HashMap<>();
+  private int valueFieldLength = -1;
 
-  private Map<Object, Identifier> valueIdCache = new LinkedHashMap<>();
+  private AbstractCodeTable codeTable;
 
-  public CodeTableData(AbstractLoadingCodeTable codeTable) {
-    super();
+  private boolean allLoaded = false;
+
+  private Disposable disposable;
+
+  public CodeTableData(AbstractCodeTable codeTable) {
     this.codeTable = codeTable;
   }
 
-  public void addIdentifier(final Identifier id) {
-    updateMaxId(id);
-    this.identifiers.add(id);
-    this.idIdCache.put(id, id);
-    final String idString = id.toString();
-    this.stringIdMap.put(idString, id);
-    if (!this.codeTable.isCaseSensitive()) {
-      final String lowerId = idString.toLowerCase();
-      this.stringIdMap.put(lowerId, id);
+  public CodeTableData(CodeTableData data) {
+    this.identifiers.addAll(data.identifiers);
+    for (final Object key : data.entryCache.values()) {
+      final CodeTableEntry entry = data.entryCache.get(key);
+      this.entryCache.put(key, entry);
     }
+    this.maxId.set(data.maxId.get());
+    this.valueFieldLength = data.valueFieldLength;
   }
 
-  public Object addIdentifierAndValue(final Identifier id, final Object value) {
-    addIdentifier(id);
-    final Object oldValue = this.idValueCache.put(id, value);
-    return oldValue;
-  }
-
-  public int calculateValueFieldLength() {
-    int length = 0;
-    for (final Object value : this.idValueCache.values()) {
-      if (!(value instanceof IncompleteValue)) {
-        final int valueLength = value.toString().length();
-        if (valueLength > length) {
-          length = valueLength;
-        }
+  protected synchronized CodeTableEntry addEntry(final Identifier id, final Object value) {
+    synchronized (this.identifiers) {
+      if (id instanceof Number) {
+        final long longValue = ((Number)id).longValue();
+        this.maxId.updateAndGet(oldId -> Math.max(oldId, longValue));
       }
+      this.identifiers.add(id);
+      final CodeTableEntry entry = CodeTableEntry.create(id, value);
+      this.entryCache.put(id, entry);
+      final String idString = id.toString();
+      this.entryCache.put(idString, entry);
+      if (!isCaseSensitive()) {
+        final String lowerId = idString.toLowerCase();
+        this.entryCache.put(lowerId, entry);
+      }
+      if (this.codeTable.isFindByValue(id)) {
+        this.entryCache.put(value, entry);
+        final Object normalizedValue = getNormalizedValue(value);
+        this.entryCache.put(normalizedValue, entry);
+      }
+      return entry;
     }
-    return length;
   }
 
   @Override
   public CodeTableData clone() {
-    try {
-      final CodeTableData clone = (CodeTableData)super.clone();
-      clone.idIdCache = new LinkedHashMap<>(this.idIdCache);
-      clone.stringIdMap = new LinkedHashMap<>(this.stringIdMap);
-      clone.identifiers = new ArrayList<>(this.identifiers);
-      clone.idValueCache = new LinkedHashMap<>(this.idValueCache);
-      for (final Entry<Identifier, Object> entry : this.idValueCache.entrySet()) {
-        final Identifier id = entry.getKey();
-        final Object value = entry.getValue();
-        if (!(value instanceof IncompleteValue)) {
-          clone.idValueCache.put(id, value);
+    return new CodeTableData(this);
+  }
+
+  @Override
+  public void close() {
+    this.identifiers.clear();
+    this.entryCache.clear();
+  }
+
+  public Disposable getDisposable() {
+    return this.disposable;
+  }
+
+  public CodeTableEntry getEntry(final Object idOrValue) {
+    if (idOrValue == null) {
+      return null;
+    }
+    CodeTableEntry entry = this.entryCache.get(idOrValue);
+    if (entry == null) {
+      final Object normalizedValue = getNormalizedValue(idOrValue);
+      entry = this.entryCache.get(normalizedValue);
+    }
+    if (entry == null) {
+      final String idString = idOrValue.toString();
+      entry = this.entryCache.get(idString);
+      if (entry == null) {
+        if (!isCaseSensitive()) {
+          final String lowerId = idString.toLowerCase();
+          entry = this.entryCache.get(lowerId);
         }
       }
-      clone.valueIdCache = new LinkedHashMap<>(this.valueIdCache);
-
-      return clone;
-    } catch (final CloneNotSupportedException e) {
-      throw Exceptions.wrap(e);
     }
+    return entry;
   }
 
-  public Identifier getIdByValue(final Object value) {
-    return this.valueIdCache.get(value);
-  }
-
-  public Identifier getIdentifier(final Object id) {
-    if (id != null) {
-      final Identifier identifier = this.idIdCache.get(id);
-      if (identifier != null) {
-        return identifier;
-      } else {
-        return getIdFromString(id);
-      }
-    }
-    return null;
+  public Identifier getIdentidier(int index) {
+    return this.identifiers.get(index);
   }
 
   public List<Identifier> getIdentifiers() {
-    return this.identifiers;
-  }
-
-  public Identifier getIdFromString(Object id) {
-    final String idString = id.toString();
-    Identifier identifier = this.stringIdMap.get(idString);
-    if (identifier == null) {
-      if (!this.codeTable.isCaseSensitive()) {
-        final String lowerId = idString.toLowerCase();
-        identifier = this.stringIdMap.get(lowerId);
-      }
-    }
-    return identifier;
+    return Collections.unmodifiableList(this.identifiers);
   }
 
   protected long getNextId() {
     return this.maxId.incrementAndGet();
   }
 
-  @SuppressWarnings("unchecked")
-  public <V> V getValueById(final Object id) {
-    return (V)this.idValueCache.get(id);
+  private Object getNormalizedValue(final Object value) {
+    if (value == null) {
+      return null;
+    } else if (value instanceof Number) {
+      final Number number = (Number)value;
+      return Numbers.toString(number);
+    } else if (isCaseSensitive()) {
+      return value;
+    } else if (value instanceof Collection) {
+      final List<Object> normalizedValues = new ArrayList<>();
+      for (final Object childValue : (Collection<?>)value) {
+        final Object normalizedValue = getNormalizedValue(childValue);
+        normalizedValues.add(normalizedValue);
+      }
+      return normalizedValues;
+    } else {
+      return value.toString().toLowerCase();
+    }
+  }
+
+  public Instant getStartTime() {
+    return this.startTime;
+  }
+
+  public int getValueFieldLength() {
+    if (this.valueFieldLength == -1) {
+      this.valueFieldLength = CodeTableEntry.maxLength(this.entryCache.values());
+    }
+    return this.valueFieldLength;
   }
 
   public boolean hasIdentifier(final Identifier id) {
-    return this.idValueCache.containsKey(id);
+    return this.entryCache.containsKey(id);
   }
 
-  public boolean hasValue(final Object value) {
-    return this.valueIdCache.containsKey(value);
+  public boolean isAfter(CodeTableData data) {
+    return data.startTime.isAfter(data.startTime);
+  }
+
+  public boolean isAllLoaded() {
+    return this.allLoaded;
+  }
+
+  protected boolean isCaseSensitive() {
+    return this.codeTable.isCaseSensitive();
   }
 
   public boolean isEmpty() {
-    return this.idIdCache.isEmpty();
+    return this.entryCache.isEmpty();
   }
 
-  public void setValueToId(final Identifier id, final Object value) {
-    this.valueIdCache.put(value, id);
+  public void setAllLoaded(boolean allLoaded) {
+    this.allLoaded = allLoaded;
   }
 
-  protected void updateMaxId(final Identifier id) {
-    if (id instanceof Number) {
-      final long longValue = ((Number)id).longValue();
-      this.maxId.updateAndGet(oldId -> Math.max(oldId, longValue));
-    }
+  public void setDisposable(Disposable disposable) {
+    this.disposable = disposable;
   }
+
+  public int size() {
+    return this.identifiers.size();
+  }
+
 }

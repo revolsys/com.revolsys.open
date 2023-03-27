@@ -3,8 +3,6 @@ package com.revolsys.record.io.format.esri.gdb.xml.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,15 +10,14 @@ import javax.swing.JComponent;
 
 import org.jeometry.common.compare.CompareUtil;
 import org.jeometry.common.data.identifier.Identifier;
-import org.jeometry.common.exception.Exceptions;
 
-import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.code.AbstractCodeTable;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.FieldType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.MergePolicyType;
 import com.revolsys.record.io.format.esri.gdb.xml.model.enums.SplitPolicyType;
 import com.revolsys.record.io.format.json.JsonObject;
 
-public class Domain implements CodeTable, Cloneable {
+public class Domain extends AbstractCodeTable {
   private List<CodedValue> codedValues = new ArrayList<>();
 
   private String description;
@@ -28,16 +25,6 @@ public class Domain implements CodeTable, Cloneable {
   private String domainName;
 
   private FieldType fieldType = FieldType.esriFieldTypeSmallInteger;
-
-  private List<Identifier> identifiers = new ArrayList<>();
-
-  private Map<Identifier, Identifier> idIdCache = new LinkedHashMap<>();
-
-  private Map<Identifier, Object> idValueCache = new LinkedHashMap<>();
-
-  private Map<Identifier, List<Object>> idValueMap = new HashMap<>();
-
-  private int maxId = 0;
 
   private String maxValue;
 
@@ -49,15 +36,9 @@ public class Domain implements CodeTable, Cloneable {
 
   private SplitPolicyType splitPolicy = SplitPolicyType.esriSPTDuplicate;
 
-  private Map<String, Identifier> stringIdMap = new HashMap<>();
-
   private JComponent swingEditor;
 
-  private Map<Object, Identifier> valueIdCache = new LinkedHashMap<>();
-
-  private Map<String, Identifier> valueIdMap = new HashMap<>();
-
-  private int valueFieldLength = 0;
+  private int maxId;
 
   public Domain() {
   }
@@ -72,18 +53,7 @@ public class Domain implements CodeTable, Cloneable {
     final Identifier identifier = Identifier.newIdentifier(code);
     final CodedValue value = new CodedValue(code, name);
     this.codedValues.add(value);
-    final List<Object> values = Collections.<Object> singletonList(name);
-    this.idValueMap.put(identifier, values);
-    this.identifiers.add(identifier);
-    this.idIdCache.put(identifier, identifier);
-    final String idString = identifier.toString();
-    this.stringIdMap.put(idString, identifier);
-    final String lowerId = idString.toLowerCase();
-    this.stringIdMap.put(lowerId, identifier);
-    this.valueIdMap.put(name.toLowerCase(), identifier);
-    if (name.length() > this.valueFieldLength) {
-      this.valueFieldLength = name.length();
-    }
+    super.addEntry(identifier, name);
     if (code instanceof Number) {
       final int id = ((Number)code).intValue();
       if (this.maxId < id) {
@@ -100,23 +70,12 @@ public class Domain implements CodeTable, Cloneable {
 
   @Override
   public Domain clone() {
-    try {
-      final Domain clone = (Domain)super.clone();
-      clone.idValueMap = new HashMap<>();
-      clone.valueIdMap = new HashMap<>();
-      clone.codedValues = new ArrayList<>();
-      clone.idIdCache = new LinkedHashMap<>(this.idIdCache);
-      clone.stringIdMap = new LinkedHashMap<>(this.stringIdMap);
-      clone.identifiers = new ArrayList<>(this.identifiers);
-      clone.idValueCache = new LinkedHashMap<>(this.idValueCache);
-      clone.valueIdCache = new LinkedHashMap<>(this.valueIdCache);
-      for (final CodedValue codedValue : this.codedValues) {
-        clone.addCodedValue(codedValue.getCode(), codedValue.getName());
-      }
-      return clone;
-    } catch (final CloneNotSupportedException e) {
-      throw Exceptions.wrap(e);
+    final Domain clone = (Domain)super.clone();
+    clone.codedValues = new ArrayList<>();
+    for (final CodedValue codedValue : this.codedValues) {
+      clone.addCodedValue(codedValue.getCode(), codedValue.getName());
     }
+    return clone;
   }
 
   @Override
@@ -162,31 +121,6 @@ public class Domain implements CodeTable, Cloneable {
   }
 
   @Override
-  public Identifier getIdentifier(final List<Object> values) {
-    if (this.codedValues.isEmpty()) {
-      return null;
-    } else if (values.size() == 1) {
-      final Object value = values.get(0);
-      if (value == null) {
-        return null;
-      } else if (this.idValueMap.containsKey(value)) {
-        return Identifier.newIdentifier(value);
-      } else {
-        final Identifier identifier = getIdentifierInternal(value);
-        if (identifier != null) {
-          return identifier;
-        } else {
-          final String lowerValue = ((String)value).toLowerCase();
-          final Identifier id = this.valueIdMap.get(lowerValue);
-          return id;
-        }
-      }
-    } else {
-      throw new IllegalArgumentException("Expecting only a single value " + values);
-    }
-  }
-
-  @Override
   public Identifier getIdentifier(final Map<String, ? extends Object> values) {
     if (this.codedValues.isEmpty()) {
       return null;
@@ -196,36 +130,9 @@ public class Domain implements CodeTable, Cloneable {
     }
   }
 
-  private Identifier getIdentifierInternal(final Object id) {
-    if (id != null) {
-      final Identifier identifier = this.idIdCache.get(id);
-      if (identifier != null) {
-        return identifier;
-      } else {
-        return getIdFromString(id);
-      }
-    }
-    return null;
-  }
-
-  @Override
-  public List<Identifier> getIdentifiers() {
-    return new ArrayList<>(this.idValueMap.keySet());
-  }
-
   @Override
   public String getIdFieldName() {
     return getDomainName() + "_ID";
-  }
-
-  private Identifier getIdFromString(Object id) {
-    final String idString = id.toString();
-    Identifier identifier = this.stringIdMap.get(idString);
-    if (identifier == null) {
-      final String lowerId = idString.toLowerCase();
-      identifier = this.stringIdMap.get(lowerId);
-    }
-    return identifier;
   }
 
   @Override
@@ -269,67 +176,12 @@ public class Domain implements CodeTable, Cloneable {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public <V> V getValue(final Identifier id) {
-    final List<Object> values = getValues(id);
-    if (values == null) {
-      return null;
-    } else {
-      final Object value = values.get(0);
-      return (V)value;
-    }
-  }
-
-  @Override
-  public <V> V getValue(final Object id) {
-    return getValue(Identifier.newIdentifier(id));
-  }
-
-  @Override
-  public int getValueFieldLength() {
-    return this.valueFieldLength;
-  }
-
-  @Override
   public List<String> getValueFieldNames() {
     return Arrays.asList("NAME");
   }
 
-  @Override
-  public List<Object> getValues(final Identifier id) {
-    if (id == null) {
-      return null;
-    } else {
-      List<Object> values = this.idValueMap.get(id);
-      if (values == null) {
-        final Identifier objectId = getIdentifierInternal(id);
-        if (objectId == null) {
-          return null;
-        } else {
-          values = this.idValueMap.get(objectId);
-        }
-      }
-      return Collections.unmodifiableList(values);
-    }
-  }
-
   public boolean hasCodedValues() {
-    return !this.idValueMap.isEmpty();
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return this.idValueMap.isEmpty();
-  }
-
-  @Override
-  public boolean isLoaded() {
-    return true;
-  }
-
-  @Override
-  public boolean isLoading() {
-    return false;
+    return !isEmpty();
   }
 
   public synchronized Identifier newCodedValue(final String name) {
@@ -347,10 +199,6 @@ public class Domain implements CodeTable, Cloneable {
     }
     addCodedValue(id, name);
     return Identifier.newIdentifier(id);
-  }
-
-  @Override
-  public void refresh() {
   }
 
   public synchronized void setCodedValues(final List<CodedValue> codedValues) {
@@ -395,6 +243,7 @@ public class Domain implements CodeTable, Cloneable {
     this.splitPolicy = splitPolicy;
   }
 
+  @Override
   public void setSwingEditor(final JComponent swingEditor) {
     this.swingEditor = swingEditor;
   }

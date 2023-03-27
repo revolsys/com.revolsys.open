@@ -1,18 +1,15 @@
 package com.revolsys.record.code;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 import javax.swing.JComponent;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataTypes;
-import org.jeometry.common.number.Numbers;
 
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.properties.BaseObjectWithPropertiesAndChange;
@@ -21,122 +18,63 @@ import com.revolsys.record.schema.FieldDefinition;
 public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChange
   implements BaseCloseable, CodeTable, Cloneable {
 
-  protected boolean caseSensitive = false;
-
-  private List<Identifier> identifiers = new ArrayList<>();
-
-  private Map<Identifier, Identifier> idIdCache = new LinkedHashMap<>();
-
-  private Map<Identifier, Object> idValueCache = new LinkedHashMap<>();
-
-  private final AtomicLong maxId = new AtomicLong();
+  private AtomicReference<CodeTableData> data = new AtomicReference<>(new CodeTableData(this));
 
   private String name;
 
-  private Map<String, Identifier> stringIdMap = new HashMap<>();
-
   private JComponent swingEditor;
 
-  private FieldDefinition valueFieldDefinition = new FieldDefinition("value", DataTypes.STRING,
-    true);
+  private List<FieldDefinition> valueFieldDefinitions = Arrays
+    .asList(new FieldDefinition("value", DataTypes.STRING, true));
 
-  protected int valueFieldLength = -1;
-
-  private Map<Object, Identifier> valueIdCache = new LinkedHashMap<>();
+  private boolean caseSensitive;
 
   public AbstractCodeTable() {
   }
 
-  protected void addIdentifierAndValue(final Identifier id, final Object value) {
-    updateMaxId(id);
-    this.identifiers.add(id);
-    this.idValueCache.put(id, value);
-    this.valueIdCache.put(id, id);
-    final String idString = id.toString();
-    this.valueIdCache.put(idString, id);
-    if (!isCaseSensitive()) {
-      final String lowerId = idString.toLowerCase();
-      this.valueIdCache.put(lowerId, id);
-    }
-    this.valueIdCache.put(value, id);
-  }
-
-  public int calculateValueFieldLength() {
-    int length = 0;
-    for (final Object value : this.idValueCache.values()) {
-      final int valueLength = value.toString().length();
-      if (valueLength > length) {
-        length = valueLength;
-      }
-    }
-    return length;
-  }
-
-  public void clear() {
-    this.idIdCache.clear();
-    this.stringIdMap.clear();
-    this.identifiers.clear();
-    this.idValueCache.clear();
-    this.valueIdCache.clear();
+  protected CodeTableEntry addEntry(final Identifier id, final Object value) {
+    return getData().addEntry(id, value);
   }
 
   @Override
   public AbstractCodeTable clone() {
     final AbstractCodeTable clone = (AbstractCodeTable)super.clone();
-    clone.idIdCache = new LinkedHashMap<>(this.idIdCache);
-    clone.stringIdMap = new LinkedHashMap<>(this.stringIdMap);
-    clone.identifiers = new ArrayList<>(this.identifiers);
-    clone.idValueCache = new LinkedHashMap<>(this.idValueCache);
-    clone.valueIdCache = new LinkedHashMap<>(this.valueIdCache);
+    clone.data = new AtomicReference<>(getData().clone());
     return clone;
   }
 
   @Override
   public void close() {
-    clear();
+    getData().close();
     this.swingEditor = null;
   }
 
+  protected CodeTableData getData() {
+    return this.data.get();
+  }
+
+  public CodeTableEntry getEntry(Consumer<CodeTableEntry> callback, final Object idOrValue) {
+    return getData().getEntry(idOrValue);
+  }
+
+  public Identifier getIdentidier(int index) {
+    return getData().getIdentidier(index);
+  }
+
   @Override
-  public Identifier getIdentifier(final Object value) {
-    Identifier identifier = null;
-    if (value != null) {
-      identifier = this.idIdCache.get(value);
-      if (identifier == null) {
-        identifier = getIdFromString(value);
-        if (identifier == null) {
-          identifier = this.valueIdCache.get(value);
-        }
-      }
-    }
-    return identifier;
+  public Identifier getIdentifier(Consumer<CodeTableEntry> callback, final Object value) {
+    final CodeTableEntry entry = getEntry(callback, value);
+    return CodeTableEntry.getIdentifier(entry);
   }
 
   @Override
   public List<Identifier> getIdentifiers() {
-    return Collections.unmodifiableList(this.identifiers);
-  }
-
-  @Override
-  public Identifier getIdExact(final Object value) {
-    return this.valueIdCache.get(value);
+    return getData().getIdentifiers();
   }
 
   @Override
   public String getIdFieldName() {
     return getName();
-  }
-
-  public Identifier getIdFromString(final Object id) {
-    final String idString = id.toString();
-    Identifier identifier = this.stringIdMap.get(idString);
-    if (identifier == null) {
-      if (!isCaseSensitive()) {
-        final String lowerId = idString.toLowerCase();
-        identifier = this.stringIdMap.get(lowerId);
-      }
-    }
-    return identifier;
   }
 
   @Override
@@ -145,20 +83,7 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
   }
 
   protected long getNextId() {
-    return this.maxId.incrementAndGet();
-  }
-
-  protected Object getNormalizedValue(final Object value) {
-    if (value == null) {
-      return null;
-    } else if (value instanceof Number) {
-      final Number number = (Number)value;
-      return Numbers.toString(number);
-    } else if (this.caseSensitive) {
-      return value;
-    } else {
-      return value.toString().toLowerCase();
-    }
+    return getData().getNextId();
   }
 
   @Override
@@ -167,30 +92,39 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
   }
 
   @Override
+  public <V> V getValue(Consumer<CodeTableEntry> callback, Identifier id) {
+    final CodeTableEntry entry = getEntry(callback, id);
+    return CodeTableEntry.getValue(entry);
+  }
+
+  @Override
   public FieldDefinition getValueFieldDefinition() {
-    return this.valueFieldDefinition;
+    return this.valueFieldDefinitions.get(0);
+  }
+
+  public List<FieldDefinition> getValueFieldDefinitions() {
+    return this.valueFieldDefinitions;
   }
 
   @Override
   public int getValueFieldLength() {
-    if (this.valueFieldLength == -1) {
-      final int length = calculateValueFieldLength();
-      this.valueFieldLength = length;
-    }
-    return this.valueFieldLength;
+    return getData().getValueFieldLength();
   }
 
-  @SuppressWarnings("unchecked")
-  protected <V> V getValueFromId(final Object id) {
-    return (V)this.idValueCache.get(id);
+  @Override
+  public List<Object> getValues(Consumer<CodeTableEntry> callback, Identifier id) {
+    final CodeTableEntry entry = getEntry(callback, id);
+    return CodeTableEntry.getValues(entry);
   }
 
   public boolean hasIdentifier(final Identifier id) {
-    return this.idValueCache.containsKey(id);
+    return getData().hasIdentifier(id);
   }
 
+  @Override
   public boolean hasValue(final Object value) {
-    return this.valueIdCache.containsKey(value);
+    final CodeTableEntry entry = getEntry(null, value);
+    return entry != null;
   }
 
   public boolean isCaseSensitive() {
@@ -199,11 +133,19 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
 
   @Override
   public boolean isEmpty() {
-    return this.identifiers.isEmpty();
+    return getData().isEmpty();
+  }
+
+  protected boolean isFindByValue(Identifier identifier) {
+    return true;
   }
 
   public void setCaseSensitive(final boolean caseSensitive) {
     this.caseSensitive = caseSensitive;
+  }
+
+  protected void setData(CodeTableData data) {
+    this.data.set(data);
   }
 
   public void setName(final String name) {
@@ -214,19 +156,18 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
     this.swingEditor = swingEditor;
   }
 
-  public void setValueFieldDefinition(final FieldDefinition valueFieldDefinition) {
-    this.valueFieldDefinition = valueFieldDefinition;
+  public AbstractCodeTable setValueFieldDefinitions(List<FieldDefinition> valueFieldDefinitions) {
+    this.valueFieldDefinitions = valueFieldDefinitions;
+    return this;
   }
 
-  public void setValueToId(final Identifier id, final Object value) {
-    this.valueIdCache.put(value, id);
+  @Override
+  public int size() {
+    return getData().size();
   }
 
-  protected void updateMaxId(final Identifier id) {
-    if (id instanceof Number) {
-      final long longValue = ((Number)id).longValue();
-      this.maxId.updateAndGet(oldId -> Math.max(oldId, longValue));
-    }
+  protected void updataData(UnaryOperator<CodeTableData> updateAction) {
+    this.data.updateAndGet(updateAction);
   }
 
 }
