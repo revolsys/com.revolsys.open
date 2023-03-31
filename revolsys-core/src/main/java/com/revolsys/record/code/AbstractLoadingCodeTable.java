@@ -33,7 +33,7 @@ public abstract class AbstractLoadingCodeTable extends AbstractCodeTable
   }
 
   @Override
-  public CodeTableEntry getEntry(Consumer<CodeTableEntry> callback, Object idOrValue) {
+  public CodeTableEntry getEntry(final Consumer<CodeTableEntry> callback, final Object idOrValue) {
     final CodeTableEntry entry = super.getEntry(callback, idOrValue);
     if (entry == null) {
       final Mono<CodeTableEntry> loader = loadValue(idOrValue);
@@ -68,7 +68,7 @@ public abstract class AbstractLoadingCodeTable extends AbstractCodeTable
 
   protected abstract Mono<CodeTableData> loadAll();
 
-  private Mono<CodeTableEntry> loadValue(Object value) {
+  private Mono<CodeTableEntry> loadValue(final Object value) {
     Mono<CodeTableData> loaded;
     if (!getData().isAllLoaded() && isLoadAll()) {
       loaded = loadAll();
@@ -110,6 +110,7 @@ public abstract class AbstractLoadingCodeTable extends AbstractCodeTable
     final Disposable disposable = loadAll().subscribe(data -> {
       this.updataData(oldData -> {
         if (data.isAfter(oldData)) {
+          this.dataSubject.tryEmitNext(data);
           return data;
         } else {
           return oldData;
@@ -140,7 +141,7 @@ public abstract class AbstractLoadingCodeTable extends AbstractCodeTable
   }
 
   @Override
-  public void setData(CodeTableData data) {
+  public void setData(final CodeTableData data) {
     if (data != null) {
       super.setData(null);
       this.dataSubject.tryEmitNext(data);

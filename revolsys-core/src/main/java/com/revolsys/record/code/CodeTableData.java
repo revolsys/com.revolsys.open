@@ -34,11 +34,11 @@ public class CodeTableData implements BaseCloseable, Cloneable {
 
   private Disposable disposable;
 
-  public CodeTableData(AbstractCodeTable codeTable) {
+  public CodeTableData(final AbstractCodeTable codeTable) {
     this.codeTable = codeTable;
   }
 
-  public CodeTableData(CodeTableData data) {
+  public CodeTableData(final CodeTableData data) {
     this.identifiers.addAll(data.identifiers);
     for (final Object key : data.entryCache.values()) {
       final CodeTableEntry entry = data.entryCache.get(key);
@@ -109,7 +109,7 @@ public class CodeTableData implements BaseCloseable, Cloneable {
     return entry;
   }
 
-  public Identifier getIdentidier(int index) {
+  public Identifier getIdentidier(final int index) {
     return this.identifiers.get(index);
   }
 
@@ -156,8 +156,8 @@ public class CodeTableData implements BaseCloseable, Cloneable {
     return this.entryCache.containsKey(id);
   }
 
-  public boolean isAfter(CodeTableData data) {
-    return data.startTime.isAfter(data.startTime);
+  public boolean isAfter(final CodeTableData data) {
+    return this.startTime.isAfter(data.startTime);
   }
 
   public boolean isAllLoaded() {
@@ -172,11 +172,11 @@ public class CodeTableData implements BaseCloseable, Cloneable {
     return this.entryCache.isEmpty();
   }
 
-  public void setAllLoaded(boolean allLoaded) {
+  public void setAllLoaded(final boolean allLoaded) {
     this.allLoaded = allLoaded;
   }
 
-  public void setDisposable(Disposable disposable) {
+  public void setDisposable(final Disposable disposable) {
     this.disposable = disposable;
   }
 
