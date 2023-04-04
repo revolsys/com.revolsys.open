@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jakarta.annotation.PreDestroy;
-
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataTypes;
 
@@ -20,6 +18,8 @@ import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.util.Property;
+
+import jakarta.annotation.PreDestroy;
 
 public abstract class AbstractRecordTableModel extends AbstractTableModel {
 
@@ -223,6 +223,7 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel {
         }
       }
       if (isShowCodeValues() && !isIdField(field)) {
+        // TODO make this reactive!!!!
         if (field.isCodeTableReady()) {
           text = field.toCodeString(objectValue);
         } else {
@@ -258,14 +259,12 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel {
       final FieldDefinition field = recordDefinition.getField(fieldName);
       final Object recordValue = field.toFieldValue(displayValue);
       return recordValue;
+    } else if (displayValue instanceof Identifier) {
+      final Identifier identifier = (Identifier)displayValue;
+      return identifier;
     } else {
-      if (displayValue instanceof Identifier) {
-        final Identifier identifier = (Identifier)displayValue;
-        return identifier;
-      } else {
-        final Object objectValue = codeTable.getIdentifier(displayValue);
-        return objectValue;
-      }
+      final Object objectValue = codeTable.getIdentifier(displayValue);
+      return objectValue;
     }
   }
 }

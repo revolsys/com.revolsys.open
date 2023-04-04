@@ -166,8 +166,8 @@ public abstract class AbstractCodeTable extends BaseObjectWithPropertiesAndChang
     return getData().size();
   }
 
-  protected void updataData(UnaryOperator<CodeTableData> updateAction) {
-    this.data.updateAndGet(updateAction);
+  protected CodeTableData updateData(UnaryOperator<CodeTableData> updateAction) {
+    return this.data.updateAndGet(updateAction);
   }
 
 }

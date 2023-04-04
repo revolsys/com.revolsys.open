@@ -11,8 +11,11 @@ import java.util.function.Consumer;
 import javax.swing.JComponent;
 
 import org.jeometry.common.compare.CompareUtil;
+import org.jeometry.common.data.identifier.Code;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.refresh.Refreshable;
+import org.jeometry.common.data.type.DataType;
+import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.io.BaseCloseable;
 import com.revolsys.record.Record;
@@ -20,6 +23,8 @@ import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.util.Emptyable;
+import com.revolsys.util.Property;
+import com.revolsys.util.Strings;
 
 import reactor.core.publisher.Mono;
 
@@ -37,6 +42,40 @@ public interface CodeTable
         return SingleValueCodeTable.newCodeTable(name, reader);
       } else {
         return MultiValueCodeTable.newCodeTable(name, reader);
+      }
+    }
+  }
+
+  public static String toCodeString(CodeTable codeTable, DataType type, final Object value) {
+    return toCodeString(null, codeTable, type, value);
+  }
+
+  public static String toCodeString(Consumer<CodeTableEntry> callback, CodeTable codeTable,
+    DataType type, final Object value) {
+    if (value == null || value instanceof String && !Property.hasValue(value)) {
+      return null;
+    } else if (codeTable == null) {
+      return type.toString(value);
+    } else {
+      final List<Object> values = codeTable.getValues(value);
+      if (values == null || values.isEmpty()) {
+        return type.toString(value);
+      } else if (values.size() == 1) {
+        final Object codeValue = values.get(0);
+        if (codeValue instanceof Code) {
+          return ((Code)codeValue).getDescription();
+        } else if (codeValue instanceof String) {
+          final String string = (String)codeValue;
+          if (Property.hasValue(string)) {
+            return string;
+          } else {
+            return null;
+          }
+        } else {
+          return DataTypes.toString(codeValue);
+        }
+      } else {
+        return Strings.toString(values);
       }
     }
   }
@@ -237,6 +276,7 @@ public interface CodeTable
   default void refreshIfNeeded() {
   }
 
+  @Override
   default Mono<Boolean> refreshIfNeeded$() {
     return Mono.defer(() -> {
       refreshIfNeeded();

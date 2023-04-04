@@ -5,7 +5,10 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
+import javax.swing.SwingUtilities;
+
 import com.revolsys.io.BaseCloseable;
+import com.revolsys.util.Debug;
 
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
@@ -27,6 +30,9 @@ public abstract class AbstractLoadingCodeTable extends AbstractCodeTable
   public AbstractLoadingCodeTable() {
   }
 
+  protected void clearCaches() {
+  }
+
   @Override
   public AbstractLoadingCodeTable clone() {
     return (AbstractLoadingCodeTable)super.clone();
@@ -38,6 +44,9 @@ public abstract class AbstractLoadingCodeTable extends AbstractCodeTable
     if (entry == null) {
       final Mono<CodeTableEntry> loader = loadValue(idOrValue);
       if (callback == null) {
+        if (SwingUtilities.isEventDispatchThread()) {
+          Debug.noOp();
+        }
         return loader.block();
       } else {
         loader.subscribe(callback);
@@ -70,8 +79,8 @@ public abstract class AbstractLoadingCodeTable extends AbstractCodeTable
 
   private Mono<CodeTableEntry> loadValue(final Object value) {
     Mono<CodeTableData> loaded;
-    if (!getData().isAllLoaded() && isLoadAll()) {
-      loaded = loadAll();
+    if (!isLoaded() && isLoadAll()) {
+      loaded = refreshIfNeeded$().then(Mono.fromSupplier(this::getData));
     } else if (isLoadMissingCodes()) {
       CodeTableLoadingEntry loading;
       synchronized (this.loadingByValue) {
@@ -107,15 +116,18 @@ public abstract class AbstractLoadingCodeTable extends AbstractCodeTable
   }
 
   public Mono<CodeTableData> refresh$() {
-    final Disposable disposable = loadAll().subscribe(data -> {
-      this.updataData(oldData -> {
+    final Disposable disposable = loadAll().doOnSuccess(data -> {
+      clearCaches();
+      data.setAllLoaded(true);
+    }).subscribe(data -> {
+      final CodeTableData savedData = updateData(oldData -> {
         if (data.isAfter(oldData)) {
-          this.dataSubject.tryEmitNext(data);
           return data;
         } else {
           return oldData;
         }
       });
+      this.dataSubject.tryEmitNext(savedData);
     });
     final Disposable oldValue = this.refreshDisposable.getAndSet(disposable);
     if (oldValue != null) {
@@ -126,25 +138,19 @@ public abstract class AbstractLoadingCodeTable extends AbstractCodeTable
 
   @Override
   public void refreshIfNeeded() {
-    if (isLoadAll() && !isLoaded() && !isLoading()) {
-      refresh();
-    }
+    refreshIfNeeded$().block();
   }
 
   @Override
   public Mono<Boolean> refreshIfNeeded$() {
-    if (isLoadAll() && !isLoaded() && !isLoading()) {
-      return refresh$().map(x -> true);
+    if (isLoadAll()) {
+      if (isLoaded() || isLoading()) {
+        return this.dataSubject.asFlux().next().thenReturn(true);
+      } else {
+        return refresh$().thenReturn(true);
+      }
     } else {
       return Mono.just(false);
-    }
-  }
-
-  @Override
-  public void setData(final CodeTableData data) {
-    if (data != null) {
-      super.setData(null);
-      this.dataSubject.tryEmitNext(data);
     }
   }
 

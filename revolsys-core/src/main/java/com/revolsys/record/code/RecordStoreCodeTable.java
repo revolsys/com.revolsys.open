@@ -73,6 +73,7 @@ public class RecordStoreCodeTable extends AbstractLoadingCodeTable
     if (id == null) {
       throw new NullPointerException(idFieldName + "=null for " + code);
     } else {
+      clearCache(id);
       final List<Object> values = new ArrayList<>();
       final List<String> valueFieldNames = getValueFieldNames();
       for (final String fieldName : valueFieldNames) {
@@ -94,7 +95,6 @@ public class RecordStoreCodeTable extends AbstractLoadingCodeTable
         data.addEntry(id, values);
       }
     }
-
   }
 
   public void addFieldAlias(final String columnName) {
@@ -104,10 +104,10 @@ public class RecordStoreCodeTable extends AbstractLoadingCodeTable
   @Override
   public final void addValue(final Record code) {
     addEntryRecord(getData(), code);
-    clearCaches();
   }
 
-  protected void clearCaches() {
+  protected void clearCache(Identifier id) {
+
   }
 
   @Override
