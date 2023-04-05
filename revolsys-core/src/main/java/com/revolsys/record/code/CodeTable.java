@@ -57,7 +57,7 @@ public interface CodeTable
     } else if (codeTable == null) {
       return type.toString(value);
     } else {
-      final List<Object> values = codeTable.getValues(value);
+      final List<Object> values = codeTable.getValues(callback, value);
       if (values == null || values.isEmpty()) {
         return type.toString(value);
       } else if (values.size() == 1) {
