@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jakarta.annotation.PreDestroy;
+
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataTypes;
 
@@ -15,11 +17,8 @@ import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
-import com.revolsys.swing.parallel.Invoke;
 import com.revolsys.swing.table.AbstractTableModel;
 import com.revolsys.util.Property;
-
-import jakarta.annotation.PreDestroy;
 
 public abstract class AbstractRecordTableModel extends AbstractTableModel {
 
@@ -52,7 +51,8 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel {
     }
   }
 
-  protected void appendJsonList(final StringBuilder string, final List<?> list) {
+  protected void appendJsonList(final int rowIndex, final int fieldIndex,
+    final StringBuilder string, final List<?> list) {
     string.append('[');
     boolean first = true;
     for (final Object value : list) {
@@ -62,13 +62,14 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel {
         } else {
           string.append(',');
         }
-        appendJsonValue(string, value);
+        appendJsonValue(rowIndex, fieldIndex, string, value);
       }
     }
     string.append(']');
   }
 
-  protected void appendJsonObject(final StringBuilder string, final FieldDefinition field,
+  protected void appendJsonObject(final int rowIndex, final int fieldIndex,
+    final StringBuilder string, final FieldDefinition field,
     final Map<String, ? extends Object> jsonObject) {
     boolean first = true;
     for (final String name : jsonObject.keySet()) {
@@ -81,13 +82,13 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel {
         }
         string.append(name);
         string.append('=');
-        appendJsonValue(string, field, name, value);
+        appendJsonValue(rowIndex, fieldIndex, string, field, name, value);
       }
     }
   }
 
-  protected void appendJsonObject(final StringBuilder string,
-    final Map<String, ? extends Object> jsonObject) {
+  protected void appendJsonObject(final int rowIndex, final int fieldIndex,
+    final StringBuilder string, final Map<String, ? extends Object> jsonObject) {
     string.append('{');
     boolean first = true;
     for (final String name : jsonObject.keySet()) {
@@ -100,25 +101,27 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel {
         }
         string.append(name);
         string.append('=');
-        appendJsonValue(string, value);
+        appendJsonValue(rowIndex, fieldIndex, string, value);
       }
     }
     string.append('}');
   }
 
-  protected void appendJsonValue(final StringBuilder string, final FieldDefinition field,
-    final String childName, final Object value) {
-    appendJsonValue(string, value);
+  protected void appendJsonValue(final int rowIndex, final int fieldIndex,
+    final StringBuilder string, final FieldDefinition field, final String childName,
+    final Object value) {
+    appendJsonValue(rowIndex, fieldIndex, string, value);
   }
 
-  protected void appendJsonValue(final StringBuilder string, final Object value) {
+  protected void appendJsonValue(final int rowIndex, final int fieldIndex,
+    final StringBuilder string, final Object value) {
     if (value instanceof List<?>) {
       final List<?> list = (List<?>)value;
-      appendJsonList(string, list);
+      appendJsonList(rowIndex, fieldIndex, string, list);
     } else if (value instanceof Map<?, ?>) {
       @SuppressWarnings("unchecked")
       final Map<String, ?> map = (Map<String, ?>)value;
-      appendJsonObject(string, map);
+      appendJsonObject(rowIndex, fieldIndex, string, map);
     } else {
       final String stringValue = DataTypes.toString(value);
       string.append(stringValue);
@@ -196,7 +199,8 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel {
     }
   }
 
-  protected String toDisplayValue(final FieldDefinition field, final Object objectValue) {
+  protected String toDisplayValue(final int rowIndex, final int fieldIndex,
+    final FieldDefinition field, final Object objectValue) {
     if (objectValue == null || field == null) {
       if (isIdField(field)) {
         return "NEW";
@@ -215,7 +219,7 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel {
             return "-";
           } else {
             final StringBuilder string = new StringBuilder();
-            appendJsonObject(string, field, jsonObject);
+            appendJsonObject(rowIndex, fieldIndex, string, field, jsonObject);
             return string.toString();
           }
         } catch (final Exception e) {
@@ -223,17 +227,7 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel {
         }
       }
       if (isShowCodeValues() && !isIdField(field)) {
-        // TODO make this reactive!!!!
-        if (field.isCodeTableReady()) {
-          text = field.toCodeString(objectValue);
-        } else {
-          final CodeTable codeTable = field.getCodeTable();
-          if (!codeTable.isLoading()) {
-            final CodeTable tableToLoad = codeTable;
-            Invoke.background("Load " + codeTable, () -> loadCodeTable(tableToLoad));
-          }
-          return "...";
-        }
+        text = field.toCodeString((x) -> fireTableCellUpdated(rowIndex, fieldIndex), objectValue);
       } else {
         text = field.toString(objectValue);
       }
@@ -246,7 +240,7 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel {
 
   public String toDisplayValue(final int rowIndex, final int fieldIndex, final Object objectValue) {
     final FieldDefinition field = getColumnField(fieldIndex);
-    return toDisplayValue(field, objectValue);
+    return toDisplayValue(rowIndex, fieldIndex, field, objectValue);
   }
 
   public Object toObjectValue(final String fieldName, final Object displayValue) {
