@@ -19,7 +19,7 @@ import org.jeometry.common.logging.Logs;
 import org.springframework.beans.factory.InitializingBean;
 
 import com.revolsys.log.LogbackUtil;
-import com.revolsys.reactor.scheduler.SwingScheduler;
+import com.revolsys.reactor.scheduler.SwingUiScheduler;
 import com.revolsys.swing.desktop.DesktopInitializer;
 import com.revolsys.swing.logging.ListLoggingAppender;
 import com.revolsys.swing.logging.LoggingEventPanel;
@@ -55,12 +55,12 @@ public class SpringSwingMain implements UncaughtExceptionHandler, InitializingBe
       Mono.just(true)//
         .subscribeOn(Schedulers.boundedElastic())//
         .flatMap(this::swingBefore)
-        .publishOn(SwingScheduler.INSTANCE)
+        .publishOn(SwingUiScheduler.INSTANCE)
         .flatMap(this::swingInit)
         .flatMap(this::swingAfter)
         .publishOn(Schedulers.boundedElastic())//
         .flatMap(this::appBefore)
-        .publishOn(SwingScheduler.INSTANCE)
+        .publishOn(SwingUiScheduler.INSTANCE)
         .flatMap(this::appSwingInit)
         .doOnError(this::logError)
         .doAfterTerminate(() -> latch.countDown())
