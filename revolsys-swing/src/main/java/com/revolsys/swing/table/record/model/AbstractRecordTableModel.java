@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import jakarta.annotation.PreDestroy;
 
@@ -14,6 +15,7 @@ import org.jeometry.common.data.type.DataTypes;
 
 import com.revolsys.geometry.model.Geometry;
 import com.revolsys.record.code.CodeTable;
+import com.revolsys.record.code.CodeTableEntry;
 import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
@@ -227,7 +229,8 @@ public abstract class AbstractRecordTableModel extends AbstractTableModel {
         }
       }
       if (isShowCodeValues() && !isIdField(field)) {
-        text = field.toCodeString((x) -> fireTableCellUpdated(rowIndex, fieldIndex), objectValue);
+        Consumer<CodeTableEntry> loadAction = (x) -> fireTableCellUpdated(rowIndex, fieldIndex);
+        text = field.toCodeString(loadAction, objectValue);
       } else {
         text = field.toString(objectValue);
       }

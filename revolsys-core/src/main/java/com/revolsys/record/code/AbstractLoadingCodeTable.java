@@ -13,6 +13,7 @@ import com.revolsys.util.Debug;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
+import reactor.core.scheduler.Schedulers;
 
 public abstract class AbstractLoadingCodeTable extends AbstractCodeTable
   implements BaseCloseable, Cloneable {
@@ -49,7 +50,7 @@ public abstract class AbstractLoadingCodeTable extends AbstractCodeTable
         }
         return loader.block();
       } else {
-        loader.subscribe(callback);
+        loader.subscribeOn(Schedulers.boundedElastic()).subscribe(callback);
       }
     }
     return entry;
