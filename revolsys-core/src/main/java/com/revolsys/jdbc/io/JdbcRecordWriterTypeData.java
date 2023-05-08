@@ -125,7 +125,6 @@ public class JdbcRecordWriterTypeData {
       try {
         this.recordStore.executeUpdate(this.statement);
       } catch (final SQLException e) {
-        System.out.println(this.sql);
         throw e;
       }
       try (

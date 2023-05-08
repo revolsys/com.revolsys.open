@@ -55,6 +55,8 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   private Map<String, CodeTable> codeTableByFieldNameMap = new HashMap<>();
 
+  private String tableAlias;
+
   private Map<String, Object> defaultValues = new HashMap<>();
 
   private BoundingBox boundingBox = BoundingBox.empty();
@@ -448,6 +450,11 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
       return codeTable;
     }
   }
+  
+  @Override
+  public String getDbTableName() {
+    return getName();
+  }
 
   @Override
   public Object getDefaultValue(final String fieldName) {
@@ -719,6 +726,14 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
     return this.restrictions;
   }
 
+  public String getTableAlias() {
+    return this.tableAlias;
+  }
+
+  public PathName getTablePath() {
+    return getPathName();
+  }
+
   @Override
   public boolean hasField(final CharSequence name) {
     if (name == null) {
@@ -956,6 +971,10 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   public void setRecordDefinitionFactory(final RecordDefinitionFactory recordDefinitionFactory) {
     this.recordDefinitionFactory = recordDefinitionFactory;
+  }
+
+  public void setTableAlias(final String tableAlias) {
+    this.tableAlias = tableAlias;
   }
 
   @Override

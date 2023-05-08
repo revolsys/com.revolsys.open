@@ -70,6 +70,8 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
 
   CodeTable getCodeTableByFieldName(CharSequence fieldName);
 
+  String getDbTableName();
+
   Object getDefaultValue(String fieldName);
 
   Map<String, Object> getDefaultValues();
@@ -264,6 +266,12 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
   @Override
   <V extends RecordStore> V getRecordStore();
 
+  default String getTitle() {
+    final PathName typeName = getPathName();
+    final String name = typeName.getName();
+    return CaseConverter.toCapitalizedWords(name);
+  }
+
   /**
    * Check to see if the type has the specified field name.
    *
@@ -312,4 +320,13 @@ public interface RecordDefinition extends Cloneable, GeometryFactoryProxy, Recor
   void setDefaultValues(Map<String, ? extends Object> defaultValues);
 
   void setGeometryFactory(com.revolsys.geometry.model.GeometryFactory geometryFactory);
+
+  void setTableAlias(String tableAlias);
+
+  default void validateRecord(final MapEx record) {
+    for (final FieldDefinition field : getFields()) {
+      field.validate(record);
+    }
+  }
+
 }

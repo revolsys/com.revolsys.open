@@ -371,8 +371,7 @@ public final class JdbcUtils {
   }
 
   public static String getTableName(final String typePath) {
-    final String tableName = PathUtil.getName(typePath);
-    return tableName;
+    return PathUtil.getName(typePath);
   }
 
   public static void lockTable(final Connection connection, final String tableName)

@@ -464,6 +464,10 @@ public class Query extends BaseObjectWithProperties
     return this.labelCountMap;
   }
 
+  public PathName getTablePath() {
+    return getTypePath();
+  }
+
   public String getTypeName() {
     if (this.typeName == null) {
       return null;

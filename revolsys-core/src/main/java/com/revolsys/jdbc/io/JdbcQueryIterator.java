@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.UncategorizedSQLException;
@@ -151,6 +152,8 @@ public class JdbcQueryIterator extends AbstractIterator<Record>
       close();
       if (cancelled) {
         throw new NoSuchElementException();
+      } else if (e2 == null) {
+        throw Exceptions.wrap(e);
       } else {
         throw e2;
       }
@@ -178,7 +181,7 @@ public class JdbcQueryIterator extends AbstractIterator<Record>
 
   protected ResultSet getResultSet() {
     final Query query = this.query;
-    final String tableName = query.getTypeName();
+    final PathName tableName = query.getTablePath();
     final RecordDefinition queryRecordDefinition = query.getRecordDefinition();
     if (queryRecordDefinition != null) {
       this.recordDefinition = this.recordStore.getRecordDefinition(queryRecordDefinition);

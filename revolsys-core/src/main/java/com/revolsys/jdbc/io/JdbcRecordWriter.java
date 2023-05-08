@@ -10,6 +10,7 @@ import java.util.Map;
 import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
+import org.jeometry.common.exception.Exceptions;
 import org.jeometry.common.io.PathName;
 import org.jeometry.common.logging.Logs;
 import org.springframework.dao.DataAccessException;
@@ -629,9 +630,9 @@ public class JdbcRecordWriter extends AbstractRecordWriter {
       for (SQLException e1 = e.getNextException(); e1 != null; e1 = e1.getNextException()) {
         Logs.error(this, "Unable to write", e1);
       }
-      throw new RuntimeException("Unable to write\n" + record, e);
+      throw Exceptions.wrap("Unable to write\n" + record, e);
     } catch (final Exception e) {
-      throw new RuntimeException("Unable to write\n" + record, e);
+      throw Exceptions.wrap("Unable to write\n" + record, e);
     }
   }
 }
