@@ -33,7 +33,7 @@ import reactor.util.context.Context;
 /**
  * Scheduler that runs tasks on Swing's event dispatch thread.
  */
-public final class SwingScheduler implements Scheduler {
+public final class SwingUiScheduler implements Scheduler {
 
   static final class SwingScheduledDirectAction extends AtomicBoolean
     implements Runnable, Disposable {
@@ -208,9 +208,9 @@ public final class SwingScheduler implements Scheduler {
     }
   }
 
-  public static final SwingScheduler INSTANCE = new SwingScheduler();
+  public static final SwingUiScheduler INSTANCE = new SwingUiScheduler();
 
-  SwingScheduler() {
+  SwingUiScheduler() {
   }
 
   @Override

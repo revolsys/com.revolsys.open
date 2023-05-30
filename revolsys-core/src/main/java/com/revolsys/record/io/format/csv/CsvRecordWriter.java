@@ -37,6 +37,10 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   private int maxFieldLength = Integer.MAX_VALUE;
 
+  private boolean initialized = false;
+
+  private boolean writePrjFile = true;
+
   public CsvRecordWriter(final RecordDefinitionProxy recordDefinition, final Object target,
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
     this(recordDefinition, Resource.getResource(target), fieldSeparator, useQuotes, ewkt);
@@ -46,7 +50,6 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     final char fieldSeparator, final boolean useQuotes, final boolean ewkt) {
     this(recordDefinition, resource.newWriter(), fieldSeparator, useQuotes, ewkt);
     setResource(resource);
-    recordDefinition.writePrjFile(resource);
   }
 
   public CsvRecordWriter(final RecordDefinitionProxy recordDefinition, final Writer out,
@@ -105,6 +108,10 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     return this.newLine;
   }
 
+  public boolean isWritePrjFile() {
+    return this.writePrjFile;
+  }
+
   public void pause() {
     final Resource resource = getResource();
     if (resource == null) {
@@ -148,6 +155,10 @@ public class CsvRecordWriter extends AbstractRecordWriter {
     this.useQuotes = useQuotes;
   }
 
+  public void setWritePrjFile(final boolean writePrjFile) {
+    this.writePrjFile = writePrjFile;
+  }
+
   private void string(final Object value) throws IOException {
     final Writer out = this.out;
     if (out != null) {
@@ -174,6 +185,12 @@ public class CsvRecordWriter extends AbstractRecordWriter {
 
   @Override
   public void write(final Record record) {
+    if (!this.initialized) {
+      this.initialized = true;
+      if (this.writePrjFile) {
+        this.recordDefinition.writePrjFile(getResource());
+      }
+    }
     Writer out = this.out;
     if (this.paused) {
       this.paused = false;

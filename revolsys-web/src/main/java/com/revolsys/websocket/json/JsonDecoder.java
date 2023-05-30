@@ -1,7 +1,7 @@
 package com.revolsys.websocket.json;
 
-import javax.websocket.Decoder;
-import javax.websocket.EndpointConfig;
+import jakarta.websocket.Decoder;
+import jakarta.websocket.EndpointConfig;
 
 import com.revolsys.collection.map.MapEx;
 import com.revolsys.record.io.format.json.Json;

@@ -312,19 +312,38 @@ public class PostgreSQLRecordStore extends AbstractJdbcRecordStore {
       + "where (t.grantee  in (current_user, 'PUBLIC') or "
       + "t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) and "
       + "privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') ");
-    setSchemaTablePermissionsSql(
-      "select distinct t.table_schema as \"SCHEMA_NAME\", t.table_name, t.privilege_type as \"PRIVILEGE\", d.description as \"REMARKS\", "
-        + "  CASE WHEN relkind = 'r' THEN 'TABLE' WHEN relkind = 'v' THEN 'VIEW' ELSE relkind || '' END \"TABLE_TYPE\" "
-        + "from" //
-        + "  information_schema.role_table_grants t"//
-        + "    join pg_namespace n on t.table_schema = n.nspname"//
-        + "    join pg_class c on (n.oid = c.relnamespace AND t.table_name = c.relname)"//
-        + "    left join pg_description d on d.objoid = c.oid "//
-        + "where" //
-        + "  t.table_schema = ? and "//
-        + "  (t.grantee in (current_user, 'PUBLIC') or t.grantee in (select role_name from information_schema.applicable_roles r where r.grantee = current_user)) AND "
-        + "  privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE') "
-        + "  order by t.table_schema, t.table_name, t.privilege_type");
+    setSchemaTablePermissionsSql("""
+WITH RECURSIVE user_roles(id) AS (
+  SELECT oid from pg_roles a where rolname = current_user
+  UNION ALL
+  select
+    am.roleid
+  from
+    user_roles parent
+      join pg_auth_members am on am.member = parent.id
+)
+select distinct
+  n.nspname as "SCHEMA_NAME",
+  c.relname as "TABLE_NAME",
+  p.privilege_type as "PRIVILEGE",
+  d.description as "REMARKS",
+  CASE
+    WHEN relkind = 'r' THEN 'TABLE'
+    WHEN relkind = 'v' THEN 'VIEW'
+    WHEN relkind = 'm' THEN 'VIEW'
+    ELSE relkind || ''
+  END "TABLE_TYPE"
+from
+  pg_namespace n
+    join pg_class c on n.oid = c.relnamespace
+    left outer join pg_description d on d.objoid = c.oid and d.objsubid =0,
+    aclexplode(COALESCE(c.relacl, acldefault('r'::"char", c.relowner))) p
+where
+  n.nspname = ? and
+  (p.grantee = 0 or p.grantee in (select id from user_roles)) and
+  p.privilege_type IN ('SELECT', 'INSERT','UPDATE','DELETE')
+order by 1, 2, 3
+""");
   }
 
   protected void initSettings() {

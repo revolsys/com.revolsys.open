@@ -95,8 +95,7 @@ public class CodeTableComboBoxModel extends AbstractListModel<Identifier>
       index--;
     }
     if (index >= 0 && index < getSize()) {
-      final List<Identifier> identifiers = this.codeTable.getIdentifiers();
-      return identifiers.get(index);
+      return this.codeTable.getIdentifier(index);
     } else {
       return null;
     }
@@ -116,7 +115,7 @@ public class CodeTableComboBoxModel extends AbstractListModel<Identifier>
     if (this.codeTable == null) {
       return 0;
     } else {
-      int size = this.codeTable.getIdentifiers().size();
+      int size = this.codeTable.size();
       if (this.allowNull) {
         size++;
       }

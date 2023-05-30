@@ -1,6 +1,5 @@
 package com.revolsys.record.io;
 
-import org.springframework.beans.factory.annotation.Required;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
 import com.revolsys.record.ArrayRecord;
@@ -42,7 +41,6 @@ public class FileRecordReaderFactory extends AbstractFactoryBean<RecordReader> {
     this.factory = factory;
   }
 
-  @Required
   public void setResource(final Resource resource) {
     this.resource = resource;
   }

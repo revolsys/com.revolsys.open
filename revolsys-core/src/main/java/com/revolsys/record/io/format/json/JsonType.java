@@ -12,7 +12,6 @@ import com.revolsys.util.BaseCloneable;
 import com.revolsys.util.JavaBeanUtil;
 
 public interface JsonType extends DataTypedValue, Jsonable, BaseCloneable {
-
   @SuppressWarnings("unchecked")
   static <V> V toJsonClone(final V value) {
     if (value == null) {
@@ -60,6 +59,16 @@ public interface JsonType extends DataTypedValue, Jsonable, BaseCloneable {
   @Override
   default JsonType toJson() {
     return clone();
+  }
+
+  @Override
+  default String toJsonString() {
+    return Json.toString(this);
+  }
+
+  @Override
+  default String toJsonString(final boolean indent) {
+    return Json.toString(this, indent);
   }
 
 }

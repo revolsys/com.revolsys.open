@@ -140,7 +140,12 @@ public class ArrayLayerRecord extends ArrayRecord implements LayerRecord {
     final int fieldIndex = fieldDefinition.getIndex();
     final String fieldName = fieldDefinition.getName();
 
-    final Object newValue = fieldDefinition.toFieldValue(value);
+    final Object newValue;
+    if (isInitializing()) {
+      newValue = value;
+    } else {
+      newValue = fieldDefinition.toFieldValue(value);
+    }
     final Object oldValue = getValue(fieldIndex);
     RecordState newState = null;
     if (!DataType.equal(oldValue, newValue)) {

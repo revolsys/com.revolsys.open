@@ -2371,6 +2371,28 @@ public abstract class GeometryFactory implements GeometryFactoryProxy, MapSerial
     }
   }
 
+  public Point pointFixed(double... coordinates) {
+    if (coordinates == null) {
+      return point();
+    } else {
+      final int axisCount = this.axisCount;
+      if (coordinates.length != this.axisCount) {
+        final double[] c = new double[this.axisCount];
+        System.arraycopy(coordinates, 0, c, 0, Math.min(this.axisCount, coordinates.length));
+        coordinates = c;
+      }
+      if (axisCount < 2) {
+        return point();
+      } else if (axisCount == 2) {
+        return point(coordinates[0], coordinates[1]);
+      } else if (axisCount == 3) {
+        return point(coordinates[0], coordinates[1], coordinates[2]);
+      } else {
+        return new PointDoubleGeometryFactory(this, coordinates);
+      }
+    }
+  }
+
   public Polygon polygon() {
     return this.emptyPolygon;
   }

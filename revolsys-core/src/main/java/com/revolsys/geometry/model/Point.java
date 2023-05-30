@@ -559,23 +559,21 @@ public interface Point extends Punctual, Serializable, BoundingBox {
       return false;
     } else if (axisCount < 2) {
       throw new IllegalArgumentException("Axis Count must be >=2");
-    } else {
-      if (isEmpty()) {
-        return point.isEmpty();
-      } else if (point.isEmpty()) {
-        return false;
-      } else if (equals(point)) {
-        for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
-          final double value = getCoordinate(axisIndex);
-          final double value2 = point.getCoordinate(axisIndex);
-          if (!Doubles.equal(value, value2)) {
-            return false;
-          }
+    } else if (isEmpty()) {
+      return point.isEmpty();
+    } else if (point.isEmpty()) {
+      return false;
+    } else if (equals(point)) {
+      for (int axisIndex = 2; axisIndex < axisCount; axisIndex++) {
+        final double value = getCoordinate(axisIndex);
+        final double value2 = point.getCoordinate(axisIndex);
+        if (!Doubles.equal(value, value2)) {
+          return false;
         }
-        return true;
-      } else {
-        return false;
       }
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -1079,7 +1077,7 @@ public interface Point extends Punctual, Serializable, BoundingBox {
         .getCoordinatesOperation(geometryFactory);
       if (coordinatesOperation == null) {
         final double[] coordinates = getCoordinates();
-        return geometryFactory.point(coordinates);
+        return geometryFactory.pointFixed(coordinates);
       } else {
         final CoordinatesOperationPoint point = newCoordinatesOperationPoint();
         coordinatesOperation.perform(point);

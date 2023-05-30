@@ -77,7 +77,7 @@ public class EqualIgnoreFieldNames extends AbstractRecordDefinitionProperty {
   }
 
   @Override
-  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+  public EqualIgnoreFieldNames setRecordDefinition(final RecordDefinition recordDefinition) {
     super.setRecordDefinition(recordDefinition);
     if (this.fieldNames.contains(Record.EXCLUDE_ID)) {
       final String idFieldName = recordDefinition.getIdFieldName();
@@ -87,6 +87,7 @@ public class EqualIgnoreFieldNames extends AbstractRecordDefinitionProperty {
       final String geometryFieldName = recordDefinition.getGeometryFieldName();
       this.fieldNames.add(geometryFieldName);
     }
+    return this;
   }
 
   @Override

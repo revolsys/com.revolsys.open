@@ -46,6 +46,8 @@ import com.revolsys.io.FileNames;
 import com.revolsys.util.Property;
 import com.revolsys.util.UrlUtil;
 
+import reactor.core.publisher.Flux;
+
 public interface Paths {
   LinkOption[] LINK_OPTIONS_NONE = new LinkOption[0];
 
@@ -127,71 +129,83 @@ public interface Paths {
   }
 
   static boolean deleteDirectories(final Path path) {
-    final SimpleValueHolder<IOException> firstException = new SimpleValueHolder<>();
-    final LinkedList<Boolean> errors = new LinkedList<>();
-    try {
-      Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
-        @Override
-        public FileVisitResult postVisitDirectory(final Path dir, final IOException exception)
-          throws IOException {
-          final Boolean hasError = errors.removeLast();
-          if (exception == null) {
-            if (!hasError) {
-              try {
-                Files.delete(dir);
-              } catch (final NoSuchFileException e) {
-                // Ignore as we want it to not exist
-              } catch (final IOException e) {
-                if (!errors.isEmpty()) {
-                  errors.removeLast();
+    if (Files.isDirectory(path)) {
+      final SimpleValueHolder<IOException> firstException = new SimpleValueHolder<>();
+      final LinkedList<Boolean> errors = new LinkedList<>();
+      try {
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+          @Override
+          public FileVisitResult postVisitDirectory(final Path dir, final IOException exception)
+            throws IOException {
+            final Boolean hasError = errors.removeLast();
+            if (exception == null) {
+              if (!hasError) {
+                try {
+                  Files.delete(dir);
+                } catch (final NoSuchFileException e) {
+                  // Ignore as we want it to not exist
+                } catch (final IOException e) {
+                  if (!errors.isEmpty()) {
+                    errors.removeLast();
+                  }
+                  errors.addLast(Boolean.TRUE);
+                  if (firstException.isEmpty()) {
+                    firstException.setValue(e);
+                  }
                 }
-                errors.addLast(Boolean.TRUE);
-                if (firstException.isEmpty()) {
-                  firstException.setValue(e);
-                }
+              }
+              return FileVisitResult.CONTINUE;
+            } else {
+              throw exception;
+            }
+          }
+
+          @Override
+          public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
+            throws IOException {
+            errors.addLast(Boolean.FALSE);
+            return FileVisitResult.CONTINUE;
+          }
+
+          @Override
+          public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
+            throws IOException {
+            try {
+              Files.delete(file);
+            } catch (final NoSuchFileException e) {
+              // Ignore as we want it to not exist
+            } catch (final IOException e) {
+              errors.removeLast();
+              errors.addLast(Boolean.TRUE);
+              if (firstException.isEmpty()) {
+                firstException.setValue(e);
               }
             }
             return FileVisitResult.CONTINUE;
-          } else {
-            throw exception;
           }
+        });
+        if (firstException.isEmpty()) {
+          return true;
+        } else {
+          final IOException exception = firstException.getValue();
+          Logs.error(Paths.class, "Unable to delete: " + path, exception);
+          return false;
         }
-
-        @Override
-        public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
-          throws IOException {
-          errors.addLast(Boolean.FALSE);
-          return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
-          throws IOException {
-          try {
-            Files.delete(file);
-          } catch (final NoSuchFileException e) {
-            // Ignore as we want it to not exist
-          } catch (final IOException e) {
-            errors.removeLast();
-            errors.addLast(Boolean.TRUE);
-            if (firstException.isEmpty()) {
-              firstException.setValue(e);
-            }
-          }
-          return FileVisitResult.CONTINUE;
-        }
-      });
-      if (firstException.isEmpty()) {
-        return true;
-      } else {
-        final IOException exception = firstException.getValue();
-        Logs.error(Paths.class, "Unable to delete: " + path, exception);
+      } catch (final NoSuchFileException e) {
+        return !exists(path);
+      } catch (final IOException e) {
         return false;
       }
-    } catch (final NoSuchFileException e) {
-      return !exists(path);
+    } else {
+      return deleteFile(path);
+    }
+  }
+
+  static boolean deleteFile(final Path path) {
+    try {
+      return Files.deleteIfExists(path);
     } catch (final IOException e) {
-      return false;
+      throw Exceptions.wrap(e);
     }
   }
 
@@ -423,6 +437,16 @@ public interface Paths {
     return false;
   }
 
+  static boolean isLastModifiedAfter(final Path path, final Instant time) {
+    final Instant time1 = lastModifiedInstant(path);
+    return time1.isAfter(time);
+  }
+
+  static boolean isLastModifiedAfter(final Path path1, final Path path2) {
+    final Instant time2 = lastModifiedInstant(path2);
+    return isLastModifiedAfter(path1, time2);
+  }
+
   static FileTime lastModified(final Path path) {
     try {
       return Files.getLastModifiedTime(path);
@@ -529,6 +553,14 @@ public interface Paths {
 
   static String toUrlString(final Path path) {
     return toUrl(path).toString();
+  }
+
+  static Flux<Path> walk$(Path dir) {
+    try {
+      return Flux.fromStream(Files.walk(dir));
+    } catch (final IOException e) {
+      return Flux.error(e);
+    }
   }
 
   static Path withExtension(final Path path, final String extension) {

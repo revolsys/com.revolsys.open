@@ -6,27 +6,32 @@ import com.revolsys.record.property.RecordDefinitionProperty;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStore;
 
-public class SingleValueCodeTableProperty extends SingleValueRecordStoreCodeTable
+public class RecordStoreCodeTableProperty extends RecordStoreCodeTable
   implements RecordDefinitionProperty {
 
-  public static final String PROPERTY_NAME = SingleValueCodeTableProperty.class.getName();
+  public static final String PROPERTY_NAME = RecordStoreCodeTableProperty.class.getName();
 
-  public SingleValueCodeTableProperty() {
+  public RecordStoreCodeTableProperty() {
     super();
   }
 
-  public SingleValueCodeTableProperty(final Map<String, ? extends Object> config) {
+  public RecordStoreCodeTableProperty(final Map<String, ? extends Object> config) {
     setProperties(config);
   }
 
   @Override
-  public SingleValueCodeTableProperty clone() {
-    return (SingleValueCodeTableProperty)super.clone();
+  public RecordStoreCodeTableProperty clone() {
+    return (RecordStoreCodeTableProperty)super.clone();
   }
 
   @Override
   public String getPropertyName() {
     return PROPERTY_NAME;
+  }
+
+  @Override
+  public RecordStoreCodeTableProperty setRecordDefinition(RecordDefinition recordDefinition) {
+    return (RecordStoreCodeTableProperty)super.setRecordDefinition(recordDefinition);
   }
 
   @Override
@@ -42,5 +47,4 @@ public class SingleValueCodeTableProperty extends SingleValueRecordStoreCodeTabl
   protected void setRecordDefinitionBefore(final RecordDefinition oldRecordDefinition) {
     oldRecordDefinition.setProperty(getPropertyName(), null);
   }
-
 }

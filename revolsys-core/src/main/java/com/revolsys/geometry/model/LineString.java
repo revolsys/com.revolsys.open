@@ -125,10 +125,8 @@ public interface LineString extends Lineal {
         if (i2 + 1 < points.getVertexCount()) {
           return getAngle(points, i1, i2 + 1, start);
         }
-      } else {
-        if (i1 - 1 > 0) {
-          return getAngle(points, i1 - 1, i2, start);
-        }
+      } else if (i1 - 1 > 0) {
+        return getAngle(points, i1 - 1, i2, start);
       }
     }
     return Angle.angleNorthDegrees(x1, y1, x2, y2);
@@ -619,7 +617,10 @@ public interface LineString extends Lineal {
               final double value1 = getCoordinate(i, axisIndex);
               final double value2 = line.getCoordinate(i, axisIndex);
               if (!Doubles.equal(value1, value2)) {
-                return false;
+                if (!(value1 == 0 && Double.isNaN(value2))
+                  && !(value2 == 0 && Double.isNaN(value1))) {
+                  return false;
+                }
               }
             }
           }
@@ -1111,12 +1112,10 @@ public interface LineString extends Lineal {
       } else {
         return End.NONE;
       }
+    } else if (distanceTo <= maxDistance) {
+      return End.TO;
     } else {
-      if (distanceTo <= maxDistance) {
-        return End.TO;
-      } else {
-        return End.NONE;
-      }
+      return End.NONE;
     }
   }
 
@@ -1774,16 +1773,14 @@ public interface LineString extends Lineal {
     notNullSameCs(boundingBox);
     if (bboxCoveredBy(boundingBox)) {
       return this;
+    } else if (isEmpty()) {
+      return this;
+    } else if (this instanceof LinearRing) {
+      return SnapIfNeededOverlayOp.overlayOp(this, boundingBox.toRectangle(),
+        OverlayOp.INTERSECTION);
     } else {
-      if (isEmpty()) {
-        return this;
-      } else if (this instanceof LinearRing) {
-        return SnapIfNeededOverlayOp.overlayOp(this, boundingBox.toRectangle(),
-          OverlayOp.INTERSECTION);
-      } else {
-        final RectangleIntersection rectangleIntersection = new RectangleIntersection();
-        return rectangleIntersection.intersectionLine(this, boundingBox);
-      }
+      final RectangleIntersection rectangleIntersection = new RectangleIntersection();
+      return rectangleIntersection.intersectionLine(this, boundingBox);
     }
   }
 

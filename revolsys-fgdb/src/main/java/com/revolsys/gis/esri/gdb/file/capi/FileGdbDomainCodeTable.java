@@ -2,7 +2,7 @@ package com.revolsys.gis.esri.gdb.file.capi;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import java.util.function.Consumer;
 
 import javax.swing.JComponent;
 
@@ -12,7 +12,7 @@ import org.jeometry.common.logging.Logs;
 
 import com.revolsys.gis.esri.gdb.file.FileGdbRecordStore;
 import com.revolsys.record.code.AbstractCodeTable;
-import com.revolsys.record.io.format.esri.gdb.xml.model.CodedValue;
+import com.revolsys.record.code.CodeTableEntry;
 import com.revolsys.record.io.format.esri.gdb.xml.model.Domain;
 import com.revolsys.record.io.format.json.JsonObject;
 
@@ -32,21 +32,12 @@ public class FileGdbDomainCodeTable extends AbstractCodeTable {
   }
 
   @Override
-  protected int calculateValueFieldLength() {
-    int length = 0;
-    for (final CodedValue codedValue : this.domain.getCodedValues()) {
-      final String name = codedValue.getName();
-      final int valueLength = name.length();
-      if (valueLength > length) {
-        length = valueLength;
-      }
-    }
-    return length;
+  public FileGdbDomainCodeTable clone() {
+    return this;
   }
 
   @Override
-  public FileGdbDomainCodeTable clone() {
-    return (FileGdbDomainCodeTable)super.clone();
+  public void close() {
   }
 
   @Override
@@ -71,26 +62,13 @@ public class FileGdbDomainCodeTable extends AbstractCodeTable {
   }
 
   @Override
+  public CodeTableEntry getEntry(Consumer<CodeTableEntry> callback, Object idOrValue) {
+    return this.domain.getEntry(callback, idOrValue);
+  }
+
+  @Override
   public List<String> getFieldNameAliases() {
     return this.domain.getFieldNameAliases();
-  }
-
-  @Override
-  public Identifier getIdentifier(final List<Object> values) {
-    final Identifier id = this.domain.getIdentifier(values);
-    if (id == null) {
-      return newIdentifier((String)values.get(0));
-    }
-    return id;
-  }
-
-  @Override
-  public Identifier getIdentifier(final Map<String, ? extends Object> values) {
-    final Identifier id = this.domain.getIdentifier(values);
-    if (id == null) {
-      return newIdentifier(this.domain.getName(values));
-    }
-    return id;
   }
 
   @Override
@@ -119,24 +97,13 @@ public class FileGdbDomainCodeTable extends AbstractCodeTable {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public <V> V getValue(final Identifier id) {
-    return (V)this.domain.getValue(id);
-  }
-
-  @Override
-  public <V> V getValue(final Object id) {
-    return getValue(Identifier.newIdentifier(id));
+  public int getValueFieldLength() {
+    return this.domain.getValueFieldLength();
   }
 
   @Override
   public List<String> getValueFieldNames() {
     return this.domain.getValueFieldNames();
-  }
-
-  @Override
-  public List<Object> getValues(final Identifier id) {
-    return this.domain.getValues(id);
   }
 
   @Override

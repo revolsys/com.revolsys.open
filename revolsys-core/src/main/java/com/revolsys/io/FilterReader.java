@@ -3,7 +3,7 @@ package com.revolsys.io;
 import java.util.Iterator;
 import java.util.function.Predicate;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 
 import com.revolsys.collection.iterator.FilterIterator;
 import com.revolsys.collection.map.MapEx;
