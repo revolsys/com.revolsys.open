@@ -37,7 +37,6 @@ import com.revolsys.swing.table.lambda.column.RecordTableModelColumn;
 import com.revolsys.swing.table.record.model.RecordListTableModel;
 import com.revolsys.swing.toolbar.ToolBar;
 import com.revolsys.swing.undo.AbstractUndoableEdit;
-import com.revolsys.swing.undo.CreateRecordUndo;
 import com.revolsys.swing.undo.DeleteLayerRecordUndo;
 import com.revolsys.swing.undo.MultipleUndo;
 import com.revolsys.swing.undo.UndoManager;
@@ -129,8 +128,8 @@ public class MergeRecordsDialog extends BaseDialog {
             MergeRecordsDialog.this.layer.fireRecordsChanged();
           }
         });
-        final CreateRecordUndo createRecordUndo = new CreateRecordUndo(this.layer, mergeableRecord,
-          true);
+        final MergeCreateRecordUndo createRecordUndo = new MergeCreateRecordUndo(this.layer,
+          mergeableRecord);
         multipleUndo.addEdit(createRecordUndo);
         for (final MergeOriginalRecord originalRecord : mergeableRecord.originalRecords) {
           final DeleteLayerRecordUndo deleteRecordUndo = new DeleteLayerRecordUndo(

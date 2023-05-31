@@ -19,7 +19,7 @@ public interface TableRecordStoreConnection extends Transactionable {
   default RecordDefinition getRecordDefinition(final CharSequence tableName) {
     final AbstractTableRecordStore recordStore = getTableRecordStore(tableName);
     if (recordStore == null) {
-      return null;
+      return getRecordStore().getRecordDefinition(PathName.newPathName(tableName));
     }
     return recordStore.getRecordDefinition();
   }

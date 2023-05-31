@@ -20,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 
 import com.revolsys.collection.bplus.BPlusTreeMap;
 import com.revolsys.collection.map.IntHashMap;

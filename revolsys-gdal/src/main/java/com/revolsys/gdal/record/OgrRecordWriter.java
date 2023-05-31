@@ -2,7 +2,7 @@ package com.revolsys.gdal.record;
 
 import java.util.List;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 
 import org.gdal.ogr.DataSource;
 import org.gdal.ogr.Feature;

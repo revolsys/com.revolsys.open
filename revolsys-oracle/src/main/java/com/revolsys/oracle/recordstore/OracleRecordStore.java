@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.jeometry.common.data.identifier.Identifier;
@@ -37,6 +37,7 @@ import com.revolsys.oracle.recordstore.field.OracleClobFieldAdder;
 import com.revolsys.oracle.recordstore.field.OracleJdbcRowIdFieldDefinition;
 import com.revolsys.oracle.recordstore.field.OracleSdoGeometryFieldAdder;
 import com.revolsys.oracle.recordstore.field.OracleSdoGeometryJdbcFieldDefinition;
+import com.revolsys.oracle.recordstore.field.OracleTimestampWithTimeZoneFieldAdder;
 import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
@@ -415,6 +416,7 @@ public class OracleRecordStore extends AbstractJdbcRecordStore {
 
     addFieldAdder("DATE", fieldAdder);
     addFieldAdder("TIMESTAMP", fieldAdder);
+    addFieldAdder("TIMESTAMP(6) WITH TIME ZONE", new OracleTimestampWithTimeZoneFieldAdder());
 
     final OracleSdoGeometryFieldAdder sdoGeometryAttributeAdder = new OracleSdoGeometryFieldAdder(
       this);

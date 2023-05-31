@@ -5,8 +5,8 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -30,15 +30,20 @@ public class AbstractWebController {
 
   private static final String UTF_8 = StandardCharsets.UTF_8.toString();
 
-  public static void responseJson(final HttpServletResponse response, final JsonObject jsonObject)
-    throws IOException {
+  public static void responseJson(final HttpServletResponse response, final int statusCode,
+    final JsonObject jsonObject) throws IOException {
     setContentTypeJson(response);
-    response.setStatus(200);
+    response.setStatus(statusCode);
     try (
       PrintWriter writer = response.getWriter();
       JsonWriter jsonWriter = new JsonWriter(writer);) {
       jsonWriter.write(jsonObject);
     }
+  }
+
+  public static void responseJson(final HttpServletResponse response, final JsonObject jsonObject)
+    throws IOException {
+    responseJson(response, 200, jsonObject);
   }
 
   public static void responseRecordJson(final HttpServletResponse response, final Record record)

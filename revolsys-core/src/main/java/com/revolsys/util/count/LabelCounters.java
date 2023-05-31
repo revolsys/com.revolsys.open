@@ -9,6 +9,7 @@ import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathNameProxy;
 
 import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.tsv.Tsv;
 import com.revolsys.record.io.format.tsv.TsvWriter;
 import com.revolsys.record.schema.RecordDefinition;
@@ -88,6 +89,8 @@ public interface LabelCounters {
   void setLogCounts(boolean logCounts);
 
   void setMessage(String message);
+
+  JsonObject toJson();
 
   default String toTsv() {
     return toTsv("LABEL", "COUNT");

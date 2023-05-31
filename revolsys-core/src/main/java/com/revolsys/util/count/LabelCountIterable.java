@@ -2,7 +2,7 @@ package com.revolsys.util.count;
 
 import java.util.Iterator;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.BeanNameAware;
 

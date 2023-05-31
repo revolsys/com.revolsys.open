@@ -131,6 +131,7 @@ public class LabelCountMap extends AbstractLabelCounters {
     return this.counterByLabel.size();
   }
 
+  @Override
   public JsonObject toJson() {
     if (isEmpty()) {
       return JsonObject.EMPTY;

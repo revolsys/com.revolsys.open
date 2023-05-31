@@ -71,8 +71,9 @@ public class PseudoNodeProperty extends AbstractRecordDefinitionProperty {
   }
 
   @Override
-  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+  public PseudoNodeProperty setRecordDefinition(final RecordDefinition recordDefinition) {
     super.setRecordDefinition(recordDefinition);
+    return this;
   }
 
   @Override

@@ -55,5 +55,5 @@ public interface BaseCloneable extends Cloneable {
     return value;
   }
 
-  public Object clone();
+  Object clone();
 }

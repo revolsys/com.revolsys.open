@@ -11,13 +11,14 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 import org.jeometry.common.data.type.DataTypes;
 import org.jeometry.common.io.PathNameProxy;
 
 import com.revolsys.record.io.RecordWriter;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.io.format.tsv.Tsv;
 import com.revolsys.record.io.format.tsv.TsvWriter;
 import com.revolsys.record.schema.RecordDefinition;
@@ -131,6 +132,16 @@ public class CategoryLabelCountMap implements Emptyable {
     }
   }
 
+  public long getCount(final CharSequence category, final CharSequence label,
+    final long defaultValue) {
+    final Long count = getCount(category, label);
+    if (count == null) {
+      return defaultValue;
+    } else {
+      return count;
+    }
+  }
+
   public synchronized String getCountsText() {
     final StringBuilder sb = new StringBuilder();
     addCountsText(sb);
@@ -191,6 +202,20 @@ public class CategoryLabelCountMap implements Emptyable {
 
   public void setPrefix(final String prefix) {
     this.prefix = prefix;
+  }
+
+  public JsonObject toJson() {
+    if (isEmpty()) {
+      return JsonObject.EMPTY;
+    } else {
+      final JsonObject json = JsonObject.tree();
+      for (final Entry<String, LabelCounters> entry : this.labelCountMapByCategory.entrySet()) {
+        final String label = entry.getKey();
+        final LabelCounters counter = entry.getValue();
+        json.add(label, counter.toJson());
+      }
+      return json;
+    }
   }
 
   public String toTsv() {

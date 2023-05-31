@@ -285,9 +285,15 @@ public class Icons {
       image = imageReference.get();
     }
     if (image == null) {
-      image = getImage(imageName, "png");
-      if (image == null) {
-        image = getImage(imageName, "gif");
+      final String[] parts = imageName.split(":");
+      if (parts.length == 1) {
+
+        image = getImage(imageName, "png");
+        if (image == null) {
+          image = getImage(imageName, "gif");
+        }
+      } else {
+        image = getImageWithBadge(parts[0], parts[1]);
       }
       NAMED_IMAGE_CACHE.put(imageName, new WeakReference<>(image));
     }
@@ -309,6 +315,26 @@ public class Icons {
       }
     }
     return getImage(in);
+  }
+
+  public static BufferedImage getImageWithBadge(final Image baseIcon, final String badgeName) {
+    final BufferedImage image = new BufferedImage(baseIcon.getWidth(null), baseIcon.getHeight(null),
+      BufferedImage.TYPE_INT_ARGB);
+    final Graphics graphics = image.createGraphics();
+    graphics.drawImage(image, 0, 0, null);
+    final Image badgeImage = getBadgeImage(badgeName);
+    graphics.drawImage(badgeImage, 0, 0, null);
+    graphics.dispose();
+    return image;
+  }
+
+  public static BufferedImage getImageWithBadge(final String iconName, final String badgeName) {
+    final BufferedImage image = getImage(iconName);
+    if (image == null) {
+      Logs.error(Icons.class, "Cannot find icon: " + iconName);
+      return getImageWithBadge("page_white", badgeName);
+    }
+    return getImageWithBadge(image, badgeName);
   }
 
   public static BufferedImage grayscale(final BufferedImage original) {

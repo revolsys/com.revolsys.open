@@ -5,8 +5,8 @@ import java.io.PrintWriter;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.io.PathName;
@@ -22,7 +22,7 @@ import com.revolsys.record.schema.AbstractTableRecordStore;
 import com.revolsys.record.schema.TableRecordStoreConnection;
 import com.revolsys.transaction.Transaction;
 import com.revolsys.transaction.TransactionOptions;
-import com.revolsys.ui.web.utils.HttpServletUtils;
+import com.revolsys.web.HttpServletUtils;
 
 public class AbstractTableRecordRestController extends AbstractWebController {
 

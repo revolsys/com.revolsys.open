@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiConsumer;
 
+import javax.swing.SwingUtilities;
+
 import org.apache.http.NameValuePair;
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataTypes;
@@ -62,6 +64,7 @@ import com.revolsys.record.schema.FieldDefinition;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordStoreSchema;
 import com.revolsys.record.schema.RecordStoreSchemaElement;
+import com.revolsys.util.Debug;
 import com.revolsys.util.UriBuilder;
 import com.revolsys.util.UrlUtil;
 
@@ -301,12 +304,12 @@ public class ODataRecordStore extends AbstractRecordStore {
     }
   }
 
-  private final ApacheHttpRequestBuilderFactory requestFactory;
+  private final ApacheHttpRequestBuilderFactory requestBuilderFactory;
 
   private final URI uri;
 
   public ODataRecordStore(final ApacheHttpRequestBuilderFactory requestFactory, final URI uri) {
-    this.requestFactory = requestFactory;
+    this.requestBuilderFactory = requestFactory;
     this.uri = uri;
   }
 
@@ -318,12 +321,17 @@ public class ODataRecordStore extends AbstractRecordStore {
     } else {
       this.uri = uri;
     }
-    final String apiKey = connectionProperties.getString("apiKey");
-    if (apiKey == null) {
-      throw new IllegalArgumentException("No login config");
-    } else {
-      this.requestFactory = new ConfigurableRequestBuilderFactory().addHeader("ApiKey", apiKey);
+    ApacheHttpRequestBuilderFactory requestBuilderFactory = connectionProperties
+      .getValue("requestBuilderFactory");
+    if (requestBuilderFactory == null) {
+      final String apiKey = connectionProperties.getString("apiKey");
+      if (apiKey == null) {
+        throw new IllegalArgumentException("No login config");
+      } else {
+        requestBuilderFactory = new ConfigurableRequestBuilderFactory().addHeader("ApiKey", apiKey);
+      }
     }
+    this.requestBuilderFactory = requestBuilderFactory;
   }
 
   @Override
@@ -339,14 +347,31 @@ public class ODataRecordStore extends AbstractRecordStore {
     }
     final URI uri = new UriBuilder(baseUri).appendPathSegments(name + "(" + idString + ")").build();
 
-    final ApacheHttpRequestBuilder request = this.requestFactory.delete(uri)
+    if (SwingUtilities.isEventDispatchThread()) {
+      Debug.noOp();
+    }
+    final ApacheHttpRequestBuilder request = this.requestBuilderFactory.delete(uri)
       .setParameter(ODataRecordStore.FORMAT_JSON);
     final JsonObject result = request.getJson();
     return result.getBoolean("deleted", false);
   }
 
+  @Override
+  public boolean deleteRecord(final Record record) {
+    if (record == null) {
+      return false;
+    } else {
+      final PathName typeName = record.getPathName();
+      final Identifier identifier = record.getIdentifier();
+      return deleteRecord(typeName, identifier);
+    }
+  }
+
   JsonObject getJson(final URI uri) {
-    return this.requestFactory.get(uri).setParameter(FORMAT_JSON).getJson();
+    if (SwingUtilities.isEventDispatchThread()) {
+      Debug.noOp();
+    }
+    return this.requestBuilderFactory.get(uri).setParameter(FORMAT_JSON).getJson();
   }
 
   @Override
@@ -376,6 +401,9 @@ public class ODataRecordStore extends AbstractRecordStore {
   }
 
   private Record getRecordDo(final PathName typePath, final Object idValue) {
+    if (SwingUtilities.isEventDispatchThread()) {
+      Debug.noOp();
+    }
     final RecordDefinition recordDefinition = getRecordDefinition(typePath);
     if (recordDefinition == null) {
       return null;
@@ -390,7 +418,7 @@ public class ODataRecordStore extends AbstractRecordStore {
       idString = "'" + idValue.toString().replace("'", "''") + "'";
     }
     final URI uri = new UriBuilder(baseUri).appendPathSegments(name + "(" + idString + ")").build();
-    final ApacheHttpRequestBuilder request = this.requestFactory.get(uri)
+    final ApacheHttpRequestBuilder request = this.requestBuilderFactory.get(uri)
       .setParameter(ODataRecordStore.FORMAT_JSON);
 
     final JsonObject result = request.getJson();
@@ -413,12 +441,15 @@ public class ODataRecordStore extends AbstractRecordStore {
 
   @Override
   public void insertRecord(final Record record) {
+    if (SwingUtilities.isEventDispatchThread()) {
+      Debug.noOp();
+    }
     final String name = record.getPathName().getName();
     final URI baseUri = getUri();
     final URI uri = new UriBuilder(baseUri).appendPathSegments(name).build();
 
     final JsonObject json = record.toJson();
-    final ApacheHttpRequestBuilder request = this.requestFactory.post(uri)
+    final ApacheHttpRequestBuilder request = this.requestBuilderFactory.post(uri)
       .setParameter(ODataRecordStore.FORMAT_JSON)
       .setJsonEntity(json);
     final JsonObject result = request.getJson();
@@ -427,7 +458,10 @@ public class ODataRecordStore extends AbstractRecordStore {
 
   @Override
   public ODataQueryIterator newIterator(final Query query, final Map<String, Object> properties) {
-    return new ODataQueryIterator(this, this.requestFactory, query, properties);
+    if (SwingUtilities.isEventDispatchThread()) {
+      Debug.noOp();
+    }
+    return new ODataQueryIterator(this, this.requestBuilderFactory, query, properties);
   }
 
   @Override
@@ -436,10 +470,13 @@ public class ODataRecordStore extends AbstractRecordStore {
   }
 
   public ApacheHttpRequestBuilder newRequest(final Query query) {
+    if (SwingUtilities.isEventDispatchThread()) {
+      Debug.noOp();
+    }
     final String name = query.getTablePath().getName();
     final URI baseUri = getUri();
     final URI uri = new UriBuilder(baseUri).appendPathSegments(name).build();
-    final ApacheHttpRequestBuilder request = this.requestFactory.get(uri)
+    final ApacheHttpRequestBuilder request = this.requestBuilderFactory.get(uri)
       .setParameter(ODataRecordStore.FORMAT_JSON);
     newRequestSelect(query, request);
     newRequestFilter(query, request);

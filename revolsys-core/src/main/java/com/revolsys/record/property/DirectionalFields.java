@@ -16,7 +16,6 @@ import java.util.Set;
 import org.jeometry.common.data.type.DataType;
 
 import com.revolsys.collection.map.MapEx;
-import com.revolsys.collection.map.Maps;
 import com.revolsys.geometry.graph.Edge;
 import com.revolsys.geometry.model.End;
 import com.revolsys.geometry.model.Geometry;
@@ -26,6 +25,7 @@ import com.revolsys.geometry.model.vertex.Vertex;
 import com.revolsys.record.FieldValueInvalidException;
 import com.revolsys.record.Record;
 import com.revolsys.record.Records;
+import com.revolsys.record.io.format.json.JsonObject;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.record.schema.RecordDefinitionProxy;
 
@@ -134,7 +134,7 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     property.reverseFieldValuesAndGeometry(record);
   }
 
-  public static void setSwapFieldValues(final Record record, MapEx newValues,
+  public static void setSwapFieldValues(final Record record, final MapEx newValues,
     final String fieldName1, final String fieldName2) {
     newValues.addFieldValue(fieldName1, record, fieldName2)
       .addFieldValue(fieldName2, record, fieldName1);
@@ -499,54 +499,6 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     return null;
   }
 
-  public Map<String, Object> getMergedMap(final Point point, final Record record1, Record record2) {
-    final LineString line1 = record1.getGeometry();
-    LineString line2 = record2.getGeometry();
-
-    Record fromRecord;
-    Record toRecord;
-
-    LineString newLine;
-
-    final Vertex line1From = line1.getVertex(0);
-    final Vertex line2From = line2.getVertex(0);
-    if (line1From.equals(2, line2From) && line1From.equals(2, point)) {
-      record2 = getReverse(record2);
-      line2 = record2.getGeometry();
-      fromRecord = record2;
-      toRecord = record1;
-      newLine = line1.merge(point, line2);
-    } else {
-      final Vertex line1To = line1.getToVertex(0);
-      final Vertex line2To = line2.getToVertex(0);
-      if (line1To.equals(2, line2To) && line1To.equals(2, point)) {
-        record2 = getReverse(record2);
-        line2 = record2.getGeometry();
-        fromRecord = record1;
-        toRecord = record2;
-        newLine = line1.merge(point, line2);
-      } else if (line1To.equals(2, line2From) && line1To.equals(2, point)) {
-        fromRecord = record1;
-        toRecord = record2;
-        newLine = line1.merge(point, line2);
-      } else if (line1From.equals(2, line2To) && line1From.equals(2, point)) {
-        fromRecord = record2;
-        toRecord = record1;
-        newLine = line2.merge(point, line1);
-      } else {
-        throw new IllegalArgumentException("Lines for records don't touch");
-      }
-    }
-
-    final Map<String, Object> newValues = new LinkedHashMap<>(record1);
-    setFromFieldValues(fromRecord, toRecord, newValues);
-    setToFieldValues(toRecord, fromRecord, newValues);
-    final RecordDefinition recordDefinition = record1.getRecordDefinition();
-    final String geometryFieldName = recordDefinition.getGeometryFieldName();
-    newValues.put(geometryFieldName, newLine);
-    return newValues;
-  }
-
   /**
    * Get a new record that is the result of merging the two records. The
    * attributes will be taken from the record with the longest length. If one
@@ -693,6 +645,54 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     }
   }
 
+  public JsonObject getMergedValues(final Point point, final Record record1, Record record2) {
+    final LineString line1 = record1.getGeometry();
+    LineString line2 = record2.getGeometry();
+
+    Record fromRecord;
+    Record toRecord;
+
+    LineString newLine;
+
+    final Vertex line1From = line1.getVertex(0);
+    final Vertex line2From = line2.getVertex(0);
+    if (line1From.equals(2, line2From) && line1From.equals(2, point)) {
+      record2 = getReverse(record2);
+      line2 = record2.getGeometry();
+      fromRecord = record2;
+      toRecord = record1;
+      newLine = line1.merge(point, line2);
+    } else {
+      final Vertex line1To = line1.getToVertex(0);
+      final Vertex line2To = line2.getToVertex(0);
+      if (line1To.equals(2, line2To) && line1To.equals(2, point)) {
+        record2 = getReverse(record2);
+        line2 = record2.getGeometry();
+        fromRecord = record1;
+        toRecord = record2;
+        newLine = line1.merge(point, line2);
+      } else if (line1To.equals(2, line2From) && line1To.equals(2, point)) {
+        fromRecord = record1;
+        toRecord = record2;
+        newLine = line1.merge(point, line2);
+      } else if (line1From.equals(2, line2To) && line1From.equals(2, point)) {
+        fromRecord = record2;
+        toRecord = record1;
+        newLine = line2.merge(point, line1);
+      } else {
+        throw new IllegalArgumentException("Lines for records don't touch");
+      }
+    }
+
+    final JsonObject newValues = JsonObject.hash(record1);
+    setFromFieldValues(fromRecord, toRecord, newValues);
+    setToFieldValues(toRecord, fromRecord, newValues);
+    final RecordDefinition recordDefinition = record1.getRecordDefinition();
+    final String geometryFieldName = recordDefinition.getGeometryFieldName();
+    newValues.put(geometryFieldName, newLine);
+    return newValues;
+  }
+
   @Override
   public String getPropertyName() {
     return PROPERTY_NAME;
@@ -797,9 +797,9 @@ public class DirectionalFields extends AbstractRecordDefinitionProperty {
     return this.toFieldNames.contains(fieldName);
   }
 
-  public Map<String, Object> newSplitValues(final Record oldRecord, final LineString oldLine,
+  public JsonObject newSplitValues(final Record oldRecord, final LineString oldLine,
     final Point splitPoint, final LineString newLine) {
-    final Map<String, Object> newValues = Maps.newLinkedHash(oldRecord);
+    final JsonObject newValues = JsonObject.hash(oldRecord);
     final String geometryFieldName = oldRecord.getGeometryFieldName();
     newValues.put(geometryFieldName, newLine);
     setSplitFieldValues(oldLine, splitPoint, newValues, newLine);

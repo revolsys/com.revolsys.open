@@ -14,11 +14,22 @@
     <version>MAIN-SNAPSHOT</version>
   </parent>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.revolsys.open</groupId>
+        <artifactId>revolsys-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>com.revolsys.open</groupId>
       <artifactId>revolsys-core</artifactId>
-      <version>${project.version}</version>
     </dependency>
     
     <dependency>
@@ -27,12 +38,12 @@
       <version>1.15</version>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
+      <groupId>com.fasterxml.jackson.core</groupId> 
       <artifactId>jackson-core</artifactId>
     </dependency>
     <dependency>
@@ -42,7 +53,6 @@
     <dependency>
       <groupId>io.netty</groupId>
       <artifactId>netty-codec-http</artifactId>
-      <version>${io.netty.version}</version>
-    </dependency>
+     </dependency>
   </dependencies>
 </project>

@@ -49,7 +49,7 @@ public abstract class AbstractMergeProcess extends AbstractInOutProcess<Record, 
   }
 
   /**
-   * Add an object from the other (otherId) channel.
+   * Add an object from the other (id) channel.
    *
    * @param object The object to add.
    */

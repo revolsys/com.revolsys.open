@@ -58,7 +58,7 @@ public class SineStarFactory extends GeometricShapeFactory {
    * Creates a factory which will create sine stars using the default
    * {@link GeometryFactory}.
    *
-   * @param geomFact the factory to use
+   * @param geometryFactory the factory to use
    */
   public SineStarFactory() {
     super();
@@ -117,12 +117,12 @@ public class SineStarFactory extends GeometricShapeFactory {
       final double ang = i * (2 * Math.PI / this.vertexCount);
       final double x = curveRadius * Math.cos(ang) + centreX;
       final double y = curveRadius * Math.sin(ang) + centreY;
-      coordinates[coordinateIndex++] = this.geomFact.makeXyPrecise(x);
-      coordinates[coordinateIndex++] = this.geomFact.makeXyPrecise(y);
+      coordinates[coordinateIndex++] = this.geometryFactory.makeXyPrecise(x);
+      coordinates[coordinateIndex++] = this.geometryFactory.makeXyPrecise(y);
     }
 
-    final LinearRing ring = this.geomFact.linearRing(2, coordinates);
-    final Polygon poly = this.geomFact.polygon(ring);
+    final LinearRing ring = this.geometryFactory.linearRing(2, coordinates);
+    final Polygon poly = this.geometryFactory.polygon(ring);
     return poly;
   }
 

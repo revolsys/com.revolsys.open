@@ -1121,10 +1121,10 @@ public interface Record extends MapEx, Comparable<Object>, Identifiable, RecordD
         synchronized (this) {
           if (record.getRecordDefinition() == getRecordDefinition()) {
             final Identifier id = getIdentifier();
-            final Identifier otherId = record.getIdentifier();
-            if (id == null || otherId == null) {
+            final Identifier id2 = record.getIdentifier();
+            if (id == null || id2 == null) {
               return false;
-            } else if (DataType.equal(id, otherId)) {
+            } else if (DataType.equal(id, id2)) {
               return true;
             } else {
               return false;

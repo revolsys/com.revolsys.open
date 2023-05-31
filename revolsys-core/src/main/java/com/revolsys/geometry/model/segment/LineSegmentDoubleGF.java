@@ -3,7 +3,7 @@ package com.revolsys.geometry.model.segment;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.geometry.model.LineString;
 import com.revolsys.geometry.model.Point;
-import com.revolsys.geometry.model.impl.PointDoubleGf;
+import com.revolsys.geometry.model.impl.PointDoubleGeometryFactory;
 
 public class LineSegmentDoubleGF extends LineSegmentDouble {
   private static final long serialVersionUID = 3905321662159212931L;
@@ -66,7 +66,7 @@ public class LineSegmentDoubleGF extends LineSegmentDouble {
   @Override
   public Point newPoint(final double... coordinates) {
     final GeometryFactory geometryFactory = getGeometryFactory();
-    return new PointDoubleGf(geometryFactory, coordinates);
+    return new PointDoubleGeometryFactory(geometryFactory, coordinates);
   }
 
   private void setGeometryFactory(final GeometryFactory geometryFactory) {

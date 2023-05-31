@@ -11,7 +11,7 @@
 
   <custom>
     <reflowSkin>
-      <absoluteResourceURL>${siteUrl}</absoluteResourceURL>
+      <absoluteResourceURL>${project.url}</absoluteResourceURL>
       <bottomNav maxSpan="0">
         <column>Home</column>
       </bottomNav>
@@ -20,7 +20,7 @@
           <![CDATA[
           <span class="color-highlight">Revolution Systems Inc</span>]]>
         </name>
-        <href>${siteUrl}</href>
+        <href>/</href>
       </brand>
       <highlightJs>true</highlightJs>
       <skinAttribution>false</skinAttribution>
@@ -77,7 +77,7 @@
     <breadcrumbs>
       <item
         name="Revolsys"
-        href="${siteUrl}" />
+        href="/" />
     </breadcrumbs>
 
     <menu
@@ -99,10 +99,10 @@
     >
       <item
         name="GitHub Project"
-        href="${gitHubUrl}" />
+        href="https://github.com/revolsys/com.revolsys.open" />
       <item
         name="Issues (GitHub)"
-        href="${gitHubUrl}/issues/" />
+        href="https://github.com/revolsys/com.revolsys.open/issues/" />
     </menu>
 
     <menu

@@ -23,6 +23,19 @@
       <comments>Icons were developed by Mark James see http://http://famfamfam.com/</comments>
     </license>
   </licenses>
+  
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.revolsys.open</groupId>
+        <artifactId>revolsys-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>com.revolsys.jocl</groupId>
@@ -32,12 +45,10 @@
     <dependency>
       <groupId>com.revolsys.open</groupId>
       <artifactId>revolsys-core</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.revolsys.open</groupId>
       <artifactId>revolsys-gdal</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.swinglabs.swingx</groupId>
@@ -52,157 +63,28 @@
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>xmlgraphics-commons</artifactId>
-      <version>${org.apache.xmlgraphics.commons.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-all</artifactId>
-      <version>${org.apache.xmlgraphics.batik.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-bridge</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-i18n</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-ttf2svg</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-gui-util</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-rasterizer-ext</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-script</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-constants</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-extension</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-squiggle</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-svggen</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-transcoder</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-squiggle-ext</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-util</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-rasterizer</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-gvt</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-svgrasterizer</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-svg-dom</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-svgpp</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-ext</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-css</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-anim</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-dom</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-xml</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-slideshow</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-svgbrowser</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-swing</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-codec</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-parser</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.xmlgraphics</groupId>
-          <artifactId>batik-awt-util</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>xml-apis</groupId>
       <artifactId>xml-apis-ext</artifactId>
-      <version>1.3.04</version>   
+      <version>1.3.04</version>  
     </dependency>
     <dependency>
       <groupId>org.graalvm.js</groupId>
       <artifactId>js</artifactId>
-      <version>${org.graalvm.version}</version>
     </dependency>
     <dependency>
       <groupId>org.graalvm.js</groupId>
       <artifactId>js-scriptengine</artifactId>
-      <version>${org.graalvm.version}</version>
     </dependency>
     <dependency>
       <groupId>org.graalvm.truffle</groupId>
       <artifactId>truffle-api</artifactId>
-      <version>${org.graalvm.version}</version>
     </dependency>
   </dependencies>
 

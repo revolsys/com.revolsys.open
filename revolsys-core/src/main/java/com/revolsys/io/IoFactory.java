@@ -91,6 +91,9 @@ public interface IoFactory extends Available {
 
   static <C extends IoFactory> C factoryByFileName(final Class<C> factoryClass,
     final String fileName) {
+    if (fileName == null) {
+      return null;
+    }
     for (final String fileExtension : FileUtil.getFileNameExtensions(fileName)) {
       final C factory = factoryByFileExtension(factoryClass, fileExtension);
       if (factory != null) {

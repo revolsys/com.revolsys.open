@@ -57,13 +57,17 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
 
   public static OpenIdConnectClient newClient(final String url) {
     final Resource resource = Resource.getResource(url);
-    final JsonObject config = JsonParser.read((Object)resource);
-    if (config == null || config.isEmpty()) {
-      throw new IllegalArgumentException("Not a valid .well-known/openid-configuration");
-    } else {
-      final OpenIdConnectClient client = new OpenIdConnectClient(config);
-      client.setUrl(url);
-      return client;
+    try {
+      final JsonObject config = JsonParser.read((Object)resource);
+      if (config == null || config.isEmpty()) {
+        throw new IllegalArgumentException("Not a valid .well-known/openid-configuration");
+      } else {
+        final OpenIdConnectClient client = new OpenIdConnectClient(config);
+        client.setUrl(url);
+        return client;
+      }
+    } catch (final Exception e) {
+      throw new IllegalArgumentException("Not a valid .well-known/openid-configuration:" + url, e);
     }
   }
 

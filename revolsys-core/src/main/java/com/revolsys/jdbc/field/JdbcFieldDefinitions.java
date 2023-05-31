@@ -13,7 +13,7 @@ public class JdbcFieldDefinitions {
 
   public static final String UNKNOWN = "UNKNOWN";
 
-  private static final JdbcFieldDefinition FIELD_UNKNOWN = new JdbcFieldDefinition();
+  public static final JdbcFieldDefinition FIELD_UNKNOWN = new JdbcFieldDefinition();
 
   private static final JdbcBooleanFieldDefinition FIELD_BOOLEAN = new JdbcBooleanFieldDefinition(
     UNKNOWN, UNKNOWN, Types.BIT, -1, false, null, null);

@@ -797,6 +797,16 @@ public class ODataParser {
         if (text.equals("false")) {
           return Value.newValue(false);
         }
+        if (text.startsWith("geometry")) {
+          final String wkt = text.substring(9, text.length() - 1);
+          final Geometry geometry = table.getRecordDefinition().getGeometryFactory().geometry(wkt);
+          return Value.newValue(geometry);
+        }
+        if (text.startsWith("geography")) {
+          final String wkt = text.substring(10, text.length() - 1);
+          final Geometry geometry = table.getRecordDefinition().getGeometryFactory().geometry(wkt);
+          return Value.newValue(geometry);
+        }
         try {
           return table.getColumn(text);
         } catch (final Exception e) {

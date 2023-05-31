@@ -1,10 +1,10 @@
 package com.revolsys.record.io.format.saif.geometry;
 
 import com.revolsys.geometry.model.GeometryFactory;
-import com.revolsys.geometry.model.impl.PointDoubleGf;
+import com.revolsys.geometry.model.impl.PointDoubleGeometryFactory;
 import com.revolsys.record.io.format.saif.SaifConstants;
 
-public class SaifPoint extends PointDoubleGf {
+public class SaifPoint extends PointDoubleGeometryFactory {
 
   /**
    *
