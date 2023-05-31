@@ -67,7 +67,7 @@ public class OpenIdConnectClient extends BaseObjectWithProperties {
         return client;
       }
     } catch (final Exception e) {
-      throw new IllegalArgumentException("Not a valid .well-known/openid-configuration", e);
+      throw new IllegalArgumentException("Not a valid .well-known/openid-configuration:" + url, e);
     }
   }
 

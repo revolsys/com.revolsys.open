@@ -19,7 +19,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
 
-import javax.annotation.PreDestroy;
 import javax.sql.DataSource;
 
 import org.jeometry.common.data.identifier.Identifier;
@@ -44,7 +43,7 @@ import com.revolsys.record.ArrayRecord;
 import com.revolsys.record.Record;
 import com.revolsys.record.RecordFactory;
 import com.revolsys.record.RecordState;
-import com.revolsys.record.code.AbstractMultiValueCodeTable;
+import com.revolsys.record.code.CodeTable;
 import com.revolsys.record.io.RecordIterator;
 import com.revolsys.record.io.RecordReader;
 import com.revolsys.record.io.RecordStoreExtension;
@@ -68,6 +67,8 @@ import com.revolsys.transaction.Transaction;
 import com.revolsys.transaction.TransactionOptions;
 import com.revolsys.util.Booleans;
 import com.revolsys.util.Property;
+
+import jakarta.annotation.PreDestroy;
 
 public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
   implements JdbcRecordStore, RecordStoreExtension {
@@ -866,10 +867,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
             RecordStoreSchema childSchema = schema.getSchema(childSchemaPath);
             if (childSchema == null) {
               childSchema = newSchema(rootSchema, dbSchemaName, childSchemaPath);
-            } else {
-              if (childSchema.isInitialized()) {
-                childSchema.refresh();
-              }
+            } else if (childSchema.isInitialized()) {
+              childSchema.refresh();
             }
             schemas.put(childSchemaPath, childSchema);
           }
@@ -959,8 +958,8 @@ public abstract class AbstractJdbcRecordStore extends AbstractRecordStore
     this.clobAsString = clobAsString;
   }
 
-  public void setCodeTables(final List<AbstractMultiValueCodeTable> codeTables) {
-    for (final AbstractMultiValueCodeTable codeTable : codeTables) {
+  public void setCodeTables(final List<CodeTable> codeTables) {
+    for (final CodeTable codeTable : codeTables) {
       addCodeTable(codeTable);
     }
   }

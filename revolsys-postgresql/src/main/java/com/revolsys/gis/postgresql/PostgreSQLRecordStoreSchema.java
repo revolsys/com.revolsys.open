@@ -35,12 +35,6 @@ public class PostgreSQLRecordStoreSchema extends JdbcRecordStoreSchema {
     super(schema, pathName, dbName, quoteName);
   }
 
-  @Override
-  public synchronized void refresh() {
-    // this.compositeTypes.refresh();
-    super.refresh();
-  }
-
   private Map<PathName, RecordDefinitionImpl> refreshCompositeTypes() {
     final Map<PathName, RecordDefinitionImpl> typeByName = new LinkedHashMap<>();
     final PostgreSQLRecordStore recordStore = getRecordStore();

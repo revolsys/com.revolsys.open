@@ -64,11 +64,12 @@ public class GlobalIdProperty extends AbstractRecordDefinitionProperty {
   }
 
   @Override
-  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+  public GlobalIdProperty setRecordDefinition(final RecordDefinition recordDefinition) {
     if (this.fieldName == null) {
       this.fieldName = recordDefinition.getIdFieldName();
     }
     super.setRecordDefinition(recordDefinition);
+    return this;
   }
 
 }

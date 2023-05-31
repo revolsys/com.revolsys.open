@@ -12,11 +12,22 @@
   <artifactId>revolsys-testapi</artifactId>
   <name>RS Test API</name>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.revolsys.open</groupId>
+        <artifactId>revolsys-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <dependencies>
     <dependency>
       <groupId>com.revolsys.open</groupId>
       <artifactId>revolsys-core</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

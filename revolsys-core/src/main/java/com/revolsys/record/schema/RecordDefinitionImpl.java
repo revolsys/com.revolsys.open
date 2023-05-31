@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PreDestroy;
 
 import org.jeometry.common.data.type.DataType;
 import org.jeometry.common.io.PathName;
@@ -37,6 +37,10 @@ import com.revolsys.record.io.format.json.JsonObjectHash;
 import com.revolsys.record.property.RecordDefinitionProperty;
 import com.revolsys.record.property.ValueRecordDefinitionProperty;
 import com.revolsys.record.query.ColumnReference;
+
+import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
+import reactor.core.publisher.Sinks.One;
 
 public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
   implements RecordDefinition {
@@ -124,6 +128,11 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   private GeometryFactory geometryFactory;
 
+  private final One<CodeTable> codeTableSink = Sinks.<CodeTable> one();
+
+  private final Mono<CodeTable> codeTable$ = this.codeTableSink.asMono()
+    .flatMap(codeTable -> codeTable.refreshIfNeeded$().thenReturn(codeTable));
+
   public RecordDefinitionImpl() {
     super(null, (PathName)null);
   }
@@ -186,7 +195,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
       recordDefinition.getFields());
     setPolygonRingDirection(recordDefinition.getPolygonRingDirection());
     setIdFieldIndex(recordDefinition.getIdFieldIndex());
-    this.codeTable = recordDefinition.getCodeTable();
+    setCodeTable(recordDefinition.getCodeTable());
   }
 
   public RecordDefinitionImpl(final RecordStoreSchema schema) {
@@ -382,6 +391,14 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
         }
       }
     }
+  }
+
+  @SuppressWarnings({
+    "unchecked", "rawtypes"
+  })
+  @Override
+  public <CT extends CodeTable> Mono<CT> codeTable$() {
+    return (Mono)this.codeTable$;
   }
 
   @Override
@@ -888,6 +905,7 @@ public class RecordDefinitionImpl extends AbstractRecordStoreSchemaElement
 
   public void setCodeTable(final CodeTable codeTable) {
     this.codeTable = codeTable;
+    this.codeTableSink.tryEmitValue(codeTable);
   }
 
   public void setCodeTableByFieldNameMap(final Map<String, CodeTable> codeTableByFieldNameMap) {

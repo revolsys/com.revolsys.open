@@ -10,5 +10,5 @@ public interface RecordDefinitionProperty extends Cloneable {
 
   RecordDefinition getRecordDefinition();
 
-  void setRecordDefinition(RecordDefinition recordDefinition);
+  RecordDefinitionProperty setRecordDefinition(RecordDefinition recordDefinition);
 }

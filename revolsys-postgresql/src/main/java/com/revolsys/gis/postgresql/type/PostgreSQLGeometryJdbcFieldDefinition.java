@@ -12,6 +12,7 @@ import com.revolsys.geometry.model.Geometry;
 import com.revolsys.geometry.model.GeometryDataTypes;
 import com.revolsys.geometry.model.GeometryFactory;
 import com.revolsys.jdbc.field.JdbcFieldDefinition;
+import com.revolsys.record.RecordState;
 import com.revolsys.record.query.ColumnIndexes;
 import com.revolsys.record.schema.RecordDefinition;
 import com.revolsys.util.Property;
@@ -109,6 +110,34 @@ public class PostgreSQLGeometryJdbcFieldDefinition extends JdbcFieldDefinition {
       statement.setObject(parameterIndex, jdbcValue);
     }
     return parameterIndex + 1;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V> V toFieldValueException(Object value) {
+    Object v = super.toFieldValueException(value);
+    if (v instanceof Geometry) {
+      final Geometry geometry = (Geometry)v;
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      if (geometry.getGeometryFactory() != geometryFactory) {
+        v = geometryFactory.geometry(geometry);
+      }
+    }
+    return (V)v;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V> V toFieldValueException(RecordState state, Object value) {
+    Object v = super.toFieldValueException(state, value);
+    if (v instanceof Geometry) {
+      final Geometry geometry = (Geometry)v;
+      final GeometryFactory geometryFactory = getGeometryFactory();
+      if (geometry.getGeometryFactory() != geometryFactory) {
+        v = geometryFactory.geometry(geometry);
+      }
+    }
+    return (V)v;
   }
 
   public Object toJava(final Object object) throws SQLException {

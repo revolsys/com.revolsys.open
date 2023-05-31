@@ -9,7 +9,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
@@ -45,7 +45,7 @@ import com.revolsys.transaction.TransactionOptions;
 import com.revolsys.transaction.TransactionRecordReader;
 import com.revolsys.util.Property;
 
-public class AbstractTableRecordStore {
+public class AbstractTableRecordStore implements RecordDefinitionProxy {
 
   public static JsonObject schemaToJson(final RecordDefinition recordDefinition) {
     final JsonList jsonFields = JsonList.array();
@@ -284,6 +284,7 @@ public class AbstractTableRecordStore {
     }
   }
 
+  @Override
   public RecordDefinition getRecordDefinition() {
     return this.recordDefinition;
   }
@@ -304,6 +305,7 @@ public class AbstractTableRecordStore {
     }
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <R extends RecordStore> R getRecordStore() {
     return (R)this.recordStore;

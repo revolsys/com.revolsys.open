@@ -26,7 +26,8 @@ public abstract class AbstractRecordDefinitionProperty implements RecordDefiniti
   }
 
   @Override
-  public void setRecordDefinition(final RecordDefinition recordDefinition) {
+  public AbstractRecordDefinitionProperty setRecordDefinition(
+    final RecordDefinition recordDefinition) {
     final String propertyName = getPropertyName();
     if (this.recordDefinition != null) {
       this.recordDefinition.setProperty(propertyName, null);
@@ -35,6 +36,7 @@ public abstract class AbstractRecordDefinitionProperty implements RecordDefiniti
     if (recordDefinition != null) {
       recordDefinition.setProperty(propertyName, this);
     }
+    return this;
   }
 
 }

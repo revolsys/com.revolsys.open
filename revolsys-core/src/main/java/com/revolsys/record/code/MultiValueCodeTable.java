@@ -1,14 +1,16 @@
 package com.revolsys.record.code;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jeometry.common.data.identifier.Identifier;
 
 import com.revolsys.record.Record;
 import com.revolsys.record.io.RecordReader;
+import com.revolsys.util.Property;
 
-public class MultiValueCodeTable extends AbstractMultiValueCodeTable {
+public class MultiValueCodeTable extends AbstractCodeTable {
 
   static CodeTable newCodeTable(final String name, final RecordReader reader) {
     final MultiValueCodeTable codeTable = new MultiValueCodeTable(name);
@@ -29,13 +31,14 @@ public class MultiValueCodeTable extends AbstractMultiValueCodeTable {
     setName(name);
   }
 
-  @Override
-  public void addValue(final Identifier id, final Object... values) {
-    super.addValue(id, values);
+  protected void addValue(final Identifier id, final List<Object> values) {
+    addEntry(id, values);
   }
 
   public void addValue(final Object id, final Object... values) {
-    super.addValue(Identifier.newIdentifier(id), values);
+    final Identifier identifier = Identifier.newIdentifier(id);
+    final List<Object> valueList = Arrays.asList(values);
+    addValue(identifier, valueList);
   }
 
   @Override
@@ -44,17 +47,30 @@ public class MultiValueCodeTable extends AbstractMultiValueCodeTable {
   }
 
   @Override
-  public String getIdFieldName() {
-    return getName();
+  public Identifier getIdentifier(final List<Object> values) {
+    return getIdentifier((Object)values);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <V> V getValue(final Identifier id) {
+    final List<Object> values = getValues(id);
+    if (Property.hasValue(values)) {
+      return (V)values.get(0);
+    } else {
+      return null;
+    }
   }
 
   @Override
-  protected Identifier loadId(final List<Object> values, final boolean createId) {
-    return null;
+  public List<Object> getValues(final Identifier id) {
+    final CodeTableEntry entry = getEntry(null, id);
+    return CodeTableEntry.getValue(entry);
   }
 
   @Override
-  public void refresh() {
+  public boolean isMultiValue() {
+    return true;
   }
 
 }
