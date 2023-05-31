@@ -3,6 +3,7 @@ package com.revolsys.record;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.jeometry.common.data.identifier.Identifier;
 import org.jeometry.common.data.type.DataType;
@@ -43,6 +44,10 @@ public class ArrayChangeTrackRecord extends ArrayRecord implements ChangeTrackRe
 
   public ArrayChangeTrackRecord(final RecordDefinition recordDefinition, final Object[] values) {
     super(recordDefinition, values);
+  }
+
+  public Set<String> getChangedFieldNames() {
+    return this.originalValues.keySet();
   }
 
   @Override
@@ -111,6 +116,7 @@ public class ArrayChangeTrackRecord extends ArrayRecord implements ChangeTrackRe
     final Object oldValue = getValue(fieldIndex);
     RecordState newState = null;
     if (!DataType.equal(oldValue, newValue)) {
+
       final RecordState state = getState();
       switch (state) {
         case INITIALIZING:
@@ -132,6 +138,7 @@ public class ArrayChangeTrackRecord extends ArrayRecord implements ChangeTrackRe
               }
             }
           } else {
+            DataType.equal(oldValue, newValue);
             if (originalValues == EMPTY_ORIGINAL_VALUES) {
               originalValues = new HashMap<>();
             }

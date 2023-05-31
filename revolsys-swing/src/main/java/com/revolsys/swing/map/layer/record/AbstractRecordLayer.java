@@ -344,7 +344,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   public static final String RECORDS_SELECTED = "recordsSelected";
 
   static {
-    MenuFactory.addMenuInitializer(AbstractRecordLayer.class, (menu) -> {
+    MenuFactory.addMenuInitializer(AbstractRecordLayer.class, menu -> {
       menu.setName("Layer");
       menu.addGroup(0, "table");
       menu.addGroup(2, "edit");
@@ -1051,7 +1051,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   }
 
   public void forEachRecord(final Query query, final Consumer<? super LayerRecord> consumer) {
-    forEachRecordInternal(query, (record) -> {
+    forEachRecordInternal(query, record -> {
       final LayerRecord proxyRecord = record.getRecordProxy();
       consumer.accept(proxyRecord);
     });
@@ -1898,7 +1898,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       if (hasGeometry) {
         menu.addMenuItem("record", "Zoom to Record", "magnifier_zoom_selected", notDeleted,
           this::zoomToRecord);
-        menu.addMenuItem("record", "Pan to Record", "pan_selected", notDeleted, (record) -> {
+        menu.addMenuItem("record", "Pan to Record", "pan_selected", notDeleted, record -> {
           final MapPanel mapPanel = getMapPanel();
           if (mapPanel != null) {
             mapPanel.panToRecord(record);
@@ -2048,42 +2048,40 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       } else if (ClipboardUtil
         .isDataFlavorAvailable(RecordReaderTransferable.RECORD_READER_FLAVOR)) {
         return true;
-      } else {
-        if (ClipboardUtil.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
-          final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
-          if (Property.hasValue(string)) {
-            int lineIndex = string.indexOf('\n');
-            if (lineIndex == -1) {
-              lineIndex = string.indexOf('\r');
-            }
-            if (lineIndex != -1) {
-              final String line = string.substring(0, lineIndex).trim();
-              String fieldName;
-              final int tabIndex = line.indexOf('\t');
-              if (tabIndex != -1) {
-                fieldName = line.substring(0, tabIndex);
+      } else if (ClipboardUtil.isDataFlavorAvailable(DataFlavor.stringFlavor)) {
+        final String string = ClipboardUtil.getContents(DataFlavor.stringFlavor);
+        if (Property.hasValue(string)) {
+          int lineIndex = string.indexOf('\n');
+          if (lineIndex == -1) {
+            lineIndex = string.indexOf('\r');
+          }
+          if (lineIndex != -1) {
+            final String line = string.substring(0, lineIndex).trim();
+            String fieldName;
+            final int tabIndex = line.indexOf('\t');
+            if (tabIndex != -1) {
+              fieldName = line.substring(0, tabIndex);
 
+            } else {
+              final int commaIndex = line.indexOf(',');
+              if (commaIndex != -1) {
+                fieldName = line.substring(0, commaIndex);
               } else {
-                final int commaIndex = line.indexOf(',');
-                if (commaIndex != -1) {
-                  fieldName = line.substring(0, commaIndex);
-                } else {
-                  fieldName = line;
-                }
-              }
-              if (fieldName.startsWith("\"")) {
-                fieldName = fieldName.substring(1);
-              }
-              if (fieldName.endsWith("\"")) {
-                fieldName = fieldName.substring(0, fieldName.length() - 1);
-              }
-              if (getRecordDefinition().hasField(fieldName)) {
-                return true;
+                fieldName = line;
               }
             }
-            if (canPasteGeometry()) {
+            if (fieldName.startsWith("\"")) {
+              fieldName = fieldName.substring(1);
+            }
+            if (fieldName.endsWith("\"")) {
+              fieldName = fieldName.substring(0, fieldName.length() - 1);
+            }
+            if (getRecordDefinition().hasField(fieldName)) {
               return true;
             }
+          }
+          if (canPasteGeometry()) {
+            return true;
           }
         }
       }
@@ -2217,16 +2215,14 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
   public boolean isReadOnly() {
     if (super.isReadOnly()) {
       return true;
+    } else if (this.canAddRecords && hasPermission("INSERT")) {
+      return false;
+    } else if (this.canDeleteRecords && hasPermission("DELETE")) {
+      return false;
+    } else if (this.canEditRecords && hasPermission("UPDATE")) {
+      return false;
     } else {
-      if (this.canAddRecords && hasPermission("INSERT")) {
-        return false;
-      } else if (this.canDeleteRecords && hasPermission("DELETE")) {
-        return false;
-      } else if (this.canEditRecords && hasPermission("UPDATE")) {
-        return false;
-      } else {
-        return true;
-      }
+      return true;
     }
   }
 
@@ -2546,7 +2542,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       LoggingEventPanel.showDialog("Unexpected error pasting records", e);
       return;
     }
-    RecordValidationDialog.validateRecords("Pasting Records", this, newRecords, (validator) -> {
+    RecordValidationDialog.validateRecords("Pasting Records", this, newRecords, validator -> {
       // Success
       // Save the valid records
       final List<LayerRecord> validRecords = validator.getValidRecords();
@@ -2562,7 +2558,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
       if (!invalidRecords.isEmpty()) {
         deleteRecords(invalidRecords);
       }
-    }, (validator) -> {
+    }, validator -> {
       // Cancel, delete all the records
       deleteRecords(newRecords);
     });
@@ -2862,7 +2858,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
         final Set<Boolean> allSaved = new HashSet<>();
         RecordValidationDialog.validateRecords("Save Changes", //
           this, //
-          records, (validator) -> {
+          records, validator -> {
             // Success
             // Save the valid records
             final List<LayerRecord> validRecords = validator.getValidRecords();
@@ -2882,7 +2878,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
             if (!invalidRecords.isEmpty()) {
               allSaved.add(false);
             }
-          }, (validator) -> {
+          }, validator -> {
             allSaved.add(false);
           });
         return allSaved.isEmpty();
@@ -2906,7 +2902,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     final Set<Boolean> allSaved = new HashSet<>();
     RecordValidationDialog.validateRecords("Save Changes", //
       this, //
-      record, (validator) -> {
+      record, validator -> {
         // Success
         // Save the valid records
         final List<LayerRecord> validRecords = validator.getValidRecords();
@@ -2936,7 +2932,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
         if (!invalidRecords.isEmpty()) {
           allSaved.add(false);
         }
-      }, (validator) -> {
+      }, validator -> {
         allSaved.add(false);
       });
     return allSaved.isEmpty();
@@ -3002,11 +2998,9 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
         firePropertyChange("preEditable", false, true);
         final boolean hasChanges = isHasChanges();
         if (hasChanges) {
-          final Integer result = Invoke.andWait(() -> {
-            return Dialogs.showConfirmDialog(
-              "The layer has unsaved changes. Click Yes to save changes. Click No to discard changes. Click Cancel to continue editing.",
-              "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION);
-          });
+          final Integer result = Invoke.andWait(() -> Dialogs.showConfirmDialog(
+            "The layer has unsaved changes. Click Yes to save changes. Click No to discard changes. Click Cancel to continue editing.",
+            "Save Changes", JOptionPane.YES_NO_CANCEL_OPTION));
           synchronized (getSync()) {
             if (result == JOptionPane.YES_OPTION) {
               if (!saveChanges()) {
@@ -3145,7 +3139,7 @@ public abstract class AbstractRecordLayer extends AbstractLayer implements
     }
     super.setProperties(properties);
     final Predicate<MapEx> predicate = AbstractRecordLayerRenderer.getFilter(this,
-      (MapEx)properties);
+      JsonObject.hash(properties));
     if (predicate instanceof RecordDefinitionSqlFilter) {
       final RecordDefinitionSqlFilter sqlFilter = (RecordDefinitionSqlFilter)predicate;
       setWhere(sqlFilter.getQuery());

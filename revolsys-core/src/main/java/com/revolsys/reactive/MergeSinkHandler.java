@@ -281,7 +281,11 @@ public class MergeSinkHandler<V> {
   public MergeSinkHandler<V> added(final Function<V, V> added) {
     this.added$ = v -> {
       final var result = added.apply(v);
-      return Mono.just(result);
+      if (result == null) {
+        return Mono.empty();
+      } else {
+        return Mono.just(result);
+      }
     };
     return this;
   }
@@ -306,7 +310,11 @@ public class MergeSinkHandler<V> {
   public MergeSinkHandler<V> matched(final BiFunction<V, V, V> matched) {
     this.matched$ = (s, t) -> {
       final var result = matched.apply(s, t);
-      return Mono.just(result);
+      if (result == null) {
+        return Mono.empty();
+      } else {
+        return Mono.just(result);
+      }
     };
     return this;
   }
@@ -331,7 +339,11 @@ public class MergeSinkHandler<V> {
   public MergeSinkHandler<V> removed(final Function<V, V> removed) {
     this.removed$ = v -> {
       final var result = removed.apply(v);
-      return Mono.just(result);
+      if (result == null) {
+        return Mono.empty();
+      } else {
+        return Mono.just(result);
+      }
     };
     return this;
   }
