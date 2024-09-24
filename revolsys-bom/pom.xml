@@ -606,7 +606,7 @@
     <org.docx4j.version>11.4.8</org.docx4j.version>
     <org.gdal.version>2.4.0</org.gdal.version>
     <org.graalvm.version>22.3.2</org.graalvm.version>
-    <org.springframework.version>6.0.9</org.springframework.version>
+    <org.springframework.version>6.0.23</org.springframework.version>
     <org.springframework.boot.version>3.1.0</org.springframework.boot.version>
     <org.springboot.version>${org.springframework.boot.version}</org.springboot.version>
     <io.netty.version>4.1.93.Final</io.netty.version>
