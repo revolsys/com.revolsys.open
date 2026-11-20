@@ -974,7 +974,7 @@ public class FileGdbRecordStore extends AbstractRecordStore {
     final String tableDefinition = EsriGdbXmlSerializer.toString(deTable);
 
     try {
-      this.geodatabase.createTable(tableDefinition, schemaCatalogPath);
+      this.geodatabase.createTable(deTable.getCatalogPath(), tableDefinition, schemaCatalogPath);
 
       final FileGdbRecordDefinition recordDefinition = new FileGdbRecordDefinition(this,
         PathName.newPathName(schemaPath), tableDefinition);

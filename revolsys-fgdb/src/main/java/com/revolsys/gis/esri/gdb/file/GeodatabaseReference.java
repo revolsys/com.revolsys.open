@@ -1,6 +1,7 @@
 package com.revolsys.gis.esri.gdb.file;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Supplier;
 
 import org.jeometry.common.logging.Logs;
 
@@ -14,6 +15,14 @@ import com.revolsys.record.io.format.esri.gdb.xml.model.Domain;
 import com.revolsys.record.io.format.esri.gdb.xml.model.EsriGdbXmlSerializer;
 
 public class GeodatabaseReference {
+
+  // The ESRI API reports the Windows ERROR_SHARING_VIOLATION (a file is open
+  // in another process) as "Unknown error (-2147024864)"
+  private static final String SHARING_VIOLATION_CODE = "-2147024864";
+
+  private static final int SHARING_VIOLATION_RETRY_COUNT = 2;
+
+  private static final long SHARING_VIOLATION_RETRY_WAIT_MILLIS = 1000;
 
   private int referenceCount = 0;
 
@@ -114,21 +123,28 @@ public class GeodatabaseReference {
     final Geodatabase geodatabase = getValue();
     if (geodatabase != null) {
       try {
-        geodatabase.createFeatureDataset(featureDatasetDef);
+        retrySharingViolation("create feature dataset", () -> {
+          geodatabase.createFeatureDataset(featureDatasetDef);
+          return null;
+        });
       } finally {
         disconnect();
       }
     }
   }
 
-  public synchronized void createTable(final String tableDefinition, final String parentPath) {
+  public synchronized void createTable(final String catalogPath, final String tableDefinition,
+    final String parentPath) {
     final Geodatabase geodatabase = getValue();
     if (geodatabase != null) {
       try {
-        final Table table;
-        synchronized (Geodatabase.class) {
-          table = geodatabase.createTable(tableDefinition, parentPath);
-        }
+        // The wait between retries is outside the lock on Geodatabase.class so
+        // it doesn't stop other geodatabases creating tables
+        final Table table = retrySharingViolation("create table " + catalogPath, () -> {
+          synchronized (Geodatabase.class) {
+            return geodatabase.createTable(tableDefinition, parentPath);
+          }
+        });
         geodatabase.closeTable(table);
         table.delete();
       } finally {
@@ -210,7 +226,8 @@ public class GeodatabaseReference {
       if (this.geodatabase == null && this.fileName != null) {
         try {
           // System.out.println("OP\tg\t" + this);
-          this.geodatabase = EsriFileGdb.openGeodatabase(this.fileName);
+          this.geodatabase = retrySharingViolation("open geodatabase",
+            () -> EsriFileGdb.openGeodatabase(this.fileName));
         } catch (final FileGdbException e) {
           final String message = e.getMessage();
           if (!"The system cannot find the path specified. (-2147024893)".equals(message)) {
@@ -303,11 +320,16 @@ public class GeodatabaseReference {
     }
   }
 
+  private boolean isSharingViolation(final FileGdbException e) {
+    final String message = e.getMessage();
+    return message != null && message.contains(SHARING_VIOLATION_CODE);
+  }
+
   public synchronized Table openTable(final String path) {
     final Geodatabase geodatabase = getValue();
     if (geodatabase != null) {
       try {
-        return geodatabase.openTable(path);
+        return retrySharingViolation("open table " + path, () -> geodatabase.openTable(path));
       } finally {
         disconnect();
       }
@@ -325,6 +347,64 @@ public class GeodatabaseReference {
       }
     }
     return null;
+  }
+
+  /**
+   * Run the operation, trying again if it fails because one of the
+   * geodatabase's files is open in another process. Each failure is logged
+   * with details of what has the files open.
+   *
+   * @param action The description of the operation for the log message.
+   * @param operation The operation.
+   * @return The result of the operation.
+   */
+  private <V> V retrySharingViolation(final String action, final Supplier<V> operation) {
+    final int attemptCount = SHARING_VIOLATION_RETRY_COUNT + 1;
+    for (int attempt = 1;; attempt++) {
+      try {
+        final V result = operation.get();
+        if (attempt > 1) {
+          Logs.error(this, "Sharing violation resolved: " + action + " worked on attempt " + attempt
+            + " of " + attemptCount + "\n  Geodatabase: " + this.fileName);
+        }
+        return result;
+      } catch (final FileGdbException e) {
+        if (!isSharingViolation(e)) {
+          if (attempt > 1) {
+            // The attempt that had the sharing violation can leave the item
+            // partly created, so trying again fails as it already exists
+            Logs.error(this,
+              "Sharing violation not resolved: " + action + " failed with a different error on attempt "
+                + attempt + " of " + attemptCount + ", the earlier attempt may have partly worked: "
+                + e.getMessage() + "\n  Geodatabase: " + this.fileName);
+          }
+          throw e;
+        }
+        final boolean retry = attempt < attemptCount;
+        final StringBuilder message = new StringBuilder(
+          "Sharing violation (a file is open in another process): unable to ");
+        message.append(action);
+        message.append(", attempt ").append(attempt).append(" of ").append(attemptCount);
+        if (retry) {
+          message.append(", retrying in ")
+            .append(SHARING_VIOLATION_RETRY_WAIT_MILLIS)
+            .append(" ms");
+        } else {
+          message.append(", not retrying");
+        }
+        message.append(FileGdbLockDiagnostics.describe(this.fileName));
+        Logs.error(this, message.toString(), e);
+        if (!retry) {
+          throw e;
+        }
+        try {
+          Thread.sleep(SHARING_VIOLATION_RETRY_WAIT_MILLIS);
+        } catch (final InterruptedException interrupted) {
+          Thread.currentThread().interrupt();
+          throw e;
+        }
+      }
+    }
   }
 
   public void setFileName(final String fileName) {
